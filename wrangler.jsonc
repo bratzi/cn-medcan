@@ -11,17 +11,11 @@
 	"observability": {
 		"enabled": true
 	},
-	"d1_databases": [
-		{
-			"binding": "DB",
-			"database_name": "cn-medcan-db",
-			// Platzhalter: mit `npx wrangler d1 create cn-medcan-db` erzeugen und hier eintragen.
-			// Lokale Entwicklung (`wrangler dev` / getPlatformProxy) braucht die echte ID nicht.
-			"database_id": "00000000-0000-0000-0000-000000000000",
-			"migrations_dir": "drizzle"
-		}
-	],
 	"images": {
 		"binding": "IMAGES"
 	}
+	// Secrets werden NICHT hier gesetzt, sondern mit `wrangler secret put <NAME>`.
+	// Lokal liegen sie in .dev.vars bzw. .env.local (beide gitignored).
+	// Benoetigt: DATABASE_URL, DIRECT_URL, SITE_PASSWORD, SITE_SESSION_SECRET,
+	//            NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY
 }

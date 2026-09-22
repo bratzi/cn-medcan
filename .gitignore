@@ -48,3 +48,11 @@ cloudflare-env.d.ts
 # supabase / prisma
 .env
 .env.local
+
+# cloudflare local vars
+.dev.vars
+# Vorlagen bewusst committen (enthalten nur Platzhalter)
+!.env.local.example
+!.dev.vars.example
+# generierter Prisma-Client
+/lib/generated/

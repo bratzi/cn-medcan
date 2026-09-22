@@ -1,0 +1,284 @@
+// Medizinalcannabis-Katalog - deutscher Markt
+// Datenbank: Supabase Postgres. Laufzeitzugriff ueber den Transaction-Pooler.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../lib/generated/prisma"
+}
+
+// Verbindungs-URLs stehen in prisma.config.ts, nicht mehr hier (Prisma 7).
+// Migrationen nutzen DIRECT_URL (Port 5432), die Laufzeit den Adapter
+// mit DATABASE_URL (Transaction-Pooler, Port 6543).
+datasource db {
+  provider = "postgresql"
+}
+
+// ---------------------------------------------------------------------------
+//  Enums
+// ---------------------------------------------------------------------------
+
+enum KultivarTyp {
+  INDICA
+  SATIVA
+  HYBRID
+  RUDERALIS
+}
+
+enum Darreichungsform {
+  BLUETE
+  EXTRAKT
+  GRANULAT
+}
+
+enum Bestrahlung {
+  GAMMA
+  E_BEAM
+  UNBESTRAHLT
+  UNBEKANNT
+}
+
+enum UnternehmensRolle {
+  HERSTELLER
+  IMPORTEUR
+  BEIDES
+}
+
+/// Wie die Apotheke Rezepte annimmt. E-Rezept ist seit 2024 der Regelfall.
+enum RezeptStatus {
+  E_REZEPT_ONLY
+  PAPIER_ONLY
+  BEIDES
+}
+
+enum BestandStatus {
+  VERFUEGBAR
+  NACHBESTELLT
+  NICHT_LIEFERBAR
+  AUSGELISTET
+}
+
+/// Geschmacksachsen der Bewertungsmatrix. Bewusst geschlossene Liste,
+/// damit Filter und Terpen-Map dieselben Kategorien teilen.
+enum GeschmacksKategorie {
+  DIESEL
+  ZITRUS
+  ERDIG
+  SUESS
+  WUERZIG
+  BLUMIG
+  HOLZIG
+  KRAEUTRIG
+}
+
+// ---------------------------------------------------------------------------
+//  Stammdaten
+// ---------------------------------------------------------------------------
+
+/// Hersteller und Importeur. Im deutschen Markt haeufig getrennte Firmen,
+/// gelegentlich identisch - deshalb eine Entitaet mit Rolle.
+model Unternehmen {
+  id        String            @id @default(uuid()) @db.Uuid
+  name      String
+  land      String?
+  rolle     UnternehmensRolle
+  gdpNummer String?           @map("gdp_nummer")
+  website   String?
+
+  hergestellt Strain[] @relation("Hersteller")
+  importiert  Strain[] @relation("Importeur")
+
+  erstelltAm DateTime @default(now()) @map("erstellt_am")
+
+  @@unique([name, rolle])
+  @@map("unternehmen")
+}
+
+model Terpen {
+  id          String              @id @default(uuid()) @db.Uuid
+  name        String              @unique
+  aromaProfil String              @map("aroma_profil")
+  /// Ordnet das Terpen einer Geschmacksachse zu - Basis fuer den Filter
+  /// "dominanter Geschmack" und fuer die Terpen-Map.
+  geschmack   GeschmacksKategorie
+  siedepunktC Float?              @map("siedepunkt_c")
+
+  strains StrainTerpen[]
+
+  @@map("terpene")
+}
+
+/// Ein Produkt im Sinne des BfArM-Handelsnamens.
+model Strain {
+  id                      String           @id @default(uuid()) @db.Uuid
+  slug                    String           @unique
+  /// Handelsname laut BfArM - die verbindliche Produktbezeichnung.
+  handelsname             String           @unique
+  pzn                     String?
+  darreichungsform        Darreichungsform @default(BLUETE)
+  kultivarName            String?          @map("kultivar_name")
+  kultivarTyp             KultivarTyp      @map("kultivar_typ")
+  /// Kreuzung, z. B. Sour Diesel x OG Kush.
+  genetik                 String?
+  thcMinProzent           Decimal          @map("thc_min_prozent") @db.Decimal(4, 1)
+  thcMaxProzent           Decimal          @map("thc_max_prozent") @db.Decimal(4, 1)
+  cbdMinProzent           Decimal          @map("cbd_min_prozent") @db.Decimal(4, 1)
+  cbdMaxProzent           Decimal          @map("cbd_max_prozent") @db.Decimal(4, 1)
+  bestrahlung             Bestrahlung      @default(UNBEKANNT)
+  anbauland               String?
+  /// Pfad zum Produktbild des Herstellers (Supabase Storage oder /public).
+  herstellerBildPfad      String?          @map("hersteller_bild_pfad")
+  beschreibung            String?
+  verschreibungspflichtig Boolean          @default(true)
+  bfarmGelistet           Boolean          @default(true) @map("bfarm_gelistet")
+  aktiv                   Boolean          @default(true)
+
+  herstellerId String?      @map("hersteller_id") @db.Uuid
+  hersteller   Unternehmen? @relation("Hersteller", fields: [herstellerId], references: [id], onDelete: SetNull)
+  importeurId  String?      @map("importeur_id") @db.Uuid
+  importeur    Unternehmen? @relation("Importeur", fields: [importeurId], references: [id], onDelete: SetNull)
+
+  terpene   StrainTerpen[]
+  bestaende PharmacyStock[]
+  chargen   Charge[]
+  reviews   Review[]
+
+  erstelltAm     DateTime @default(now()) @map("erstellt_am")
+  aktualisiertAm DateTime @updatedAt @map("aktualisiert_am")
+
+  @@index([kultivarTyp])
+  @@index([thcMinProzent])
+  @@index([darreichungsform])
+  @@index([aktiv])
+  @@map("strains")
+}
+
+/// Terpenprofil je Produkt. rang = 1 ist das dominante Terpen.
+model StrainTerpen {
+  strainId             String   @map("strain_id") @db.Uuid
+  strain               Strain   @relation(fields: [strainId], references: [id], onDelete: Cascade)
+  terpenId             String   @map("terpen_id") @db.Uuid
+  terpen               Terpen   @relation(fields: [terpenId], references: [id], onDelete: Cascade)
+  konzentrationProzent Decimal? @map("konzentration_prozent") @db.Decimal(4, 2)
+  rang                 Int
+
+  @@id([strainId, terpenId])
+  @@unique([strainId, rang])
+  @@index([terpenId])
+  @@map("strain_terpene")
+}
+
+/// Deutsche Versandapotheke.
+model Pharmacy {
+  id                  String       @id @default(uuid()) @db.Uuid
+  slug                String       @unique
+  name                String
+  plz                 String       @db.VarChar(5)
+  ort                 String
+  strasse             String?
+  telefon             String?
+  email               String?
+  website             String?
+  versandapotheke     Boolean      @default(true)
+  /// Lieferzeit in Werktagen, als Spanne.
+  lieferzeitTageMin   Int          @map("lieferzeit_tage_min")
+  lieferzeitTageMax   Int          @map("lieferzeit_tage_max")
+  rezeptStatus        RezeptStatus @map("rezept_status")
+  /// Nimmt die Apotheke den E-Rezept-Token per Upload oder App an?
+  eRezeptTokenUpload  Boolean      @default(false) @map("erezept_token_upload")
+  betriebserlaubnisNr String?      @map("betriebserlaubnis_nr")
+
+  bestaende PharmacyStock[]
+
+  erstelltAm DateTime @default(now()) @map("erstellt_am")
+
+  @@index([plz])
+  @@map("pharmacies")
+}
+
+/// Bestandszuweisung Apotheke zu Produkt. Preise als Integer-Cent.
+model PharmacyStock {
+  id                String        @id @default(uuid()) @db.Uuid
+  pharmacyId        String        @map("pharmacy_id") @db.Uuid
+  pharmacy          Pharmacy      @relation(fields: [pharmacyId], references: [id], onDelete: Cascade)
+  strainId          String        @map("strain_id") @db.Uuid
+  strain            Strain        @relation(fields: [strainId], references: [id], onDelete: Cascade)
+  packungGramm      Int           @map("packung_gramm")
+  preisProGrammCent Int?          @map("preis_pro_gramm_cent")
+  bestandGramm      Decimal?      @map("bestand_gramm") @db.Decimal(8, 1)
+  status            BestandStatus @default(VERFUEGBAR)
+  /// Preise verschreibungspflichtiger Arzneimittel unterliegen dem HWG.
+  /// Steuert das Fachkreis-Gate in der Oberflaeche.
+  nurFuerFachkreise Boolean       @default(true) @map("nur_fuer_fachkreise")
+  standAm           DateTime      @default(now()) @map("stand_am")
+
+  @@unique([pharmacyId, strainId, packungGramm])
+  @@index([strainId, status])
+  @@index([preisProGrammCent])
+  @@map("pharmacy_stock")
+}
+
+/// Charge / Batch. Bewertungen haengen an der Charge, nicht nur am Produkt -
+/// zwei Chargen desselben Handelsnamens koennen deutlich abweichen.
+model Charge {
+  id            String    @id @default(uuid()) @db.Uuid
+  strainId      String    @map("strain_id") @db.Uuid
+  strain        Strain    @relation(fields: [strainId], references: [id], onDelete: Cascade)
+  chargenNr     String    @map("chargen_nr")
+  analysedatum  DateTime? @db.Date
+  thcIst        Decimal?  @map("thc_ist") @db.Decimal(4, 1)
+  cbdIst        Decimal?  @map("cbd_ist") @db.Decimal(4, 1)
+  laborBericht  String?   @map("labor_bericht")
+  verfallsdatum DateTime? @db.Date
+
+  reviews Review[]
+
+  @@unique([strainId, chargenNr])
+  @@map("chargen")
+}
+
+// ---------------------------------------------------------------------------
+//  Community
+// ---------------------------------------------------------------------------
+
+/// Bewertung nach festem Schema, gebunden an eine konkrete Charge.
+model Review {
+  id       String  @id @default(uuid()) @db.Uuid
+  strainId String  @map("strain_id") @db.Uuid
+  strain   Strain  @relation(fields: [strainId], references: [id], onDelete: Cascade)
+  chargeId String? @map("charge_id") @db.Uuid
+  charge   Charge? @relation(fields: [chargeId], references: [id], onDelete: SetNull)
+
+  /// Supabase-Auth-Nutzer. Referenziert auth.users, deshalb ohne Prisma-Relation.
+  autorId String @map("autor_id") @db.Uuid
+
+  /// Festes Bewertungsschema, jeweils 1-5.
+  aussehen   Int
+  geruch     Int
+  geschmack  Int
+  wirkung    Int
+  konsistenz Int
+
+  /// Restfeuchte in Prozent. Unter 8 Prozent zu trocken, ueber 13 Prozent
+  /// Schimmelrisiko - deshalb als eigener Messwert, nicht als Note.
+  feuchtigkeitProzent Decimal? @map("feuchtigkeit_prozent") @db.Decimal(3, 1)
+
+  /// Geschmacks-Matrix: Achse zu Intensitaet 0-5.
+  /// JSON, weil die Achsenzahl fix ist und immer als Ganzes gelesen wird.
+  geschmacksMatrix Json @map("geschmacks_matrix")
+
+  notiz String?
+
+  /// Oeffentliche Instagram-Reel-URL zur Bewertung.
+  instagramReelUrl String? @map("instagram_reel_url")
+
+  /// Freigabe, bevor die Bewertung oeffentlich sichtbar ist.
+  freigegeben Boolean @default(false)
+
+  erstelltAm     DateTime @default(now()) @map("erstellt_am")
+  aktualisiertAm DateTime @updatedAt @map("aktualisiert_am")
+
+  @@index([strainId, freigegeben])
+  @@index([chargeId])
+  @@index([autorId])
+  @@map("reviews")
+}

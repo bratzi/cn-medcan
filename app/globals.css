@@ -1,26 +1,255 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* ==========================================================================
+   Design tokens — 8px grid & clinical premium aesthetics
+   Regelwerk: .claude/skills/ui-design-engine.md
+   ========================================================================== */
+
+@theme {
+  /* ---- Fonts ---------------------------------------------------------- */
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+
+  /* ---- Spacing: base 4px, only even steps are allowed (8px grid) ------ */
+  --spacing: 4px;
+
+  --space-1: 8px;
+  --space-2: 16px;
+  --space-3: 24px;
+  --space-4: 32px;
+  --space-5: 40px;
+  --space-6: 48px;
+  --space-8: 64px;
+  --space-10: 80px;
+  --space-12: 96px;
+  --space-16: 128px;
+  /* optical-only correction inside an icon/text pair — requires a reason */
+  --space-half: 4px;
+
+  /* ---- Type scale: modular, ratio 1.25, base 16px --------------------- */
+  --text-caption: 0.8125rem; /* 13px */
+  --text-caption--line-height: 1rem; /* 16px */
+  --text-caption--font-weight: 500;
+
+  --text-small: 0.875rem; /* 14px */
+  --text-small--line-height: 1.25rem; /* 20px */
+  --text-small--font-weight: 400;
+
+  --text-body: 1rem; /* 16px */
+  --text-body--line-height: 1.5rem; /* 24px */
+  --text-body--font-weight: 400;
+
+  --text-h3: 1.25rem; /* 20px */
+  --text-h3--line-height: 1.75rem; /* 28px */
+  --text-h3--font-weight: 600;
+
+  --text-h2: 1.5625rem; /* 25px */
+  --text-h2--line-height: 2rem; /* 32px */
+  --text-h2--font-weight: 600;
+
+  --text-h1: 1.9375rem; /* 31px */
+  --text-h1--line-height: 2.5rem; /* 40px */
+  --text-h1--font-weight: 600;
+
+  --text-display: 2.4375rem; /* 39px */
+  --text-display--line-height: 3rem; /* 48px */
+  --text-display--font-weight: 600;
+
+  /* ---- Neutral ramp (OKLCH, cool neutral, hue 250) -------------------- */
+  --color-neutral-0: oklch(1 0 0);
+  --color-neutral-25: oklch(0.985 0.002 250);
+  --color-neutral-50: oklch(0.97 0.003 250);
+  --color-neutral-100: oklch(0.94 0.005 250);
+  --color-neutral-200: oklch(0.89 0.007 250);
+  --color-neutral-300: oklch(0.82 0.009 250);
+  --color-neutral-400: oklch(0.7 0.011 250);
+  --color-neutral-500: oklch(0.6 0.013 250);
+  --color-neutral-600: oklch(0.5 0.014 250);
+  --color-neutral-700: oklch(0.4 0.015 250);
+  --color-neutral-800: oklch(0.3 0.015 250);
+  --color-neutral-850: oklch(0.25 0.014 250);
+  --color-neutral-900: oklch(0.2 0.013 250);
+  --color-neutral-950: oklch(0.16 0.012 250);
+  --color-neutral-1000: oklch(0.12 0.01 250);
+
+  /* ---- Single accent: clinical deep blue ------------------------------ */
+  --color-accent-400: oklch(0.68 0.1 240);
+  --color-accent-500: oklch(0.6 0.11 240);
+  --color-accent-600: oklch(0.52 0.11 240);
+  --color-accent-700: oklch(0.44 0.1 240);
+
+  /* ---- Status hues ---------------------------------------------------- */
+  --color-danger-500: oklch(0.55 0.18 25);
+  --color-danger-400: oklch(0.66 0.16 25);
+  --color-warning-500: oklch(0.62 0.13 75);
+  --color-warning-400: oklch(0.75 0.12 75);
+  --color-success-500: oklch(0.52 0.1 150);
+  --color-success-400: oklch(0.66 0.1 150);
+
+  /* ---- Semantic tokens (light theme defaults) ------------------------- */
+  --color-surface: var(--color-neutral-0);
+  --color-surface-raised: var(--color-neutral-50);
+  --color-surface-sunken: var(--color-neutral-100);
+  --color-border: var(--color-neutral-200);
+  --color-border-strong: var(--color-neutral-300);
+  --color-text: var(--color-neutral-900);
+  --color-text-muted: var(--color-neutral-600);
+  --color-accent: var(--color-accent-600);
+  --color-accent-fg: var(--color-neutral-0);
+  --color-accent-subtle: oklch(0.96 0.02 240);
+  --color-danger: var(--color-danger-500);
+  --color-danger-fg: var(--color-neutral-0);
+  --color-warning: var(--color-warning-500);
+  --color-warning-fg: var(--color-neutral-1000);
+  --color-success: var(--color-success-500);
+  --color-success-fg: var(--color-neutral-0);
+  --color-focus-ring: var(--color-accent-600);
+
+  /* ---- Radius --------------------------------------------------------- */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-full: 9999px;
+
+  /* ---- Elevation (sparingly, elevation signal only) ------------------- */
+  --shadow-sm: 0 1px 2px oklch(0.2 0.013 250 / 0.06);
+  --shadow-md: 0 2px 8px oklch(0.2 0.013 250 / 0.1);
+  --shadow-lg: 0 8px 24px oklch(0.2 0.013 250 / 0.14);
+
+  /* ---- Motion --------------------------------------------------------- */
+  --ease-standard: cubic-bezier(0.2, 0, 0.2, 1);
+  --ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --duration-fast: 150ms;
+  --duration-normal: 200ms;
+  --duration-slow: 250ms;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+/* ==========================================================================
+   Dark theme — system preference (unless explicitly forced to light)
+   ========================================================================== */
 
 @media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  :root:not([data-theme="light"]) {
+    --color-surface: var(--color-neutral-1000);
+    --color-surface-raised: var(--color-neutral-900);
+    --color-surface-sunken: var(--color-neutral-950);
+    --color-border: var(--color-neutral-800);
+    --color-border-strong: var(--color-neutral-700);
+    --color-text: var(--color-neutral-50);
+    --color-text-muted: var(--color-neutral-400);
+    --color-accent: var(--color-accent-400);
+    --color-accent-fg: var(--color-neutral-1000);
+    --color-accent-subtle: oklch(0.28 0.04 240);
+    --color-danger: var(--color-danger-400);
+    --color-danger-fg: var(--color-neutral-1000);
+    --color-warning: var(--color-warning-400);
+    --color-warning-fg: var(--color-neutral-1000);
+    --color-success: var(--color-success-400);
+    --color-success-fg: var(--color-neutral-1000);
+    --color-focus-ring: var(--color-accent-400);
+
+    --shadow-sm: 0 1px 2px oklch(0 0 0 / 0.5);
+    --shadow-md: 0 2px 8px oklch(0 0 0 / 0.55);
+    --shadow-lg: 0 8px 24px oklch(0 0 0 / 0.6);
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* ==========================================================================
+   Dark theme — explicit opt-in via data attribute
+   ========================================================================== */
+
+:root[data-theme="dark"] {
+  --color-surface: var(--color-neutral-1000);
+  --color-surface-raised: var(--color-neutral-900);
+  --color-surface-sunken: var(--color-neutral-950);
+  --color-border: var(--color-neutral-800);
+  --color-border-strong: var(--color-neutral-700);
+  --color-text: var(--color-neutral-50);
+  --color-text-muted: var(--color-neutral-400);
+  --color-accent: var(--color-accent-400);
+  --color-accent-fg: var(--color-neutral-1000);
+  --color-accent-subtle: oklch(0.28 0.04 240);
+  --color-danger: var(--color-danger-400);
+  --color-danger-fg: var(--color-neutral-1000);
+  --color-warning: var(--color-warning-400);
+  --color-warning-fg: var(--color-neutral-1000);
+  --color-success: var(--color-success-400);
+  --color-success-fg: var(--color-neutral-1000);
+  --color-focus-ring: var(--color-accent-400);
+
+  --shadow-sm: 0 1px 2px oklch(0 0 0 / 0.5);
+  --shadow-md: 0 2px 8px oklch(0 0 0 / 0.55);
+  --shadow-lg: 0 8px 24px oklch(0 0 0 / 0.6);
+}
+
+/* ==========================================================================
+   Base layer
+   ========================================================================== */
+
+@layer base {
+  html {
+    color-scheme: light dark;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  :root[data-theme="light"] {
+    color-scheme: light;
+  }
+
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+  }
+
+  body {
+    background-color: var(--color-surface);
+    color: var(--color-text);
+    font-family: var(--font-sans);
+    font-size: var(--text-body);
+    line-height: var(--text-body--line-height);
+    font-weight: 400;
+  }
+
+  /* Numeric data must align in tables and value rows. */
+  [data-numeric],
+  .numeric {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Single global focus treatment — never removed in components. */
+  :focus-visible {
+    outline: 2px solid var(--color-focus-ring);
+    outline-offset: 2px;
+    border-radius: var(--radius-sm);
+  }
+
+  /* Suppress the legacy ring only where :focus-visible takes over. */
+  :focus:not(:focus-visible) {
+    outline: none;
+  }
+
+  ::selection {
+    background-color: var(--color-accent-subtle);
+    color: var(--color-text);
+  }
+
+  hr {
+    border-color: var(--color-border);
+  }
+}
+
+/* ==========================================================================
+   Reduced motion
+   ========================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
