@@ -16,7 +16,8 @@
     "db:migrate": "prisma migrate dev",
     "db:studio": "prisma studio",
     "db:generate": "prisma generate",
-    "typegen": "next typegen"
+    "typegen": "next typegen",
+    "db:seed": "prisma db seed"
   },
   "dependencies": {
     "@opennextjs/cloudflare": "^1.20.6",
@@ -42,6 +43,7 @@
     "eslint-config-next": "16.3.6",
     "prisma": "^7.10.0",
     "tailwindcss": "^4",
+    "tsx": "^4.23.15",
     "typescript": "^5",
     "wrangler": "^4.136.3"
   }

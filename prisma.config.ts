@@ -17,6 +17,8 @@ export default defineConfig({
   schema: "prisma/schema.prisma",
   migrations: {
     path: "prisma/migrations",
+    // Seed-Skript (Prisma 7 registriert es hier, nicht in package.json).
+    seed: "npx tsx prisma/seed.ts",
   },
   datasource: {
     url: env("DIRECT_URL"),
