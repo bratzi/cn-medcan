@@ -9,190 +9,256 @@
 
 ---
 
-## ⇢ Hier geht es weiter: Umstellung von Supabase auf Cloudflare D1
+## Worum es bei diesem Projekt wirklich geht
 
-**Status: geplant, noch nicht umgesetzt.** Der Code steht aktuell auf Supabase Postgres. Die
-Umstellung ist der nächste Arbeitsblock und unten in fünf Wellen zerlegt.
+`cn-medcan` ist **kein reiner Produktkatalog.** Der Katalog, die Apothekenbestände und die Filter
+sind Beiwerk. Der Kern sind zwei Dinge, die zentral und sichtbar auf der Startseite stehen:
 
-### Warum die Umstellung
-Der Nutzer hat auf seinem Supabase-Konto zu viele Free-Projekte und will Supabase nicht nutzen.
-Gewählt wurde **Cloudflare D1**, weil es keinen weiteren Account und kein weiteres Projekt
-braucht — es läuft als Binding im bereits vorhandenen Cloudflare-Konto. Belegte Free-Limits:
-5 GB Speicher, 5 Mio. gelesene Zeilen pro Tag, 100 000 geschriebene Zeilen pro Tag.
+1. **Die eigenen Reviews des Betreibers** — der zentrale Anhaltspunkt der Seite. Bewertet nach dem
+   festen Schema in `lib/query/bewertung.ts`, gebunden an eine konkrete Charge. Community-Reviews
+   existieren, aber als Zweitstimme darunter, nicht gleichrangig.
+2. **Umfragen, die den nächsten Strain bestimmen** — verifizierte Mitglieder wählen, was der
+   Betreiber als nächstes probiert und bewertet. Das Ergebnis ist verbindlich für die nächste
+   Review. Diese Schleife ist das Alleinstellungsmerkmal, gekoppelt an den Instagram-Account des
+   Betreibers.
 
-Neon wäre die Postgres-Alternative gewesen (100 Projekte pro Org, 0,5 GB pro Projekt), wurde aber
-verworfen: neuer Account, und Suspend nach 5 Minuten Inaktivität mit Kaltstart.
+Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 
-### Der Punkt, der die Entscheidung tragbar macht
-Ohne Supabase-Auth verliert RLS fast seinen Sinn: RLS greift nur, wenn die Verbindung eine
-Nutzeridentität trägt. Prisma verbindet als Eigentümer. Die RLS-Policies waren also ausschließlich
-auf dem `supabase-js`-Pfad wirksam — der mit Supabase ohnehin wegfällt. Der Verlust von RLS in
-SQLite ist damit kein echter Rückschritt. Das HWG-Gate liegt in der Abfrageschicht, wo es mit
-`bestandSichtbarkeit()` in `lib/query/strains.ts` schon implementiert ist. CHECK-Constraints
-funktionieren in SQLite weiter und bleiben erhalten.
+---
 
-### Zwei belegte Eigenheiten von D1, die den Plan formen
-1. **D1 unterstützt keine Transaktionen.** Prisma führt `$transaction` als Einzelabfragen aus, die
-   ACID-Garantie fällt weg. Die Abfrageschicht nutzt `Promise.all`, ist also nicht betroffen. Der
-   Seed darf keine Transaktionsannahme enthalten.
-2. **Migrationen laufen hybrid.** `prisma migrate dev` fällt weg. Stattdessen:
+## ⇢ Hier geht es weiter
+
+Zwei Arbeitsblöcke stehen an, **in dieser Reihenfolge**. Block A ist das Fundament, Block B setzt
+darauf auf.
+
+- **Block A — Umstellung Supabase → Cloudflare D1.** Geplant, noch nicht umgesetzt. Fünf Wellen,
+  unten beschrieben.
+- **Block B — Mitglieder, Umfragen, Reviews als Produktkern.** Entwurf steht unten, Umsetzung nach
+  Block A.
+
+Dazwischen liegt außerdem die einzige noch fehlende Seite: `app/produkte/[slug]/page.tsx`. Ihre
+Bausteine sind fertig (`GlasHeader`, `TerpenMap`, `BestandTabelle`, `BewertungsListe`,
+`InstagramEmbed`); die Seite setzt sie nur zusammen. Aufbau: Glas-Header → Faktenblock als `<dl>`
+→ `CannabinoidBar` → `TerpenChips` (alle Ränge) → `BestandTabelle` → Chargentabelle → `TerpenMap`
+mit `verdichteGeschmacksMatrix(reviews)` → `BewertungsListe`. `params` ist ein Promise.
+
+---
+
+## Block A — Umstellung auf Cloudflare D1
+
+### Warum
+Supabase entfällt: das Konto des Nutzers führt zu viele Free-Projekte. **Cloudflare D1** braucht
+keinen weiteren Account und kein weiteres Projekt, es läuft als Binding im vorhandenen
+Cloudflare-Konto. Belegte Free-Limits: 5 GB Speicher, 5 Mio. gelesene Zeilen/Tag, 100 000
+geschriebene Zeilen/Tag.
+
+Neon wurde verworfen (neuer Account, Suspend nach 5 Minuten mit Kaltstart), obwohl das
+Projektlimit dort kein Problem gewesen wäre.
+
+### Der Punkt, der den RLS-Verlust tragbar macht
+RLS greift nur, wenn die Verbindung eine Nutzeridentität trägt. Prisma verbindet als Eigentümer —
+die Policies waren also ausschließlich auf dem `supabase-js`-Pfad wirksam, der mit Supabase
+ohnehin wegfällt. Das HWG-Gate liegt in der Abfrageschicht, wo es mit `bestandSichtbarkeit()` in
+`lib/query/strains.ts` schon implementiert ist. CHECK-Constraints funktionieren in SQLite weiter.
+
+### Zwei belegte D1-Eigenheiten, die den Plan formen
+1. **Keine Transaktionen.** Prisma führt `$transaction` als Einzelabfragen aus. Die Abfrageschicht
+   nutzt `Promise.all`, ist also nicht betroffen. Wichtig für Block B: „eine Stimme pro Mitglied"
+   darf **nicht** über eine Transaktion abgesichert werden, sondern über einen Unique-Index.
+2. **Migrationen hybrid.** `prisma migrate dev` fällt weg. Stattdessen
    `wrangler d1 migrations create` → `prisma migrate diff --from-local-d1 --to-schema-datamodel`
-   erzeugt das SQL → `wrangler d1 migrations apply --local` bzw. `--remote`.
+   → `wrangler d1 migrations apply --local` bzw. `--remote`.
 
-### SQLite-Umbauten am Schema, die Folgen im ganzen Code haben
+### SQLite-Umbauten am Schema
 | Bisher (Postgres) | Neu (SQLite/D1) | Folge |
 |---|---|---|
-| `enum` (7 Stück) | `String` + TS-Union-Typ | Prisma-Enums gibt es in SQLite nicht. Die Typen wandern in eine neue Datei `db/enums.ts`. **Alle Importe von `@/lib/generated/prisma/enums` müssen umgezogen werden** — betrifft `lib/labels.ts`, `lib/query/*`, `components/produkt/*`. |
-| `Decimal @db.Decimal(4,1)` | `Float` | Prozentwerte. Preise sind schon `Int` in Cent und bleiben unverändert. |
-| `Json` | `String` | `geschmacksMatrix` wird als JSON-Text gespeichert. `parseGeschmacksMatrix` in `lib/query/bewertung.ts` validiert ohnehin schon — nur `JSON.parse` davorziehen. |
-| `@db.Uuid`, `@db.VarChar(5)`, `@db.Date` | entfällt | `@default(uuid())` funktioniert weiter, Datumsfelder werden `DateTime`. |
-| `contains` mit `mode: "insensitive"` | **nicht unterstützt** | Der Freitextfilter braucht einen Ersatz. Lösung: eine zusätzliche, kleingeschriebene Suchspalte `suchtext` am `Strain`, beim Schreiben gefüllt, und `contains` darauf mit kleingeschriebener Eingabe. Kein `LOWER()` in der Query, weil Prisma das auf SQLite nicht abbildet. |
-| RLS-Policies | entfallen | `supabase/rls.sql` wird zu `db/constraints.sql` reduziert: nur die 16 CHECK-Constraints bleiben, alle `create policy` und `ist_fachkreis()` fallen. |
+| `enum` (7 Stück) | `String` + TS-Union | Prisma-Enums gibt es in SQLite nicht. Typen wandern nach `db/enums.ts`. **Alle Importe von `@/lib/generated/prisma/enums` müssen umgezogen werden** — `lib/labels.ts`, `lib/query/*`, `components/produkt/*`. |
+| `Decimal @db.Decimal(4,1)` | `Float` | Prozentwerte. Preise sind schon `Int` in Cent, unverändert. |
+| `Json` | `String` | `geschmacksMatrix` als JSON-Text. `parseGeschmacksMatrix` validiert schon, nur `JSON.parse` davorziehen. |
+| `@db.Uuid`, `@db.VarChar(5)`, `@db.Date` | entfällt | `@default(uuid())` funktioniert weiter. |
+| `contains` mit `mode: "insensitive"` | **nicht unterstützt** | Ersatz: Spalte `suchtext` am `Strain`, beim Schreiben kleingeschrieben gefüllt, `contains` darauf mit kleingeschriebener Eingabe. Kein `LOWER()` in der Query — Prisma bildet das auf SQLite nicht ab. |
+| RLS-Policies | entfallen | `supabase/rls.sql` wird zu `db/constraints.sql`: nur die 16 CHECK-Constraints bleiben, `create policy` und `ist_fachkreis()` fallen. |
 
-### Fachkreis-Nachweis ohne Supabase-Auth
-Gewählt: **vorerst keine Nutzeranmeldung.** Bewertungen bleiben redaktionell (Seed, später ein
-Admin-Skript). Der Fachkreis-Zugang läuft über ein **zweites Passwort** im bestehenden Gate:
-
-- `SITE_PASSWORD` → normaler Zugang, Rolle `gast`
-- `FACHKREIS_PASSWORD` → Zugang **plus** Rolle `fachkreis`, sieht Preise und Bestände
-
-Die Rolle wird in das bereits HMAC-signierte Cookie geschrieben, also nicht manipulierbar.
-`lib/gate.ts` signiert künftig `gate:<rolle>:<ablauf>`, und `lib/query/fachkreis.ts` liest die
-Rolle aus dem Cookie statt aus einem Supabase-JWT.
-
----
-
-## Die Umstellung in fünf Wellen
-
-**Welle 1 — Fundament, sequenziell (alles andere hängt daran)**
+### Die fünf Wellen
+**Welle 1 — Fundament, sequenziell**
 1. `npm uninstall @supabase/supabase-js @supabase/ssr @prisma/adapter-pg pg @types/pg dotenv`,
    `npm install @prisma/adapter-d1`. `lib/supabase/` löschen.
-2. `wrangler.jsonc`: `d1_databases`-Binding `DB` wieder aufnehmen, `database_name: "cn-medcan-db"`,
+2. `wrangler.jsonc`: `d1_databases`-Binding `DB`, `database_name: "cn-medcan-db"`,
    `migrations_dir: "migrations"`. Danach `npm run cf-typegen`.
-3. `prisma/schema.prisma` auf `provider = "sqlite"` umstellen, alle Umbauten aus der Tabelle oben,
-   Feld `suchtext` am `Strain` ergänzen.
-4. `db/enums.ts` anlegen: die sieben Wertelisten als `as const`-Arrays plus abgeleitete
-   Union-Typen, dazu `istKultivarTyp()`-artige Guards für das Parsen aus der DB.
-5. `prisma.config.ts`: `datasource`-Block und `dotenv`-Import entfernen, `migrations.seed`
-   behalten. D1 braucht keine Verbindungs-URL.
-6. `lib/prisma.ts`: `PrismaD1`-Adapter mit dem `DB`-Binding. **Wichtig:** der Client kann nicht
-   mehr als Modul-Singleton entstehen, weil das Binding erst im Request-Kontext existiert.
-   Also `getPrisma()` async über `getEnv()` aus `lib/cloudflare.ts`, mit Caching pro Isolate nur
-   wenn das Binding identisch ist.
+3. `prisma/schema.prisma` auf `provider = "sqlite"`, alle Umbauten oben, Feld `suchtext` ergänzen.
+4. `db/enums.ts`: sieben Wertelisten als `as const` plus Union-Typen und Guards zum Parsen.
+5. `prisma.config.ts`: `datasource`-Block und `dotenv`-Import raus, `migrations.seed` behalten.
+6. `lib/prisma.ts`: `PrismaD1`-Adapter mit dem `DB`-Binding. **Der Client kann kein
+   Modul-Singleton mehr sein** — das Binding existiert erst im Request-Kontext. Also `getPrisma()`
+   async über `getEnv()`, mit Caching pro Isolate nur bei identischem Binding.
 
 **Welle 2 — zwei Agents parallel**
-7. `lib/query/*`: Enum-Importe umziehen, Freitextfilter auf `suchtext` umstellen,
-   `lib/query/fachkreis.ts` auf das Gate-Cookie umschreiben, `parseGeschmacksMatrix` um
-   `JSON.parse` erweitern, `getPrisma()`-Aufrufe auf `await` umstellen.
-8. `lib/gate.ts`, `proxy.ts`, `app/zugang/page.tsx`, `app/api/zugang/route.ts`: Rolle im Token,
-   zweites Passwort, ein Hinweis auf der Zugangsseite, dass es zwei Zugänge gibt.
+7. `lib/query/*`: Enum-Importe umziehen, Freitext auf `suchtext`, `getPrisma()` auf `await`,
+   `parseGeschmacksMatrix` um `JSON.parse` erweitern.
+8. `lib/labels.ts`, `components/produkt/*`: Enum-Importe auf `@/db/enums`.
 
-**Welle 3 — zwei Agents parallel**
-9. `lib/labels.ts` und `components/produkt/*`: Enum-Importe auf `@/db/enums` umziehen.
-10. `db/constraints.sql` aus `supabase/rls.sql` ableiten (nur CHECK-Constraints),
-    `supabase/` löschen, `db/README.md` mit der neuen Befehlsfolge.
+**Welle 3 — sequenziell**
+9. `db/constraints.sql` aus `supabase/rls.sql` ableiten, `supabase/` löschen, `db/README.md`.
+10. `prisma/seed.ts`: kein `dotenv`, keine Transaktionsannahme, `geschmacksMatrix` als JSON-String,
+    `suchtext` mitschreiben. Prüfen, ob der D1-Adapter außerhalb des Workers nutzbar ist; wenn
+    nicht, den Seed als generiertes SQL für `wrangler d1 execute` ausliefern.
+11. Migration erzeugen, lokal anwenden, seeden.
 
-**Welle 4 — sequenziell**
-11. `prisma/seed.ts` anpassen: kein `dotenv`, keine Transaktionsannahme, `geschmacksMatrix` als
-    JSON-String, `suchtext` mitschreiben. Seed läuft über `wrangler d1 execute` oder ein
-    Node-Skript gegen die lokale D1-Datei — prüfen, was mit dem Adapter außerhalb des Workers
-    funktioniert, und wenn es nicht geht, den Seed als generiertes SQL ausliefern.
-12. Migration erzeugen und lokal anwenden.
+**Welle 4** — `app/produkte/[slug]/page.tsx` bauen.
 
-**Welle 5 — die noch fehlende Seite und Verifikation**
-13. `app/produkte/[slug]/page.tsx` bauen. Alle Bausteine sind fertig: `GlasHeader`, `TerpenMap`,
-    `BestandTabelle`, `BewertungsListe`, `InstagramEmbed`. Aufbau: Glas-Header → Faktenblock als
-    `<dl>` → `CannabinoidBar` → `TerpenChips` (alle Ränge) → `BestandTabelle` → Chargentabelle →
-    `TerpenMap` mit `verdichteGeschmacksMatrix(reviews)` → `BewertungsListe`. `params` ist ein
-    Promise. `generateMetadata` mit dem Handelsnamen. Hinweis auf Verschreibungspflicht.
-14. `npx tsc --noEmit`, `npx eslint . --max-warnings=0`, `npx next build`, dann
-    `npm run db:migrate:local` und der Seed, dann `npm run dev` gegen echte Daten.
+**Welle 5** — Verifikation: `tsc`, `eslint`, `next build`, dann `npm run dev` gegen echte Daten.
 
 ---
 
-## Was schon fertig ist und die Umstellung übersteht
+## Block B — Mitglieder, Umfragen, Reviews (Entwurf, vom Nutzer bestätigt)
+
+### Die vier Entscheidungen des Nutzers
+1. **Verifizierung durch manuelle Freigabe.** Registrierung ist offen, Stimmrecht vergibt der
+   Betreiber in einer Admin-Ansicht. Kein Mailversand-Dienst nötig, keine Wegwerf-Adressen-Lücke.
+2. **Eigene Reviews zentral, Community-Reviews als Zweitstimme.** Die Freigabe-Warteschlange
+   (`Review.freigegeben`) bleibt und wird gebraucht.
+3. **Umfrage dreiphasig** (Kombination aus Vorschlag und kuratierter Auswahl):
+   `VORSCHLAG` → Mitglieder schlagen Strains mit Begründung vor.
+   `ABSTIMMUNG` → der Betreiber übernimmt 3 bis 5 Vorschläge als Kandidaten, Mitglieder haben je
+   eine Stimme, die Umfrage hat ein Enddatum.
+   `BEENDET` → der Gewinner wird mit der daraus entstehenden Review verknüpft.
+4. **Preise sehen alle verifizierten Mitglieder.** Ausdrückliche Entscheidung des Nutzers.
+   **Einordnung, die im Code als Kommentar stehen muss:** §10 HWG adressiert Fachkreise, also
+   Angehörige der Heilberufe — „verifiziertes Mitglied" ist das nicht. Die Preisanzeige braucht
+   deshalb einen deutlichen Hinweis. Die Rolle `fachkreis` bleibt im Datenmodell erhalten, damit
+   die strengere Variante ohne Schemaänderung nachziehbar ist.
+
+### Auth: Better Auth mit D1
+Das Skill `better-auth` ist installiert (Better Auth mit D1-Adapter, OAuth, RBAC). Better Auth
+verwaltet seine eigenen Tabellen (`user`, `session`, `account`, `verification`). Unsere Felder
+kommen als eigene Tabelle `mitglied` mit `1:1` auf `user`, damit ein Better-Auth-Update unsere
+Spalten nicht anfasst:
+
+- `mitglied`: `userId` (1:1), `anzeigename`, `instagramHandle`, `freigegeben` (Boolean, die
+  manuelle Verifizierung), `rolle` (`mitglied` | `fachkreis` | `admin`), `freigegebenAm`,
+  `freigegebenVon`.
+
+Das bisherige Passwort-Gate in `proxy.ts` **bleibt zusätzlich bestehen**, solange die Seite in der
+geschlossenen Entwicklungsphase ist. Es schützt die ganze Seite; Better Auth regelt, wer darin
+abstimmen darf. Das zweite Passwort (`FACHKREIS_PASSWORD`) wird mit Block B überflüssig und
+entfällt dann.
+
+### Neue Modelle
+| Modell | Felder (Kern) | Wichtig |
+|---|---|---|
+| `Umfrage` | `titel`, `beschreibung`, `phase` (`VORSCHLAG`/`ABSTIMMUNG`/`BEENDET`), `startAm`, `vorschlagBisAm`, `endetAm`, `gewinnerStrainId`, `ergebnisReviewId` | Genau **eine** Umfrage darf aktiv sein — über einen partiellen Unique-Index oder eine Prüfung in der Schreibschicht sicherstellen und kommentieren. |
+| `UmfrageVorschlag` | `umfrageId`, `strainId`, `mitgliedId`, `begruendung`, `uebernommen` | Unique `(umfrageId, mitgliedId, strainId)` — ein Mitglied schlägt einen Strain nur einmal vor. |
+| `UmfrageOption` | `umfrageId`, `strainId`, `reihenfolge` | Die kuratierte Auswahl. Unique `(umfrageId, strainId)` und `(umfrageId, reihenfolge)`. |
+| `Stimme` | `umfrageId`, `optionId`, `mitgliedId`, `abgegebenAm` | **Unique `(umfrageId, mitgliedId)`** — das ist die Absicherung gegen Doppelstimmen. Nicht über eine Transaktion lösen, D1 hat keine. |
+| `Review` (Änderung) | neu: `istRedaktionell` (Boolean) | Trennt die Reviews des Betreibers von Community-Reviews. `autorId` wird Relation auf `mitglied`. |
+
+### Oberfläche
+- **Startseite:** oben die aktuelle Umfrage als Kernelement (Phase, Kandidaten, Stimmenzahl,
+  Restlaufzeit, Abstimm-Button oder Hinweis „Freigabe ausstehend"), daneben die neueste eigene
+  Review mit Instagram-Reel. Der Katalog rutscht darunter.
+- `/umfragen` — laufende und vergangene Umfragen mit Ergebnis und verknüpfter Review.
+- `/reviews` — alle eigenen Reviews chronologisch, Community-Reviews je Charge darunter.
+- `/mitglied` — eigenes Konto, Freigabestatus, eigene Vorschläge und Stimmen.
+- `/admin` — nur Rolle `admin`: Mitglieder freigeben, Vorschläge übernehmen, Umfragephase
+  weiterschalten, Community-Reviews freigeben.
+- Schreibzugriffe als Server Actions. **Jede Schreibaktion prüft serverseitig `freigegeben` und
+  die Rolle** — nie im Client entscheiden.
+
+### Reihenfolge für Block B
+1. Better Auth mit D1-Adapter einrichten, Schema erweitern, Migration.
+2. Registrierung, Anmeldung, `/mitglied`.
+3. `/admin` mit Freigabe von Mitgliedern.
+4. Umfragemodell, Server Actions für Vorschlag und Stimme, Umfragephasen.
+5. Startseite umbauen: Umfrage und neueste Review als Kern.
+6. `/umfragen`, `/reviews`.
+7. `FACHKREIS_PASSWORD` und das zweite Gate-Passwort ausbauen, Preisanzeige an die Mitgliedsrolle
+   binden, HWG-Hinweis setzen.
+
+---
+
+## Was fertig ist und beide Blöcke übersteht
 
 - Scaffold, Cloudflare-Anbindung, `lib/cloudflare.ts` als einziger Binding-Zugang
-- Zugangsschutz: `proxy.ts`, `lib/gate.ts`, `app/zugang/page.tsx`, `app/api/zugang/route.ts`
-  (wird in Welle 2 um die Rolle erweitert, nicht ersetzt)
+- Zugangsschutz: `proxy.ts`, `lib/gate.ts` (HMAC-Cookie, zeitkonstanter Vergleich),
+  `app/zugang/page.tsx`, `app/api/zugang/route.ts`
 - Design-System: `.claude/skills/ui-design-engine.md`, Tokens in `app/globals.css`
   (Akzent: klinisches Tiefblau `oklch(0.52 0.11 240)`), 11 Primitives in `components/ui/`
-- Edge-Regelwerk: `.claude/skills/edge-stack-master.md` — der Supabase-Abschnitt darin muss auf
-  D1 umgeschrieben werden
+- Edge-Regelwerk: `.claude/skills/edge-stack-master.md` — der Supabase-Abschnitt muss auf D1
+  umgeschrieben werden
 - Produktkomponenten: `ProduktCard`, `CannabinoidBar`, `TerpenChips`, `GlasHeader`, `TerpenMap`,
   `BestandTabelle`, `BewertungsListe`, `InstagramEmbed`, `FilterLeiste`, `AktiveFilter`
-- Seiten: Layout mit Sprunglink und Navigation, Landing, `/produkte` mit Live-Filter,
-  `/apotheken` und Detail, 404
-- Fachlogik: `lib/query/bewertung.ts` (festes Bewertungsschema), `lib/query/filter.ts`
-  (URL-Filter, wirft nie), `lib/format.ts`, `lib/labels.ts`
+- Seiten: Layout, Landing, `/produkte` mit Live-Filter, `/apotheken` und Detail, 404
+- Fachlogik: `lib/query/bewertung.ts`, `lib/query/filter.ts`, `lib/format.ts`, `lib/labels.ts`
 
-**Verifikationsstand vor der Umstellung:** `tsc` grün · `eslint` grün, null Warnungen ·
-`next build` grün, 6 Routen.
+**Verifikationsstand:** `tsc` grün · `eslint` grün, null Warnungen · `next build` grün, 6 Routen.
 
 ---
 
 ## Bekannte Blocker
 
 ### 1. Workers-Bundle baut auf Windows nicht
-`npx opennextjs-cloudflare build` bricht ab mit
-`EPERM: operation not permitted, symlink 'C:\cn\node_modules\@prisma\client' -> ...`.
-OpenNext legt beim Bündeln Symlinks an; Windows erlaubt das ohne erhöhte Rechte nicht.
-**Kein Code-Fehler** — `next build` läuft durch, die Entwicklung ist nicht blockiert.
-
-Drei Wege, in dieser Reihenfolge zu empfehlen:
-- **Weg C (empfohlen): Build und Deploy in GitHub Actions auf Ubuntu.** Dort existiert das Problem
-  nicht. Passt zum Grund, aus dem das Repo public ist: unbegrenzte Actions-Minuten. Nötig sind ein
-  Workflow und ein Cloudflare-API-Token in den Repository-Secrets.
-- **Weg A: Windows Developer Mode aktivieren** (Einstellungen → System → Für Entwickler).
-- **Weg B: Terminal als Administrator.** Funktioniert, für Routinearbeit falsch.
+`npx opennextjs-cloudflare build` bricht ab mit `EPERM ... symlink`. OpenNext legt beim Bündeln
+Symlinks an, Windows erlaubt das ohne erhöhte Rechte nicht. **Kein Code-Fehler** — `next build`
+läuft durch.
+- **Weg C (empfohlen): Build und Deploy in GitHub Actions auf Ubuntu.** Passt zum Grund, aus dem
+  das Repo public ist: unbegrenzte Actions-Minuten. Braucht einen Workflow und ein
+  Cloudflare-API-Token in den Repository-Secrets.
+- Weg A: Windows Developer Mode aktivieren. Weg B: Terminal als Administrator.
 
 ### 2. Alle Datenseiten sind `force-dynamic`
-Bewusst gesetzt, weil ein Prerender zur Buildzeit ohne Datenbank scheitern würde. Entfällt mit ISR,
-sobald die R2-Bindings stehen. Das TODO über `ladeFilterFacetten` in `lib/query/strains.ts`
-beschreibt den Nachzug.
+Bewusst, weil ein Prerender ohne Datenbank scheitern würde. Entfällt mit ISR, sobald die
+R2-Bindings stehen. TODO über `ladeFilterFacetten` in `lib/query/strains.ts`.
 
 ---
 
 ## Blockiert auf Input vom Nutzer
 
-`C:\cn\.env.local` ist mit Platzhaltern angelegt und gitignored. Die Liste ist durch D1 kurz
-geworden — **es gibt keine Datenbank-Zugangsdaten mehr**:
+`C:\cn\.env.local` ist mit Platzhaltern angelegt und gitignored. Durch D1 gibt es **keine
+Datenbank-Zugangsdaten** mehr:
 
 | Variable | Wert |
 |---|---|
 | `SITE_PASSWORD` | frei wählbar, öffnet die Seite |
-| `FACHKREIS_PASSWORD` | frei wählbar, **anderes** Passwort, schaltet zusätzlich Preise frei |
+| `FACHKREIS_PASSWORD` | frei wählbar, anderes Passwort; entfällt mit Block B |
 | `SITE_SESSION_SECRET` | `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"` |
-| `NEXT_PUBLIC_INSTAGRAM_REEL_URL` | optional, öffentliche Reel-URL, darf leer bleiben |
+| `NEXT_PUBLIC_INSTAGRAM_REEL_URL` | optional, darf leer bleiben |
+
+Mit Block B kommt hinzu: `BETTER_AUTH_SECRET` (gleiche Erzeugung wie oben) und `BETTER_AUTH_URL`.
 
 Einmalig für die Datenbank, kein Eintrag in `.env.local`:
 ```sh
 npx wrangler login
 npx wrangler d1 create cn-medcan-db     # database_id in wrangler.jsonc eintragen
 ```
-Für rein lokale Entwicklung genügt sogar das nicht — wrangler arbeitet dann gegen eine Datei
-unter `.wrangler/`.
+Für rein lokale Entwicklung genügt sogar das nicht — wrangler arbeitet gegen eine Datei in
+`.wrangler/`.
 
 ---
 
 ## Arbeitsweise in diesem Projekt
 
-- Antwortstil: Caveman-Modus `full` (knapp, keine Füllwörter), deutsch. Gilt für den Chat,
-  **nicht** für Code, Kommentare, Commits und Dokumente wie diese Datei.
+- **Installierte Skills von sich aus nutzen**, nicht erst auf Zuruf. Zuordnung:
+  `prisma-upgrade-v7` bei Prisma-Fehlern, die nach Breaking Change riechen · `prisma-client-api`
+  bei Queries · `prisma-driver-adapter-implementation` beim D1-Adapter · `prisma-cli` bei
+  `migrate diff` · `cloudflare-d1` nur für D1-Plattformverhalten, nicht für ORM-Fragen (Datei ist
+  auf Drizzle ausgerichtet und trägt `last_verified: 2025-01-15`) · `better-auth` für Block B ·
+  `cloudflare:wrangler` bei jedem wrangler-Befehl · `cloudflare:workers-best-practices` ·
+  `cloudflare:web-perf` · `ui-design-engine` bei allem unter `app/**` und `components/**` ·
+  `edge-stack-master` bei Bindings, Datenzugriff, Caching, Deployment.
+- Antwortstil: Caveman-Modus `full`, deutsch. Gilt für den Chat, **nicht** für Code, Kommentare,
+  Commits und Dokumente wie diese Datei.
 - Verifikation vor jeder Fertigmeldung: `npx tsc --noEmit` und `npx eslint . --max-warnings=0`,
   bei Seitenänderungen zusätzlich `npx next build`. Behauptungen nur mit Beleg.
 - Commit je abgeschlossener Welle, Push sobald Typecheck und Build grün sind.
-- Unabhängige Teilaufgaben parallel an Subagents geben, jeder mit expliziten Dateigrenzen, damit
-  sich zwei nie dieselbe Datei teilen. **Vor einem Session-Clear alle Agents stoppen** — sie
-  sterben sonst mitten im Schreiben.
-- **Heredocs (`cat > datei <<EOF`) werden in dieser Umgebung teils verstümmelt** — Dateiinhalte
-  über das Write-Tool schreiben. Das hat schon dreimal Arbeit gekostet.
+- Unabhängige Teilaufgaben parallel an Subagents, jeder mit expliziten Dateigrenzen.
+  **Vor einem Session-Clear alle Agents stoppen** — sie sterben sonst mitten im Schreiben.
+- **Heredocs werden in dieser Umgebung teils verstümmelt** — Dateiinhalte über das Write-Tool
+  schreiben. Hat schon dreimal Arbeit gekostet.
 - Farbtoken: immer die semantischen Aliase (`bg-accent`, `text-danger`), **nie** die Ramp-Stufen
-  (`bg-accent-600`). Nur die Aliase kippen im Dunkelmodus mit; die Ramp-Variante war schon ein
-  Kontrastbug.
-- Glasmorphismus ist projektweit unerwünscht, **mit einer dokumentierten Ausnahme**: der Header
-  der Produktdetailseite, ausdrücklich vom Nutzer gewünscht. Steht im Dateikopf von
-  `components/produkt/GlasHeader.tsx` und gilt nur dort.
-- Verworfen und nicht erneut vorschlagen: Supabase (zu viele Free-Projekte), Neon (neuer Account,
-  Kaltstart), vinext, Cloudflare Pages, Cloudflare Access (braucht eigene Domain),
-  Instagram `embed.js` (Tracking ohne Einwilligung).
+  (`bg-accent-600`). Nur die Aliase kippen im Dunkelmodus mit; war schon ein Kontrastbug.
+- Glasmorphismus ist projektweit unerwünscht, **mit einer dokumentierten Ausnahme**: der Header der
+  Produktdetailseite. Steht im Dateikopf von `components/produkt/GlasHeader.tsx`.
+- Verworfen, nicht erneut vorschlagen: Supabase (zu viele Free-Projekte), Neon (neuer Account,
+  Kaltstart), vinext, Cloudflare Pages, Cloudflare Access (braucht eigene Domain), Instagram
+  `embed.js` (Tracking ohne Einwilligung), `tailwind-v4-shadcn` (kollidiert mit
+  `ui-design-engine`).
