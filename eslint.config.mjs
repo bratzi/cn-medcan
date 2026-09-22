@@ -12,6 +12,10 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Generiert: von wrangler types bzw. prisma generate erzeugt.
+    "cloudflare-env.d.ts",
+    "lib/generated/**",
+    ".open-next/**",
   ]),
 ]);
 
