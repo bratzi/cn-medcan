@@ -36,19 +36,19 @@ export default async function ZugangPage({ searchParams }: Props) {
               autoFocus
               aria-describedby={fehler ? "zugang-fehler" : undefined}
               aria-invalid={fehler ? true : undefined}
-              className="h-11 rounded-md border border-border-strong bg-surface px-4 text-body text-text outline-none transition-colors duration-150 focus-visible:border-accent-600 focus-visible:ring-2 focus-visible:ring-focus-ring"
+              className="h-11 rounded-md border border-border-strong bg-surface px-4 text-body text-text outline-none transition-colors duration-150 focus-visible:border-accent focus-visible:ring-2 focus-visible:ring-focus-ring"
             />
           </div>
 
           {fehler ? (
-            <p id="zugang-fehler" role="alert" className="text-small text-danger-500">
+            <p id="zugang-fehler" role="alert" className="text-small text-danger">
               Passwort falsch. Bitte erneut versuchen.
             </p>
           ) : null}
 
           <button
             type="submit"
-            className="h-11 rounded-md bg-accent-600 px-6 text-small font-medium text-accent-fg transition-colors duration-150 hover:bg-accent-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring"
+            className="h-11 rounded-md bg-accent px-6 text-small font-medium text-accent-fg transition-opacity duration-150 ease-standard hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring"
           >
             Weiter
           </button>
