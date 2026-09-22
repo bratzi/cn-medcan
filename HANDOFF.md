@@ -1,19 +1,53 @@
 # HANDOFF — Stand der Arbeit
 
-> Diese Datei ist das Übergabemedium zwischen Sessions. Sie wird nach jedem Arbeitsblock
-> aktualisiert und committet. Wer hier weiterarbeitet, liest sie zuerst und braucht den
-> Chatverlauf nicht.
+> Übergabemedium zwischen Sessions. Wird nach jedem Arbeitsblock aktualisiert und committet.
+> Wer hier weiterarbeitet, liest diese Datei zuerst und braucht den Chatverlauf nicht.
 
 **Letzte Aktualisierung:** 2026-09-22
 **Repo:** https://github.com/bratzi/cn-medcan (public)
-**Branch:** `main`, gepusht bis Commit `40a1a2c`
+**Branch:** `main`
+
+---
+
+## ⇢ Hier geht es weiter
+
+**Der nächste Schritt ist genau einer: `app/produkte/[slug]/page.tsx` anlegen.**
+
+Die Produktdetailseite fehlt als einzige Seite. Alle ihre Bausteine sind fertig und getestet:
+`components/produkt/GlasHeader.tsx`, `TerpenMap.tsx`, `BestandTabelle.tsx`,
+`BewertungsListe.tsx`, `InstagramEmbed.tsx`. Die Seite muss sie nur zusammensetzen.
+
+Vorgehen für die Seite:
+1. Server Component. `params` ist in Next 16 ein Promise, also `await params`.
+2. `istFachkreis()` aus `lib/query/fachkreis.ts`, dann `ladeStrainDetail(slug, fachkreis)` aus
+   `lib/query/strains.ts`. Bei `null` → `notFound()`.
+3. Reihenfolge im Seitenaufbau: `GlasHeader` → Faktenblock als `<dl>` (Handelsname, Kultivar,
+   Typ, Genetik, Darreichungsform, Bestrahlung, Anbauland, Hersteller und Importeur getrennt,
+   PZN) → `CannabinoidBar` → `TerpenChips` mit allen Rängen → `BestandTabelle` → Chargentabelle
+   → `TerpenMap` mit `verdichteGeschmacksMatrix(reviews)` → `BewertungsListe`.
+4. `generateMetadata` mit dem Handelsnamen, kein zusätzlicher `metadata`-Export.
+5. `export const dynamic = "force-dynamic"` mit Kommentar (siehe unten, ISR-Nachzug).
+6. Sichtbarer Hinweis: verschreibungspflichtig, keine medizinische Beratung.
+
+Danach: `npx tsc --noEmit`, `npx eslint . --max-warnings=0`, `npx next build` — alle drei müssen
+grün sein. Dann committen und pushen.
+
+**Danach in dieser Reihenfolge weiterarbeiten,** ohne auf Rückfragen zu warten, solange nichts
+davon eine Entscheidung des Nutzers braucht:
+1. Deploy-Blocker lösen (siehe „Bekannte Blocker", Weg C ist der empfohlene).
+2. Datenbank scharf schalten, sobald `.env.local` gefüllt ist (siehe „Blockiert auf Input").
+3. ISR statt `force-dynamic` einführen: R2-Bucket und `WORKER_SELF_REFERENCE` in `wrangler.jsonc`,
+   dann das TODO über `ladeFilterFacetten` in `lib/query/strains.ts` abarbeiten.
+4. Bewertungen einreichbar machen: Supabase-Auth-Login, Formular gegen das feste Schema aus
+   `lib/query/bewertung.ts`, Server Action, Schreibpfad über `supabase-js` mit Nutzer-JWT —
+   **nicht** über Prisma, weil Prisma RLS umgeht.
 
 ---
 
 ## Was das Projekt ist
 
 `cn-medcan` — Produktkatalog für den deutschen Medizinalcannabis-Markt. Produkte nach
-BfArM-Handelsnamen, Apotheken-Bestände mit Preis pro Gramm, chargenbezogene Community-Bewertungen.
+BfArM-Handelsnamen, Apothekenbestände mit Preis pro Gramm, chargenbezogene Community-Bewertungen.
 
 **Harte Randbedingung: alles muss kostenlos bleiben.**
 
@@ -21,91 +55,78 @@ BfArM-Handelsnamen, Apotheken-Bestände mit Preis pro Gramm, chargenbezogene Com
 
 ## Stack, wie er tatsächlich steht
 
-| Schicht | Wahl | Begründung |
-|---|---|---|
-| Framework | Next.js 16.3.6, React 19.2.8, App Router | — |
-| Styling | Tailwind v4, CSS-first (`@theme` in `app/globals.css`), keine `tailwind.config.js` | — |
-| Hosting | Cloudflare Workers via `@opennextjs/cloudflare` 1.20.6 | Pages/`next-on-pages` ist deprecated; vinext ist nur ein Vite-Reimplement der Next-API |
-| Datenbank | Supabase Postgres (Free Tier) | |
-| ORM | Prisma 7.10 mit `@prisma/adapter-pg` | Prisma 7 verwaltet URLs in `prisma.config.ts`, **nicht** im Schema |
-| Nutzerzugriff | `@supabase/supabase-js` + `@supabase/ssr` | Prisma umgeht RLS (Service-Rolle), deshalb zwei Pfade |
-| Zugangsschutz | Passwort-Gate als Worker-Middleware | Cloudflare Access schützt keine `workers.dev`-Subdomain, eigene Domain kostet Geld |
+| Schicht | Wahl |
+|---|---|
+| Framework | Next.js 16.3.6, React 19.2.8, App Router |
+| Styling | Tailwind v4, CSS-first (`@theme` in `app/globals.css`), keine `tailwind.config.js` |
+| Hosting | Cloudflare Workers via `@opennextjs/cloudflare` 1.20.6 |
+| Datenbank | Supabase Postgres (Free Tier) |
+| ORM | Prisma 7.10 mit `@prisma/adapter-pg` |
+| Nutzerzugriff | `@supabase/supabase-js` + `@supabase/ssr` |
+| Zugangsschutz | Passwort-Gate in `proxy.ts` (früher `middleware.ts`) |
 
 ### Verworfene Alternativen — nicht erneut vorschlagen
-- **D1 + Drizzle** war zuerst geplant, wurde durch Supabase + Prisma ersetzt. Alle Reste sind entfernt.
+- **D1 + Drizzle** war zuerst geplant, durch Supabase + Prisma ersetzt. Reste sind entfernt.
 - **vinext** statt OpenNext — verworfen, weil echtes Next 16 gewünscht ist.
-- **Cloudflare Pages** — verworfen, deprecated für Next.
-- **Cloudflare Access (Zero Trust, E-Mail-PIN)** — verworfen wegen Domainkosten. Upgrade-Pfad ist
-  in `.claude/skills/edge-stack-master.md` dokumentiert, falls später eine Domain dazukommt.
+- **Cloudflare Pages** — verworfen, `next-on-pages` ist deprecated.
+- **Cloudflare Access (Zero Trust, E-Mail-PIN)** — verworfen: schützt keine `workers.dev`-Subdomain,
+  eine eigene Domain kostet Geld. Upgrade-Pfad steht in `.claude/skills/edge-stack-master.md`.
+- **Instagram `embed.js`** — verworfen: Tracking-Cookies ohne Einwilligung (DSGVO ohne
+  Consent-Banner nicht tragbar) und CPU-Kosten im 10-ms-Budget. Stattdessen validierter `<iframe>`.
 
 ### Zwei Grenzen, die jede Designentscheidung binden
-1. **Workers Free Tier: 10 ms CPU pro Request, 50 Sub-Requests.** Deshalb: `Intl`-Formatter als
+1. **Workers Free Tier: 10 ms CPU pro Request, 50 Sub-Requests.** Daher: `Intl`-Formatter als
    Modulkonstanten, keine N+1-Queries, jede Liste mit `take`, Prisma-Client als Isolate-Singleton.
-2. **§10 HWG** verbietet Publikumswerbung für verschreibungspflichtige Arzneimittel. Apothekenpreise
-   und Bestände sind nur für Fachkreise sichtbar — gesteuert über `pharmacy_stock.nur_fuer_fachkreise`,
-   eine RLS-Policy und einen **serverseitig** gesetzten JWT-Claim (`app_metadata.rolle`). Der Claim
-   darf nie aus Cookie oder Request-Body kommen.
+2. **§10 HWG** verbietet Publikumswerbung für verschreibungspflichtige Arzneimittel.
+   Apothekenpreise und Bestände nur für Fachkreise — über `pharmacy_stock.nur_fuer_fachkreise`,
+   eine RLS-Policy und `public.ist_fachkreis()`, das den **serverseitig** gesetzten Claim
+   `app_metadata.rolle` liest. Der Claim darf nie aus Cookie, Body oder Header kommen.
 
 ---
 
-## Dateistand
+## Fertig und verifiziert
 
-```
-C:\cn
-├── .claude/skills/
-│   ├── ui-design-engine.md + ui-design-engine/SKILL.md      FERTIG
-│   └── edge-stack-master.md + edge-stack-master/SKILL.md    FERTIG
-├── app/
-│   ├── globals.css        FERTIG — 8px-Tokens, OKLCH, Dark Mode doppelt gegated
-│   ├── layout.tsx         lang="de", sonst noch Scaffold-Metadata
-│   ├── page.tsx           NOCH SCAFFOLD — muss ersetzt werden
-│   ├── zugang/page.tsx    FERTIG — Referenzimplementierung für den Designstil
-│   └── api/zugang/route.ts FERTIG
-├── lib/
-│   ├── cloudflare.ts      FERTIG — getEnv, getEnvSync, requireVar
-│   ├── prisma.ts          FERTIG — getPrisma() Singleton, Adapter über DATABASE_URL
-│   ├── gate.ts            FERTIG — HMAC-Cookie, zeitkonstanter Vergleich
-│   ├── supabase/{server,client}.ts  FERTIG
-│   └── generated/prisma/  generiert, gitignored
-├── prisma/
-│   ├── schema.prisma      FERTIG, valide
-│   └── seed.ts            von Agent in Arbeit
-├── supabase/
-│   ├── rls.sql            von Agent in Arbeit
-│   └── README.md          von Agent in Arbeit
-├── middleware.ts          FERTIG — sperrt alles außer /zugang
-├── prisma.config.ts       FERTIG — lädt .env.local, nutzt DIRECT_URL
-├── wrangler.jsonc         FERTIG — kein D1 mehr
-└── .env.local.example     FERTIG — die Vorlage für alle Zugangsdaten
-```
+- Scaffold, Cloudflare-Anbindung, `wrangler.jsonc`, `lib/cloudflare.ts` als einziger Binding-Zugang
+- Datenschicht: `prisma/schema.prisma` (8 Modelle), `prisma.config.ts`, `lib/prisma.ts` als
+  Isolate-Singleton, Supabase-Clients für Server und Browser
+- `supabase/rls.sql`: RLS auf allen 8 Tabellen, 12 Policies mit vorangestelltem
+  `drop policy if exists`, 16 Check-Constraints über `pg_constraint`-Prüfung
+- `prisma/seed.ts`: 8 Terpene, 4 Unternehmen, 8 Strains, 5 Apotheken, 26 Bestandszeilen,
+  6 Chargen, 6 Bewertungen — alle Handelsnamen und PZN erkennbar fiktiv
+- Zugangsschutz: `proxy.ts`, `lib/gate.ts` (HMAC-Cookie, zeitkonstanter Vergleich),
+  `app/zugang/page.tsx`, `app/api/zugang/route.ts`
+- Design-System: `.claude/skills/ui-design-engine.md`, Tokens in `app/globals.css`
+  (Akzent: klinisches Tiefblau `oklch(0.52 0.11 240)`), 11 Primitives in `components/ui/`
+- Edge-Regelwerk: `.claude/skills/edge-stack-master.md`
+- Abfrageschicht: `lib/query/{filter,strains,fachkreis,bewertung}.ts`
+- Seiten: Layout mit Sprunglink und Navigation, Landing, `/produkte` mit Live-Filter,
+  `/apotheken` und Detail, 404
 
-### Datenmodell (`prisma/schema.prisma`, valide, nicht ändern ohne Grund)
-`Unternehmen` (Hersteller/Importeur mit Rolle) · `Terpen` (mit Geschmacksachse) · `Strain`
-(BfArM-Handelsname, THC/CBD-Spannen als `Decimal`, Bestrahlung, Herstellerbildpfad) ·
-`StrainTerpen` (Join mit `rang`, 1 = dominant) · `Pharmacy` (Versandapotheke mit Lieferzeitspanne
-und `RezeptStatus`) · `PharmacyStock` (Join, Preis als **Integer-Cent**, `nurFuerFachkreise`) ·
-`Charge` (Batch mit Ist-Werten) · `Review` (fünf Noten 1–5, Feuchtigkeit, `geschmacksMatrix` als
-JSON über acht Achsen, `instagramReelUrl`, `freigegeben`).
+**Verifikationsstand:** `npx tsc --noEmit` grün · `npx eslint . --max-warnings=0` grün ·
+`npx next build` grün, 6 Routen. `npx opennextjs-cloudflare build` scheitert lokal, siehe unten.
 
 ---
 
-## Was als Nächstes dran ist
+## Bekannte Blocker
 
-1. **Agents abwarten** (liefen bei Erstellung dieser Datei noch): RLS + Seed, UI-Primitives,
-   Abfrageschicht. Ergebnis prüfen, `npx tsc --noEmit` grün halten, committen.
-2. **Seiten bauen** — noch offen:
-   - `app/page.tsx` — Landing, ersetzt das Scaffold
-   - `app/produkte/page.tsx` — Live-Filter-Übersicht: Apothekenverfügbarkeit, Preis pro Gramm,
-     THC-Gehalt, dominanter Geschmack. Filter über URL-Suchparameter, Server Component.
-   - `app/produkte/[slug]/page.tsx` — Detailseite mit Glasmorphismus-Header im Dunkelmodus,
-     Instagram-Reel-Einbettung, interaktiver Terpen-Map für Bewertungen.
-     *Hinweis:* Der Glasmorphismus ist eine bewusste, vom Nutzer gewünschte Ausnahme von der
-     Anti-Deko-Regel in `ui-design-engine.md` — auf diesen einen Header begrenzt halten.
-   - `app/apotheken/**` — Liste und Detail mit Bestandstabelle hinter dem Fachkreis-Gate
-3. **Datenbank scharf schalten** — sobald `.env.local` gefüllt ist: `npm run db:migrate`,
-   dann `supabase/rls.sql` im Supabase SQL Editor ausführen, dann `npm run db:seed`.
-4. **Deploy** — `npx wrangler login`, `npm run cf-build`, `npm run preview` (workerd-Smoke-Test),
-   dann `npm run deploy`. Secrets mit `wrangler secret put` setzen, nicht in `wrangler.jsonc`.
+### 1. Workers-Bundle baut auf Windows nicht
+`npx opennextjs-cloudflare build` bricht ab mit
+`EPERM: operation not permitted, symlink 'C:\cn\node_modules\@prisma\client' -> ...`.
+OpenNext legt beim Bündeln Symlinks an; Windows erlaubt das ohne erhöhte Rechte nicht.
+**Kein Code-Fehler** — `next build` läuft durch, die Entwicklung ist nicht blockiert.
+
+Drei Wege, in dieser Reihenfolge zu empfehlen:
+- **Weg C (empfohlen): Build und Deploy in GitHub Actions auf Ubuntu.** Dort existiert das Problem
+  nicht. Passt genau zum Grund, aus dem das Repo public ist: unbegrenzte Actions-Minuten. Nötig
+  sind ein Workflow und ein Cloudflare-API-Token in den Repository-Secrets (nicht in `.env.local`).
+- **Weg A: Windows Developer Mode aktivieren** (Einstellungen → System → Für Entwickler). Erlaubt
+  Symlinks ohne Adminrechte, danach läuft der Build lokal.
+- **Weg B: Terminal als Administrator** starten. Funktioniert, ist aber für Routinearbeit falsch.
+
+### 2. Alle Datenseiten sind `force-dynamic`
+Bewusst gesetzt, weil es keine erreichbare Datenbank gibt und ein Prerender zur Buildzeit
+scheitern würde. Entfällt mit ISR, sobald die R2-Bindings stehen. Das TODO über
+`ladeFilterFacetten` in `lib/query/strains.ts` beschreibt den Nachzug.
 
 ---
 
@@ -122,21 +143,35 @@ JSON über acht Achsen, `instagramReelUrl`, `freigegeben`).
 | `SITE_SESSION_SECRET` | `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"` |
 | `NEXT_PUBLIC_INSTAGRAM_REEL_URL` | optional, öffentliche Reel-URL |
 
-Cloudflare-Zugangsdaten gehören **nicht** in die Datei — Deployment läuft über `wrangler login`.
+Cloudflare-Zugangsdaten gehören **nicht** in die Datei — lokal `wrangler login`, für CI ein
+API-Token in den GitHub-Repository-Secrets.
 
-Ohne diese Werte lässt sich alles bauen und typprüfen, aber keine Migration, kein Seed, kein
-echter Datenabruf.
+Sobald die Werte stehen:
+```sh
+npm run db:migrate          # Migration gegen DIRECT_URL
+# supabase/rls.sql im Supabase SQL Editor ausfuehren
+npm run db:seed
+npm run dev
+```
+`supabase/rls.sql` muss nach **jeder** Migration erneut laufen — `prisma migrate` kennt kein RLS.
 
 ---
 
 ## Arbeitsweise in diesem Projekt
 
-- Antwortstil: Caveman-Modus `full` (knapp, keine Füllwörter), deutsch. Gilt für Chat, **nicht**
-  für Code, Kommentare, Commits und Dokumente wie diese Datei.
-- Verifikation vor jeder Fertigmeldung: `npx tsc --noEmit` und `npx eslint . --max-warnings=0`.
-  Behauptungen nur mit Beleg.
-- Commit je abgeschlossener Welle, Push gesammelt sobald Typecheck und Build grün sind.
-- Unabhängige Teilaufgaben parallel an Subagents geben. Jeder Agent bekommt explizite
-  Dateigrenzen, damit sich zwei nie dieselbe Datei teilen.
+- Antwortstil: Caveman-Modus `full` (knapp, keine Füllwörter), deutsch. Gilt für den Chat,
+  **nicht** für Code, Kommentare, Commits und Dokumente wie diese Datei.
+- Verifikation vor jeder Fertigmeldung: `npx tsc --noEmit` und `npx eslint . --max-warnings=0`,
+  bei Seitenänderungen zusätzlich `npx next build`. Behauptungen nur mit Beleg.
+- Commit je abgeschlossener Welle, Push sobald Typecheck und Build grün sind.
+- Unabhängige Teilaufgaben parallel an Subagents geben, jeder mit expliziten Dateigrenzen, damit
+  sich zwei nie dieselbe Datei teilen. **Vor einem Session-Clear alle Agents stoppen** — sie
+  sterben sonst mitten im Schreiben.
 - **Heredocs (`cat > datei <<EOF`) werden in dieser Umgebung teils verstümmelt** — Dateiinhalte
-  über das Write-Tool schreiben. Das hat schon zweimal Arbeit gekostet.
+  über das Write-Tool schreiben. Das hat schon dreimal Arbeit gekostet.
+- Farbtoken: immer die semantischen Aliase (`bg-accent`, `text-danger`), **nie** die Ramp-Stufen
+  (`bg-accent-600`). Nur die Aliase kippen im Dunkelmodus mit; die Ramp-Variante war schon ein
+  Kontrastbug.
+- Glasmorphismus ist projektweit unerwünscht, **mit einer dokumentierten Ausnahme**: der Header
+  der Produktdetailseite, ausdrücklich vom Nutzer gewünscht. Die Ausnahme steht im Dateikopf von
+  `components/produkt/GlasHeader.tsx` und gilt nur dort.
