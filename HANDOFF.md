@@ -3,107 +3,131 @@
 > Übergabemedium zwischen Sessions. Wird nach jedem Arbeitsblock aktualisiert und committet.
 > Wer hier weiterarbeitet, liest diese Datei zuerst und braucht den Chatverlauf nicht.
 
-**Letzte Aktualisierung:** 2026-09-22
+**Letzte Aktualisierung:** 2026-09-23
 **Repo:** https://github.com/bratzi/cn-medcan (public)
 **Branch:** `main`
 
 ---
 
-## ⇢ Hier geht es weiter
+## ⇢ Hier geht es weiter: Umstellung von Supabase auf Cloudflare D1
 
-**Der nächste Schritt ist genau einer: `app/produkte/[slug]/page.tsx` anlegen.**
+**Status: geplant, noch nicht umgesetzt.** Der Code steht aktuell auf Supabase Postgres. Die
+Umstellung ist der nächste Arbeitsblock und unten in fünf Wellen zerlegt.
 
-Die Produktdetailseite fehlt als einzige Seite. Alle ihre Bausteine sind fertig und getestet:
-`components/produkt/GlasHeader.tsx`, `TerpenMap.tsx`, `BestandTabelle.tsx`,
-`BewertungsListe.tsx`, `InstagramEmbed.tsx`. Die Seite muss sie nur zusammensetzen.
+### Warum die Umstellung
+Der Nutzer hat auf seinem Supabase-Konto zu viele Free-Projekte und will Supabase nicht nutzen.
+Gewählt wurde **Cloudflare D1**, weil es keinen weiteren Account und kein weiteres Projekt
+braucht — es läuft als Binding im bereits vorhandenen Cloudflare-Konto. Belegte Free-Limits:
+5 GB Speicher, 5 Mio. gelesene Zeilen pro Tag, 100 000 geschriebene Zeilen pro Tag.
 
-Vorgehen für die Seite:
-1. Server Component. `params` ist in Next 16 ein Promise, also `await params`.
-2. `istFachkreis()` aus `lib/query/fachkreis.ts`, dann `ladeStrainDetail(slug, fachkreis)` aus
-   `lib/query/strains.ts`. Bei `null` → `notFound()`.
-3. Reihenfolge im Seitenaufbau: `GlasHeader` → Faktenblock als `<dl>` (Handelsname, Kultivar,
-   Typ, Genetik, Darreichungsform, Bestrahlung, Anbauland, Hersteller und Importeur getrennt,
-   PZN) → `CannabinoidBar` → `TerpenChips` mit allen Rängen → `BestandTabelle` → Chargentabelle
-   → `TerpenMap` mit `verdichteGeschmacksMatrix(reviews)` → `BewertungsListe`.
-4. `generateMetadata` mit dem Handelsnamen, kein zusätzlicher `metadata`-Export.
-5. `export const dynamic = "force-dynamic"` mit Kommentar (siehe unten, ISR-Nachzug).
-6. Sichtbarer Hinweis: verschreibungspflichtig, keine medizinische Beratung.
+Neon wäre die Postgres-Alternative gewesen (100 Projekte pro Org, 0,5 GB pro Projekt), wurde aber
+verworfen: neuer Account, und Suspend nach 5 Minuten Inaktivität mit Kaltstart.
 
-Danach: `npx tsc --noEmit`, `npx eslint . --max-warnings=0`, `npx next build` — alle drei müssen
-grün sein. Dann committen und pushen.
+### Der Punkt, der die Entscheidung tragbar macht
+Ohne Supabase-Auth verliert RLS fast seinen Sinn: RLS greift nur, wenn die Verbindung eine
+Nutzeridentität trägt. Prisma verbindet als Eigentümer. Die RLS-Policies waren also ausschließlich
+auf dem `supabase-js`-Pfad wirksam — der mit Supabase ohnehin wegfällt. Der Verlust von RLS in
+SQLite ist damit kein echter Rückschritt. Das HWG-Gate liegt in der Abfrageschicht, wo es mit
+`bestandSichtbarkeit()` in `lib/query/strains.ts` schon implementiert ist. CHECK-Constraints
+funktionieren in SQLite weiter und bleiben erhalten.
 
-**Danach in dieser Reihenfolge weiterarbeiten,** ohne auf Rückfragen zu warten, solange nichts
-davon eine Entscheidung des Nutzers braucht:
-1. Deploy-Blocker lösen (siehe „Bekannte Blocker", Weg C ist der empfohlene).
-2. Datenbank scharf schalten, sobald `.env.local` gefüllt ist (siehe „Blockiert auf Input").
-3. ISR statt `force-dynamic` einführen: R2-Bucket und `WORKER_SELF_REFERENCE` in `wrangler.jsonc`,
-   dann das TODO über `ladeFilterFacetten` in `lib/query/strains.ts` abarbeiten.
-4. Bewertungen einreichbar machen: Supabase-Auth-Login, Formular gegen das feste Schema aus
-   `lib/query/bewertung.ts`, Server Action, Schreibpfad über `supabase-js` mit Nutzer-JWT —
-   **nicht** über Prisma, weil Prisma RLS umgeht.
+### Zwei belegte Eigenheiten von D1, die den Plan formen
+1. **D1 unterstützt keine Transaktionen.** Prisma führt `$transaction` als Einzelabfragen aus, die
+   ACID-Garantie fällt weg. Die Abfrageschicht nutzt `Promise.all`, ist also nicht betroffen. Der
+   Seed darf keine Transaktionsannahme enthalten.
+2. **Migrationen laufen hybrid.** `prisma migrate dev` fällt weg. Stattdessen:
+   `wrangler d1 migrations create` → `prisma migrate diff --from-local-d1 --to-schema-datamodel`
+   erzeugt das SQL → `wrangler d1 migrations apply --local` bzw. `--remote`.
 
----
+### SQLite-Umbauten am Schema, die Folgen im ganzen Code haben
+| Bisher (Postgres) | Neu (SQLite/D1) | Folge |
+|---|---|---|
+| `enum` (7 Stück) | `String` + TS-Union-Typ | Prisma-Enums gibt es in SQLite nicht. Die Typen wandern in eine neue Datei `db/enums.ts`. **Alle Importe von `@/lib/generated/prisma/enums` müssen umgezogen werden** — betrifft `lib/labels.ts`, `lib/query/*`, `components/produkt/*`. |
+| `Decimal @db.Decimal(4,1)` | `Float` | Prozentwerte. Preise sind schon `Int` in Cent und bleiben unverändert. |
+| `Json` | `String` | `geschmacksMatrix` wird als JSON-Text gespeichert. `parseGeschmacksMatrix` in `lib/query/bewertung.ts` validiert ohnehin schon — nur `JSON.parse` davorziehen. |
+| `@db.Uuid`, `@db.VarChar(5)`, `@db.Date` | entfällt | `@default(uuid())` funktioniert weiter, Datumsfelder werden `DateTime`. |
+| `contains` mit `mode: "insensitive"` | **nicht unterstützt** | Der Freitextfilter braucht einen Ersatz. Lösung: eine zusätzliche, kleingeschriebene Suchspalte `suchtext` am `Strain`, beim Schreiben gefüllt, und `contains` darauf mit kleingeschriebener Eingabe. Kein `LOWER()` in der Query, weil Prisma das auf SQLite nicht abbildet. |
+| RLS-Policies | entfallen | `supabase/rls.sql` wird zu `db/constraints.sql` reduziert: nur die 16 CHECK-Constraints bleiben, alle `create policy` und `ist_fachkreis()` fallen. |
 
-## Was das Projekt ist
+### Fachkreis-Nachweis ohne Supabase-Auth
+Gewählt: **vorerst keine Nutzeranmeldung.** Bewertungen bleiben redaktionell (Seed, später ein
+Admin-Skript). Der Fachkreis-Zugang läuft über ein **zweites Passwort** im bestehenden Gate:
 
-`cn-medcan` — Produktkatalog für den deutschen Medizinalcannabis-Markt. Produkte nach
-BfArM-Handelsnamen, Apothekenbestände mit Preis pro Gramm, chargenbezogene Community-Bewertungen.
+- `SITE_PASSWORD` → normaler Zugang, Rolle `gast`
+- `FACHKREIS_PASSWORD` → Zugang **plus** Rolle `fachkreis`, sieht Preise und Bestände
 
-**Harte Randbedingung: alles muss kostenlos bleiben.**
-
----
-
-## Stack, wie er tatsächlich steht
-
-| Schicht | Wahl |
-|---|---|
-| Framework | Next.js 16.3.6, React 19.2.8, App Router |
-| Styling | Tailwind v4, CSS-first (`@theme` in `app/globals.css`), keine `tailwind.config.js` |
-| Hosting | Cloudflare Workers via `@opennextjs/cloudflare` 1.20.6 |
-| Datenbank | Supabase Postgres (Free Tier) |
-| ORM | Prisma 7.10 mit `@prisma/adapter-pg` |
-| Nutzerzugriff | `@supabase/supabase-js` + `@supabase/ssr` |
-| Zugangsschutz | Passwort-Gate in `proxy.ts` (früher `middleware.ts`) |
-
-### Verworfene Alternativen — nicht erneut vorschlagen
-- **D1 + Drizzle** war zuerst geplant, durch Supabase + Prisma ersetzt. Reste sind entfernt.
-- **vinext** statt OpenNext — verworfen, weil echtes Next 16 gewünscht ist.
-- **Cloudflare Pages** — verworfen, `next-on-pages` ist deprecated.
-- **Cloudflare Access (Zero Trust, E-Mail-PIN)** — verworfen: schützt keine `workers.dev`-Subdomain,
-  eine eigene Domain kostet Geld. Upgrade-Pfad steht in `.claude/skills/edge-stack-master.md`.
-- **Instagram `embed.js`** — verworfen: Tracking-Cookies ohne Einwilligung (DSGVO ohne
-  Consent-Banner nicht tragbar) und CPU-Kosten im 10-ms-Budget. Stattdessen validierter `<iframe>`.
-
-### Zwei Grenzen, die jede Designentscheidung binden
-1. **Workers Free Tier: 10 ms CPU pro Request, 50 Sub-Requests.** Daher: `Intl`-Formatter als
-   Modulkonstanten, keine N+1-Queries, jede Liste mit `take`, Prisma-Client als Isolate-Singleton.
-2. **§10 HWG** verbietet Publikumswerbung für verschreibungspflichtige Arzneimittel.
-   Apothekenpreise und Bestände nur für Fachkreise — über `pharmacy_stock.nur_fuer_fachkreise`,
-   eine RLS-Policy und `public.ist_fachkreis()`, das den **serverseitig** gesetzten Claim
-   `app_metadata.rolle` liest. Der Claim darf nie aus Cookie, Body oder Header kommen.
+Die Rolle wird in das bereits HMAC-signierte Cookie geschrieben, also nicht manipulierbar.
+`lib/gate.ts` signiert künftig `gate:<rolle>:<ablauf>`, und `lib/query/fachkreis.ts` liest die
+Rolle aus dem Cookie statt aus einem Supabase-JWT.
 
 ---
 
-## Fertig und verifiziert
+## Die Umstellung in fünf Wellen
 
-- Scaffold, Cloudflare-Anbindung, `wrangler.jsonc`, `lib/cloudflare.ts` als einziger Binding-Zugang
-- Datenschicht: `prisma/schema.prisma` (8 Modelle), `prisma.config.ts`, `lib/prisma.ts` als
-  Isolate-Singleton, Supabase-Clients für Server und Browser
-- `supabase/rls.sql`: RLS auf allen 8 Tabellen, 12 Policies mit vorangestelltem
-  `drop policy if exists`, 16 Check-Constraints über `pg_constraint`-Prüfung
-- `prisma/seed.ts`: 8 Terpene, 4 Unternehmen, 8 Strains, 5 Apotheken, 26 Bestandszeilen,
-  6 Chargen, 6 Bewertungen — alle Handelsnamen und PZN erkennbar fiktiv
-- Zugangsschutz: `proxy.ts`, `lib/gate.ts` (HMAC-Cookie, zeitkonstanter Vergleich),
-  `app/zugang/page.tsx`, `app/api/zugang/route.ts`
+**Welle 1 — Fundament, sequenziell (alles andere hängt daran)**
+1. `npm uninstall @supabase/supabase-js @supabase/ssr @prisma/adapter-pg pg @types/pg dotenv`,
+   `npm install @prisma/adapter-d1`. `lib/supabase/` löschen.
+2. `wrangler.jsonc`: `d1_databases`-Binding `DB` wieder aufnehmen, `database_name: "cn-medcan-db"`,
+   `migrations_dir: "migrations"`. Danach `npm run cf-typegen`.
+3. `prisma/schema.prisma` auf `provider = "sqlite"` umstellen, alle Umbauten aus der Tabelle oben,
+   Feld `suchtext` am `Strain` ergänzen.
+4. `db/enums.ts` anlegen: die sieben Wertelisten als `as const`-Arrays plus abgeleitete
+   Union-Typen, dazu `istKultivarTyp()`-artige Guards für das Parsen aus der DB.
+5. `prisma.config.ts`: `datasource`-Block und `dotenv`-Import entfernen, `migrations.seed`
+   behalten. D1 braucht keine Verbindungs-URL.
+6. `lib/prisma.ts`: `PrismaD1`-Adapter mit dem `DB`-Binding. **Wichtig:** der Client kann nicht
+   mehr als Modul-Singleton entstehen, weil das Binding erst im Request-Kontext existiert.
+   Also `getPrisma()` async über `getEnv()` aus `lib/cloudflare.ts`, mit Caching pro Isolate nur
+   wenn das Binding identisch ist.
+
+**Welle 2 — zwei Agents parallel**
+7. `lib/query/*`: Enum-Importe umziehen, Freitextfilter auf `suchtext` umstellen,
+   `lib/query/fachkreis.ts` auf das Gate-Cookie umschreiben, `parseGeschmacksMatrix` um
+   `JSON.parse` erweitern, `getPrisma()`-Aufrufe auf `await` umstellen.
+8. `lib/gate.ts`, `proxy.ts`, `app/zugang/page.tsx`, `app/api/zugang/route.ts`: Rolle im Token,
+   zweites Passwort, ein Hinweis auf der Zugangsseite, dass es zwei Zugänge gibt.
+
+**Welle 3 — zwei Agents parallel**
+9. `lib/labels.ts` und `components/produkt/*`: Enum-Importe auf `@/db/enums` umziehen.
+10. `db/constraints.sql` aus `supabase/rls.sql` ableiten (nur CHECK-Constraints),
+    `supabase/` löschen, `db/README.md` mit der neuen Befehlsfolge.
+
+**Welle 4 — sequenziell**
+11. `prisma/seed.ts` anpassen: kein `dotenv`, keine Transaktionsannahme, `geschmacksMatrix` als
+    JSON-String, `suchtext` mitschreiben. Seed läuft über `wrangler d1 execute` oder ein
+    Node-Skript gegen die lokale D1-Datei — prüfen, was mit dem Adapter außerhalb des Workers
+    funktioniert, und wenn es nicht geht, den Seed als generiertes SQL ausliefern.
+12. Migration erzeugen und lokal anwenden.
+
+**Welle 5 — die noch fehlende Seite und Verifikation**
+13. `app/produkte/[slug]/page.tsx` bauen. Alle Bausteine sind fertig: `GlasHeader`, `TerpenMap`,
+    `BestandTabelle`, `BewertungsListe`, `InstagramEmbed`. Aufbau: Glas-Header → Faktenblock als
+    `<dl>` → `CannabinoidBar` → `TerpenChips` (alle Ränge) → `BestandTabelle` → Chargentabelle →
+    `TerpenMap` mit `verdichteGeschmacksMatrix(reviews)` → `BewertungsListe`. `params` ist ein
+    Promise. `generateMetadata` mit dem Handelsnamen. Hinweis auf Verschreibungspflicht.
+14. `npx tsc --noEmit`, `npx eslint . --max-warnings=0`, `npx next build`, dann
+    `npm run db:migrate:local` und der Seed, dann `npm run dev` gegen echte Daten.
+
+---
+
+## Was schon fertig ist und die Umstellung übersteht
+
+- Scaffold, Cloudflare-Anbindung, `lib/cloudflare.ts` als einziger Binding-Zugang
+- Zugangsschutz: `proxy.ts`, `lib/gate.ts`, `app/zugang/page.tsx`, `app/api/zugang/route.ts`
+  (wird in Welle 2 um die Rolle erweitert, nicht ersetzt)
 - Design-System: `.claude/skills/ui-design-engine.md`, Tokens in `app/globals.css`
   (Akzent: klinisches Tiefblau `oklch(0.52 0.11 240)`), 11 Primitives in `components/ui/`
-- Edge-Regelwerk: `.claude/skills/edge-stack-master.md`
-- Abfrageschicht: `lib/query/{filter,strains,fachkreis,bewertung}.ts`
+- Edge-Regelwerk: `.claude/skills/edge-stack-master.md` — der Supabase-Abschnitt darin muss auf
+  D1 umgeschrieben werden
+- Produktkomponenten: `ProduktCard`, `CannabinoidBar`, `TerpenChips`, `GlasHeader`, `TerpenMap`,
+  `BestandTabelle`, `BewertungsListe`, `InstagramEmbed`, `FilterLeiste`, `AktiveFilter`
 - Seiten: Layout mit Sprunglink und Navigation, Landing, `/produkte` mit Live-Filter,
   `/apotheken` und Detail, 404
+- Fachlogik: `lib/query/bewertung.ts` (festes Bewertungsschema), `lib/query/filter.ts`
+  (URL-Filter, wirft nie), `lib/format.ts`, `lib/labels.ts`
 
-**Verifikationsstand:** `npx tsc --noEmit` grün · `npx eslint . --max-warnings=0` grün ·
-`npx next build` grün, 6 Routen. `npx opennextjs-cloudflare build` scheitert lokal, siehe unten.
+**Verifikationsstand vor der Umstellung:** `tsc` grün · `eslint` grün, null Warnungen ·
+`next build` grün, 6 Routen.
 
 ---
 
@@ -117,43 +141,37 @@ OpenNext legt beim Bündeln Symlinks an; Windows erlaubt das ohne erhöhte Recht
 
 Drei Wege, in dieser Reihenfolge zu empfehlen:
 - **Weg C (empfohlen): Build und Deploy in GitHub Actions auf Ubuntu.** Dort existiert das Problem
-  nicht. Passt genau zum Grund, aus dem das Repo public ist: unbegrenzte Actions-Minuten. Nötig
-  sind ein Workflow und ein Cloudflare-API-Token in den Repository-Secrets (nicht in `.env.local`).
-- **Weg A: Windows Developer Mode aktivieren** (Einstellungen → System → Für Entwickler). Erlaubt
-  Symlinks ohne Adminrechte, danach läuft der Build lokal.
-- **Weg B: Terminal als Administrator** starten. Funktioniert, ist aber für Routinearbeit falsch.
+  nicht. Passt zum Grund, aus dem das Repo public ist: unbegrenzte Actions-Minuten. Nötig sind ein
+  Workflow und ein Cloudflare-API-Token in den Repository-Secrets.
+- **Weg A: Windows Developer Mode aktivieren** (Einstellungen → System → Für Entwickler).
+- **Weg B: Terminal als Administrator.** Funktioniert, für Routinearbeit falsch.
 
 ### 2. Alle Datenseiten sind `force-dynamic`
-Bewusst gesetzt, weil es keine erreichbare Datenbank gibt und ein Prerender zur Buildzeit
-scheitern würde. Entfällt mit ISR, sobald die R2-Bindings stehen. Das TODO über
-`ladeFilterFacetten` in `lib/query/strains.ts` beschreibt den Nachzug.
+Bewusst gesetzt, weil ein Prerender zur Buildzeit ohne Datenbank scheitern würde. Entfällt mit ISR,
+sobald die R2-Bindings stehen. Das TODO über `ladeFilterFacetten` in `lib/query/strains.ts`
+beschreibt den Nachzug.
 
 ---
 
 ## Blockiert auf Input vom Nutzer
 
-`C:\cn\.env.local` ist mit Platzhaltern angelegt und gitignored. Zu füllen:
+`C:\cn\.env.local` ist mit Platzhaltern angelegt und gitignored. Die Liste ist durch D1 kurz
+geworden — **es gibt keine Datenbank-Zugangsdaten mehr**:
 
-| Variable | Quelle |
+| Variable | Wert |
 |---|---|
-| `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase → Project Settings → API |
-| `DATABASE_URL` | Settings → Database → **Transaction pooler, Port 6543** |
-| `DIRECT_URL` | Settings → Database → **Direct connection, Port 5432** |
-| `SITE_PASSWORD` | frei wählbar |
+| `SITE_PASSWORD` | frei wählbar, öffnet die Seite |
+| `FACHKREIS_PASSWORD` | frei wählbar, **anderes** Passwort, schaltet zusätzlich Preise frei |
 | `SITE_SESSION_SECRET` | `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"` |
-| `NEXT_PUBLIC_INSTAGRAM_REEL_URL` | optional, öffentliche Reel-URL |
+| `NEXT_PUBLIC_INSTAGRAM_REEL_URL` | optional, öffentliche Reel-URL, darf leer bleiben |
 
-Cloudflare-Zugangsdaten gehören **nicht** in die Datei — lokal `wrangler login`, für CI ein
-API-Token in den GitHub-Repository-Secrets.
-
-Sobald die Werte stehen:
+Einmalig für die Datenbank, kein Eintrag in `.env.local`:
 ```sh
-npm run db:migrate          # Migration gegen DIRECT_URL
-# supabase/rls.sql im Supabase SQL Editor ausfuehren
-npm run db:seed
-npm run dev
+npx wrangler login
+npx wrangler d1 create cn-medcan-db     # database_id in wrangler.jsonc eintragen
 ```
-`supabase/rls.sql` muss nach **jeder** Migration erneut laufen — `prisma migrate` kennt kein RLS.
+Für rein lokale Entwicklung genügt sogar das nicht — wrangler arbeitet dann gegen eine Datei
+unter `.wrangler/`.
 
 ---
 
@@ -173,5 +191,8 @@ npm run dev
   (`bg-accent-600`). Nur die Aliase kippen im Dunkelmodus mit; die Ramp-Variante war schon ein
   Kontrastbug.
 - Glasmorphismus ist projektweit unerwünscht, **mit einer dokumentierten Ausnahme**: der Header
-  der Produktdetailseite, ausdrücklich vom Nutzer gewünscht. Die Ausnahme steht im Dateikopf von
+  der Produktdetailseite, ausdrücklich vom Nutzer gewünscht. Steht im Dateikopf von
   `components/produkt/GlasHeader.tsx` und gilt nur dort.
+- Verworfen und nicht erneut vorschlagen: Supabase (zu viele Free-Projekte), Neon (neuer Account,
+  Kaltstart), vinext, Cloudflare Pages, Cloudflare Access (braucht eigene Domain),
+  Instagram `embed.js` (Tracking ohne Einwilligung).
