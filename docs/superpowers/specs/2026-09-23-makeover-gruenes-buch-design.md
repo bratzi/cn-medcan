@@ -206,6 +206,20 @@ Umsetzen mit `better-typography`.
     dilate in `surface-raised` hinter dem Tag), damit das Tag wie ein aufgeklebter Sticker
     auf dem Buch sitzt. Nicht übernommen: Spirale (müsste gezeichnet werden), Zauberer-
     Figur (Leitplanke 3), Violett als Vollfläche (Sprühviolett bleibt Material der Wand).
+- **Akzente aus Verpackung und Merch (Bildersuche, 2026-09-23):**
+  - *Wizard Trees:* gestanzte Beutel mit eigener Silhouette, Holo-Folie, dichte Hintergründe
+    (Rauchranken, Blitze), Schleim-Drips an der Schrift, kleine Aufkleber-Siegel.
+  - *Doja Pak:* Marmorierung (Tinte auf Wasser) als Fläche, das Tag stark vergrößert und
+    **über den Rand angeschnitten**; im Merch dagegen Ton-in-Ton (Tag schwarz auf schwarz,
+    wie geprägt) plus kleiner Aufnäher.
+  - **Übernommen für die Wand:** (1) Marmorierung als weitere Wand-Textur (Pexels „marbling
+    ink“, per Pipeline zur Maske, eingefärbt in `spray`); (2) das große Footer-Tag läuft
+    angeschnitten aus dem Bild; (3) Ton-in-Ton-Tag als Wasserzeichen hinter der Abstimmung
+    (`surface-sunken` auf `surface`, rein dekorativ); (4) Stimmzettel und das „gb“-Tag mit
+    Stanzkontur wie ein Aufkleber; (5) Holo-Schimmer **nur** auf dem „gb“-Aufkleber beim
+    Hover (Verlauf per CSS, bei reduzierter Bewegung aus). Drips gibt es schon.
+  - **Nicht übernommen:** Sortennamen als eigenes Lettering (Leitplanke 4), Rauch (2),
+    Figuren (3), dichte Vollflächen hinter Text (Lesbarkeit).
 - Komponente `components/marke/Wortmarke.tsx` (Server Component), zwei Größen: `kopf`
   (Header, Tag statisch) und `buehne` (Hero, Tag wird per Animation „gesprüht“).
 - Zugänglicher Name: „Grünes Buch“; das Tag ist `aria-hidden`.
