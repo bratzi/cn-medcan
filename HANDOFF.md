@@ -77,17 +77,25 @@ Die drei alten offenen Punkte gelten unveraendert, siehe „Was noch offen ist".
 ### Was beim Umsetzen anders kam als geplant
 
 1. **Ein Server-Action-Aufruf laesst sich mit `curl` nicht sinnvoll nachbauen.** Weder der
-   `Next-Action`-Header mit `1_feld`-Namen noch die `$ACTION_ID_<id>`-Variante liefern die
-   Felder an: im Log steht jedes Mal `profilSpeichern({})` — ein **leeres** FormData. Die
-   Aktion laeuft, die Felder kommen nicht an. Wer hier testet und aus der Fehlermeldung
-   „Bitte einen Anzeigenamen angeben" schliesst, die Pruefung funktioniere, sitzt einem
-   falschen Positiv auf: das ist nur der Zweig fuer den leeren Namen.
+   `Next-Action`-Header mit `1_feld`-Namen noch die `$ACTION_ID_<id>`-Variante brachten die
+   Felder an: die Datenbank blieb unveraendert, obwohl die Aktion lief. Wer hier testet und aus
+   der Fehlermeldung „Bitte einen Anzeigenamen angeben" schliesst, die Pruefung funktioniere,
+   sitzt einem falschen Positiv auf: das ist nur der Zweig fuer den leeren Namen.
    **Deshalb die reine Funktion in `lib/mitglied-eingabe.ts`** — sie ist mit `npx tsx` direkt
    pruefbar. Die Action-Id steht uebrigens im Client-Chunk:
    `curl -s http://localhost:3000/_next/static/chunks/<chunk>._.js | grep -oE '"[0-9a-f]{40,}"'`.
+   **Achtung, Fehlschluss:** die Log-Zeile `ƒ profilSpeichern({}) in 511ms` zeigt **immer** `{}`,
+   auch wenn das FormData vollstaendig ankommt — der Browser-Durchlauf hat das bewiesen. Sie ist
+   kein Beleg fuer leere Argumente.
 2. **`--data-urlencode` mit `-G` verfaelschte in einem Testlauf die Ergebnisse** (ein `/produkte`
    kam als leerer Parameter an). Weiterleitungsziele mit fertig kodierter URL testen, nicht mit
    `-G`.
+3. **Tastatur- und Klick-Simulation im Browserwerkzeug kam auf dieser Seite nicht an** — die
+   Felder blieben leer, und der Submit scheiterte still an der nativen `required`-Pruefung, ohne
+   dass der eigene Handler lief. Das sah zweimal nach einem Fehler im Formular aus und war
+   keiner. Wer hier wieder testet: Werte ueber den `value`-Setter von `HTMLInputElement.prototype`
+   setzen, ein `input`-Event verschicken und `form.requestSubmit()` aufrufen — nur so sieht React
+   die Eingabe.
 
 ### Verifiziert (gegen `next dev` mit echtem D1-Binding)
 
@@ -108,12 +116,20 @@ Die drei alten offenen Punkte gelten unveraendert, siehe „Was noch offen ist".
   nur `@` ergibt `null`.
 - Testnutzer wieder geloescht, `user` und `mitglied` sind leer — die Kaskade greift.
 
-### Ungetestet geblieben
+### Verifiziert im Browser (echter Durchlauf durch die Oberflaeche)
 
-- **Das Absenden der drei Formulare im Browser.** Die Formulare rufen Better Auth und die Server
-  Action ueber JavaScript auf; beide Pfade sind serverseitig belegt (siehe oben), der Klickweg
-  durch die Oberflaeche aber nicht. Ein Browser-Durchlauf wurde in der Session abgelehnt.
-  **Beim naechsten Mal von Hand nachholen:** registrieren, abmelden, anmelden, Profil speichern.
+- Passwort-Gate, dann Registrierung: ungleiche Passwoerter zeigen „Die beiden Passwoerter stimmen
+  nicht ueberein", gleiche legen das Konto an und leiten auf `/mitglied`.
+- Der Instagram-Nachtrag nach der Registrierung greift: `@Browser.Kanal_1` steht als
+  `Browser.Kanal_1` in der Spalte.
+- `/mitglied`: Profil speichern mit ungueltigem Handle zeigt die Meldung der Server Action,
+  gueltig gespeichert steht getrimmt und normalisiert in der Datenbank („  Geaenderter Name  "
+  -> `Geänderter Name`, `@Neuer.Kanal_2` -> `Neuer.Kanal_2`), Bestaetigung „Gespeichert."
+- Abmelden: `/mitglied` faellt danach auf `/anmelden?weiter=%2Fmitglied` zurueck.
+- Anmelden: falsches Passwort zeigt „E-Mail-Adresse oder Passwort ist falsch", richtiges fuehrt
+  auf `/mitglied`.
+- Dark und Light geprueft (`data-theme="light"`): Badge „✓ Freigegeben" mit Haken, Rolle,
+  §-10-HWG-Hinweis, Felder und Fokusringe sitzen in beiden Themes.
 
 ---
 
