@@ -131,12 +131,13 @@ z. B. Nummerierung nur in der Navigation, Radius-Tokens 0, Pipeline-Skripte als 
 **Als Nächstes:** Der Nutzer prüft den Plan und wählt die Ausführungsart (empfohlen: "Native",
 also `superpowers:executing-plans` in der Session; Alternative "Subagent-driven"). Danach Task 1.
 
-**Konto des Nutzers (2026-09-24):** Auf Wunsch des Nutzers Passwort zurückgesetzt, lokal
-erledigt und geprüft. **Live offen:** wrangler-Login abgelaufen (`Authentication error
-[code: 10000]`); der Nutzer führt `npx.cmd wrangler login` und danach einmal den vorbereiteten
-`wrangler d1 execute --remote`-Aufruf aus (in PowerShell `npx.cmd`, weil die Ausführungsrichtlinie
-`npx.ps1` sperrt). Einzelheiten stehen bewusst nicht im öffentlichen Repo. Lesende Live-Zugriffe
-blockiert der Auto-Modus ("Production Reads").
+**Konto des Nutzers (2026-09-24):** Auf Wunsch des Nutzers Passwort zurückgesetzt, lokal und
+live erledigt (live hat der Nutzer den vorbereiteten `wrangler d1 execute --remote`-Aufruf selbst
+ausgeführt: "1 command executed successfully"). Hinweise für künftige Live-Zugriffe: in PowerShell
+`npx.cmd` statt `npx` (Ausführungsrichtlinie sperrt `npx.ps1`); wrangler-Login läuft ab
+(`Authentication error [code: 10000]` → `npx.cmd wrangler login`); lesende und schreibende
+Live-Zugriffe von Claude blockiert der Auto-Modus. Einzelheiten zum Konto gehören nie ins
+öffentliche Repo.
 
 **Session 6 (2026-09-23): Schritt 0 ist komplett erledigt** (Commit `1f1bd17`, Spec 4.2,
 4.3, 4.5): wizardtrees.com und dojadirect.com (vom Nutzer genannt; dojaexclusive.com liefert
