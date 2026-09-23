@@ -51,7 +51,19 @@ geprueft, dass alles gespeichert ist.
 **Ab jetzt gilt: Push nach `main` mit Code-Aenderung = Live-Gang** - erst nach dem Go des
 Nutzers pushen (Memory `immer-nach-github-pushen`).
 
-**Testlauf von Workers Builds (2026-09-23, auf Go des Nutzers) - noch nicht gruen:**
+**Workers Builds funktioniert (2026-09-23, 22:04):** Der Build zu `4e21291` lief durch und hat
+Version `138177b3` live gestellt. Online einmal geprueft: `/`, `/reviews`, `/umfragen` 200,
+`/admin` 307 (Login). Damit ist jeder Push nach `main` mit Code-Aenderung ein Live-Gang.
+Der Commit mit diesem Absatz (nur HANDOFF.md, loest keinen Build aus) ist **lokal** - die
+naechste Session pusht ihn als Erstes.
+
+**Nebenbefund zum Netzausfall:** Nach dem Neustart hielt ein fremder Dienst `aoservice`
+(PID 5452, Systemrechte, Hersteller nicht lesbar) rund 200 TCP-Verbindungen, davon 68
+**eingehende** auf Port 3159; daneben lief `urban-vpn-service`. Beides nicht von Claude. Dem
+Nutzer gesagt; er soll im Task-Manager nachsehen, was `aoservice.exe` ist. Nach dem Neustart
+lief der Push ohne Probleme.
+
+**Verlauf des Testlaufs (zur Nachvollziehbarkeit):**
 1. Build `d87d9ae` (nur README geaendert) scheiterte am Typecheck: `cloudflare-env.d.ts` war
    gitignored -> `Cannot find name 'D1Database'`, `Property 'DB' does not exist on type
    'CloudflareEnv'`. **Behoben in `77537ad`** (Datei wird mitcommittet, `.gitignore` erklaert
