@@ -73,7 +73,9 @@
   --text-titel--font-weight: 300;
 
   /* Randfuellender Titel im Auftakt, zwei Zeilen Versalien. */
-  --text-auftakt: clamp(4.5rem, 20vw, 21rem);
+  /* 23.3vw: "GRUENES" fuellt bei 390 bis 1440 px 92 bis 100 % der Zeile
+     (Laufweite gemessen: 3.818 x Schriftgroesse), 22rem ab 1504 px. */
+  --text-auftakt: clamp(4.5rem, 23.3vw, 22rem);
   --text-auftakt--line-height: 0.86;
   --text-auftakt--font-weight: 500;
 

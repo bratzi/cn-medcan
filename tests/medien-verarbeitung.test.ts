@@ -54,3 +54,19 @@ test("Video: größte SD-Datei bis 960 px, sonst kleinste MP4", () => {
   assert.equal(waehleSdVideo([datei("hd", 1920), datei("hd", 1280)])?.width, 1280);
   assert.equal(waehleSdVideo([datei("sd", 640, "video/webm")]), null);
 });
+
+test("Graustufen-WebP: heller Grund wird weiß, das Motiv bleibt dunkel", async () => {
+  // 40 x 40, Grund hellgrau (210), in der Mitte ein schwarzes Quadrat.
+  const pixel = Buffer.alloc(40 * 40, 210);
+  for (let y = 15; y < 25; y++) for (let x = 15; x < 25; x++) pixel[y * 40 + x] = 0;
+  const eingabe = await sharp(pixel, { raw: { width: 40, height: 40, channels: 1 } }).png().toBuffer();
+  const { data, info } = await sharp(await zuGraustufenWebp(eingabe, 40)).grayscale().raw().toBuffer({ resolveWithObject: true });
+  assert.ok(data[0] >= 250, `Grund ${data[0]}`);
+  assert.ok(data[20 * info.width + 20] <= 10, `Motiv ${data[20 * info.width + 20]}`);
+});
+
+test("Graustufen-WebP: dunkler Grund bleibt unverändert hell", async () => {
+  const dunkel = await sharp({ create: { width: 40, height: 40, channels: 3, background: { r: 80, g: 80, b: 80 } } }).png().toBuffer();
+  const { data } = await sharp(await zuGraustufenWebp(dunkel, 40)).grayscale().raw().toBuffer({ resolveWithObject: true });
+  assert.ok(Math.abs(data[0] - 80) <= 4, `Grund ${data[0]}`);
+});

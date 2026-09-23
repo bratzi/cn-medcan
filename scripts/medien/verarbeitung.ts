@@ -4,14 +4,40 @@
  */
 import sharp from "sharp";
 
-/** Graustufen-WebP in einer Breite, nie vergroessert. */
+/** Ab dieser Randhelligkeit gilt der Grund als hell und wird auf Weiss gezogen. */
+const HELLER_GRUND = 180;
+
+/** Median der Helligkeit im aeusseren Rand (5 %): dort liegt der Grund, nicht das Motiv. */
+function randMedian(data: Buffer, breite: number, hoehe: number): number {
+  const rand = Math.max(1, Math.round(Math.min(breite, hoehe) * 0.05));
+  const werte: number[] = [];
+  for (let y = 0; y < hoehe; y++) {
+    for (let x = 0; x < breite; x++) {
+      if (x < rand || y < rand || x >= breite - rand || y >= hoehe - rand) werte.push(data[y * breite + x]);
+    }
+  }
+  werte.sort((a, b) => a - b);
+  return werte[Math.floor(werte.length / 2)];
+}
+
+/**
+ * Graustufen-WebP in einer Breite, nie vergroessert.
+ *
+ * Weissabgleich: Fotos "vor hellem Grund" liegen oft auf Hellgrau. Mit
+ * multiply bliebe davon ein graues Rechteck ueber dem Papier (Spec 4.5),
+ * deshalb wird ein heller Grund linear auf Weiss gezogen. Ein dunkler Grund
+ * (Video-Standbild) bleibt unveraendert.
+ */
 export async function zuGraustufenWebp(eingabe: Buffer, breite: number): Promise<Buffer> {
-  return sharp(eingabe)
+  const { data, info } = await sharp(eingabe)
     .rotate()
     .resize({ width: breite, withoutEnlargement: true })
     .grayscale()
-    .webp({ quality: 72 })
-    .toBuffer();
+    .raw()
+    .toBuffer({ resolveWithObject: true });
+  const grund = randMedian(data, info.width, info.height);
+  const bild = sharp(data, { raw: { width: info.width, height: info.height, channels: 1 } });
+  return (grund >= HELLER_GRUND ? bild.linear(255 / grund, 0) : bild).webp({ quality: 72 }).toBuffer();
 }
 
 /**

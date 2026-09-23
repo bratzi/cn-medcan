@@ -11,8 +11,7 @@ const ORDNER = [
   "components/marke",
   "components/medien",
 ];
-/** app/page.tsx kommt in Task 9 dazu, wenn die alte Startseite ersetzt ist. */
-const DATEIEN = ["app/layout.tsx"];
+const DATEIEN = ["app/page.tsx", "app/layout.tsx"];
 
 /** Geviertstrich überall, Gedankenstrich nur als Trenner zwischen Leerzeichen. */
 const TRENNER = /—|\s–\s/;
