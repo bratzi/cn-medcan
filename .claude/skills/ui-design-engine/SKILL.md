@@ -1,6 +1,6 @@
 ---
 name: ui-design-engine
-description: Design-System-Regelwerk "8px-Grid & Premium-Ästhetik" für diesen Medizinalcannabis-Produktkatalog. Greift immer beim Bauen oder Ändern von UI-Komponenten, Seiten, Layouts oder Styles in diesem Projekt (alles unter app/** und components/**, sowie app/globals.css) — also bei jeder Arbeit an Spacing, Typografie, Farbe, Motion, Zuständen, Badges oder Barrierefreiheit. Definiert die verbindlichen Tokens und die Abschluss-Checkliste.
+description: Design-System-Regelwerk "Grünes Buch" (Buch und Wand, 8px-Raster) für diesen Medizinalcannabis-Katalog. Greift immer beim Bauen oder Ändern von UI-Komponenten, Seiten, Layouts oder Styles in diesem Projekt (alles unter app/** und components/**, sowie app/globals.css): Spacing, Typografie, Farbe, Formen, Medien, Motion, Zustände, Badges, Barrierefreiheit. Marke in docs/brand/gruenes-buch.md, hier die verbindlichen Code-Regeln und die Abschluss-Checkliste.
 ---
 
 # UI Design Engine (Wrapper)
@@ -10,9 +10,8 @@ Die Quelle der Wahrheit für dieses Skill ist die flache Datei
 
 **Lies diese Datei jetzt vollständig** (Read-Tool auf
 `.claude/skills/ui-design-engine.md`) und arbeite nach ihren Regeln, bevor du
-UI-Code schreibst oder änderst. Sie enthält 8px-Grid, Typo-Skala,
-OKLCH-Farbtokens, Anti-"AI-Look"-Regeln, Motion, Barrierefreiheit, die
-domänenspezifischen Vorgaben und die Abschluss-Checkliste.
+UI-Code schreibst oder änderst. Sie enthält Buch und Wand, 8px-Raster, Tokens, Formen,
+Medien, Bewegung, Barrierefreiheit, Checkliste.
 
 Dieser Wrapper existiert nur, weil Claude Code Skills als `<name>/SKILL.md`
 lädt. Inhalte werden hier absichtlich nicht wiederholt — bei Abweichungen gilt
