@@ -34,8 +34,98 @@ export const FOTO_BREITEN = [640, 1280, 1920] as const;
 export const MASKEN_BREITE = 960;
 export const STANDBILD_BREITE = 1280;
 
-/** Wird in Task 6 gefuellt. */
-export const MEDIEN: readonly Medium[] = [];
+export const MEDIEN: readonly Medium[] = [
+  {
+    id: "leitobjekt",
+    art: "foto",
+    pexelsId: 8534174,
+    datei: "leitobjekt",
+    breite: 4160,
+    hoehe: 6240,
+    alt: "Aufgeschlagenes leeres Notizbuch mit einem Blatt, einer weißen Lilie und einem Stift auf hellem Grund",
+    urheber: "Hanna Pad",
+    quelle: "https://www.pexels.com/photo/an-open-blank-notebook-with-white-flower-on-top-8534174/",
+  },
+  {
+    id: "blatt",
+    art: "foto",
+    pexelsId: 7668040,
+    datei: "blatt",
+    breite: 5184,
+    hoehe: 3888,
+    alt: "Einzelnes Cannabisblatt vor hellem Grund",
+    urheber: "Kindel Media",
+    quelle: "https://www.pexels.com/photo/photo-of-cannabis-on-white-background-7668040/",
+  },
+  {
+    id: "bluete",
+    art: "foto",
+    pexelsId: 20288575,
+    datei: "bluete",
+    breite: 3116,
+    hoehe: 2078,
+    alt: "Zwei getrocknete Cannabisblüten vor hellem Grund",
+    urheber: "Jonathan Cooper",
+    quelle: "https://www.pexels.com/photo/dry-buds-of-marijuana-20288575/",
+  },
+  {
+    id: "trichom",
+    art: "foto",
+    pexelsId: 30439065,
+    datei: "trichom",
+    breite: 6720,
+    hoehe: 4480,
+    alt: "Nahaufnahme einer Cannabisblüte mit Trichomen",
+    urheber: "Stephen Leonardi",
+    quelle: "https://www.pexels.com/photo/close-up-of-frosty-cannabis-bud-30439065/",
+  },
+  {
+    id: "drip",
+    art: "maske",
+    pexelsId: 4862581,
+    datei: "drip",
+    breite: 3750,
+    hoehe: 2500,
+    alt: "",
+    urheber: "Aleksandar Pasaric",
+    quelle: "https://www.pexels.com/photo/yellow-paint-dripping-on-orange-surface-4862581/",
+    // Gelbe Farbe laeuft ueber orangem Grund: die Farbe ist heller als der Grund.
+    maskeUmkehren: true,
+  },
+  {
+    id: "nebel",
+    art: "maske",
+    pexelsId: 1193879,
+    datei: "nebel",
+    breite: 5184,
+    hoehe: 3456,
+    alt: "",
+    urheber: "Dan Cristian Pădureț",
+    quelle: "https://www.pexels.com/photo/yellow-green-and-red-abstract-painting-1193879/",
+  },
+  {
+    id: "marmor",
+    art: "maske",
+    pexelsId: 33199141,
+    datei: "marmor",
+    breite: 3648,
+    hoehe: 5472,
+    alt: "",
+    urheber: "Landiva Weber",
+    quelle: "https://www.pexels.com/photo/abstract-marble-texture-in-purple-and-gray-hues-33199141/",
+  },
+  {
+    id: "pflanze-loop",
+    art: "video",
+    pexelsId: 12361112,
+    datei: "pflanze-loop",
+    breite: 3840,
+    hoehe: 2160,
+    alt: "",
+    urheber: "Nicky Pe",
+    quelle: "https://www.pexels.com/video/cannabis-plants-swaying-in-the-wind-12361112/",
+  },
+];
 
 export function medium(id: string): Medium {
   const gefunden = MEDIEN.find((m) => m.id === id);
