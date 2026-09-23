@@ -72,12 +72,19 @@ async function nextEnvBereinigen() {
   writeFileSync(NEXT_ENV, inhalt);
 }
 
+// node_modules in der Ausgabe sind unveraenderte Kopien installierter Pakete
+// und koennen keine Werte aus .env-Dateien enthalten. Seit der Prisma-Client
+// ueber Turbopacks Wasm-Lader rund 30.000 Dateien in die Build-Spur zieht,
+// kopiert OpenNext dort Hunderte Pakete samt Binaerdateien hinein; sie
+// Byte fuer Byte zu lesen dauerte ueber zehn Minuten. Geprueft wird alles,
+// was der Build erzeugt: next-env.mjs, Chunks, handler.mjs, Assets.
 function* alleDateien(ordner) {
   for (const name of readdirSync(ordner)) {
     const pfad = join(ordner, name);
     const info = statSync(pfad);
-    if (info.isDirectory()) yield* alleDateien(pfad);
-    else if (info.isFile()) yield pfad;
+    if (info.isDirectory()) {
+      if (name !== "node_modules") yield* alleDateien(pfad);
+    } else if (info.isFile()) yield pfad;
   }
 }
 

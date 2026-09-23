@@ -34,7 +34,8 @@ import type {
   Darreichungsform,
   KultivarTyp,
 } from "../db/enums";
-import { PrismaClient } from "../lib/generated/prisma/client";
+// Der Node-Client, nicht der Cloudflare-Client der App - siehe schema.prisma.
+import { PrismaClient } from "../lib/generated/prisma-node/client";
 
 const D1_VERZEICHNIS = ".wrangler/state/v3/d1/miniflare-D1DatabaseObject";
 

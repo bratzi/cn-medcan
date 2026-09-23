@@ -2,9 +2,26 @@
 // Datenbank: Cloudflare D1 (SQLite). Zugriff ausschliesslich ueber das
 // Worker-Binding DB, siehe lib/prisma.ts.
 
+// runtime = "cloudflare" ist Pflicht: ohne die Angabe erzeugt Prisma den
+// Query-Compiler als Base64-Text und kompiliert ihn zur Laufzeit mit
+// `new WebAssembly.Module()`. Workers verbieten das ("Wasm code generation
+// disallowed by embedder") - live warf damit jede Datenbankabfrage. Mit
+// "cloudflare" wird die .wasm-Datei direkt importiert und von wrangler beim
+// Upload vorkompiliert. Lokal in `next dev` fiel das nie auf (Node erlaubt es).
 generator client {
   provider = "prisma-client"
   output   = "../lib/generated/prisma"
+  runtime  = "cloudflare"
+}
+
+// Nur fuer prisma/seed.ts, das mit tsx unter reinem Node laeuft. Dort liefert
+// der `.wasm?module`-Import des Cloudflare-Clients nichts ("The loaded wasm
+// module was unexpectedly undefined"). `next dev` braucht diesen Client nicht,
+// Turbopack versteht den Import. Gleiches Schema, also gleiche Typen.
+generator seed {
+  provider = "prisma-client"
+  output   = "../lib/generated/prisma-node"
+  runtime  = "nodejs"
 }
 
 // D1 hat keine Verbindungs-URL. Migrationen laufen hybrid:

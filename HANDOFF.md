@@ -28,6 +28,52 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 
 ## ⇢ Hier geht es weiter
 
+### 0. Zuerst: ist der Prisma-Fix live?
+
+Live-Adresse: **https://cn-medcan.w-helwich.workers.dev** (hinter dem Seitenpasswort = lokales
+`SITE_PASSWORD`). Stand 2026-09-23: das erste Deploy lief, aber **jede Datenbankabfrage warf**
+(`WebAssembly.Module(): Wasm code generation disallowed by embedder`), sichtbar als 500 auf
+`/reviews` und `/umfragen`. Behoben im Code (siehe "Was noch offen ist", Punkt 5); live wird es
+erst mit dem naechsten `npm.cmd run deploy` **durch den Nutzer** (Claude darf nicht deployen).
+Pruefen: `/reviews` und `/umfragen` mit Passwort-Cookie muessen 200 liefern, `wrangler tail`
+ohne `CompileError`.
+
+### 1. Grosser Auftrag: Komplettes Makeover (Nutzer, 2026-09-23) - **damit beginnt die naechste Session**
+
+Der Nutzer findet die Seite "kacke bis 0815". Verlangt ist ein **komplettes Makeover** samt
+**Brand Guideline / Preset** (zwingend).
+
+- **Referenz fuer Look & Feel:** https://moneyincheck.org/ (Landingpage zum Roman "Money in
+  Check" von Óscar Pérez). Farben, Scroll-Effekte, Typografie, Scroll-Storytelling gefallen dem
+  Nutzer - Thema von Geld auf **Cannabis** umdeuten. Die Seite rendert per JavaScript; ein
+  Abruf liefert nur den Titel. **Im Browser analysieren**: Screenshots je Scrollabschnitt,
+  berechnete Farben und Schriften, eingesetzte Libraries (Scripts/Network, z. B. GSAP,
+  ScrollTrigger, Lenis). Look & Feel adaptieren, nicht kopieren.
+- **Aufbau der Startseite laut Nutzer:** zuerst Scroll-Storytelling zur Philosophie - *Cannabis
+  transparent machen, das Wissen der Community buendeln, gemeinsam mehr ueber die Pflanze
+  lernen*. Danach Umfragen, dann Produkte, Apotheken und was kuenftig dazukommt.
+- **Offene Frage fuers Brainstorming:** Die eigenen Reviews des Betreibers sind laut Produktkern
+  zentral, der Nutzer hat sie im neuen Aufbau nicht genannt - wo stehen sie?
+- **Ablauf:** `superpowers:brainstorming` zuerst (kreative Arbeit) -> Referenz im Browser
+  analysieren -> Brand Guideline als Datei im Repo (Farben, Typo, Spacing, Motion,
+  Bildsprache, Tonalitaet) -> Design-Skills installieren -> Startseite Sektion fuer Sektion ->
+  uebrige Seiten -> Review.
+- **Skills:** Zuordnung steht in der Memory `design-skills-einsatz` (Brand: `brand-guidelines`
+  + `taste-skill`; Scroll/Motion: `build-awwwards-quality-sites`, `animate`; Bau:
+  `frontend-design`; Feinschliff: `emil-design-eng`; Typo/Farbe/A11y: `jakub-krehel-skills`;
+  Review: `interface-review` + `web-design-guidelines`). Installation ueber
+  `npx skills add <owner/repo>`, Quell-Repo auf `agenticskills.io/skills/<slug>`.
+- **Grenzen, die das Design einhalten muss:**
+  - **§10 HWG:** Storytelling ist Information und Community, keine Publikumswerbung fuer ein
+    verschreibungspflichtiges Arzneimittel - keine Heilversprechen, keine Produkt- oder
+    Preisbewerbung fuer Besucher. Preise bleiben hinter der Freigabe.
+  - `ui-design-engine` (klinisches Tiefblau, 8px-Grid) gilt bis zur neuen Guideline und wird
+    dann auf deren Tokens umgeschrieben (`app/globals.css`), nicht parallel gefuehrt.
+  - Animationen clientseitig, `prefers-reduced-motion` Pflicht, Client-Bundle klein halten
+    (`cloudflare:web-perf`). Nichts, was Geld kostet (Schriften, Libraries).
+
+### 2. Danach (aeltere Punkte, weiter gueltig)
+
 **Block A (Cloudflare D1) ist abgeschlossen.** Von **Block B** sind **Schritt 1 bis 7** erledigt:
 Anmeldung, `/mitglied`, `/admin`, das Umfragemodell samt Schreibschicht, die umgebaute Startseite,
 `/umfragen`, `/reviews` - und jetzt die **Umfrageverwaltung in `/admin`**. Die Schleife, die das
@@ -650,7 +696,13 @@ Pooler-URLs). Die Datenbank ist **Cloudflare D1** als Binding `DB`. Was dabei en
    Nicht erwogen: die Wrangler-Option `build.command` als zweite Sperre vor jedem Deploy - wrangler
    fuehrt sie auch bei `wrangler types` aus (`getEntry(..., "types")`), und `cf-typegen` braeche
    ohne Build-Ausgabe.
-3. **Live gehen - liegt beim Nutzer, weil die Session es nicht darf.** Die Rechtepruefung von
+3. **Erledigt am 2026-09-23 durch den Nutzer:** Secrets gesetzt, Migrationen und Trigger in der
+   Cloud-D1, erstes Deploy (`https://cn-medcan.w-helwich.workers.dev`, Version `f7abe9f7`).
+   **Im PowerShell des Nutzers `npm.cmd`/`npx.cmd` schreiben** - die Execution Policy sperrt
+   `npm.ps1`/`npx.ps1`. Die Deploy-Ausgabe zeigt bei D1 `PLATZHALTER-...` an: das ist nur die
+   Anzeige (wrangler druckt `preview_database_id`), die Version haengt nachweislich an
+   `cdee3489-...` (`wrangler versions view`). Das Gate greift live (ohne Cookie 307).
+   Urspruenglicher Stand zu Punkt 3: **Live gehen - liegt beim Nutzer, weil die Session es nicht darf.** Die Rechtepruefung von
    Claude Code blockiert Remote-Migration, `wrangler secret put` (beim zweiten Mal) und Deploy als
    Produktionsaktionen, und ein Skript, das diese Schritte buendelt, als Umgehung. **Nicht erneut
    versuchen**, sondern dem Nutzer den Block geben (PowerShell, in `C:\cn`, Dev-Server gestoppt):
@@ -693,6 +745,35 @@ Pooler-URLs). Die Datenbank ist **Cloudflare D1** als Binding `DB`. Was dabei en
    (drei Treffer gemeldet, nur Pfad und Name) und danach sauber. **Nie `opennextjs-cloudflare
    deploy` direkt aufrufen**, immer `npm run deploy`.
    Git-Historie geprueft: keiner der vier lokalen Werte steht in einem der 21 Commits.
+   **Nachtrag:** Die Pruefung ueberspringt `node_modules` in der Ausgabe - unveraenderte
+   Paketkopien, die keine `.env`-Werte enthalten koennen. Vorher las sie seit Punkt 5 Hunderte
+   kopierte Pakete samt Binaerdateien und brauchte ueber zehn Minuten; jetzt 1 Sekunde. Erneut
+   mit einer absichtlich platzierten Datei geprueft: Treffer, Exit 1.
+5. **Behoben, aber noch nicht deployt: jede Datenbankabfrage warf live.**
+   `WebAssembly.Module(): Wasm code generation disallowed by embedder` (per `wrangler tail`).
+   Der Generator `prisma-client` erzeugt ohne `runtime` den Query-Compiler als Base64 und
+   kompiliert ihn zur Laufzeit - Workers verbieten das, Node erlaubt es, lokal fiel es nie auf.
+   Seiten mit `Suspense` meldeten trotzdem 200 (der Status war vor dem Fehler gesendet), nur
+   `/reviews` und `/umfragen` zeigten 500.
+   - `prisma/schema.prisma`: `runtime = "cloudflare"` -> Import als `.wasm?module`, von wrangler
+     vorkompiliert. `next dev` (Turbopack) versteht das, geprueft.
+   - **Zweiter Generator `seed`** (`runtime = "nodejs"`, Ausgabe `lib/generated/prisma-node`) nur
+     fuer `prisma/seed.ts`: unter tsx liefert der `?module`-Import nichts ("The loaded wasm module
+     was unexpectedly undefined"). Geprueft: Node-Client liest die lokale D1.
+   - **Nebenwirkung, behoben in `next.config.ts`:** Turbopacks Wasm-Lader loest den Pfad dynamisch
+     auf, die Build-Spur erfasst ~30.000 Dateien, OpenNext importiert **jede** erfasste `.wasm`
+     statisch (`loadWasmChunkFn`) - der Worker wuchs von 19,7 auf 62,6 MiB (Limit 64).
+     `outputFileTracingExcludes` mit einer ausdruecklichen Paketliste; `resvg.wasm`/`yoga.wasm`
+     aus `next/dist/compiled/@vercel/og` muessen drin bleiben (OpenNexts og-Patch importiert sie
+     fest, sonst ENOENT beim Deploy). `node_modules/!(next)/**` greift in Next **nicht**.
+     Ergebnis: 19,5 MiB, drei `.wasm` in der Spur.
+   - Verifiziert in lokalem workerd (`npx opennextjs-cloudflare preview` auf dem fertigen Build):
+     `/reviews`, `/produkte`, `/` liefern 200 mit Daten, keine Wasm-Fehler im Log.
+   - **`npm run preview` braucht eine `.dev.vars`** mit den lokalen Secrets: OpenNext schaltet das
+     Laden von `.env`-Dateien in wrangler ab (`CLOUDFLARE_LOAD_DEV_VARS_FROM_DOT_ENV=false`) und
+     liefert sie sonst ueber `next-env.mjs` - das bereinigt Punkt 4. Ohne `.dev.vars` ist das Gate
+     in der Vorschau offen und Auth wirft. Nur lokal relevant, noch nicht angelegt.
+   - **Live erst nach `npm.cmd run deploy` durch den Nutzer** (bei gestopptem `next dev`).
 
 ---
 
