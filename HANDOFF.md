@@ -130,13 +130,13 @@ Budgets, Akzeptanzkriterien und Reihenfolge. **Die Spec ist die Quelle - nicht d
   live). Beim Start prüfen: `git branch --show-current` muss `makeover/gruenes-buch` zeigen.
 - **Ledger** (Fortschritt, Rulings): `.superpowers/sdd/2026-09-24-makeover-gruenes-buch/progress.md`,
   lokal, über `.git/info/exclude` ignoriert (nicht im Repo). Tasks mit `Task N: complete` sind fertig.
-- **Stand 2026-09-24 (Session 7): Tasks 1 bis 4 fertig** (Commits bis `6b4701a`, nur lokal auf dem Branch).
-  Weiter bei **Task 5** und ohne Rückfrage bis Task 16 (executing-plans: nicht zwischen Tasks anhalten).
-  Rulings stehen im Ledger (Zeilen mit `Ruling:`); wichtig für spätere Tasks: `duration-fast/normal/slow`
-  funktionieren erst über die neuen `--transition-duration-*`-Aliase in `app/globals.css`; ESLint ignoriert
-  jetzt `.wrangler/**` (lief sonst in heap out of memory); Dateien mit CRLF beim Schreiben per Skript nicht
-  auf LF umstellen (`git ls-files --eol`).
-- Sichtprüfung: Browser-Erweiterung „Browser 1“ läuft nach Chrome-Neustart. Gate-Cookie lokal: der Browser hat
+- **Stand 2026-09-24 (Session 7): Tasks 1 bis 9 fertig** (Commits bis `8f4729f`, nur lokal auf dem Branch).
+  Weiter bei **Task 10** und ohne Rückfrage bis Task 16 (executing-plans: nicht zwischen Tasks anhalten).
+  Alle Abweichungen vom Plan stehen im Ledger (Zeilen mit `Ruling:`), u. a.: `duration-*` braucht die
+  `--transition-duration-*`-Aliase; ESLint ignoriert `.wrangler/**`; Leitobjekt ist jetzt 5712437 (Spiralheft),
+  Pipeline macht Weißabgleich; Auftakt-Wrapper ohne z-index/transform (sonst kein multiply); Masken/Video über
+  den Richtwerten, vom Nutzer akzeptiert, in Task 15 (web-perf) prüfen. CRLF-Dateien nicht auf LF umstellen.
+- Sichtprüfung: Browser-Erweiterung „Browser 1“; hängt ein Tab nach Hot Reload, frischen Tab öffnen (nicht aufgeben). Gate-Cookie lokal: der Browser hat
   schon eins; für `curl` erzeugt man es aus `.env.local` (`SITE_SESSION_SECRET`, Format in `lib/gate.ts`).
 - Skripte: `task-start`/`task-done` unter
   `~/.claude/plugins/cache/claude-plugins-official/superpowers/6.4.1/skills/executing-plans/scripts/`,
