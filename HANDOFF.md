@@ -149,9 +149,11 @@ Doja-Seite lief in einen Timeout (nicht wiederholt).
 - `.env.local`: Pexels-Key vom Nutzer eingetragen, Variable von `pexel-api-key` in
   **`PEXELS_API_KEY`** umbenannt (Wert nie gelesen). `.env.local.example` hat den Platzhalter.
 
-**Offen beim Nutzer:** Instagram-Handle pruefen; Chrome-Erweiterung verbinden (war die ganze
-Session nicht verbunden, `list_connected_browsers` leer - fuer die Browser-Pruefungen der Spec
-noetig).
+**Offen beim Nutzer:** Instagram-Handle pruefen.
+
+**Browser-Werkzeug:** War fast die ganze Session 4 nicht verbunden (`list_connected_browsers`
+leer). **Abhilfe: Nutzer startet Chrome neu** - danach war "Browser 1" sofort da
+(`select_browser`, dann `tabs_context_mcp`). Den MCP-Server selbst kann Claude nicht neu starten.
 
 ### 2. Danach (aeltere Punkte, weiter gueltig)
 
