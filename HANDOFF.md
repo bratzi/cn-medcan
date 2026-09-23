@@ -103,8 +103,28 @@ Sie enthaelt alle Entscheidungen samt verworfenen Alternativen, Farben mit gemes
 Kontrasten, Schriften, Logo, Startseiten-Dramaturgie (9 Sektionen), Technik, Medien-Pipeline,
 Budgets, Akzeptanzkriterien und Reihenfolge. **Die Spec ist die Quelle - nicht diese Notiz.**
 
+**Session 5 (2026-09-23), Stand von Schritt 0:**
+- **Erledigt, in die Spec eingearbeitet** (Commits `7d60fd5`, `6f5a5bc`):
+  a. moneyincheck.org im Browser gemessen (Desktop per Screenshots und berechneten Styles,
+     Handy per gleich-originigem iframe mit 390 px) -> Spec 4.2 (Cormorant zusaetzlich 500),
+     4.6 (Hover, Vorhang), neu 4.7 (Feldbuch-Raster), neu 4.8 (Referenzwerte), 5.1 Sektionen
+     1, 2, 9 umgebaut (randfuellender Titel mit ueberlagertem Leitobjekt, Manifest mit
+     scroll-gekoppelter Wort-Einfaerbung, Schlusszeile als Kontur, die sich fuellt).
+  b. Logos, Verpackung und Merch von Wizard Trees und Doja Pak ueber die Google-Bildersuche
+     -> Spec 4.3 (Schleife um das Tag, gesperrte Versalien darunter, Stanzkontur,
+     Marmorierung, angeschnittenes Footer-Tag, Ton-in-Ton-Wasserzeichen, Holo nur auf dem
+     Aufkleber). Die **Websites** wizardtrees.com und Doja wurden **nicht** gesehen: der Tab
+     hing bei wizardtrees.com (Screenshot-Timeout, vermutlich Altersabfrage). Nutzer will
+     Websites auch sehen - einmal im **neuen Tab** versuchen, bei Timeout den Nutzer bitten,
+     den Dialog wegzuklicken.
+- **Offen:** c. Schriftvergleich, d. Pexels-Motive, dann Schritt 1 (Freigabe der Spec).
+- Dosierung bleibt **60/40** (Nutzer hat bestaetigt, 80/20 war ein Versprecher).
+- Browser: `mcp__browser__navigate` steht jetzt in den Allow-Regeln. Die Fenstergroesse laesst
+  sich nicht aendern (innen 2296 px). Bei "Permission denied" sofort dem Nutzer sagen, dass ein
+  Freigabe-Fenster wartet (Memory `freigabe-fenster-melden`).
+
 **Naechste Schritte, in dieser Reihenfolge:**
-0. **Zuerst, ohne Rueckfrage: alles mit dem Browser pruefen und die Spec nachschaerfen**
+0. **Zuerst, ohne Rueckfrage: Rest von Schritt 0 (siehe oben: Websites, c, d), dann Spec nachschaerfen**
    (Nutzer nach Session 4: "nach dem clear alles mit der faehigkeit des browsers checken und
    nachschaerfen!"). Die Referenzanalyse in Session 4 lief nur ueber `curl` auf HTML/CSS/JS,
    ohne gerenderte Seite. Browser verbinden (`list_connected_browsers` -> Nutzer per
