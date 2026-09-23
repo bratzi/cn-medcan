@@ -32,8 +32,12 @@ export type AngemeldetesMitglied = {
 
 /** Rohe Better-Auth-Sitzung. Nur innerhalb dieser Datei gebraucht. */
 const sitzung = cache(async () => {
+  // headers() zuerst: damit ist die Seite dynamisch, bevor getAuth() das
+  // Secret braucht. Andersherum rendert `next build` Seiten wie /admin vorab
+  // und bricht ohne BETTER_AUTH_SECRET ab - Workers Builds hat keine Secrets.
+  const anfrageHeader = await headers();
   const auth = await getAuth();
-  return auth.api.getSession({ headers: await headers() });
+  return auth.api.getSession({ headers: anfrageHeader });
 });
 
 /**
