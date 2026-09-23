@@ -7,6 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
+    "test": "tsx --test \"tests/**/*.test.ts\"",
+    "farben": "node scripts/farben-pruefen.mjs",
     "preview": "npm run cf-build && opennextjs-cloudflare preview",
     "deploy": "npm run cf-build && opennextjs-cloudflare deploy",
     "cf-build": "opennextjs-cloudflare build && node scripts/bundle-env-bereinigen.mjs",
