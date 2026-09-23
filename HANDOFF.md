@@ -104,6 +104,31 @@ Kontrasten, Schriften, Logo, Startseiten-Dramaturgie (9 Sektionen), Technik, Med
 Budgets, Akzeptanzkriterien und Reihenfolge. **Die Spec ist die Quelle - nicht diese Notiz.**
 
 **Naechste Schritte, in dieser Reihenfolge:**
+0. **Zuerst, ohne Rueckfrage: alles mit dem Browser pruefen und die Spec nachschaerfen**
+   (Nutzer nach Session 4: "nach dem clear alles mit der faehigkeit des browsers checken und
+   nachschaerfen!"). Die Referenzanalyse in Session 4 lief nur ueber `curl` auf HTML/CSS/JS,
+   ohne gerenderte Seite. Browser verbinden (`list_connected_browsers` -> Nutzer per
+   AskUserQuestion waehlen lassen -> `select_browser` -> `tabs_context_mcp`; ist die Liste
+   leer: Nutzer bitten, Chrome neu zu starten). Dann pruefen:
+   a. **moneyincheck.org**, Desktop (1440 px) und Handy (390 px): Screenshot je
+      Scrollabschnitt; Scroll-Choreografie (was pinnt, was blendet wie ein, Ladevorhang,
+      Uebergaenge, Footer-Video); berechnete Styles per `javascript_tool` (Schriftgroessen,
+      Laufweite, Zeilenhoehe, Abstaende, Button- und Hover-Zustaende); Verhalten bei
+      reduzierter Bewegung.
+   b. **Wizard Trees** (wizardtrees.com) und **Doja Pak** (dojaexclusive.com lief per `curl` in
+      einen Timeout, im Browser einmal versuchen; sonst Instagram `@doja.pak`): Handstyle,
+      Schnoerkel, Farben, Layout, Bewegung.
+   c. **Schriften** auf fonts.google.com mit Mustertext „Grünes Buch“ / „Wähl mit“ /
+      „Cannabis, offen gelegt.“: Cormorant Garamond 300 gegen EB Garamond und Playfair Display;
+      Sedgwick Ave Display gegen Permanent Marker und Rubik Spray Paint.
+   d. **Pexels** (Website-Suche, noch keine API): gibt es die Motive der Spec wirklich
+      (Blatt/Pflanze vor hellem Grund, Trichom-Makro, Sprühfarbe/Drips auf heller Wand, grünes
+      Notizbuch; SD-Videos)? Je Motiv 2 bis 3 Treffer notieren.
+   Befunde in die Spec einarbeiten (v. a. Abschnitte 4 und 5.1), die Aenderungen dem Nutzer
+   kurz auflisten, dann Schritt 1. Screenshots laufen oft in einen Timeout: dann `zoom`,
+   `get_page_text`, `javascript_tool` nutzen. Nicht pollen, keine Wiederholungsschleifen.
+   Der Nutzer will **keinen** Browser-Companion fuer Mockups - Screenshots sind nur fuer die
+   eigene Analyse.
 1. **Nutzer um Freigabe der Spec bitten** (Pflicht-Gate aus `superpowers:brainstorming`: "Spec
    written and committed ... please review"). Dabei **ausdruecklich** auf die eine Abweichung vom
    Chat hinweisen: Kapitel "Wissen buendeln" zeigt **echte Zahlen** (Stimmen, Vorschlaege,
