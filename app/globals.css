@@ -155,6 +155,11 @@
   --duration-fast: 180ms;
   --duration-normal: 250ms;
   --duration-slow: 350ms;
+  /* Tailwind liest duration-* aus --transition-duration-*: ohne diese Zeilen
+     erzeugt duration-fast keine Klasse. */
+  --transition-duration-fast: var(--duration-fast);
+  --transition-duration-normal: var(--duration-normal);
+  --transition-duration-slow: var(--duration-slow);
 }
 
 /* ==========================================================================

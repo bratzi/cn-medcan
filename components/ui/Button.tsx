@@ -5,18 +5,18 @@ export type ButtonVariante = "primary" | "secondary" | "ghost";
 export type ButtonGroesse = "md" | "sm";
 
 const BASIS =
-  "inline-flex items-center justify-center gap-2 rounded-md border border-transparent " +
-  "font-medium whitespace-nowrap transition-opacity duration-150 ease-standard " +
-  "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring " +
+  "inline-flex items-center justify-center gap-2 rounded-full border " +
+  "font-medium whitespace-nowrap transition-colors duration-fast ease-standard " +
   "disabled:pointer-events-none disabled:opacity-50";
 
 const VARIANTEN: Record<ButtonVariante, string> = {
-  // Hover/Active nur ueber opacity: bleibt in Light und Dark korrekt,
-  // ohne Rohfarben aus der Ramp zu greifen.
-  primary: "bg-accent text-accent-fg hover:opacity-90 active:opacity-100",
-  secondary:
-    "border-border-strong bg-surface-raised text-text hover:opacity-80 active:opacity-100",
-  ghost: "bg-transparent text-text hover:opacity-70 active:opacity-100",
+  // Hover ueber eigene Tokens: bleibt in hell und dunkel korrekt und
+  // haelt den Kontrast (accent-fg auf accent-hover 7.88 bzw. 5.40).
+  // Rahmenfarbe je Variante: cn() fuegt nur zusammen, ein border-transparent
+  // in BASIS wuerde im CSS den Rahmen der Sekundaervariante schlagen.
+  primary: "border-transparent bg-accent text-accent-fg hover:bg-accent-hover",
+  secondary: "border-border-strong bg-surface-raised text-text hover:bg-surface-sunken",
+  ghost: "border-transparent bg-transparent text-text hover:bg-surface-sunken",
 };
 
 /** h-11 = 44px: Mindest-Touch-Target, deshalb kein 8px-Vielfaches. */

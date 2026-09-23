@@ -48,7 +48,8 @@ export function Badge({
         // gap-1/py-1 = 4px: optische Korrektur innerhalb des Marker/Text-Paares.
         // 8px wuerde den Marker vom Wort loesen und das Badge (16px Zeile)
         // auf 32px aufblasen, womit es neben 16px-Fliesstext nicht mehr sitzt.
-        "inline-flex items-center gap-1 rounded-sm border px-2 py-1 text-caption",
+        // whitespace-nowrap: eine umbrechende Pille sieht kaputt aus.
+        "inline-flex items-center gap-1 rounded-full border px-2 py-1 text-caption whitespace-nowrap",
         VARIANTEN[variante],
         className,
       )}
