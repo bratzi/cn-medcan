@@ -987,3 +987,33 @@ export async function ladeApothekeDetail(
     })),
   };
 }
+
+// ---------------------------------------------------------------------------
+//  Schlanke Auswahlliste
+// ---------------------------------------------------------------------------
+
+/** Obergrenze der Auswahlliste. Ein `select` mit 500 Eintraegen ist die Grenze
+ *  des Zumutbaren; darueber braucht die Seite eine Suche statt einer Liste. */
+const MAX_AUSWAHL = 500;
+
+export type StrainAuswahlEintrag = {
+  id: string;
+  handelsname: string;
+};
+
+/**
+ * Nur Id und Handelsname aller aktiven Produkte - fuer das Auswahlfeld im
+ * Vorschlagsformular.
+ *
+ * Bewusst nicht `ladeStrainListe`: die holt Terpene, Bestaende und Preise
+ * mit. Fuer ein `<select>` waere das ein Vielfaches der noetigen Daten.
+ */
+export async function ladeStrainAuswahl(): Promise<StrainAuswahlEintrag[]> {
+  const prisma = await getPrisma();
+  return prisma.strain.findMany({
+    where: { aktiv: true },
+    select: { id: true, handelsname: true },
+    orderBy: { handelsname: "asc" },
+    take: MAX_AUSWAHL,
+  });
+}

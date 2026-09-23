@@ -28,22 +28,120 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 
 ## ⇢ Hier geht es weiter
 
-**Block A (Cloudflare D1) ist abgeschlossen.** Von **Block B** sind **Schritt 1 bis 4** erledigt:
-Anmeldung, `/mitglied`, `/admin` und das komplette Umfragemodell samt Schreibschicht.
+**Block A (Cloudflare D1) ist abgeschlossen.** Von **Block B** sind **Schritt 1 bis 6** erledigt:
+Anmeldung, `/mitglied`, `/admin`, das Umfragemodell samt Schreibschicht, die umgebaute Startseite
+und die beiden Seiten `/umfragen` und `/reviews`.
 
-**Als naechstes: Block B, Schritt 5** — die Startseite umbauen: oben die aktuelle Umfrage als
-Kernelement (Phase, Kandidaten, Stimmenzahl, Restlaufzeit, Abstimm-Button oder Hinweis
-„Freigabe ausstehend“), daneben die neueste eigene Review mit Instagram-Reel; der Katalog rutscht
-darunter. Danach Schritt 6 (`/umfragen`, `/reviews`).
+**Als naechstes: die Verwaltung der Umfragen in `/admin`.** `app/admin/umfrage-aktionen.ts`
+(Runde anlegen, gesetzten Platz vergeben, Vorschlag uebernehmen, Phase weiterschalten, Ergebnis
+verknuepfen) ist vollstaendig und **immer noch durch keinen Klick gelaufen** - es gibt keine
+Oberflaeche dazu. Ohne sie kann der Betreiber keine Runde eroeffnen; die Startseite zeigt dann
+dauerhaft "Derzeit laeuft keine Abstimmung". Das ist die naechste Luecke.
 
-**Alles, was die Oberflaeche dafuer braucht, steht bereit** und wartet nur auf Seiten:
-`lib/query/umfragen.ts` (Leseschicht), `app/umfragen/aktionen.ts` (Vorschlag, Stimme) und
-`app/admin/umfrage-aktionen.ts` (Runde anlegen, Vorschlag uebernehmen, Phase schalten, Ergebnis
-verknuepfen). **Die Server Actions sind noch durch keinen Klick gelaufen** — es gibt noch keine
-Oberflaeche dazu; das passiert in Schritt 5 und 6.
+Danach: die **vier alten Formulare ohne Hydrations-Sperre** (siehe Schritt 5/6, Punkt 1 unter
+"Was beim Umsetzen anders kam"), die drei alten offenen Punkte unter "Was noch offen ist" - und
+der Mailversand als **Block C**.
 
-Die drei alten offenen Punkte gelten unveraendert, siehe „Was noch offen ist“.
-Der Mailversand ist als **Block C** eingetaktet, nach Block B.
+---
+
+## Block B, Schritt 5 und 6 - erledigt: Startseite, /umfragen, /reviews
+
+| Datei | Inhalt |
+|---|---|
+| `app/page.tsx` | Umgebaut. Oben die laufende Runde und daneben die neueste eigene Bewertung, beide in einer eigenen `Suspense`-Grenze. Katalog, Filter und Apotheken darunter, der Rechtshinweis ans Ende. |
+| `app/umfragen/page.tsx` | Laufende Runde, Vorschlagsformular (nur in der Vorschlagsphase und nur fuer Freigegebene), Vorschlagsliste, Uebersicht aller Runden. |
+| `app/reviews/page.tsx` | Alle freigegebenen Bewertungen des Betreibers. Nicht nutzerbezogen - der erste Kandidat fuer ISR. |
+| `lib/query/reviews.ts` | Neu: `neuesteRedaktionelleReview()` und `redaktionelleReviews()`. |
+| `lib/query/umfragen.ts` | Neu: `umfragenUebersicht()` - alle Runden mit Phase und Gewinnern in **einer** Query. |
+| `lib/query/strains.ts` | Neu: `ladeStrainAuswahl()` - nur Id und Handelsname, fuer das Auswahlfeld. |
+| `components/umfrage/UmfrageKarte.tsx` | Die Runde als Karte. Kennt vier Betrachterzustaende, entscheidet aber ueber nichts. |
+| `components/umfrage/StimmFormular.tsx`, `VorschlagFormular.tsx` | Die beiden Schreibformulare. |
+| `components/review/ReviewKarte.tsx` | Eine Bewertung mit Reel, Noten und Restfeuchte. |
+| `components/ui/useHydriert.ts` | Neu, siehe "Was beim Umsetzen anders kam", Punkt 1. |
+
+### Entscheidungen, damit sie niemand zurueckdreht
+
+1. **Der Betrachterzustand entsteht in der Seite, nicht in der Karte.** `UmfrageKarte` bekommt
+   `StimmZustand` (`ANONYM`, `FREIGABE_OFFEN`, `STIMMBERECHTIGT`, `ABGESTIMMT`) uebergeben und
+   zeigt ihn nur an. Ueber das Schreiben entscheidet erneut `freigabeErforderlich()` in der
+   Server Action - die Karte ist Anzeige, kein Gate.
+2. **Gesetzte Plaetze bekommen keinen Balken und keinen Zaehler.** `stimmen` ist dort `null`;
+   ein Balken auf 0 % hiesse "niemand wollte sie" und waere eine Falschaussage.
+3. **In der Vorschlagsphase zeigt die Karte weder Zaehler noch "Deine Stimme".** Beides haengt an
+   derselben Bedingung. Sonst behauptet ein Badge einen Zustand, den die Zahlen daneben nicht
+   zeigen - im Browser gesehen und behoben.
+4. **Die Startseite bleibt `force-dynamic`, jetzt mit einem zweiten Grund:** sie ist
+   nutzerbezogen geworden. Die eigene Stimme darf nie gecacht werden. Wenn ISR kommt, wird
+   einzeln gecacht (Umfragezahlen, Katalog), nicht die Seite als Ganzes. `/reviews` ist dagegen
+   fuer alle Nutzer gleich.
+5. **`ReviewKarte` ist nicht `BewertungsListe`.** Die Liste zeigt Bewertungen *zu einem Produkt*
+   und nennt das Produkt deshalb nicht; hier ist der Handelsname die Hauptaussage.
+6. **Das Vorschlagsformular laedt die Katalogliste nur, wenn es angezeigt wird.** Sonst waere es
+   eine Abfrage fuer nichts - jede Query ist ein Sub-Request.
+
+### Was beim Umsetzen anders kam als geplant
+
+1. **Vor der Hydration schickt ein Formular einen nativen GET ab** - die Eingaben landen in der
+   URL, und es passiert nichts. Reproduzierbar auf einer frisch geladenen Seite, wenn abgeschickt
+   wird, bevor React den `onSubmit`-Handler angehaengt hat. Deshalb `components/ui/useHydriert.ts`
+   (`useSyncExternalStore`, nicht `useState` plus `useEffect` - die ESLint-Regel
+   `react-hooks/set-state-in-effect` verbietet das) und `disabled={laeuft || !hydriert}` am
+   Absende-Button. **Die vier aelteren Formulare** (`AnmeldeFormular`, `RegistrierFormular`,
+   `ProfilFormular`, `MitgliedAktionen`) haben dieselbe Luecke und sind **nicht** nachgezogen.
+2. **Der laufende `next dev` musste neu gestartet werden**, weil er den vor Schritt 4
+   generierten Prisma-Client im Speicher hielt: `prisma.umfrage` war `undefined` und
+   `review.istRedaktionell` ein unbekanntes Argument. `npm run db:generate`, Prozess beenden,
+   `.next` loeschen, neu starten. Wer nach Schritt 4 zum ersten Mal Seiten baut, faengt damit an.
+3. **Ein abgebrochener Dev-Server hinterlaesst einen Zustand, in dem gestreamte
+   `Suspense`-Inhalte nie eingeblendet werden** - die Seite bleibt bei den Platzhaltern stehen,
+   obwohl das ausgelieferte HTML den Inhalt enthaelt (per `curl` geprueft). Betraf auch
+   `/produkte`, an dem nichts geaendert war. Ein sauberer Neustart behebt es. Nicht als Fehler im
+   eigenen Code suchen.
+4. **Ein `wrangler d1 execute` mit mehreren Statements bricht beim ersten Fehler ab und fuehrt
+   keines davon aus.** Beim Aufraeumen stand `user_id` statt `userId` in einem `DELETE` - die
+   Better-Auth-Tabellen haben camelCase-Spalten. Danach war scheinbar nichts geloescht.
+5. **Registrierung und Anmeldung liefen im Browserwerkzeug in ein Haengen** (der POST kam
+   minutenlang nicht am Server an). Konto per `curl` gegen `/api/auth/sign-up/email` angelegt -
+   **der `Origin`-Header ist Pflicht**, sonst antwortet Better Auth `MISSING_OR_NULL_ORIGIN` -,
+   angemeldet per `fetch` aus der Seite heraus. Danach lief alles normal.
+
+### Verifiziert (gegen `next dev` mit echtem D1-Binding, im Browser geklickt)
+
+- `npm run typecheck`, `npx eslint .` und `npm run build` gruen; `/umfragen` und `/reviews`
+  erscheinen im Routenbaum.
+- **Die Server Actions sind zum ersten Mal echt gelaufen** - das war der offene Punkt aus
+  Schritt 4:
+  - `stimmeAbgeben`: Klick auf einen Community-Kandidaten schreibt die Stimme (`option_id` = der
+    gewaehlte Platz, `mitglied_id` = das angemeldete Konto). Danach ist das Formular weg, der
+    Zaehler steht auf 1, das Badge "Deine Stimme" sitzt an der richtigen Zeile.
+  - `vorschlagEinreichen`: Vorschlag samt Begruendung landet **getrimmt** in der Datenbank,
+    die Bestaetigung erscheint, der Vorschlag steht danach in der Liste ("Offen", mit Autor und
+    Datum).
+  - **Derselbe Vorschlag ein zweites Mal** ergibt die lesbare Meldung "Diese Sorte hast du in
+    dieser Runde schon vorgeschlagen." - der P2002-Pfad war bisher nur als Datenbankregel belegt,
+    jetzt auch als Antwort der Aktion.
+- **Alle vier Betrachterzustaende gesehen:** abgemeldet (Hinweis und "Anmelden"), angemeldet ohne
+  Freigabe (Badge "Freigabe ausstehend"), freigegeben ohne Stimme (Formular mit **nur** den
+  Community-Kandidaten, der gesetzte Platz fehlt), nach der Stimme (Bestaetigung).
+- **Phasen:** in `VORSCHLAG` keine Zaehler, keine Balken, dafuer Vorschlagsfrist und
+  Vorschlagsformular; in `ABSTIMMUNG` Zaehler, Balken und Abstimmfrist.
+- **`freigegeben` wirkt:** die Startseite nahm die neueste *freigegebene* Bewertung, nicht die
+  neuere unfreigegebene, an der die Test-Reel-URL zuerst hing.
+- `/reviews` zeigt alle vier freigegebenen redaktionellen Bewertungen, eine davon mit
+  Reel-`<iframe>`.
+- Light geprueft (Screenshot), Dark ueber die berechneten Token-Werte (`--color-surface`,
+  `--color-text`, `--color-accent` und weitere schalten unter `[data-theme="dark"]` um). Die
+  neuen Komponenten nutzen ausschliesslich semantische Tokens und keine `dark:`-Varianten.
+  **Ein Dark-Screenshot ist nicht entstanden** - das Browserwerkzeug brach dabei wiederholt ab.
+- Testdaten wieder geloescht: `umfragen`, `umfrage_optionen`, `umfrage_vorschlaege` und `stimmen`
+  sind leer, das Testkonto ist weg, die 6 Bewertungen stehen unveraendert und ohne Reel-URL.
+
+### Noch nicht verifiziert
+
+- **`app/admin/umfrage-aktionen.ts` ist weiterhin durch keinen Klick gelaufen** - es gibt keine
+  Oberflaeche dazu. Die Testrunde dieser Session wurde per SQL angelegt, nicht ueber die Aktion.
+- **Nichts davon lief in workerd.** `npm run cf-build` scheitert auf diesem Rechner weiterhin an
+  den Symlinks (EPERM), damit bleiben `npm run preview` und `npm run deploy` ungetestet.
 
 ---
 

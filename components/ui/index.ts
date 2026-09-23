@@ -33,3 +33,5 @@ export {
   TableRow,
 } from "./Table";
 export type { TableProps, TableHeaderCellProps } from "./Table";
+
+export { useHydriert } from "./useHydriert";

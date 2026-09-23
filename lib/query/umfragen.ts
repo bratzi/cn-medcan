@@ -199,3 +199,62 @@ export async function vorschlaegeLaden(umfrageId: string): Promise<VorschlagAnsi
     erstelltAm: v.erstelltAm,
   }));
 }
+
+// ---------------------------------------------------------------------------
+//  Uebersicht
+// ---------------------------------------------------------------------------
+
+/** Obergrenze fuer die Runden-Uebersicht. */
+const MAX_UMFRAGEN = 30;
+
+export type UmfrageUebersicht = {
+  id: string;
+  titel: string;
+  phase: UmfragePhase;
+  startAm: Date;
+  endetAm: Date | null;
+  istAktiv: boolean;
+  /** Nur die markierten Gewinner - der Rest interessiert in der Liste nicht. */
+  gewinner: { handelsname: string; slug: string }[];
+};
+
+/**
+ * Alle Runden, neueste zuerst.
+ *
+ * Eine Query mit `include` statt einer Schleife ueber die Runden: jede Query
+ * ist ein Sub-Request, und auf Free sind 50 davon das Budget.
+ */
+export async function umfragenUebersicht(limit = MAX_UMFRAGEN): Promise<UmfrageUebersicht[]> {
+  const prisma = await getPrisma();
+  const saetze = await prisma.umfrage.findMany({
+    orderBy: { startAm: "desc" },
+    take: limit,
+    select: {
+      id: true,
+      titel: true,
+      phase: true,
+      startAm: true,
+      endetAm: true,
+      aktiv: true,
+      optionen: {
+        where: { istGewinner: true },
+        select: { strain: { select: { handelsname: true, slug: true } } },
+        orderBy: { reihenfolge: "asc" },
+        take: MAX_OPTIONEN,
+      },
+    },
+  });
+
+  return saetze.map((u) => ({
+    id: u.id,
+    titel: u.titel,
+    phase: istUmfragePhase(u.phase) ? u.phase : "VORSCHLAG",
+    startAm: u.startAm,
+    endetAm: u.endetAm,
+    istAktiv: u.aktiv === "AKTIV",
+    gewinner: u.optionen.map((o) => ({
+      handelsname: o.strain.handelsname,
+      slug: o.strain.slug,
+    })),
+  }));
+}
