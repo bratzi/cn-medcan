@@ -123,6 +123,12 @@ Budgets, Akzeptanzkriterien und Reihenfolge. **Die Spec ist die Quelle - nicht d
   sich nicht aendern (innen 2296 px). Bei "Permission denied" sofort dem Nutzer sagen, dass ein
   Freigabe-Fenster wartet (Memory `freigabe-fenster-melden`).
 
+**Session 6 (2026-09-23): Schritt 0 ist komplett erledigt** (Commit `1f1bd17`, Spec 4.2,
+4.3, 4.5): wizardtrees.com und dojadirect.com (vom Nutzer genannt; dojaexclusive.com liefert
+eine Fehlerseite) im Browser, Schriftvergleich (Cormorant und Sedgwick bleiben), Pexels-Motive
+mit IDs. **Als Naechstes: Schritt 1, die Freigabe der Spec** - dem Nutzer vorgelegt, Antwort offen.
+Auf Pexels frieren Screenshots ein; Treffer per `javascript_tool` auslesen.
+
 **Naechste Schritte, in dieser Reihenfolge:**
 0. **Zuerst, ohne Rueckfrage: Rest von Schritt 0 (siehe oben: Websites, c, d), dann Spec nachschaerfen**
    (Nutzer nach Session 4: "nach dem clear alles mit der faehigkeit des browsers checken und
