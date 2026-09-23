@@ -17,6 +17,12 @@ export type FieldProps = {
   hinweis?: string;
   fehler?: string;
   pflicht?: boolean;
+  /**
+   * Label nur fuer Screenreader. Fuer Felder in einer Tabellenzelle, wo die
+   * Spaltenueberschrift die Beschriftung schon traegt und ein zweites,
+   * sichtbares Label nur Rauschen waere. Das Label selbst entfaellt nie.
+   */
+  labelVersteckt?: boolean;
   className?: string;
 };
 
@@ -27,6 +33,7 @@ export function Field({
   hinweis,
   fehler,
   pflicht,
+  labelVersteckt,
   className,
 }: FieldProps) {
   const hinweisId = hinweis ? `${id}-hinweis` : undefined;
@@ -41,7 +48,12 @@ export function Field({
 
   return (
     <div className={cn("flex flex-col gap-2", className)}>
-      <label htmlFor={id} className="text-small font-medium text-text">
+      <label
+        htmlFor={id}
+        className={cn(
+          labelVersteckt ? "sr-only" : "text-small font-medium text-text",
+        )}
+      >
         {label}
         {pflicht ? (
           <span className="text-text-muted"> (Pflichtangabe)</span>

@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { AbmeldeButton } from "@/components/auth/AbmeldeButton";
 import { ProfilFormular } from "@/components/auth/ProfilFormular";
-import { Badge, Card, CardBody, CardHeader } from "@/components/ui";
+import { Badge, buttonKlassen, Card, CardBody, CardHeader } from "@/components/ui";
 import { aktuellesMitglied } from "@/lib/session";
 import type { MitgliedRolle } from "@/db/enums";
 
@@ -75,6 +76,29 @@ export default async function MitgliedPage() {
           </CardBody>
         </Card>
       </section>
+
+      {/* Der einzige Einstieg zu /admin. Bewusst nicht in der Navigation:
+          die muesste sonst auf jeder Seite die Sitzung lesen und waere
+          durchgehend dynamisch. Diese Seite liest sie ohnehin. */}
+      {mitglied.rolle === "ADMIN" ? (
+        <section aria-labelledby="verwaltung-titel" className="mt-8">
+          <Card>
+            <CardHeader>
+              <h2 id="verwaltung-titel" className="text-h3 text-text">
+                Verwaltung
+              </h2>
+            </CardHeader>
+            <CardBody className="flex flex-col items-start gap-4">
+              <p className="max-w-[68ch] text-body text-text-muted">
+                Mitglieder freigeben und Rollen vergeben.
+              </p>
+              <Link href="/admin" className={buttonKlassen("secondary")}>
+                Zur Verwaltung
+              </Link>
+            </CardBody>
+          </Card>
+        </section>
+      ) : null}
 
       <section aria-labelledby="profil-titel" className="mt-8">
         <Card>

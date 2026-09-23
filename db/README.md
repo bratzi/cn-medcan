@@ -121,3 +121,37 @@ vergessener Filter faellt nicht als Fehler auf, sondern als stilles Datenleck.
   kleingeschriebene Spalte `strains.suchtext`.
 - **Kein Json-Typ.** `reviews.geschmacks_matrix` ist JSON-Text.
 - **Kein Decimal.** Prozentwerte sind `Float`, Preise bleiben `Int` in Cent.
+
+## Den ersten Betreiber anlegen (Bootstrap)
+
+Rollen vergibt `/admin`. Den **ersten** Admin kann diese Seite nicht vergeben —
+wer sie aufruft, muesste schon Admin sein. Der erste Satz wird deshalb einmalig
+direkt in der Datenbank gesetzt, nachdem sich das Konto ueber `/registrieren`
+angelegt hat:
+
+```
+npx wrangler d1 execute cn-medcan-db --local --command \
+  "update mitglied set rolle = 'ADMIN', freigegeben = 1, \
+   freigegeben_am = strftime('%Y-%m-%dT%H:%M:%f','now') || '+00:00' \
+   where user_id = (select id from user where email = '<deine@adresse>');"
+```
+
+Fuer die entfernte Datenbank dasselbe mit `--remote` statt `--local`.
+
+Zwei Punkte, die dabei zaehlen:
+
+- **Es gibt keine Rolle `SUPERADMIN`.** Die Werteliste in `db/enums.ts` kennt
+  `MITGLIED`, `FACHKREIS`, `ADMIN` — der Trigger aus `db/constraints.sql` weist
+  jeden anderen Wert ab (`SQLITE_CONSTRAINT_TRIGGER`). `ADMIN` ist die
+  hoechste Rolle.
+- `freigegeben_am` wird genau in der Form geschrieben, die Prisma selbst
+  schreibt (ISO-8601-Text mit Offset). Ein Integer aus `strftime('%s')*1000`
+  wird zwar auch gelesen, steht dann aber als zweite Darstellung derselben
+  Spalte in der Tabelle - genau das faellt spaeter jemandem auf die Fuesse.
+  `freigegeben_von` bleibt beim Bootstrap leer: es gab noch keinen Betreiber,
+  der freigegeben haette.
+
+Danach vergibt der Betreiber jede weitere Freigabe und Rolle ueber `/admin`.
+Die eigene Admin-Rolle und die eigene Freigabe kann er dort **nicht** ablegen
+(`lib/admin-eingabe.ts`) — sonst waere die Seite fuer alle zu und nur ueber den
+Weg oben wieder zu oeffnen.

@@ -28,15 +28,79 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 
 ## ⇢ Hier geht es weiter
 
-**Block A (Cloudflare D1) ist abgeschlossen.** Von **Block B** sind **Schritt 1 und 2** erledigt:
-Better Auth laeuft mit D1, und Registrierung, Anmeldung sowie `/mitglied` stehen als Oberflaeche.
+**Block A (Cloudflare D1) ist abgeschlossen.** Von **Block B** sind **Schritt 1, 2 und 3** erledigt:
+Better Auth laeuft mit D1, Registrierung/Anmeldung/`/mitglied` stehen, und `/admin` gibt Mitglieder
+frei und vergibt Rollen.
 
-**Als naechstes: Block B, Schritt 3** — `/admin` mit der Freigabe von Mitgliedern.
-Der Server-Teil dafuer ist fertig und wartet nur auf die Seite: `adminErforderlich()` aus
-`lib/session.ts` als Gate, `mitglied.freigegeben` / `freigegebenAm` / `freigegebenVon` als
-Felder. Danach das Umfragemodell (Schritt 4).
+**Als naechstes: Block B, Schritt 4** — das Umfragemodell: `Umfrage`, `UmfrageVorschlag`,
+`UmfrageOption`, `Stimme` samt Migration, Triggern in `db/constraints.sql` und den Server Actions
+fuer Vorschlag und Stimme. Die Modelle und ihre Regeln stehen unten unter „Neue Modelle“.
 
-Die drei alten offenen Punkte gelten unveraendert, siehe „Was noch offen ist".
+Die drei alten offenen Punkte gelten unveraendert, siehe „Was noch offen ist“.
+
+---
+
+## Block B, Schritt 3 — erledigt: /admin mit Freigabe und Rollenvergabe
+
+| Datei | Inhalt |
+|---|---|
+| `app/admin/page.tsx` | Mitgliedertabelle, offene Freigaben zuerst. Gate: ohne Sitzung 307 auf `/anmelden?weiter=%2Fadmin`, als Nicht-Betreiber **404**. |
+| `app/admin/aktionen.ts` | `freigabeSetzen` und `rolleSetzen`. Beide beginnen mit `adminErforderlich()`. |
+| `lib/admin-eingabe.ts` | Die Pruefregeln als **reine Funktionen**, ohne Request, Prisma und Sitzung. |
+| `components/admin/MitgliedAktionen.tsx` | Freigabe-Button und Rollen-Select je Zeile. |
+| `components/ui/Field.tsx`, `Select.tsx` | Neu: `labelVersteckt` — Label bleibt fuer Screenreader, ist in der Tabellenzelle aber unsichtbar, weil die Spaltenueberschrift schon beschriftet. |
+| `app/mitglied/page.tsx` | Einstieg „Zur Verwaltung“, nur fuer Rolle `ADMIN`. |
+| `db/README.md` | Neuer Abschnitt „Den ersten Betreiber anlegen (Bootstrap)“. |
+
+### Entscheidungen, damit sie niemand zurueckdreht
+
+1. **Als Nicht-Betreiber gibt `/admin` 404, keinen Redirect und keine Meldung „keine Berechtigung“.**
+   Wer die Seite nicht benutzen darf, soll nicht erfahren, dass es sie gibt.
+2. **Der eigene Satz ist gesperrt**: die eigene Freigabe ist nicht zuruecknehmbar, die eigene
+   Betreiber-Rolle nicht ablegbar. Sonst waere `/admin` nach einem Fehlklick fuer alle zu und nur
+   noch per `wrangler d1 execute` zu oeffnen. Entschieden wird das in `lib/admin-eingabe.ts`; was
+   die Oberflaeche ausgraut, ist nur Bedienkomfort.
+3. **Der Einstieg zu `/admin` steht auf `/mitglied`, nicht in der Navigation.** Gleicher Grund wie
+   bei Schritt 2: die Navigation muesste sonst auf jeder Seite die Sitzung lesen.
+4. **`freigegeben_von` und `freigegeben_am` werden beim Zuruecknehmen geleert.** Eine
+   stehengebliebene Freigabe-Spur ohne Freigabe waere spaeter nicht zu deuten.
+5. **Den ersten Betreiber kann `/admin` nicht vergeben** — dafuer muesste man schon Betreiber sein.
+   Der erste Satz wird einmalig per SQL gesetzt, dokumentiert in `db/README.md`. **Es gibt keine
+   Rolle `SUPERADMIN`**: `db/enums.ts` kennt `MITGLIED`, `FACHKREIS`, `ADMIN`, und der Trigger weist
+   alles andere ab. `ADMIN` ist die hoechste Rolle.
+
+### Was beim Umsetzen anders kam als geplant
+
+1. **React verwirft Klicks auf Buttons, die es selbst als `disabled` gerendert hat** — auch wenn man
+   `disabled` vorher im DOM entfernt und einen `MouseEvent` schickt. Es geht kein Request raus.
+   Die Client-Sperre laesst sich im Browser also **nicht** umgehen und damit auch nicht
+   gegenpruefen; der serverseitige Selbstschutz ist ueber die reinen Funktionen belegt, nicht ueber
+   einen Klick.
+2. **Der Zeitstempel `freigegeben_am` hat zwei moegliche Darstellungen.** Prisma schreibt
+   ISO-8601-Text mit Offset; ein Bootstrap per `strftime('%s','now')*1000` schreibt einen Integer.
+   Beides wird gelesen, steht danach aber als zwei Formate in derselben Spalte. `db/README.md`
+   nennt deshalb ausdruecklich die ISO-Form.
+3. **`curl` gegen `/api/zugang` braucht `--data-urlencode`**, wenn das Passwort ein `&` enthaelt —
+   mit `-d` wird es zum Parametertrenner und das Gate antwortet mit `fehler=1`. Ausserdem mangelt
+   Git Bash Argumente, die mit `/` beginnen, zu Windows-Pfaden: `MSYS_NO_PATHCONV=1` setzen.
+   Das Gate-Cookie ist `Secure` und landet ueber `http` **nicht** im Cookie-Jar — mit
+   `-b "cn_gate=..."` von Hand mitgeben.
+
+### Verifiziert (gegen `next dev` mit echtem D1-Binding)
+
+- `npm run typecheck`, `npx eslint .` und `npm run build` gruen; `/admin` erscheint im Routenbaum.
+- **Gate:** ohne Sitzung 307 auf `/anmelden?weiter=%2Fadmin`, als einfaches Mitglied **404**,
+  als Betreiber 200 mit allen Konten in der Tabelle.
+- **`freigabeEingabePruefen` und `rolleEingabePruefen`: 15 Faelle, alle bestanden** — Trimmen,
+  leere Id, unbekannte Aktion, kleingeschriebene Aktion/Rolle, alle drei Rollen, eigene Freigabe
+  zuruecknehmen abgelehnt, eigene Rolle ablegen abgelehnt, eigene Rolle `ADMIN` erneut setzen erlaubt.
+- **Im Browser geklickt:** „Freigeben“ schreibt `freigegeben = 1` samt `freigegeben_am` und
+  `freigegeben_von` (Id des handelnden Betreibers); der Rollen-Select schreibt die neue Rolle.
+- **Das Rollen-Gate der Server Action greift im echten Durchlauf:** waehrend das Konto kurzzeitig
+  nur `FACHKREIS` war, warf derselbe Klick serverseitig `Keine Berechtigung.` und schrieb nichts.
+- Eigener Satz: Button und Select sind gesperrt, fremde Zeilen bedienbar.
+- Dark und Light geprueft (`data-theme`), Tabelle, Badges und Felder sitzen in beiden Themes.
+- Testkonten wieder geloescht.
 
 ---
 
@@ -351,7 +415,7 @@ braucht eine kleingeschriebene Suchspalte.
 ### Reihenfolge für Block B
 1. ~~Better Auth mit D1 einrichten, Schema erweitern, Migration.~~ **erledigt**
 2. ~~Registrierung, Anmeldung, `/mitglied`.~~ **erledigt**
-3. `/admin` mit Freigabe von Mitgliedern.
+3. ~~`/admin` mit Freigabe von Mitgliedern.~~ **erledigt**
 4. Umfragemodell, Server Actions für Vorschlag und Stimme, Umfragephasen.
 5. Startseite umbauen: Umfrage und neueste Review als Kern.
 6. `/umfragen`, `/reviews`.
@@ -374,4 +438,4 @@ braucht eine kleingeschriebene Suchspalte.
 - Anmeldung: Better Auth mit D1, `lib/auth.ts`, `lib/session.ts` als einzige Rechtequelle,
   `components/auth/`
 - Seiten: Layout, Landing, `/produkte` mit Live-Filter, `/produkte/[slug]`, `/apotheken` und
-  Detail, `/anmelden`, `/registrieren`, `/mitglied`, 404
+  Detail, `/anmelden`, `/registrieren`, `/mitglied`, `/admin`, 404

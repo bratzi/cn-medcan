@@ -15,6 +15,8 @@ export type SelectProps = Omit<
   id: string;
   label: string;
   optionen: readonly SelectOption[];
+  /** Label nur fuer Screenreader, siehe Field. */
+  labelVersteckt?: boolean;
   /** Erste, nicht-auswaehlbare Zeile — ersetzt kein Label. */
   platzhalter?: string;
   hinweis?: string;
@@ -38,6 +40,7 @@ export function Select({
   platzhalter,
   hinweis,
   fehler,
+  labelVersteckt,
   className,
   feldClassName,
   ...rest
@@ -48,6 +51,7 @@ export function Select({
       label={label}
       hinweis={hinweis}
       fehler={fehler}
+      labelVersteckt={labelVersteckt}
       className={feldClassName}
     >
       {(attribute) => (
