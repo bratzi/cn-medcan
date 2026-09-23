@@ -54,8 +54,8 @@ Nutzers pushen (Memory `immer-nach-github-pushen`).
 **Workers Builds funktioniert (2026-09-23, 22:04):** Der Build zu `4e21291` lief durch und hat
 Version `138177b3` live gestellt. Online einmal geprueft: `/`, `/reviews`, `/umfragen` 200,
 `/admin` 307 (Login). Damit ist jeder Push nach `main` mit Code-Aenderung ein Live-Gang.
-Der Commit mit diesem Absatz (nur HANDOFF.md, loest keinen Build aus) ist **lokal** - die
-naechste Session pusht ihn als Erstes.
+Alle Commits bis einschliesslich Session 4 (Spec, Design-Skills) sind gepusht; der Push erfolgte
+nach Rueckfrage, Citrix war laut Nutzer getrennt.
 
 **Nebenbefund zum Netzausfall:** Nach dem Neustart hielt ein fremder Dienst `aoservice`
 (PID 5452, Systemrechte, Hersteller nicht lesbar) rund 200 TCP-Verbindungen, davon 68
@@ -72,13 +72,10 @@ lief der Push ohne Probleme.
    fehlt", bevor `headers()` die Seite dynamisch machte (Workers Builds hat keine Secrets, lokal
    lieferte `.env.local` sie). **Behoben in `4e21291`** (`lib/session.ts`: erst `headers()`, dann
    `getAuth()`). Verifiziert: `next build` in einem frischen Klon **ohne** `.env.local` laeuft
-   durch, gleiche Routen. **Nur lokal committet, NICHT gepusht** - beim Push fiel das Netz aus.
-3. **Naechster Schritt:** sobald das Netz wieder geht und der Nutzer Go gibt, `git push`, dann
-   den Build **einmal** im Dashboard pruefen (Worker -> Deployments -> Recent builds; Log per
+   durch, gleiche Routen. Nach dem Netzausfall gepusht, Build gruen (siehe oben).
+3. Build-Pruefung kuenftig: **einmal** im Dashboard (Worker -> Deployments -> Recent builds; Log per
    "Download log" landet in `C:\Users\w.helwich\Downloads`). **Nicht pollen** - siehe Memory
    `netzwerk-schonen`.
-- Live ist weiterhin die von Hand deployte Version `6eedb132` (Prisma-Fix), sie funktioniert.
-  Gescheiterte Builds aendern daran nichts.
 - Im CI-Log: npm 10.9.2 fuehrt Installationsskripte nicht aus ("9 packages have install scripts
   not yet covered by allowScripts": esbuild, workerd, better-sqlite3, prisma, @prisma/engines,
   unrs-resolver). Der Build kam trotzdem bis `next build`; beobachten, falls Deploy daran scheitert.
@@ -93,9 +90,8 @@ Push-Wiederholungen. Ursache nicht belegt; der Nutzer kennt das aus einem fruehe
 Regel seitdem: Memory `netzwerk-schonen`. Nach dem Router-Reconnect scheiterte auch ein
 einzelner `git push` (erst DNS, dann Timeout auf github.com:443), und das Netz fiel laut Nutzer
 erneut aus. Lokal ausgelesen: **Citrix-VPN-Adapter aktiv** (10.180.0.3) neben WLAN, zwei
-Standard-Gateways, kein Proxy. Verdacht: der Citrix-Client. **Die Commits `4e21291` und
-`182eb86` sind deshalb noch nicht gepusht** - der Nutzer pusht selbst (`git push` in `C:\cn`),
-oder die naechste Session fragt vorher, ob Citrix getrennt ist.
+Standard-Gateways, kein Proxy. Verdacht: der Citrix-Client. **Regel:** vor jedem Push fragen,
+ob Citrix getrennt ist, oder den Nutzer selbst pushen lassen.
 Das Browser-Werkzeug: Screenshots laufen hier oft in einen Timeout; `get_page_text`, `find` und
 `zoom` funktionieren. `form_input` setzt Felder im Dashboard zuverlaessig.
 
