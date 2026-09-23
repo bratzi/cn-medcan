@@ -16,6 +16,8 @@ const eslintConfig = defineConfig([
     "cloudflare-env.d.ts",
     "lib/generated/**",
     ".open-next/**",
+    // Lokale Worker-Buendel von wrangler dev/preview (mehrere MB, sprengen den Heap).
+    ".wrangler/**",
     // Fremder Code: Referenz- und Vorlagendateien der installierten Skills.
     // Sie werden nie gebaut und folgen nicht unseren Regeln.
     ".agents/**",

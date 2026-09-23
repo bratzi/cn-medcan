@@ -1,5 +1,10 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import {
+  Cormorant_Garamond,
+  Geist,
+  Geist_Mono,
+  Sedgwick_Ave_Display,
+} from "next/font/google";
 import Link from "next/link";
 import "./globals.css";
 
@@ -11,6 +16,22 @@ const geistSans = Geist({
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+});
+
+/** Variabel (300 bis 700), normal und kursiv: zwei Dateien (Spec 6.4). */
+const cormorant = Cormorant_Garamond({
+  variable: "--font-cormorant",
+  subsets: ["latin"],
+  style: ["normal", "italic"],
+  display: "swap",
+});
+
+/** Nur die Wand. Ein Schnitt, eine Datei. */
+const sedgwick = Sedgwick_Ave_Display({
+  variable: "--font-sedgwick",
+  subsets: ["latin"],
+  weight: "400",
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -32,7 +53,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="de"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} ${cormorant.variable} ${sedgwick.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
         <a
