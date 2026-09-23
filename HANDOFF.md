@@ -41,17 +41,20 @@ Seed-Daten in der Cloud-D1).
 den Live-Gang erfragen -> nach dem Go live stellen und pruefen -> HANDOFF sichern, committen,
 pushen -> Bescheid geben, dass gecleart werden kann.
 
-**Workers Builds (automatisches Deploy bei Push) - vom Nutzer gewaehlt, noch NICHT verbunden.**
-Claude wollte es im Dashboard per Browser-Werkzeug einrichten; Chrome ("Browser 1") war bei
-Cloudflare nicht angemeldet, und anmelden darf nur der Nutzer. Einstellungen, sobald er
-angemeldet ist (Worker `cn-medcan` -> Settings -> Build -> Connect): Git-Konto `bratzi`, Repo
-`cn-medcan`, Branch `main`, Build command `npx prisma generate && npm run cf-build`, Deploy
-command `npx opennextjs-cloudflare deploy` (statt `npx wrangler deploy`), Root directory leer,
-keine Build-Variablen, keine Builds fuer andere Branches. Der Build braucht keine `.env.local`
-(geprueft: `prisma.config.ts` liest keine Umgebung). **Nach dem Verbinden gilt: Push nach `main`
-= Live-Gang**, also erst nach Go pushen (Memory `immer-nach-github-pushen`). Optional in den
-Build-Einstellungen `HANDOFF.md` von den Watch-Pfaden ausnehmen, damit Doku-Commits keinen Build
-ausloesen.
+**Workers Builds ist verbunden (2026-09-23, von Claude per Browser-Werkzeug im Dashboard,
+nachdem der Nutzer sich angemeldet hatte).** Worker `cn-medcan` -> Settings -> Builds:
+Repo `bratzi/cn-medcan`, Branch `main`, Build command `npx prisma generate && npm run cf-build`,
+Deploy command `npx opennextjs-cloudflare deploy`, Root `/`, Preview-Builds **aus**, keine
+Build-Variablen, API-Token automatisch ("Workers Builds - 2026-09-23 21:00"). **Exclude paths:
+`HANDOFF.md`** - ein Commit, der nur HANDOFF.md aendert, loest keinen Build aus. Nach dem Neuladen
+geprueft, dass alles gespeichert ist.
+**Ab jetzt gilt: Push nach `main` mit Code-Aenderung = Live-Gang** - erst nach dem Go des
+Nutzers pushen (Memory `immer-nach-github-pushen`). **Der erste Build ueber Workers Builds ist
+noch nicht gelaufen** (Linux-Build ohne `.env.local`, `npm ci`, `prisma generate` - ungetestet).
+Er laeuft beim naechsten Code-Push; scheitert er, bleibt die zuletzt deployte Version live.
+Den Build-Log findet man unter Worker -> Deployments bzw. Builds.
+Das Browser-Werkzeug: Screenshots laufen hier oft in einen Timeout; `get_page_text`, `find` und
+`zoom` funktionieren. `form_input` setzt Felder im Dashboard zuverlaessig.
 
 ### 1. Grosser Auftrag: Komplettes Makeover (Nutzer, 2026-09-23) - **damit beginnt die naechste Session**
 
