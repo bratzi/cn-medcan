@@ -1,6 +1,6 @@
 # Makeover „Grünes Buch“ – Teilprojekt 1: Brand Guideline, Tokens, Startseite
 
-**Stand:** 2026-09-23 · **Status:** Entwurf zur Durchsicht · **Folgt:** Implementierungsplan (writing-plans)
+**Stand:** 2026-09-24 · **Status:** freigegeben (Nutzer, 2026-09-24) · **Plan:** `docs/superpowers/plans/2026-09-24-makeover-gruenes-buch.md` · Präzisierungen aus der Planung in Abschnitt 13
 
 ## 1. Ausgangslage und Ziel
 
@@ -242,8 +242,8 @@ Umsetzen mit `better-typography`.
     Tag-Logo weiß oben mittig, sonst betont nüchtern: **Work Sans** in Versalien, eckige
     Umriss-Buttons, Vollbild-Fotos mit Rauch und Feuerzeug.
   - **Übernommen:** (1) Die Lehre aus Doja - ein starkes Tag verträgt eine **nüchterne**
-    Umgebung; das bestätigt Geist neben Sedgwick. (2) Nummerierte Kapitel („01“, „02“ in
-    Geist Mono) in Navigation und Kapitelköpfen, passt zum Feldbuch-Raster (4.7). (3) Ein
+    Umgebung; das bestätigt Geist neben Sedgwick. (2) Nummerierte Einträge („01“, „02“ in
+    Geist Mono) nur in der Hauptnavigation; Kapitelköpfe bleiben ohne Nummern (5.1, 13). (3) Ein
     Bogen-Rahmen als **einmaliges** Motiv um das Leitobjekt der Review-Sektion, flach als
     1-px-Linie in `ink`, ohne Chrom.
   - **Nicht übernommen:** Monument Extended (kommerziell, dritte Display-Schrift wäre zu
@@ -513,3 +513,35 @@ Pre-Flight), `better-colors` (Palette, Gamut, gemessene Kontraste). Beim Umsetze
 `frontend-design`, `cloudflare:web-perf`, zum Abschluss `interface-review` und
 `web-design-guidelines`. `brand-guidelines` (Anthropic) wurde nicht installiert: Es wendet nur
 Anthropics eigene Marke an und taugt nicht als allgemeines Guideline-Gerüst.
+
+## 13. Präzisierungen aus der Planung (2026-09-24)
+
+Beim Schreiben des Plans aufgefallen; sie gehen den Abschnitten oben vor.
+
+1. **Nummerierung** nur in der Hauptnavigation, nicht in Kapitelköpfen (Widerspruch 4.3 zu 5.1 aufgelöst).
+2. **Fokus:** Die globale Regel setzt keinen eigenen Radius mehr; der Umriss folgt dem Radius des
+   Elements. `border-radius: inherit` (4.4) hätte den Radius des Elternteils übernommen.
+3. **Formregel über Tokens:** `--radius-sm/md/lg` sind 0, Pillen ausdrücklich `rounded-full`. So erben
+   alle Seiten die eckigen Flächen ohne Einzeländerung. Der **einzige Bogen** (4.3) umschließt das
+   Netzdiagramm im neuesten Eintrag; die Sektion hat kein anderes Leitobjekt.
+4. **Wortmarke im Kopf:** Cormorant **500** bei 28 px, weil 300 erst ab 40 px trägt (4.2). Im Fuß
+   dieselbe Größe.
+5. **Auftakt-Titel in `accent`** ist die einzige Verwendung von Blattgrün außerhalb der Bedienung.
+6. **Medien-Pipeline in TypeScript** über `tsx`: `scripts/medien/suchen.ts`, `aufbereiten.ts`,
+   `pexels.ts`, `verarbeitung.ts`, weil sie `lib/medien.ts` direkt lesen. Masken als Palette-PNG,
+   960 px breit. Fotos bleiben Graustufen; der Hover von Graustufen zu Farbe (4.6) entfällt damit,
+   kein Foto der Startseite hat Farbe.
+7. **Ein Video** (`pflanze-loop`) in der Mitte der Schleife (Sektion 4); 5.1 hatte keinen Ort genannt.
+8. **Manifest-Einfärbung über Deckkraft** (0,25 → 1) statt über Farbe, damit sie in 4.6 bleibt.
+   **Schleife über `strokeDashoffset`**: die einzige Ausnahme von „nur transform, opacity,
+   clip-path, Masken-Position“, eine 1,5-px-Linie in einem kleinen SVG.
+9. **`ReviewKarte` bleibt unverändert** (Karte für `/reviews`); die Doppelseite ist eine eigene
+   Komponente in `components/story/NeuesterEintrag.tsx`. `UmfrageKarte` bekommt die optionale Prop
+   `darstellung` (`"karte"` Standard, `"wand"` Startseite); Logik und Zustände bleiben.
+10. **„Ganzen Eintrag lesen“** führt auf `/produkte/[slug]`: eine Einzelseite je Review gibt es nicht.
+11. **Einstieg:** Ausgeblendet wird vor dem Start nur `[data-story-einstieg]`, per CSS unter
+    `@media (scripting: enabled) and (prefers-reduced-motion: no-preference)`, mit Notfall-Einblendung
+    nach 2,5 s. Die Scroll-Abläufe starten erst, wenn keine Skelette mehr stehen.
+12. **Leitsätze der Wand** bei leerer Datenbank: „Schlag vor.“, „Stimm ab.“, „Lies mit.“
+13. **Randnotizen** des Feldbuch-Rasters in Cormorant kursiv (Buch), nicht in Sedgwick.
+14. **Schlusszeile:** vorgelesen wird eine `sr-only`-Fassung; beide sichtbaren Ebenen sind `aria-hidden`.
