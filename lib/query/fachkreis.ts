@@ -1,32 +1,33 @@
-import { getSupabaseServerClient } from "@/lib/supabase/server";
+import { cookies } from "next/headers";
+
+import { COOKIE_NAME, tokenPruefen } from "@/lib/gate";
 
 /**
  * Fachkreis-Gate.
  *
- * SICHERHEITSREGEL, keine Stilfrage: Die Rolle wird ausschliesslich
- * serverseitig aus `app_metadata` des Supabase-Nutzers gelesen.
- * `app_metadata` kann der Nutzer selbst nicht schreiben (im Gegensatz zu
- * `user_metadata`). Die Rolle darf NIEMALS aus einem Cookie, einem
- * Query-Parameter, einem Header oder einem Request-Body uebernommen werden -
- * sonst laesst sich das Preisgate (§10 HWG) durch einen manipulierten
- * Request aushebeln.
+ * SICHERHEITSREGEL, keine Stilfrage: Die Rolle stammt ausschliesslich aus dem
+ * HMAC-signierten Gate-Token (lib/gate.ts). Der Cookie-Inhalt wird nie roh
+ * uebernommen - ohne gueltige Signatur gilt er als nicht vorhanden. Die Rolle
+ * darf NIEMALS aus einem Query-Parameter, einem Header oder einem
+ * Request-Body kommen, sonst laesst sich das Preisgate (Paragraph 10 HWG)
+ * durch einen manipulierten Request aushebeln.
+ *
+ * Einordnung: Paragraph 10 HWG adressiert Fachkreise, also Angehoerige der
+ * Heilberufe. Das zweite Passwort ist dafuer ein Behelf fuer die geschlossene
+ * Entwicklungsphase, kein Nachweis. Mit Block B (Better Auth) wird daraus
+ * eine echte Mitgliedsrolle; bis dahin bleibt die Seite ohnehin komplett
+ * hinter dem Gate.
  */
-const FACHKREIS_ROLLEN = new Set(["fachkreis", "admin"]);
-
 export async function istFachkreis(): Promise<boolean> {
-  try {
-    const supabase = await getSupabaseServerClient();
-    const { data, error } = await supabase.auth.getUser();
-    if (error || !data.user) return false;
+  const secret = process.env.SITE_SESSION_SECRET;
+  if (!secret) return false;
 
-    const rolle = data.user.app_metadata?.rolle;
-    return typeof rolle === "string" && FACHKREIS_ROLLEN.has(rolle);
+  try {
+    const token = (await cookies()).get(COOKIE_NAME)?.value;
+    return (await tokenPruefen(secret, token)) === "fachkreis";
   } catch {
-    // Absichtlich weit gefasst: `getSupabaseServerClient()` wirft, wenn
-    // NEXT_PUBLIC_SUPABASE_URL / _ANON_KEY fehlen - in .env.local stehen
-    // derzeit nur Platzhalter. Ausserdem kann `cookies()` in einem statisch
-    // gerenderten Kontext fehlschlagen. Der sichere Default ist in beiden
-    // Faellen "kein Fachkreis": lieber Preise verbergen als leaken.
+    // `cookies()` wirft in einem statisch gerenderten Kontext. Der sichere
+    // Default ist dort "kein Fachkreis": lieber Preise verbergen als leaken.
     return false;
   }
 }

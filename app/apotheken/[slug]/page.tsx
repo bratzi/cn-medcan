@@ -17,7 +17,7 @@ import {
   TableRow,
 } from "@/components/ui";
 import type { BadgeVariante } from "@/components/ui";
-import type { BestandStatus } from "@/lib/generated/prisma/enums";
+import type { BestandStatus } from "@/db/enums";
 import {
   formatiereGramm,
   formatiereLieferzeit,

@@ -1,26 +1,33 @@
-import { config as ladeEnv } from "dotenv";
-import { defineConfig, env } from "prisma/config";
-
-// Zugangsdaten stehen in .env.local, nicht in .env.
-ladeEnv({ path: ".env.local", quiet: true });
+import { defineConfig } from "prisma/config";
 
 /**
- * Prisma 7 verwaltet die Verbindungs-URLs hier, nicht mehr im Schema.
+ * Reine Arbeitsdatei fuer `prisma migrate diff`.
  *
- * Wichtig, das ist die haeufigste Fehlerquelle bei Supabase:
- * - Migrationen und Introspection laufen ueber die DIREKTE Verbindung (Port 5432),
- *   weil der Transaction-Pooler kein DDL mit Prepared Statements vertraegt.
- * - Die Laufzeit verbindet ueber den Pooler (Port 6543) und bekommt die URL
- *   nicht hier, sondern ueber den Adapter in lib/prisma.ts.
+ * D1 selbst hat keine Verbindungs-URL - die Datenbank kommt als Binding in
+ * den Worker. Die Schema-Engine verlangt aber auch fuer einen Diff aus dem
+ * Nichts (`--from-empty`) zwingend eine Datasource; fehlt sie, bricht sie
+ * still ab: Exit-Code 0, leere Ausgabe, keine Fehlermeldung. Deshalb steht
+ * hier ein lokaler SQLite-Pfad. In diese Datei wird nie geschrieben, sie ist
+ * nur das Ziel, gegen das der Diff rechnet - sie darf sogar fehlen.
+ */
+const DIFF_ZIEL = "file:./db/.migrate-diff.sqlite";
+
+/**
+ * Cloudflare D1 hat keine Verbindungs-URL: die Datenbank kommt als Binding
+ * in den Worker. Deshalb steht hier kein `datasource`-Block - Prisma
+ * braucht fuer D1 keine Zugangsdaten, und `.env.local` enthaelt keine mehr.
+ *
+ * `prisma migrate dev` gibt es auf diesem Pfad nicht. Migrationen laufen
+ * hybrid ueber `prisma migrate diff` und `wrangler d1 migrations apply`,
+ * siehe db/README.md.
  */
 export default defineConfig({
   schema: "prisma/schema.prisma",
+  datasource: {
+    url: DIFF_ZIEL,
+  },
   migrations: {
-    path: "prisma/migrations",
     // Seed-Skript (Prisma 7 registriert es hier, nicht in package.json).
     seed: "npx tsx prisma/seed.ts",
-  },
-  datasource: {
-    url: env("DIRECT_URL"),
   },
 });

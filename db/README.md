@@ -1,0 +1,110 @@
+# Datenbank — Cloudflare D1
+
+D1 ist SQLite und laeuft als **Binding** im Worker: keine Verbindungs-URL, kein
+Passwort, kein zusaetzliches Konto. Das Binding heisst `DB` und steht in
+`wrangler.jsonc`. Zugriff ausschliesslich ueber `getPrisma()` in `lib/prisma.ts`.
+
+## Dateien hier
+
+| Datei | Zweck |
+|---|---|
+| `enums.ts` | Die sieben geschlossenen Wertelisten als TS-Unions. SQLite kennt keine Enums. |
+| `constraints.sql` | Wertepruefungen als Trigger. Muss nach **jeder** Migration erneut laufen. |
+| `.migrate-diff.sqlite` | Wird nie angelegt — nur der Pfad, den `prisma migrate diff` als Datasource braucht. |
+
+Die Migrationen liegen in `migrations/` im Projektstamm, weil `wrangler` sie
+dort erwartet (`migrations_dir` in `wrangler.jsonc`).
+
+## Erstes Aufsetzen
+
+```bash
+npx wrangler login
+npx wrangler d1 create cn-medcan-db     # database_id in wrangler.jsonc eintragen
+npm run cf-typegen
+npm run db:migrate:local
+npm run db:constraints:local
+npm run db:seed
+```
+
+Ohne Cloudflare-Konto funktioniert alles ausser `--remote`: wrangler legt die
+Datenbank dann als Datei unter `.wrangler/` an.
+
+## Eine Migration schreiben
+
+`prisma migrate dev` gibt es auf diesem Pfad **nicht** — es setzt eine
+Verbindung zur Zieldatenbank voraus, und die hat D1 nicht. Stattdessen:
+
+```bash
+# 1. Schema aendern (prisma/schema.prisma)
+
+# 2. SQL erzeugen: Diff vom Stand der bisherigen Migrationen zum neuen Schema
+npx prisma migrate diff \
+  --from-migrations migrations \
+  --to-schema prisma/schema.prisma \
+  --script > migrations/000X_<name>.sql
+
+# 3. Anwenden
+npm run db:migrate:local
+npm run db:constraints:local     # Trigger neu setzen, siehe unten
+```
+
+Die allererste Migration entstand mit `--from-empty` statt `--from-migrations`.
+
+**Zwei Fallen, beide schon erlebt:**
+
+1. `prisma migrate diff` bricht **still** ab, wenn `prisma.config.ts` keine
+   `datasource` hat: Exit-Code 0, leere Ausgabe, keine Fehlermeldung. Die
+   Schema-Engine verlangt das Argument auch fuer einen Diff aus dem Nichts.
+   Deshalb steht dort ein lokaler Dateipfad, in den nie geschrieben wird.
+2. Die Flags heissen seit Prisma 7 `--from-schema` / `--to-schema`.
+   `--to-schema-datamodel` und `--from-local-d1` gibt es nicht mehr.
+
+## Warum die Pruefungen Trigger sind und keine `check`-Constraints
+
+SQLite kann CHECK-Constraints nur beim `create table` setzen; ein
+`alter table ... add constraint` gibt es nicht. Die Tabellen erzeugt aber
+Prisma aus dem Schema, und Prisma kennt diese Bedingungen nicht.
+
+Folge: **`db/constraints.sql` nach jeder Migration erneut ausfuehren.** Prisma
+baut Tabellen beim Aendern als create/copy/drop/rename um, und SQLite verwirft
+dabei alle Trigger der alten Tabelle. Das Skript ist idempotent.
+
+Die Werte in `constraints.sql` und `enums.ts` muessen uebereinstimmen. Wer dort
+einen Wert ergaenzt, ergaenzt ihn hier mit — sonst weist die Datenbank ihn ab.
+
+## Seed
+
+`npm run db:seed` schreibt mit einem SQLite-Treiber **direkt in die lokale
+D1-Datei** unter `.wrangler/`. Der D1-Adapter ist dafuer nicht nutzbar: er
+braucht ein `D1Database`-Binding, und das gibt es nur im laufenden Worker.
+
+Fuer die entfernte Datenbank gibt es keinen Dateipfad. Der Weg dorthin:
+
+```bash
+npx wrangler d1 export cn-medcan-db --local --no-schema --output db/seed-daten.sql
+npx wrangler d1 execute cn-medcan-db --remote --file db/seed-daten.sql
+```
+
+## Was es hier nicht mehr gibt: Row Level Security
+
+Die frueheren Policies aus `supabase/rls.sql` sind ersatzlos entfallen — sie
+stehen in der Git-Historie. RLS greift nur, wenn die Verbindung eine
+Nutzeridentitaet traegt; Prisma verbindet als Eigentuemer, die Policies waren
+also ausschliesslich auf dem `supabase-js`-Pfad wirksam, den es nicht mehr gibt.
+
+Die fachliche Sichtbarkeitsgrenze — das Fachkreis-Gate nach §10 HWG — liegt in
+der Abfrageschicht: `bestandSichtbarkeit()` in `lib/query/strains.ts`. Sie ist
+dort die **einzige** Stelle, die die Bedingung formuliert. Wer eine neue
+Abfrage auf `pharmacy_stock` schreibt, geht ueber diese Funktion. Ein
+vergessener Filter faellt nicht als Fehler auf, sondern als stilles Datenleck.
+
+## D1-Eigenheiten, die den Code formen
+
+- **Keine echten Transaktionen.** Prisma fuehrt `$transaction` gegen D1 als
+  Einzelabfragen aus. Eindeutigkeit wird deshalb ueber Unique-Indizes
+  abgesichert, nie ueber eine Transaktion. (Relevant fuer Block B: „eine
+  Stimme pro Mitglied" ist ein Unique-Index.)
+- **Kein `mode: "insensitive"`.** Freitextsuche laeuft ueber die
+  kleingeschriebene Spalte `strains.suchtext`.
+- **Kein Json-Typ.** `reviews.geschmacks_matrix` ist JSON-Text.
+- **Kein Decimal.** Prozentwerte sind `Float`, Preise bleiben `Int` in Cent.

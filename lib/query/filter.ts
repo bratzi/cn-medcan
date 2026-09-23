@@ -1,10 +1,10 @@
 import { z } from "zod";
 
 import {
-  Darreichungsform,
-  GeschmacksKategorie,
-  KultivarTyp,
-} from "@/lib/generated/prisma/enums";
+  DARREICHUNGSFORMEN,
+  GESCHMACKS_KATEGORIEN,
+  KULTIVAR_TYPEN,
+} from "@/db/enums";
 
 /** Treffer pro Seite in der Katalogliste. */
 export const TREFFER_PRO_SEITE = 24;
@@ -94,9 +94,9 @@ export const strainFilterSchema = z.object({
     .transform((rohwert) => (ersterWert(rohwert) ?? "").trim().slice(0, 100))
     .transform((wert) => (wert.length > 0 ? wert : undefined))
     .catch(undefined),
-  typ: enumListe(Object.values(KultivarTyp)),
-  form: enumListe(Object.values(Darreichungsform)),
-  geschmack: enumListe(Object.values(GeschmacksKategorie)),
+  typ: enumListe(KULTIVAR_TYPEN),
+  form: enumListe(DARREICHUNGSFORMEN),
+  geschmack: enumListe(GESCHMACKS_KATEGORIEN),
   thcMin: zahl(0, 100, THC_MIN_DEFAULT),
   thcMax: zahl(0, 100, THC_MAX_DEFAULT),
   preisMax: z

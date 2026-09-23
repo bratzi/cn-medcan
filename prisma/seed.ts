@@ -1,12 +1,20 @@
 /**
  * Seed fuer den Medizinalcannabis-Katalog.
  *
- * Ausfuehren:  npm run db:seed
+ * Ausfuehren:  npm run db:seed          (lokale D1-Datei unter .wrangler/)
+ *              npm run db:seed -- <pfad> (eine andere SQLite-Datei)
  *
- * Verbindet ueber die DIREKTE Verbindung (DIRECT_URL, Port 5432), nicht ueber
- * den Transaction-Pooler - Seeds sind ein Wartungsjob, kein Request-Pfad.
- * Prisma verbindet mit der Service-Rolle und umgeht Row Level Security; das
- * ist hier genau richtig (siehe .claude/skills/edge-stack-master.md, RLS-Grenze).
+ * WARUM NICHT UEBER DEN D1-ADAPTER: `@prisma/adapter-d1` braucht ein
+ * D1Database-Binding, und das gibt es nur im laufenden Worker - ein Skript in
+ * Node hat keins. Der Seed schreibt deshalb mit einem SQLite-Treiber direkt
+ * in dieselbe Datei, die Miniflare fuer die lokale D1 benutzt. Dieselben
+ * Tabellen, derselbe Inhalt, nur ohne Umweg ueber den Worker.
+ *
+ * FUER DIE ENTFERNTE DATENBANK ist dieser Weg nicht nutzbar - dorthin fuehrt
+ * kein Dateipfad. Der Weg dorthin ist ein Export der lokal geseedeten Daten:
+ *     npx wrangler d1 export cn-medcan-db --local --no-schema --output db/seed-daten.sql
+ *     npx wrangler d1 execute cn-medcan-db --remote --file db/seed-daten.sql
+ * Siehe db/README.md.
  *
  * Das Skript ist idempotent: alles laeuft ueber `upsert` gegen die
  * Unique-Felder des Schemas und kann beliebig oft laufen.
@@ -15,30 +23,45 @@
  * Apotheken, PZN und Chargennummern sind erfunden und bewusst als solche
  * erkennbar. Keine echten Markennamen, keine realistisch aussehenden PZN.
  */
-import { config as ladeEnv } from "dotenv";
+import { existsSync, readdirSync } from "node:fs";
+import { join } from "node:path";
 
-ladeEnv({ path: ".env.local", quiet: true });
+import { PrismaBetterSqlite3 } from "@prisma/adapter-better-sqlite3";
 
-import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "../lib/generated/prisma/client";
-import {
-  Bestrahlung,
-  BestandStatus,
-  Darreichungsform,
-  GeschmacksKategorie,
-  KultivarTyp,
-  RezeptStatus,
-  UnternehmensRolle,
-} from "../lib/generated/prisma/enums";
 
-const connectionString = process.env.DIRECT_URL;
-if (!connectionString) {
-  throw new Error(
-    "DIRECT_URL fehlt. Direkte Supabase-Verbindung (Port 5432) in .env.local eintragen."
+const D1_VERZEICHNIS = ".wrangler/state/v3/d1/miniflare-D1DatabaseObject";
+
+/**
+ * Findet die lokale D1-Datei. Miniflare benennt sie nach einem Hash der
+ * Datenbank-ID, der Name ist also nicht vorhersagbar - `metadata.sqlite`
+ * gehoert Miniflare selbst und ist es nie.
+ */
+function findeLokaleD1(): string {
+  if (!existsSync(D1_VERZEICHNIS)) {
+    throw new Error(
+      `Keine lokale D1 gefunden (${D1_VERZEICHNIS} fehlt). Zuerst die Migration anwenden:
+` +
+        "  npx wrangler d1 migrations apply cn-medcan-db --local"
+    );
+  }
+  const dateien = readdirSync(D1_VERZEICHNIS).filter(
+    (name) => name.endsWith(".sqlite") && name !== "metadata.sqlite"
   );
+  if (dateien.length !== 1) {
+    throw new Error(
+      `Erwartet genau eine D1-Datei in ${D1_VERZEICHNIS}, gefunden: ${dateien.length}. ` +
+        "Pfad sonst als Argument uebergeben: npm run db:seed -- <pfad>"
+    );
+  }
+  return join(D1_VERZEICHNIS, dateien[0]);
 }
 
-const prisma = new PrismaClient({ adapter: new PrismaPg({ connectionString }) });
+const zielDatei = process.argv[2] ?? findeLokaleD1();
+
+const prisma = new PrismaClient({
+  adapter: new PrismaBetterSqlite3({ url: `file:${zielDatei}` }),
+});
 
 /** Instagram-Reel-URL ist optional und steht nur in .env.local. */
 const reelUrl = process.env.NEXT_PUBLIC_INSTAGRAM_REEL_URL ?? null;
@@ -51,49 +74,49 @@ const terpenDaten = [
   {
     name: "Myrcen",
     aromaProfil: "erdig-moschusartig, Hopfen und feuchtes Laub",
-    geschmack: GeschmacksKategorie.ERDIG,
+    geschmack: "ERDIG",
     siedepunktC: 167,
   },
   {
     name: "Limonen",
     aromaProfil: "frische Zitrusschale, Grapefruit und Zitrone",
-    geschmack: GeschmacksKategorie.ZITRUS,
+    geschmack: "ZITRUS",
     siedepunktC: 176,
   },
   {
     name: "beta-Caryophyllen",
     aromaProfil: "schwarzer Pfeffer, Nelke, warm-scharf",
-    geschmack: GeschmacksKategorie.WUERZIG,
+    geschmack: "WUERZIG",
     siedepunktC: 130,
   },
   {
     name: "Linalool",
     aromaProfil: "Lavendel, blumig mit leicht seifiger Suesse",
-    geschmack: GeschmacksKategorie.BLUMIG,
+    geschmack: "BLUMIG",
     siedepunktC: 198,
   },
   {
     name: "alpha-Pinen",
     aromaProfil: "Kiefernnadel, Harz, frisches Nadelholz",
-    geschmack: GeschmacksKategorie.HOLZIG,
+    geschmack: "HOLZIG",
     siedepunktC: 155,
   },
   {
     name: "Terpinolen",
     aromaProfil: "scharf-loesemittelartig, Treibstoffnote mit Apfel",
-    geschmack: GeschmacksKategorie.DIESEL,
+    geschmack: "DIESEL",
     siedepunktC: 186,
   },
   {
     name: "Humulen",
     aromaProfil: "bitter-kraeutrig, Hopfenblueten und Beifuss",
-    geschmack: GeschmacksKategorie.KRAEUTRIG,
+    geschmack: "KRAEUTRIG",
     siedepunktC: 198,
   },
   {
     name: "Ocimen",
     aromaProfil: "suesslich-fruchtig, Mango und Basilikumbluete",
-    geschmack: GeschmacksKategorie.SUESS,
+    geschmack: "SUESS",
     siedepunktC: 100,
   },
 ] as const;
@@ -106,28 +129,28 @@ const unternehmenDaten = [
   {
     name: "Nordlicht Kultivar GmbH (fiktiv)",
     land: "Deutschland",
-    rolle: UnternehmensRolle.HERSTELLER,
+    rolle: "HERSTELLER",
     gdpNummer: "GDP-FIKTIV-1001",
     website: "https://example.invalid/nordlicht",
   },
   {
     name: "Talwind Pharma Import AG (fiktiv)",
     land: "Deutschland",
-    rolle: UnternehmensRolle.IMPORTEUR,
+    rolle: "IMPORTEUR",
     gdpNummer: "GDP-FIKTIV-1002",
     website: "https://example.invalid/talwind",
   },
   {
     name: "Maple Ridge Botanicals Ltd. (fiktiv)",
     land: "Kanada",
-    rolle: UnternehmensRolle.BEIDES,
+    rolle: "BEIDES",
     gdpNummer: "GDP-FIKTIV-1003",
     website: "https://example.invalid/mapleridge",
   },
   {
     name: "Aurora Valley Cultivation Pty (fiktiv)",
     land: "Australien",
-    rolle: UnternehmensRolle.HERSTELLER,
+    rolle: "HERSTELLER",
     gdpNummer: "GDP-FIKTIV-1004",
     website: "https://example.invalid/auroravalley",
   },
@@ -164,15 +187,15 @@ const strainDaten: StrainSeed[] = [
     slug: "nebelharz-22",
     handelsname: "Nebelharz 22 (fiktiv)",
     pzn: "PZN-FIKTIV-0001",
-    darreichungsform: Darreichungsform.BLUETE,
+    darreichungsform: "BLUETE",
     kultivarName: "Nebelharz",
-    kultivarTyp: KultivarTyp.INDICA,
+    kultivarTyp: "INDICA",
     genetik: "Fiktivkreuzung A x Fiktivkreuzung B",
     thcMin: 21,
     thcMax: 24,
     cbdMin: 0,
     cbdMax: 1,
-    bestrahlung: Bestrahlung.GAMMA,
+    bestrahlung: "GAMMA",
     anbauland: "Kanada",
     beschreibung:
       "Dichte, harzreiche Bluete mit erdig-moschusartigem Grundton und deutlicher Pfeffernote im Abgang.",
@@ -188,15 +211,15 @@ const strainDaten: StrainSeed[] = [
     slug: "zitronensegel-18",
     handelsname: "Zitronensegel 18 (fiktiv)",
     pzn: "PZN-FIKTIV-0002",
-    darreichungsform: Darreichungsform.BLUETE,
+    darreichungsform: "BLUETE",
     kultivarName: "Zitronensegel",
-    kultivarTyp: KultivarTyp.SATIVA,
+    kultivarTyp: "SATIVA",
     genetik: "Fiktivkreuzung C x Fiktivkreuzung D",
     thcMin: 17,
     thcMax: 20,
     cbdMin: 0,
     cbdMax: 1,
-    bestrahlung: Bestrahlung.E_BEAM,
+    bestrahlung: "E_BEAM",
     anbauland: "Portugal",
     beschreibung:
       "Hellgruene, luftige Bluete mit ausgepraegter Zitrusschale und blumigem Nachklang.",
@@ -213,15 +236,15 @@ const strainDaten: StrainSeed[] = [
     slug: "treibstoff-nord-27",
     handelsname: "Treibstoff Nord 27 (fiktiv)",
     pzn: "PZN-FIKTIV-0003",
-    darreichungsform: Darreichungsform.BLUETE,
+    darreichungsform: "BLUETE",
     kultivarName: "Treibstoff Nord",
-    kultivarTyp: KultivarTyp.HYBRID,
+    kultivarTyp: "HYBRID",
     genetik: "Fiktivkreuzung E x Fiktivkreuzung F",
     thcMin: 25,
     thcMax: 28,
     cbdMin: 0,
     cbdMax: 1,
-    bestrahlung: Bestrahlung.UNBESTRAHLT,
+    bestrahlung: "UNBESTRAHLT",
     anbauland: "Australien",
     beschreibung:
       "Sehr potente Bluete mit scharfer Treibstoffnote, harzig und langanhaltend im Geruch.",
@@ -237,15 +260,15 @@ const strainDaten: StrainSeed[] = [
     slug: "lavendelgrund-9",
     handelsname: "Lavendelgrund 9 (fiktiv)",
     pzn: "PZN-FIKTIV-0004",
-    darreichungsform: Darreichungsform.BLUETE,
+    darreichungsform: "BLUETE",
     kultivarName: "Lavendelgrund",
-    kultivarTyp: KultivarTyp.INDICA,
+    kultivarTyp: "INDICA",
     genetik: "Fiktivkreuzung G x Fiktivkreuzung H",
     thcMin: 7.5,
     thcMax: 9.5,
     cbdMin: 0,
     cbdMax: 1,
-    bestrahlung: Bestrahlung.GAMMA,
+    bestrahlung: "GAMMA",
     anbauland: "Deutschland",
     beschreibung:
       "Niedrig dosierte Bluete fuer den Einstieg, blumig-lavendelartig mit weicher Konsistenz.",
@@ -260,15 +283,15 @@ const strainDaten: StrainSeed[] = [
     slug: "stillwasser-cbd-12",
     handelsname: "Stillwasser CBD 12 (fiktiv)",
     pzn: "PZN-FIKTIV-0005",
-    darreichungsform: Darreichungsform.BLUETE,
+    darreichungsform: "BLUETE",
     kultivarName: "Stillwasser",
-    kultivarTyp: KultivarTyp.HYBRID,
+    kultivarTyp: "HYBRID",
     genetik: "Fiktivkreuzung I x Fiktivkreuzung J",
     thcMin: 0.4,
     thcMax: 1,
     cbdMin: 10,
     cbdMax: 13,
-    bestrahlung: Bestrahlung.E_BEAM,
+    bestrahlung: "E_BEAM",
     anbauland: "Daenemark",
     beschreibung:
       "CBD-dominante Bluete mit sehr niedrigem THC-Gehalt, kraeutrig-bitterer Grundton.",
@@ -284,15 +307,15 @@ const strainDaten: StrainSeed[] = [
     slug: "kiefernkante-cbd-8",
     handelsname: "Kiefernkante CBD 8 (fiktiv)",
     pzn: "PZN-FIKTIV-0006",
-    darreichungsform: Darreichungsform.GRANULAT,
+    darreichungsform: "GRANULAT",
     kultivarName: "Kiefernkante",
-    kultivarTyp: KultivarTyp.RUDERALIS,
+    kultivarTyp: "RUDERALIS",
     genetik: "Fiktivkreuzung K x Fiktiv-Ruderalis",
     thcMin: 0.3,
     thcMax: 0.8,
     cbdMin: 7,
     cbdMax: 9,
-    bestrahlung: Bestrahlung.GAMMA,
+    bestrahlung: "GAMMA",
     anbauland: "Deutschland",
     beschreibung:
       "CBD-dominantes Granulat, harzig-holzige Kiefernnote, fuer die Verdampfung vordosiert.",
@@ -308,15 +331,15 @@ const strainDaten: StrainSeed[] = [
     slug: "honigwind-20",
     handelsname: "Honigwind 20 (fiktiv)",
     pzn: "PZN-FIKTIV-0007",
-    darreichungsform: Darreichungsform.BLUETE,
+    darreichungsform: "BLUETE",
     kultivarName: "Honigwind",
-    kultivarTyp: KultivarTyp.SATIVA,
+    kultivarTyp: "SATIVA",
     genetik: "Fiktivkreuzung L x Fiktivkreuzung M",
     thcMin: 19,
     thcMax: 22,
     cbdMin: 0,
     cbdMax: 1,
-    bestrahlung: Bestrahlung.UNBESTRAHLT,
+    bestrahlung: "UNBESTRAHLT",
     anbauland: "Kanada",
     beschreibung:
       "Suesslich-fruchtige Bluete mit Mangonote, locker gewachsen und sehr aromatisch.",
@@ -333,15 +356,15 @@ const strainDaten: StrainSeed[] = [
     slug: "pfefferstern-extrakt",
     handelsname: "Pfefferstern Extrakt (fiktiv)",
     pzn: "PZN-FIKTIV-0008",
-    darreichungsform: Darreichungsform.EXTRAKT,
+    darreichungsform: "EXTRAKT",
     kultivarName: "Pfefferstern",
-    kultivarTyp: KultivarTyp.HYBRID,
+    kultivarTyp: "HYBRID",
     genetik: "Vollspektrum-Extrakt aus Fiktivkreuzung N",
     thcMin: 24,
     thcMax: 26,
     cbdMin: 1,
     cbdMax: 2,
-    bestrahlung: Bestrahlung.UNBEKANNT,
+    bestrahlung: "UNBEKANNT",
     anbauland: "Niederlande",
     beschreibung:
       "Vollspektrum-Extrakt in oeliger Traegerloesung, deutlich wuerzig mit Nelkennote.",
@@ -371,7 +394,7 @@ const apothekenDaten = [
     website: "https://example.invalid/nordkanal",
     lieferzeitTageMin: 1,
     lieferzeitTageMax: 2,
-    rezeptStatus: RezeptStatus.E_REZEPT_ONLY,
+    rezeptStatus: "E_REZEPT_ONLY",
     eRezeptTokenUpload: true,
     betriebserlaubnisNr: "BE-FIKTIV-2001",
   },
@@ -386,7 +409,7 @@ const apothekenDaten = [
     website: "https://example.invalid/sonnenhof",
     lieferzeitTageMin: 2,
     lieferzeitTageMax: 4,
-    rezeptStatus: RezeptStatus.BEIDES,
+    rezeptStatus: "BEIDES",
     eRezeptTokenUpload: true,
     betriebserlaubnisNr: "BE-FIKTIV-2002",
   },
@@ -401,7 +424,7 @@ const apothekenDaten = [
     website: "https://example.invalid/rheinbogen",
     lieferzeitTageMin: 1,
     lieferzeitTageMax: 3,
-    rezeptStatus: RezeptStatus.E_REZEPT_ONLY,
+    rezeptStatus: "E_REZEPT_ONLY",
     eRezeptTokenUpload: true,
     betriebserlaubnisNr: "BE-FIKTIV-2003",
   },
@@ -416,7 +439,7 @@ const apothekenDaten = [
     website: "https://example.invalid/elbsand",
     lieferzeitTageMin: 3,
     lieferzeitTageMax: 5,
-    rezeptStatus: RezeptStatus.PAPIER_ONLY,
+    rezeptStatus: "PAPIER_ONLY",
     eRezeptTokenUpload: false,
     betriebserlaubnisNr: "BE-FIKTIV-2004",
   },
@@ -431,7 +454,7 @@ const apothekenDaten = [
     website: "https://example.invalid/taunusquelle",
     lieferzeitTageMin: 2,
     lieferzeitTageMax: 3,
-    rezeptStatus: RezeptStatus.BEIDES,
+    rezeptStatus: "BEIDES",
     eRezeptTokenUpload: true,
     betriebserlaubnisNr: "BE-FIKTIV-2005",
   },
@@ -452,36 +475,36 @@ type BestandSeed = {
 };
 
 const bestandDaten: BestandSeed[] = [
-  { apotheke: "apotheke-am-nordkanal-fiktiv", strain: "nebelharz-22", packungGramm: 10, preisProGrammCent: 1120, bestandGramm: 240, status: BestandStatus.VERFUEGBAR, nurFuerFachkreise: false },
-  { apotheke: "apotheke-am-nordkanal-fiktiv", strain: "nebelharz-22", packungGramm: 30, preisProGrammCent: 980, bestandGramm: 90, status: BestandStatus.VERFUEGBAR, nurFuerFachkreise: true },
-  { apotheke: "apotheke-am-nordkanal-fiktiv", strain: "zitronensegel-18", packungGramm: 10, preisProGrammCent: 1050, bestandGramm: 120, status: BestandStatus.VERFUEGBAR, nurFuerFachkreise: false },
-  { apotheke: "apotheke-am-nordkanal-fiktiv", strain: "treibstoff-nord-27", packungGramm: 5, preisProGrammCent: 1780, bestandGramm: 35, status: BestandStatus.NACHBESTELLT, nurFuerFachkreise: true },
-  { apotheke: "apotheke-am-nordkanal-fiktiv", strain: "honigwind-20", packungGramm: 15, preisProGrammCent: 1240, bestandGramm: 60, status: BestandStatus.VERFUEGBAR, nurFuerFachkreise: false },
-  { apotheke: "apotheke-am-nordkanal-fiktiv", strain: "pfefferstern-extrakt", packungGramm: 5, preisProGrammCent: 1690, bestandGramm: null, status: BestandStatus.NICHT_LIEFERBAR, nurFuerFachkreise: true },
+  { apotheke: "apotheke-am-nordkanal-fiktiv", strain: "nebelharz-22", packungGramm: 10, preisProGrammCent: 1120, bestandGramm: 240, status: "VERFUEGBAR", nurFuerFachkreise: false },
+  { apotheke: "apotheke-am-nordkanal-fiktiv", strain: "nebelharz-22", packungGramm: 30, preisProGrammCent: 980, bestandGramm: 90, status: "VERFUEGBAR", nurFuerFachkreise: true },
+  { apotheke: "apotheke-am-nordkanal-fiktiv", strain: "zitronensegel-18", packungGramm: 10, preisProGrammCent: 1050, bestandGramm: 120, status: "VERFUEGBAR", nurFuerFachkreise: false },
+  { apotheke: "apotheke-am-nordkanal-fiktiv", strain: "treibstoff-nord-27", packungGramm: 5, preisProGrammCent: 1780, bestandGramm: 35, status: "NACHBESTELLT", nurFuerFachkreise: true },
+  { apotheke: "apotheke-am-nordkanal-fiktiv", strain: "honigwind-20", packungGramm: 15, preisProGrammCent: 1240, bestandGramm: 60, status: "VERFUEGBAR", nurFuerFachkreise: false },
+  { apotheke: "apotheke-am-nordkanal-fiktiv", strain: "pfefferstern-extrakt", packungGramm: 5, preisProGrammCent: 1690, bestandGramm: null, status: "NICHT_LIEFERBAR", nurFuerFachkreise: true },
 
-  { apotheke: "sonnenhof-apotheke-fiktiv", strain: "nebelharz-22", packungGramm: 15, preisProGrammCent: 1080, bestandGramm: 150, status: BestandStatus.VERFUEGBAR, nurFuerFachkreise: false },
-  { apotheke: "sonnenhof-apotheke-fiktiv", strain: "lavendelgrund-9", packungGramm: 10, preisProGrammCent: 720, bestandGramm: 200, status: BestandStatus.VERFUEGBAR, nurFuerFachkreise: false },
-  { apotheke: "sonnenhof-apotheke-fiktiv", strain: "stillwasser-cbd-12", packungGramm: 10, preisProGrammCent: 640, bestandGramm: 310, status: BestandStatus.VERFUEGBAR, nurFuerFachkreise: false },
-  { apotheke: "sonnenhof-apotheke-fiktiv", strain: "kiefernkante-cbd-8", packungGramm: 30, preisProGrammCent: 610, bestandGramm: 120, status: BestandStatus.NACHBESTELLT, nurFuerFachkreise: true },
-  { apotheke: "sonnenhof-apotheke-fiktiv", strain: "treibstoff-nord-27", packungGramm: 10, preisProGrammCent: 1650, bestandGramm: 45, status: BestandStatus.VERFUEGBAR, nurFuerFachkreise: true },
-  { apotheke: "sonnenhof-apotheke-fiktiv", strain: "zitronensegel-18", packungGramm: 5, preisProGrammCent: 1130, bestandGramm: 25, status: BestandStatus.AUSGELISTET, nurFuerFachkreise: true },
+  { apotheke: "sonnenhof-apotheke-fiktiv", strain: "nebelharz-22", packungGramm: 15, preisProGrammCent: 1080, bestandGramm: 150, status: "VERFUEGBAR", nurFuerFachkreise: false },
+  { apotheke: "sonnenhof-apotheke-fiktiv", strain: "lavendelgrund-9", packungGramm: 10, preisProGrammCent: 720, bestandGramm: 200, status: "VERFUEGBAR", nurFuerFachkreise: false },
+  { apotheke: "sonnenhof-apotheke-fiktiv", strain: "stillwasser-cbd-12", packungGramm: 10, preisProGrammCent: 640, bestandGramm: 310, status: "VERFUEGBAR", nurFuerFachkreise: false },
+  { apotheke: "sonnenhof-apotheke-fiktiv", strain: "kiefernkante-cbd-8", packungGramm: 30, preisProGrammCent: 610, bestandGramm: 120, status: "NACHBESTELLT", nurFuerFachkreise: true },
+  { apotheke: "sonnenhof-apotheke-fiktiv", strain: "treibstoff-nord-27", packungGramm: 10, preisProGrammCent: 1650, bestandGramm: 45, status: "VERFUEGBAR", nurFuerFachkreise: true },
+  { apotheke: "sonnenhof-apotheke-fiktiv", strain: "zitronensegel-18", packungGramm: 5, preisProGrammCent: 1130, bestandGramm: 25, status: "AUSGELISTET", nurFuerFachkreise: true },
 
-  { apotheke: "rheinbogen-versandapotheke-fiktiv", strain: "zitronensegel-18", packungGramm: 15, preisProGrammCent: 1010, bestandGramm: 180, status: BestandStatus.VERFUEGBAR, nurFuerFachkreise: false },
-  { apotheke: "rheinbogen-versandapotheke-fiktiv", strain: "honigwind-20", packungGramm: 10, preisProGrammCent: 1280, bestandGramm: 95, status: BestandStatus.VERFUEGBAR, nurFuerFachkreise: false },
-  { apotheke: "rheinbogen-versandapotheke-fiktiv", strain: "lavendelgrund-9", packungGramm: 30, preisProGrammCent: 680, bestandGramm: 240, status: BestandStatus.VERFUEGBAR, nurFuerFachkreise: false },
-  { apotheke: "rheinbogen-versandapotheke-fiktiv", strain: "pfefferstern-extrakt", packungGramm: 10, preisProGrammCent: 1600, bestandGramm: 40, status: BestandStatus.NACHBESTELLT, nurFuerFachkreise: true },
-  { apotheke: "rheinbogen-versandapotheke-fiktiv", strain: "stillwasser-cbd-12", packungGramm: 15, preisProGrammCent: 630, bestandGramm: 140, status: BestandStatus.VERFUEGBAR, nurFuerFachkreise: false },
-  { apotheke: "rheinbogen-versandapotheke-fiktiv", strain: "nebelharz-22", packungGramm: 5, preisProGrammCent: 1190, bestandGramm: null, status: BestandStatus.NICHT_LIEFERBAR, nurFuerFachkreise: true },
+  { apotheke: "rheinbogen-versandapotheke-fiktiv", strain: "zitronensegel-18", packungGramm: 15, preisProGrammCent: 1010, bestandGramm: 180, status: "VERFUEGBAR", nurFuerFachkreise: false },
+  { apotheke: "rheinbogen-versandapotheke-fiktiv", strain: "honigwind-20", packungGramm: 10, preisProGrammCent: 1280, bestandGramm: 95, status: "VERFUEGBAR", nurFuerFachkreise: false },
+  { apotheke: "rheinbogen-versandapotheke-fiktiv", strain: "lavendelgrund-9", packungGramm: 30, preisProGrammCent: 680, bestandGramm: 240, status: "VERFUEGBAR", nurFuerFachkreise: false },
+  { apotheke: "rheinbogen-versandapotheke-fiktiv", strain: "pfefferstern-extrakt", packungGramm: 10, preisProGrammCent: 1600, bestandGramm: 40, status: "NACHBESTELLT", nurFuerFachkreise: true },
+  { apotheke: "rheinbogen-versandapotheke-fiktiv", strain: "stillwasser-cbd-12", packungGramm: 15, preisProGrammCent: 630, bestandGramm: 140, status: "VERFUEGBAR", nurFuerFachkreise: false },
+  { apotheke: "rheinbogen-versandapotheke-fiktiv", strain: "nebelharz-22", packungGramm: 5, preisProGrammCent: 1190, bestandGramm: null, status: "NICHT_LIEFERBAR", nurFuerFachkreise: true },
 
-  { apotheke: "elbsand-apotheke-fiktiv", strain: "kiefernkante-cbd-8", packungGramm: 10, preisProGrammCent: 660, bestandGramm: 85, status: BestandStatus.VERFUEGBAR, nurFuerFachkreise: false },
-  { apotheke: "elbsand-apotheke-fiktiv", strain: "lavendelgrund-9", packungGramm: 15, preisProGrammCent: 700, bestandGramm: 110, status: BestandStatus.VERFUEGBAR, nurFuerFachkreise: false },
-  { apotheke: "elbsand-apotheke-fiktiv", strain: "treibstoff-nord-27", packungGramm: 30, preisProGrammCent: 1540, bestandGramm: 30, status: BestandStatus.AUSGELISTET, nurFuerFachkreise: true },
-  { apotheke: "elbsand-apotheke-fiktiv", strain: "honigwind-20", packungGramm: 5, preisProGrammCent: 1330, bestandGramm: 20, status: BestandStatus.NACHBESTELLT, nurFuerFachkreise: true },
+  { apotheke: "elbsand-apotheke-fiktiv", strain: "kiefernkante-cbd-8", packungGramm: 10, preisProGrammCent: 660, bestandGramm: 85, status: "VERFUEGBAR", nurFuerFachkreise: false },
+  { apotheke: "elbsand-apotheke-fiktiv", strain: "lavendelgrund-9", packungGramm: 15, preisProGrammCent: 700, bestandGramm: 110, status: "VERFUEGBAR", nurFuerFachkreise: false },
+  { apotheke: "elbsand-apotheke-fiktiv", strain: "treibstoff-nord-27", packungGramm: 30, preisProGrammCent: 1540, bestandGramm: 30, status: "AUSGELISTET", nurFuerFachkreise: true },
+  { apotheke: "elbsand-apotheke-fiktiv", strain: "honigwind-20", packungGramm: 5, preisProGrammCent: 1330, bestandGramm: 20, status: "NACHBESTELLT", nurFuerFachkreise: true },
 
-  { apotheke: "taunusquelle-apotheke-fiktiv", strain: "pfefferstern-extrakt", packungGramm: 15, preisProGrammCent: 1580, bestandGramm: 55, status: BestandStatus.VERFUEGBAR, nurFuerFachkreise: false },
-  { apotheke: "taunusquelle-apotheke-fiktiv", strain: "stillwasser-cbd-12", packungGramm: 30, preisProGrammCent: 600, bestandGramm: 260, status: BestandStatus.VERFUEGBAR, nurFuerFachkreise: false },
-  { apotheke: "taunusquelle-apotheke-fiktiv", strain: "nebelharz-22", packungGramm: 15, preisProGrammCent: 1100, bestandGramm: 70, status: BestandStatus.NICHT_LIEFERBAR, nurFuerFachkreise: true },
-  { apotheke: "taunusquelle-apotheke-fiktiv", strain: "kiefernkante-cbd-8", packungGramm: 5, preisProGrammCent: 780, bestandGramm: 15, status: BestandStatus.AUSGELISTET, nurFuerFachkreise: true },
+  { apotheke: "taunusquelle-apotheke-fiktiv", strain: "pfefferstern-extrakt", packungGramm: 15, preisProGrammCent: 1580, bestandGramm: 55, status: "VERFUEGBAR", nurFuerFachkreise: false },
+  { apotheke: "taunusquelle-apotheke-fiktiv", strain: "stillwasser-cbd-12", packungGramm: 30, preisProGrammCent: 600, bestandGramm: 260, status: "VERFUEGBAR", nurFuerFachkreise: false },
+  { apotheke: "taunusquelle-apotheke-fiktiv", strain: "nebelharz-22", packungGramm: 15, preisProGrammCent: 1100, bestandGramm: 70, status: "NICHT_LIEFERBAR", nurFuerFachkreise: true },
+  { apotheke: "taunusquelle-apotheke-fiktiv", strain: "kiefernkante-cbd-8", packungGramm: 5, preisProGrammCent: 780, bestandGramm: 15, status: "AUSGELISTET", nurFuerFachkreise: true },
 ];
 
 // ---------------------------------------------------------------------------
@@ -705,6 +728,13 @@ async function main() {
       verschreibungspflichtig: true,
       bfarmGelistet: true,
       aktiv: true,
+      // Kleingeschriebene Suchspalte - siehe Schema. Sie wird hier gefuellt,
+      // nicht in der Abfrage berechnet: SQLite kann `contains` nicht
+      // case-insensitive.
+      suchtext: [s.handelsname, s.kultivarName, s.genetik]
+        .filter((teil): teil is string => Boolean(teil))
+        .join(" ")
+        .toLowerCase(),
       herstellerId: unternehmenIds.get(s.hersteller) ?? null,
       importeurId: unternehmenIds.get(s.importeur) ?? null,
     };
@@ -825,7 +855,9 @@ async function main() {
       wirkung: r.wirkung,
       konsistenz: r.konsistenz,
       feuchtigkeitProzent: r.feuchtigkeitProzent,
-      geschmacksMatrix: r.geschmacksMatrix,
+      // SQLite hat keinen Json-Typ: die Matrix geht als JSON-Text in die
+      // Spalte. Gelesen wird sie ueber parseGeschmacksMatrix().
+      geschmacksMatrix: JSON.stringify(r.geschmacksMatrix),
       notiz: r.notiz,
       instagramReelUrl: r.instagramReelUrl,
       freigegeben: r.freigegeben,
@@ -845,8 +877,9 @@ async function main() {
   console.log(`  Bewertungen:    ${reviewAnzahl} (davon freigegeben: ${reviewFreigegeben})`);
 
   console.log("\nSeed abgeschlossen.");
+  console.log(`Geschrieben nach: ${zielDatei}`);
   console.log(
-    "Hinweis: supabase/rls.sql muss nach jeder Prisma-Migration erneut ausgefuehrt werden."
+    "Hinweis: db/constraints.sql muss nach jeder Migration erneut ausgefuehrt werden."
   );
 }
 

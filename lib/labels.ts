@@ -6,7 +6,7 @@ import type {
   KultivarTyp,
   RezeptStatus,
   UnternehmensRolle,
-} from "@/lib/generated/prisma/enums";
+} from "@/db/enums";
 
 /**
  * Deutsche Anzeigetexte fuer alle Enum-Werte.

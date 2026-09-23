@@ -21,7 +21,7 @@ import {
   bestandStatusLabel,
   rezeptStatusLabel,
 } from "@/lib/labels";
-import { BestandStatus } from "@/lib/generated/prisma/enums";
+import { istBestandStatus, type BestandStatus } from "@/db/enums";
 import type { BestandEintrag } from "@/lib/query/strains";
 
 export type BestandTabelleProps = {
@@ -29,11 +29,6 @@ export type BestandTabelleProps = {
   /** Steuert, ob die Preisspalte oder der §-10-HWG-Hinweis erscheint. */
   fachkreis: boolean;
 };
-
-/** `status` kommt als `string` aus der Query - hier auf das Enum verengen. */
-function istBestandStatus(wert: string): wert is BestandStatus {
-  return Object.prototype.hasOwnProperty.call(BestandStatus, wert);
-}
 
 const STATUS_VARIANTE: Record<BestandStatus, BadgeVariante> = {
   VERFUEGBAR: "success",

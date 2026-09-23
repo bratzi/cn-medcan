@@ -1,7 +1,7 @@
 import { cn } from "@/lib/cn";
 import { formatiereProzent, type Dezimalwert } from "@/lib/format";
 import { geschmacksKategorieLabel } from "@/lib/labels";
-import type { GeschmacksKategorie } from "@/lib/generated/prisma/enums";
+import type { GeschmacksKategorie } from "@/db/enums";
 
 export type TerpenEintrag = {
   name: string;

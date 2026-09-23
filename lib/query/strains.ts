@@ -1,11 +1,18 @@
 import type { Prisma } from "@/lib/generated/prisma/client";
-import type {
-  Bestrahlung,
-  Darreichungsform,
-  GeschmacksKategorie,
-  KultivarTyp,
-  RezeptStatus,
-} from "@/lib/generated/prisma/enums";
+import {
+  istBestandStatus,
+  istBestrahlung,
+  istDarreichungsform,
+  istGeschmacksKategorie,
+  istKultivarTyp,
+  istRezeptStatus,
+  type BestandStatus,
+  type Bestrahlung,
+  type Darreichungsform,
+  type GeschmacksKategorie,
+  type KultivarTyp,
+  type RezeptStatus,
+} from "@/db/enums";
 import { getPrisma } from "@/lib/prisma";
 
 import { TREFFER_PRO_SEITE, type StrainFilter } from "./filter";
@@ -40,15 +47,50 @@ function bestandSichtbarkeit(fachkreis: boolean): Prisma.PharmacyStockWhereInput
   return fachkreis ? {} : { nurFuerFachkreise: false };
 }
 
-function zuZahl(wert: Prisma.Decimal | null | undefined): number | null {
+/**
+ * Prozentwerte sind auf D1 `Float`, nicht mehr `Decimal`. Die Umwandlung
+ * bleibt trotzdem bestehen: SQLite speichert Zahlen locker typisiert, und ein
+ * `NaN` aus einem schlecht eingespielten Datensatz soll in der Oberflaeche
+ * als "keine Angabe" landen, nicht als "NaN %".
+ */
+function zuZahl(wert: number | null | undefined): number | null {
   if (wert === null || wert === undefined) return null;
-  const zahl = Number(wert);
-  return Number.isFinite(zahl) ? zahl : null;
+  return Number.isFinite(wert) ? wert : null;
 }
 
-function zuZahlPflicht(wert: Prisma.Decimal): number {
+function zuZahlPflicht(wert: number): number {
   return zuZahl(wert) ?? 0;
 }
+
+// ---------------------------------------------------------------------------
+//  Verengung der Werteliste-Spalten
+//
+//  Auf D1 sind die sieben Wertelisten String-Spalten (SQLite kennt keine
+//  Enums), Prisma gibt sie folglich als `string` heraus. Die UI-Typen weiter
+//  unten arbeiten aber mit Unions, damit `Record<Enum, Label>` in lib/labels.ts
+//  vollstaendig bleibt und ein fehlendes Label `tsc` bricht.
+//
+//  Diese Grenze ist genau hier - nicht in den Komponenten. Ein Wert, der nicht
+//  in der Liste steht, kann regulaer nicht entstehen: die CHECK-Constraints in
+//  db/constraints.sql lassen ihn nicht in die Datenbank. Erreichbar ist der
+//  Fallback also nur ueber Daten, die an den Constraints vorbei eingespielt
+//  wurden. Dann ist ein neutraler Anzeigewert richtig - nicht ein Absturz der
+//  ganzen Seite wegen einer einzelnen Zeile.
+// ---------------------------------------------------------------------------
+
+function verenge<T extends string>(
+  pruefe: (wert: unknown) => wert is T,
+  ersatz: T
+): (wert: string) => T {
+  return (wert) => (pruefe(wert) ? wert : ersatz);
+}
+
+const alsKultivarTyp = verenge(istKultivarTyp, "HYBRID");
+const alsDarreichungsform = verenge(istDarreichungsform, "BLUETE");
+const alsBestrahlung = verenge(istBestrahlung, "UNBEKANNT");
+const alsRezeptStatus = verenge(istRezeptStatus, "BEIDES");
+const alsBestandStatus = verenge(istBestandStatus, "NICHT_LIEFERBAR");
+const alsGeschmacksKategorie = verenge(istGeschmacksKategorie, "ERDIG");
 
 // ---------------------------------------------------------------------------
 //  Stabile Ausgabetypen - die UI baut gegen diese, nicht gegen Prisma-Payloads.
@@ -74,7 +116,7 @@ export type StrainListenEintrag = {
   thcMaxProzent: number;
   cbdMinProzent: number;
   cbdMaxProzent: number;
-  bestrahlung: Bestrahlung;
+  bestrahlung: string;
   anbauland: string | null;
   herstellerBildPfad: string | null;
   herstellerName: string | null;
@@ -158,7 +200,7 @@ export type StrainDetail = {
   thcMaxProzent: number;
   cbdMinProzent: number;
   cbdMaxProzent: number;
-  bestrahlung: Bestrahlung;
+  bestrahlung: string;
   anbauland: string | null;
   herstellerBildPfad: string | null;
   beschreibung: string | null;
@@ -187,11 +229,12 @@ function baueWhere(
   const bedingungen: Prisma.StrainWhereInput = { aktiv: true };
 
   if (filter.q) {
-    bedingungen.OR = [
-      { handelsname: { contains: filter.q, mode: "insensitive" } },
-      { kultivarName: { contains: filter.q, mode: "insensitive" } },
-      { genetik: { contains: filter.q, mode: "insensitive" } },
-    ];
+    // SQLite/D1 kennt `mode: "insensitive"` nicht, und Prisma bildet dort
+    // auch kein LOWER() in der Query ab. Stattdessen sucht die Abfrage in
+    // der kleingeschriebenen Spalte `suchtext` (Handelsname, Kultivarname
+    // und Genetik zusammengefasst, beim Schreiben gefuellt) mit ebenfalls
+    // kleingeschriebener Eingabe. Ein OR ueber drei Spalten entfaellt damit.
+    bedingungen.suchtext = { contains: filter.q.toLowerCase() };
   }
 
   if (filter.typ.length > 0) bedingungen.kultivarTyp = { in: filter.typ };
@@ -300,21 +343,21 @@ type ListenZeile = {
   slug: string;
   handelsname: string;
   kultivarName: string | null;
-  kultivarTyp: KultivarTyp;
-  darreichungsform: Darreichungsform;
+  kultivarTyp: string;
+  darreichungsform: string;
   genetik: string | null;
-  thcMinProzent: Prisma.Decimal;
-  thcMaxProzent: Prisma.Decimal;
-  cbdMinProzent: Prisma.Decimal;
-  cbdMaxProzent: Prisma.Decimal;
-  bestrahlung: Bestrahlung;
+  thcMinProzent: number;
+  thcMaxProzent: number;
+  cbdMinProzent: number;
+  cbdMaxProzent: number;
+  bestrahlung: string;
   anbauland: string | null;
   herstellerBildPfad: string | null;
   hersteller: { name: string } | null;
   terpene: {
     rang: number;
-    konzentrationProzent: Prisma.Decimal | null;
-    terpen: { name: string; aromaProfil: string; geschmack: GeschmacksKategorie };
+    konzentrationProzent: number | null;
+    terpen: { name: string; aromaProfil: string; geschmack: string };
   }[];
   bestaende: {
     preisProGrammCent: number | null;
@@ -357,21 +400,21 @@ function zuListenEintrag(zeile: ListenZeile): StrainListenEintrag {
     slug: zeile.slug,
     handelsname: zeile.handelsname,
     kultivarName: zeile.kultivarName,
-    kultivarTyp: zeile.kultivarTyp,
-    darreichungsform: zeile.darreichungsform,
+    kultivarTyp: alsKultivarTyp(zeile.kultivarTyp),
+    darreichungsform: alsDarreichungsform(zeile.darreichungsform),
     genetik: zeile.genetik,
     thcMinProzent: zuZahlPflicht(zeile.thcMinProzent),
     thcMaxProzent: zuZahlPflicht(zeile.thcMaxProzent),
     cbdMinProzent: zuZahlPflicht(zeile.cbdMinProzent),
     cbdMaxProzent: zuZahlPflicht(zeile.cbdMaxProzent),
-    bestrahlung: zeile.bestrahlung,
+    bestrahlung: alsBestrahlung(zeile.bestrahlung),
     anbauland: zeile.anbauland,
     herstellerBildPfad: zeile.herstellerBildPfad,
     herstellerName: zeile.hersteller?.name ?? null,
     terpene: zeile.terpene.map((eintrag) => ({
       name: eintrag.terpen.name,
       aromaProfil: eintrag.terpen.aromaProfil,
-      geschmack: eintrag.terpen.geschmack,
+      geschmack: alsGeschmacksKategorie(eintrag.terpen.geschmack),
       konzentrationProzent: zuZahl(eintrag.konzentrationProzent),
       rang: eintrag.rang,
     })),
@@ -392,7 +435,7 @@ export async function ladeStrainListe(
   filter: StrainFilter,
   fachkreis: boolean
 ): Promise<StrainListe> {
-  const prisma = getPrisma();
+  const prisma = await getPrisma();
   const where = baueWhere(filter, fachkreis);
   const seite = Math.max(1, filter.seite);
 
@@ -441,7 +484,7 @@ export async function ladeStrainDetail(
   slug: string,
   fachkreis: boolean
 ): Promise<StrainDetail | null> {
-  const prisma = getPrisma();
+  const prisma = await getPrisma();
 
   const zeile = await prisma.strain.findFirst({
     where: { slug, aktiv: true },
@@ -555,14 +598,14 @@ export async function ladeStrainDetail(
     handelsname: zeile.handelsname,
     pzn: zeile.pzn,
     kultivarName: zeile.kultivarName,
-    kultivarTyp: zeile.kultivarTyp,
-    darreichungsform: zeile.darreichungsform,
+    kultivarTyp: alsKultivarTyp(zeile.kultivarTyp),
+    darreichungsform: alsDarreichungsform(zeile.darreichungsform),
     genetik: zeile.genetik,
     thcMinProzent: zuZahlPflicht(zeile.thcMinProzent),
     thcMaxProzent: zuZahlPflicht(zeile.thcMaxProzent),
     cbdMinProzent: zuZahlPflicht(zeile.cbdMinProzent),
     cbdMaxProzent: zuZahlPflicht(zeile.cbdMaxProzent),
-    bestrahlung: zeile.bestrahlung,
+    bestrahlung: alsBestrahlung(zeile.bestrahlung),
     anbauland: zeile.anbauland,
     herstellerBildPfad: zeile.herstellerBildPfad,
     beschreibung: zeile.beschreibung,
@@ -573,7 +616,7 @@ export async function ladeStrainDetail(
     terpene: zeile.terpene.map((eintrag) => ({
       name: eintrag.terpen.name,
       aromaProfil: eintrag.terpen.aromaProfil,
-      geschmack: eintrag.terpen.geschmack,
+      geschmack: alsGeschmacksKategorie(eintrag.terpen.geschmack),
       konzentrationProzent: zuZahl(eintrag.konzentrationProzent),
       rang: eintrag.rang,
     })),
@@ -582,9 +625,12 @@ export async function ladeStrainDetail(
       packungGramm: bestand.packungGramm,
       preisProGrammCent: bestand.preisProGrammCent,
       bestandGramm: zuZahl(bestand.bestandGramm),
-      status: bestand.status,
+      status: alsBestandStatus(bestand.status),
       standAm: bestand.standAm,
-      apotheke: bestand.pharmacy,
+      apotheke: {
+        ...bestand.pharmacy,
+        rezeptStatus: alsRezeptStatus(bestand.pharmacy.rezeptStatus),
+      },
     })),
     guenstigsterPreisCent,
     anzahlApothekenVerfuegbar,
@@ -661,7 +707,7 @@ const ALLE_GESCHMAECKER: GeschmacksKategorie[] = [
 export async function ladeFilterFacetten(
   fachkreis: boolean
 ): Promise<FilterFacetten> {
-  const prisma = getPrisma();
+  const prisma = await getPrisma();
   const sichtbar = bestandSichtbarkeit(fachkreis);
 
   const [
@@ -720,8 +766,10 @@ export async function ladeFilterFacetten(
     }),
   ]);
 
-  const geschmackJeTerpen = new Map(
-    terpenListe.map((terpen) => [terpen.id, terpen.geschmack])
+  const geschmackJeTerpen = new Map<string, GeschmacksKategorie>(
+    terpenListe
+      .filter((terpen) => istGeschmacksKategorie(terpen.geschmack))
+      .map((terpen) => [terpen.id, terpen.geschmack as GeschmacksKategorie])
   );
   const geschmacksZaehler = new Map<GeschmacksKategorie, number>(
     ALLE_GESCHMAECKER.map((achse) => [achse, 0])
@@ -736,15 +784,20 @@ export async function ladeFilterFacetten(
   }
 
   return {
+    // Facetten filtern unbekannte Werte heraus, statt sie auf einen Ersatz zu
+    // ziehen: ein Filterknopf fuer einen Wert, den es nicht gibt, waere
+    // schlimmer als eine fehlende Zeile in der Facettenliste.
     typen: typGruppen
+      .filter((gruppe) => istKultivarTyp(gruppe.kultivarTyp))
       .map((gruppe) => ({
-        wert: gruppe.kultivarTyp,
+        wert: gruppe.kultivarTyp as KultivarTyp,
         anzahl: gruppe._count._all,
       }))
       .sort((a, b) => b.anzahl - a.anzahl),
     formen: formGruppen
+      .filter((gruppe) => istDarreichungsform(gruppe.darreichungsform))
       .map((gruppe) => ({
-        wert: gruppe.darreichungsform,
+        wert: gruppe.darreichungsform as Darreichungsform,
         anzahl: gruppe._count._all,
       }))
       .sort((a, b) => b.anzahl - a.anzahl),
@@ -784,7 +837,7 @@ export type ApothekenListenEintrag = {
 
 /** Apothekenuebersicht. Eine Abfrage, `take` begrenzt. */
 export async function ladeApothekenListe(): Promise<ApothekenListenEintrag[]> {
-  const prisma = getPrisma();
+  const prisma = await getPrisma();
   const zeilen = await prisma.pharmacy.findMany({
     orderBy: { name: "asc" },
     take: 200,
@@ -812,7 +865,7 @@ export async function ladeApothekenListe(): Promise<ApothekenListenEintrag[]> {
     versandapotheke: zeile.versandapotheke,
     lieferzeitTageMin: zeile.lieferzeitTageMin,
     lieferzeitTageMax: zeile.lieferzeitTageMax,
-    rezeptStatus: zeile.rezeptStatus,
+    rezeptStatus: alsRezeptStatus(zeile.rezeptStatus),
     eRezeptTokenUpload: zeile.eRezeptTokenUpload,
     anzahlProdukte: zeile._count.bestaende,
   }));
@@ -857,7 +910,7 @@ export async function ladeApothekeDetail(
   slug: string,
   fachkreis: boolean
 ): Promise<ApothekeDetail | null> {
-  const prisma = getPrisma();
+  const prisma = await getPrisma();
   const zeile = await prisma.pharmacy.findUnique({
     where: { slug },
     select: {
@@ -916,20 +969,20 @@ export async function ladeApothekeDetail(
     versandapotheke: zeile.versandapotheke,
     lieferzeitTageMin: zeile.lieferzeitTageMin,
     lieferzeitTageMax: zeile.lieferzeitTageMax,
-    rezeptStatus: zeile.rezeptStatus,
+    rezeptStatus: alsRezeptStatus(zeile.rezeptStatus),
     eRezeptTokenUpload: zeile.eRezeptTokenUpload,
     betriebserlaubnisNr: zeile.betriebserlaubnisNr,
     sortiment: zeile.bestaende.map((bestand) => ({
       id: bestand.id,
       packungGramm: bestand.packungGramm,
       preisProGrammCent: bestand.preisProGrammCent,
-      status: bestand.status,
+      status: alsBestandStatus(bestand.status),
       standAm: bestand.standAm,
       strain: {
         slug: bestand.strain.slug,
         handelsname: bestand.strain.handelsname,
-        kultivarTyp: bestand.strain.kultivarTyp,
-        darreichungsform: bestand.strain.darreichungsform,
+        kultivarTyp: alsKultivarTyp(bestand.strain.kultivarTyp),
+        darreichungsform: alsDarreichungsform(bestand.strain.darreichungsform),
         thcMinProzent: zuZahlPflicht(bestand.strain.thcMinProzent),
         thcMaxProzent: zuZahlPflicht(bestand.strain.thcMaxProzent),
       },

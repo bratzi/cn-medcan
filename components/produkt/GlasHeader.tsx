@@ -24,7 +24,7 @@ import { Badge } from "@/components/ui";
 import { InstagramEmbed } from "@/components/produkt/InstagramEmbed";
 import { cn } from "@/lib/cn";
 import { darreichungsformLabel, kultivarTypLabel } from "@/lib/labels";
-import type { Darreichungsform, KultivarTyp } from "@/lib/generated/prisma/enums";
+import type { Darreichungsform, KultivarTyp } from "@/db/enums";
 
 /**
  * Tailwind v4 kennt keine eingebaute Variante fuer

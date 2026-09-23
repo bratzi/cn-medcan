@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import type { GeschmacksKategorie } from "@/lib/generated/prisma/enums";
+import type { GeschmacksKategorie } from "@/db/enums";
 
 /** Die fuenf Noten-Achsen des festen Bewertungsschemas (jeweils 1-5). */
 export const BEWERTUNGS_ACHSEN = [
@@ -58,9 +58,10 @@ export type GeschmacksAchse = (typeof GESCHMACKS_ACHSEN)[number]["key"];
 const achsenWert = z.number().min(0).max(5);
 
 /**
- * Die Spalte `geschmacksMatrix` ist `Json` - Prisma gibt dafuer `unknown`
- * heraus und garantiert keine Struktur. Deshalb muss beim Lesen validiert
- * werden, nicht nur beim Schreiben.
+ * Die Spalte `geschmacksMatrix` ist auf D1 ein JSON-TEXT - SQLite hat keinen
+ * Json-Typ. Prisma gibt also einen String heraus und garantiert weder, dass
+ * er sich parsen laesst, noch welche Struktur er hat. Deshalb muss beim
+ * Lesen validiert werden, nicht nur beim Schreiben.
  */
 export const geschmacksMatrixSchema = z.object({
   diesel: achsenWert,
@@ -95,9 +96,25 @@ export function leereGeschmacksMatrix(): GeschmacksMatrix {
  * Bewertungszeile (Altdaten, fehlgeschlagener Import) darf die Detailseite
  * nicht zerstoeren.
  */
-export function parseGeschmacksMatrix(json: unknown): GeschmacksMatrix {
-  const ergebnis = geschmacksMatrixSchema.safeParse(json);
+export function parseGeschmacksMatrix(roh: unknown): GeschmacksMatrix {
+  const ergebnis = geschmacksMatrixSchema.safeParse(entpacke(roh));
   return ergebnis.success ? ergebnis.data : leereGeschmacksMatrix();
+}
+
+/**
+ * Holt das Objekt aus der Spalte. Auf D1 kommt ein String an, der erst
+ * geparst werden muss; ein bereits geparstes Objekt (Testdaten, spaeter
+ * vielleicht wieder ein echter Json-Typ) wird unveraendert durchgereicht.
+ * Ein kaputter String fuehrt zu `undefined` und damit weiter unten zum
+ * neutralen Fallback, nicht zu einer geworfenen Ausnahme.
+ */
+function entpacke(roh: unknown): unknown {
+  if (typeof roh !== "string") return roh;
+  try {
+    return JSON.parse(roh);
+  } catch {
+    return undefined;
+  }
 }
 
 type NotenQuelle = {
@@ -130,7 +147,9 @@ export function verdichteGeschmacksMatrix(
   let anzahl = 0;
 
   for (const review of reviews) {
-    const ergebnis = geschmacksMatrixSchema.safeParse(review.geschmacksMatrix);
+    const ergebnis = geschmacksMatrixSchema.safeParse(
+      entpacke(review.geschmacksMatrix)
+    );
     // Ungueltige Zeilen fliessen nicht in den Durchschnitt ein, statt ihn
     // mit Nullen zu verwaessern.
     if (!ergebnis.success) continue;

@@ -16,7 +16,7 @@ export async function proxy(request: NextRequest) {
   if (!passwort || !secret) return NextResponse.next();
 
   const token = request.cookies.get(COOKIE_NAME)?.value;
-  if (await tokenPruefen(secret, token)) return NextResponse.next();
+  if ((await tokenPruefen(secret, token)) !== null) return NextResponse.next();
 
   const ziel = new URL("/zugang", request.url);
   ziel.searchParams.set("weiter", request.nextUrl.pathname + request.nextUrl.search);

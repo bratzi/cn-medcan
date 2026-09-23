@@ -13,9 +13,27 @@
 	},
 	"images": {
 		"binding": "IMAGES"
-	}
+	},
+
+	// Datenbank. D1 laeuft als Binding, es gibt keine Verbindungs-URL und kein
+	// Passwort - deshalb steht hier auch nichts Geheimes.
+	//
+	// `database_id` ist noch ein Platzhalter. Einmalig setzen mit:
+	//     npx wrangler login
+	//     npx wrangler d1 create cn-medcan-db
+	// und die ausgegebene ID hier eintragen. Ohne echte ID funktioniert alles
+	// Lokale (`--local`, `npm run preview`) gegen die Datei unter .wrangler/;
+	// nur `--remote` und `npm run deploy` brauchen sie.
+	"d1_databases": [
+		{
+			"binding": "DB",
+			"database_name": "cn-medcan-db",
+			"database_id": "PLATZHALTER-wrangler-d1-create-ausfuehren",
+			"migrations_dir": "migrations"
+		}
+	]
+
 	// Secrets werden NICHT hier gesetzt, sondern mit `wrangler secret put <NAME>`.
 	// Lokal liegen sie in .dev.vars bzw. .env.local (beide gitignored).
-	// Benoetigt: DATABASE_URL, DIRECT_URL, SITE_PASSWORD, SITE_SESSION_SECRET,
-	//            NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY
+	// Benoetigt: SITE_PASSWORD, FACHKREIS_PASSWORD, SITE_SESSION_SECRET
 }

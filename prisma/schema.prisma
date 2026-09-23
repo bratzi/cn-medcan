@@ -1,74 +1,24 @@
 // Medizinalcannabis-Katalog - deutscher Markt
-// Datenbank: Supabase Postgres. Laufzeitzugriff ueber den Transaction-Pooler.
+// Datenbank: Cloudflare D1 (SQLite). Zugriff ausschliesslich ueber das
+// Worker-Binding DB, siehe lib/prisma.ts.
 
 generator client {
   provider = "prisma-client"
   output   = "../lib/generated/prisma"
 }
 
-// Verbindungs-URLs stehen in prisma.config.ts, nicht mehr hier (Prisma 7).
-// Migrationen nutzen DIRECT_URL (Port 5432), die Laufzeit den Adapter
-// mit DATABASE_URL (Transaction-Pooler, Port 6543).
+// D1 hat keine Verbindungs-URL. Migrationen laufen hybrid:
+//   wrangler d1 migrations create cn-medcan-db <name>
+//   prisma migrate diff --from-local-d1 --to-schema-datamodel prisma/schema.prisma --script
+//   wrangler d1 migrations apply cn-medcan-db --local   (bzw. --remote)
+// Siehe db/README.md.
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
 }
 
-// ---------------------------------------------------------------------------
-//  Enums
-// ---------------------------------------------------------------------------
-
-enum KultivarTyp {
-  INDICA
-  SATIVA
-  HYBRID
-  RUDERALIS
-}
-
-enum Darreichungsform {
-  BLUETE
-  EXTRAKT
-  GRANULAT
-}
-
-enum Bestrahlung {
-  GAMMA
-  E_BEAM
-  UNBESTRAHLT
-  UNBEKANNT
-}
-
-enum UnternehmensRolle {
-  HERSTELLER
-  IMPORTEUR
-  BEIDES
-}
-
-/// Wie die Apotheke Rezepte annimmt. E-Rezept ist seit 2024 der Regelfall.
-enum RezeptStatus {
-  E_REZEPT_ONLY
-  PAPIER_ONLY
-  BEIDES
-}
-
-enum BestandStatus {
-  VERFUEGBAR
-  NACHBESTELLT
-  NICHT_LIEFERBAR
-  AUSGELISTET
-}
-
-/// Geschmacksachsen der Bewertungsmatrix. Bewusst geschlossene Liste,
-/// damit Filter und Terpen-Map dieselben Kategorien teilen.
-enum GeschmacksKategorie {
-  DIESEL
-  ZITRUS
-  ERDIG
-  SUESS
-  WUERZIG
-  BLUMIG
-  HOLZIG
-  KRAEUTRIG
-}
+// Enums gibt es in SQLite nicht. Die sieben Wertelisten stehen als
+// TS-Unions in db/enums.ts; in der Datenbank sind es String-Spalten, die
+// von den CHECK-Constraints in db/constraints.sql abgesichert werden.
 
 // ---------------------------------------------------------------------------
 //  Stammdaten
@@ -77,11 +27,11 @@ enum GeschmacksKategorie {
 /// Hersteller und Importeur. Im deutschen Markt haeufig getrennte Firmen,
 /// gelegentlich identisch - deshalb eine Entitaet mit Rolle.
 model Unternehmen {
-  id        String            @id @default(uuid()) @db.Uuid
+  id        String  @id @default(uuid())
   name      String
   land      String?
-  rolle     UnternehmensRolle
-  gdpNummer String?           @map("gdp_nummer")
+  rolle     String
+  gdpNummer String? @map("gdp_nummer")
   website   String?
 
   hergestellt Strain[] @relation("Hersteller")
@@ -94,13 +44,13 @@ model Unternehmen {
 }
 
 model Terpen {
-  id          String              @id @default(uuid()) @db.Uuid
-  name        String              @unique
-  aromaProfil String              @map("aroma_profil")
+  id          String @id @default(uuid())
+  name        String @unique
+  aromaProfil String @map("aroma_profil")
   /// Ordnet das Terpen einer Geschmacksachse zu - Basis fuer den Filter
   /// "dominanter Geschmack" und fuer die Terpen-Map.
-  geschmack   GeschmacksKategorie
-  siedepunktC Float?              @map("siedepunkt_c")
+  geschmack   String
+  siedepunktC Float? @map("siedepunkt_c")
 
   strains StrainTerpen[]
 
@@ -109,32 +59,38 @@ model Terpen {
 
 /// Ein Produkt im Sinne des BfArM-Handelsnamens.
 model Strain {
-  id                      String           @id @default(uuid()) @db.Uuid
-  slug                    String           @unique
+  id                      String  @id @default(uuid())
+  slug                    String  @unique
   /// Handelsname laut BfArM - die verbindliche Produktbezeichnung.
-  handelsname             String           @unique
+  handelsname             String  @unique
   pzn                     String?
-  darreichungsform        Darreichungsform @default(BLUETE)
-  kultivarName            String?          @map("kultivar_name")
-  kultivarTyp             KultivarTyp      @map("kultivar_typ")
+  darreichungsform        String  @default("BLUETE")
+  kultivarName            String? @map("kultivar_name")
+  kultivarTyp             String  @map("kultivar_typ")
   /// Kreuzung, z. B. Sour Diesel x OG Kush.
   genetik                 String?
-  thcMinProzent           Decimal          @map("thc_min_prozent") @db.Decimal(4, 1)
-  thcMaxProzent           Decimal          @map("thc_max_prozent") @db.Decimal(4, 1)
-  cbdMinProzent           Decimal          @map("cbd_min_prozent") @db.Decimal(4, 1)
-  cbdMaxProzent           Decimal          @map("cbd_max_prozent") @db.Decimal(4, 1)
-  bestrahlung             Bestrahlung      @default(UNBEKANNT)
+  thcMinProzent           Float   @map("thc_min_prozent")
+  thcMaxProzent           Float   @map("thc_max_prozent")
+  cbdMinProzent           Float   @map("cbd_min_prozent")
+  cbdMaxProzent           Float   @map("cbd_max_prozent")
+  bestrahlung             String  @default("UNBEKANNT")
   anbauland               String?
-  /// Pfad zum Produktbild des Herstellers (Supabase Storage oder /public).
-  herstellerBildPfad      String?          @map("hersteller_bild_pfad")
+  /// Pfad zum Produktbild des Herstellers (unter /public oder R2).
+  herstellerBildPfad      String? @map("hersteller_bild_pfad")
   beschreibung            String?
-  verschreibungspflichtig Boolean          @default(true)
-  bfarmGelistet           Boolean          @default(true) @map("bfarm_gelistet")
-  aktiv                   Boolean          @default(true)
+  verschreibungspflichtig Boolean @default(true)
+  bfarmGelistet           Boolean @default(true) @map("bfarm_gelistet")
+  aktiv                   Boolean @default(true)
+  /// Kleingeschriebene Kopie der durchsuchbaren Felder (Handelsname,
+  /// Kultivarname, Genetik). SQLite kann `contains` nicht
+  /// case-insensitive - Prisma bildet `mode: "insensitive"` dort nicht ab.
+  /// Deshalb wird beim Schreiben kleingeschrieben gefuellt und die
+  /// Sucheingabe ebenfalls kleingeschrieben verglichen.
+  suchtext                String
 
-  herstellerId String?      @map("hersteller_id") @db.Uuid
+  herstellerId String?      @map("hersteller_id")
   hersteller   Unternehmen? @relation("Hersteller", fields: [herstellerId], references: [id], onDelete: SetNull)
-  importeurId  String?      @map("importeur_id") @db.Uuid
+  importeurId  String?      @map("importeur_id")
   importeur    Unternehmen? @relation("Importeur", fields: [importeurId], references: [id], onDelete: SetNull)
 
   terpene   StrainTerpen[]
@@ -149,16 +105,17 @@ model Strain {
   @@index([thcMinProzent])
   @@index([darreichungsform])
   @@index([aktiv])
+  @@index([suchtext])
   @@map("strains")
 }
 
 /// Terpenprofil je Produkt. rang = 1 ist das dominante Terpen.
 model StrainTerpen {
-  strainId             String   @map("strain_id") @db.Uuid
-  strain               Strain   @relation(fields: [strainId], references: [id], onDelete: Cascade)
-  terpenId             String   @map("terpen_id") @db.Uuid
-  terpen               Terpen   @relation(fields: [terpenId], references: [id], onDelete: Cascade)
-  konzentrationProzent Decimal? @map("konzentration_prozent") @db.Decimal(4, 2)
+  strainId             String @map("strain_id")
+  strain               Strain @relation(fields: [strainId], references: [id], onDelete: Cascade)
+  terpenId             String @map("terpen_id")
+  terpen               Terpen @relation(fields: [terpenId], references: [id], onDelete: Cascade)
+  konzentrationProzent Float? @map("konzentration_prozent")
   rang                 Int
 
   @@id([strainId, terpenId])
@@ -169,23 +126,23 @@ model StrainTerpen {
 
 /// Deutsche Versandapotheke.
 model Pharmacy {
-  id                  String       @id @default(uuid()) @db.Uuid
-  slug                String       @unique
+  id                  String  @id @default(uuid())
+  slug                String  @unique
   name                String
-  plz                 String       @db.VarChar(5)
+  plz                 String
   ort                 String
   strasse             String?
   telefon             String?
   email               String?
   website             String?
-  versandapotheke     Boolean      @default(true)
+  versandapotheke     Boolean @default(true)
   /// Lieferzeit in Werktagen, als Spanne.
-  lieferzeitTageMin   Int          @map("lieferzeit_tage_min")
-  lieferzeitTageMax   Int          @map("lieferzeit_tage_max")
-  rezeptStatus        RezeptStatus @map("rezept_status")
+  lieferzeitTageMin   Int     @map("lieferzeit_tage_min")
+  lieferzeitTageMax   Int     @map("lieferzeit_tage_max")
+  rezeptStatus        String  @map("rezept_status")
   /// Nimmt die Apotheke den E-Rezept-Token per Upload oder App an?
-  eRezeptTokenUpload  Boolean      @default(false) @map("erezept_token_upload")
-  betriebserlaubnisNr String?      @map("betriebserlaubnis_nr")
+  eRezeptTokenUpload  Boolean @default(false) @map("erezept_token_upload")
+  betriebserlaubnisNr String? @map("betriebserlaubnis_nr")
 
   bestaende PharmacyStock[]
 
@@ -197,19 +154,19 @@ model Pharmacy {
 
 /// Bestandszuweisung Apotheke zu Produkt. Preise als Integer-Cent.
 model PharmacyStock {
-  id                String        @id @default(uuid()) @db.Uuid
-  pharmacyId        String        @map("pharmacy_id") @db.Uuid
-  pharmacy          Pharmacy      @relation(fields: [pharmacyId], references: [id], onDelete: Cascade)
-  strainId          String        @map("strain_id") @db.Uuid
-  strain            Strain        @relation(fields: [strainId], references: [id], onDelete: Cascade)
-  packungGramm      Int           @map("packung_gramm")
-  preisProGrammCent Int?          @map("preis_pro_gramm_cent")
-  bestandGramm      Decimal?      @map("bestand_gramm") @db.Decimal(8, 1)
-  status            BestandStatus @default(VERFUEGBAR)
+  id                String   @id @default(uuid())
+  pharmacyId        String   @map("pharmacy_id")
+  pharmacy          Pharmacy @relation(fields: [pharmacyId], references: [id], onDelete: Cascade)
+  strainId          String   @map("strain_id")
+  strain            Strain   @relation(fields: [strainId], references: [id], onDelete: Cascade)
+  packungGramm      Int      @map("packung_gramm")
+  preisProGrammCent Int?     @map("preis_pro_gramm_cent")
+  bestandGramm      Float?   @map("bestand_gramm")
+  status            String   @default("VERFUEGBAR")
   /// Preise verschreibungspflichtiger Arzneimittel unterliegen dem HWG.
   /// Steuert das Fachkreis-Gate in der Oberflaeche.
-  nurFuerFachkreise Boolean       @default(true) @map("nur_fuer_fachkreise")
-  standAm           DateTime      @default(now()) @map("stand_am")
+  nurFuerFachkreise Boolean  @default(true) @map("nur_fuer_fachkreise")
+  standAm           DateTime @default(now()) @map("stand_am")
 
   @@unique([pharmacyId, strainId, packungGramm])
   @@index([strainId, status])
@@ -220,15 +177,15 @@ model PharmacyStock {
 /// Charge / Batch. Bewertungen haengen an der Charge, nicht nur am Produkt -
 /// zwei Chargen desselben Handelsnamens koennen deutlich abweichen.
 model Charge {
-  id            String    @id @default(uuid()) @db.Uuid
-  strainId      String    @map("strain_id") @db.Uuid
+  id            String    @id @default(uuid())
+  strainId      String    @map("strain_id")
   strain        Strain    @relation(fields: [strainId], references: [id], onDelete: Cascade)
   chargenNr     String    @map("chargen_nr")
-  analysedatum  DateTime? @db.Date
-  thcIst        Decimal?  @map("thc_ist") @db.Decimal(4, 1)
-  cbdIst        Decimal?  @map("cbd_ist") @db.Decimal(4, 1)
+  analysedatum  DateTime?
+  thcIst        Float?    @map("thc_ist")
+  cbdIst        Float?    @map("cbd_ist")
   laborBericht  String?   @map("labor_bericht")
-  verfallsdatum DateTime? @db.Date
+  verfallsdatum DateTime?
 
   reviews Review[]
 
@@ -242,14 +199,15 @@ model Charge {
 
 /// Bewertung nach festem Schema, gebunden an eine konkrete Charge.
 model Review {
-  id       String  @id @default(uuid()) @db.Uuid
-  strainId String  @map("strain_id") @db.Uuid
+  id       String  @id @default(uuid())
+  strainId String  @map("strain_id")
   strain   Strain  @relation(fields: [strainId], references: [id], onDelete: Cascade)
-  chargeId String? @map("charge_id") @db.Uuid
+  chargeId String? @map("charge_id")
   charge   Charge? @relation(fields: [chargeId], references: [id], onDelete: SetNull)
 
-  /// Supabase-Auth-Nutzer. Referenziert auth.users, deshalb ohne Prisma-Relation.
-  autorId String @map("autor_id") @db.Uuid
+  /// Autor der Bewertung. Bis Block B (Better Auth) eine freie ID ohne
+  /// Relation; danach Relation auf das Modell `mitglied`.
+  autorId String @map("autor_id")
 
   /// Festes Bewertungsschema, jeweils 1-5.
   aussehen   Int
@@ -260,11 +218,13 @@ model Review {
 
   /// Restfeuchte in Prozent. Unter 8 Prozent zu trocken, ueber 13 Prozent
   /// Schimmelrisiko - deshalb als eigener Messwert, nicht als Note.
-  feuchtigkeitProzent Decimal? @map("feuchtigkeit_prozent") @db.Decimal(3, 1)
+  feuchtigkeitProzent Float? @map("feuchtigkeit_prozent")
 
-  /// Geschmacks-Matrix: Achse zu Intensitaet 0-5.
-  /// JSON, weil die Achsenzahl fix ist und immer als Ganzes gelesen wird.
-  geschmacksMatrix Json @map("geschmacks_matrix")
+  /// Geschmacks-Matrix: Achse zu Intensitaet 0-5, als JSON-Text.
+  /// SQLite hat keinen JSON-Typ; gelesen wird sie ueber
+  /// parseGeschmacksMatrix() in lib/query/bewertung.ts, die den Text parst
+  /// und validiert. Niemals ungeprueft JSON.parse in einer Komponente.
+  geschmacksMatrix String @map("geschmacks_matrix")
 
   notiz String?
 
