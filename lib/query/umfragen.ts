@@ -2,6 +2,7 @@ import "server-only";
 
 import { getPrisma } from "@/lib/prisma";
 import { istOptionHerkunft, istUmfragePhase, type OptionHerkunft, type UmfragePhase } from "@/db/enums";
+import { zuCommunityZahlen, type CommunityZahlen } from "@/lib/query/community";
 
 /**
  * Leseschicht fuer Umfragen.
@@ -257,6 +258,24 @@ export async function umfragenUebersicht(limit = MAX_UMFRAGEN): Promise<UmfrageU
       slug: o.strain.slug,
     })),
   }));
+}
+
+/**
+ * Drei Zaehler fuer die Wand der Startseite (Spec 5.3).
+ *
+ * Eine Abfrage mit drei Unterabfragen statt drei `count()`: jede Query ist
+ * ein Sub-Request. Tabellennamen wie in den @@map-Angaben des Schemas.
+ * Bewusst ohne Namen und Freitexte (Spec 2, §10 HWG).
+ */
+export async function communityZahlen(): Promise<CommunityZahlen> {
+  const prisma = await getPrisma();
+  const zeilen = await prisma.$queryRaw<{ stimmen: unknown; vorschlaege: unknown; runden: unknown }[]>`
+    SELECT
+      (SELECT COUNT(*) FROM stimmen) AS stimmen,
+      (SELECT COUNT(*) FROM umfrage_vorschlaege) AS vorschlaege,
+      (SELECT COUNT(*) FROM umfragen WHERE phase = 'BEENDET') AS runden
+  `;
+  return zuCommunityZahlen(zeilen);
 }
 
 // ---------------------------------------------------------------------------

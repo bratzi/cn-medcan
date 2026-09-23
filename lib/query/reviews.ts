@@ -1,5 +1,8 @@
 import "server-only";
 
+import { cache } from "react";
+
+import { parseGeschmacksMatrix, type GeschmacksMatrix } from "@/lib/query/bewertung";
 import { getPrisma } from "@/lib/prisma";
 
 /**
@@ -23,6 +26,7 @@ export type RedaktionelleReview = {
   geschmack: number;
   wirkung: number;
   konsistenz: number;
+  geschmacksMatrix: GeschmacksMatrix;
   feuchtigkeitProzent: number | null;
   notiz: string | null;
   instagramReelUrl: string | null;
@@ -30,7 +34,7 @@ export type RedaktionelleReview = {
   erstelltAm: Date;
 };
 
-/** Gezieltes `select` - die Geschmacksmatrix braucht die Startseite nicht. */
+/** Gezieltes `select`. Die Geschmacksmatrix braucht die Doppelseite der Startseite (Netzdiagramm). */
 const AUSWAHL = {
   id: true,
   strainId: true,
@@ -39,6 +43,7 @@ const AUSWAHL = {
   geschmack: true,
   wirkung: true,
   konsistenz: true,
+  geschmacksMatrix: true,
   feuchtigkeitProzent: true,
   notiz: true,
   instagramReelUrl: true,
@@ -55,6 +60,7 @@ type Satz = {
   geschmack: number;
   wirkung: number;
   konsistenz: number;
+  geschmacksMatrix: string;
   feuchtigkeitProzent: number | null;
   notiz: string | null;
   instagramReelUrl: string | null;
@@ -74,6 +80,7 @@ function zuAnsicht(satz: Satz): RedaktionelleReview {
     geschmack: satz.geschmack,
     wirkung: satz.wirkung,
     konsistenz: satz.konsistenz,
+    geschmacksMatrix: parseGeschmacksMatrix(satz.geschmacksMatrix),
     feuchtigkeitProzent: satz.feuchtigkeitProzent,
     notiz: satz.notiz,
     instagramReelUrl: satz.instagramReelUrl,
@@ -86,9 +93,11 @@ function zuAnsicht(satz: Satz): RedaktionelleReview {
  * Die neueste freigegebene Bewertung des Betreibers, oder null.
  *
  * `freigegeben` steht hier nicht zur Debatte: eine unfreigegebene Bewertung
- * ist ein Entwurf und gehoert nicht auf die Startseite.
+ * ist ein Entwurf und gehoert nicht auf die Startseite. `cache`: die
+ * Startseite fragt sie zweimal (Kopfzeile und Doppelseite), die Datenbank
+ * sieht pro Request eine Abfrage.
  */
-export async function neuesteRedaktionelleReview(): Promise<RedaktionelleReview | null> {
+export const neuesteRedaktionelleReview = cache(async (): Promise<RedaktionelleReview | null> => {
   const prisma = await getPrisma();
   const satz = await prisma.review.findFirst({
     where: { istRedaktionell: true, freigegeben: true },
@@ -96,7 +105,7 @@ export async function neuesteRedaktionelleReview(): Promise<RedaktionelleReview 
     select: AUSWAHL,
   });
   return satz ? zuAnsicht(satz as Satz) : null;
-}
+});
 
 /** Die letzten Bewertungen des Betreibers - fuer /reviews (Schritt 6). */
 export async function redaktionelleReviews(limit = 20): Promise<RedaktionelleReview[]> {
