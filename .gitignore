@@ -43,7 +43,9 @@ next-env.d.ts
 # cloudflare / opennext
 /.open-next/
 /.wrangler/
-cloudflare-env.d.ts
+# cloudflare-env.d.ts wird mitcommittet: ohne die Datei scheitert der Typecheck
+# in Workers Builds (kein D1Database, kein env.DB). Nach Aenderungen an
+# wrangler.jsonc oder den Secrets `npm run cf-typegen` und neu committen.
 
 # supabase / prisma
 .env
