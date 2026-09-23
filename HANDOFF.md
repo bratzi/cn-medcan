@@ -123,6 +123,23 @@ Budgets, Akzeptanzkriterien und Reihenfolge. **Die Spec ist die Quelle - nicht d
   sich nicht aendern (innen 2296 px). Bei "Permission denied" sofort dem Nutzer sagen, dass ein
   Freigabe-Fenster wartet (Memory `freigabe-fenster-melden`).
 
+**⇢ Stand für die nächste Session (2026-09-24, Session 6, vor dem Clear): UMSETZUNG LÄUFT.**
+- Ausführungsart ist gewählt: **Native**, also `superpowers:executing-plans` in der Session
+  (keine Subagents; Nutzer hat nach Abwägung der Kosten so entschieden). Nicht erneut fragen.
+- Gearbeitet wird auf dem Branch **`makeover/gruenes-buch`** (gepusht, `main` unberührt, also nichts
+  live). Beim Start prüfen: `git branch --show-current` muss `makeover/gruenes-buch` zeigen.
+- **Ledger** (Fortschritt, Rulings): `.superpowers/sdd/2026-09-24-makeover-gruenes-buch/progress.md`,
+  lokal, über `.git/info/exclude` ignoriert (nicht im Repo). Tasks mit `Task N: complete` sind fertig.
+- **Weiter bei Task 1, Step 3:** `.claude/skills/ui-design-engine.md` nach dem Plan neu schreiben,
+  dann Step 4 (Beschreibung in `ui-design-engine/SKILL.md`), Step 5 (Prüfungen), Step 6 (Commit nur
+  noch der beiden Skill-Dateien; die Guideline ist schon committet, `4837843`). Danach `task-done`
+  für Task 1 und ohne Rückfrage weiter mit Task 2 bis 16 (executing-plans: nicht zwischen Tasks anhalten).
+- Skripte: `task-start`/`task-done` unter
+  `~/.claude/plugins/cache/claude-plugins-official/superpowers/6.4.1/skills/executing-plans/scripts/`,
+  Aufruf mit `bash <skript> docs/superpowers/plans/2026-09-24-makeover-gruenes-buch.md <N> …`.
+- Skills je Task stehen im Plan unter **Skills**; zu Beginn jedes Tasks laden und dem Nutzer in einem
+  Satz nennen (Memory `skills-einsatzregeln`).
+
 **Session 6 (2026-09-24), Fortsetzung: Schritt 1 und 2 erledigt.** Der Nutzer hat die Spec
 freigegeben ("ja"). Umsetzungsplan geschrieben und committet (`ee6385b`, **nicht gepusht**):
 `docs/superpowers/plans/2026-09-24-makeover-gruenes-buch.md`, 16 Tasks, Arbeit auf Branch
