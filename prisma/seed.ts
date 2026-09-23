@@ -28,6 +28,12 @@ import { join } from "node:path";
 
 import { PrismaBetterSqlite3 } from "@prisma/adapter-better-sqlite3";
 
+import type {
+  BestandStatus,
+  Bestrahlung,
+  Darreichungsform,
+  KultivarTyp,
+} from "../db/enums";
 import { PrismaClient } from "../lib/generated/prisma/client";
 
 const D1_VERZEICHNIS = ".wrangler/state/v3/d1/miniflare-D1DatabaseObject";

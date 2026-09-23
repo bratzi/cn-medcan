@@ -28,85 +28,96 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 
 ## ⇢ Hier geht es weiter
 
-Zwei Arbeitsblöcke stehen an, **in dieser Reihenfolge**. Block A ist das Fundament, Block B setzt
-darauf auf.
+**Block A (Umstellung auf Cloudflare D1) ist abgeschlossen**, ebenso die letzte fehlende Seite
+`app/produkte/[slug]/page.tsx`. Als nächstes steht **Block B** an: Mitglieder, Umfragen und
+Reviews als Produktkern. Der Entwurf dazu steht unten und ist unverändert gültig.
 
-- **Block A — Umstellung Supabase → Cloudflare D1.** Geplant, noch nicht umgesetzt. Fünf Wellen,
-  unten beschrieben.
-- **Block B — Mitglieder, Umfragen, Reviews als Produktkern.** Entwurf steht unten, Umsetzung nach
-  Block A.
-
-Dazwischen liegt außerdem die einzige noch fehlende Seite: `app/produkte/[slug]/page.tsx`. Ihre
-Bausteine sind fertig (`GlasHeader`, `TerpenMap`, `BestandTabelle`, `BewertungsListe`,
-`InstagramEmbed`); die Seite setzt sie nur zusammen. Aufbau: Glas-Header → Faktenblock als `<dl>`
-→ `CannabinoidBar` → `TerpenChips` (alle Ränge) → `BestandTabelle` → Chargentabelle → `TerpenMap`
-mit `verdichteGeschmacksMatrix(reviews)` → `BewertungsListe`. `params` ist ein Promise.
+Vorher zwei kleine offene Punkte, siehe „Was noch offen ist".
 
 ---
 
-## Block A — Umstellung auf Cloudflare D1
+## Block A — erledigt
 
-### Warum
-Supabase entfällt: das Konto des Nutzers führt zu viele Free-Projekte. **Cloudflare D1** braucht
-keinen weiteren Account und kein weiteres Projekt, es läuft als Binding im vorhandenen
-Cloudflare-Konto. Belegte Free-Limits: 5 GB Speicher, 5 Mio. gelesene Zeilen/Tag, 100 000
-geschriebene Zeilen/Tag.
+Supabase ist vollständig entfernt (`@supabase/*`, `lib/supabase/`, `supabase/rls.sql`, die
+Pooler-URLs). Die Datenbank ist **Cloudflare D1** als Binding `DB`. Was dabei entstand:
 
-Neon wurde verworfen (neuer Account, Suspend nach 5 Minuten mit Kaltstart), obwohl das
-Projektlimit dort kein Problem gewesen wäre.
+| Datei | Inhalt |
+|---|---|
+| `db/enums.ts` | Die sieben Wertelisten als `as const` plus Unions und Type-Guards. SQLite kennt keine Enums. |
+| `db/constraints.sql` | Die früheren CHECK-Constraints als **Trigger**, plus Prüfung der Wertelisten. |
+| `db/README.md` | Migrationspfad, Seed-Weg, D1-Eigenheiten. **Vor jeder Migration lesen.** |
+| `migrations/0001_initial.sql` | Erzeugt mit `prisma migrate diff`, angewendet mit `wrangler`. |
 
-### Der Punkt, der den RLS-Verlust tragbar macht
-RLS greift nur, wenn die Verbindung eine Nutzeridentität trägt. Prisma verbindet als Eigentümer —
-die Policies waren also ausschließlich auf dem `supabase-js`-Pfad wirksam, der mit Supabase
-ohnehin wegfällt. Das HWG-Gate liegt in der Abfrageschicht, wo es mit `bestandSichtbarkeit()` in
-`lib/query/strains.ts` schon implementiert ist. CHECK-Constraints funktionieren in SQLite weiter.
+### Was beim Umsetzen anders kam als geplant
 
-### Zwei belegte D1-Eigenheiten, die den Plan formen
-1. **Keine Transaktionen.** Prisma führt `$transaction` als Einzelabfragen aus. Die Abfrageschicht
-   nutzt `Promise.all`, ist also nicht betroffen. Wichtig für Block B: „eine Stimme pro Mitglied"
-   darf **nicht** über eine Transaktion abgesichert werden, sondern über einen Unique-Index.
-2. **Migrationen hybrid.** `prisma migrate dev` fällt weg. Stattdessen
-   `wrangler d1 migrations create` → `prisma migrate diff --from-local-d1 --to-schema-datamodel`
-   → `wrangler d1 migrations apply --local` bzw. `--remote`.
+1. **`prisma migrate diff` bricht still ab**, wenn `prisma.config.ts` keine `datasource` hat:
+   Exit-Code 0, leere Ausgabe, keine Fehlermeldung. Die Schema-Engine verlangt das Argument auch
+   bei `--from-empty`. Dort steht deshalb ein lokaler Dateipfad, in den nie geschrieben wird.
+2. **Die Flags aus dem alten Plan gibt es in Prisma 7 nicht mehr.** `--to-schema-datamodel` und
+   `--from-local-d1` sind weg; es heißt `--from-schema` / `--to-schema` bzw. `--from-migrations`.
+3. **CHECK-Constraints lassen sich in SQLite nicht nachrüsten** — es gibt kein
+   `alter table ... add constraint`, sie gehen nur beim `create table`. Die Tabellen erzeugt aber
+   Prisma. Deshalb sind die Prüfungen **Trigger** (`RAISE(ABORT, ...)`), und deshalb muss
+   `db/constraints.sql` **nach jeder Migration** erneut laufen: SQLite verwirft beim Tabellenumbau
+   alle Trigger der alten Tabelle.
+4. **Der Seed kann nicht über den D1-Adapter laufen** — der braucht ein `D1Database`-Binding, das
+   es nur im Worker gibt. `prisma/seed.ts` schreibt jetzt mit `@prisma/adapter-better-sqlite3`
+   direkt in die Miniflare-Datei unter `.wrangler/`. Für die entfernte Datenbank führt der Weg
+   über `wrangler d1 export --local` und `wrangler d1 execute --remote`, siehe `db/README.md`.
 
-### SQLite-Umbauten am Schema
-| Bisher (Postgres) | Neu (SQLite/D1) | Folge |
-|---|---|---|
-| `enum` (7 Stück) | `String` + TS-Union | Prisma-Enums gibt es in SQLite nicht. Typen wandern nach `db/enums.ts`. **Alle Importe von `@/lib/generated/prisma/enums` müssen umgezogen werden** — `lib/labels.ts`, `lib/query/*`, `components/produkt/*`. |
-| `Decimal @db.Decimal(4,1)` | `Float` | Prozentwerte. Preise sind schon `Int` in Cent, unverändert. |
-| `Json` | `String` | `geschmacksMatrix` als JSON-Text. `parseGeschmacksMatrix` validiert schon, nur `JSON.parse` davorziehen. |
-| `@db.Uuid`, `@db.VarChar(5)`, `@db.Date` | entfällt | `@default(uuid())` funktioniert weiter. |
-| `contains` mit `mode: "insensitive"` | **nicht unterstützt** | Ersatz: Spalte `suchtext` am `Strain`, beim Schreiben kleingeschrieben gefüllt, `contains` darauf mit kleingeschriebener Eingabe. Kein `LOWER()` in der Query — Prisma bildet das auf SQLite nicht ab. |
-| RLS-Policies | entfallen | `supabase/rls.sql` wird zu `db/constraints.sql`: nur die 16 CHECK-Constraints bleiben, `create policy` und `ist_fachkreis()` fallen. |
+### Zwei Sicherheitsbefunde, beide behoben
 
-### Die fünf Wellen
-**Welle 1 — Fundament, sequenziell**
-1. `npm uninstall @supabase/supabase-js @supabase/ssr @prisma/adapter-pg pg @types/pg dotenv`,
-   `npm install @prisma/adapter-d1`. `lib/supabase/` löschen.
-2. `wrangler.jsonc`: `d1_databases`-Binding `DB`, `database_name: "cn-medcan-db"`,
-   `migrations_dir: "migrations"`. Danach `npm run cf-typegen`.
-3. `prisma/schema.prisma` auf `provider = "sqlite"`, alle Umbauten oben, Feld `suchtext` ergänzen.
-4. `db/enums.ts`: sieben Wertelisten als `as const` plus Union-Typen und Guards zum Parsen.
-5. `prisma.config.ts`: `datasource`-Block und `dotenv`-Import raus, `migrations.seed` behalten.
-6. `lib/prisma.ts`: `PrismaD1`-Adapter mit dem `DB`-Binding. **Der Client kann kein
-   Modul-Singleton mehr sein** — das Binding existiert erst im Request-Kontext. Also `getPrisma()`
-   async über `getEnv()`, mit Caching pro Isolate nur bei identischem Binding.
+1. **Das Fachkreis-Recht hatte nach dem Umbau keine Quelle mehr.** Es kam aus
+   `app_metadata` des Supabase-Nutzers; `FACHKREIS_PASSWORD` war zwar dokumentiert, aber nirgends
+   implementiert. Die Rolle steckt jetzt im HMAC-signierten Gate-Token
+   (`gate:<ablauf>:<rolle>`), `lib/gate.ts` gibt sie nur nach geprüfter Signatur heraus.
+   `istFachkreis()` liest sie dort. Ein manipuliertes Cookie fällt auf „kein Zugang" zurück —
+   verifiziert.
 
-**Welle 2 — zwei Agents parallel**
-7. `lib/query/*`: Enum-Importe umziehen, Freitext auf `suchtext`, `getPrisma()` auf `await`,
-   `parseGeschmacksMatrix` um `JSON.parse` erweitern.
-8. `lib/labels.ts`, `components/produkt/*`: Enum-Importe auf `@/db/enums`.
+2. **Der Zugangsschutz war faktisch wirkungslos** (Fehler war vorher schon da). Im Matcher in
+   `proxy.ts` stand `"...|.*\.)..."` — in einem normalen JS-String ist `\.` nur `.`, das Muster
+   wurde also zu `.*.` und passte auf jeden nicht leeren Pfad. Die Negation nahm damit **alles
+   außer `/`** vom Gate aus: `/produkte` und alle Detailseiten waren ohne Passwort erreichbar.
+   Jetzt `\\.`, mit Kommentar. Verifiziert: ohne Cookie liefert `/produkte` 307, mit gültigem
+   Cookie 200, `/zugang` bleibt erreichbar.
 
-**Welle 3 — sequenziell**
-9. `db/constraints.sql` aus `supabase/rls.sql` ableiten, `supabase/` löschen, `db/README.md`.
-10. `prisma/seed.ts`: kein `dotenv`, keine Transaktionsannahme, `geschmacksMatrix` als JSON-String,
-    `suchtext` mitschreiben. Prüfen, ob der D1-Adapter außerhalb des Workers nutzbar ist; wenn
-    nicht, den Seed als generiertes SQL für `wrangler d1 execute` ausliefern.
-11. Migration erzeugen, lokal anwenden, seeden.
+### Verifiziert
 
-**Welle 4** — `app/produkte/[slug]/page.tsx` bauen.
+- `npm run typecheck` grün, `npx eslint .` grün (ESLint ignoriert jetzt `.agents/**` und
+  `.claude/**` — fremde Referenzdateien der installierten Skills, 22 Fehler stammten von dort).
+- `npm run build` grün, alle acht Routen inklusive `/produkte/[slug]`.
+- **Gegen echte D1-Daten in `next dev`** (Bindings über `initOpenNextCloudflareForDev`):
+  Katalogliste, Filter, Freitextsuche (Groß-/Kleinschreibung über `suchtext`), Produktdetailseite,
+  Apothekenseiten, 404 bei unbekanntem Slug. Preisspalte erscheint als Fachkreis und fehlt als
+  Besucher, mit §-10-HWG-Hinweis.
+- Die Trigger greifen: ein Insert mit unbekanntem Wertelisten-Wert wird abgewiesen
+  (`SQLITE_CONSTRAINT_TRIGGER`), der komplette Seed läuft durch sie hindurch.
 
-**Welle 5** — Verifikation: `tsc`, `eslint`, `next build`, dann `npm run dev` gegen echte Daten.
+### Ungetestet geblieben
+
+- **`npm run cf-build` läuft auf diesem Windows-Rechner nicht durch.** OpenNext legt beim Bündeln
+  Symlinks unter `.open-next/` an; das scheitert mit `EPERM`, weil der Windows-Entwicklermodus
+  nicht aktiv ist. Ein Symlink-Test schlägt auch direkt fehl. `next build` läuft durch — der
+  Fehler liegt also im OpenNext-Bündelschritt, nicht im Code.
+  **Folge: `npm run preview` (workerd) und `npm run deploy` sind ungetestet.**
+  Abhilfe: Entwicklermodus in den Windows-Einstellungen aktivieren, oder den Build in einer
+  Shell mit Administratorrechten laufen lassen.
+
+---
+
+## Was noch offen ist
+
+1. **Die D1-Datenbank existiert nur lokal.** In `wrangler.jsonc` steht bei `database_id` ein
+   markierter Platzhalter, weil `wrangler login` einen Browser braucht und in der Session nicht
+   möglich war. Einmalig nachzuholen:
+   ```
+   npx wrangler login
+   npx wrangler d1 create cn-medcan-db     # ausgegebene ID in wrangler.jsonc eintragen
+   npm run cf-typegen
+   npm run db:migrate:remote
+   npm run db:constraints:remote
+   ```
+2. **Windows-Entwicklermodus aktivieren**, damit `cf-build`, `preview` und `deploy` laufen.
 
 ---
 
@@ -151,7 +162,7 @@ Spalten nicht anfasst:
 Das bisherige Passwort-Gate in `proxy.ts` **bleibt zusätzlich bestehen**, solange die Seite in der
 geschlossenen Entwicklungsphase ist. Es schützt die ganze Seite; Better Auth regelt, wer darin
 abstimmen darf. Das zweite Passwort (`FACHKREIS_PASSWORD`) wird mit Block B überflüssig und
-entfällt dann.
+entfällt dann — zusammen mit der Rolle im Gate-Token und `lib/query/fachkreis.ts`.
 
 ### Neue Modelle
 | Modell | Felder (Kern) | Wichtig |
@@ -161,6 +172,10 @@ entfällt dann.
 | `UmfrageOption` | `umfrageId`, `strainId`, `reihenfolge`, **`herkunft`** (`GESETZT`/`COMMUNITY`), `istGewinner`, `ergebnisReviewId` | `GESETZT` = Wahl des Betreibers, nicht abstimmbar, ohne Stimmenzähler in der Oberfläche. `COMMUNITY` = aus einem übernommenen Vorschlag, abstimmbar. Unique `(umfrageId, strainId)` und `(umfrageId, reihenfolge)`. Beim Beenden werden die `communityPlaetze` stimmenstärksten `COMMUNITY`-Optionen plus alle `GESETZT`-Optionen als `istGewinner` markiert. |
 | `Stimme` | `umfrageId`, `optionId`, `mitgliedId`, `abgegebenAm` | **Unique `(umfrageId, mitgliedId)`** — jedes Mitglied hat genau eine Stimme, die zwei stimmenstärksten Community-Optionen gewinnen. Das ist die einzige Absicherung gegen Doppelstimmen; **nicht** über eine Transaktion lösen, D1 hat keine. Die Schreibschicht muss zusätzlich prüfen, dass `optionId` zur Umfrage gehört **und** `herkunft = COMMUNITY` ist — sonst ließe sich auf einen gesetzten Platz abstimmen. |
 | `Review` (Änderung) | neu: `istRedaktionell` (Boolean) | Trennt die Reviews des Betreibers von Community-Reviews. `autorId` wird Relation auf `mitglied`. |
+
+**Für alle neuen Modelle gilt der D1-Umbau mit:** keine Enums (Werte nach `db/enums.ts`, Prüfung
+in `db/constraints.sql` ergänzen), kein `Json`, kein `Decimal`, und jede neue durchsuchbare Spalte
+braucht eine kleingeschriebene Suchspalte.
 
 ### Oberfläche
 - **Startseite:** oben die aktuelle Umfrage als Kernelement (Phase, Kandidaten, Stimmenzahl,
@@ -186,94 +201,16 @@ entfällt dann.
 
 ---
 
-## Was fertig ist und beide Blöcke übersteht
+## Was fertig ist
 
 - Scaffold, Cloudflare-Anbindung, `lib/cloudflare.ts` als einziger Binding-Zugang
-- Zugangsschutz: `proxy.ts`, `lib/gate.ts` (HMAC-Cookie, zeitkonstanter Vergleich),
+- Zugangsschutz: `proxy.ts`, `lib/gate.ts` (HMAC-Cookie mit Rolle, zeitkonstanter Vergleich),
   `app/zugang/page.tsx`, `app/api/zugang/route.ts`
+- Datenbank: Cloudflare D1, Schema, Migration, Trigger, Seed — siehe `db/README.md`
 - Design-System: `.claude/skills/ui-design-engine.md`, Tokens in `app/globals.css`
   (Akzent: klinisches Tiefblau `oklch(0.52 0.11 240)`), 11 Primitives in `components/ui/`
-- Edge-Regelwerk: `.claude/skills/edge-stack-master.md` — der Supabase-Abschnitt muss auf D1
-  umgeschrieben werden
+- Edge-Regelwerk: `.claude/skills/edge-stack-master.md` — auf D1 umgeschrieben
 - Produktkomponenten: `ProduktCard`, `CannabinoidBar`, `TerpenChips`, `GlasHeader`, `TerpenMap`,
   `BestandTabelle`, `BewertungsListe`, `InstagramEmbed`, `FilterLeiste`, `AktiveFilter`
-- Seiten: Layout, Landing, `/produkte` mit Live-Filter, `/apotheken` und Detail, 404
-- Fachlogik: `lib/query/bewertung.ts`, `lib/query/filter.ts`, `lib/format.ts`, `lib/labels.ts`
-
-**Verifikationsstand:** `tsc` grün · `eslint` grün, null Warnungen · `next build` grün, 6 Routen.
-
----
-
-## Bekannte Blocker
-
-### 1. Workers-Bundle baut auf Windows nicht
-`npx opennextjs-cloudflare build` bricht ab mit `EPERM ... symlink`. OpenNext legt beim Bündeln
-Symlinks an, Windows erlaubt das ohne erhöhte Rechte nicht. **Kein Code-Fehler** — `next build`
-läuft durch.
-- **Weg C (empfohlen): Build und Deploy in GitHub Actions auf Ubuntu.** Passt zum Grund, aus dem
-  das Repo public ist: unbegrenzte Actions-Minuten. Braucht einen Workflow und ein
-  Cloudflare-API-Token in den Repository-Secrets.
-- Weg A: Windows Developer Mode aktivieren. Weg B: Terminal als Administrator.
-
-### 2. Alle Datenseiten sind `force-dynamic`
-Bewusst, weil ein Prerender ohne Datenbank scheitern würde. Entfällt mit ISR, sobald die
-R2-Bindings stehen. TODO über `ladeFilterFacetten` in `lib/query/strains.ts`.
-
----
-
-## Blockiert auf Input vom Nutzer
-
-`C:\cn\.env.local` ist mit Platzhaltern angelegt und gitignored. Durch D1 gibt es **keine
-Datenbank-Zugangsdaten** mehr:
-
-| Variable | Wert |
-|---|---|
-| `SITE_PASSWORD` | frei wählbar, öffnet die Seite |
-| `FACHKREIS_PASSWORD` | frei wählbar, anderes Passwort; entfällt mit Block B |
-| `SITE_SESSION_SECRET` | `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"` |
-| `NEXT_PUBLIC_INSTAGRAM_REEL_URL` | optional, darf leer bleiben |
-
-Mit Block B kommt hinzu: `BETTER_AUTH_SECRET` (gleiche Erzeugung wie oben) und `BETTER_AUTH_URL`.
-
-Einmalig für die Datenbank, kein Eintrag in `.env.local`:
-```sh
-npx wrangler login
-npx wrangler d1 create cn-medcan-db     # database_id in wrangler.jsonc eintragen
-```
-Für rein lokale Entwicklung genügt sogar das nicht — wrangler arbeitet gegen eine Datei in
-`.wrangler/`.
-
----
-
-## Arbeitsweise in diesem Projekt
-
-- **Installierte Skills von sich aus nutzen**, nicht erst auf Zuruf. Zuordnung:
-  `prisma-upgrade-v7` bei Prisma-Fehlern, die nach Breaking Change riechen · `prisma-client-api`
-  bei Queries · `prisma-driver-adapter-implementation` beim D1-Adapter · `prisma-cli` bei
-  `migrate diff` · `cloudflare-d1` nur für D1-Plattformverhalten, nicht für ORM-Fragen (Datei ist
-  auf Drizzle ausgerichtet und trägt `last_verified: 2025-01-15`) · `better-auth` für Block B ·
-  `cloudflare:wrangler` bei jedem wrangler-Befehl · `cloudflare:workers-best-practices` ·
-  `cloudflare:web-perf` · `ui-design-engine` bei allem unter `app/**` und `components/**` ·
-  `edge-stack-master` bei Bindings, Datenzugriff, Caching, Deployment.
-- **`AGENTS.md` im Projektroot beachten** (wird von `next dev` selbst geschrieben): Next 16 hat
-  Breaking Changes gegenüber älterem Wissen. Vor Next-spezifischem Code die passende Anleitung in
-  `node_modules/next/dist/docs/` lesen, statt aus dem Gedächtnis zu arbeiten. Zwei Fälle hatten
-  wir schon: `searchParams` und `params` sind Promises, und die `middleware`-Konvention wurde
-  durch `proxy.ts` ersetzt.
-- Antwortstil: Caveman-Modus `full`, deutsch. Gilt für den Chat, **nicht** für Code, Kommentare,
-  Commits und Dokumente wie diese Datei.
-- Verifikation vor jeder Fertigmeldung: `npx tsc --noEmit` und `npx eslint . --max-warnings=0`,
-  bei Seitenänderungen zusätzlich `npx next build`. Behauptungen nur mit Beleg.
-- Commit je abgeschlossener Welle, Push sobald Typecheck und Build grün sind.
-- Unabhängige Teilaufgaben parallel an Subagents, jeder mit expliziten Dateigrenzen.
-  **Vor einem Session-Clear alle Agents stoppen** — sie sterben sonst mitten im Schreiben.
-- **Heredocs werden in dieser Umgebung teils verstümmelt** — Dateiinhalte über das Write-Tool
-  schreiben. Hat schon dreimal Arbeit gekostet.
-- Farbtoken: immer die semantischen Aliase (`bg-accent`, `text-danger`), **nie** die Ramp-Stufen
-  (`bg-accent-600`). Nur die Aliase kippen im Dunkelmodus mit; war schon ein Kontrastbug.
-- Glasmorphismus ist projektweit unerwünscht, **mit einer dokumentierten Ausnahme**: der Header der
-  Produktdetailseite. Steht im Dateikopf von `components/produkt/GlasHeader.tsx`.
-- Verworfen, nicht erneut vorschlagen: Supabase (zu viele Free-Projekte), Neon (neuer Account,
-  Kaltstart), vinext, Cloudflare Pages, Cloudflare Access (braucht eigene Domain), Instagram
-  `embed.js` (Tracking ohne Einwilligung), `tailwind-v4-shadcn` (kollidiert mit
-  `ui-design-engine`).
+- Seiten: Layout, Landing, `/produkte` mit Live-Filter, `/produkte/[slug]`, `/apotheken` und
+  Detail, 404

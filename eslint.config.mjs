@@ -16,6 +16,10 @@ const eslintConfig = defineConfig([
     "cloudflare-env.d.ts",
     "lib/generated/**",
     ".open-next/**",
+    // Fremder Code: Referenz- und Vorlagendateien der installierten Skills.
+    // Sie werden nie gebaut und folgen nicht unseren Regeln.
+    ".agents/**",
+    ".claude/**",
   ]),
 ]);
 

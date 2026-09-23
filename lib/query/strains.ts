@@ -6,8 +6,6 @@ import {
   istGeschmacksKategorie,
   istKultivarTyp,
   istRezeptStatus,
-  type BestandStatus,
-  type Bestrahlung,
   type Darreichungsform,
   type GeschmacksKategorie,
   type KultivarTyp,

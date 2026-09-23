@@ -1,16 +1,17 @@
 ---
 name: edge-stack-master
-description: Regelwerk "Edge-Optimierung" für diesen Medizinalcannabis-Produktkatalog auf Cloudflare Workers (Next.js 16 App Router + @opennextjs/cloudflare). Greift bei jeder Arbeit an wrangler.jsonc, Bindings und lib/cloudflare.ts, an Datenzugriff über Supabase/Prisma, an Caching und Revalidation, an der Runtime-Wahl einer Route, an Bundle-Größe und Imports im Request-Pfad sowie an Build, Preview und Deployment. Definiert die verbindlichen Grenzen, die Sicherheitsregel zu RLS und die Abschluss-Checkliste.
+description: Regelwerk "Edge-Optimierung" für diesen Medizinalcannabis-Produktkatalog auf Cloudflare Workers (Next.js 16 App Router + @opennextjs/cloudflare). Greift bei jeder Arbeit an wrangler.jsonc, Bindings und lib/cloudflare.ts, an Datenzugriff über D1/Prisma, an Caching und Revalidation, an der Runtime-Wahl einer Route, an Bundle-Größe und Imports im Request-Pfad sowie an Build, Preview und Deployment. Definiert die verbindlichen Grenzen, die Sicherheitsregel zur fehlenden Zugriffskontrolle in der Datenbank und die Abschluss-Checkliste.
 ---
 
 # Edge-Stack-Master
 
 Verbindliches Regelwerk für **diesen** Stack. Keine allgemeinen Edge-Ratschläge: alles hier bezieht sich auf
 Worker `cn-medcan`, `main: ".open-next/worker.js"`, `@opennextjs/cloudflare` ^1.20.6, Next.js 16.3.6 / React 19,
-Tailwind v4, Daten aus Supabase Postgres via Prisma (`@prisma/adapter-pg`) und `@supabase/supabase-js`.
+Tailwind v4, Daten aus **Cloudflare D1** via Prisma (`@prisma/adapter-d1`).
 
-Nicht Cloudflare Pages. Nicht `@cloudflare/next-on-pages` (deprecated). Nicht D1 — das `d1_databases`-Binding
-`DB` in `wrangler.jsonc` ist Altlast und wird entfernt; baue nichts darauf und referenziere es nicht in neuem Code.
+Nicht Cloudflare Pages. Nicht `@cloudflare/next-on-pages` (deprecated). **Kein Supabase** — der Supabase-Pfad
+(`@supabase/supabase-js`, `@supabase/ssr`, `lib/supabase/`, `supabase/rls.sql`) ist entfernt; er steht in der
+Git-Historie. Baue nichts darauf und referenziere ihn nicht in neuem Code.
 
 ## 1. Workers-Limits und was daraus folgt
 
@@ -19,7 +20,7 @@ Belegte Werte (Quelle: https://developers.cloudflare.com/workers/platform/limits
 | Limit | Free | Paid | Konsequenz für uns |
 |---|---|---|---|
 | CPU-Zeit pro Request | 10 ms | bis 5 min möglich, **Default 30 s** | CPU-Zeit ist reine Rechenzeit; Warten auf DB oder Fetch zählt nicht mit. 10 ms sind für SSR mit Markdown-Parsing oder großen Array-Transformationen zu wenig — auf Free gilt: keine Rechenarbeit im Request-Pfad, die sich in den Build oder in Cache verlagern lässt. |
-| Sub-Requests pro Invocation | 50 | 10.000 | Jeder `fetch`, jeder Binding-Call, jeder Supabase-Roundtrip zählt. Eine Produktliste, die pro Zeile eine Query macht, sprengt auf Free eine Seite mit 50 Produkten allein durch die DB. |
+| Sub-Requests pro Invocation | 50 | 10.000 | Jeder `fetch` und jeder Binding-Call zählt, also auch jede einzelne D1-Query. Eine Produktliste, die pro Zeile eine Query macht, sprengt auf Free eine Seite mit 50 Produkten allein durch die DB. |
 | Simultan offene Verbindungen | 6 | 6 | Harte Parallelitätsgrenze. `Promise.all` über mehr als 6 Fetches bringt keinen Zeitgewinn; batche stattdessen in der Query. |
 | Script-Größe | 64 MiB **unkomprimiert**, kein Limit auf die komprimierte Größe | dito | Die 64 MiB sind für unsere Größenordnung kein realistisches Risiko — das Bundle-Argument ist hier **Startup-/CPU-Zeit und Isolate-Speicher**, nicht das Größenlimit. Argumentiere nie mit einem "1 MB Gzip-Limit"; das gilt für Workers-Bundles in dieser Form nicht. |
 | Memory pro Isolate | 128 MB | 128 MB | JS-Heap plus WASM. Keine vollständigen Datensätze in Modul-Scope-Caches laden, keine unbounded Maps als "Cache" im Modulkopf. |
@@ -49,7 +50,7 @@ Wenn du es in einer Datei findest, entferne es.
 
 Grund: OpenNext bündelt die Next.js-**Node.js**-Server-Runtime und lässt sie im Worker unter `nodejs_compat`
 laufen. Das ist der Default und der unterstützte Pfad. `runtime = "edge"` schaltet Next auf die Edge-Runtime
-um, schneidet damit Node-APIs weg, die unser Datenpfad (Prisma, `@prisma/adapter-pg`) braucht, und bringt
+um, schneidet damit Node-APIs weg, die unser Datenpfad (Prisma, `@prisma/adapter-d1`) braucht, und bringt
 keinen Vorteil — der Code läuft bereits auf Workers, es gibt keine Lambda, der man entkommen müsste.
 
 Die echten Stellschrauben pro Route sind stattdessen:
@@ -83,36 +84,38 @@ Regeln:
 - Nach jeder Änderung an den Bindings in `wrangler.jsonc`: `npm run cf-typegen`, damit `CloudflareEnv` stimmt.
 - Binding-Typen kommen aus `cloudflare-env.d.ts`, nicht aus handgeschriebenen Interfaces.
 
-## 4. Datenzugriff: Supabase + Prisma
+## 4. Datenzugriff: D1 + Prisma
 
 Prisma läuft **ausschließlich serverseitig**. Kein Prisma-Import in einer Client Component.
 
-**Singleton pro Isolate.** Der Prisma-Client mit `@prisma/adapter-pg` wird einmal pro Isolate erzeugt und
-über Requests hinweg wiederverwendet — nicht pro Request neu instanziiert. Ein neuer Client pro Request
-bedeutet Adapter-Setup und Verbindungsaufbau pro Request und frisst genau die CPU-Zeit aus §1. Muster:
-Modul-Scope-Variable mit Lazy-Init in `lib/`, nie ein `new PrismaClient()` in einer Page oder einem Handler.
+**Der Client ist kein Modul-Singleton — und das ist kein Versehen.** D1 kommt als Binding und existiert erst
+im Request-Kontext; auf Modulebene gibt es das Binding schlicht nicht. Deshalb ist `getPrisma()` in
+`lib/prisma.ts` **async** und cacht den Client pro Isolate nur, solange dasselbe Binding-Objekt kommt.
+Trotzdem gilt unverändert: nie ein `new PrismaClient()` in einer Page, Komponente oder einem Handler — der
+einzige Weg zum Client ist `await getPrisma()`.
 
-**Pooler-Port, und der klassische Fehler.** Belegt über
-https://supabase.com/docs/guides/database/connecting-to-postgres :
-- **Runtime im Worker → Transaction-Pooler, Port 6543.** Workers können keine dauerhaften TCP-Pools halten:
-  Isolates sind kurzlebig, können jederzeit verworfen werden, und es laufen viele parallel. Eine
-  Direktverbindung pro Isolate erschöpft die Postgres-Verbindungen. Der Transaction-Pooler ist ausdrücklich
-  für serverless/edge gedacht, weil dort viele kurzlebige Verbindungen entstehen.
-- **Migrationen → Direktverbindung, Port 5432.** `prisma migrate` braucht eine Session mit nativen
-  Postgres-Kommandos; das ist im Transaction-Mode nicht möglich.
-- **Der klassische Fehler ist, für beides eine einzige URL zu benutzen.** Entweder laufen Migrationen gegen
-  den Pooler und scheitern mit unklaren Fehlern (Advisory-Locks, Prepared-Statement-Fehler), oder die
-  Runtime verbindet direkt und erschöpft unter Last die Verbindungen. Also: zwei getrennte Variablen —
-  Runtime-URL (6543) und Migrations-/Direct-URL (5432) — und wer eine Migration ausführt, prüft vorher,
-  welche er zieht.
-- Der Session-Pooler läuft ebenfalls auf 5432 und ist nicht unser Runtime-Pfad.
+**Keine Verbindungs-URLs, keine Pools, keine Prepared-Statement-Fallen.** D1 ist SQLite hinter dem Binding:
+kein Port, kein Passwort, kein Pooler. Der frühere Supabase-Abschnitt über Port 6543 gegen 5432 ist damit
+gegenstandslos. Was stattdessen zählt, steht in `db/README.md`.
 
-**Prepared Statements sind im Transaction-Pooling-Modus nicht verfügbar** (gleiche Quelle; Supabase nennt
-Prisma dort ausdrücklich). Konsequenzen:
-- In der Runtime-Verbindung muss die Prepared-Statement-Nutzung abgeschaltet sein, sonst gibt es sporadische
-  Fehler, die erst unter Parallelität auftreten und lokal nie reproduzieren.
-- Kein Performance-Gewinn aus Statement-Wiederverwendung erwarten — jede Query wird geplant. Das ist ein
-  weiteres Argument für wenige, gezielte Queries statt viele kleine.
+**Vier D1-Eigenheiten, die den Code formen** — wer sie übergeht, baut etwas, das lokal läuft und in
+Produktion falsch ist:
+
+1. **Keine echten Transaktionen.** Prisma führt `$transaction` gegen D1 als Einzelabfragen aus. Eindeutigkeit
+   wird über **Unique-Indizes** abgesichert, nie über eine Transaktion. Wer "erst prüfen, dann schreiben"
+   baut, hat eine Race Condition gebaut.
+2. **Kein `mode: "insensitive"`.** Prisma bildet das auf SQLite nicht ab, ein `LOWER()` in der Query auch
+   nicht. Freitextsuche läuft über die kleingeschriebene Spalte `strains.suchtext`, gefüllt beim Schreiben.
+   Wer eine neue durchsuchbare Spalte einführt, erweitert `suchtext` — und füllt es im Seed mit.
+3. **Kein Json-Typ.** `reviews.geschmacks_matrix` ist JSON-Text. Gelesen wird sie ausschließlich über
+   `parseGeschmacksMatrix()` — das validiert und fällt auf eine Nullmatrix zurück —, nie mit rohem
+   `JSON.parse` in einer Komponente.
+4. **Kein Decimal.** Prozentwerte sind `Float`, Preise bleiben `Int` in Cent. Geld nie als Float.
+
+**Migrationen** laufen hybrid über `prisma migrate diff` und `wrangler d1 migrations apply`. `prisma migrate
+dev` gibt es auf diesem Pfad nicht. Die Wertprüfungen (`db/constraints.sql`) müssen **nach jeder Migration**
+erneut ausgeführt werden, weil SQLite beim Tabellenumbau alle Trigger verwirft. Das steht ausführlich in
+`db/README.md`; wer eine Migration schreibt, liest die Datei vorher.
 
 **Query-Regeln:**
 - Keine N+1. Relationen über `include`/`select` in **einer** Query holen, nicht in einer Schleife nachladen.
@@ -123,24 +126,30 @@ Prisma dort ausdrücklich). Konsequenzen:
 - Aggregate über `count`/`groupBy` in der DB, nicht durch Laden und Zählen in JS (Memory, §1).
 - Keine Query im Render-Pfad einer Client Component. Daten fließen von Server Components nach unten.
 
-## 5. RLS-Grenze — Sicherheitsregel, nicht Stil
+## 5. Die Datenbank kennt keine Zugriffskontrolle — Sicherheitsregel, nicht Stil
 
-**Prisma verbindet mit der Service-Rolle und umgeht damit Row Level Security vollständig.** Jede Zeile, die
-Prisma lesen kann, liest es — unabhängig davon, welcher Nutzer den Request gestellt hat.
+**D1 hat kein Row Level Security.** Es gibt keine Policies, keine Rollen, keine Nutzeridentität auf der
+Verbindung. Jede Zeile, die der Worker lesen darf, liest er — unabhängig davon, wer den Request gestellt hat.
+
+Unter Supabase war es faktisch genauso: Prisma verband als Eigentümer und umging RLS vollständig. Die
+Policies wirkten ausschließlich auf dem `supabase-js`-Pfad, den es nicht mehr gibt. Der Verlust ist also
+kleiner, als er klingt — aber er verschiebt die **gesamte** Verantwortung in die Abfrageschicht.
 
 Daraus folgt bindend:
-- **Alles, was pro Nutzer gefiltert werden muss, läuft über `@supabase/supabase-js` mit dem Nutzer-JWT**,
-  damit die RLS-Policies in Postgres greifen. Nicht über Prisma mit einem selbstgeschriebenen
-  `where: { userId }`.
-- Ein `where: { userId }` in Prisma ist **keine** Zugriffskontrolle, sondern ein Filter, der beim nächsten
-  Refactor oder in einem vergessenen Zweig wegfällt, ohne dass etwas fehlschlägt. Der Fehlermodus ist
-  stilles Datenleck, nicht ein Fehler.
-- Prisma ist zulässig für Aufgaben, die legitim **ohne** Nutzerkontext laufen: Katalog- und
-  Produktstammdaten, Terpen-/Referenztabellen, statische Generierung und `generateStaticParams`, Seeds,
-  Importe, Migrationen, Aggregate über öffentlich sichtbare Daten, interne Wartungsjobs.
-- Der Supabase Service-Role-Key gehört nie in Client-Code und nie in eine `NEXT_PUBLIC_*`-Variable (§7).
-- Bei neuen Tabellen mit nutzerbezogenen Daten: RLS aktivieren und Policies schreiben, auch wenn der
-  aktuelle Zugriff nur über Prisma läuft. RLS ist die letzte Verteidigungslinie, nicht der Ersatz für sie.
+- **Die fachliche Sichtbarkeitsgrenze liegt in `lib/query/`, und zwar an genau einer Stelle je Regel.** Für
+  das Fachkreis-Gate nach §10 HWG ist das `bestandSichtbarkeit()` in `lib/query/strains.ts`. Sie formuliert
+  die Bedingung einmal, damit Filter, Ausgabe und Facetten nicht auseinanderlaufen.
+- Eine neue Abfrage auf `pharmacy_stock` geht über diese Funktion. Ein handgeschriebenes `where` daneben ist
+  **keine** Zugriffskontrolle, sondern ein Filter, der beim nächsten Refactor wegfällt, ohne dass etwas
+  fehlschlägt. Der Fehlermodus ist stilles Datenleck, nicht ein Fehler.
+- **Die Rolle kommt nie aus einem ungeprüften Request-Bestandteil.** Sie stammt ausschließlich aus dem
+  HMAC-signierten Gate-Token (`lib/gate.ts`), gelesen über `istFachkreis()` — nicht aus einem
+  Query-Parameter, nicht aus einem Header, nicht aus einem Cookie-Teil ohne Signaturprüfung.
+- Mit Block B (Better Auth) kommen Schreibzugriffe dazu. **Jede Server Action prüft serverseitig Freigabe und
+  Rolle**, bevor sie schreibt — nie im Client entscheiden. Eindeutigkeit über Unique-Index, nicht über
+  Transaktion (§4).
+- Die Wertprüfungen in `db/constraints.sql` sind Datenintegrität, keine Zugriffskontrolle. Sie halten Müll
+  aus Spalten fern, sie verhindern nicht das Lesen fremder Zeilen.
 
 ## 6. Caching-Kaskade
 
@@ -222,12 +231,13 @@ Vor dem Fertigmelden einer Edge-Aufgabe jeden Punkt tatsächlich prüfen — nic
 
 - [ ] Kein `export const runtime = "edge"` hinzugefügt oder stehen gelassen.
 - [ ] Kein `getCloudflareContext()` außerhalb von `lib/cloudflare.ts`.
-- [ ] Kein neues D1-Artefakt, kein Bezug auf das Alt-Binding `DB`.
+- [ ] Kein Bezug auf Supabase (`supabase-js`, `lib/supabase/`, RLS-Policies, Pooler-Ports).
 - [ ] Keine schwere Library neu im Request-Pfad; Datums-/Zahlenformatierung über `Intl`, Formatter auf Modulebene.
-- [ ] Prisma-Client als Singleton, kein `new PrismaClient()` pro Request; kein Prisma-Import in Client Code.
-- [ ] Runtime-Verbindung über Transaction-Pooler 6543 mit deaktivierten Prepared Statements; Migrationen über Direktverbindung 5432.
+- [ ] Client ausschließlich über `await getPrisma()`, kein `new PrismaClient()` irgendwo sonst; kein Prisma-Import in Client Code.
+- [ ] Keine Annahme von Transaktionen; Eindeutigkeit über Unique-Index. Kein `mode: "insensitive"`, Freitext über `suchtext`.
+- [ ] Nach einer Migration `db/constraints.sql` erneut ausgeführt (SQLite verwirft Trigger beim Tabellenumbau).
 - [ ] Jede neue Listenabfrage hat `take` und gezieltes `select`; keine Query in einer Schleife.
-- [ ] Nutzerbezogene Daten über `supabase-js` mit Nutzer-JWT, nicht über Prisma mit `where`-Filter.
+- [ ] Sichtbarkeitsgrenze über die Helfer in `lib/query/`, nicht über ein handgeschriebenes `where` daneben; Rolle nur aus dem signierten Gate-Token.
 - [ ] Caching auf der obersten passenden Stufe; wenn ISR neu genutzt wird, sind `NEXT_INC_CACHE_R2_BUCKET` und `WORKER_SELF_REFERENCE` konfiguriert.
 - [ ] Keine Secrets in `wrangler.jsonc`; nichts Geheimes unter `NEXT_PUBLIC_*`.
 - [ ] Nach Binding-Änderung `npm run cf-typegen` gelaufen.
@@ -243,8 +253,10 @@ Diese Punkte sind hier bewusst ohne Zahl formuliert, weil sie nicht belegt wurde
 - Startup-/Kaltstart-CPU-Budget für die Modulauswertung eines Workers: keine Zahl genannt. Wenn es für eine
   Entscheidung zählt, aktuelle Cloudflare-Doku prüfen.
 - Größenlimits einzelner Cache-API-Einträge und KV-Werte: nicht belegt, vor Nutzung nachsehen.
-- Die genaue Adapter-/Connection-String-Option zum Abschalten der Prepared Statements: gegen die installierte
-  `@prisma/adapter-pg`-Version prüfen, nicht aus dem Gedächtnis setzen.
-- Aktueller Stand des Repos: `package.json` enthält (noch) `drizzle-orm`/`drizzle-kit` und D1-Scripts, aber
-  kein `@prisma/*` und kein `@supabase/supabase-js`. Die Regeln in §4 und §5 gelten ab dem Zeitpunkt, an dem
-  der Supabase/Prisma-Pfad eingezogen ist; vorher prüfen, was tatsächlich installiert ist.
+- D1-Limits des Free-Tiers (Speicher, gelesene und geschriebene Zeilen pro Tag): die Zahlen stammen aus der
+  Planungsphase und wurden hier nicht neu belegt. Vor einer Zusage gegen die Cloudflare-Doku prüfen.
+- Verhalten von `@prisma/adapter-d1` bei sehr großen Ergebnismengen und die D1-Grenze für die Länge eines
+  einzelnen Statements: nicht belegt.
+- **`npm run cf-build` läuft auf diesem Windows-Rechner nicht durch**: OpenNext legt beim Bündeln Symlinks an,
+  und das scheitert ohne aktivierten Entwicklermodus mit `EPERM`. `next build` läuft. Damit sind
+  `npm run preview` (workerd) und `npm run deploy` derzeit ungetestet — siehe HANDOFF.md.
