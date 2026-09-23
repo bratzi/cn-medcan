@@ -45,6 +45,24 @@ Bewertung verknuepfen), ist damit **zum ersten Mal vollstaendig durch die Oberfl
    Braucht Pruefung in `umfrageEingabePruefen` und ein Datumsfeld im Formular.
 3. Die drei alten offenen Punkte unter "Was noch offen ist", danach der Mailversand als **Block C**.
 
+**Beim Abgleich mit dem Code gefunden (2026-09-23), Reihenfolge vom Nutzer noch nicht bestaetigt.**
+Empfohlen: diese drei **vor** den Punkten 1 und 2 oben.
+
+- **Der geplante Block-B-Schritt 7 ist nie gemacht worden.** Die Nummer 7 ging an die
+  Umfrageverwaltung; `FACHKREIS_PASSWORD` ausbauen und die Preise an `mitglied.freigegeben`
+  binden steht noch aus. `istFachkreis()` aus dem Gate-Token steuert weiter die Preise in
+  `app/page.tsx`, `app/produkte/page.tsx`, `app/produkte/[slug]/page.tsx`,
+  `app/apotheken/[slug]/page.tsx`. **Sichtbarer Fehler:** `app/mitglied/page.tsx` verspricht
+  Freigegebenen „Sicht auf die Preisangaben“ - das stimmt nicht.
+- **Es gibt keine Oberflaeche zum Anlegen einer Bewertung.** `review.create` steht nur in
+  `prisma/seed.ts`. Der Betreiber kann seine eigenen Reviews - den Kern der Seite - nicht
+  schreiben, `ergebnisVerknuepfen` verknuepft nur Seed-Bewertungen. Community-Reviews: weder
+  Schreiben noch Freigabe in `/admin`. **Offene Nutzerfrage:** darf jedes freigegebene Mitglied
+  schreiben, und wird jede einzeln freigegeben?
+- `/mitglied` zeigt die eigenen Vorschlaege und Stimmen nicht (steht im Plan unter "Oberflaeche").
+- **Block C kollidiert mit der Kostenregel:** Mailversand ueber Cloudflare braucht eine eigene
+  Absenderdomain. Offene Nutzerfrage, ob eine Domain vorhanden ist.
+
 ---
 
 ## Block B, Schritt 7 - erledigt: Umfrageverwaltung in /admin
@@ -612,20 +630,34 @@ Pooler-URLs). Die Datenbank ist **Cloudflare D1** als Binding `DB`. Was dabei en
 
 ## Was noch offen ist
 
-1. **Die D1-Datenbank existiert nur lokal.** In `wrangler.jsonc` steht bei `database_id` ein
-   markierter Platzhalter, weil `wrangler login` einen Browser braucht und in der Session nicht
-   möglich war. Einmalig nachzuholen:
+1. **Die D1-Datenbank in Cloudflare ist angelegt, aber noch leer (2026-09-23).**
+   `cn-medcan-db`, ID `cdee3489-a940-4353-b164-c58e7a1226f7`, mit `--jurisdiction eu`
+   (Mitgliederdaten mit Gesundheitsbezug bleiben in der EU; Region EEUR). Die ID steht in
+   `wrangler.jsonc`. Wrangler-Login laeuft ueber OAuth (`wrangler login --device` - der normale
+   Login scheiterte mit „No CSRF value available in the session cookie“).
+   **`preview_database_id` traegt absichtlich den alten Platzhalterwert:** Miniflare benennt die
+   lokale Datei nach einem Hash dieser ID (`preview_database_id ?? database_id`, im Wrangler-Code
+   nachgesehen). Ohne das Feld haette die echte ID eine neue, leere lokale Datei erzeugt, und
+   `npm run db:seed` bricht bei zwei Dateien ab. Geprueft: dieselbe Datei, die Runde „test“ ist da.
+   **Offen:** die Migrationen in die Cloud. Die Rechtepruefung der Session hat
+   `npm run db:migrate:remote` als Produktions-Deployment abgelehnt - der Nutzer fuehrt es selbst
+   aus oder gibt es frei:
    ```
-   npx wrangler login
-   npx wrangler d1 create cn-medcan-db     # ausgegebene ID in wrangler.jsonc eintragen
-   npm run cf-typegen
    npm run db:migrate:remote
    npm run db:constraints:remote
    ```
-2. **Windows-Entwicklermodus aktivieren**, damit `cf-build`, `preview` und `deploy` laufen.
-3. **`BETTER_AUTH_SECRET` fuer den Worker setzen**: `npx wrangler secret put BETTER_AUTH_SECRET`.
-   Lokal steht der Wert in `.env.local`, die Vorlage in `.env.local.example`. In Produktion
-   zusaetzlich `BETTER_AUTH_URL` auf den echten Host setzen.
+   Danach ist die Cloud-Datenbank leer (kein Katalog). Ob die Seed-Daten hoch sollen, ist eine
+   Frage an den Nutzer; der Weg steht im Kopf von `prisma/seed.ts`.
+2. **Windows-Entwicklermodus ist aktiv (Nutzer, 2026-09-23).** `npm run cf-build` und
+   `npm run preview` sind damit zum ersten Mal pruefbar - noch nicht geschehen.
+3. **Secrets fuer den Worker - vor dem ersten `deploy` setzen, nicht danach.** Ohne
+   `SITE_PASSWORD` und `SITE_SESSION_SECRET` laesst `proxy.ts` die Seite **offen** (bewusst, damit
+   lokale Entwicklung ohne Secret geht) - ein Deploy ohne sie waere oeffentlich.
+   `BETTER_AUTH_SECRET` fehlt -> jede Auth-Anfrage wirft. Alle drei mit
+   `npx wrangler secret put <NAME>` (fragt den Wert verdeckt ab), jeweils einen **neuen** Wert,
+   nicht den aus `.env.local`. `FACHKREIS_PASSWORD` **nicht** setzen, es faellt mit dem Umbau der
+   Preisanzeige weg. `BETTER_AUTH_URL` ist kein Secret: sobald die workers.dev-Adresse feststeht,
+   als `vars` in `wrangler.jsonc`.
 
 ---
 
@@ -723,10 +755,11 @@ braucht eine kleingeschriebene Suchspalte.
 2. ~~Registrierung, Anmeldung, `/mitglied`.~~ **erledigt**
 3. ~~`/admin` mit Freigabe von Mitgliedern.~~ **erledigt**
 4. ~~Umfragemodell, Server Actions für Vorschlag und Stimme, Umfragephasen.~~ **erledigt**
-5. Startseite umbauen: Umfrage und neueste Review als Kern.
-6. `/umfragen`, `/reviews`.
-7. `FACHKREIS_PASSWORD` und das zweite Gate-Passwort ausbauen, Preisanzeige an die Mitgliedsrolle
-   binden, HWG-Hinweis setzen.
+5. ~~Startseite umbauen: Umfrage und neueste Review als Kern.~~ **erledigt**
+6. ~~`/umfragen`, `/reviews`.~~ **erledigt** (dazu, ungeplant: Umfrageverwaltung in `/admin`,
+   oben als "Schritt 7" gefuehrt)
+7. **Offen:** `FACHKREIS_PASSWORD` und das zweite Gate-Passwort ausbauen, Preisanzeige an die
+   Mitgliedsrolle binden, HWG-Hinweis setzen. Siehe "Hier geht es weiter".
 
 ---
 

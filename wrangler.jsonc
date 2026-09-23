@@ -18,17 +18,21 @@
 	// Datenbank. D1 laeuft als Binding, es gibt keine Verbindungs-URL und kein
 	// Passwort - deshalb steht hier auch nichts Geheimes.
 	//
-	// `database_id` ist noch ein Platzhalter. Einmalig setzen mit:
-	//     npx wrangler login
-	//     npx wrangler d1 create cn-medcan-db
-	// und die ausgegebene ID hier eintragen. Ohne echte ID funktioniert alles
-	// Lokale (`--local`, `npm run preview`) gegen die Datei unter .wrangler/;
-	// nur `--remote` und `npm run deploy` brauchen sie.
+	// `database_id` ist die echte Datenbank in Cloudflare (angelegt am
+	// 2026-09-23 mit `--jurisdiction eu`: Mitgliederdaten mit Gesundheitsbezug
+	// bleiben in der EU). Sie gilt fuer `--remote` und `npm run deploy`.
+	//
+	// `preview_database_id` gilt fuer alles Lokale (`next dev`, `--local`,
+	// `npm run preview`). Miniflare benennt die Datei unter .wrangler/ nach
+	// einem Hash dieser ID. Der Wert ist der fruehere Platzhalter und bleibt
+	// absichtlich stehen: aendert man ihn, zeigt die lokale Entwicklung auf
+	// eine neue, leere Datei, und `npm run db:seed` findet zwei Dateien.
 	"d1_databases": [
 		{
 			"binding": "DB",
 			"database_name": "cn-medcan-db",
-			"database_id": "PLATZHALTER-wrangler-d1-create-ausfuehren",
+			"database_id": "cdee3489-a940-4353-b164-c58e7a1226f7",
+			"preview_database_id": "PLATZHALTER-wrangler-d1-create-ausfuehren",
 			"migrations_dir": "migrations"
 		}
 	]
