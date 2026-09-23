@@ -186,6 +186,18 @@ Kursive mit Unterlängen (g, j, p, q, y) bekommen mindestens 1.1 Zeilenhöhe plu
 unten. Die Feineinstellung (Laufweite, `text-wrap: balance`, optische Größen) erfolgt beim
 Umsetzen mit `better-typography`.
 
+**Schriftvergleich im Browser (fonts.google.com, Mustertext „Grünes Buch · Wähl mit“, 56 px,
+2026-09-23):**
+- *Buch:* Cormorant Garamond 300 steht PP Editorial Old am nächsten (hohe Kontraste, feine
+  Serifen, offene Formen). EB Garamond wirkt als Display zu dunkel und buchig, Playfair
+  Display zu fett und hart kontrastiert, dazu zu nah an Luxus-Klischees. **Bleibt: Cormorant.**
+- *Wand:* Sedgwick Ave Display hat als einzige Kandidatin echten Sprüh- und Handstyle-
+  Charakter (schräg, unruhig, schmal); Umlaute sitzen sauber. Permanent Marker liest sich
+  wie Filzstift-Kapitälchen (Schulheft), Rubik Spray Paint wie weiche Bubble-Schrift ohne
+  Tag-Schwung. **Bleibt: Sedgwick Ave Display.** Hinweis: Sedgwick setzt Kleinbuchstaben als
+  kleine Versalien - Tags deshalb in natürlicher Schreibung speichern, nicht per
+  `text-transform`.
+
 ### 4.3 Logo
 
 - **Wortmarke:** „Grünes Buch“ in Cormorant Garamond 300, sauber gesetzt.
@@ -220,6 +232,23 @@ Umsetzen mit `better-typography`.
     Hover (Verlauf per CSS, bei reduzierter Bewegung aus). Drips gibt es schon.
   - **Nicht übernommen:** Sortennamen als eigenes Lettering (Leitplanke 4), Rauch (2),
     Figuren (3), dichte Vollflächen hinter Text (Lesbarkeit).
+- **Websites im Browser (2026-09-23):**
+  - *wizardtrees.com:* Altersabfrage, danach Newsletter-Dialog; dunkles Violett-Schwarz
+    (`#0f0f0f`), Überschriften in **Monument Extended** (sehr breite Grotesk, Versalien),
+    Text und Navigation in **Spline Sans Mono**, nummerierte Menüpunkte („01 HOME“).
+    Produkte stehen in **Chrom-Bögen** (gotische Fensterform), darunter violette
+    Pillen-Buttons mit Verlauf. Hero ist ein 3D-Render-Karussell.
+  - *dojadirect.com* (vom Nutzer genannt; dojaexclusive.com liefert eine Fehlerseite):
+    Tag-Logo weiß oben mittig, sonst betont nüchtern: **Work Sans** in Versalien, eckige
+    Umriss-Buttons, Vollbild-Fotos mit Rauch und Feuerzeug.
+  - **Übernommen:** (1) Die Lehre aus Doja - ein starkes Tag verträgt eine **nüchterne**
+    Umgebung; das bestätigt Geist neben Sedgwick. (2) Nummerierte Kapitel („01“, „02“ in
+    Geist Mono) in Navigation und Kapitelköpfen, passt zum Feldbuch-Raster (4.7). (3) Ein
+    Bogen-Rahmen als **einmaliges** Motiv um das Leitobjekt der Review-Sektion, flach als
+    1-px-Linie in `ink`, ohne Chrom.
+  - **Nicht übernommen:** Monument Extended (kommerziell, dritte Display-Schrift wäre zu
+    viel), Chrom und 3D-Renders, Rauch- und Konsumbilder (Leitplanke 2, HWG), dunkler
+    Grund als Marke.
 - Komponente `components/marke/Wortmarke.tsx` (Server Component), zwei Größen: `kopf`
   (Header, Tag statisch) und `buehne` (Hero, Tag wird per Animation „gesprüht“).
 - Zugänglicher Name: „Grünes Buch“; das Tag ist `aria-hidden`.
@@ -243,6 +272,20 @@ Umsetzen mit `better-typography`.
 - Videos: höchstens zwei, SD-Dateien von Pexels, stumm, `playsinline`, mit Standbild,
   verzögert geladen, Graustufen per CSS-Filter. Bei reduzierter Bewegung nur Standbild.
 - Jedes Motiv hat eine erzählerische Rolle; kein Deko-Stock.
+
+**Motiv-Verfügbarkeit auf Pexels (Website-Suche im Browser, 2026-09-23; IDs = Pexels-Foto-
+bzw. Video-ID, Auswahl final erst per Pipeline, 6.3):**
+
+| Motiv | Befund | Kandidaten |
+|---|---|---|
+| Blatt vor hellem Grund | reichlich, freigestellt auf Weiß | 7668040, 7668041, 7668057, 7668029 |
+| Trichom-Makro | reichlich, meist dunkler Grund - Graustufen + `multiply` prüfen, sonst nur im Dunkelmodus | 30682041, 33856592, 30682036 |
+| Sprühfarbe/Drips auf heller Wand | **als Motiv nicht vorhanden**; Graffiti-Wände tragen fremde Tags (unbrauchbar). Ersatz: Drip-Texturen, per Graustufe zur Maske | 11016984 (Drips an Wand), 4862581, 7256100; Geste: 9311622 (Sprühhand, s/w) |
+| Grünes Notizbuch | vorhanden, eher schlicht | 479817 (grünes Spiralheft), 12914430 (mintgrün mit Stift) |
+| Video Pflanze | vorhanden | 12361112 (Pflanzen im Wind), 7667163, 4543689 |
+
+Pexels-Fotos mit Konsum (Joints, Rauch) und mit „MEDICINE“-Schriftzügen ausschließen
+(Leitplanken, HWG).
 
 ### 4.6 Motion-Prinzipien
 
@@ -459,7 +502,6 @@ gemeldet.
 ## 11. Offene Inputs
 
 - **Instagram-Handle** „Grünes Buch“ auf Verfügbarkeit prüfen (Nutzer).
-- **Chrome-Erweiterung** für die Browser-Prüfungen verbinden (Nutzer).
 - Pixabay-Key: nicht nötig (vorerst ohne Pixabay).
 
 ## 12. Eingesetzte Skills
