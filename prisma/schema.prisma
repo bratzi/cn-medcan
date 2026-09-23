@@ -98,6 +98,9 @@ model Strain {
   chargen   Charge[]
   reviews   Review[]
 
+  umfrageVorschlaege UmfrageVorschlag[]
+  umfrageOptionen    UmfrageOption[]
+
   erstelltAm     DateTime @default(now()) @map("erstellt_am")
   aktualisiertAm DateTime @updatedAt @map("aktualisiert_am")
 
@@ -205,9 +208,19 @@ model Review {
   chargeId String? @map("charge_id")
   charge   Charge? @relation(fields: [chargeId], references: [id], onDelete: SetNull)
 
-  /// Autor der Bewertung. Bis Block B (Better Auth) eine freie ID ohne
-  /// Relation; danach Relation auf das Modell `mitglied`.
-  autorId String @map("autor_id")
+  /// Autor der Bewertung.
+  ///
+  /// Bewusst optional: die fiktiven Bewertungen aus dem Seed haben kein
+  /// Mitglied hinter sich, und ein geloeschtes Mitglied soll seine Bewertung
+  /// nicht mitnehmen (`SetNull` statt `Cascade`). Wer schreiben darf,
+  /// entscheidet die Schreibschicht, nicht die Spalte.
+  autorId String?   @map("autor_id")
+  autor   Mitglied? @relation(fields: [autorId], references: [id], onDelete: SetNull)
+
+  /// Trennt die Bewertungen des Betreibers von Community-Bewertungen. Die
+  /// redaktionellen sind der zentrale Anhaltspunkt der Seite; Community-
+  /// Bewertungen stehen als Zweitstimme darunter, nicht gleichrangig.
+  istRedaktionell Boolean @default(false) @map("ist_redaktionell")
 
   /// Festes Bewertungsschema, jeweils 1-5.
   aussehen   Int
@@ -237,9 +250,14 @@ model Review {
   erstelltAm     DateTime @default(now()) @map("erstellt_am")
   aktualisiertAm DateTime @updatedAt @map("aktualisiert_am")
 
+  /// Ergebnis-Reviews einer Umfragerunde. Eine Bewertung kann aus mehreren
+  /// Runden folgen (dieselbe Sorte gewinnt erneut), deshalb eine Liste.
+  umfrageOptionen UmfrageOption[]
+
   @@index([strainId, freigegeben])
   @@index([chargeId])
   @@index([autorId])
+  @@index([istRedaktionell, erstelltAm])
   @@map("reviews")
 }
 
@@ -349,6 +367,149 @@ model Mitglied {
 
   erstelltAm DateTime @default(now()) @map("erstellt_am")
 
+  vorschlaege UmfrageVorschlag[]
+  stimmen     Stimme[]
+  reviews     Review[]
+
   @@index([freigegeben])
   @@map("mitglied")
+}
+
+// ---------------------------------------------------------------------------
+//  Umfragen - der Produktkern
+// ---------------------------------------------------------------------------
+//
+// Eine Runde ergibt 3 bis 4 getestete Sorten:
+//   1-2 GESETZTE Plaetze  - der Betreiber waehlt sie selbst, keine Abstimmung.
+//   2 COMMUNITY-Plaetze   - darueber entscheiden die Stimmen der Mitglieder.
+// Jedes freigegebene Mitglied hat GENAU EINE Stimme; die `communityPlaetze`
+// stimmenstaerksten COMMUNITY-Optionen gewinnen.
+//
+// D1 hat keine Transaktionen. Eindeutigkeit steht deshalb durchgehend in
+// Unique-Indizes, nie in einem "erst pruefen, dann schreiben" der
+// Schreibschicht - das waere eine Race Condition.
+
+/// Eine Umfragerunde.
+model Umfrage {
+  id           String  @id @default(uuid())
+  titel        String
+  beschreibung String?
+
+  /// Werte nach UMFRAGE_PHASEN in db/enums.ts, geprueft in db/constraints.sql.
+  phase String @default("VORSCHLAG")
+
+  /// Sicherung "genau eine aktive Umfrage".
+  ///
+  /// SQLite kennt keine partiellen Unique-Indizes ueber Prisma, erlaubt aber
+  /// beliebig viele NULL in einer Unique-Spalte. Deshalb traegt eine laufende
+  /// Umfrage hier die Konstante 'AKTIV' und eine beendete NULL: ein zweiter
+  /// 'AKTIV'-Satz wird von der Datenbank abgewiesen. Dass der Wert zur Phase
+  /// passt, sichert ein Trigger in db/constraints.sql - nicht die Anwendung.
+  aktiv String? @unique
+
+  startAm        DateTime  @default(now()) @map("start_am")
+  /// Ende der Vorschlagsphase. Rein informativ fuer die Oberflaeche - die
+  /// Phase schaltet der Betreiber, nicht die Uhr (es gibt keinen Cron).
+  vorschlagBisAm DateTime? @map("vorschlag_bis_am")
+  endetAm        DateTime? @map("endet_am")
+
+  /// Wie viele Plaetze die Abstimmung vergibt. Die gesetzten Plaetze zaehlen
+  /// hier NICHT mit.
+  communityPlaetze Int @default(2) @map("community_plaetze")
+
+  erstelltAm DateTime @default(now()) @map("erstellt_am")
+
+  vorschlaege UmfrageVorschlag[]
+  optionen    UmfrageOption[]
+  stimmen     Stimme[]
+
+  @@index([phase])
+  @@map("umfragen")
+}
+
+/// Vorschlag eines Mitglieds in der Phase VORSCHLAG.
+model UmfrageVorschlag {
+  id        String  @id @default(uuid())
+  umfrageId String  @map("umfrage_id")
+  umfrage   Umfrage @relation(fields: [umfrageId], references: [id], onDelete: Cascade)
+  strainId  String  @map("strain_id")
+  strain    Strain  @relation(fields: [strainId], references: [id], onDelete: Cascade)
+
+  /// Wer vorgeschlagen hat. Cascade: verschwindet das Mitglied, verschwindet
+  /// sein Vorschlag - anders als bei einer Bewertung ist er ohne Autor wertlos.
+  mitgliedId String   @map("mitglied_id")
+  mitglied   Mitglied @relation(fields: [mitgliedId], references: [id], onDelete: Cascade)
+
+  begruendung String?
+
+  /// Vom Betreiber als Kandidat uebernommen. Der Vorschlag bleibt erhalten,
+  /// damit nachvollziehbar ist, von wem die Sorte kam.
+  uebernommen Boolean @default(false)
+
+  erstelltAm DateTime @default(now()) @map("erstellt_am")
+
+  /// Ein Mitglied schlaegt dieselbe Sorte in derselben Runde nur einmal vor.
+  @@unique([umfrageId, mitgliedId, strainId])
+  @@index([umfrageId, uebernommen])
+  @@index([strainId])
+  @@index([mitgliedId])
+  @@map("umfrage_vorschlaege")
+}
+
+/// Ein Kandidat einer Runde - gesetzt oder aus einem Vorschlag uebernommen.
+model UmfrageOption {
+  id        String  @id @default(uuid())
+  umfrageId String  @map("umfrage_id")
+  umfrage   Umfrage @relation(fields: [umfrageId], references: [id], onDelete: Cascade)
+  strainId  String  @map("strain_id")
+  strain    Strain  @relation(fields: [strainId], references: [id], onDelete: Cascade)
+
+  /// Anzeigereihenfolge. Eindeutig je Runde, damit die Liste stabil steht.
+  reihenfolge Int
+
+  /// Werte nach OPTION_HERKUNFT in db/enums.ts. GESETZT ist nicht abstimmbar -
+  /// die Schreibschicht muss das pruefen, sonst liesse sich auf einen
+  /// gesetzten Platz abstimmen.
+  herkunft String
+
+  /// Wird beim Beenden gesetzt: alle GESETZTEN plus die `communityPlaetze`
+  /// stimmenstaerksten COMMUNITY-Optionen.
+  istGewinner Boolean @default(false) @map("ist_gewinner")
+
+  /// Die Bewertung, die aus diesem Platz entstanden ist.
+  ergebnisReviewId String? @map("ergebnis_review_id")
+  ergebnisReview   Review? @relation(fields: [ergebnisReviewId], references: [id], onDelete: SetNull)
+
+  erstelltAm DateTime @default(now()) @map("erstellt_am")
+
+  stimmen Stimme[]
+
+  @@unique([umfrageId, strainId])
+  @@unique([umfrageId, reihenfolge])
+  @@index([umfrageId, herkunft])
+  @@index([strainId])
+  @@index([ergebnisReviewId])
+  @@map("umfrage_optionen")
+}
+
+/// Die eine Stimme eines Mitglieds in einer Runde.
+model Stimme {
+  id        String  @id @default(uuid())
+  umfrageId String  @map("umfrage_id")
+  umfrage   Umfrage @relation(fields: [umfrageId], references: [id], onDelete: Cascade)
+
+  optionId String        @map("option_id")
+  option   UmfrageOption @relation(fields: [optionId], references: [id], onDelete: Cascade)
+
+  mitgliedId String   @map("mitglied_id")
+  mitglied   Mitglied @relation(fields: [mitgliedId], references: [id], onDelete: Cascade)
+
+  abgegebenAm DateTime @default(now()) @map("abgegeben_am")
+
+  /// DIE Absicherung gegen Doppelstimmen. Genau eine Stimme je Mitglied und
+  /// Runde - erzwungen von der Datenbank, nicht von einer Transaktion (die
+  /// es auf D1 nicht gibt) und nicht von einer Pruefung vor dem Schreiben.
+  @@unique([umfrageId, mitgliedId])
+  @@index([optionId])
+  @@map("stimmen")
 }

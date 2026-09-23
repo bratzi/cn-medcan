@@ -59,6 +59,36 @@ export const MITGLIED_ROLLEN = ["MITGLIED", "FACHKREIS", "ADMIN"] as const;
 export type MitgliedRolle = (typeof MITGLIED_ROLLEN)[number];
 
 /**
+ * Phasen einer Umfragerunde.
+ *
+ * VORSCHLAG   - Mitglieder schlagen Strains mit Begruendung vor.
+ * ABSTIMMUNG  - der Betreiber hat Vorschlaege als Kandidaten uebernommen,
+ *               jedes freigegebene Mitglied hat genau eine Stimme.
+ * BEENDET     - Gewinner stehen fest und werden mit den Reviews verknuepft.
+ *
+ * VORSCHLAG und ABSTIMMUNG gelten als aktiv; genau eine Umfrage darf zur
+ * selben Zeit aktiv sein (siehe `umfragen.aktiv` in prisma/schema.prisma).
+ */
+export const UMFRAGE_PHASEN = ["VORSCHLAG", "ABSTIMMUNG", "BEENDET"] as const;
+export type UmfragePhase = (typeof UMFRAGE_PHASEN)[number];
+
+/** Die Phasen, in denen eine Umfrage laeuft. Gegenstueck zu BEENDET. */
+export const UMFRAGE_PHASEN_AKTIV: readonly UmfragePhase[] = ["VORSCHLAG", "ABSTIMMUNG"];
+
+/**
+ * Woher ein Kandidat kommt.
+ *
+ * GESETZT   - Wahl des Betreibers. Steht von Anfang an fest, ist NICHT
+ *             abstimmbar und traegt in der Oberflaeche keinen Stimmenzaehler.
+ * COMMUNITY - aus einem uebernommenen Vorschlag. Darueber wird abgestimmt.
+ *
+ * Beides muss sichtbar unterschieden bleiben, sonst wirkt die Abstimmung
+ * manipuliert.
+ */
+export const OPTION_HERKUNFT = ["GESETZT", "COMMUNITY"] as const;
+export type OptionHerkunft = (typeof OPTION_HERKUNFT)[number];
+
+/**
  * Baut einen Type-Guard ueber einer Werteliste.
  *
  * Gebraucht wird er ueberall dort, wo ein Wert aus der Datenbank kommt: fuer
@@ -79,3 +109,5 @@ export const istRezeptStatus = istWert(REZEPT_STATUS);
 export const istBestandStatus = istWert(BESTAND_STATUS);
 export const istGeschmacksKategorie = istWert(GESCHMACKS_KATEGORIEN);
 export const istMitgliedRolle = istWert(MITGLIED_ROLLEN);
+export const istUmfragePhase = istWert(UMFRAGE_PHASEN);
+export const istOptionHerkunft = istWert(OPTION_HERKUNFT);

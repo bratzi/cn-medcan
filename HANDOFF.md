@@ -28,15 +28,112 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 
 ## ⇢ Hier geht es weiter
 
-**Block A (Cloudflare D1) ist abgeschlossen.** Von **Block B** sind **Schritt 1, 2 und 3** erledigt:
-Better Auth laeuft mit D1, Registrierung/Anmeldung/`/mitglied` stehen, und `/admin` gibt Mitglieder
-frei und vergibt Rollen.
+**Block A (Cloudflare D1) ist abgeschlossen.** Von **Block B** sind **Schritt 1 bis 4** erledigt:
+Anmeldung, `/mitglied`, `/admin` und das komplette Umfragemodell samt Schreibschicht.
 
-**Als naechstes: Block B, Schritt 4** — das Umfragemodell: `Umfrage`, `UmfrageVorschlag`,
-`UmfrageOption`, `Stimme` samt Migration, Triggern in `db/constraints.sql` und den Server Actions
-fuer Vorschlag und Stimme. Die Modelle und ihre Regeln stehen unten unter „Neue Modelle“.
+**Als naechstes: Block B, Schritt 5** — die Startseite umbauen: oben die aktuelle Umfrage als
+Kernelement (Phase, Kandidaten, Stimmenzahl, Restlaufzeit, Abstimm-Button oder Hinweis
+„Freigabe ausstehend“), daneben die neueste eigene Review mit Instagram-Reel; der Katalog rutscht
+darunter. Danach Schritt 6 (`/umfragen`, `/reviews`).
+
+**Alles, was die Oberflaeche dafuer braucht, steht bereit** und wartet nur auf Seiten:
+`lib/query/umfragen.ts` (Leseschicht), `app/umfragen/aktionen.ts` (Vorschlag, Stimme) und
+`app/admin/umfrage-aktionen.ts` (Runde anlegen, Vorschlag uebernehmen, Phase schalten, Ergebnis
+verknuepfen). **Die Server Actions sind noch durch keinen Klick gelaufen** — es gibt noch keine
+Oberflaeche dazu; das passiert in Schritt 5 und 6.
 
 Die drei alten offenen Punkte gelten unveraendert, siehe „Was noch offen ist“.
+Der Mailversand ist als **Block C** eingetaktet, nach Block B.
+
+---
+
+## Block B, Schritt 4 — erledigt: Umfragemodell und Schreibschicht
+
+| Datei | Inhalt |
+|---|---|
+| `prisma/schema.prisma` | Neu: `Umfrage`, `UmfrageVorschlag`, `UmfrageOption`, `Stimme`. Geaendert: `Review.autorId` ist Relation auf `Mitglied` (optional), neu `Review.istRedaktionell`. |
+| `migrations/0003_umfragen.sql` | Vier Tabellen, Umbau von `reviews`, dazu zwei `UPDATE` auf Bestandsdaten (siehe unten). |
+| `db/enums.ts` | `UMFRAGE_PHASEN`, `UMFRAGE_PHASEN_AKTIV`, `OPTION_HERKUNFT` plus Type-Guards. |
+| `db/constraints.sql` | Trigger fuer `umfragen`, `umfrage_optionen` und `stimmen`. |
+| `lib/umfrage-eingabe.ts` | Pruefregeln und `gewinnerErmitteln()` als **reine Funktionen**. |
+| `lib/query/umfragen.ts` | Leseschicht: `aktiveUmfrage()`, `umfrageLaden()`, `eigeneStimme()`, `vorschlaegeLaden()`. |
+| `lib/prisma-fehler.ts` | `istEindeutigkeitsfehler()` (P2002) — der Unique-Verstoss ist hier eine fachliche Antwort, kein Unfall. |
+| `app/umfragen/aktionen.ts` | `vorschlagEinreichen`, `stimmeAbgeben`. Beide hinter `freigabeErforderlich()`. |
+| `app/admin/umfrage-aktionen.ts` | `umfrageAnlegen`, `gesetztenPlatzVergeben`, `vorschlagUebernehmen`, `phaseWeiterschalten`, `ergebnisVerknuepfen`. Alle hinter `adminErforderlich()`. |
+| `prisma/seed.ts` | Die fiktiven Autoren-Ids sind raus, die Seed-Bewertungen sind `istRedaktionell` ohne Autor. |
+
+### Entscheidungen, damit sie niemand zurueckdreht
+
+1. **„Genau eine aktive Umfrage“ haengt an der Spalte `umfragen.aktiv`, nicht an einer Pruefung.**
+   Eine laufende Runde traegt dort die Konstante `'AKTIV'`, eine beendete `NULL`. SQLite laesst
+   beliebig viele `NULL` in einer Unique-Spalte zu, aber nur ein `'AKTIV'`. Dass Wert und Phase
+   zusammenpassen, erzwingt ein Trigger. **Nicht** durch „erst nachsehen, ob eine laeuft“ ersetzen —
+   D1 hat keine Transaktionen, das waere eine Race Condition.
+2. **Eine Stimme je Mitglied und Runde steht im Unique-Index `(umfrage_id, mitglied_id)`.** Die
+   Server Action faengt P2002 ab und macht daraus einen lesbaren Satz — sie prueft nicht vorher.
+3. **Auf `GESETZT` kann nicht abgestimmt werden**, und eine Stimme muss zur selben Runde gehoeren.
+   Beides steht doppelt: als Trigger (damit eine vergessene Pruefung nicht still danebengeht) und
+   in der Server Action (damit die Meldung verstaendlich ist).
+4. **`stimmen` ist bei gesetzten Plaetzen `null`, nicht `0`.** `null` heisst „steht nicht zur
+   Wahl“, `0` hiesse „niemand wollte sie“. Ohne diesen Unterschied wirkt die Abstimmung
+   manipuliert.
+5. **Phasen laufen nur vorwaerts.** Ein Rueckschritt aus `ABSTIMMUNG` stellte abgegebene Stimmen in
+   einen Zustand, den es fachlich nicht gibt; ein Wiederoeffnen machte ein Ergebnis nachtraeglich
+   verschiebbar. Wer wiederholen will, legt eine neue Runde an.
+6. **Gleichstand am Schnitt entscheidet die kleinere `reihenfolge`** (die fruehere Aufnahme in die
+   Runde). Das ist eine gesetzte Regel, keine fachliche Wahrheit — sie muss nur deterministisch
+   sein, sonst haengt das Ergebnis an der Sortierung der Datenbank.
+7. **Eine Option ohne eine einzige Stimme gewinnt keinen freien Platz.** Sie zur Gewinnerin zu
+   erklaeren, weil niemand sonst kandidierte, waere eine Behauptung. Gesetzte Plaetze gewinnen
+   dagegen immer — sie standen nie zur Wahl.
+8. **`Review.autorId` ist optional und `SetNull`.** Eine Bewertung des Betreibers braucht kein
+   Mitglied dahinter, und ein geloeschtes Mitglied nimmt seine Bewertung nicht mit. Wer schreiben
+   darf, entscheidet die Schreibschicht, nicht die Spalte.
+9. **Beim Beenden werden erst die Gewinner markiert, dann die Runde geschlossen.** Ohne
+   Transaktion ist die Reihenfolge die einzige Sicherung: bricht es dazwischen ab, steht eine
+   laufende Runde mit markierten Gewinnern da — sichtbar und nachbesserbar. Andersherum stuende
+   eine beendete Runde ohne Ergebnis, und nachtragen ginge nicht, weil Phasen nur vorwaerts laufen.
+
+### Was beim Umsetzen anders kam als geplant
+
+1. **Der `cp`-Befehl aus `db/README.md` funktionierte nicht mehr.** Im Ordner
+   `.wrangler/state/v3/d1/miniflare-D1DatabaseObject/` liegt inzwischen auch `metadata.sqlite`;
+   der Glob `*.sqlite` trifft zwei Dateien und `cp` bricht mit „target is not a directory“ ab.
+   **`db/README.md` ist korrigiert** (`| grep -v metadata`).
+2. **Die Migration enthaelt ein `DROP TABLE "reviews"` — das ist in Ordnung.** Es ist der normale
+   SQLite-Tabellenumbau (neu anlegen, Zeilen kopieren, umbenennen), weil SQLite Spalten und
+   Fremdschluessel nicht nachtraeglich aendern kann. Nicht mit der `d1_migrations`-Falle
+   verwechseln. Die Zeilen werden mitkopiert — 6 Bewertungen vorher, 6 nachher.
+3. **Der Umbau laeuft mit `foreign_keys=OFF`** und haette die erfundenen Autoren-Ids aus dem Seed
+   stehen lassen: Zeilen, die gegen ihren eigenen Fremdschluessel verstossen und erst beim
+   naechsten Schreibzugriff auffallen. Deshalb stehen in `0003` zwei `UPDATE` auf Bestandsdaten —
+   entgegen der Regel aus `0002`, und mit Begruendung im Migrationskopf.
+
+### Verifiziert (gegen die lokale D1)
+
+- `npx prisma validate`, `npm run typecheck`, `npx eslint .` und `npm run build` gruen.
+- Migration angewendet (32 Befehle), `db/constraints.sql` danach erneut ausgefuehrt.
+- Bestandsdaten: 6 Bewertungen vorher und nachher, alle `ist_redaktionell = 1`, alle Autoren-Ids
+  geleert. `npm run db:seed` erneut durchgelaufen — weiterhin 6, keine Duplikate.
+- **Trigger, 16 Faelle gegen die echte Datenbank, alle korrekt:** laufende Umfrage ohne `AKTIV`
+  abgewiesen, unbekannte Phase abgewiesen, beendete Umfrage mit `AKTIV` abgewiesen, leerer Titel
+  abgewiesen, **zweite aktive Umfrage vom Unique-Index abgewiesen**, beendete Umfrage daneben
+  erlaubt, unbekannte Herkunft abgewiesen, **Stimme auf einen gesetzten Platz abgewiesen**,
+  Stimme auf eine Option fremder Runde abgewiesen, Stimme ausserhalb der Abstimmungsphase
+  abgewiesen, gueltige Stimme durchgelassen, **zweite Stimme desselben Mitglieds vom
+  Unique-Index abgewiesen**.
+- **Reine Funktionen: 30 Faelle, alle bestanden** — Trimmen, Laengengrenzen, alle Phasenwechsel
+  (auch rueckwaerts und uebersprungen), `communityPlaetze` als „2x“/„2.5“/0/11, und die
+  Gewinnerermittlung inklusive Gleichstand, Null-Stimmen und „weniger Kandidaten als Plaetze“.
+- Testdaten wieder geloescht.
+
+### Noch nicht verifiziert
+
+**Die Server Actions sind durch keinen echten Aufruf gelaufen.** Es gibt noch keine Oberflaeche,
+die sie ausloest, und ein Server-Action-Aufruf laesst sich von Hand nicht sinnvoll nachbauen
+(siehe Schritt 2). Belegt sind ihre Entscheidungslogik (reine Funktionen) und die Regeln der
+Datenbank (Trigger, Unique-Indizes) — nicht die Verdrahtung dazwischen. **Das ist beim Bauen der
+Seiten in Schritt 5 und 6 als Erstes zu pruefen.**
 
 ---
 
@@ -344,6 +441,27 @@ Pooler-URLs). Die Datenbank ist **Cloudflare D1** als Binding `DB`. Was dabei en
 
 ---
 
+## Block C — Mailversand (vom Nutzer beauftragt, nach Block B)
+
+Eingetaktet am 2026-09-23. **Erst nach Block B**, weil es den Produktkern nicht beruehrt.
+Heute verschickt das Projekt **keine** E-Mail: es gibt keinen Mailversand-Dienst, kein
+Kontaktformular, und die E-Mail-Bestaetigung in Better Auth ist bewusst aus (die Verifizierung
+ist die manuelle Freigabe). Es gibt also auch keine „normale Routine“, die man testen koennte —
+die entsteht erst hier.
+
+1. **Mailversand einbauen.** Kandidat: Cloudflare Email Sending (Skill
+   `cloudflare:cloudflare-email-service`), passend zum Worker-Stack und ohne zweiten Anbieter.
+   Absenderdomain und DNS sind Voraussetzung. Zugangsdaten als Worker-Secret, nie in
+   `wrangler.jsonc` (siehe `edge-stack-master`, §7).
+2. **Benachrichtigung an den Betreiber, wenn sich jemand registriert** und auf Freigabe wartet —
+   Ziel ist die Betreiber-Adresse, Ausloeser der `user.create.after`-Hook in `lib/auth.ts`, der
+   heute schon den `mitglied`-Satz anlegt. **Der Versand darf die Registrierung nicht scheitern
+   lassen**, gleiche Begruendung wie beim Instagram-Nachtrag in Schritt 2: das Konto ist wichtiger
+   als die Benachrichtigung.
+3. Danach ist eine Testmail „so wie sie beim Nutzer ankommt“ ueber die echte Routine moeglich.
+
+---
+
 ## Block B — Mitglieder, Umfragen, Reviews (Entwurf, vom Nutzer bestätigt)
 
 ### Die vier Entscheidungen des Nutzers
@@ -416,7 +534,7 @@ braucht eine kleingeschriebene Suchspalte.
 1. ~~Better Auth mit D1 einrichten, Schema erweitern, Migration.~~ **erledigt**
 2. ~~Registrierung, Anmeldung, `/mitglied`.~~ **erledigt**
 3. ~~`/admin` mit Freigabe von Mitgliedern.~~ **erledigt**
-4. Umfragemodell, Server Actions für Vorschlag und Stimme, Umfragephasen.
+4. ~~Umfragemodell, Server Actions für Vorschlag und Stimme, Umfragephasen.~~ **erledigt**
 5. Startseite umbauen: Umfrage und neueste Review als Kern.
 6. `/umfragen`, `/reviews`.
 7. `FACHKREIS_PASSWORD` und das zweite Gate-Passwort ausbauen, Preisanzeige an die Mitgliedsrolle

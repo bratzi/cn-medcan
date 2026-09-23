@@ -229,3 +229,94 @@ begin
   select case when NEW.rolle not in ('MITGLIED','FACHKREIS','ADMIN') then raise(abort, 'mitglied.rolle: unbekannter Wert') end;
   select case when length(trim(NEW.anzeigename)) = 0 then raise(abort, 'mitglied.anzeigename leer') end;
 end;
+
+
+-- ---------------------------------------------------------------------------
+--  umfragen
+-- ---------------------------------------------------------------------------
+-- Werte muessen mit UMFRAGE_PHASEN in db/enums.ts uebereinstimmen.
+--
+-- Zusaetzlich haelt der zweite Test die Spalte `aktiv` und die Phase
+-- zusammen: `aktiv` traegt 'AKTIV', solange die Runde laeuft, und NULL,
+-- sobald sie beendet ist. Der Unique-Index auf `aktiv` laesst beliebig viele
+-- NULL zu, aber nur ein einziges 'AKTIV' - daraus folgt "genau eine aktive
+-- Umfrage". Ohne diesen Trigger koennte eine beendete Runde 'AKTIV' behalten
+-- und damit jede neue Runde blockieren; eine laufende mit NULL wuerde die
+-- Sperre umgehen. Die Regel gehoert in die Datenbank, weil D1 keine
+-- Transaktionen hat und die Schreibschicht sie nicht atomar halten kann.
+drop trigger if exists umfragen_insert_chk;
+create trigger umfragen_insert_chk
+before insert on umfragen
+for each row
+begin
+  select case when NEW.phase not in ('VORSCHLAG','ABSTIMMUNG','BEENDET') then raise(abort, 'umfragen.phase: unbekannter Wert') end;
+  select case when NEW.phase = 'BEENDET' and NEW.aktiv is not null then raise(abort, 'umfragen.aktiv: beendete Umfrage muss NULL tragen') end;
+  select case when NEW.phase <> 'BEENDET' and NEW.aktiv is not 'AKTIV' then raise(abort, 'umfragen.aktiv: laufende Umfrage muss AKTIV tragen') end;
+  select case when length(trim(NEW.titel)) = 0 then raise(abort, 'umfragen.titel leer') end;
+  select case when NEW.community_plaetze < 1 then raise(abort, 'umfragen.community_plaetze: mindestens 1') end;
+end;
+
+drop trigger if exists umfragen_update_chk;
+create trigger umfragen_update_chk
+before update on umfragen
+for each row
+begin
+  select case when NEW.phase not in ('VORSCHLAG','ABSTIMMUNG','BEENDET') then raise(abort, 'umfragen.phase: unbekannter Wert') end;
+  select case when NEW.phase = 'BEENDET' and NEW.aktiv is not null then raise(abort, 'umfragen.aktiv: beendete Umfrage muss NULL tragen') end;
+  select case when NEW.phase <> 'BEENDET' and NEW.aktiv is not 'AKTIV' then raise(abort, 'umfragen.aktiv: laufende Umfrage muss AKTIV tragen') end;
+  select case when length(trim(NEW.titel)) = 0 then raise(abort, 'umfragen.titel leer') end;
+  select case when NEW.community_plaetze < 1 then raise(abort, 'umfragen.community_plaetze: mindestens 1') end;
+end;
+
+-- ---------------------------------------------------------------------------
+--  umfrage_optionen
+-- ---------------------------------------------------------------------------
+-- Werte muessen mit OPTION_HERKUNFT in db/enums.ts uebereinstimmen.
+drop trigger if exists umfrage_optionen_insert_chk;
+create trigger umfrage_optionen_insert_chk
+before insert on umfrage_optionen
+for each row
+begin
+  select case when NEW.herkunft not in ('GESETZT','COMMUNITY') then raise(abort, 'umfrage_optionen.herkunft: unbekannter Wert') end;
+end;
+
+drop trigger if exists umfrage_optionen_update_chk;
+create trigger umfrage_optionen_update_chk
+before update on umfrage_optionen
+for each row
+begin
+  select case when NEW.herkunft not in ('GESETZT','COMMUNITY') then raise(abort, 'umfrage_optionen.herkunft: unbekannter Wert') end;
+end;
+
+-- ---------------------------------------------------------------------------
+--  stimmen
+-- ---------------------------------------------------------------------------
+-- Auf einen GESETZTEN Platz darf nicht abgestimmt werden: er ist die Wahl des
+-- Betreibers und traegt keinen Stimmenzaehler. Und eine Stimme muss zu einer
+-- Option DERSELBEN Umfrage gehoeren - sonst liesse sich ueber die
+-- Unique-Sperre (umfrage_id, mitglied_id) hinweg in einer fremden Runde
+-- mitstimmen. Die Schreibschicht prueft das ebenfalls; hier steht es, weil
+-- eine vergessene Pruefung sonst still danebengeht.
+drop trigger if exists stimmen_insert_chk;
+create trigger stimmen_insert_chk
+before insert on stimmen
+for each row
+begin
+  select case when (select herkunft from umfrage_optionen where id = NEW.option_id) <> 'COMMUNITY'
+    then raise(abort, 'stimmen: nur COMMUNITY-Optionen sind abstimmbar') end;
+  select case when (select umfrage_id from umfrage_optionen where id = NEW.option_id) <> NEW.umfrage_id
+    then raise(abort, 'stimmen: Option gehoert zu einer anderen Umfrage') end;
+  select case when (select phase from umfragen where id = NEW.umfrage_id) <> 'ABSTIMMUNG'
+    then raise(abort, 'stimmen: Umfrage ist nicht in der Abstimmungsphase') end;
+end;
+
+drop trigger if exists stimmen_update_chk;
+create trigger stimmen_update_chk
+before update on stimmen
+for each row
+begin
+  select case when (select herkunft from umfrage_optionen where id = NEW.option_id) <> 'COMMUNITY'
+    then raise(abort, 'stimmen: nur COMMUNITY-Optionen sind abstimmbar') end;
+  select case when (select umfrage_id from umfrage_optionen where id = NEW.option_id) <> NEW.umfrage_id
+    then raise(abort, 'stimmen: Option gehoert zu einer anderen Umfrage') end;
+end;

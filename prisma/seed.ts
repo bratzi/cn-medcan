@@ -531,17 +531,19 @@ const chargenDaten = [
 // ---------------------------------------------------------------------------
 
 /**
- * ACHTUNG: Diese Autor-UUIDs sind feste Platzhalter und zeigen auf KEINEN
- * existierenden Nutzer. Fachlich referenziert `reviews.autor_id` die Tabelle
- * `auth.users` in Supabase (im Prisma-Schema bewusst ohne Relation, weil
- * `auth` ein fremdes Schema ist). Sobald echte Supabase-Auth-Nutzer angelegt
- * sind, muessen diese IDs durch deren echte UUIDs ersetzt werden - sonst
- * greifen die RLS-Policies auf `reviews` (autor_id = auth.uid()) fuer
- * niemanden, und die Seed-Bewertungen haben keinen Besitzer.
+ * Die Seed-Bewertungen haben KEINEN Autor (`autorId: null`) und sind als
+ * `istRedaktionell` markiert.
+ *
+ * Grund: `reviews.autor_id` ist seit Migration 0003 ein Fremdschluessel auf
+ * `mitglied`. Erfundene UUIDs waeren damit Zeilen, die gegen ihren eigenen
+ * Fremdschluessel verstossen und erst beim naechsten Schreibzugriff
+ * auffallen. Die Spalte ist bewusst optional: eine Bewertung des Betreibers
+ * braucht kein Mitglied dahinter, und ein geloeschtes Mitglied nimmt seine
+ * Bewertung nicht mit.
+ *
+ * Die frueheren Supabase-RLS-Policies auf `autor_id = auth.uid()` gibt es
+ * nicht mehr - D1 kennt kein RLS, die Sichtbarkeit liegt in lib/query/.
  */
-const AUTOR_FIKTIV_1 = "00000000-0000-4000-8000-000000000001";
-const AUTOR_FIKTIV_2 = "00000000-0000-4000-8000-000000000002";
-const AUTOR_FIKTIV_3 = "00000000-0000-4000-8000-000000000003";
 
 /** Alle acht Achsen der Geschmacks-Matrix, Intensitaet jeweils 0-5. */
 type GeschmacksMatrix = {
@@ -558,7 +560,6 @@ type GeschmacksMatrix = {
 type ReviewSeed = {
   strain: string;
   chargenNr: string;
-  autorId: string;
   aussehen: number;
   geruch: number;
   geschmack: number;
@@ -575,7 +576,6 @@ const reviewDaten: ReviewSeed[] = [
   {
     strain: "nebelharz-22",
     chargenNr: "CH-FIKTIV-2401",
-    autorId: AUTOR_FIKTIV_1,
     aussehen: 5,
     geruch: 5,
     geschmack: 4,
@@ -590,7 +590,6 @@ const reviewDaten: ReviewSeed[] = [
   {
     strain: "zitronensegel-18",
     chargenNr: "CH-FIKTIV-2402",
-    autorId: AUTOR_FIKTIV_2,
     aussehen: 4,
     geruch: 5,
     geschmack: 5,
@@ -605,7 +604,6 @@ const reviewDaten: ReviewSeed[] = [
   {
     strain: "treibstoff-nord-27",
     chargenNr: "CH-FIKTIV-2403",
-    autorId: AUTOR_FIKTIV_1,
     aussehen: 5,
     geruch: 4,
     geschmack: 3,
@@ -620,7 +618,6 @@ const reviewDaten: ReviewSeed[] = [
   {
     strain: "stillwasser-cbd-12",
     chargenNr: "CH-FIKTIV-2405",
-    autorId: AUTOR_FIKTIV_3,
     aussehen: 3,
     geruch: 3,
     geschmack: 3,
@@ -635,7 +632,6 @@ const reviewDaten: ReviewSeed[] = [
   {
     strain: "lavendelgrund-9",
     chargenNr: "CH-FIKTIV-2404",
-    autorId: AUTOR_FIKTIV_2,
     aussehen: 4,
     geruch: 4,
     geschmack: 4,
@@ -650,7 +646,6 @@ const reviewDaten: ReviewSeed[] = [
   {
     strain: "honigwind-20",
     chargenNr: "CH-FIKTIV-2406",
-    autorId: AUTOR_FIKTIV_3,
     aussehen: 4,
     geruch: 5,
     geschmack: 5,
@@ -854,7 +849,8 @@ async function main() {
     const werte = {
       strainId,
       chargeId,
-      autorId: r.autorId,
+      autorId: null,
+      istRedaktionell: true,
       aussehen: r.aussehen,
       geruch: r.geruch,
       geschmack: r.geschmack,
@@ -869,7 +865,9 @@ async function main() {
       freigegeben: r.freigegeben,
     };
     const vorhanden = await prisma.review.findFirst({
-      where: { chargeId, autorId: r.autorId },
+      // Je Charge genau eine redaktionelle Bewertung - das ist der
+      // Idempotenz-Schluessel, seit der Autor nicht mehr mitspielt.
+      where: { chargeId, istRedaktionell: true },
       select: { id: true },
     });
     if (vorhanden) {

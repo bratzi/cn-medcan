@@ -40,7 +40,11 @@ Verbindung zur Zieldatenbank voraus, und die hat D1 nicht. Stattdessen:
 # 2. Stand der lokalen Datenbank als Diff-Quelle bereitstellen.
 #    Prisma 7 kann nur gegen die Datasource aus prisma.config.ts diffen -
 #    genau dieser Pfad ist db/.migrate-diff.sqlite.
-cp .wrangler/state/v3/d1/miniflare-D1DatabaseObject/*.sqlite db/.migrate-diff.sqlite
+#    ACHTUNG: In dem Ordner liegt inzwischen auch metadata.sqlite. Ein
+#    Glob ueber *.sqlite trifft beide und `cp` bricht mit
+#    "target is not a directory" ab. Deshalb die Datei mit dem langen
+#    Hash-Namen gezielt nehmen:
+cp "$(ls .wrangler/state/v3/d1/miniflare-D1DatabaseObject/*.sqlite | grep -v metadata)" db/.migrate-diff.sqlite
 
 # 3. SQL erzeugen
 npx prisma migrate diff \n  --from-config-datasource \n  --to-schema prisma/schema.prisma \n  --script > migrations/000X_<name>.sql
