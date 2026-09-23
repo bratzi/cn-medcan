@@ -8,9 +8,9 @@ Passwort, kein zusaetzliches Konto. Das Binding heisst `DB` und steht in
 
 | Datei | Zweck |
 |---|---|
-| `enums.ts` | Die sieben geschlossenen Wertelisten als TS-Unions. SQLite kennt keine Enums. |
+| `enums.ts` | Die geschlossenen Wertelisten als TS-Unions. SQLite kennt keine Enums. |
 | `constraints.sql` | Wertepruefungen als Trigger. Muss nach **jeder** Migration erneut laufen. |
-| `.migrate-diff.sqlite` | Wird nie angelegt — nur der Pfad, den `prisma migrate diff` als Datasource braucht. |
+| `.migrate-diff.sqlite` | Arbeitskopie der lokalen D1-Datei, nur fuer `prisma migrate diff`. Wird angelegt und danach wieder geloescht, gehoert nicht ins Repo. |
 
 Die Migrationen liegen in `migrations/` im Projektstamm, weil `wrangler` sie
 dort erwartet (`migrations_dir` in `wrangler.jsonc`).
@@ -37,27 +37,40 @@ Verbindung zur Zieldatenbank voraus, und die hat D1 nicht. Stattdessen:
 ```bash
 # 1. Schema aendern (prisma/schema.prisma)
 
-# 2. SQL erzeugen: Diff vom Stand der bisherigen Migrationen zum neuen Schema
-npx prisma migrate diff \
-  --from-migrations migrations \
-  --to-schema prisma/schema.prisma \
-  --script > migrations/000X_<name>.sql
+# 2. Stand der lokalen Datenbank als Diff-Quelle bereitstellen.
+#    Prisma 7 kann nur gegen die Datasource aus prisma.config.ts diffen -
+#    genau dieser Pfad ist db/.migrate-diff.sqlite.
+cp .wrangler/state/v3/d1/miniflare-D1DatabaseObject/*.sqlite db/.migrate-diff.sqlite
 
-# 3. Anwenden
+# 3. SQL erzeugen
+npx prisma migrate diff \n  --from-config-datasource \n  --to-schema prisma/schema.prisma \n  --script > migrations/000X_<name>.sql
+rm db/.migrate-diff.sqlite
+
+# 4. ERGEBNIS LESEN, bevor es laeuft - siehe Falle 3.
+
+# 5. Anwenden
 npm run db:migrate:local
 npm run db:constraints:local     # Trigger neu setzen, siehe unten
 ```
 
-Die allererste Migration entstand mit `--from-empty` statt `--from-migrations`.
-
-**Zwei Fallen, beide schon erlebt:**
+**Drei Fallen, alle schon erlebt:**
 
 1. `prisma migrate diff` bricht **still** ab, wenn `prisma.config.ts` keine
    `datasource` hat: Exit-Code 0, leere Ausgabe, keine Fehlermeldung. Die
    Schema-Engine verlangt das Argument auch fuer einen Diff aus dem Nichts.
-   Deshalb steht dort ein lokaler Dateipfad, in den nie geschrieben wird.
-2. Die Flags heissen seit Prisma 7 `--from-schema` / `--to-schema`.
-   `--to-schema-datamodel` und `--from-local-d1` gibt es nicht mehr.
+2. Die Flags heissen seit Prisma 7 `--from-schema` / `--to-schema`,
+   `--from-config-datasource`. Weg sind `--to-schema-datamodel`,
+   `--from-local-d1` und `--from-url`.
+   `--from-migrations` **hilft hier nicht**: der Ordner `migrations/` gehoert
+   wrangler und hat flache `.sql`-Dateien, Prisma erwartet seine eigene
+   Struktur mit `migration_lock.toml` und bricht mit „Could not determine the
+   connector" ab.
+3. Der Diff kennt die wrangler-eigene Tabelle `d1_migrations` nicht und kann
+   deshalb ein `DROP TABLE d1_migrations` erzeugen. Bei Migration `0002` tat
+   er es nicht - trotzdem **jedes Mal nachsehen** und so eine Zeile loeschen,
+   sonst vergisst wrangler, was bereits angewendet wurde.
+
+Die allererste Migration entstand mit `--from-empty` statt `--from-migrations`.
 
 ## Warum die Pruefungen Trigger sind und keine `check`-Constraints
 

@@ -28,11 +28,75 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 
 ## ⇢ Hier geht es weiter
 
-**Block A (Umstellung auf Cloudflare D1) ist abgeschlossen**, ebenso die letzte fehlende Seite
-`app/produkte/[slug]/page.tsx`. Als nächstes steht **Block B** an: Mitglieder, Umfragen und
-Reviews als Produktkern. Der Entwurf dazu steht unten und ist unverändert gültig.
+**Block A (Cloudflare D1) ist abgeschlossen.** Von **Block B** ist **Schritt 1 erledigt**:
+Better Auth laeuft mit D1, Schema und Migration stehen, die Anmeldung ist gegen den laufenden
+Server geprueft.
 
-Vorher zwei kleine offene Punkte, siehe „Was noch offen ist".
+**Als naechstes: Block B, Schritt 2** — Registrierung, Anmeldung und `/mitglied` als Oberflaeche.
+Der Server-Teil dafuer ist fertig und wartet nur auf Seiten:
+`signUp`/`signIn`/`signOut` aus `lib/auth-client.ts`, Leserechte aus `lib/session.ts`.
+Danach Schritt 3 (`/admin` mit Mitglieder-Freigabe), dann das Umfragemodell.
+
+Die zwei alten offenen Punkte gelten unveraendert, siehe „Was noch offen ist".
+
+---
+
+## Block B, Schritt 1 — erledigt: Better Auth mit D1
+
+Better Auth `1.7.5` laeuft ueber den **Prisma-Adapter**, nicht ueber Drizzle oder Kysely und
+nicht ueber einen D1-Adapter. Gruende, damit das niemand „aufraeumt":
+
+- Die Datenbank laeuft in diesem Projekt ohnehin ueber Prisma. Ein zweites ORM haette einen
+  zweiten Migrationspfad bedeutet.
+- Das `better-auth`-Skill verspricht fuer v1.5+ eine native D1-Unterstuetzung („`database: env.DB`").
+  In `better-auth@1.7.5` gibt es dazu **keine Spur** — kein `D1Database` in den Typen, kein
+  D1-Adapter. Die Angabe im Skill ist fuer diese Version falsch.
+- `transaction: false` ist Pflicht: D1 hat keine echten Transaktionen. Mit `true` wuerde Better
+  Auth eine Garantie annehmen, die die Datenbank nicht gibt.
+
+| Datei | Inhalt |
+|---|---|
+| `lib/auth.ts` | `getAuth()` — Instanz pro Isolate, gecacht am Prisma-Client. Kein Modul-Singleton: das D1-Binding gibt es erst im Request. Enthaelt den `user.create.after`-Hook, der den `mitglied`-Satz anlegt. |
+| `lib/session.ts` | Die Zugriffsschicht (DAL). `aktuellesMitglied()` mit React-`cache()`, dazu `istFreigegeben()`, `istAdmin()` und die drei werfenden Gates fuer Server Actions. **Ueber Rechte entscheidet ausschliesslich diese Datei.** |
+| `lib/auth-client.ts` | Browser-Client, nur Bedienoberflaeche. |
+| `app/api/auth/[...all]/route.ts` | Alle Auth-Endpunkte. Kein `toNextJsHandler` — der braucht eine Instanz auf Modulebene, die es hier nicht geben kann. |
+| `prisma/schema.prisma` | `User`, `Session`, `Account`, `Verification` (Feldnamen von Better Auth vorgegeben, camelCase ohne `@map` — abgeglichen mit `getAuthTables()`), plus eigenes Modell `Mitglied` mit `1:1`. |
+| `migrations/0002_better_auth_mitglied.sql` | Fuenf Tabellen, nur `CREATE`, keine Aenderung an Bestandsdaten. |
+| `db/enums.ts`, `db/constraints.sql` | `MITGLIED_ROLLEN` (`MITGLIED`/`FACHKREIS`/`ADMIN`) plus Trigger auf `mitglied`. |
+
+E-Mail-Bestaetigung ist **bewusst aus**: es gibt keinen Mailversand-Dienst, und die Verifizierung
+ist ohnehin die manuelle Freigabe durch den Betreiber (`mitglied.freigegeben`, Default `false`).
+
+### Was beim Umsetzen anders kam als geplant
+
+1. **`prisma migrate diff --from-migrations` funktioniert hier nicht.** Der Ordner `migrations/`
+   gehoert wrangler (flache `.sql`-Dateien), Prisma erwartet seine eigene Struktur mit
+   `migration_lock.toml` und bricht mit „Could not determine the connector" ab.
+   **Und `--from-url` gibt es in Prisma 7 nicht mehr.** Der Weg, der funktioniert:
+   die lokale D1-Datei aus `.wrangler/state/v3/d1/miniflare-D1DatabaseObject/*.sqlite` nach
+   `db/.migrate-diff.sqlite` kopieren (genau der Pfad aus `prisma.config.ts`), dann
+   `npx prisma migrate diff --from-config-datasource --to-schema prisma/schema.prisma --script`,
+   danach die Kopie loeschen. Das Ergebnis pruefen: der Diff kennt `d1_migrations` nicht und
+   koennte ein `DROP` erzeugen — in `0002` tat er es nicht, in der naechsten Migration erneut
+   nachsehen. **`db/README.md` ist entsprechend korrigiert.**
+2. **`server-only` war nicht installiert.** Next.js bringt es nicht mit; ohne das Paket ist der
+   Import in `lib/session.ts` nur ein Laufzeitfehler-Risiko. Nachinstalliert.
+
+### Verifiziert (gegen `next dev` mit echtem D1-Binding)
+
+- Registrierung ueber `/api/auth/sign-up/email` gibt 200 und setzt `better-auth.session_token`.
+- `/api/auth/get-session` liefert Sitzung und Nutzer; Anmeldung mit richtigem Passwort 200,
+  mit falschem **401**.
+- Der `user.create.after`-Hook legt den `mitglied`-Satz an: `freigegeben = 0`, `rolle = MITGLIED`.
+- Der neue Trigger weist `rolle = 'SUPERADMIN'` ab (`SQLITE_CONSTRAINT_TRIGGER`), der Wert bleibt
+  unveraendert.
+- `delete from user` raeumt den Mitgliedssatz per Cascade mit ab.
+- Testnutzer wieder geloescht, die Datenbank ist sauber.
+
+**Zwei Stolpersteine fuer den naechsten Test von Hand:** die Auth-Route liegt hinter dem
+Entwicklungs-Passwort aus `proxy.ts` (erst `cn_gate`-Cookie holen), und Better Auth weist
+Anfragen ohne `Origin`-Header mit 403 `MISSING_OR_NULL_ORIGIN` ab. Im Browser faellt beides
+nicht auf, mit `curl` sofort.
 
 ---
 
@@ -118,6 +182,9 @@ Pooler-URLs). Die Datenbank ist **Cloudflare D1** als Binding `DB`. Was dabei en
    npm run db:constraints:remote
    ```
 2. **Windows-Entwicklermodus aktivieren**, damit `cf-build`, `preview` und `deploy` laufen.
+3. **`BETTER_AUTH_SECRET` fuer den Worker setzen**: `npx wrangler secret put BETTER_AUTH_SECRET`.
+   Lokal steht der Wert in `.env.local`, die Vorlage in `.env.local.example`. In Produktion
+   zusaetzlich `BETTER_AUTH_URL` auf den echten Host setzen.
 
 ---
 
@@ -190,7 +257,7 @@ braucht eine kleingeschriebene Suchspalte.
   die Rolle** — nie im Client entscheiden.
 
 ### Reihenfolge für Block B
-1. Better Auth mit D1-Adapter einrichten, Schema erweitern, Migration.
+1. ~~Better Auth mit D1 einrichten, Schema erweitern, Migration.~~ **erledigt**
 2. Registrierung, Anmeldung, `/mitglied`.
 3. `/admin` mit Freigabe von Mitgliedern.
 4. Umfragemodell, Server Actions für Vorschlag und Stimme, Umfragephasen.

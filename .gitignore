@@ -56,3 +56,6 @@ cloudflare-env.d.ts
 !.dev.vars.example
 # generierter Prisma-Client
 /lib/generated/
+
+# Arbeitskopie fuer `prisma migrate diff` (siehe db/README.md)
+db/.migrate-diff.sqlite

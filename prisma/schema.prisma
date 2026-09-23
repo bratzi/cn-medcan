@@ -242,3 +242,113 @@ model Review {
   @@index([autorId])
   @@map("reviews")
 }
+
+// ---------------------------------------------------------------------------
+//  Mitglieder und Anmeldung (Better Auth)
+// ---------------------------------------------------------------------------
+//
+// Die vier Tabellen `user`, `session`, `account` und `verification` gehoeren
+// Better Auth. Ihre Feldnamen sind VORGEGEBEN und stehen bewusst in
+// camelCase ohne @map - Better Auth spricht die Spalten genau so an. Wer hier
+// umbenennt, bricht die Anmeldung, ohne dass ein Typfehler darauf hinweist.
+// Abgeglichen mit getAuthTables() aus better-auth@1.7.5.
+//
+// Eigene Felder stehen deshalb NICHT in `user`, sondern in `mitglied` mit 1:1
+// darauf - so fasst ein Better-Auth-Update unsere Spalten nicht an.
+//
+// Zugriff laeuft ueber den Prisma-Adapter mit `transaction: false`: D1 hat
+// keine Transaktionen, siehe db/README.md.
+
+model User {
+  id            String    @id
+  name          String
+  email         String    @unique
+  emailVerified Boolean   @default(false)
+  image         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  sessions Session[]
+  accounts Account[]
+  mitglied Mitglied?
+
+  @@map("user")
+}
+
+model Session {
+  id        String   @id
+  expiresAt DateTime
+  token     String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("session")
+}
+
+model Account {
+  id                    String    @id
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  /// Passwort-Hash (scrypt). Steht bei Better Auth im Konto, nicht am Nutzer.
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@index([userId])
+  @@map("account")
+}
+
+model Verification {
+  id         String   @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([identifier])
+  @@map("verification")
+}
+
+/// Die fachliche Seite eines Nutzers: alles, was dieses Projekt braucht und
+/// Better Auth nicht kennt.
+model Mitglied {
+  id     String @id @default(uuid())
+  userId String @unique @map("user_id")
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  anzeigename     String
+  instagramHandle String? @map("instagram_handle")
+
+  /// Manuelle Verifizierung durch den Betreiber. Erst damit besteht
+  /// Stimmrecht in Umfragen und Sicht auf Preise. Registrierung ist offen -
+  /// die Freigabe ist der Filter, nicht die Anmeldung.
+  freigegeben    Boolean   @default(false)
+  freigegebenAm  DateTime? @map("freigegeben_am")
+  /// Mitglied-Id des Betreibers, der freigegeben hat. Absichtlich ohne
+  /// Relation: eine Selbstrelation waere hier nur Ballast, die Spur reicht.
+  freigegebenVon String?   @map("freigegeben_von")
+
+  /// Werte nach MITGLIED_ROLLEN in db/enums.ts, geprueft in
+  /// db/constraints.sql. `fachkreis` bleibt erhalten, damit die strengere
+  /// Preis-Sichtbarkeit nach §10 HWG ohne Schemaaenderung nachziehbar ist.
+  rolle String @default("MITGLIED")
+
+  erstelltAm DateTime @default(now()) @map("erstellt_am")
+
+  @@index([freigegeben])
+  @@map("mitglied")
+}

@@ -1,5 +1,5 @@
 /**
- * Die sieben geschlossenen Wertelisten des Datenmodells.
+ * Die geschlossenen Wertelisten des Datenmodells.
  *
  * SQLite kennt keine Enums, und Prisma erzeugt fuer D1 deshalb auch keine.
  * Die Wahrheit steht hier; in der Datenbank sind es String-Spalten, die von
@@ -51,6 +51,14 @@ export const GESCHMACKS_KATEGORIEN = [
 export type GeschmacksKategorie = (typeof GESCHMACKS_KATEGORIEN)[number];
 
 /**
+ * Rollen eines Mitglieds. MITGLIED ist der Regelfall; FACHKREIS bleibt fuer
+ * die strengere Preis-Sichtbarkeit nach §10 HWG reserviert, ADMIN darf
+ * freigeben und Umfragen steuern.
+ */
+export const MITGLIED_ROLLEN = ["MITGLIED", "FACHKREIS", "ADMIN"] as const;
+export type MitgliedRolle = (typeof MITGLIED_ROLLEN)[number];
+
+/**
  * Baut einen Type-Guard ueber einer Werteliste.
  *
  * Gebraucht wird er ueberall dort, wo ein Wert aus der Datenbank kommt: fuer
@@ -70,3 +78,4 @@ export const istUnternehmensRolle = istWert(UNTERNEHMENS_ROLLEN);
 export const istRezeptStatus = istWert(REZEPT_STATUS);
 export const istBestandStatus = istWert(BESTAND_STATUS);
 export const istGeschmacksKategorie = istWert(GESCHMACKS_KATEGORIEN);
+export const istMitgliedRolle = istWert(MITGLIED_ROLLEN);

@@ -207,3 +207,25 @@ begin
   select case when json_valid(NEW.geschmacks_matrix) = 0 then raise(abort, 'reviews.geschmacks_matrix ist kein gueltiges JSON') end;
 end;
 
+
+-- ---------------------------------------------------------------------------
+--  mitglied
+-- ---------------------------------------------------------------------------
+-- Werte muessen mit MITGLIED_ROLLEN in db/enums.ts uebereinstimmen.
+drop trigger if exists mitglied_insert_chk;
+create trigger mitglied_insert_chk
+before insert on mitglied
+for each row
+begin
+  select case when NEW.rolle not in ('MITGLIED','FACHKREIS','ADMIN') then raise(abort, 'mitglied.rolle: unbekannter Wert') end;
+  select case when length(trim(NEW.anzeigename)) = 0 then raise(abort, 'mitglied.anzeigename leer') end;
+end;
+
+drop trigger if exists mitglied_update_chk;
+create trigger mitglied_update_chk
+before update on mitglied
+for each row
+begin
+  select case when NEW.rolle not in ('MITGLIED','FACHKREIS','ADMIN') then raise(abort, 'mitglied.rolle: unbekannter Wert') end;
+  select case when length(trim(NEW.anzeigename)) = 0 then raise(abort, 'mitglied.anzeigename leer') end;
+end;
