@@ -28,15 +28,30 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 
 ## ⇢ Hier geht es weiter
 
-### 0. Zuerst: ist der Prisma-Fix live?
+### 0. Live-Stand und Sessionablauf
 
 Live-Adresse: **https://cn-medcan.w-helwich.workers.dev** (hinter dem Seitenpasswort = lokales
-`SITE_PASSWORD`). Stand 2026-09-23: das erste Deploy lief, aber **jede Datenbankabfrage warf**
-(`WebAssembly.Module(): Wasm code generation disallowed by embedder`), sichtbar als 500 auf
-`/reviews` und `/umfragen`. Behoben im Code (siehe "Was noch offen ist", Punkt 5); live wird es
-erst mit dem naechsten `npm.cmd run deploy` **durch den Nutzer** (Claude darf nicht deployen).
-Pruefen: `/reviews` und `/umfragen` mit Passwort-Cookie muessen 200 liefern, `wrangler tail`
-ohne `CompileError`.
+`SITE_PASSWORD`). **Der Prisma-Fix ist live (2026-09-23, Commit `9a6aadd`)** - Claude durfte
+`npm run deploy` nach ausdruecklicher Anweisung des Nutzers ausfuehren. Geprueft mit
+Passwort-Cookie: `/`, `/reviews`, `/umfragen`, `/produkte`, `/apotheken`, `/anmelden`,
+`/registrieren`, `/api/auth/get-session` alle 200, ohne Cookie 307. Katalog live leer (keine
+Seed-Daten in der Cloud-D1).
+
+**Jede Session endet mit dem festen Ablauf** aus der Memory `periodic-session-handoff`: Go fuer
+den Live-Gang erfragen -> nach dem Go live stellen und pruefen -> HANDOFF sichern, committen,
+pushen -> Bescheid geben, dass gecleart werden kann.
+
+**Workers Builds (automatisches Deploy bei Push) - vom Nutzer gewaehlt, noch NICHT verbunden.**
+Claude wollte es im Dashboard per Browser-Werkzeug einrichten; Chrome ("Browser 1") war bei
+Cloudflare nicht angemeldet, und anmelden darf nur der Nutzer. Einstellungen, sobald er
+angemeldet ist (Worker `cn-medcan` -> Settings -> Build -> Connect): Git-Konto `bratzi`, Repo
+`cn-medcan`, Branch `main`, Build command `npx prisma generate && npm run cf-build`, Deploy
+command `npx opennextjs-cloudflare deploy` (statt `npx wrangler deploy`), Root directory leer,
+keine Build-Variablen, keine Builds fuer andere Branches. Der Build braucht keine `.env.local`
+(geprueft: `prisma.config.ts` liest keine Umgebung). **Nach dem Verbinden gilt: Push nach `main`
+= Live-Gang**, also erst nach Go pushen (Memory `immer-nach-github-pushen`). Optional in den
+Build-Einstellungen `HANDOFF.md` von den Watch-Pfaden ausnehmen, damit Doku-Commits keinen Build
+ausloesen.
 
 ### 1. Grosser Auftrag: Komplettes Makeover (Nutzer, 2026-09-23) - **damit beginnt die naechste Session**
 
