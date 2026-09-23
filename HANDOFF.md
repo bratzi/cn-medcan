@@ -123,6 +123,21 @@ Budgets, Akzeptanzkriterien und Reihenfolge. **Die Spec ist die Quelle - nicht d
   sich nicht aendern (innen 2296 px). Bei "Permission denied" sofort dem Nutzer sagen, dass ein
   Freigabe-Fenster wartet (Memory `freigabe-fenster-melden`).
 
+**Session 6 (2026-09-24), Fortsetzung: Schritt 1 und 2 erledigt.** Der Nutzer hat die Spec
+freigegeben ("ja"). Umsetzungsplan geschrieben und committet (`ee6385b`, **nicht gepusht**):
+`docs/superpowers/plans/2026-09-24-makeover-gruenes-buch.md`, 16 Tasks, Arbeit auf Branch
+`makeover/gruenes-buch`. Die Spec hat einen neuen Abschnitt 13 (Präzisierungen aus der Planung,
+z. B. Nummerierung nur in der Navigation, Radius-Tokens 0, Pipeline-Skripte als .ts über tsx).
+**Als Nächstes:** Der Nutzer prüft den Plan und wählt die Ausführungsart (empfohlen: "Native",
+also `superpowers:executing-plans` in der Session; Alternative "Subagent-driven"). Danach Task 1.
+
+**Konto des Nutzers (2026-09-24):** Auf Wunsch des Nutzers Passwort zurückgesetzt, lokal
+erledigt und geprüft. **Live offen:** wrangler-Login abgelaufen (`Authentication error
+[code: 10000]`); der Nutzer führt `npx.cmd wrangler login` und danach einmal den vorbereiteten
+`wrangler d1 execute --remote`-Aufruf aus (in PowerShell `npx.cmd`, weil die Ausführungsrichtlinie
+`npx.ps1` sperrt). Einzelheiten stehen bewusst nicht im öffentlichen Repo. Lesende Live-Zugriffe
+blockiert der Auto-Modus ("Production Reads").
+
 **Session 6 (2026-09-23): Schritt 0 ist komplett erledigt** (Commit `1f1bd17`, Spec 4.2,
 4.3, 4.5): wizardtrees.com und dojadirect.com (vom Nutzer genannt; dojaexclusive.com liefert
 eine Fehlerseite) im Browser, Schriftvergleich (Cormorant und Sedgwick bleiben), Pexels-Motive
