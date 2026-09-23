@@ -167,7 +167,7 @@ Alle über `next/font/google`, selbst gehostet, `display: swap`.
 
 | Rolle | Schrift | Schnitte | Einsatz |
 |---|---|---|---|
-| Buch-Display | **Cormorant Garamond** | 300, 300 italic | Titel, Kapitelüberschriften, große Zitate; nur ab 40 px |
+| Buch-Display | **Cormorant Garamond** | 300, 300 italic, 500 | 300: Kapitel, Manifest, große Zitate; 500: randfüllender Titel im Auftakt und die Schlusszeile (die Referenz setzt ihren Titel in 400, nicht light); nur ab 40 px |
 | Text und Bedienung | **Geist** (vorhanden) | variabel | Fließtext, Buttons, Formulare, Navigation |
 | Messwerte | **Geist Mono** (vorhanden) | variabel | Noten, Chargen, Zahlen (`tabular-nums`) |
 | Wand | **Sedgwick Ave Display** | 400 | Tags, Wand-Überschriften, „Wähl mit“; nie Fließtext, Daten, Formulare, Namen |
@@ -194,6 +194,18 @@ Umsetzen mit `better-typography`.
   (`feTurbulence` + `feDisplacementMap`) und einen weichen Overspray (`feGaussianBlur`
   auf einer Kopie). Ein Drip kommt aus der Medien-Pipeline (Pexels-Foto, zu Alpha-Maske
   umgerechnet). Keine von Hand gezeichneten Pfade.
+- **Akzente aus den Referenzlogos (Bildersuche, 2026-09-23):**
+  - *Doja Pak:* ein Tag in **einem Zug** (Marker-Handstyle), dessen Anfangsschwung als
+    Schleife das ganze Wort umschließt; darunter ruhige, **weit gesperrte Versalien**
+    („EXCLUSIVE“). Übernommen: das „gb“-Tag bekommt die umschließende Schleife (Glyphen-
+    Schwung von Sedgwick, sonst weglassen), darunter „GRÜNES BUCH“ in Geist, Versalien,
+    Laufweite 0.3em. Der Bruch wild/geordnet ist genau Buch und Wand im Kleinen.
+  - *Wizard Trees:* Psychedelic-Plakatschrift, zwei Zeilen ineinander verzahnt, Spirale im
+    Buchstaben, **weiße Aufkleber-Kontur** um die schwarze Form (Stanzkontur), Violett als
+    Fläche. Übernommen: nur die Stanzkontur, erzeugt per SVG-Filter (`feMorphology`
+    dilate in `surface-raised` hinter dem Tag), damit das Tag wie ein aufgeklebter Sticker
+    auf dem Buch sitzt. Nicht übernommen: Spirale (müsste gezeichnet werden), Zauberer-
+    Figur (Leitplanke 3), Violett als Vollfläche (Sprühviolett bleibt Material der Wand).
 - Komponente `components/marke/Wortmarke.tsx` (Server Component), zwei Größen: `kopf`
   (Header, Tag statisch) und `buehne` (Hero, Tag wird per Animation „gesprüht“).
 - Zugänglicher Name: „Grünes Buch“; das Tag ist `aria-hidden`.
@@ -230,6 +242,29 @@ Umsetzen mit `better-typography`.
 - `prefers-reduced-motion: reduce`: GSAP und Lenis werden **nicht geladen**, alle Endzustände
   stehen sofort da.
 - Hover, Fokus und Tippen per CSS; ScrollTrigger nur für gepinnte oder gekoppelte Abläufe.
+- Hover-Übergänge kurz: 0,18 bis 0,35 s, nur Farbe, Deckkraft, Unterstrichfarbe. Bilder
+  wechseln beim Hover von Graustufen zu Farbe (0,7 s), nur dort, wo ein Foto Farbe hat.
+- Sektionswechsel als Vorhang: der neue Abschnitt wird per `clip-path: inset()` von oben
+  aufgedeckt.
+
+### 4.7 Feldbuch-Raster
+
+Ein feines Raster (Linien in `border`, 1 px) liegt als feste Ebene hinter der ganzen
+Startseite, 10 Spalten ab 1080 px, 4 Spalten darunter, `pointer-events: none`. Darauf
+verstreut, sehr blass, handschriftliche Randnotizen aus dem Feldbuch (Chargenkürzel,
+Messwerte wie „RF 11 %“) als Textur. Sie tragen keine Information und sind `aria-hidden`.
+
+### 4.8 Referenzwerte moneyincheck.org (im Browser gemessen, 2026-09-23)
+
+- Skalierung: `html { font-size: min(0.58vw, 0.99vh, 11.1px) }`, unter 1080 px fest 10 px;
+  die ganze Seite in rem. Übernommen wird das Prinzip (Display-Größen an den Viewport
+  gekoppelt), nicht die Formel: unsere Tokens bleiben `clamp()`.
+- Größen: Titel 34 rem / 400 / Versalien; Manifest 9,6 rem / 200 / Zeilenhöhe 1,35;
+  Autorentext 4,4 rem / 200 / −0,01 em; Schlusszeile 13 rem; Fließtext 2,2 rem / 300.
+- Hervorhebung fett-kursiv in derselben Familie; handschriftliche Akzente („say hello“,
+  gekritzelter Unterstrich) nur im Footer.
+- Handy: kein WebGL, Wort-Einfärbung bleibt, Figuren-Videos bleiben.
+- Reduzierte Bewegung: Übergänge aus, Deko-Objekte ausgeblendet.
 
 ## 5. Startseite
 
@@ -244,15 +279,15 @@ Oberzeilen auf der ganzen Seite, kein Scroll-Hinweis.
 
 | # | Sektion | Schicht | Layout | Inhalt | Bewegung (volle Fassung) | Handy (< 768 px) |
 |---|---|---|---|---|---|---|
-| 1 | **Auftakt** | Buch + Tag | asymmetrischer Split | Wortmarke groß, Überschrift „Cannabis, offen gelegt.“, Unterzeile „Ich teste Sorten nach festem Schema. Du entscheidest mit, welche als Nächstes drankommt.“, Button **Wähl mit** (Anker `#abstimmung`); rechts Leitobjekt (Buch mit Blatt, Graustufen) | Einstieg: Titel Wort für Wort, dann Tag gesprüht, dann Drip; Navigation und Button sind sofort bedienbar | gestapelt, Leitobjekt unter dem Text |
-| 2 | **Transparent machen** | Buch | gepinnte Bühne | „Hinter jedem Handelsnamen steckt eine Charge. Ich schreibe auf, was drin ist.“ plus drei Feldbuch-Notizen (Aussehen, Geruch, Restfeuchte) | Zoom Blatt → Blüte → Trichom an den Scrollweg gekoppelt, Notizen erscheinen nacheinander | ohne Pin, drei Bilder untereinander mit Einblendung |
+| 1 | **Auftakt** | Buch + Tag | randfüllender Titel mit überlagertem Leitobjekt | „Grünes Buch“ in Versalien, Cormorant 500, in `accent`, randfüllend über zwei Zeilen; das Leitobjekt (Buch mit Blatt, Graustufen, `multiply`) liegt **über** den Buchstaben; darüber die Unterzeile „Cannabis, offen gelegt.“, darunter „Ich teste Sorten nach festem Schema. Du entscheidest mit, welche als Nächstes drankommt.“ und Button **Wähl mit** (Anker `#abstimmung`); das „gb“-Tag sitzt schräg am Titel | Einstieg: Titel Wort für Wort, dann Tag gesprüht, dann Drip; Navigation und Button sind sofort bedienbar | Titel zweizeilig, Leitobjekt kleiner, weiter überlagernd |
+| 2 | **Transparent machen** | Buch | Manifest, danach gepinnte Bühne | Kopfzeile wie bei einer Zeitung („Grünes Buch.“, Datum der neuesten Review, „Charge für Charge.“); dann „Hinter jedem Handelsnamen steckt eine Charge. Ich schreibe auf, was drin ist.“ als großer Absatz (Cormorant 300); danach drei Feldbuch-Notizen (Aussehen, Geruch, Restfeuchte) | Manifest: Wörter färben sich scroll-gekoppelt von `text-muted` zu `text` (Referenz); danach Zoom Blatt → Blüte → Trichom an den Scrollweg gekoppelt | ohne Pin, Einfärbung bleibt, drei Bilder untereinander |
 | 3 | **Wissen bündeln** | Wand | horizontaler Schwenk | „Einer allein weiß wenig. Hier sammelt sich, was viele erfahren.“ plus echte Zahlen als Tags (5.3) | vertikales Scrollen schwenkt die Wand seitlich, Tags sprühen beim Eintritt auf | kein Schwenk, Wand vertikal gestapelt |
 | 4 | **Gemeinsam lernen** | Buch mit Wand-Einschub | Schleifen-Diagramm | „Ihr schlagt vor. Ihr stimmt ab. Ich teste. Alle lesen.“; erklärt 1 bis 2 gesetzte und 2 gewählte Plätze | die Schleife zeichnet sich als Linie (Datengrafik) | Linie vertikal |
 | 5 | **Der neueste Eintrag** (Höhepunkt) | Buch | aufgeschlagene Doppelseite | echte neueste Review: Handelsname, Charge, Datum, **vier** Noten (Aussehen, Geruch, Geschmack, Konsistenz) als Mono-Ziffern, Geschmacksmatrix als Netzdiagramm, höchstens drei Zeilen Text, Link **Ganzen Eintrag lesen** | Seite „schlägt auf“ (Clip-Pfad), Ziffern zählen einmal hoch | Doppelseite wird eine Spalte |
 | 6 | **Die Abstimmung** (`#abstimmung`) | Wand | Wand mit Stimmzettel | „Was teste ich als Nächstes?“; gesetzte Plätze **gestempelt**, gewählte **gesprüht markiert**; Namen immer in Buch-Typo; Stimmabgabe mit allen Zuständen | Markierungen sprühen beim Eintritt auf; Stimmabgabe ohne Scroll-Animation | eine Spalte |
 | 7 | **Katalog** | Buch, ruhig | horizontale Reihe (Scroll-Snap) | sechs Produkte, Einstiege als Pillen (Indica, Sativa, Zitrus, Nur verfügbare), Link zum Katalog; Preise nur mit Freigabe | nur Einblendung | wischbar |
 | 8 | **Apotheken** | Buch | Satz plus Link | ein Satz, Link **Apotheken ansehen** | keine | – |
-| 9 | **Footer** | Buch + großes Tag | Abschluss | große Wortmarke, Navigation, Rechtshinweis (sachlich), Bildnachweise aus `lib/medien.ts` | Tag sprüht einmal | gestapelt |
+| 9 | **Footer** | Buch + großes Tag | Schlusszeile, dann Abschluss | Schlusszeile „Du liest mit. Du wählst mit.“ in Cormorant 500, groß; darunter große Wortmarke, Navigation, Rechtshinweis (sachlich), Bildnachweise aus `lib/medien.ts` | Schlusszeile steht als Kontur (`-webkit-text-stroke`) und füllt sich scroll-gekoppelt Wort für Wort (Referenz); Tag sprüht einmal | gestapelt |
 
 Die „Wirkung“-Note erscheint auf der Startseite nicht; der vollständige Eintrag zeigt alle
 fünf Noten unverändert.
