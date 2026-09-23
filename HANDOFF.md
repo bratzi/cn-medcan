@@ -99,39 +99,63 @@ oder die naechste Session fragt vorher, ob Citrix getrennt ist.
 Das Browser-Werkzeug: Screenshots laufen hier oft in einen Timeout; `get_page_text`, `find` und
 `zoom` funktionieren. `form_input` setzt Felder im Dashboard zuverlaessig.
 
-### 1. Grosser Auftrag: Komplettes Makeover (Nutzer, 2026-09-23) - **damit beginnt die naechste Session**
+### 1. Makeover „Grünes Buch“ - **damit beginnt die naechste Session**
 
-Der Nutzer findet die Seite "kacke bis 0815". Verlangt ist ein **komplettes Makeover** samt
-**Brand Guideline / Preset** (zwingend).
+**Stand (2026-09-23, Session 4):** Brainstorming abgeschlossen, **Spec geschrieben und
+committet:** `docs/superpowers/specs/2026-09-23-makeover-gruenes-buch-design.md`.
+Sie enthaelt alle Entscheidungen samt verworfenen Alternativen, Farben mit gemessenen
+Kontrasten, Schriften, Logo, Startseiten-Dramaturgie (9 Sektionen), Technik, Medien-Pipeline,
+Budgets, Akzeptanzkriterien und Reihenfolge. **Die Spec ist die Quelle - nicht diese Notiz.**
 
-- **Referenz fuer Look & Feel:** https://moneyincheck.org/ (Landingpage zum Roman "Money in
-  Check" von Óscar Pérez). Farben, Scroll-Effekte, Typografie, Scroll-Storytelling gefallen dem
-  Nutzer - Thema von Geld auf **Cannabis** umdeuten. Die Seite rendert per JavaScript; ein
-  Abruf liefert nur den Titel. **Im Browser analysieren**: Screenshots je Scrollabschnitt,
-  berechnete Farben und Schriften, eingesetzte Libraries (Scripts/Network, z. B. GSAP,
-  ScrollTrigger, Lenis). Look & Feel adaptieren, nicht kopieren.
-- **Aufbau der Startseite laut Nutzer:** zuerst Scroll-Storytelling zur Philosophie - *Cannabis
-  transparent machen, das Wissen der Community buendeln, gemeinsam mehr ueber die Pflanze
-  lernen*. Danach Umfragen, dann Produkte, Apotheken und was kuenftig dazukommt.
-- **Offene Frage fuers Brainstorming:** Die eigenen Reviews des Betreibers sind laut Produktkern
-  zentral, der Nutzer hat sie im neuen Aufbau nicht genannt - wo stehen sie?
-- **Ablauf:** `superpowers:brainstorming` zuerst (kreative Arbeit) -> Referenz im Browser
-  analysieren -> Brand Guideline als Datei im Repo (Farben, Typo, Spacing, Motion,
-  Bildsprache, Tonalitaet) -> Design-Skills installieren -> Startseite Sektion fuer Sektion ->
-  uebrige Seiten -> Review.
-- **Skills:** Zuordnung steht in der Memory `design-skills-einsatz` (Brand: `brand-guidelines`
-  + `taste-skill`; Scroll/Motion: `build-awwwards-quality-sites`, `animate`; Bau:
-  `frontend-design`; Feinschliff: `emil-design-eng`; Typo/Farbe/A11y: `jakub-krehel-skills`;
-  Review: `interface-review` + `web-design-guidelines`). Installation ueber
-  `npx skills add <owner/repo>`, Quell-Repo auf `agenticskills.io/skills/<slug>`.
-- **Grenzen, die das Design einhalten muss:**
-  - **§10 HWG:** Storytelling ist Information und Community, keine Publikumswerbung fuer ein
-    verschreibungspflichtiges Arzneimittel - keine Heilversprechen, keine Produkt- oder
-    Preisbewerbung fuer Besucher. Preise bleiben hinter der Freigabe.
-  - `ui-design-engine` (klinisches Tiefblau, 8px-Grid) gilt bis zur neuen Guideline und wird
-    dann auf deren Tokens umgeschrieben (`app/globals.css`), nicht parallel gefuehrt.
-  - Animationen clientseitig, `prefers-reduced-motion` Pflicht, Client-Bundle klein halten
-    (`cloudflare:web-perf`). Nichts, was Geld kostet (Schriften, Libraries).
+**Naechste Schritte, in dieser Reihenfolge:**
+1. **Nutzer um Freigabe der Spec bitten** (Pflicht-Gate aus `superpowers:brainstorming`: "Spec
+   written and committed ... please review"). Dabei **ausdruecklich** auf die eine Abweichung vom
+   Chat hinweisen: Kapitel "Wissen buendeln" zeigt **echte Zahlen** (Stimmen, Vorschlaege,
+   Runden) statt der Vorschlaege selbst - Vorschlaege tragen Handelsnamen und unmoderierten
+   Freitext (§10 HWG, Spec Abschnitt 2). Aenderungswuensche einarbeiten, Spec neu pruefen.
+2. Nach Freigabe: **`superpowers:writing-plans`** aufrufen (einziger erlaubter naechster Skill
+   laut brainstorming) -> Plan nach `docs/superpowers/plans/`, Nutzer waehlt die
+   Ausfuehrungsart.
+3. Umsetzen nach Spec Abschnitt 10. Design-Skills je Schritt laden (Spec Abschnitt 12, Memory
+   `design-skills-einsatz`) - **der Nutzer besteht darauf ("wichtig")**.
+
+**Kernentscheidungen in einem Satz je (Details in der Spec):**
+- Name **Grünes Buch** (Gaddafi-Assoziation genannt, akzeptiert). Instagram-Handle prueft der
+  Nutzer.
+- Leitreferenz **moneyincheck.org**, dazu ein Touch **Wizard Trees / Doja Pak**
+  (Graffiti, Schnoerkel). Konzept **"Buch und Wand"**, **60/40**: Buch = Stimme des
+  Betreibers (Editorial), Wand = Stimme der Community (Graffiti in Sprühviolett).
+- **Du + Ich**. Reviews sind der **Hoehepunkt der Scroll-Story**; "Wirkung" nicht auf der
+  Startseite.
+- Hell als Marke, Dark Mode abgeleitet. Blattgruen einziger Bedienakzent, Sprühviolett nur Wand.
+- Cormorant Garamond 300 (Buch-Display), Geist/Geist Mono (vorhanden), Sedgwick Ave Display
+  (Wand).
+- **GSAP + ScrollTrigger + SplitText + Lenis**, eine Client-Insel `StoryBuehne`, nur Startseite.
+- Medien: **nur Pexels** (Nutzer: "pixabay erstmal nicht"), zur Entwicklungszeit per Skript,
+  selbst gehostet, Graustufen + multiply/screen, Wand-Texturen als Alpha-Masken via `sharp`.
+- Nutzer wollte **keinen** Browser-Companion fuer Mockups - Varianten nur als Text zeigen.
+
+**Referenzanalyse (ohne Browser, per einzelnem `curl` auf HTML/CSS/JS):** moneyincheck.org nutzt
+`#e9e9e9` Papier, `#000` Tinte, einen Akzent `#00846a` (Hover `#00ae8c`), PP Editorial Old
+(kommerziell, daher Cormorant als freie Verwandte), Liu Jian Mao Cao fuer den Ladevorhang,
+Pillen-Buttons, Lenis + OGL (WebGL) + Lottie, kein GSAP, `clip-path`-Enthuellungen,
+`mix-blend-mode: multiply`, Leitobjekt = Schwarzweiss-Springer im Geldschein. Wizard Trees:
+psychedelische Schnoerkel-Wortmarke mit Spirale, Violett, Chrom, fette breite Grotesk daneben.
+Doja-Seite lief in einen Timeout (nicht wiederholt).
+
+**Schon erledigt in dieser Session (nicht erneut machen):**
+- 9 Design-Skills installiert und inhaltlich geprueft (keine riskanten Muster):
+  `design-taste-frontend` (= taste-skill), `build-awwwards-quality-sites`, `animate`,
+  `emil-design-eng`, `better-typography`, `better-colors`, `better-layout`,
+  `better-accessibility`, `interface-review`. Liegen als Kopie in `.claude/skills/`,
+  eingetragen in `skills-lock.json`. `brand-guidelines` (Anthropic) bewusst **nicht**
+  installiert: wendet nur Anthropics eigene Marke an.
+- `.env.local`: Pexels-Key vom Nutzer eingetragen, Variable von `pexel-api-key` in
+  **`PEXELS_API_KEY`** umbenannt (Wert nie gelesen). `.env.local.example` hat den Platzhalter.
+
+**Offen beim Nutzer:** Instagram-Handle pruefen; Chrome-Erweiterung verbinden (war die ganze
+Session nicht verbunden, `list_connected_browsers` leer - fuer die Browser-Pruefungen der Spec
+noetig).
 
 ### 2. Danach (aeltere Punkte, weiter gueltig)
 
