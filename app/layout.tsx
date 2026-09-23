@@ -63,6 +63,15 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
                     Apotheken
                   </Link>
                 </li>
+                <li>
+                  {/* Bewusst ein fester Link statt "Anmelden"/"Mein Konto" je
+                      nach Sitzung: das Layout muesste dafuer die Sitzung lesen
+                      und waere auf jeder Seite dynamisch. /mitglied leitet
+                      ohne Anmeldung selbst auf /anmelden weiter. */}
+                  <Link href="/mitglied" className={NAV_LINK}>
+                    Mein Konto
+                  </Link>
+                </li>
               </ul>
             </nav>
           </div>

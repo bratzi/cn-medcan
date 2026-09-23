@@ -12,6 +12,9 @@ export type { EmptyStateProps } from "./EmptyState";
 export { Field } from "./Field";
 export type { FeldAttribute, FieldProps } from "./Field";
 
+export { Input, INPUT_KLASSEN } from "./Input";
+export type { InputProps } from "./Input";
+
 export { RangeSlider } from "./RangeSlider";
 export type { RangeSliderProps } from "./RangeSlider";
 

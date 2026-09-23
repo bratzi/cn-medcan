@@ -28,16 +28,92 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 
 ## ⇢ Hier geht es weiter
 
-**Block A (Cloudflare D1) ist abgeschlossen.** Von **Block B** ist **Schritt 1 erledigt**:
-Better Auth laeuft mit D1, Schema und Migration stehen, die Anmeldung ist gegen den laufenden
-Server geprueft.
+**Block A (Cloudflare D1) ist abgeschlossen.** Von **Block B** sind **Schritt 1 und 2** erledigt:
+Better Auth laeuft mit D1, und Registrierung, Anmeldung sowie `/mitglied` stehen als Oberflaeche.
 
-**Als naechstes: Block B, Schritt 2** — Registrierung, Anmeldung und `/mitglied` als Oberflaeche.
-Der Server-Teil dafuer ist fertig und wartet nur auf Seiten:
-`signUp`/`signIn`/`signOut` aus `lib/auth-client.ts`, Leserechte aus `lib/session.ts`.
-Danach Schritt 3 (`/admin` mit Mitglieder-Freigabe), dann das Umfragemodell.
+**Als naechstes: Block B, Schritt 3** — `/admin` mit der Freigabe von Mitgliedern.
+Der Server-Teil dafuer ist fertig und wartet nur auf die Seite: `adminErforderlich()` aus
+`lib/session.ts` als Gate, `mitglied.freigegeben` / `freigegebenAm` / `freigegebenVon` als
+Felder. Danach das Umfragemodell (Schritt 4).
 
-Die zwei alten offenen Punkte gelten unveraendert, siehe „Was noch offen ist".
+Die drei alten offenen Punkte gelten unveraendert, siehe „Was noch offen ist".
+
+---
+
+## Block B, Schritt 2 — erledigt: Registrierung, Anmeldung, /mitglied
+
+| Datei | Inhalt |
+|---|---|
+| `app/registrieren/page.tsx`, `app/anmelden/page.tsx` | Serverseiten. Wer schon angemeldet ist, wird direkt weitergeleitet. |
+| `app/mitglied/page.tsx` | Eigenes Konto: Freigabestatus, Rolle, Profilangaben, Abmelden. Ohne Sitzung 307 auf `/anmelden?weiter=%2Fmitglied`. |
+| `app/mitglied/aktionen.ts` | Server Action `profilSpeichern`. |
+| `lib/mitglied-eingabe.ts` | Die Pruefregeln als **reine Funktion**, ohne Request, Prisma und Sitzung. |
+| `lib/weiterleitung.ts` | `sicheresZiel()` gegen offene Weiterleitung ueber `?weiter=`. |
+| `components/auth/` | `AnmeldeFormular`, `RegistrierFormular`, `ProfilFormular`, `AbmeldeButton`, `fehlertexte.ts`. |
+| `components/ui/Input.tsx` | Fehlendes Primitive, gleiche Klassenbasis wie `Select`, haengt an `Field`. |
+
+### Entscheidungen, damit sie niemand zurueckdreht
+
+1. **`profilSpeichern` nimmt genau zwei Felder entgegen**: `anzeigename` und `instagramHandle`.
+   `freigegeben` und `rolle` sind hier **nicht** schreibbar — sonst koennte sich jedes Mitglied
+   selbst Stimmrecht und Preissicht geben. Beides vergibt `/admin` (Schritt 3). Die Identitaet
+   kommt aus `lib/session.ts`, nie aus dem Formular: eine mitgesendete Mitglieds-Id waere eine
+   fremde Identitaet.
+2. **Die Pruefregeln liegen in `lib/mitglied-eingabe.ts`, nicht in der Server Action.** Grund:
+   ein Server-Action-Aufruf laesst sich von aussen praktisch nicht nachbauen (siehe unten), die
+   Regel als reine Funktion dagegen direkt. Wer eine Regel aendert, aendert sie dort.
+3. **Der Instagram-Name wird normalisiert** (fuehrendes `@` faellt weg, leer wird `null`), sonst
+   stehen `@name` und `name` als zwei verschiedene Werte in der Spalte.
+4. **Der Navigationspunkt ist fest „Mein Konto"**, nicht „Anmelden"/„Mein Konto" je nach Sitzung.
+   Sonst muesste das Layout auf **jeder** Seite die Sitzung lesen und waere durchgehend dynamisch.
+   `/mitglied` leitet ohne Anmeldung selbst weiter.
+5. **Der Instagram-Name wird bei der Registrierung nachgetragen**, nicht mitgeschickt: er gehoert
+   zu `mitglied`, nicht zu Better Auth. Schlaegt der Nachtrag fehl, ist das Konto trotzdem da und
+   der Name unter `/mitglied` nachtragbar — dafuer wird die Registrierung nicht abgebrochen.
+6. **`Input` setzt „(Pflichtangabe)" nicht automatisch aus `required`.** In diesen Formularen ist
+   fast jedes Feld Pflicht; der Marker an jedem Label waere Rauschen. Freiwillige Felder sagen es
+   im `hinweis`.
+
+### Was beim Umsetzen anders kam als geplant
+
+1. **Ein Server-Action-Aufruf laesst sich mit `curl` nicht sinnvoll nachbauen.** Weder der
+   `Next-Action`-Header mit `1_feld`-Namen noch die `$ACTION_ID_<id>`-Variante liefern die
+   Felder an: im Log steht jedes Mal `profilSpeichern({})` — ein **leeres** FormData. Die
+   Aktion laeuft, die Felder kommen nicht an. Wer hier testet und aus der Fehlermeldung
+   „Bitte einen Anzeigenamen angeben" schliesst, die Pruefung funktioniere, sitzt einem
+   falschen Positiv auf: das ist nur der Zweig fuer den leeren Namen.
+   **Deshalb die reine Funktion in `lib/mitglied-eingabe.ts`** — sie ist mit `npx tsx` direkt
+   pruefbar. Die Action-Id steht uebrigens im Client-Chunk:
+   `curl -s http://localhost:3000/_next/static/chunks/<chunk>._.js | grep -oE '"[0-9a-f]{40,}"'`.
+2. **`--data-urlencode` mit `-G` verfaelschte in einem Testlauf die Ergebnisse** (ein `/produkte`
+   kam als leerer Parameter an). Weiterleitungsziele mit fertig kodierter URL testen, nicht mit
+   `-G`.
+
+### Verifiziert (gegen `next dev` mit echtem D1-Binding)
+
+- `npm run typecheck`, `npx eslint .` und `npm run build` gruen; die drei neuen Routen
+  `/anmelden`, `/registrieren`, `/mitglied` erscheinen im Routenbaum.
+- Ohne Sitzung: `/anmelden` 200, `/registrieren` 200, `/mitglied` **307** auf
+  `/anmelden?weiter=%2Fmitglied`.
+- Mit Sitzung: `/mitglied` 200 mit E-Mail, Badge „Freigabe steht aus" und „Rolle: Mitglied";
+  `/anmelden` und `/registrieren` leiten **307** auf `/mitglied`.
+- Nach `freigegeben = 1` in der Datenbank: Badge „Freigegeben", der §-10-HWG-Hinweis erscheint,
+  der Instagram-Name steht im Formularfeld.
+- **Offene Weiterleitung abgewehrt:** `?weiter=` mit `https://fremd.example`, `//fremd.example`
+  und `/remd.example` faellt auf `/mitglied` zurueck, `/produkte` geht durch.
+- **`profilSpeichern` ohne Sitzung:** 500 `Nicht angemeldet.` aus `mitgliedErforderlich()` —
+  der Aufruf am Formular vorbei greift also nicht.
+- **`profilEingabePruefen`: 11 Faelle, alle bestanden** — Trimmen, `@`-Entfernung (auch mehrfach),
+  leerer Name, Grenzen 60 und 30 Zeichen (je genau/ueberschritten), Sonderzeichen, Leerzeichen,
+  nur `@` ergibt `null`.
+- Testnutzer wieder geloescht, `user` und `mitglied` sind leer — die Kaskade greift.
+
+### Ungetestet geblieben
+
+- **Das Absenden der drei Formulare im Browser.** Die Formulare rufen Better Auth und die Server
+  Action ueber JavaScript auf; beide Pfade sind serverseitig belegt (siehe oben), der Klickweg
+  durch die Oberflaeche aber nicht. Ein Browser-Durchlauf wurde in der Session abgelehnt.
+  **Beim naechsten Mal von Hand nachholen:** registrieren, abmelden, anmelden, Profil speichern.
 
 ---
 
@@ -258,7 +334,7 @@ braucht eine kleingeschriebene Suchspalte.
 
 ### Reihenfolge für Block B
 1. ~~Better Auth mit D1 einrichten, Schema erweitern, Migration.~~ **erledigt**
-2. Registrierung, Anmeldung, `/mitglied`.
+2. ~~Registrierung, Anmeldung, `/mitglied`.~~ **erledigt**
 3. `/admin` mit Freigabe von Mitgliedern.
 4. Umfragemodell, Server Actions für Vorschlag und Stimme, Umfragephasen.
 5. Startseite umbauen: Umfrage und neueste Review als Kern.
@@ -275,9 +351,11 @@ braucht eine kleingeschriebene Suchspalte.
   `app/zugang/page.tsx`, `app/api/zugang/route.ts`
 - Datenbank: Cloudflare D1, Schema, Migration, Trigger, Seed — siehe `db/README.md`
 - Design-System: `.claude/skills/ui-design-engine.md`, Tokens in `app/globals.css`
-  (Akzent: klinisches Tiefblau `oklch(0.52 0.11 240)`), 11 Primitives in `components/ui/`
+  (Akzent: klinisches Tiefblau `oklch(0.52 0.11 240)`), 12 Primitives in `components/ui/`
 - Edge-Regelwerk: `.claude/skills/edge-stack-master.md` — auf D1 umgeschrieben
 - Produktkomponenten: `ProduktCard`, `CannabinoidBar`, `TerpenChips`, `GlasHeader`, `TerpenMap`,
   `BestandTabelle`, `BewertungsListe`, `InstagramEmbed`, `FilterLeiste`, `AktiveFilter`
+- Anmeldung: Better Auth mit D1, `lib/auth.ts`, `lib/session.ts` als einzige Rechtequelle,
+  `components/auth/`
 - Seiten: Layout, Landing, `/produkte` mit Live-Filter, `/produkte/[slug]`, `/apotheken` und
-  Detail, 404
+  Detail, `/anmelden`, `/registrieren`, `/mitglied`, 404
