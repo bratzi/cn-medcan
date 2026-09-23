@@ -648,16 +648,40 @@ Pooler-URLs). Die Datenbank ist **Cloudflare D1** als Binding `DB`. Was dabei en
    ```
    Danach ist die Cloud-Datenbank leer (kein Katalog). Ob die Seed-Daten hoch sollen, ist eine
    Frage an den Nutzer; der Weg steht im Kopf von `prisma/seed.ts`.
-2. **Windows-Entwicklermodus ist aktiv (Nutzer, 2026-09-23).** `npm run cf-build` und
-   `npm run preview` sind damit zum ersten Mal pruefbar - noch nicht geschehen.
-3. **Secrets fuer den Worker - vor dem ersten `deploy` setzen, nicht danach.** Ohne
-   `SITE_PASSWORD` und `SITE_SESSION_SECRET` laesst `proxy.ts` die Seite **offen** (bewusst, damit
-   lokale Entwicklung ohne Secret geht) - ein Deploy ohne sie waere oeffentlich.
-   `BETTER_AUTH_SECRET` fehlt -> jede Auth-Anfrage wirft. Alle drei mit
-   `npx wrangler secret put <NAME>` (fragt den Wert verdeckt ab), jeweils einen **neuen** Wert,
-   nicht den aus `.env.local`. `FACHKREIS_PASSWORD` **nicht** setzen, es faellt mit dem Umbau der
-   Preisanzeige weg. `BETTER_AUTH_URL` ist kein Secret: sobald die workers.dev-Adresse feststeht,
-   als `vars` in `wrangler.jsonc`.
+2. **Windows-Entwicklermodus ist aktiv (Nutzer, 2026-09-23).** Der erste `npm run cf-build`
+   danach scheiterte trotzdem mit EPERM - diesmal beim **Loeschen** von `.open-next`, nicht bei
+   den Symlinks. Uebrig blieb nur der leere Ordner `.open-next/assets`, "Device or resource busy",
+   auch nach mehreren Versuchen. Ursache sehr wahrscheinlich: ein laufendes `next dev` startet ueber
+   `initOpenNextCloudflareForDev` eine Wrangler-Umgebung, die `assets.directory` aus
+   `wrangler.jsonc` (= `.open-next/assets`) offen haelt. **`cf-build`, `preview` und `deploy`
+   also nur bei gestopptem Dev-Server.** Noch nicht bestaetigt, weil der Dev-Server nicht von
+   Claude gestartet war und laufen blieb. Ob die Symlinks jetzt gehen, ist damit weiter offen.
+   Nicht erwogen: die Wrangler-Option `build.command` als zweite Sperre vor jedem Deploy - wrangler
+   fuehrt sie auch bei `wrangler types` aus (`getEntry(..., "types")`), und `cf-typegen` braeche
+   ohne Build-Ausgabe.
+3. **Secrets fuer den Worker sind gesetzt (2026-09-23, auf Wunsch des Nutzers von Claude).**
+   `SITE_PASSWORD` = das lokale Seitenpasswort aus `.env.local` (der Nutzer kennt es);
+   `SITE_SESSION_SECRET` und `BETTER_AUTH_SECRET` neu und zufaellig, **nirgends gespeichert** -
+   per Pipe von `node -e "...randomBytes(32)..."` direkt in `wrangler secret put`, nie auf dem
+   Bildschirm. Wer sie verliert, erzeugt neue (kostet nur bestehende Sitzungen). Dabei hat
+   wrangler den Worker `cn-medcan` als leeren Entwurf angelegt. Pruefen: `npx wrangler secret list`.
+   **Warum vor dem Deploy:** ohne `SITE_PASSWORD`/`SITE_SESSION_SECRET` laesst `proxy.ts` die Seite
+   offen (bewusst, fuer lokale Entwicklung).
+   `FACHKREIS_PASSWORD` ist **absichtlich nicht** gesetzt, es faellt mit dem Umbau der Preisanzeige
+   weg. `BETTER_AUTH_URL` ist kein Secret: sobald die workers.dev-Adresse feststeht, als `vars`
+   in `wrangler.jsonc`. Bis dahin leitet Better Auth die Herkunft aus dem Request ab.
+4. **Sicherheitsbefund, behoben: OpenNext packt `.env.local` in den Worker.**
+   `opennextjs-cloudflare build` schreibt die Werte aller `.env*`-Dateien im Klartext nach
+   `.open-next/cloudflare/next-env.mjs` (alle drei Modi), wrangler buendelt das in den Worker, und
+   zur Laufzeit fuellt es jede nicht gesetzte Variable (`process.env[key] ??=`). Ein Deploy haette
+   die lokalen Secrets hochgeladen und das lokale `FACHKREIS_PASSWORD` live scharf geschaltet.
+   Einen Schalter gibt es in OpenNext 1.20.6 nicht. **`scripts/bundle-env-bereinigen.mjs`** laeuft
+   jetzt in `cf-build` (und damit in `preview` und `deploy`): schreibt `next-env.mjs` nur mit
+   `NEXT_PUBLIC_*` neu und durchsucht danach die gesamte Build-Ausgabe nach jedem lokalen
+   Secret-Wert - Treffer = Exit 1, kein Deploy. Getestet mit einer absichtlich verseuchten Kopie
+   (drei Treffer gemeldet, nur Pfad und Name) und danach sauber. **Nie `opennextjs-cloudflare
+   deploy` direkt aufrufen**, immer `npm run deploy`.
+   Git-Historie geprueft: keiner der vier lokalen Werte steht in einem der 21 Commits.
 
 ---
 
