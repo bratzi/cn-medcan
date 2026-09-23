@@ -45,6 +45,25 @@ export function Select({
   feldClassName,
   ...rest
 }: SelectProps) {
+  /**
+   * Der Platzhalter muss ausdruecklich vorausgewaehlt werden.
+   *
+   * HTML waehlt von sich aus die erste *nicht deaktivierte* Option - der
+   * deaktivierte Platzhalter wird uebersprungen, und das Feld stand damit
+   * auf dem ersten echten Eintrag, obwohl "Bitte auswaehlen" darauf stand.
+   * `required` griff nie, `reset()` fiel auf denselben Eintrag zurueck, und
+   * ein unachtsames Abschicken trug den ersten Katalogeintrag ein.
+   *
+   * Nur wenn der Aufrufer die Auswahl nicht selbst fuehrt: `value` und
+   * `defaultValue` zusammen wuerde React beanstanden.
+   */
+  const platzhalterVorwahl =
+    platzhalter !== undefined &&
+    rest.value === undefined &&
+    rest.defaultValue === undefined
+      ? { defaultValue: "" }
+      : undefined;
+
   return (
     <Field
       id={id}
@@ -55,7 +74,12 @@ export function Select({
       className={feldClassName}
     >
       {(attribute) => (
-        <select {...attribute} {...rest} className={cn(SELECT_KLASSEN, className)}>
+        <select
+          {...attribute}
+          {...platzhalterVorwahl}
+          {...rest}
+          className={cn(SELECT_KLASSEN, className)}
+        >
           {platzhalter ? (
             <option value="" disabled>
               {platzhalter}

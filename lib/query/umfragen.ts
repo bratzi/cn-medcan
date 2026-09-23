@@ -258,3 +258,85 @@ export async function umfragenUebersicht(limit = MAX_UMFRAGEN): Promise<UmfrageU
     })),
   }));
 }
+
+// ---------------------------------------------------------------------------
+//  Ergebnispflege (nur /admin)
+// ---------------------------------------------------------------------------
+
+/**
+ * Wie viele beendete Runden /admin zur Ergebnispflege zeigt.
+ *
+ * Klein gehalten: gepflegt wird die letzte Runde, nicht das Archiv. Wer
+ * weiter zurueck muss, hat ein anderes Problem als eine fehlende Zeile hier.
+ */
+const MAX_BEENDETE = 5;
+
+export type ErgebnisPlatz = {
+  optionId: string;
+  strainId: string;
+  handelsname: string;
+  slug: string;
+  herkunft: OptionHerkunft;
+  ergebnisReviewId: string | null;
+};
+
+export type BeendeteRunde = {
+  id: string;
+  titel: string;
+  endetAm: Date | null;
+  /** Nur die Gewinner - nur sie werden probiert und bewertet. */
+  plaetze: ErgebnisPlatz[];
+};
+
+/**
+ * Die beendeten Runden mit ihren Gewinnern - Arbeitsvorrat des Betreibers.
+ *
+ * Eine laufende Runde hat noch keine Gewinner: `istGewinner` setzt erst der
+ * Phasenwechsel nach BEENDET. Deshalb steht die Ergebnisverknuepfung an den
+ * beendeten Runden und nicht an der laufenden.
+ *
+ * Eine Query mit `select` ueber die Relation, keine Schleife: jede Query ist
+ * ein Sub-Request.
+ */
+export async function beendeteRundenMitGewinnern(
+  limit = MAX_BEENDETE,
+): Promise<BeendeteRunde[]> {
+  const prisma = await getPrisma();
+  const saetze = await prisma.umfrage.findMany({
+    where: { phase: "BEENDET" },
+    orderBy: { endetAm: "desc" },
+    take: limit,
+    select: {
+      id: true,
+      titel: true,
+      endetAm: true,
+      optionen: {
+        where: { istGewinner: true },
+        select: {
+          id: true,
+          strainId: true,
+          herkunft: true,
+          ergebnisReviewId: true,
+          strain: { select: { handelsname: true, slug: true } },
+        },
+        orderBy: { reihenfolge: "asc" },
+        take: MAX_OPTIONEN,
+      },
+    },
+  });
+
+  return saetze.map((u) => ({
+    id: u.id,
+    titel: u.titel,
+    endetAm: u.endetAm,
+    plaetze: u.optionen.map((o) => ({
+      optionId: o.id,
+      strainId: o.strainId,
+      handelsname: o.strain.handelsname,
+      slug: o.strain.slug,
+      // Wie in `umfrageLaden`: ein unbekannter Wert gilt als COMMUNITY.
+      herkunft: istOptionHerkunft(o.herkunft) ? o.herkunft : "COMMUNITY",
+      ergebnisReviewId: o.ergebnisReviewId,
+    })),
+  }));
+}

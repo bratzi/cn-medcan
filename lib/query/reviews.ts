@@ -109,3 +109,59 @@ export async function redaktionelleReviews(limit = 20): Promise<RedaktionelleRev
   });
   return (saetze as Satz[]).map(zuAnsicht);
 }
+
+// ---------------------------------------------------------------------------
+//  Auswahlliste (nur /admin)
+// ---------------------------------------------------------------------------
+
+/** Obergrenze der Auswahlliste. Eine Sorte hat eine Handvoll Chargen. */
+const MAX_AUSWAHL = 100;
+
+export type ReviewAuswahlEintrag = {
+  id: string;
+  strainId: string;
+  chargenNr: string | null;
+  /** Ein Entwurf ist verknuepfbar - die Oberflaeche schreibt es ans Label. */
+  freigegeben: boolean;
+  erstelltAm: Date;
+};
+
+/**
+ * Die eigenen Bewertungen zu bestimmten Sorten - fuer die Auswahl in /admin.
+ *
+ * `freigegeben` filtert hier bewusst **nicht**: der Betreiber verknuepft das
+ * Ergebnis einer Runde oft, bevor er die Bewertung veroeffentlicht. Die
+ * Auswahl nennt den Entwurf dafuer als solchen.
+ *
+ * Eine Query fuer alle Sorten zusammen (`in`), nicht eine pro Platz: jede
+ * Query ist ein Sub-Request. Eine leere Liste fragt gar nicht erst.
+ */
+export async function reviewAuswahlFuerStrains(
+  strainIds: readonly string[],
+  limit = MAX_AUSWAHL,
+): Promise<ReviewAuswahlEintrag[]> {
+  const eindeutig = [...new Set(strainIds)];
+  if (eindeutig.length === 0) return [];
+
+  const prisma = await getPrisma();
+  const saetze = await prisma.review.findMany({
+    where: { istRedaktionell: true, strainId: { in: eindeutig } },
+    orderBy: { erstelltAm: "desc" },
+    take: limit,
+    select: {
+      id: true,
+      strainId: true,
+      freigegeben: true,
+      erstelltAm: true,
+      charge: { select: { chargenNr: true } },
+    },
+  });
+
+  return saetze.map((satz) => ({
+    id: satz.id,
+    strainId: satz.strainId,
+    chargenNr: satz.charge?.chargenNr ?? null,
+    freigegeben: satz.freigegeben,
+    erstelltAm: satz.erstelltAm,
+  }));
+}

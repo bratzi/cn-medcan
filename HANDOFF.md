@@ -28,19 +28,109 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 
 ## ⇢ Hier geht es weiter
 
-**Block A (Cloudflare D1) ist abgeschlossen.** Von **Block B** sind **Schritt 1 bis 6** erledigt:
-Anmeldung, `/mitglied`, `/admin`, das Umfragemodell samt Schreibschicht, die umgebaute Startseite
-und die beiden Seiten `/umfragen` und `/reviews`.
+**Block A (Cloudflare D1) ist abgeschlossen.** Von **Block B** sind **Schritt 1 bis 7** erledigt:
+Anmeldung, `/mitglied`, `/admin`, das Umfragemodell samt Schreibschicht, die umgebaute Startseite,
+`/umfragen`, `/reviews` - und jetzt die **Umfrageverwaltung in `/admin`**. Die Schleife, die das
+Alleinstellungsmerkmal ist (Runde eroeffnen, Vorschlag, Uebernahme, Abstimmung, Beenden,
+Bewertung verknuepfen), ist damit **zum ersten Mal vollstaendig durch die Oberflaeche gelaufen**.
 
-**Als naechstes: die Verwaltung der Umfragen in `/admin`.** `app/admin/umfrage-aktionen.ts`
-(Runde anlegen, gesetzten Platz vergeben, Vorschlag uebernehmen, Phase weiterschalten, Ergebnis
-verknuepfen) ist vollstaendig und **immer noch durch keinen Klick gelaufen** - es gibt keine
-Oberflaeche dazu. Ohne sie kann der Betreiber keine Runde eroeffnen; die Startseite zeigt dann
-dauerhaft "Derzeit laeuft keine Abstimmung". Das ist die naechste Luecke.
+**Als naechstes:**
 
-Danach: die **vier alten Formulare ohne Hydrations-Sperre** (siehe Schritt 5/6, Punkt 1 unter
-"Was beim Umsetzen anders kam"), die drei alten offenen Punkte unter "Was noch offen ist" - und
-der Mailversand als **Block C**.
+1. **Die drei uebrigen alten Formulare ohne Hydrations-Sperre** - `AnmeldeFormular`,
+   `RegistrierFormular`, `ProfilFormular`. `MitgliedAktionen` ist mit Schritt 7 nachgezogen.
+   Dabei gleich auf `Meldung` (`components/ui/Meldung.tsx`) umstellen, das Muster steht dort
+   noch dreimal von Hand.
+2. **`vorschlagBisAm` ist nicht setzbar.** Die Karte auf der Startseite zeigt "Vorschlaege bis",
+   wenn das Feld gesetzt ist - `umfrageAnlegen` liest es aber nicht, und es gibt kein Feld dafuer.
+   Braucht Pruefung in `umfrageEingabePruefen` und ein Datumsfeld im Formular.
+3. Die drei alten offenen Punkte unter "Was noch offen ist", danach der Mailversand als **Block C**.
+
+---
+
+## Block B, Schritt 7 - erledigt: Umfrageverwaltung in /admin
+
+| Datei | Inhalt |
+|---|---|
+| `app/admin/page.tsx` | Umgebaut: drei Bereiche in je eigener `Suspense`-Grenze - laufende Runde (oder "Neue Runde eroeffnen"), "Ergebnisse verknuepfen", Mitglieder. Die Mitgliedertabelle ist unveraendert, nur in `MitgliederBereich` ausgelagert. |
+| `components/admin/RundeSteuerung.tsx` | Die laufende Runde als Arbeitsflaeche: Kandidatentabelle, Phasenschalter, gesetzter Platz. Server Component. |
+| `components/admin/VorschlagListe.tsx` | Vorschlaege der Runde, offene zuerst, mit "Uebernehmen". |
+| `components/admin/ErgebnisListe.tsx` | Die letzten 5 beendeten Runden mit ihren Gewinnern und je einer Bewertungsauswahl. |
+| `components/admin/RundeAnlegenFormular.tsx`, `PhasenSchalter.tsx`, `GesetztenPlatzFormular.tsx`, `VorschlagUebernehmen.tsx`, `ErgebnisFormular.tsx` | Die fuenf Client-Teile, je einer pro Aktion in `app/admin/umfrage-aktionen.ts`. |
+| `components/admin/useAktion.ts` | Gemeinsamer Hook: Zustand, Fehlertext, `router.refresh()`, Hydrations-Sperre (`bereit`) und ein `catch` fuer geworfene Serverfehler. `MitgliedAktionen` nutzt ihn jetzt auch. |
+| `components/ui/Meldung.tsx` | Fehler- und Erfolgssatz mit Wortmarker (`role="alert"` bzw. `status`). |
+| `lib/query/umfragen.ts` | Neu: `beendeteRundenMitGewinnern()` - eine Query. |
+| `lib/query/reviews.ts` | Neu: `reviewAuswahlFuerStrains()` - eine Query ueber alle Sorten (`in`), eine leere Liste fragt gar nicht. |
+| `components/ui/Select.tsx` | Fehler behoben, siehe "Was beim Umsetzen anders kam", Punkt 1. |
+
+### Entscheidungen, damit sie niemand zurueckdreht
+
+1. **`RundeSteuerung` ist nicht `UmfrageKarte`.** Die Karte zeigt die Runde einem Mitglied und
+   bietet das Abstimmen an; hier ist dieselbe Runde ein Vorgang. Eine Karte mit `istAdmin`-Schalter
+   waere beides halb.
+2. **Beide Phasenwechsel haben eine Rueckfrage** - kein Dialog, derselbe Knopf in zwei Stufen.
+   Beide sind unumkehrbar (`phasenwechselPruefen` laesst nur vorwaerts zu).
+3. **Die Ergebnisverknuepfung haengt an den beendeten Runden, nicht an der laufenden.**
+   `istGewinner` setzt erst der Wechsel nach BEENDET; vorher gibt es nichts zu verknuepfen.
+4. **Die Bewertungsauswahl zeigt auch Entwuerfe**, mit "· Entwurf" im Label. Der Betreiber
+   verknuepft oft, bevor er veroeffentlicht. Angeboten werden nur eigene Bewertungen
+   (`istRedaktionell`) der jeweiligen Sorte - die Pruefung auf die Sorte macht zusaetzlich die Aktion.
+5. **Das Ergebnis wird per Knopf gespeichert, nicht beim Umschalten des Feldes.** Ein `select`
+   feuert bei Tastaturbedienung pro Pfeiltaste ein `change`. (`MitgliedAktionen` speichert die Rolle
+   noch beim Umschalten - dort bewusst nicht angefasst.)
+6. **In der Vorschlagsphase hat die Kandidatentabelle keine Stimmenspalte**, gesetzte Plaetze
+   zeigen "—" statt 0. Dieselbe Regel wie auf der Startseite.
+7. **Alle neuen Knoepfe sind `md` (44 px).** `sm` (36 px) unterschreitet das Touch-Target aus
+   `ui-design-engine`. `MitgliedAktionen` ist mitgezogen.
+8. **`PhasenSchalter` hat einen `key` aus Phase und Zahl der waehlbaren Kandidaten.** Ohne ihn
+   stuende "Uebernimm zuerst Kandidaten" noch da, nachdem genau das geschehen ist.
+
+### Was beim Umsetzen anders kam als geplant
+
+1. **Der Platzhalter von `Select` war nie ausgewaehlt.** HTML waehlt die erste *nicht
+   deaktivierte* Option vor; der deaktivierte "Bitte auswaehlen" wurde uebersprungen. Das Feld
+   stand also auf dem ersten Katalogeintrag, `required` griff nie, `reset()` fiel auf denselben
+   Eintrag zurueck. Betraf auch das bestehende `VorschlagFormular`. Behoben in `Select`: mit
+   `platzhalter` und ohne `value`/`defaultValue` wird `defaultValue=""` gesetzt.
+2. **`curl` gegen das Gate braucht drei Dinge:** das Passwort aus `.env.local` ohne die
+   Anfuehrungszeichen, `MSYS_NO_PATHCONV=1` (Git Bash macht aus `weiter=/` sonst einen
+   Windows-Pfad), und das Cookie von Hand als Header - es ist `Secure`, und curl schickt es ueber
+   `http://localhost` nicht mit.
+3. **Screenshots ueber das Browserwerkzeug liefen wieder in einen Timeout**, ein Tab blieb
+   zeitweise bei "Page still loading" haengen. Ein neuer Tab half. Gelesen wurde ueber Seitentext,
+   Accessibility-Baum und `javascript_exec`.
+4. **Die Anmeldung ueber das Formular lief diesmal im Browser durch** - kein Haengen wie in
+   Schritt 5/6.
+
+### Verifiziert (gegen `next dev` mit echtem D1-Binding, im Browser geklickt)
+
+- `npm run typecheck`, `npx eslint .` und `npm run build` gruen.
+- **Alle fuenf Aktionen aus `umfrage-aktionen.ts` sind zum ersten Mal durch einen Klick gelaufen:**
+  - `umfrageAnlegen`: Runde erscheint in der Vorschlagsphase, ohne Stimmenspalte.
+  - `phaseWeiterschalten` ohne waehlbaren Kandidaten: lesbare Ablehnung. Mit Kandidat:
+    Abstimmung, Stimmenspalte erscheint, gesetzter Platz zeigt "—".
+  - `gesetztenPlatzVergeben`: Zeile mit "Gesetzter Platz"; dieselbe Sorte ein zweites Mal ergibt
+    "Diese Sorte steht in dieser Runde schon auf der Liste."
+  - `vorschlagUebernehmen`: Kandidat "Zur Wahl", Vorschlag "Auf der Wahlliste", Badge-Zaehler stimmt.
+  - Beenden: gesetzter Platz und der Community-Platz mit Stimme als Gewinner markiert, `aktiv`
+    frei, "Neue Runde eroeffnen" wieder da, "Ergebnisse verknuepfen" erscheint.
+  - `ergebnisVerknuepfen`: Verknuepfen und Loesen, Badge wechselt, Wert in der Datenbank geprueft.
+- **Der Nutzer hat parallel eine eigene Runde ("test") durch die Oberflaeche gefahren** - mit vier
+  gesetzten Plaetzen, einem Community-Platz und verknuepften Bewertungen. Sie steht noch in der
+  lokalen D1 und ist absichtlich nicht geloescht.
+- Der `key`-Reset am Phasenschalter: Fehler ausgeloest, Vorschlag uebernommen, Fehler verschwindet.
+- Der Platzhalter im `Select` ist nach dem Fix tatsaechlich ausgewaehlt (auf `/umfragen` geprueft).
+- Kontrast der Statusfarben rechnerisch geprueft: `danger`/`success` auf `surface` und
+  `surface-raised` in Light 4,82-5,32:1, in Dark 5,40-6,81:1. Keine `dark:`-Varianten, keine
+  Pixelwerte, kein Inline-Style in den neuen Dateien.
+- Eigene Testdaten wieder geloescht (Testrunde, Key-Test-Runde, Testkonto samt Sitzung).
+
+### Noch nicht verifiziert
+
+- **Kein Screenshot, weder Light noch Dark** - das Browserwerkzeug brach dabei ab. Dark ist nur
+  ueber die Token-Werte belegt.
+- **Nichts davon lief in workerd** - `npm run cf-build` scheitert hier weiterhin an den Symlinks.
+- Der `catch`-Zweig in `useAktion` (Sitzung laeuft waehrend einer Aktion ab) ist nicht
+  ausgeloest worden.
 
 ---
 

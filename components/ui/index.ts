@@ -15,6 +15,9 @@ export type { FeldAttribute, FieldProps } from "./Field";
 export { Input, INPUT_KLASSEN } from "./Input";
 export type { InputProps } from "./Input";
 
+export { Meldung } from "./Meldung";
+export type { MeldungArt, MeldungProps } from "./Meldung";
+
 export { RangeSlider } from "./RangeSlider";
 export type { RangeSliderProps } from "./RangeSlider";
 
