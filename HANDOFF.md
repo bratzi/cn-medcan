@@ -49,10 +49,41 @@ Build-Variablen, API-Token automatisch ("Workers Builds - 2026-09-23 21:00"). **
 `HANDOFF.md`** - ein Commit, der nur HANDOFF.md aendert, loest keinen Build aus. Nach dem Neuladen
 geprueft, dass alles gespeichert ist.
 **Ab jetzt gilt: Push nach `main` mit Code-Aenderung = Live-Gang** - erst nach dem Go des
-Nutzers pushen (Memory `immer-nach-github-pushen`). **Der erste Build ueber Workers Builds ist
-noch nicht gelaufen** (Linux-Build ohne `.env.local`, `npm ci`, `prisma generate` - ungetestet).
-Er laeuft beim naechsten Code-Push; scheitert er, bleibt die zuletzt deployte Version live.
-Den Build-Log findet man unter Worker -> Deployments bzw. Builds.
+Nutzers pushen (Memory `immer-nach-github-pushen`).
+
+**Testlauf von Workers Builds (2026-09-23, auf Go des Nutzers) - noch nicht gruen:**
+1. Build `d87d9ae` (nur README geaendert) scheiterte am Typecheck: `cloudflare-env.d.ts` war
+   gitignored -> `Cannot find name 'D1Database'`, `Property 'DB' does not exist on type
+   'CloudflareEnv'`. **Behoben in `77537ad`** (Datei wird mitcommittet, `.gitignore` erklaert
+   es; enthaelt nur Secret-*Namen*, keine Werte - geprueft). Gepusht.
+2. Build `77537ad` scheiterte beim Vorab-Rendern von `/admin`: `getAuth()` warf "BETTER_AUTH_SECRET
+   fehlt", bevor `headers()` die Seite dynamisch machte (Workers Builds hat keine Secrets, lokal
+   lieferte `.env.local` sie). **Behoben in `4e21291`** (`lib/session.ts`: erst `headers()`, dann
+   `getAuth()`). Verifiziert: `next build` in einem frischen Klon **ohne** `.env.local` laeuft
+   durch, gleiche Routen. **Nur lokal committet, NICHT gepusht** - beim Push fiel das Netz aus.
+3. **Naechster Schritt:** sobald das Netz wieder geht und der Nutzer Go gibt, `git push`, dann
+   den Build **einmal** im Dashboard pruefen (Worker -> Deployments -> Recent builds; Log per
+   "Download log" landet in `C:\Users\w.helwich\Downloads`). **Nicht pollen** - siehe Memory
+   `netzwerk-schonen`.
+- Live ist weiterhin die von Hand deployte Version `6eedb132` (Prisma-Fix), sie funktioniert.
+  Gescheiterte Builds aendern daran nichts.
+- Im CI-Log: npm 10.9.2 fuehrt Installationsskripte nicht aus ("9 packages have install scripts
+  not yet covered by allowScripts": esbuild, workerd, better-sqlite3, prisma, @prisma/engines,
+  unrs-resolver). Der Build kam trotzdem bis `next build`; beobachten, falls Deploy daran scheitert.
+- **Offen, pruefen:** das Dashboard zeigt fuer die Live-Version eine Median-CPU-Zeit von 69 ms,
+  `edge-stack-master` rechnet mit 10 ms im Free-Plan. Fehlerrate war 0 %. Aktuelle Limits in der
+  Cloudflare-Doku nachlesen, bevor daraus Schluesse gezogen werden.
+
+**Netzausfall am 2026-09-23:** Waehrend dieser Arbeit fiel das gesamte Netz des Nutzers aus
+(DNS-Timeouts fuer alle Hosts). Vorher liefen: `npm ci` in einem frischen Klon, mehrere
+`next build`, Polling-Schleifen gegen `wrangler deployments list`, Browser-Automation,
+Push-Wiederholungen. Ursache nicht belegt; der Nutzer kennt das aus einem frueheren Projekt.
+Regel seitdem: Memory `netzwerk-schonen`. Nach dem Router-Reconnect scheiterte auch ein
+einzelner `git push` (erst DNS, dann Timeout auf github.com:443), und das Netz fiel laut Nutzer
+erneut aus. Lokal ausgelesen: **Citrix-VPN-Adapter aktiv** (10.180.0.3) neben WLAN, zwei
+Standard-Gateways, kein Proxy. Verdacht: der Citrix-Client. **Die Commits `4e21291` und
+`182eb86` sind deshalb noch nicht gepusht** - der Nutzer pusht selbst (`git push` in `C:\cn`),
+oder die naechste Session fragt vorher, ob Citrix getrennt ist.
 Das Browser-Werkzeug: Screenshots laufen hier oft in einen Timeout; `get_page_text`, `find` und
 `zoom` funktionieren. `form_input` setzt Felder im Dashboard zuverlaessig.
 
