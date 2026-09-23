@@ -3,7 +3,7 @@
 > Übergabemedium zwischen Sessions. Wird nach jedem Arbeitsblock aktualisiert und committet.
 > Wer hier weiterarbeitet, liest diese Datei zuerst und braucht den Chatverlauf nicht.
 
-**Letzte Aktualisierung:** 2026-09-23
+**Letzte Aktualisierung:** 2026-09-24
 **Repo:** https://github.com/bratzi/cn-medcan (public)
 **Branch:** `main`
 
@@ -130,10 +130,14 @@ Budgets, Akzeptanzkriterien und Reihenfolge. **Die Spec ist die Quelle - nicht d
   live). Beim Start prüfen: `git branch --show-current` muss `makeover/gruenes-buch` zeigen.
 - **Ledger** (Fortschritt, Rulings): `.superpowers/sdd/2026-09-24-makeover-gruenes-buch/progress.md`,
   lokal, über `.git/info/exclude` ignoriert (nicht im Repo). Tasks mit `Task N: complete` sind fertig.
-- **Weiter bei Task 1, Step 3:** `.claude/skills/ui-design-engine.md` nach dem Plan neu schreiben,
-  dann Step 4 (Beschreibung in `ui-design-engine/SKILL.md`), Step 5 (Prüfungen), Step 6 (Commit nur
-  noch der beiden Skill-Dateien; die Guideline ist schon committet, `4837843`). Danach `task-done`
-  für Task 1 und ohne Rückfrage weiter mit Task 2 bis 16 (executing-plans: nicht zwischen Tasks anhalten).
+- **Stand 2026-09-24 (Session 7): Tasks 1 bis 4 fertig** (Commits bis `6b4701a`, nur lokal auf dem Branch).
+  Weiter bei **Task 5** und ohne Rückfrage bis Task 16 (executing-plans: nicht zwischen Tasks anhalten).
+  Rulings stehen im Ledger (Zeilen mit `Ruling:`); wichtig für spätere Tasks: `duration-fast/normal/slow`
+  funktionieren erst über die neuen `--transition-duration-*`-Aliase in `app/globals.css`; ESLint ignoriert
+  jetzt `.wrangler/**` (lief sonst in heap out of memory); Dateien mit CRLF beim Schreiben per Skript nicht
+  auf LF umstellen (`git ls-files --eol`).
+- Sichtprüfung: Browser-Erweiterung „Browser 1“ läuft nach Chrome-Neustart. Gate-Cookie lokal: der Browser hat
+  schon eins; für `curl` erzeugt man es aus `.env.local` (`SITE_SESSION_SECRET`, Format in `lib/gate.ts`).
 - Skripte: `task-start`/`task-done` unter
   `~/.claude/plugins/cache/claude-plugins-official/superpowers/6.4.1/skills/executing-plans/scripts/`,
   Aufruf mit `bash <skript> docs/superpowers/plans/2026-09-24-makeover-gruenes-buch.md <N> …`.
