@@ -117,11 +117,21 @@ ohnehin wegfällt. Das HWG-Gate liegt in der Abfrageschicht, wo es mit `bestandS
    Betreiber in einer Admin-Ansicht. Kein Mailversand-Dienst nötig, keine Wegwerf-Adressen-Lücke.
 2. **Eigene Reviews zentral, Community-Reviews als Zweitstimme.** Die Freigabe-Warteschlange
    (`Review.freigegeben`) bleibt und wird gebraucht.
-3. **Umfrage dreiphasig** (Kombination aus Vorschlag und kuratierter Auswahl):
+3. **Umfrage mit gesetzten und erwählten Plätzen.** Eine Runde ergibt 3 bis 4 getestete Strains:
+   - **1 bis 2 gesetzte Plätze** — der Betreiber wählt sie selbst, sie stehen von Anfang an fest
+     und werden **nicht** abgestimmt. Er testet sie ohnehin.
+   - **2 Community-Plätze** — darüber entscheidet die Abstimmung.
+
+   Ablauf in drei Phasen:
    `VORSCHLAG` → Mitglieder schlagen Strains mit Begründung vor.
-   `ABSTIMMUNG` → der Betreiber übernimmt 3 bis 5 Vorschläge als Kandidaten, Mitglieder haben je
-   eine Stimme, die Umfrage hat ein Enddatum.
-   `BEENDET` → der Gewinner wird mit der daraus entstehenden Review verknüpft.
+   `ABSTIMMUNG` → der Betreiber übernimmt geeignete Vorschläge als Kandidaten. **Jedes Mitglied
+   hat genau eine Stimme; die zwei Vorschläge mit den meisten Stimmen gewinnen** die beiden
+   Community-Plätze. Die Umfrage hat ein Enddatum.
+   `BEENDET` → alle Gewinner (gesetzte plus erwählte) werden mit den daraus entstehenden Reviews
+   verknüpft.
+
+   Konsequenz für die Oberfläche: gesetzte und erwählte Plätze müssen sichtbar unterschieden sein,
+   sonst wirkt die Abstimmung manipuliert. Gesetzte Kandidaten tragen keinen Stimmenzähler.
 4. **Preise sehen alle verifizierten Mitglieder.** Ausdrückliche Entscheidung des Nutzers.
    **Einordnung, die im Code als Kommentar stehen muss:** §10 HWG adressiert Fachkreise, also
    Angehörige der Heilberufe — „verifiziertes Mitglied" ist das nicht. Die Preisanzeige braucht
@@ -146,10 +156,10 @@ entfällt dann.
 ### Neue Modelle
 | Modell | Felder (Kern) | Wichtig |
 |---|---|---|
-| `Umfrage` | `titel`, `beschreibung`, `phase` (`VORSCHLAG`/`ABSTIMMUNG`/`BEENDET`), `startAm`, `vorschlagBisAm`, `endetAm`, `gewinnerStrainId`, `ergebnisReviewId` | Genau **eine** Umfrage darf aktiv sein — über einen partiellen Unique-Index oder eine Prüfung in der Schreibschicht sicherstellen und kommentieren. |
+| `Umfrage` | `titel`, `beschreibung`, `phase` (`VORSCHLAG`/`ABSTIMMUNG`/`BEENDET`), `startAm`, `vorschlagBisAm`, `endetAm`, `communityPlaetze` (Int, Default 2) | Genau **eine** Umfrage darf aktiv sein — über einen partiellen Unique-Index oder eine Prüfung in der Schreibschicht sicherstellen und kommentieren. Kein einzelnes `gewinnerStrainId`: eine Runde hat mehrere Gewinner. |
 | `UmfrageVorschlag` | `umfrageId`, `strainId`, `mitgliedId`, `begruendung`, `uebernommen` | Unique `(umfrageId, mitgliedId, strainId)` — ein Mitglied schlägt einen Strain nur einmal vor. |
-| `UmfrageOption` | `umfrageId`, `strainId`, `reihenfolge` | Die kuratierte Auswahl. Unique `(umfrageId, strainId)` und `(umfrageId, reihenfolge)`. |
-| `Stimme` | `umfrageId`, `optionId`, `mitgliedId`, `abgegebenAm` | **Unique `(umfrageId, mitgliedId)`** — das ist die Absicherung gegen Doppelstimmen. Nicht über eine Transaktion lösen, D1 hat keine. |
+| `UmfrageOption` | `umfrageId`, `strainId`, `reihenfolge`, **`herkunft`** (`GESETZT`/`COMMUNITY`), `istGewinner`, `ergebnisReviewId` | `GESETZT` = Wahl des Betreibers, nicht abstimmbar, ohne Stimmenzähler in der Oberfläche. `COMMUNITY` = aus einem übernommenen Vorschlag, abstimmbar. Unique `(umfrageId, strainId)` und `(umfrageId, reihenfolge)`. Beim Beenden werden die `communityPlaetze` stimmenstärksten `COMMUNITY`-Optionen plus alle `GESETZT`-Optionen als `istGewinner` markiert. |
+| `Stimme` | `umfrageId`, `optionId`, `mitgliedId`, `abgegebenAm` | **Unique `(umfrageId, mitgliedId)`** — jedes Mitglied hat genau eine Stimme, die zwei stimmenstärksten Community-Optionen gewinnen. Das ist die einzige Absicherung gegen Doppelstimmen; **nicht** über eine Transaktion lösen, D1 hat keine. Die Schreibschicht muss zusätzlich prüfen, dass `optionId` zur Umfrage gehört **und** `herkunft = COMMUNITY` ist — sonst ließe sich auf einen gesetzten Platz abstimmen. |
 | `Review` (Änderung) | neu: `istRedaktionell` (Boolean) | Trennt die Reviews des Betreibers von Community-Reviews. `autorId` wird Relation auf `mitglied`. |
 
 ### Oberfläche
@@ -245,6 +255,11 @@ Für rein lokale Entwicklung genügt sogar das nicht — wrangler arbeitet gegen
   `cloudflare:wrangler` bei jedem wrangler-Befehl · `cloudflare:workers-best-practices` ·
   `cloudflare:web-perf` · `ui-design-engine` bei allem unter `app/**` und `components/**` ·
   `edge-stack-master` bei Bindings, Datenzugriff, Caching, Deployment.
+- **`AGENTS.md` im Projektroot beachten** (wird von `next dev` selbst geschrieben): Next 16 hat
+  Breaking Changes gegenüber älterem Wissen. Vor Next-spezifischem Code die passende Anleitung in
+  `node_modules/next/dist/docs/` lesen, statt aus dem Gedächtnis zu arbeiten. Zwei Fälle hatten
+  wir schon: `searchParams` und `params` sind Promises, und die `middleware`-Konvention wurde
+  durch `proxy.ts` ersetzt.
 - Antwortstil: Caveman-Modus `full`, deutsch. Gilt für den Chat, **nicht** für Code, Kommentare,
   Commits und Dokumente wie diese Datei.
 - Verifikation vor jeder Fertigmeldung: `npx tsc --noEmit` und `npx eslint . --max-warnings=0`,
