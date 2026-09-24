@@ -68,6 +68,7 @@ Komponenten nutzen nur semantische Tokens:
 - `kopierstift` für Handschrift, Wortmarke und seit Redesign 12 für `.farbverlauf` (je ein Schlüsselwort pro Überschrift, Grün, Lila, Grün) und die Buzz-Sätze (abwechselnd `ton="gruen"`/`"lila"`, `opacity-15`); nie auf Buttons, Links oder Fokus. Gemessen auf
   `surface`, `surface-raised` und `surface-sunken` (jeweils ≥ 4.5 in beiden Modi).
 - Datengrafiken in `text`/`text-muted` (Linie plus Fläche mit geringer Deckkraft), nicht in `accent`.
+  Ausnahme seit Spec Redesign 14: AromaKarte und SweetSpot nutzen `accent` (Hersteller) und `kopierstift` (Community) als Reihenfarben.
 - Verboten in Komponenten: Primitives (`blatt-*`, `violett-*`, `neutral-*`), Hex, `oklch()`,
   Tailwind-Standardpaletten, `dark:`-Farbvarianten. Dark Mode entsteht allein über die Tokens.
 - Wer ein Token ändert, ändert die Tabelle in `scripts/farben-pruefen.mjs` mit und lässt `npm run farben` laufen.
@@ -108,6 +109,7 @@ Komponenten nutzen nur semantische Tokens:
 - Neu erlaubt: CSS scroll-gekoppelte Tiefenebenen (`animation-timeline: view()`, nur `transform`, nur
   unter `@supports` und `prefers-reduced-motion: no-preference`), der WebGL-Effekt „Kopierstift läuft“
   nur in `components/story/bewegung/tinte.ts`, Seitenwechsel per `<ViewTransition>`.
+- Three.js nur in `components/story/bewegung/blaetter.ts`, dynamisch importiert, nur Desktop, nie bei reduzierter Bewegung.
 - Reduzierte Bewegung: GSAP, Lenis und `tinte.ts` werden nicht geladen, Endzustände stehen sofort da.
 - Der statische erste Frame ist ohne JavaScript vollständig. Ausgeblendet wird vor dem Start nur
   `[data-story-einstieg]`, und nur unter `@media (scripting: enabled) and (prefers-reduced-motion: no-preference)`

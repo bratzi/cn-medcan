@@ -141,7 +141,7 @@ test("keine Reste von Wand und Graffiti in app, components, lib (Spec TP3 15.2)"
     readFileSync(pfad, "utf8")
       .split("\n")
       .flatMap((zeile, index) =>
-        /font-wand|sedgwick|spray|textur|text-tag\b|text-auftakt|text-wortmarke|gb-/i.test(zeile)
+        /font-wand|sedgwick|spray|(?<!Canvas)textur|text-tag\b|text-auftakt|text-wortmarke|gb-/i.test(zeile)
           ? [`${pfad}:${index + 1}: ${zeile.trim()}`]
           : [],
       ),

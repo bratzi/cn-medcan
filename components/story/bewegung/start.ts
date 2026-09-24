@@ -1,13 +1,14 @@
 import { abstimmung } from "./abstimmung";
 import { auftakt, auftaktFilm } from "./auftakt";
 import { eintrag } from "./eintrag";
+import { starteBlaetter } from "./blaetter";
 import { beobachteLoops } from "./loops";
 import { randnotizen } from "./randnotizen";
 import { schleife } from "./schleife";
 import { schluss } from "./schluss";
 import { transparent } from "./transparent";
 import { vorhang } from "./vorhang";
-import type { Choreografie, Werkzeug } from "./typen";
+import { AB_TABLET, type Choreografie, type Werkzeug } from "./typen";
 
 /**
  * Scroll-Ablaeufe der Sektionen 2 bis 9. Sie starten erst, wenn kein
@@ -105,10 +106,22 @@ export async function starteBuehne(): Promise<() => void> {
   window.addEventListener("load", neuMessen);
   const loops = beobachteLoops();
 
+  // 3D-Blätter nur ab Tablet: auf kleinen Geräten kostet WebGL zu viel Akku.
+  let blaetterStopp: (() => void) | null = null;
+  if (window.matchMedia(AB_TABLET).matches) {
+    void starteBlaetter(() => lenis.velocity)
+      .then((stopp) => {
+        if (beendet) stopp();
+        else blaetterStopp = stopp;
+      })
+      .catch(() => undefined);
+  }
+
   return () => {
     beendet = true;
     stoppeWarten();
     loops.stoppen();
+    blaetterStopp?.();
     window.removeEventListener("load", neuMessen);
     for (const aufraeumen of aufraeumer.splice(0)) aufraeumen();
     mm.revert();

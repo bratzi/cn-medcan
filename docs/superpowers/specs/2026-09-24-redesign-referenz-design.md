@@ -41,6 +41,33 @@ Bilder, um die der Text fließt.
 ## 10. Wir-Stimme und Fuß
 Texte in der Wir-Form, gesetzte Plätze nicht erwähnt. Die Wortmarke im Fuß liegt im Fuß hinter dem Inhalt, nicht darunter.
 
+## 14. Aroma-Karte
+`components/review/AromaKarte.tsx` mit `lib/aromakarte.ts`. Poster-Karte: links 8 Geschmacksachsen, rechts Terpene,
+dazwischen Bögen. Schalter „Karte“/„Netz“ morpht animiert per `requestAnimationFrame` (~900 ms). Zwei Reihen:
+„Laut Hersteller“ (Grün, `herstellerProfil()` aus den Strain-Terpenen, gewichtet nach Konzentration, sonst Rang) gegen
+„Laut Community“ bzw. „Diese Bewertung“ (Lila). Eingesetzt in der Doppelseite, auf der Produktseite („Stimmt das
+Profil?“) und auf der Startseite (`components/story/AromaSektion.tsx`). Aufklärung Sativa/Indica in
+`components/review/Aufklaerung.tsx`, ohne Heilversprechen (§10 HWG).
+
+## 15. Terpen-Intensität
+Spalte `reviews.terpen_intensitaet` (Migration `migrations/0004_terpen_intensitaet.sql`, remote angewandt 2026-09-24):
+JSON Terpenname → 1..5, 3 = Sweet Spot. Parsen und Mitteln in `lib/query/bewertung.ts`, Anzeige
+`components/review/SweetSpot.tsx`.
+
+## 16. Startseite
+Buzz-Sätze nur noch in drei Sektionen (was drin ist, wir stimmen ab, stimmt das?), `text-kulisse` größer und mittig.
+Betonungen im Manifest in Handschrift.
+
+## 17. Bewertungsformular
+`/bewerten/[slug]` (`app/bewerten/aktionen.ts`, `lib/bewertung-eingabe.ts`, `components/review/BewertungsFormular.tsx`
+mit Live-Vorschau der AromaKarte). Mitglieder: `freigegeben = false`; Betreiber (ADMIN): redaktionell, sofort sichtbar.
+Freigabe in `/admin` (`components/admin/BewertungFreigabe.tsx`).
+
+## 18. 3D-Blätter
+`components/story/bewegung/blaetter.ts`. Three.js dynamisch geladen, nur ab Tablet und ohne reduzierte Bewegung.
+22 selbst gezeichnete siebenfingrige Blätter (Canvas, Grün und Lila), fixe Leinwand `z-40 pointer-events-none`.
+Scrollgeschwindigkeit (Lenis) treibt den Wind.
+
 ## 6. Regeländerungen
 - `accent` darf zusätzlich den Auftakt-Titel färben (einzige Schrift in Grün).
 - Handschrift darf als aria-hidden-Textur im Hintergrund stehen (nur Grade ≥ 32 px).

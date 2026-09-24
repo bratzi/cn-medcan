@@ -28,6 +28,23 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 
 ## ⇢ Hier geht es weiter
 
+### ⇢ STAND SESSION 14, vierter Block (2026-09-25): live bis `17134f4`, Build erfolgreich
+- Aroma-Karte (`components/review/AromaKarte.tsx`, `lib/aromakarte.ts`): Poster mit 8 Geschmacksachsen, Terpenen und
+  Bögen, Morph „Karte“/„Netz“ (~900 ms); Hersteller (Grün, `herstellerProfil()`) gegen Community (Lila). In Doppelseite,
+  Produktseite („Stimmt das Profil?“) und Startseite (`AromaSektion.tsx`); Aufklärung Sativa/Indica ohne Heilversprechen.
+- Terpen-Intensität: `reviews.terpen_intensitaet` (Migration 0004, remote angewandt), 1..5 mit 3 = Sweet Spot,
+  Anzeige `SweetSpot.tsx`.
+- Startseite: Buzz-Sätze nur noch in drei Sektionen, größer und mittig; Manifest-Betonungen in Handschrift.
+- Bewertungsformular `/bewerten/[slug]` mit Live-Aroma-Karte; Mitglieder landen unfreigegeben, Betreiber sofort
+  sichtbar; Freigabe in `/admin` (`BewertungFreigabe.tsx`).
+- 3D-Blätter `components/story/bewegung/blaetter.ts` (Three.js dynamisch, nur ab Tablet, ohne reduzierte Bewegung,
+  22 Canvas-Blätter, Wind aus Lenis-Scrollgeschwindigkeit).
+- **Live-D1 ist LEER** (0 Strains, 0 Reviews, 0 Terpene): die fiktiven Seed-Daten gibt es nur lokal, Datensektionen
+  sind live ausgeblendet. Produktion befüllen braucht die Entscheidung des Nutzers.
+- Netzregel: keine Polling-Schleifen, kein Dev-Server, keine großen Downloads ohne Ansage (Memory netzwerk-schonen);
+  `DISABLE_AUTOUPDATER=1` in `~/.claude/settings.json` gesetzt.
+- Spec Redesign 14 bis 18 nachgetragen.
+
 ### ⇢ STAND SESSION 14, dritter Block (2026-09-24): live bis `9b91d4f`, alles grün
 - Auftakt: Bühnenvideo Pexels 7684711 (Nutzervorgabe) in Farbe, opacity 45 % plus Schleier, `buehne-dunkel`,
   Wortmarke `plakat` mittig (gemessen), Film zoomt beim Scrollen, Pause-Knopf.
