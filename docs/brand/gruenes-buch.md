@@ -131,7 +131,8 @@ Haarstriche hat. Datengrafiken stehen in Tinte (`text`), nicht in Grün. Kein re
 
 | Token | Wert | Zeilenhöhe | Schrift |
 |---|---|---|---|
-| `text-riesig` | `clamp(6rem, 1rem + 14vw, 18rem)` | 0.82, −0.045em | Newsreader 200, nur Auftakt-Titel in Blattgrün |
+| `text-plakat` | `clamp(8rem, 1rem + 21vw, 34rem)` | 0.9 | Inspiration, Wortmarke als h1 im Auftakt, von Rand zu Rand |
+| `text-kulisse` | `clamp(6rem, 1rem + 16vw, 26rem)` | 0.9 | Inspiration, Buzz-Satz blass (`text-border`) hinter jeder Sektion, aria-hidden, angeschnitten |
 | `text-manifest` | `clamp(3rem, 1.5rem + 4vw, 6.25rem)` | 1.02, −0.025em | Newsreader 200 |
 | `text-titel` | `clamp(3.5rem, 2rem + 6vw, 8rem)` | 1, −0.03em | Newsreader 200 |
 | `text-kapitel` | `clamp(2.5rem, 1.5rem + 3.5vw, 5rem)` | 1.05, −0.02em | Newsreader 200 |

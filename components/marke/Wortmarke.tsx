@@ -1,7 +1,7 @@
 import { cn } from "@/lib/cn";
 
 type Props = {
-  groesse: "kopf" | "umschlag" | "signatur";
+  groesse: "kopf" | "umschlag" | "plakat";
   /** Nur umschlag: "Grünes Buch" in einer Zeile (Fuß) statt in zwei (Auftakt). */
   einzeilig?: boolean;
   className?: string;
@@ -17,20 +17,20 @@ type Props = {
  *           im Fuß. Das Leerzeichen zwischen den Zeilen hält den
  *           zugänglichen Namen "Grünes Buch" zusammen. An
  *           `data-marke-zeile` hängt der geschriebene Einstieg (globals.css).
- * signatur: einzeilig in text-notiz, unter dem Serif-Titel im Auftakt
- *           (Spec Redesign 2); schreibt sich wie der Umschlag.
+ * plakat:   einzeilig in text-plakat, als h1 im Auftakt von Rand zu Rand
+ *           (Spec Redesign 7); schreibt sich wie der Umschlag.
  */
 export function Wortmarke({ groesse, einzeilig = false, className }: Props) {
   if (groesse === "kopf") {
     return <span className={cn("font-hand text-marke text-kopierstift", className)}>Grünes Buch</span>;
   }
 
-  const signatur = groesse === "signatur";
+  const signatur = groesse === "plakat";
   const zeile = einzeilig || signatur ? "inline-block" : "block";
   return (
     <span
       className={cn(
-        signatur ? "block font-hand text-notiz text-kopierstift" : "block font-hand text-umschlag text-kopierstift",
+        signatur ? "block font-hand text-plakat text-kopierstift" : "block font-hand text-umschlag text-kopierstift",
         (einzeilig || signatur) && "whitespace-nowrap",
         className,
       )}

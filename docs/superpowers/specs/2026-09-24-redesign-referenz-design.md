@@ -25,6 +25,11 @@ Manifest Wort für Wort von `text-muted` zu `text` (scroll-gekoppelt), Schluss K
 ## 5. Wellen
 1. Typografie und Startseite. 2. Bilder und 3D. 3. Unterseiten.
 
+## 7. Referenz choreograffiti.com (Nachtrag 2026-09-24)
+Übernommen wird nur der Stil des Kopf-Schriftzugs: riesig, von Rand zu Rand, angeschnitten, sitzt im Hintergrund, Bild
+davor. Umsetzung in unserer Handschrift: Wortmarke als h1 in `text-plakat`, dazu je Sektion ein Buzz-Satz in
+`text-kulisse` blass dahinter. Die Handschrift-Notizen im Raster entfallen, das Notizbuch-Bild ebenso.
+
 ## 6. Regeländerungen
 - `accent` darf zusätzlich den Auftakt-Titel färben (einzige Schrift in Grün).
 - Handschrift darf als aria-hidden-Textur im Hintergrund stehen (nur Grade ≥ 32 px).

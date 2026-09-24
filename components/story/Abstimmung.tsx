@@ -6,6 +6,7 @@ import { stimmZustand } from "@/components/umfrage/stimmzustand";
 import { aktiveUmfrage, eigeneStimme } from "@/lib/query/umfragen";
 import { aktuellesMitglied } from "@/lib/session";
 import { sicher } from "@/lib/sicher";
+import { Schlagwort } from "@/components/story/Schlagwort";
 
 /**
  * Der Stimmzettel. Der Zustand entsteht hier und nur hier; die Karte zeigt
@@ -55,8 +56,9 @@ export function Abstimmung() {
       aria-labelledby="abstimmung-titel"
       data-story="abstimmung"
       data-story-vorhang=""
-      className="relative px-4 py-24 sm:px-8 sm:py-32"
+      className="relative isolate overflow-x-clip px-4 py-24 sm:px-8 sm:py-32"
     >
+      <Schlagwort satz="wähl mit" />
       <div className="mx-auto grid w-full max-w-360 grid-cols-1 gap-12 lg:grid-cols-[2fr_3fr] lg:items-start">
         <div className="flex flex-col items-start gap-6">
           <h2 id="abstimmung-titel" className="font-buch text-kapitel text-text text-balance">

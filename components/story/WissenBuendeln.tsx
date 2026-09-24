@@ -5,6 +5,7 @@ import { Randspalte } from "@/components/story/Randspalte";
 import { RandspaltenSkelett } from "@/components/story/Skelette";
 import { randnotizen, type CommunityZahlen } from "@/lib/query/community";
 import { communityZahlen } from "@/lib/query/umfragen";
+import { Schlagwort } from "@/components/story/Schlagwort";
 
 /**
  * Die Notizen der Randspalte: echte Zähler oder, wenn es nichts zu zählen
@@ -34,8 +35,9 @@ export function WissenBuendeln() {
       aria-labelledby="wissen-titel"
       data-story="wissen"
       data-story-vorhang=""
-      className="relative px-4 py-24 sm:px-8 sm:py-32"
+      className="relative isolate overflow-x-clip px-4 py-24 sm:px-8 sm:py-32"
     >
+      <Schlagwort satz="gemeinsam wissen" />
       <div className="mx-auto grid w-full max-w-360 grid-cols-1 gap-12 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)] lg:gap-16">
         <h2 id="wissen-titel" className="max-w-4xl font-buch text-kapitel text-text text-balance">
           Einer allein weiß wenig. Hier sammelt sich, was viele erfahren.

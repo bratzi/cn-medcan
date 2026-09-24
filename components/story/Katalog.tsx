@@ -8,6 +8,7 @@ import { leererFilter } from "@/lib/query/filter";
 import { istFachkreis } from "@/lib/query/fachkreis";
 import { ladeStrainListe } from "@/lib/query/strains";
 import { sicher } from "@/lib/sicher";
+import { Schlagwort } from "@/components/story/Schlagwort";
 
 const ANZAHL = 6;
 
@@ -63,7 +64,8 @@ async function Reihe() {
 /** Sektion 7 (Spec 5.1): ruhiges Buch nach der Abstimmung. */
 export function Katalog() {
   return (
-    <section aria-labelledby="katalog-titel" data-story="katalog" className="px-4 py-24 sm:px-8 sm:py-32">
+    <section aria-labelledby="katalog-titel" data-story="katalog" className="relative isolate overflow-x-clip px-4 py-24 sm:px-8 sm:py-32">
+      <Schlagwort satz="alles im Blick" />
       <div className="mx-auto flex w-full max-w-360 flex-col gap-8">
         <div className="flex flex-wrap items-end justify-between gap-6">
           <div className="flex max-w-2xl flex-col gap-4">

@@ -45,10 +45,10 @@ Größen: `text-caption` 13, `text-small` 14, `text-body` 16, `text-h3` 20, `tex
 (clamp 5 bis 20rem, Wortmarke im Auftakt und im Fuß), `text-notiz` (clamp 2 bis 4.5rem, Randnotizen,
 „Wähl mit.“, Überschriften auf `/umfragen`), `text-vermerk` (2rem, Vermerke am Stimmzettel und in der
 Schleife).
-- Geist: 400, 500, 600. Newsreader 200 **nur ab 40 px** (`text-riesig`, `text-manifest`, `text-titel`, `text-kapitel`), sonst 500; 800 nur für kurze Kapitelmarken.
+- Geist: 400, 500, 600. Newsreader 200 **nur ab 40 px** (`text-manifest`, `text-titel`, `text-kapitel`), sonst 500; 800 nur für kurze Kapitelmarken.
 - Große Grade tragen negative Laufweite aus dem Token; nie per Klasse überschreiben.
-- `text-riesig` nur für die h1 im Auftakt, in `text-accent` (einzige grüne Schrift, Spec Redesign 6). Die Wortmarke signiert darunter (`groesse="signatur"`, aria-hidden).
-- Handschrift als Hintergrund-Notiz (`FeldbuchRaster`): aria-hidden, `text-notiz`, blass, ab `lg`.
+- Auftakt (Referenz choreograffiti): die h1 ist die Wortmarke in `text-plakat` von Rand zu Rand.
+- Jede Startseiten-Sektion trägt einen Buzz-Satz (höchstens drei Wörter) über `components/story/Schlagwort` in `text-kulisse`, `text-border`, aria-hidden; Sektion `relative isolate overflow-x-clip`.
 - Inspiration nur 400 (`.font-hand` setzt `font-synthesis: none`) und **nie unter 32 px**: `font-hand`
   steht immer zusammen mit einem der vier Handschrift-Grade in derselben Zeile (Test `tests/marke.test.ts`).
 - Handschrift ohne Versalien, ohne Laufweite, ohne Drehung, in natürlicher Schreibung.

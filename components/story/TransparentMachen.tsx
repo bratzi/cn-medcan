@@ -5,6 +5,7 @@ import { formatiereDatum } from "@/lib/format";
 import { BEWERTUNGS_ACHSEN } from "@/lib/query/bewertung";
 import { neuesteRedaktionelleReview } from "@/lib/query/reviews";
 import { sicher } from "@/lib/sicher";
+import { Schlagwort } from "@/components/story/Schlagwort";
 
 const ERLAEUTERUNG: Record<string, string> = Object.fromEntries(
   BEWERTUNGS_ACHSEN.map((achse) => [achse.key, achse.erlaeuterung]),
@@ -43,8 +44,9 @@ export function TransparentMachen() {
     <section
       aria-labelledby="transparent-titel"
       data-story="transparent"
-      className="px-4 py-24 sm:px-8 sm:py-32"
+      className="relative isolate overflow-x-clip px-4 py-24 sm:px-8 sm:py-32"
     >
+      <Schlagwort satz="was drin ist" />
       <div className="mx-auto w-full max-w-360">
         <div className="grid grid-cols-1 gap-2 border-y-2 border-text py-2 text-small uppercase tracking-wide text-text sm:grid-cols-3 sm:items-center">
           <span className="font-buch text-h3 font-medium normal-case tracking-normal">Grünes Buch.</span>

@@ -75,10 +75,16 @@
   --text-manifest--font-weight: 200;
   --text-manifest--letter-spacing: -0.025em;
 
-  --text-riesig: clamp(6rem, 1rem + 14vw, 18rem);
-  --text-riesig--line-height: 0.82;
-  --text-riesig--font-weight: 200;
-  --text-riesig--letter-spacing: -0.045em;
+  /* Redesign 7 (Referenz choreograffiti): Handschrift riesig von Rand zu Rand.
+     plakat: die Wortmarke als Titel im Auftakt. kulisse: Buzz-Sätze blass
+     hinter den Sektionen. Beide nie unter 32 px. */
+  --text-plakat: clamp(8rem, 1rem + 21vw, 34rem);
+  --text-plakat--line-height: 0.9;
+  --text-plakat--font-weight: 400;
+
+  --text-kulisse: clamp(6rem, 1rem + 16vw, 26rem);
+  --text-kulisse--line-height: 0.9;
+  --text-kulisse--font-weight: 400;
 
   /* ---- Handschrift (Spec TP3 4): Inspiration, nur 400, nie unter 32 px -- */
   /* Wortmarke im Kopf aller Seiten. */

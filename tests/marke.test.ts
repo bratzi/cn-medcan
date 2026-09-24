@@ -27,7 +27,7 @@ test("Farbprüfung misst Kopierstift auf allen drei Papieren", () => {
   assert.doesNotMatch(skript, /spray/);
 });
 
-const HAND_GRADE = ["marke", "umschlag", "notiz", "vermerk"] as const;
+const HAND_GRADE = ["marke", "umschlag", "notiz", "vermerk", "plakat", "kulisse"] as const;
 
 function token(name: string): string {
   const treffer = new RegExp(`--text-${name}:\\s*([^;]+);`).exec(css);
@@ -95,22 +95,21 @@ test("Unterzeile: gedruckt, natürliche Schreibung, Versalien per CSS", () => {
   assert.doesNotMatch(html, /font-hand/);
 });
 
-test("Auftakt: h1 ist der grüne Serif-Titel, die Wortmarke signiert darunter, nie per Einstieg versteckt", () => {
+test("Auftakt: die h1 ist die Wortmarke als Plakat, nie per Einstieg versteckt", () => {
   const quelle = lies("components/story/Auftakt.tsx");
-  const h1 = /<h1[\s\S]*?<\/h1>/.exec(quelle)?.[0];
-  assert.ok(h1, "keine h1 im Auftakt");
-  assert.match(h1, /font-buch text-riesig text-accent/);
-  assert.doesNotMatch(h1, /data-story-einstieg|Wortmarke/);
-  assert.match(quelle, /<div aria-hidden="true" className="auftakt-marke [^"]*">\s*<Wortmarke groesse="signatur" \/>/);
-  assert.match(quelle, /<Unterzeile className="auftakt-unterzeile /);
-  assert.doesNotMatch(quelle, /uppercase|groesse="buehne"/);
+  const h1 = /<h1[^>]*>\s*<Wortmarke groesse="plakat" \/>\s*<\/h1>/.exec(quelle)?.[0];
+  assert.ok(h1, "die h1 enthält nicht genau die Plakat-Wortmarke");
+  assert.match(h1, /className="auftakt-marke /);
+  assert.doesNotMatch(h1, /data-story-einstieg/);
+  assert.match(quelle, /<Unterzeile className="auftakt-unterzeile/);
+  assert.doesNotMatch(quelle, /text-accent|groesse="buehne"/);
 });
 
-test("Wortmarke als Signatur: einzeilig, Notiz-Grad, schreibt sich", () => {
-  const html = renderToStaticMarkup(createElement(Wortmarke, { groesse: "signatur" }));
+test("Wortmarke als Plakat: einzeilig, Plakat-Grad, schreibt sich", () => {
+  const html = renderToStaticMarkup(createElement(Wortmarke, { groesse: "plakat" }));
   assert.equal(html.match(/data-marke-zeile=""/g)?.length, 2);
-  assert.match(html, /\btext-notiz\b/);
-  assert.doesNotMatch(html, /text-umschlag/);
+  assert.match(html, /\btext-plakat\b/);
+  assert.match(html, /\bwhitespace-nowrap\b/);
   assert.equal(ohneTags(html), "Grünes Buch");
 });
 
@@ -151,7 +150,7 @@ test("keine Reste von Wand und Graffiti in app, components, lib (Spec TP3 15.2)"
 });
 
 test("Handschrift nur in den Handschrift-Graden: nie unter 32 px (Spec TP3 15.3)", () => {
-  const GRAD = /text-(marke|umschlag|notiz|vermerk)\b/;
+  const GRAD = /text-(marke|umschlag|notiz|vermerk|plakat|kulisse)\b/;
   const treffer = QUELLEN.filter((pfad) => /\.tsx?$/.test(pfad) && !pfad.endsWith(join("marke", "Wortmarke.tsx")))
     .flatMap((pfad) =>
       readFileSync(pfad, "utf8")

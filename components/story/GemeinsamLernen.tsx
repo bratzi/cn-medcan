@@ -1,5 +1,6 @@
 import { Loop } from "@/components/medien/Loop";
 import { Button } from "@/components/ui";
+import { Schlagwort } from "@/components/story/Schlagwort";
 
 /**
  * Sektion 4 (Spec 5.1, Spec TP3 8.4): die Schleife. Die Überschrift trägt
@@ -22,7 +23,8 @@ function stationKlasse(hand: boolean): string {
 
 export function GemeinsamLernen() {
   return (
-    <section aria-labelledby="lernen-titel" data-story="lernen" className="px-4 py-24 sm:px-8 sm:py-32">
+    <section aria-labelledby="lernen-titel" data-story="lernen" className="relative isolate overflow-x-clip px-4 py-24 sm:px-8 sm:py-32">
+      <Schlagwort satz="ihr stimmt ab" />
       <div className="mx-auto grid w-full max-w-360 grid-cols-1 items-center gap-16 lg:grid-cols-2">
         <div className="flex flex-col gap-6">
           <h2 id="lernen-titel" className="font-buch text-kapitel text-text text-balance">
