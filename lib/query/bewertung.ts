@@ -212,3 +212,42 @@ export function bewerteFeuchtigkeit(
     hinweis: "Über 13 % Restfeuchte: erhöhtes Schimmelrisiko bei Lagerung.",
   };
 }
+
+type TeilbareBewertung = NotenQuelle & { istRedaktionell: boolean; erstelltAm: Date };
+
+export type GeteilteBewertungen<T> = {
+  eigene: T[];
+  community: T[];
+  /** Gesamtnote der neuesten eigenen Bewertung, sonst null. */
+  meineNote: number | null;
+  /** Mittel der Gesamtnoten der Community, sonst null. */
+  communityMittel: number | null;
+};
+
+/**
+ * Trennt die Stimme des Betreibers von der Community (Spec TP2 4.4). Beide
+ * Listen neueste zuerst. "Meine Note" ist die Gesamtnote der neuesten
+ * eigenen Bewertung und bewusst kein Mittel: eine aeltere Charge soll die
+ * neueste Aussage nicht verwaessern, und die Community mischt nicht mit.
+ */
+export function teileBewertungen<T extends TeilbareBewertung>(
+  reviews: readonly T[],
+): GeteilteBewertungen<T> {
+  const neuesteZuerst = [...reviews].sort((a, b) => b.erstelltAm.getTime() - a.erstelltAm.getTime());
+  const eigene = neuesteZuerst.filter((review) => review.istRedaktionell);
+  const community = neuesteZuerst.filter((review) => !review.istRedaktionell);
+
+  const communityMittel =
+    community.length > 0
+      ? Math.round(
+          (community.reduce((summe, review) => summe + berechneGesamtnote(review), 0) / community.length) * 10,
+        ) / 10
+      : null;
+
+  return {
+    eigene,
+    community,
+    meineNote: eigene.length > 0 ? berechneGesamtnote(eigene[0]) : null,
+    communityMittel,
+  };
+}

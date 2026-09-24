@@ -165,6 +165,8 @@ export type ChargeEintrag = {
 
 export type ReviewEintrag = {
   id: string;
+  /** true = Bewertung des Betreibers, false = Community (Zweitstimme). */
+  istRedaktionell: boolean;
   aussehen: number;
   geruch: number;
   geschmack: number;
@@ -563,6 +565,7 @@ export async function ladeStrainDetail(
         take: 20,
         select: {
           id: true,
+          istRedaktionell: true,
           aussehen: true,
           geruch: true,
           geschmack: true,
@@ -643,6 +646,7 @@ export async function ladeStrainDetail(
     })),
     reviews: zeile.reviews.map((review) => ({
       id: review.id,
+      istRedaktionell: review.istRedaktionell,
       aussehen: review.aussehen,
       geruch: review.geruch,
       geschmack: review.geschmack,
