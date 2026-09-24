@@ -150,7 +150,7 @@ test("keine Reste von Wand und Graffiti in app, components, lib (Spec TP3 15.2)"
 });
 
 test("Handschrift nur in den Handschrift-Graden: nie unter 32 px (Spec TP3 15.3)", () => {
-  const GRAD = /text-(marke|umschlag|notiz|vermerk|plakat|kulisse)\b/;
+  const GRAD = /text-(marke|umschlag|notiz|vermerk|plakat|kulisse|manifest)\b/;
   const treffer = QUELLEN.filter((pfad) => /\.tsx?$/.test(pfad) && !pfad.endsWith(join("marke", "Wortmarke.tsx")))
     .flatMap((pfad) =>
       readFileSync(pfad, "utf8")

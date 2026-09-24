@@ -1025,3 +1025,58 @@ export async function ladeStrainAuswahl(): Promise<StrainAuswahlEintrag[]> {
     take: MAX_AUSWAHL,
   });
 }
+
+// ---------------------------------------------------------------------------
+//  Aroma-Karte der Startseite (Spec Redesign 16)
+// ---------------------------------------------------------------------------
+
+export type AromaVorzeige = {
+  handelsname: string;
+  slug: string;
+  terpene: TerpenEintrag[];
+  /** Rohe Spalten der freigegebenen Bewertungen; verdichtet wird in der Sektion. */
+  reviews: { geschmacksMatrix: unknown; terpenIntensitaet: unknown }[];
+};
+
+/**
+ * Die Sorte, an der die Startseite die Aroma-Karte vorführt: aktiv, mit
+ * Terpenangaben, mit den meisten Bewertungen. Keine Preise, keine Bestände,
+ * also unabhängig vom Fachkreis-Gate.
+ */
+export async function ladeAromaVorzeige(): Promise<AromaVorzeige | null> {
+  const prisma = await getPrisma();
+  const zeile = await prisma.strain.findFirst({
+    where: { aktiv: true, terpene: { some: {} }, reviews: { some: { freigegeben: true } } },
+    orderBy: { reviews: { _count: "desc" } },
+    select: {
+      handelsname: true,
+      slug: true,
+      terpene: {
+        orderBy: { rang: "asc" },
+        select: {
+          rang: true,
+          konzentrationProzent: true,
+          terpen: { select: { name: true, aromaProfil: true, geschmack: true } },
+        },
+      },
+      reviews: {
+        where: { freigegeben: true },
+        take: 50,
+        select: { geschmacksMatrix: true, terpenIntensitaet: true },
+      },
+    },
+  });
+  if (!zeile) return null;
+  return {
+    handelsname: zeile.handelsname,
+    slug: zeile.slug,
+    terpene: zeile.terpene.map((eintrag) => ({
+      name: eintrag.terpen.name,
+      aromaProfil: eintrag.terpen.aromaProfil,
+      geschmack: alsGeschmacksKategorie(eintrag.terpen.geschmack),
+      konzentrationProzent: zuZahl(eintrag.konzentrationProzent),
+      rang: eintrag.rang,
+    })),
+    reviews: zeile.reviews,
+  };
+}

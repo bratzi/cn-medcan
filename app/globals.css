@@ -83,7 +83,7 @@
   --text-plakat--line-height: 0.9;
   --text-plakat--font-weight: 400;
 
-  --text-kulisse: clamp(6rem, 1rem + 16vw, 26rem);
+  --text-kulisse: clamp(8rem, 1rem + 24vw, 40rem);
   --text-kulisse--line-height: 0.9;
   --text-kulisse--font-weight: 400;
 

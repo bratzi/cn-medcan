@@ -10,7 +10,7 @@ const TON = { gruen: "text-accent", lila: "text-kopierstift" } as const;
 export function Schlagwort({
   satz,
   ton = "lila",
-  oben = "top-4",
+  oben = "top-1/2 -translate-y-1/2",
 }: {
   satz: string;
   /** Grün und Lila wechseln sich von Sektion zu Sektion ab (Spec Redesign 12). */
@@ -20,7 +20,7 @@ export function Schlagwort({
   return (
     <span
       aria-hidden="true"
-      className={`pointer-events-none absolute inset-x-0 -z-10 select-none whitespace-nowrap text-center font-hand text-kulisse opacity-15 ${TON[ton]} ${oben}`}
+      className={`pointer-events-none absolute inset-x-0 -z-10 select-none whitespace-nowrap text-center flex justify-center font-hand text-kulisse opacity-15 ${TON[ton]} ${oben}`}
     >
       {satz}
     </span>

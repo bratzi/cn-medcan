@@ -1,4 +1,5 @@
 import { Abstimmung } from "@/components/story/Abstimmung";
+import { AromaSektion } from "@/components/story/AromaSektion";
 import { Apotheken } from "@/components/story/Apotheken";
 import { Auftakt } from "@/components/story/Auftakt";
 import { FeldbuchRaster } from "@/components/story/FeldbuchRaster";
@@ -27,6 +28,7 @@ export default function StartPage() {
       <TransparentMachen />
       <WissenBuendeln />
       <GemeinsamLernen />
+      <AromaSektion />
       <NeuesterEintrag />
       <Abstimmung />
       <Katalog />

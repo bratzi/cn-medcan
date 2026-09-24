@@ -1,13 +1,11 @@
 import Link from "next/link";
 
 import { buttonKlassen } from "@/components/ui";
-import { Schlagwort } from "@/components/story/Schlagwort";
 
 /** Sektion 8 (Spec 5.1): ein Satz und ein Link. */
 export function Apotheken() {
   return (
     <section aria-labelledby="apotheken-titel" className="relative isolate overflow-x-clip px-4 pb-24 sm:px-8 sm:pb-32">
-      <Schlagwort satz="wo es das gibt" />
       <div className="mx-auto flex w-full max-w-360 flex-col items-start gap-6 border-t border-border pt-12">
         <h2 id="apotheken-titel" className="font-buch text-kapitel text-text">
           <em className="farbverlauf italic">Apotheken</em>

@@ -6,7 +6,6 @@ import { Doppelseite } from "@/components/review/Doppelseite";
 import { DoppelseitenSkelett } from "@/components/story/Skelette";
 import { buttonKlassen } from "@/components/ui";
 import { neuesteRedaktionelleReview, type RedaktionelleReview } from "@/lib/query/reviews";
-import { Schlagwort } from "@/components/story/Schlagwort";
 
 /** Lädt den Eintrag; leer und Fehler haben eigene Sätze (Spec 5.2). */
 async function EintragInhalt() {
@@ -48,7 +47,6 @@ export function NeuesterEintrag() {
       data-story="eintrag"
       className="relative isolate overflow-x-clip bg-surface-sunken px-4 py-24 sm:px-8 sm:py-32"
     >
-      <Schlagwort satz="frisch probiert" ton="gruen" />
       <div className="mx-auto flex w-full max-w-360 flex-col gap-12">
         <h2 id="eintrag-titel" className="font-buch text-kapitel text-text">
           Der <em className="farbverlauf italic">neueste</em> Eintrag
