@@ -28,6 +28,18 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 
 ## ⇢ Hier geht es weiter
 
+### ⇢ STAND SESSION 14, zweiter Block (2026-09-24): Referenz choreograffiti, Freisteller, Video (`21555d8`)
+- Nutzer: Name „Grünes Buch“ bleibt, Notizbuch-Bild weg, alle Downloads erlaubt. Stil nach choreograffiti.com: nur
+  der Kopf-Schriftzug (riesig, Rand zu Rand, sitzt im Hintergrund, Bild davor), umgesetzt in UNSERER Handschrift.
+- Umgesetzt: h1 = Wortmarke `groesse="plakat"` (`text-plakat`); je Sektion Buzz-Satz über
+  `components/story/Schlagwort.tsx` (`text-kulisse`, `text-border`); Handschrift-Notizen im Raster entfernt.
+- Freisteller-Pipeline `scripts/medien/freistellen.py` (rembg isnet, SW mit Alpha): `frei-bluete` (Auftakt, vor den
+  Buchstaben), `frei-hoch`, `frei-paar` (Manifest-Bühne); `Medium.freigestellt` = kein Mischmodus. Alte Fotos
+  leitobjekt/blatt/bluete gelöscht, trichom bleibt.
+- Sektion 4: Kreis und Videokasten entfernt, neues Video (Pexels 7667040, HD 1280) blass bildschirmfüllend im
+  Hintergrund, Stationen groß davor. `three` installiert, noch ungenutzt (3D-Blätter offen).
+- **Offen:** Live-Prüfung von `21555d8` hell/dunkel; 3D-Blätter; Unterseiten.
+
 ### ⇢ STAND SESSION 14 (2026-09-24): Redesign Welle 1 gepusht (`6f74318`)
 - Richtung und Schalter vom Nutzer freigegeben („ja“, wenig Zwischenfragen, pushen). Spec:
   `docs/superpowers/specs/2026-09-24-redesign-referenz-design.md`.
