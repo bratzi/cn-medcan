@@ -28,6 +28,18 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 
 ## ⇢ Hier geht es weiter
 
+### ⇢ NÄCHSTE SESSION (Stand Ende Session 9, 2026-09-24): Welle 1 von Teilprojekt 2 umsetzen
+
+1. `superpowers:executing-plans` mit `docs/superpowers/plans/2026-09-24-makeover-tp2-welle-1.md` starten,
+   **Native** (Nutzer hat gewählt, nicht erneut fragen). Task 1 Step 1 legt den Branch `makeover/tp2-welle-1` an.
+   Spec dazu: `docs/superpowers/specs/2026-09-24-makeover-teilprojekt-2-design.md` (freigegeben).
+2. Je Task die Skills aus **Skills** laden und in einem Satz nennen; nach jedem Task eine HANDOFF-Zeile im
+   Task-Commit. Fortschritt steht unter „Teilprojekt 2“ in Abschnitt 1 („Welle 1, Task N erledigt“).
+3. Task 13 endet mit Go des Nutzers, Push (ohne Citrix-Rückfrage), Live-Prüfung.
+4. **Danach** (eigene Session, vor Welle 2): die eingetaktete Marken- und Medien-Überarbeitung (Logo und Akzente
+   in „Inspiration“, Medien awwwards-fähig, freigestellt statt invertiert), Details unter „Eingetaktet für eine
+   neue Session“ in Abschnitt 1.
+
 ### 0. Live-Stand und Sessionablauf
 
 Live-Adresse: **https://cn-medcan.w-helwich.workers.dev** (hinter dem Seitenpasswort = lokales
@@ -90,8 +102,10 @@ Push-Wiederholungen. Ursache nicht belegt; der Nutzer kennt das aus einem fruehe
 Regel seitdem: Memory `netzwerk-schonen`. Nach dem Router-Reconnect scheiterte auch ein
 einzelner `git push` (erst DNS, dann Timeout auf github.com:443), und das Netz fiel laut Nutzer
 erneut aus. Lokal ausgelesen: **Citrix-VPN-Adapter aktiv** (10.180.0.3) neben WLAN, zwei
-Standard-Gateways, kein Proxy. Verdacht: der Citrix-Client. **Regel:** vor jedem Push fragen,
-ob Citrix getrennt ist, oder den Nutzer selbst pushen lassen.
+Standard-Gateways, kein Proxy. Verdacht: der Citrix-Client. ~~Regel: vor jedem Push fragen, ob
+Citrix getrennt ist.~~ **Aufgehoben am 2026-09-24:** laut Nutzer ist das Citrix-Problem behoben,
+Claude pusht ohne Rückfrage (einmal, keine Wiederholung bei Netzfehler). Das Go vor einem Live-Gang
+bleibt.
 Das Browser-Werkzeug: Screenshots laufen hier oft in einen Timeout; `get_page_text`, `find` und
 `zoom` funktionieren. `form_input` setzt Felder im Dashboard zuverlaessig.
 
@@ -213,7 +227,8 @@ Budgets, Akzeptanzkriterien und Reihenfolge. **Die Spec ist die Quelle - nicht d
   **Vorgehen:** `superpowers:brainstorming` (architektonisch, eigene Spec „Teilprojekt 3“ oder Nachtrag zu TP1),
   Skills laut Memory `design-skills-einsatz`, v. a. `build-awwwards-quality-sites`, `design-taste-frontend`,
   `better-typography`, `animate`, `emil-design-eng`; für Bilder `ideogram4`, `qwen-edit`.
-  **Reihenfolge gegenüber Welle 1:** entscheidet der Nutzer am Ende von Session 9 (Antwort unten eintragen).
+  **Reihenfolge (Nutzer, Ende Session 9): erst Welle 1 umsetzen, dann diese Überarbeitung als eigene
+  Session, vor Welle 2.**
   Beim Einlesen gefundener Kleinkram (für die Spec): `/produkte` rendert ein zweites `<main>` im Layout-`<main>`
   (ebenso `/zugang`); sichtbares „fuer“ in `ProduktCard` („Preis nur fuer Fachkreise“) und „oeffentlich“ auf
   `/zugang`; `/zugang`-Titel noch „cn-medcan“, eigener Button mit Deckkraft-Hover und `rounded-md`; Geviertstrich

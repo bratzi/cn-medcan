@@ -3197,7 +3197,7 @@ git commit -m "test: Texte der Welle 1 ohne Trennstriche, Pruefbericht (TP2 Well
 Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
 ```
 
-Dem Nutzer kurz sagen, was live geht, und um das Go bitten. Vorher fragen, ob Citrix getrennt ist (Memory `netzwerk-schonen`).
+Dem Nutzer kurz sagen, was live geht, und um das Go bitten. Nicht nach Citrix fragen (seit 2026-09-24 aufgehoben, Memory `netzwerk-schonen`).
 
 - [ ] **Step 8: Nach dem Go: zusammenführen und pushen**
 
