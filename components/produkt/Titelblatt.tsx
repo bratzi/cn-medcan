@@ -45,7 +45,7 @@ export function Titelblatt(props: TitelblattProps) {
       <div className="flex min-w-0 flex-col gap-4">
         <h1
           id="produkt-titel"
-          className="font-buch text-kapitel font-light text-balance text-text wrap-break-word hyphens-auto"
+          className="font-buch text-kapitel text-balance text-text wrap-break-word hyphens-auto"
         >
           {props.handelsname}
         </h1>

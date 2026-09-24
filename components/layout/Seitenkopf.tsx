@@ -9,7 +9,7 @@ export function seitenRahmen(schmal = false): string {
   return cn("mx-auto w-full px-4 sm:px-8", schmal ? "max-w-120" : "max-w-360");
 }
 
-/** Abschnittsueberschrift (h2) der Unterseiten: Newsreader 500, weil 300 erst ab 40 px traegt. */
+/** Abschnittsueberschrift (h2) der Unterseiten: Newsreader 500, weil 200 erst ab 40 px traegt. */
 export const ABSCHNITT_TITEL = "font-buch text-h1 font-medium text-balance text-text";
 
 export type SeitenkopfProps = {
@@ -36,7 +36,7 @@ export function Seitenkopf({ titel, satz, zurueck, schmal = false, children }: S
           </Link>
         </p>
       ) : null}
-      <h1 className="font-buch text-kapitel font-light text-balance text-text wrap-break-word">{titel}</h1>
+      <h1 className="font-buch text-kapitel text-balance text-text wrap-break-word">{titel}</h1>
       {satz ? <p className="mt-4 max-w-[56ch] text-body text-pretty text-text-muted">{satz}</p> : null}
       {children ? <div className="mt-4">{children}</div> : null}
     </header>

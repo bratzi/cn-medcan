@@ -9,7 +9,7 @@ import { Seitenkopf, seitenRahmen, ABSCHNITT_TITEL } from "@/components/layout/S
 test("Seitenkopf: genau ein h1 in Newsreader 200, Satz darunter, keine Oberzeile", () => {
   const html = renderToStaticMarkup(createElement(Seitenkopf, { titel: "Bewertungen", satz: "Ein Satz." }));
   assert.equal(html.match(/<h1/g)?.length, 1);
-  assert.match(html, /font-buch text-kapitel font-light/);
+  assert.match(html, /font-buch text-kapitel/);
   assert.match(html, /Ein Satz\./);
   assert.doesNotMatch(html, /uppercase/);
 });
