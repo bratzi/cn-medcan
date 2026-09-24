@@ -1,16 +1,14 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Suspense } from "react";
 
 import { ABSCHNITT_TITEL, Seitenkopf, seitenRahmen } from "@/components/layout/Seitenkopf";
 import { Textur } from "@/components/medien/Textur";
-import { StimmzettelSkelett } from "@/components/story/Skelette";
 import { Badge, Blatt, EmptyState, buttonKlassen, namenLinkKlassen, textLinkKlassen } from "@/components/ui";
 import { UmfrageKarte } from "@/components/umfrage/UmfrageKarte";
 import { VorschlagFormular } from "@/components/umfrage/VorschlagFormular";
+import { PHASEN_LABEL } from "@/components/umfrage/phasen";
 import { stimmZustand } from "@/components/umfrage/stimmzustand";
 import { rundenZeitraum } from "@/components/umfrage/zeitraum";
-import type { UmfragePhase } from "@/db/enums";
 import { cn } from "@/lib/cn";
 import { formatiereDatum } from "@/lib/format";
 import { ladeStrainAuswahl } from "@/lib/query/strains";
@@ -31,12 +29,6 @@ export const metadata: Metadata = {
   description: "Laufende und vergangene Runden: Ihr schlagt Sorten vor und wählt, was ich als Nächstes teste.",
 };
 
-const PHASEN_LABEL: Record<UmfragePhase, string> = {
-  VORSCHLAG: "Vorschlagsphase",
-  ABSTIMMUNG: "Abstimmung",
-  BEENDET: "Beendet",
-};
-
 /** Wand-Ueberschrift: kurz, Imperativ, in Sprühviolett (Guideline 8). */
 const WAND_TITEL = "font-wand text-tag text-spray";
 
@@ -47,7 +39,7 @@ function RundenZeile({ runde }: { runde: UmfrageUebersicht }) {
         <p className="font-buch text-h2 font-medium text-text wrap-break-word">{runde.titel}</p>
         <p className="numeric text-small text-text-muted">{rundenZeitraum(runde.startAm, runde.endetAm)}</p>
         {runde.gewinner.length > 0 ? (
-          <p className="text-body text-text">
+          <p className="text-body text-text wrap-break-word">
             {"Gewonnen: "}
             {runde.gewinner.map((gewinner, index) => (
               <span key={gewinner.slug}>
@@ -202,9 +194,8 @@ export default function UmfragenPage() {
     <>
       <Seitenkopf titel="Abstimmung" satz="Ihr schlagt Sorten vor und wählt. Was gewinnt, teste ich als Nächstes." />
       <div className={cn(seitenRahmen(), "pt-12 pb-24 sm:pt-16")}>
-        <Suspense fallback={<StimmzettelSkelett />}>
-          <UmfragenInhalt />
-        </Suspense>
+        {/* Bewusst ohne Suspense-Grenze: der Inhalt steht im ersten HTML, damit er ohne JavaScript lesbar ist und Sprungziele (#eintrag-…) existieren. */}
+        <UmfragenInhalt />
       </div>
     </>
   );

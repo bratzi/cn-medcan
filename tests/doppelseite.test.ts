@@ -113,3 +113,11 @@ test("alsEintrag: Name und Slug vom Produkt, kaputte Matrix wird neutral", () =>
   assert.deepEqual(e.geschmacksMatrix, leereGeschmacksMatrix());
   assert.equal(eintragHref("nebelharz-22", "r1"), "/produkte/nebelharz-22#eintrag-r1");
 });
+
+test("Überschrift: auf Unterseiten kleiner als der Abschnittstitel, auf der Startseite wie bisher", () => {
+  const unterseite = zeige({ eintrag: eintrag(), umfang: "auszug", ueberschrift: "h3" });
+  assert.match(unterseite, /<h3 id="eintrag-r1-titel" class="[^"]*\btext-h2\b[^"]*"/);
+  assert.doesNotMatch(unterseite, /<h3 id="eintrag-r1-titel" class="[^"]*text-kapitel/);
+  const startseite = zeige({ eintrag: eintrag(), umfang: "auszug", ueberschrift: "h3", story: true });
+  assert.match(startseite, /<h3 id="eintrag-r1-titel" class="[^"]*\btext-kapitel\b/);
+});

@@ -15,7 +15,9 @@ export const DATEIEN = [
   "components/review/CommunityStimmen.tsx",
   "components/review/Doppelseite.tsx",
   "components/review/Inhaltsverzeichnis.tsx",
+  "components/umfrage/StimmFormular.tsx",
   "components/umfrage/UmfrageKarte.tsx",
+  "components/umfrage/VorschlagFormular.tsx",
 ];
 
 test("kein Deckkraft-Hover in den angefassten Dateien", () => {

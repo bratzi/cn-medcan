@@ -13,3 +13,8 @@ test("Fehlerseite: Titel, Ausweg, Knopf und Rückweg", () => {
   assert.match(html, />Erneut versuchen</);
   assert.match(html, /href="\/"[^>]*>Zur Startseite</);
 });
+
+test("Fehlerseite: Rückweg ist 44 px hoch", () => {
+  const html = renderToStaticMarkup(createElement(Fehler, { error: new Error("x"), retry: () => {} }));
+  assert.match(html, /<a[^>]*class="[^"]*min-h-11[^"]*"[^>]*>Zur Startseite</);
+});

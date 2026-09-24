@@ -3216,3 +3216,73 @@ Nach Rückmeldung des Nutzers, dass der Build durch ist (oder einmal im Dashboar
 - [ ] **Step 10: Session abschließen**
 
 `HANDOFF.md` mit dem Live-Stand ergänzen, den lokalen Branch `makeover/tp2-welle-1` nach `git merge-base --is-ancestor makeover/tp2-welle-1 main` löschen, committen, pushen (nur `HANDOFF.md` geändert: löst keinen Build aus), dem Nutzer sagen, dass gecleart werden kann (Memory `periodic-session-handoff`).
+
+---
+
+## Ausfuehrungsprotokoll (Ledger, Session 10)
+
+Uebernommen aus `.superpowers/sdd/2026-09-24-makeover-tp2-welle-1/progress.md`, bevor der Workspace geloescht wurde. Rulings, Befunde und zurueckgestellte Kleinigkeiten stehen hier.
+
+
+Spec: docs/superpowers/specs/2026-09-24-makeover-teilprojekt-2-design.md (freigegeben). Executor: executing-plans (Native), Session 10.
+
+Pre-flight (Produces -> Consumes):
+- T1 -> T3,T5,T8,T9,T10,T11,T12: textLinkKlassen/namenLinkKlassen/Blatt/Faktenliste; Namen stimmen ueberein. ok
+- T2 -> T12: EmptyState-Signatur unveraendert. ok
+- T3 -> T5,T8,T9,T10,T12: Seitenkopf/seitenRahmen/ABSCHNITT_TITEL/TitelblattSkelett. ok
+- T6 -> T7,T8,T9: ReviewEintrag.istRedaktionell, teileBewertungen. ok
+- T7 -> T9,T10: EintragDaten/alsEintrag/Doppelseite({eintrag,...}). Spec 4.3 nennt Prop `review`, Plan `eintrag: EintragDaten`. Ruling: Plan folgen (Adapter alsEintrag entkoppelt Startseite/Produktseite; Verhalten laut Spec-Tabelle gleich) — Kosten falls falsch: Prop umbenennen.
+- T8 -> T9: Titelblatt/MeineBewertung/CommunityStimmen. ok
+- T9 -> T10,T12,T13: scripts/seiten-pruefen.ts. ok
+- T11 -> T12: UmfrageKarte mit ort statt darstellung. ok
+Task 1: complete (commits 5266ec3..71e6594, tests: npx tsx --test tests/primitive.test.ts → ℹ duration_ms 431.3048)
+Task 2: complete (commits 71e6594..70bc8ef, tests: npx tsx --test tests/primitive.test.ts → ℹ duration_ms 350.6994)
+Task 3: complete (commits 70bc8ef..cabd1e0, tests: npx tsx --test tests/seitenkopf.test.ts → ℹ duration_ms 376.4216)
+Task 4: complete (commits cabd1e0..165a575, tests: npx tsx --test tests/navigation.test.ts → ℹ duration_ms 323.9387)
+Task 5: complete (commits 165a575..7129bfa, tests: npx tsx --test tests/fehlerseite.test.ts → ℹ duration_ms 381.0286)
+Task 6: complete (commits 7129bfa..0c247b4, tests: npx tsx --test tests/bewertungen-teilen.test.ts → ℹ duration_ms 287.1499)
+Task 7: complete (commits 0c247b4..654a8c2, tests: npx tsx --test tests/doppelseite.test.ts tests/netz.test.ts → ℹ duration_ms 733.5302)
+Task 8: complete (commits 654a8c2..3e712bd, tests: npx tsx --test tests/titelblatt.test.ts tests/hover.test.ts → ℹ duration_ms 686.6077)
+Task 9: Ruling: /produkte/gibt-es-nicht liefert im Server-HTML 0 h1 und Status 200 (Plan erwartete genau ein h1) — notFound() feuert innerhalb der Suspense-Grenze nach dem gestreamten Shell, der 404-Inhalt steht nur im RSC-Stream; die alte Seite hatte dieselbe Struktur (vorbestehend, nicht durch Welle 1 verursacht). Struktur bleibt wie im Plan (Titelblatt-Skelett gewollt, Spec 3.9); Befund geht in den Abschlussbericht, Loesungsweg: Existenzpruefung vor der Suspense-Grenze (not-found gehoert zu Welle 3, Spec 6.5) — Kosten falls falsch: ohne JS leere 404-Seite fuer unbekannte Produkte, Soft-404 fuer Suchmaschinen.
+Task 9: complete (commits 3e712bd..8a86620, tests: npx tsx --test tests/hover.test.ts → ℹ duration_ms 192.2319)
+Task 10: Ruling: Pruefskript meldete auf / "Preis nur fuer Fachkreise" (ProduktCard, laut Spec 5.1 Welle 2) — Wort in Welle 1 korrigiert, weil die Startseite durch den Umzug der Doppelseite angefasst ist und Spec 9.2 keine Umschrift erlaubt; Deckkraft-Hover und Vermerk bleiben Welle 2 — Kosten falls falsch: keine (reiner Text).
+Task 10: complete (commits 8a86620..fbd6b7c, tests: npx tsx --test tests/inhaltsverzeichnis.test.ts tests/hover.test.ts → ℹ duration_ms 616.8745)
+Task 11: complete (commits fbd6b7c..9c9aa19, tests: npx tsx --test tests/umfrage-karte.test.ts tests/stimmzustand.test.ts → ℹ duration_ms 226.7214)
+Task 12: Ruling: Sichtpruefung fand "der Betreiber" in StimmFormular (Legende) und VorschlagFormular (Erfolgssatz), beide auf /umfragen und der Startseite sichtbar — in Ich-Form bereinigt (Spec 3.11, Inhalt unveraendert), Test "Formulare der Abstimmung sprechen in der Ich-Form" RED->GREEN — Kosten falls falsch: zwei Saetze.
+Task 12: Ruling: Step 7 per SQL statt Klickstrecke — Server Actions laufen im Hintergrund-Tab des Browserwerkzeugs nicht sichtbar durch (Runde kam verzoegert an); Zustaende VORSCHLAG freigeschaltet (Blatt), ABSTIMMUNG stimmberechtigt (Formular), ABGESTIMMT (Balken Tinte, Deine Stimme) im Browser gesehen, ANONYM in beiden Phasen per Seitenabruf; "angemeldet, nicht freigeschaltet" NICHT verifiziert (kein solches Konto lokal) — Kosten falls falsch: ein Satz ungeprueft gerendert.
+Task 12: complete (commits 9c9aa19..89d0826, tests: npx tsx --test tests/zeitraum.test.ts tests/hover.test.ts tests/umfrage-karte.test.ts → ℹ duration_ms 343.5994)
+Task 13: Ruling: npx eslint . meldete 7x react/no-children-prop in tests/primitive.test.ts (Buchtabellen-Test, Code woertlich aus Plan Task 2) — Test auf createElement(Komponente, props, ...kinder) umgestellt, Zusicherungen unveraendert, 12/12 gruen — Kosten falls falsch: keine.
+Task 13 Pruefbericht (Stand vor Fix-Pass):
+- Automatisch: npm test 92/92, typecheck 0, eslint (nach Test-Fix) 0, farben ok, build exit 0 (alle Routen dynamisch ausser /_not-found; Warnung "overly broad patterns" aus lib/prisma, vorbestehend). Pruefskript: 6x ok (/, /reviews, /umfragen, /produkte/nebelharz-22, /produkte/pfefferstern-extrakt, /gibt-es-nicht).
+- Browser (Hintergrund-Tab, 2296 px, iframe fuer schmale Breiten): Kopf einzeilig, aria-current richtig; 390 px Leiste wischt, dritter Punkt schaut an, Konto Zeile 1; kein Ueberlaufen bei 320/390/720 px auf /reviews, /umfragen, Produktseite; Fokusring an allen Bedienelementen sichtbar, 44 px ausser Verzeichnis-Namenslinks (32 px Text, Zeile als Klickflaeche); hell/dunkel gesehen; Startseite: Zaehler auf Endwerten, Ids eindeutig, Konsole ohne Fehler; GSAP-Bewegung NICHT verifiziert (Hintergrund-Tab, rAF steht).
+- Befund A (Spec 13.7): "Ganzen Eintrag lesen"/Inhaltsverzeichnis springen NICHT auf #eintrag-… (direkt und per Client-Navigation scrollY 0): Ziel steckt in Suspense-Grenze, existiert beim Fragment-/Router-Sprung noch nicht.
+- Befund B (Spec 9.4): ohne JS nur Skelett auf /reviews, /umfragen, Produktseite (Inhalt in <div hidden id="S:…">). /reviews und /umfragen hatten vorher keine Suspense-Grenze; Startseite (TP1) hat dieselbe Eigenschaft (5 hidden S), vorbestehend.
+- Befund C (Spec 9.3, vorbestehend): /produkte/<unbekannt> Status 200 ohne h1 im Server-HTML (s. Ruling Task 9) — gleiche Ursache wie A/B.
+- Befund D (LOW): Titelblatt THC/CBD-Zeile bricht bei 390 px zwischen "CBD" und Wert um.
+- Befund E (LOW): Navigationsleiste zeigt auf Desktop-Browsern mit schmalem Fenster einen klassischen Scrollbalken.
+- Hinweis: 200 % Text bei 390 px (~195 px Viewport, strenger als Plan/WCAG): Kopfzeile und lange Badges laufen ueber; bei Plan-Massstab (720 px) und WCAG-Reflow (320 px) kein Ueberlaufen.
+Final: Ruling: /produkte/<unbekannt> nach Suspense-Entfernung Status 404 (vorher 200), Server-HTML aber leer (<html id="__next_error__">, Next rendert 404 bei Shell-Fehler im Client, app-render.js getErrorRSCPayload) — Framework-Verhalten, echte 404 ist der wesentliche Gewinn; Server-HTML-404 ueber proxy-Pruefung waere Welle 3 (not-found) — Kosten falls falsch: ohne JS leere Seite nur fuer unbekannte Produkte.
+Final review: Code-Review-Subagent (opus, "With fixes", 3 Important) + Design-Review-Subagent (better-interface/web-design-guidelines, Umfang auf alle geaenderten Oberflaechen erweitert auf Wunsch des Nutzers, "Block", 1 HIGH). Parallel ausgefuehrt auf Wunsch des Nutzers.
+Final: Ruling (Nutzerentscheidung): Suspense-Grenzen auf /reviews, /umfragen, /produkte/[slug] entfernt — Spec 9.4/13.7/9.3 vor 3.9 (Skelette); TitelblattSkelett + components/layout/Skelette.tsx entfallen — Kosten falls falsch: kein Skelett beim Laden der Unterseiten.
+Final: fixed Suspense/Sprung/ohne-JS/404 — tests/seiten-ohne-streaming "Unterseiten ohne Suspense-Grenze" RED->GREEN (gegen alten Code geprueft); Laufzeit: hidden-S 0 auf allen drei Seiten, /produkte/gibt-es-nicht 404.
+Final: fixed Kopf ueberlappt Wortmarke 768-950 px (CR Important 1, DR MEDIUM) + Fokusring in der Leiste abgeschnitten (DR MEDIUM) + Aktiv-Unterstrich nur am Wort (DR LOW) — navigation.test "einzeilig erst ab lg…" und "Aktiv-Markierung nur am Wort" RED->GREEN.
+Final: fixed Badge-Kontrast hell (DR HIGH: warning 3.37, accent 4.29) — npm run farben RED mit neuen Badge-Paaren, Badge warning/accent in Tinte, primitive "Badges mit kleinem Text…" RED->GREEN, farben ok.
+Final: fixed Tabellen-Tabstopp ohne Namen (DR MEDIUM) — primitive "Buchtabelle: … benannte Region" RED->GREEN.
+Final: fixed Einzellinks unter 44 px (DR MEDIUM) — einzelLinkKlassen(); primitive/seitenkopf/fehlerseite/titelblatt/produktseite-Tests RED->GREEN.
+Final: fixed Doppelseite-Ueberschrift groesser als Abschnittstitel auf Unterseiten (DR MEDIUM; CR hatte es als TP1-Absicht zurueckgestellt) — Unterseiten text-h2 font-medium, Startseite unveraendert; doppelseite "Überschrift: …" RED->GREEN (gegen alten Code geprueft).
+Final: fixed zwei Phasennamen-Karten + "freigegebene Mitglieder" auf der Startseite (DR MEDIUM) — components/umfrage/phasen.ts; umfrage-karte-Tests RED->GREEN.
+Final: fixed hover:opacity/duration-150/Fokus-Kette in Stimm- und Vorschlagsformular (DR MEDIUM, CR Minor 6) — umfrage-karte + hover.test RED->GREEN.
+Final: fixed lange Namen im gesetzten Platz und bei den Gewinnern (CR Minor 5, hochgestuft: Seite scrollt sonst am Handy seitlich; Review Focus 1) — umfrage-karte RED->GREEN.
+Final: fixed (LOW, Plan Step 6 erlaubt) Stimmzettel shadow-md, THC/CBD whitespace-nowrap, Terpen-Hilfszeile entfernt, Katalog-Leerzustand im Kasten — Tests RED->GREEN.
+Final: minor (deferred): Produktseiten-Metadaten sagen "Meine Bewertung" auch ohne eigene Bewertung (CR 4).
+Final: minor (deferred): Fokusreihenfolge im Kopf unter lg: "Mein Konto" optisch zweites, in der Tab-Reihenfolge letztes Element (CR 7).
+Final: minor (deferred): Reel-iframe bei lg etwa 1000 px hoch, max-w-sm erwaegen (CR 8).
+Final: minor (deferred): eigene focus-visible-Ketten in Select.tsx und RangeSlider.tsx (CR 6) — Welle 2 (FilterLeiste).
+Final: minor (deferred): BestandTabelle: sichtbare Caption wiederholt die h2, HWG-Satz passiv (DR LOW) — Welle 2 (Apothekenseite, Spec-7-Wortlaut).
+Final: minor (deferred): Skelett-Flaechen kaum sichtbar (1.09:1) (DR LOW) — nach Suspense-Entfernung nur noch Startseite (TP1).
+Final: minor (deferred): Navigationsleiste zeigt in schmalen Desktop-Fenstern einen klassischen Scrollbalken (eigener Befund E).
+Final: Ruling: "Alle Runden" zeigt bei leerer DB "Noch keine Runden." unter "Gerade läuft keine Runde." (DR LOW) — Spec 7 legt beide Saetze ausdruecklich fest; bleibt — Kosten falls falsch: eine doppelte Leerzeile live.
+Final: Ruling: Declined "DSGVO: Instagram-iframe ohne Einwilligung" — Spec 4.3 verlangt das Reel; rechtliche Frage fuer den Nutzer, im Abschlussbericht genannt — Kosten falls falsch: Einwilligungsbanner/Zwei-Klick-Loesung nachruesten, sobald ein Reel hinterlegt ist (live ist keines).
+Final: Ruling: Declined "take: 20 mischt eigene und Community-Bewertungen, Anker koennten ab 20 fehlen" — Blaettern ist Spec 11 ausgeschlossen, heute nicht erreichbar — Kosten falls falsch: toter Sprunglink ab 21 Bewertungen je Produkt.
+Final: Ruling: Declined "beendete Runde ohne endetAm zeigt 'seit …'" — die Admin-Aktion setzt endetAm immer — Kosten falls falsch: falscher Zeitraumtext bei Altdaten.
+Final: Ruling: Declined "Fokusring im Inhaltsverzeichnis nur um den Namen" — Zeilen-Fokus ist Spec 3.7 (Welle 2, Verzeichnis) — Kosten falls falsch: kleinerer Fokusring als Klickflaeche.

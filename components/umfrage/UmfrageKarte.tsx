@@ -4,18 +4,12 @@ import { Textur } from "@/components/medien/Textur";
 import { Badge, buttonKlassen } from "@/components/ui";
 import { namenLinkKlassen } from "@/components/ui/textlink";
 import { StimmFormular } from "@/components/umfrage/StimmFormular";
+import { PHASEN_LABEL } from "@/components/umfrage/phasen";
 import { cn } from "@/lib/cn";
 import { formatiereDatum, formatiereRelativ } from "@/lib/format";
 import type { UmfrageAnsicht, UmfrageOptionAnsicht } from "@/lib/query/umfragen";
-import type { UmfragePhase } from "@/db/enums";
 
 const ZAHL_FORMATTER = new Intl.NumberFormat("de-DE");
-
-const PHASEN_LABEL: Record<UmfragePhase, string> = {
-  VORSCHLAG: "Vorschlagsphase",
-  ABSTIMMUNG: "Abstimmung läuft",
-  BEENDET: "Runde beendet",
-};
 
 /**
  * Der Zustand des Betrachters gegenueber dieser Runde.
@@ -70,7 +64,7 @@ function Kandidat({
   const name = (
     <Link
       href={`/produkte/${option.slug}`}
-      className={namenLinkKlassen("font-buch text-h3 font-medium wrap-break-word")}
+      className={namenLinkKlassen("min-w-0 font-buch text-h3 font-medium wrap-break-word")}
       title={option.handelsname}
     >
       {option.handelsname}
@@ -204,7 +198,7 @@ export function UmfrageKarte({ umfrage, zustand, className, ort = "startseite" }
   const fristLabel = umfrage.phase === "VORSCHLAG" ? "Vorschläge bis" : "Abstimmung bis";
 
   return (
-    <div className={cn("stimmzettel border border-border-strong bg-surface-raised shadow-lg", className)}>
+    <div className={cn("stimmzettel border border-border-strong bg-surface-raised shadow-md", className)}>
       <div className="flex flex-wrap items-center justify-between gap-4 border-b border-border px-6 py-4">
         <Badge variante="accent">{PHASEN_LABEL[umfrage.phase]}</Badge>
         {frist && umfrage.phase !== "BEENDET" ? (

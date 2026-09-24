@@ -72,7 +72,7 @@ export function Abstimmung() {
             <Textur id="drip" className="absolute top-full left-1/3 -z-10 h-16 w-6" />
           </p>
           <p className="max-w-[48ch] text-body text-text-muted text-pretty">
-            Gesetzte Plätze bestimme ich. Über die übrigen stimmen freigegebene Mitglieder ab, eine
+            Gesetzte Plätze bestimme ich. Über die übrigen stimmen freigeschaltete Mitglieder ab, eine
             Stimme pro Runde.
           </p>
         </div>

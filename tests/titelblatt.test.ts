@@ -96,3 +96,13 @@ test("Datengrafik in Tinte, Terpen-Chips als Pillen ohne Grün", () => {
   assert.match(chips, /rounded-full/);
   assert.match(chips, /border-2 border-text/);
 });
+
+test("Titelblatt: Weg zur Abstimmung ist 44 px hoch", () => {
+  assert.match(zeige(BASIS), /<a[^>]*class="[^"]*min-h-11[^"]*"[^>]*>Zur Abstimmung</);
+});
+
+test("Titelblatt: THC und CBD brechen nicht zwischen Bezeichnung und Wert um", () => {
+  const html = zeige(BASIS);
+  assert.match(html, /<span class="whitespace-nowrap">THC [^<]*<\/span>/);
+  assert.match(html, /<span class="whitespace-nowrap">CBD [^<]*<\/span>/);
+});

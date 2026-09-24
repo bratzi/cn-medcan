@@ -1,11 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Suspense } from "react";
 
 import { ABSCHNITT_TITEL, Seitenkopf, seitenRahmen } from "@/components/layout/Seitenkopf";
 import { Doppelseite } from "@/components/review/Doppelseite";
 import { Inhaltsverzeichnis } from "@/components/review/Inhaltsverzeichnis";
-import { DoppelseitenSkelett } from "@/components/story/Skelette";
 import { EmptyState, buttonKlassen } from "@/components/ui";
 import { cn } from "@/lib/cn";
 import { redaktionelleReviews } from "@/lib/query/reviews";
@@ -69,9 +67,8 @@ export default function ReviewsPage() {
         satz="Jede Sorte teste ich nach demselben Schema und schreibe dazu, welche Charge es war."
       />
       <div className={cn(seitenRahmen(), "pt-12 pb-24 sm:pt-16")}>
-        <Suspense fallback={<DoppelseitenSkelett />}>
-          <ReviewsInhalt />
-        </Suspense>
+        {/* Bewusst ohne Suspense-Grenze: der Inhalt steht im ersten HTML, damit er ohne JavaScript lesbar ist und Sprungziele (#eintrag-…) existieren. */}
+        <ReviewsInhalt />
       </div>
     </>
   );

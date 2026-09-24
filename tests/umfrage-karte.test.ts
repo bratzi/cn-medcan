@@ -33,3 +33,36 @@ test("Formulare der Abstimmung sprechen in der Ich-Form", () => {
     assert.doesNotMatch(readFileSync(join(process.cwd(), datei), "utf8"), /Betreiber/, datei);
   }
 });
+
+const lies = (datei: string) => readFileSync(join(process.cwd(), datei), "utf8");
+
+test("Phasennamen aus einer Quelle für Stimmzettel und Chronik", () => {
+  assert.doesNotMatch(lies("app/umfragen/page.tsx"), /const PHASEN_LABEL/);
+  assert.doesNotMatch(QUELLE, /const PHASEN_LABEL/);
+  assert.match(lies("components/umfrage/phasen.ts"), /export const PHASEN_LABEL/);
+});
+
+test("Startseite spricht von freigeschalteten Mitgliedern", () => {
+  assert.doesNotMatch(lies("components/story/Abstimmung.tsx"), /freigegebene Mitglieder/);
+});
+
+test("Formulare der Abstimmung: Hover über Fläche, Fokus über die globale Regel", () => {
+  const stimme = lies("components/umfrage/StimmFormular.tsx");
+  assert.doesNotMatch(stimme, /hover:opacity|duration-150/);
+  assert.match(stimme, /hover:bg-surface-sunken/);
+  assert.doesNotMatch(lies("components/umfrage/VorschlagFormular.tsx"), /focus-visible:outline/);
+});
+
+test("Lange Namen im gesetzten Platz und bei den Gewinnern brechen um", () => {
+  assert.match(QUELLE, /namenLinkKlassen\("min-w-0 /);
+  assert.match(lies("app/umfragen/page.tsx"), /<p className="text-body text-text wrap-break-word">\s*\{"Gewonnen: "\}/);
+});
+
+test("Stimmzettel auf derselben Ebene wie Doppelseite und Blatt", () => {
+  assert.doesNotMatch(QUELLE, /shadow-lg/);
+  assert.match(QUELLE, /stimmzettel border border-border-strong bg-surface-raised shadow-md/);
+});
+
+test("Startseite: Katalog-Leerzustand im Kasten wie seine Nachbarn", () => {
+  assert.match(lies("components/story/Katalog.tsx"), /<EmptyState[\s\S]*?className="border border-border bg-surface-raised p-8 sm:p-12"/);
+});

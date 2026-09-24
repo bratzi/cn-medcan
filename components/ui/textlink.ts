@@ -13,6 +13,14 @@ export function textLinkKlassen(className?: string): string {
 }
 
 /**
+ * Einzelstehende Textlinks (Rueckweg, Ausweg): 44 px hoch wie jedes
+ * Touch-Ziel (ui-design-engine Regel 8), Aussehen wie textLinkKlassen.
+ */
+export function einzelLinkKlassen(className?: string): string {
+  return textLinkKlassen(cn("inline-flex min-h-11 items-center text-small", className));
+}
+
+/**
  * Handelsnamen als Link in Listen (Inhaltsverzeichnis, Vorschläge,
  * Stimmzettel): Tinte, der Unterstrich zeigt den Link, beim Hover dunkelt
  * nur die Unterstrichfarbe nach (Guideline 7).

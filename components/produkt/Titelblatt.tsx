@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 import { Badge } from "@/components/ui";
-import { textLinkKlassen } from "@/components/ui/textlink";
+import { einzelLinkKlassen } from "@/components/ui/textlink";
 import type { Darreichungsform, KultivarTyp } from "@/db/enums";
 import { formatiereDatum, formatiereProzentSpanne } from "@/lib/format";
 import { darreichungsformLabel, kultivarTypLabel } from "@/lib/labels";
@@ -60,10 +60,10 @@ export function Titelblatt(props: TitelblattProps) {
           </Badge>
         </div>
         <p className="numeric text-h3 font-normal text-text">
-          {`THC ${formatiereProzentSpanne(props.thcMin, props.thcMax)}`}
+          <span className="whitespace-nowrap">{`THC ${formatiereProzentSpanne(props.thcMin, props.thcMax)}`}</span>
           <span aria-hidden="true">{" · "}</span>
           <span className="sr-only">, </span>
-          {`CBD ${formatiereProzentSpanne(props.cbdMin, props.cbdMax)}`}
+          <span className="whitespace-nowrap">{`CBD ${formatiereProzentSpanne(props.cbdMin, props.cbdMax)}`}</span>
         </p>
       </div>
       <MeineNote bewertung={props.meineBewertung} />
@@ -77,7 +77,7 @@ function MeineNote({ bewertung }: { bewertung: MeineBewertung | null }) {
     return (
       <div className="flex flex-col gap-2 lg:items-end lg:text-right">
         <p className="text-h3 font-normal text-text">Noch nicht von mir getestet.</p>
-        <Link href="/umfragen" className={textLinkKlassen("text-small")}>
+        <Link href="/umfragen" className={einzelLinkKlassen()}>
           Zur Abstimmung
         </Link>
       </div>

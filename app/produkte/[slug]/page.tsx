@@ -1,10 +1,9 @@
-import { Suspense, type ReactNode } from "react";
+import type { ReactNode } from "react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { ABSCHNITT_TITEL, seitenRahmen } from "@/components/layout/Seitenkopf";
-import { TitelblattSkelett } from "@/components/layout/Skelette";
 import { BestandTabelle } from "@/components/produkt/BestandTabelle";
 import { CannabinoidBar } from "@/components/produkt/CannabinoidBar";
 import { TerpenChips } from "@/components/produkt/TerpenChips";
@@ -15,6 +14,7 @@ import { Netzdiagramm } from "@/components/review/Netzdiagramm";
 import { alsEintrag } from "@/components/review/eintrag";
 import {
   Faktenliste,
+  einzelLinkKlassen,
   Table,
   TableBody,
   TableCell,
@@ -226,7 +226,6 @@ async function ProduktInhalt({ slug }: { slug: string }) {
             </div>
             <div>
               <h3 className="text-h3 text-text">Terpenprofil</h3>
-              <p className="mt-2 text-small text-text-muted">Rang 1 ist das dominante Terpen.</p>
               <TerpenChips className="mt-4" terpene={strain.terpene} />
             </div>
           </div>
@@ -271,14 +270,13 @@ export default async function ProduktDetailPage({ params }: PageProps<"/produkte
   const { slug } = await params;
   return (
     <div className={cn(seitenRahmen(), "pt-16 pb-24 sm:pt-24")}>
-      <p className="mb-8 text-small">
-        <Link href="/produkte" className={textLinkKlassen()}>
+      <p className="mb-8">
+        <Link href="/produkte" className={einzelLinkKlassen()}>
           Alle Produkte
         </Link>
       </p>
-      <Suspense fallback={<TitelblattSkelett />}>
-        <ProduktInhalt slug={slug} />
-      </Suspense>
+      {/* Bewusst ohne Suspense-Grenze: notFound() antwortet so mit 404, der Inhalt ist ohne JavaScript lesbar und #eintrag-… existiert beim Sprung. */}
+      <ProduktInhalt slug={slug} />
     </div>
   );
 }

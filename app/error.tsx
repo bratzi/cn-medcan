@@ -5,7 +5,7 @@ import { useEffect } from "react";
 
 import { Seitenkopf, seitenRahmen } from "@/components/layout/Seitenkopf";
 import { Button } from "@/components/ui/Button";
-import { textLinkKlassen } from "@/components/ui/textlink";
+import { einzelLinkKlassen } from "@/components/ui/textlink";
 import { cn } from "@/lib/cn";
 
 /**
@@ -33,7 +33,7 @@ export default function Fehler({
       />
       <div className={cn(seitenRahmen(), "flex flex-wrap items-center gap-8 pt-8 pb-24")}>
         <Button onClick={() => retry()}>Erneut versuchen</Button>
-        <Link href="/" className={textLinkKlassen("text-small")}>
+        <Link href="/" className={einzelLinkKlassen()}>
           Zur Startseite
         </Link>
       </div>

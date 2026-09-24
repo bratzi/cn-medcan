@@ -88,6 +88,11 @@ const PAARE = [
   ["warning", "surface", 3],
   ["warning-fg", "warning", 4.5],
   ["text", "accent-subtle", 4.5],
+  // Badges: 13-px-Text auf ihrer Flaeche (components/ui/Badge.tsx).
+  ["success", "surface-raised", 4.5],
+  ["danger", "surface-raised", 4.5],
+  // warning- und accent-Badge: Text in Tinte (text/surface-raised, text/accent-subtle oben);
+  // den Zustand tragen Rahmen, Flaeche und Marker. warning/accent erreichen 4.5 hell nicht.
 ];
 
 const css = readFileSync(new URL("../app/globals.css", import.meta.url), "utf8");

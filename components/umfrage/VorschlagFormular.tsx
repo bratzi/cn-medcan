@@ -77,7 +77,7 @@ export function VorschlagFormular({ umfrageId, strains }: Props) {
             name="begruendung"
             rows={3}
             maxLength={MAX_BEGRUENDUNG}
-            className="w-full rounded-md border border-border-strong bg-surface px-4 py-2 text-body text-text focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring"
+            className="w-full rounded-md border border-border-strong bg-surface px-4 py-2 text-body text-text"
           />
         )}
       </Field>

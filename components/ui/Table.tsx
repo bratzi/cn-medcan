@@ -16,8 +16,9 @@ export type TableProps = {
  * Buchtabelle (Spec TP2 3.6): kein Rahmen, kein Zebra, eine kraeftige Linie
  * unter dem Kopf, Haarlinien zwischen den Zeilen. Der Rahmen scrollt
  * seitlich (`min-w-full` innen), damit schmale Viewports nicht die ganze
- * Seite mitscrollen; `tabIndex` macht ihn per Tastatur erreichbar, den Fokus
- * zeichnet die globale Regel.
+ * Seite mitscrollen; `tabIndex` macht ihn per Tastatur erreichbar, Rolle und
+ * Name sagen dem Screenreader, was dieser Tabstopp ist. Den Fokus zeichnet
+ * die globale Regel.
  */
 export function Table({
   caption,
@@ -27,7 +28,12 @@ export function Table({
   wrapperClassName,
 }: TableProps) {
   return (
-    <div tabIndex={0} className={cn("w-full max-w-full overflow-x-auto", wrapperClassName)}>
+    <div
+      role="region"
+      aria-label={caption}
+      tabIndex={0}
+      className={cn("w-full max-w-full overflow-x-auto", wrapperClassName)}
+    >
       <table className={cn("w-full min-w-full border-collapse text-body", className)}>
         <caption
           className={cn(captionVersteckt ? "sr-only" : "pb-4 text-left text-small text-text-muted")}

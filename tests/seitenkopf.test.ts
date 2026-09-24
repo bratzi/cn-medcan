@@ -5,7 +5,6 @@ import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 
 import { Seitenkopf, seitenRahmen, ABSCHNITT_TITEL } from "@/components/layout/Seitenkopf";
-import { TitelblattSkelett } from "@/components/layout/Skelette";
 
 test("Seitenkopf: genau ein h1 in Cormorant 300, Satz darunter, keine Oberzeile", () => {
   const html = renderToStaticMarkup(createElement(Seitenkopf, { titel: "Bewertungen", satz: "Ein Satz." }));
@@ -32,8 +31,9 @@ test("Abschnittstitel in Cormorant 500", () => {
   assert.match(ABSCHNITT_TITEL, /font-buch text-h1 font-medium/);
 });
 
-test("Titelblatt-Skelett meldet sich als Status", () => {
-  const html = renderToStaticMarkup(createElement(TitelblattSkelett));
-  assert.match(html, /role="status"/);
-  assert.match(html, /Produkt wird geladen/);
+test("Seitenkopf: Rückweg ist 44 px hoch", () => {
+  const html = renderToStaticMarkup(
+    createElement(Seitenkopf, { titel: "X", zurueck: { href: "/produkte", text: "Alle Produkte" } }),
+  );
+  assert.match(html, /<a[^>]*class="[^"]*min-h-11[^"]*"[^>]*>Alle Produkte</);
 });

@@ -37,7 +37,12 @@ async function Reihe() {
 
   if (eintraege.length === 0) {
     return (
-      <EmptyState titel="Keine Produkte im Katalog" beschreibung="Derzeit sind keine Handelsnamen hinterlegt." />
+      // Kasten wie die Leerzustaende der Nachbar-Sektionen, bis Welle 2 den Katalog umbaut.
+      <EmptyState
+        titel="Keine Produkte im Katalog"
+        beschreibung="Derzeit sind keine Handelsnamen hinterlegt."
+        className="border border-border bg-surface-raised p-8 sm:p-12"
+      />
     );
   }
 

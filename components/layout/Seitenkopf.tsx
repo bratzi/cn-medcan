@@ -1,7 +1,7 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 
-import { textLinkKlassen } from "@/components/ui/textlink";
+import { einzelLinkKlassen } from "@/components/ui/textlink";
 import { cn } from "@/lib/cn";
 
 /** Seitenrahmen der Unterseiten: breit fuer Inhalt, schmal fuer Konto und Formulare. */
@@ -30,8 +30,8 @@ export function Seitenkopf({ titel, satz, zurueck, schmal = false, children }: S
   return (
     <header className={cn(seitenRahmen(schmal), "pt-16 sm:pt-24")}>
       {zurueck ? (
-        <p className="mb-8 text-small">
-          <Link href={zurueck.href} className={textLinkKlassen()}>
+        <p className="mb-8">
+          <Link href={zurueck.href} className={einzelLinkKlassen()}>
             {zurueck.text}
           </Link>
         </p>

@@ -3,7 +3,7 @@
 > Übergabemedium zwischen Sessions. Wird nach jedem Arbeitsblock aktualisiert und committet.
 > Wer hier weiterarbeitet, liest diese Datei zuerst und braucht den Chatverlauf nicht.
 
-**Letzte Aktualisierung:** 2026-09-24 (Session 9, Brainstorming Teilprojekt 2 läuft)
+**Letzte Aktualisierung:** 2026-09-24 (Session 10, Welle 1 von TP2 umgesetzt, wartet auf Go)
 **Repo:** https://github.com/bratzi/cn-medcan (public)
 **Branch:** `main` (Makeover „Grünes Buch“ Teilprojekt 1 ist seit 2026-09-24 auf `main`)
 
@@ -211,6 +211,13 @@ Budgets, Akzeptanzkriterien und Reihenfolge. **Die Spec ist die Quelle - nicht d
   - Welle 1, Task 10 erledigt: /reviews mit Doppelseite und Inhaltsverzeichnis, ReviewKarte entfernt; ProduktCard sagt „für“ statt „fuer“ (vorgezogen aus Welle 2).
   - Welle 1, Task 11 erledigt: UmfrageKarte nur noch Stimmzettel, Balken in Tinte, Begriffe freigeschaltet, ort-Prop.
   - Welle 1, Task 12 erledigt: /umfragen mit Wand-Tags, Stimmzettel, Vorschlagsblatt, Chronik; Stimm- und Vorschlagsformular in Ich-Form. Lokal gesehen: Vorschlagsphase freigeschaltet, Abstimmung stimmberechtigt und abgestimmt, anonym; nicht gesehen: angemeldet ohne Freischaltung.
+  - **Welle 1, Task 13 (Abschluss), Stand Session 10:** Welle 1 ist auf `makeover/tp2-welle-1` umgesetzt und geprüft, **noch nicht live**. Prüfbericht:
+    grün: `npm test`, Typecheck, eslint, `npm run farben`, Build; Prüfskript `/ /reviews /umfragen /produkte/nebelharz-22 /produkte/pfefferstern-extrakt /gibt-es-nicht` 6x ok.
+    Browser (Hintergrund-Tab): Kopf und aria-current, 320/390/720 px ohne seitliches Überlaufen, Fokus überall sichtbar, hell/dunkel, Startseiten-Zähler auf Endwerten, Stimmzustände per SQL-Testrunde (freigeschaltet, stimmberechtigt, abgestimmt, anonym).
+    **Nicht verifiziert:** GSAP-Bewegung der Startseite (Hintergrund-Tab), Zustand "angemeldet ohne Freischaltung", Sprung auf `#eintrag-…` nach dem Fix im Browser (Erweiterung war getrennt; per HTML belegt: Ziel steht im ersten HTML).
+    Abschlussprüfung parallel (Nutzerwunsch): Code-Review-Agent und Design-Review-Agent (Umfang: alle geänderten Oberflächen). Ein Korrekturdurchgang, jeder Fix mit Test RED→GREEN.
+    **Nutzerentscheidung:** Suspense-Grenzen auf `/reviews`, `/umfragen`, Produktseite entfernt (Sprung auf den Eintrag, Lesbarkeit ohne JS, echte 404 vor Skeletten). Weitere Fixes: Kopf erst ab lg einzeilig, Fokusring in der Leiste, Badge-Kontrast hell (warning/accent in Tinte), Tabellen-Region, 44-px-Einzellinks, kleinere Doppelseiten-Überschrift auf Unterseiten, eine Phasennamen-Quelle, "freigeschaltet" auf der Startseite, Formular-Hover, lange Namen, Stimmzettel shadow-md.
+    **Offen für den Nutzer:** DSGVO-Frage zum Instagram-Reel-iframe (Einwilligung/Zwei-Klick, sobald ein Reel hinterlegt ist). Zurückgestellte Kleinigkeiten und alle Rulings stehen im Ledger bzw. im Plan-Ausführungsprotokoll.
 
 - **⇢ EINGETAKTET FÜR EINE NEUE SESSION (Nutzer, 2026-09-24, Session 9): Marke und Medien professionell
   überarbeiten, für das gesamte Projekt.** Der Nutzer schickte das mitten in die Planung und sagte ausdrücklich:

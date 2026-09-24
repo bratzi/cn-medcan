@@ -5,7 +5,7 @@ import { createElement, Fragment } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 
 import { Textur } from "@/components/medien/Textur";
-import { Badge } from "@/components/ui/Badge";
+import { Badge, type BadgeProps } from "@/components/ui/Badge";
 import { buttonKlassen } from "@/components/ui/Button";
 import { Blatt } from "@/components/ui/Blatt";
 import { EmptyState } from "@/components/ui/EmptyState";
@@ -112,4 +112,26 @@ test("Leerzustand ohne Kasten, Titel in Cormorant", () => {
   const html = renderToStaticMarkup(createElement(EmptyState, { titel: "Noch nichts da." }));
   assert.match(html, /\bfont-buch\b/);
   assert.doesNotMatch(html, /\bborder\b|bg-surface-raised/);
+});
+
+test("Badges mit kleinem Text: warning und accent in Tinte, Zustand über Rahmen und Marker", () => {
+  const warnung = renderToStaticMarkup(createElement(Badge, { variante: "warning" } as BadgeProps, "Nachbestellt"));
+  const akzent = renderToStaticMarkup(createElement(Badge, { variante: "accent" } as BadgeProps, "Deine Stimme"));
+  assert.doesNotMatch(warnung, /\btext-warning\b/);
+  assert.match(warnung, /\bborder-warning\b/);
+  assert.doesNotMatch(akzent, /\btext-accent\b/);
+  assert.match(akzent, /\bborder-accent\b/);
+});
+
+test("Buchtabelle: der scrollende Rahmen ist eine benannte Region", () => {
+  const html = renderToStaticMarkup(
+    createElement(Table, { caption: "Chargen" } as TableProps, createElement(TableBody, null)),
+  );
+  assert.match(html, /<div role="region" aria-label="Chargen" tabindex="0"/);
+});
+
+test("Einzelstehende Textlinks sind 44 px hoch", async () => {
+  const { einzelLinkKlassen } = await import("@/components/ui/textlink");
+  assert.match(einzelLinkKlassen(), /\bmin-h-11\b/);
+  assert.match(einzelLinkKlassen(), /\bhover:text-accent-hover\b/);
 });

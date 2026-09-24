@@ -6,7 +6,7 @@ export { Blatt } from "./Blatt";
 export { Faktenliste } from "./Faktenliste";
 export type { Fakt } from "./Faktenliste";
 
-export { namenLinkKlassen, textLinkKlassen } from "./textlink";
+export { einzelLinkKlassen, namenLinkKlassen, textLinkKlassen } from "./textlink";
 
 export { Button, buttonKlassen } from "./Button";
 export type { ButtonProps, ButtonGroesse, ButtonVariante } from "./Button";

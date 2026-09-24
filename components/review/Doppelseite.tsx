@@ -91,7 +91,12 @@ export function Doppelseite({ eintrag, umfang, ueberschrift: Ueberschrift, story
 
         <Ueberschrift
           id={titelId}
-          className="font-buch text-kapitel font-light text-text wrap-break-word hyphens-auto"
+          className={cn(
+            "font-buch text-balance text-text wrap-break-word hyphens-auto",
+            // Startseite: gross wie das Kapitel darueber. Unterseiten: kleiner als
+            // der Abschnittstitel (h2, text-h1), damit die Ebenen absteigen (Spec 3.3).
+            story ? "text-kapitel font-light" : "text-h2 font-medium",
+          )}
         >
           {voll ? <>Bewertung vom {datum}</> : eintrag.handelsname}
         </Ueberschrift>

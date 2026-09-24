@@ -6,9 +6,11 @@ export type BadgeVariante = "neutral" | "success" | "warning" | "danger" | "acce
 const VARIANTEN: Record<BadgeVariante, string> = {
   neutral: "border-border-strong bg-surface-raised text-text-muted",
   success: "border-success bg-surface-raised text-success",
-  warning: "border-warning bg-surface-raised text-warning",
+  // Tinte statt warning/accent: beide erreichen als 13-px-Text hell keine 4.5:1
+  // (npm run farben); den Zustand tragen Rahmen, Flaeche und Marker.
+  warning: "border-warning bg-surface-raised text-text",
   danger: "border-danger bg-surface-raised text-danger",
-  accent: "border-accent bg-accent-subtle text-accent",
+  accent: "border-accent bg-accent-subtle text-text",
 };
 
 /**
