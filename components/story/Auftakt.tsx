@@ -26,11 +26,11 @@ export function Auftakt() {
     <section
       aria-labelledby="auftakt-titel"
       data-story="auftakt"
-      className="buehne-dunkel relative isolate flex min-h-svh flex-col justify-end overflow-hidden pt-32 pb-16 sm:pb-24"
+      className="buehne-dunkel relative isolate flex min-h-svh flex-col overflow-hidden pt-16 pb-16 sm:pb-24"
     >
       <div aria-hidden="true" data-story="auftakt-film" className="pointer-events-none absolute inset-0 -z-10">
-        <Loop id="auftakt-loop" buehne className="h-full" />
-        <div className="absolute inset-0 bg-linear-to-b from-surface/40 via-surface/10 to-surface" />
+        <Loop id="auftakt-loop" buehne className="h-full opacity-45" />
+        <div className="absolute inset-0 bg-linear-to-b from-surface/60 via-surface/30 to-surface" />
       </div>
 
       <div className="mx-auto w-full max-w-360 px-4 sm:px-8">
@@ -43,7 +43,11 @@ export function Auftakt() {
         </p>
       </div>
 
-      <h1 id="auftakt-titel" data-story="titel" className="auftakt-marke relative mt-4 text-center">
+      <h1
+        id="auftakt-titel"
+        data-story="titel"
+        className="auftakt-marke relative flex flex-1 items-center justify-center py-8"
+      >
         <Wortmarke groesse="plakat" />
       </h1>
 

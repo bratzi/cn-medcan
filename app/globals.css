@@ -72,7 +72,7 @@
 
   /* Redesign 1: Manifest und Auftakt-Titel, Newsreader 200, nur Display. */
   --text-manifest: clamp(3rem, 1.5rem + 4vw, 6.25rem);
-  --text-manifest--line-height: 1.02;
+  --text-manifest--line-height: 1.14;
   --text-manifest--font-weight: 200;
   --text-manifest--letter-spacing: -0.025em;
 

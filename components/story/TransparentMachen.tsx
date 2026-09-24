@@ -12,27 +12,28 @@ const ERLAEUTERUNG: Record<string, string> = Object.fromEntries(
 );
 
 /**
- * Die drei Prüfpunkte als kleine Randfiguren (Spec Redesign 9): runde Bilder,
- * um die der Manifest-Text fließt (float mit shape-outside). Bewusst leise,
- * der Text trägt die Sektion.
+ * Die drei Prüfpunkte zwischen den Absätzen (Spec Redesign 9 und 13): große
+ * Bilder in ungleichen, leicht verlaufenen Kreisen (unperfekt mit Absicht),
+ * um die der Manifest-Text fließt (float mit shape-outside: ellipse).
  */
 const PUNKTE = [
-  { titel: "Aussehen", bild: "frei-hoch", text: ERLAEUTERUNG.aussehen, seite: "rechts" },
-  { titel: "Geruch", bild: "frei-paar", text: ERLAEUTERUNG.geruch, seite: "links" },
+  { titel: "Aussehen", bild: "frei-hoch", text: ERLAEUTERUNG.aussehen, seite: "rechts", form: "rounded-[62%_38%_55%_45%/48%_60%_40%_52%] rotate-3" },
+  { titel: "Geruch", bild: "frei-paar", text: ERLAEUTERUNG.geruch, seite: "links", form: "rounded-[45%_55%_40%_60%/58%_42%_62%_38%] -rotate-2" },
   {
     titel: "Restfeuchte",
     bild: "trichom",
     text: "Zwischen 8 und 13 Prozent ist gut. Darunter wird es staubig, darüber droht Schimmel.",
     seite: "rechts",
+    form: "rounded-[55%_45%_62%_38%/42%_56%_44%_58%] rotate-1",
   },
 ] as const;
 
 function Punkt({ punkt }: { punkt: (typeof PUNKTE)[number] }) {
-  const seite = punkt.seite === "rechts" ? "float-right ml-8 md:ml-16" : "float-left mr-8 md:mr-16";
+  const seite = punkt.seite === "rechts" ? "float-right ml-8 md:ml-24" : "float-left mr-8 md:mr-24";
   return (
-    <aside className={`${seite} mb-8 flex w-40 flex-col items-center gap-2 text-center md:w-56 [shape-outside:circle(50%)]`}>
-      <div className="aspect-square w-full overflow-hidden rounded-full bg-surface-sunken">
-        <Bild id={punkt.bild} sizes="(min-width: 768px) 224px, 160px" className="h-full object-cover" />
+    <aside className={`${seite} my-16 flex w-56 flex-col items-center gap-4 text-center md:w-md [shape-outside:ellipse(50%_45%)]`}>
+      <div className={`aspect-square w-full overflow-hidden bg-surface-sunken ${punkt.form}`}>
+        <Bild id={punkt.bild} sizes="(min-width: 768px) 448px, 224px" className="h-full object-cover" />
       </div>
       <h3 className="font-buch text-h3 font-medium text-text">{punkt.titel}</h3>
       <p className="text-small text-text-muted text-pretty">{punkt.text}</p>
@@ -43,7 +44,7 @@ function Punkt({ punkt }: { punkt: (typeof PUNKTE)[number] }) {
 /** Ein Absatz des Manifests: scroll-gekoppelt Wort für Wort sichtbar (transparent.ts). */
 function Zeile({ children }: { children: ReactNode }) {
   return (
-    <p data-manifest-zeile="" className="font-buch text-manifest text-text">
+    <p data-manifest-zeile="" className="mt-24 font-buch text-manifest text-text md:mt-32">
       {children}
     </p>
   );
