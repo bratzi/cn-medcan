@@ -170,9 +170,14 @@ Budgets, Akzeptanzkriterien und Reihenfolge. **Die Spec ist die Quelle - nicht d
      Bedeutung (Formularblatt, Stimmzettel, Doppelseite); Kernseiten luftig mit Doppelseite/Stimmzettel der
      Startseite, Katalog/Apotheken als Verzeichnis (mittlere Dichte), Admin als dichte Werkbank; Bewegung nur CSS.
      Verworfen: B „Zwei Register“ (Katalog bliebe 0815), C „GSAP auf Kernseiten“ (bricht Regel 7, +60 KB JS).
-  **Als Nächstes:** Design in Abschnitten vorlegen (gemeinsame Bausteine, dann Welle 1 bis 3), je Abschnitt Okay
-  holen, dann Spec `docs/superpowers/specs/2026-09-24-makeover-teilprojekt-2-design.md` schreiben, committen,
-  Nutzer prüfen lassen, dann `superpowers:writing-plans` (Plan für Welle 1).
+  6. Design in vier Abschnitten vorgelegt, **jeder vom Nutzer bestätigt** („passt“, „ja“, „ja“, „ja“), dabei auch:
+     Produktseite zeigt **„Meine Note“** (neueste eigene Bewertung), Community-Mittel getrennt (Abfrage bekommt
+     `istRedaktionell`); Katalog als **Zeilen** mit Vermerk **„Von mir getestet“** (Relation `take: 1`).
+  **Spec geschrieben und committet:** `docs/superpowers/specs/2026-09-24-makeover-teilprojekt-2-design.md`
+  (Wortlaut aller neuen Sätze in Abschnitt 7, Präzisierungen gegenüber dem Chat in Abschnitt 13).
+  **Als Nächstes:** Nutzer prüft die Spec (Pflicht-Gate aus `superpowers:brainstorming`). Nach Freigabe
+  `superpowers:writing-plans` für **Welle 1** (Kern), Nutzer wählt die Ausführungsart. Bei Änderungswünschen:
+  Spec anpassen, Selbstcheck (Platzhalter, Widersprüche, Mehrdeutigkeit), erneut vorlegen.
   Beim Einlesen gefundener Kleinkram (für die Spec): `/produkte` rendert ein zweites `<main>` im Layout-`<main>`
   (ebenso `/zugang`); sichtbares „fuer“ in `ProduktCard` („Preis nur fuer Fachkreise“) und „oeffentlich“ auf
   `/zugang`; `/zugang`-Titel noch „cn-medcan“, eigener Button mit Deckkraft-Hover und `rounded-md`; Geviertstrich
