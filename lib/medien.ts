@@ -26,6 +26,8 @@ export type Medium = {
   urheber: string;
   /** Pexels-Seite des Motivs. */
   quelle: string;
+  /** Freisteller mit Alpha (scripts/medien/freistellen.py): kein Mischmodus, steht frei auf jedem Grund. */
+  freigestellt?: boolean;
 };
 
 export const FOTO_BREITEN = [640, 1280, 1920] as const;
@@ -34,37 +36,40 @@ export const STANDBILD_BREITE = 576;
 
 export const MEDIEN: readonly Medium[] = [
   {
-    id: "leitobjekt",
+    id: "frei-bluete",
     art: "foto",
-    pexelsId: 5712437,
-    datei: "leitobjekt",
-    breite: 4000,
-    hoehe: 2670,
-    alt: "Aufgeschlagenes Spiralheft mit einem getrockneten Ahornblatt und einem Stift auf hellem Grund",
-    urheber: "Arina Krasnikova",
-    quelle: "https://www.pexels.com/photo/brown-maple-leaf-on-white-spiral-notebook-5712437/",
+    pexelsId: 12728515,
+    datei: "frei-bluete",
+    breite: 1133,
+    hoehe: 903,
+    alt: "Getrocknete Cannabisblüte, freigestellt, in Schwarzweiß",
+    urheber: "Brokkelen.nl",
+    quelle: "https://www.pexels.com/photo/dried-cannabis-on-white-surface-12728515/",
+    freigestellt: true,
   },
   {
-    id: "blatt",
+    id: "frei-hoch",
     art: "foto",
-    pexelsId: 7668040,
-    datei: "blatt",
-    breite: 5184,
-    hoehe: 3888,
-    alt: "Einzelnes Cannabisblatt vor hellem Grund",
+    pexelsId: 7773105,
+    datei: "frei-hoch",
+    breite: 1913,
+    hoehe: 1942,
+    alt: "Cannabisblüte mit Stängel, freigestellt, in Schwarzweiß",
     urheber: "Kindel Media",
-    quelle: "https://www.pexels.com/photo/photo-of-cannabis-on-white-background-7668040/",
+    quelle: "https://www.pexels.com/photo/close-up-photo-of-kush-on-white-background-7773105/",
+    freigestellt: true,
   },
   {
-    id: "bluete",
+    id: "frei-paar",
     art: "foto",
-    pexelsId: 20288575,
-    datei: "bluete",
-    breite: 3116,
-    hoehe: 2078,
-    alt: "Zwei getrocknete Cannabisblüten vor hellem Grund",
-    urheber: "Jonathan Cooper",
-    quelle: "https://www.pexels.com/photo/dry-buds-of-marijuana-20288575/",
+    pexelsId: 16662341,
+    datei: "frei-paar",
+    breite: 1606,
+    hoehe: 1066,
+    alt: "Zwei Cannabisblüten, freigestellt, in Schwarzweiß",
+    urheber: "Terrance Barksdale",
+    quelle: "https://www.pexels.com/photo/weed-on-white-background-16662341/",
+    freigestellt: true,
   },
   {
     id: "trichom",
@@ -80,13 +85,13 @@ export const MEDIEN: readonly Medium[] = [
   {
     id: "pflanze-loop",
     art: "video",
-    pexelsId: 12361112,
+    pexelsId: 7667040,
     datei: "pflanze-loop",
     breite: 3840,
     hoehe: 2160,
     alt: "",
-    urheber: "Nicky Pe",
-    quelle: "https://www.pexels.com/video/cannabis-plants-swaying-in-the-wind-12361112/",
+    urheber: "Kindel Media",
+    quelle: "https://www.pexels.com/video/lush-green-leaves-of-a-cannabis-tree-7667040/",
   },
 ];
 

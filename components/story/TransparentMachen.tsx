@@ -13,8 +13,8 @@ const ERLAEUTERUNG: Record<string, string> = Object.fromEntries(
 
 /** Drei Feldbuch-Notizen, dazu der Zoom Blatt, Blüte, Trichom (Spec 5.1, Sektion 2). */
 const NOTIZEN = [
-  { titel: "Aussehen", bild: "blatt", text: ERLAEUTERUNG.aussehen },
-  { titel: "Geruch", bild: "bluete", text: ERLAEUTERUNG.geruch },
+  { titel: "Aussehen", bild: "frei-hoch", text: ERLAEUTERUNG.aussehen },
+  { titel: "Geruch", bild: "frei-paar", text: ERLAEUTERUNG.geruch },
   {
     titel: "Restfeuchte",
     bild: "trichom",

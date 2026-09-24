@@ -30,7 +30,7 @@ export function Bild({ id, sizes, className, prioritaet = false, dekorativ = fal
       loading={prioritaet ? "eager" : "lazy"}
       fetchPriority={prioritaet ? "high" : "auto"}
       decoding="async"
-      className={cn("medien-buch block h-auto w-full", className)}
+      className={cn(m.freigestellt ? "block h-auto w-full" : "medien-buch block h-auto w-full", className)}
     />
   );
 }
