@@ -51,11 +51,6 @@ export function Kandidat({ option, gesamt, gewaehlt, zeigeStimmen }: KandidatPro
         </span>
 
         <span className="flex items-center gap-2">
-          {option.herkunft === "GESETZT" ? (
-            <span className="stempel" title="Von mir gesetzt, nicht zur Wahl gestellt">
-              Gesetzt
-            </span>
-          ) : null}
           {option.herkunft === "COMMUNITY" ? (
             <span data-story="vermerk" className={VERMERK}>
               von euch

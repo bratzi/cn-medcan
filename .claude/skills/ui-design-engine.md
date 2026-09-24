@@ -12,7 +12,7 @@ Spacing, Farbe, Formen, Motion oder Tokens gilt diese Datei. Für Design-Arbeit 
 die Design-Skills geladen (Zuordnung in der Memory `design-skills-einsatz`).
 
 ## 1. Zwei Stimmen
-- **Gedruckt** (Betreiber): Newsreader, Geist, Geist Mono, Papier und Tinte. Messwerte, Reviews,
+- **Zwei Familien, keine dritte** (Spec Redesign 11). **Gedruckt**: Newsreader (auch Bedienung und Zahlen), Papier und Tinte. Messwerte, Reviews,
   Katalogdaten, Handelsnamen, Rechtshinweise und Bedienung sind immer gedruckt.
 - **Von Hand** (Community und Logo): Inspiration (`font-hand`) in `kopierstift`. Nur, wo die Community
   spricht (Stimmen, Vorschläge, Zähler, „Wähl mit.“, Vermerke am Stimmzettel, Überschriften auf
@@ -45,7 +45,7 @@ Größen: `text-caption` 13, `text-small` 14, `text-body` 16, `text-h3` 20, `tex
 (clamp 5 bis 20rem, Wortmarke im Auftakt und im Fuß), `text-notiz` (clamp 2 bis 4.5rem, Randnotizen,
 „Wähl mit.“, Überschriften auf `/umfragen`), `text-vermerk` (2rem, Vermerke am Stimmzettel und in der
 Schleife).
-- Geist: 400, 500, 600. Newsreader 200 **nur ab 40 px** (`text-manifest`, `text-titel`, `text-kapitel`), sonst 500; 800 nur für kurze Kapitelmarken.
+- Newsreader im Text: 400, 500, 600; Newsreader 200 **nur ab 40 px** (`text-manifest`, `text-titel`, `text-kapitel`), sonst 500; 800 nur für kurze Kapitelmarken.
 - Große Grade tragen negative Laufweite aus dem Token; nie per Klasse überschreiben.
 - Auftakt (Referenz choreograffiti): die h1 ist die Wortmarke in `text-plakat` von Rand zu Rand.
 - Jede Startseiten-Sektion trägt einen Buzz-Satz (höchstens drei Wörter) über `components/story/Schlagwort` in `text-kulisse`, `text-border`, aria-hidden; Sektion `relative isolate overflow-x-clip`.

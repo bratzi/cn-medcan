@@ -25,7 +25,7 @@ export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Abstimmung",
-  description: "Laufende und vergangene Runden: Ihr schlagt Sorten vor und wählt, was ich als Nächstes teste.",
+  description: "Laufende und vergangene Runden: Wir schlagen Sorten vor und wählen, was wir als Nächstes testen.",
 };
 
 /** Handschrift-Überschrift: kurz, Imperativ, in Kopierstift (Spec TP3 10). */
@@ -132,7 +132,7 @@ async function UmfragenInhalt() {
           ) : null}
 
           {umfrage.phase === "VORSCHLAG" && mitglied && !mitglied.freigegeben ? (
-            <p className="text-body text-text-muted">Sobald ich dein Konto freischalte, kannst du hier vorschlagen.</p>
+            <p className="text-body text-text-muted">Sobald dein Konto freigeschaltet ist, kannst du hier vorschlagen.</p>
           ) : null}
 
           {vorschlaege.length === 0 ? (
@@ -188,7 +188,7 @@ async function UmfragenInhalt() {
 export default function UmfragenPage() {
   return (
     <>
-      <Seitenkopf titel="Abstimmung" satz="Ihr schlagt Sorten vor und wählt. Was gewinnt, teste ich als Nächstes." />
+      <Seitenkopf titel="Abstimmung" satz="Wir schlagen Sorten vor und wählen. Was gewinnt, testen wir als Nächstes." />
       <div className={cn(seitenRahmen(), "pt-12 pb-24 sm:pt-16")}>
         {/* Bewusst ohne Suspense-Grenze: der Inhalt steht im ersten HTML, damit er ohne JavaScript lesbar ist und Sprungziele (#eintrag-…) existieren. */}
         <UmfragenInhalt />

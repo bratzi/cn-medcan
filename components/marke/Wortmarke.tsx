@@ -46,7 +46,7 @@ export function Wortmarke({ groesse, einzeilig = false, className }: Props) {
 }
 
 /**
- * Die Unterzeile der Wortmarke (Spec TP3 6): gedruckt in Geist 500,
+ * Die Unterzeile der Wortmarke (Spec TP3 6): gedruckt in Newsreader 500,
  * gespeichert in natürlicher Schreibung, Versalien und Laufweite per CSS.
  */
 export function Unterzeile({ className }: { className?: string }) {

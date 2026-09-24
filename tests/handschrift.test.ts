@@ -106,9 +106,9 @@ test("Community-Platz: Vermerk „von euch“ von Hand, der Name gedruckt", () =
   assert.doesNotMatch(name, /font-hand/);
 });
 
-test("Gesetzter Platz: Stempel, kein Vermerk, keine Handschrift", () => {
+test("Gesetzter Platz: nicht als gesetzt erkennbar, kein Vermerk, keine Handschrift (Spec Redesign 10)", () => {
   const html = kandidat({ option: option({ herkunft: "GESETZT", stimmen: null }) });
-  assert.match(html, /class="stempel"/);
+  assert.doesNotMatch(html, /class="stempel"|Gesetzt/);
   assert.doesNotMatch(html, /von euch|font-hand/);
 });
 

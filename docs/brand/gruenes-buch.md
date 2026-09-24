@@ -125,8 +125,10 @@ Haarstriche hat. Datengrafiken stehen in Tinte (`text`), nicht in Grün. Kein re
 | Rolle | Schrift | Schnitte | Einsatz |
 |---|---|---|---|
 | Buch-Display | **Newsreader** (OFL, variabel, opsz) | 200 bis 800, kursiv | 200: Auftakt-Titel, Manifest, Kapitel (nur ab 40 px); 500: Handelsnamen, Schlusszeile; 800 nur kurze Kapitelmarken; Betonung kursiv |
-| Text und Bedienung | **Geist** | variabel | Fließtext, Buttons, Formulare, Navigation, Unterzeile der Wortmarke |
-| Messwerte | **Geist Mono** | variabel | Noten, Chargen, Zahlen (`tabular-nums`), auch die Zahl neben einer Randnotiz |
+| Text und Bedienung | **Newsreader** | 400, 500, 600 | Fließtext, Buttons, Formulare, Navigation, Unterzeile der Wortmarke |
+| Messwerte | **Newsreader** | 500 | Noten, Chargen, Zahlen (`tabular-nums lining-nums`) |
+
+**Genau zwei Familien** (Spec Redesign 11): Inspiration (Logo, von Hand) und Newsreader (alles Gedruckte). Keine dritte Schrift.
 | Handschrift | **Inspiration** | 400 (einziger Schnitt) | Wortmarke (auch als Signatur unter dem Auftakt-Titel), Randnotizen, „Wähl mit.“, Vermerke, Community-Überschriften auf `/umfragen`; blasse Messwert-Notizen im Hintergrund (aria-hidden) |
 
 | Token | Wert | Zeilenhöhe | Schrift |

@@ -54,7 +54,7 @@ export function StimmFormular({ umfrageId, optionen }: Props) {
 
       <fieldset className="border-0 p-0">
         <legend className="text-small font-medium text-text">
-          Wofür soll ich als Nächstes eine Bewertung schreiben?
+          Was sollen wir als Nächstes bewerten?
         </legend>
 
         <ul className="mt-4 flex flex-col gap-2">

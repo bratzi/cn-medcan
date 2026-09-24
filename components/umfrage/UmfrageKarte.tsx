@@ -51,7 +51,7 @@ function Aktionsbereich({
   if (umfrage.phase === "BEENDET") {
     return (
       <p className="text-small text-text-muted">
-        Diese Runde ist abgeschlossen. Das Ergebnis ist verbindlich für meine nächste Bewertung.
+        Diese Runde ist abgeschlossen. Das Ergebnis ist verbindlich für unsere nächste Bewertung.
       </p>
     );
   }
@@ -87,7 +87,7 @@ function Aktionsbereich({
     return (
       <div className="flex flex-wrap items-center gap-2">
         <Badge variante="warning">Noch nicht freigeschaltet</Badge>
-        <p className="text-small text-text-muted">Sobald ich dein Konto freischalte, kannst du abstimmen.</p>
+        <p className="text-small text-text-muted">Sobald dein Konto freigeschaltet ist, kannst du abstimmen.</p>
       </div>
     );
   }

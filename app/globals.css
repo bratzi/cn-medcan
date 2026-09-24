@@ -8,8 +8,9 @@
 
 @theme {
   /* ---- Schriften ------------------------------------------------------- */
-  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
-  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+  /* Zwei Familien (Spec Redesign 11): Newsreader für alles Gedruckte, Inspiration von Hand. */
+  --font-sans: var(--font-newsreader), Georgia, "Times New Roman", serif;
+  --font-mono: var(--font-newsreader), Georgia, "Times New Roman", serif;
   --font-buch: var(--font-newsreader), Georgia, "Times New Roman", serif;
   --font-hand: var(--font-inspiration), "Segoe Script", cursive;
 
@@ -285,7 +286,7 @@
   [data-numeric],
   .numeric {
     font-family: var(--font-mono);
-    font-variant-numeric: tabular-nums;
+    font-variant-numeric: tabular-nums lining-nums;
   }
 
   /* Einheitlicher Fokus, nie in Komponenten entfernt. Kein eigener Radius:

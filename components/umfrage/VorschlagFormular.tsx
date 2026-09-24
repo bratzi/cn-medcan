@@ -92,7 +92,7 @@ export function VorschlagFormular({ umfrageId, strains }: Props) {
       {gespeichert && !fehler ? (
         <p role="status" className="text-small text-success">
           <span className="font-medium">Vorschlag eingereicht. </span>
-          Ich entscheide, welche Vorschläge auf die Wahlliste kommen.
+          Vorschläge werden geprüft, bevor sie auf die Wahlliste kommen.
         </p>
       ) : null}
 

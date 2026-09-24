@@ -3,7 +3,7 @@ import type { Randnotiz } from "@/lib/query/community";
 const ZAHL = new Intl.NumberFormat("de-DE");
 
 /**
- * Die Randspalte der Sektion 3 (Spec TP3 8.3): die Zahl gedruckt in Geist
+ * Die Randspalte der Sektion 3 (Spec TP3 8.3): die Zahl gedruckt in Newsreader
  * Mono, das Wort von Hand. Mit Zahl wird die Notiz als ein Satz vorgelesen
  * (sr-only); die sichtbaren Teile sind aria-hidden, weil die StoryBuehne
  * die Zahl hochzählt. Ein Leitsatz steht allein und wird direkt gelesen.

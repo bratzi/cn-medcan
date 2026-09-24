@@ -1,26 +1,15 @@
 import type { Metadata } from "next";
-import {
-  Geist,
-  Geist_Mono,
-  Inspiration,
-  Newsreader,
-} from "next/font/google";
+import { Inspiration, Newsreader } from "next/font/google";
 import { Fuss } from "@/components/layout/Fuss";
 import { Kopf } from "@/components/layout/Kopf";
 import { THEMA_SKRIPT, THEMA_STANDARD } from "@/lib/thema";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
-
-/** Die eine Serif (Spec Redesign 1): variabel 200 bis 800 mit optischer Größe, normal und kursiv. */
+/**
+ * Eine von zwei Familien (Spec Redesign 11): Newsreader trägt alles Gedruckte,
+ * von der Story bis zur Bedienung und den Zahlen. Variabel 200 bis 800 mit
+ * optischer Größe, normal und kursiv. Die zweite Familie ist Inspiration.
+ */
 const newsreader = Newsreader({
   variable: "--font-newsreader",
   subsets: ["latin"],
@@ -54,7 +43,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="de"
       data-theme={THEMA_STANDARD}
       suppressHydrationWarning
-      className={`${geistSans.variable} ${geistMono.variable} ${newsreader.variable} ${inspiration.variable} h-full antialiased`}
+      className={`${newsreader.variable} ${inspiration.variable} h-full antialiased`}
     >
       <head>
         <script dangerouslySetInnerHTML={{ __html: THEMA_SKRIPT }} />
