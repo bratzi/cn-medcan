@@ -1,0 +1,358 @@
+{
+  "stand": "2026-09-25",
+  "zweck": "Suchliste: Hersteller und Importeure fuer Medizinalcannabis in Deutschland, nur Namen (Quelle der Namensliste: medcanonestop.com/manufacturer). Produktdaten kommen aus eigener Recherche.",
+  "hersteller": [
+    {
+      "name": "ACA Müller Pharma",
+      "imStamm": false
+    },
+    {
+      "name": "ADREXpharma",
+      "imStamm": false
+    },
+    {
+      "name": "Adven",
+      "imStamm": false
+    },
+    {
+      "name": "alephSana",
+      "imStamm": true
+    },
+    {
+      "name": "AMP Alternative Medical Products",
+      "imStamm": false
+    },
+    {
+      "name": "Aurora Deutschland",
+      "imStamm": false
+    },
+    {
+      "name": "avaay Medical",
+      "imStamm": true
+    },
+    {
+      "name": "Avextra Pharma",
+      "imStamm": false
+    },
+    {
+      "name": "Balancial GmbH",
+      "imStamm": false
+    },
+    {
+      "name": "Bathera",
+      "imStamm": false
+    },
+    {
+      "name": "Bava Med",
+      "imStamm": false
+    },
+    {
+      "name": "BC Green",
+      "imStamm": false
+    },
+    {
+      "name": "Beacon Medical",
+      "imStamm": false
+    },
+    {
+      "name": "Becanex GmbH",
+      "imStamm": false
+    },
+    {
+      "name": "BeCherry",
+      "imStamm": false
+    },
+    {
+      "name": "Bedrocan",
+      "imStamm": true
+    },
+    {
+      "name": "California's Medical",
+      "imStamm": false
+    },
+    {
+      "name": "Candoro ethics",
+      "imStamm": false
+    },
+    {
+      "name": "Canify",
+      "imStamm": false
+    },
+    {
+      "name": "Cannaflos",
+      "imStamm": false
+    },
+    {
+      "name": "Cannamedical",
+      "imStamm": true
+    },
+    {
+      "name": "Cannovum Health",
+      "imStamm": false
+    },
+    {
+      "name": "Cannprisma",
+      "imStamm": false
+    },
+    {
+      "name": "CanopyMedical",
+      "imStamm": true
+    },
+    {
+      "name": "Cansativa",
+      "imStamm": true
+    },
+    {
+      "name": "Cantourage",
+      "imStamm": true
+    },
+    {
+      "name": "canymed",
+      "imStamm": false
+    },
+    {
+      "name": "Curaleaf",
+      "imStamm": false
+    },
+    {
+      "name": "Day3 Pharmaceuticals Germany GmbH",
+      "imStamm": false
+    },
+    {
+      "name": "DEMECAN",
+      "imStamm": true
+    },
+    {
+      "name": "Dopiopharm GmbH",
+      "imStamm": false
+    },
+    {
+      "name": "DRAPALIN Pharmaceuticals",
+      "imStamm": false
+    },
+    {
+      "name": "enua Pharma",
+      "imStamm": true
+    },
+    {
+      "name": "Ethypharm",
+      "imStamm": false
+    },
+    {
+      "name": "Farmako",
+      "imStamm": false
+    },
+    {
+      "name": "Four 20 Pharma",
+      "imStamm": true
+    },
+    {
+      "name": "Fritz Apotheke",
+      "imStamm": false
+    },
+    {
+      "name": "GantryCare",
+      "imStamm": false
+    },
+    {
+      "name": "Grow",
+      "imStamm": true
+    },
+    {
+      "name": "Grüne Blüte",
+      "imStamm": false
+    },
+    {
+      "name": "Grünhorn",
+      "imStamm": false
+    },
+    {
+      "name": "Herbasana",
+      "imStamm": false
+    },
+    {
+      "name": "HEYDAY",
+      "imStamm": false
+    },
+    {
+      "name": "Ilios Santé",
+      "imStamm": false
+    },
+    {
+      "name": "IMCannabis",
+      "imStamm": false
+    },
+    {
+      "name": "INOPHA",
+      "imStamm": false
+    },
+    {
+      "name": "IUVO Therapeutics",
+      "imStamm": false
+    },
+    {
+      "name": "Jumis Pharma",
+      "imStamm": false
+    },
+    {
+      "name": "KHIRON",
+      "imStamm": false
+    },
+    {
+      "name": "Kineo Medical",
+      "imStamm": false
+    },
+    {
+      "name": "Marien Apotheke Neukirchen",
+      "imStamm": false
+    },
+    {
+      "name": "Materia Deutschland GmbH",
+      "imStamm": false
+    },
+    {
+      "name": "mediproCan Pharma",
+      "imStamm": false
+    },
+    {
+      "name": "Medizinalhanf GmbH",
+      "imStamm": false
+    },
+    {
+      "name": "MGF Medical",
+      "imStamm": false
+    },
+    {
+      "name": "Montu Therapeutics",
+      "imStamm": false
+    },
+    {
+      "name": "MYCB1",
+      "imStamm": false
+    },
+    {
+      "name": "Natural Pharma",
+      "imStamm": false
+    },
+    {
+      "name": "Nimbus Health",
+      "imStamm": true
+    },
+    {
+      "name": "Noc Pharma",
+      "imStamm": false
+    },
+    {
+      "name": "Novacana GmbH",
+      "imStamm": false
+    },
+    {
+      "name": "NOVVIA PHARM",
+      "imStamm": false
+    },
+    {
+      "name": "Panaxia",
+      "imStamm": false
+    },
+    {
+      "name": "Pharmabion GmbH",
+      "imStamm": true
+    },
+    {
+      "name": "PharmaRolly",
+      "imStamm": true
+    },
+    {
+      "name": "Pharmcann",
+      "imStamm": false
+    },
+    {
+      "name": "Pineappletreecann",
+      "imStamm": false
+    },
+    {
+      "name": "PSMO",
+      "imStamm": false
+    },
+    {
+      "name": "PureCan",
+      "imStamm": false
+    },
+    {
+      "name": "Remexian Pharma",
+      "imStamm": true
+    },
+    {
+      "name": "ROOBS GmbH",
+      "imStamm": false
+    },
+    {
+      "name": "SafriCanna",
+      "imStamm": true
+    },
+    {
+      "name": "Sanvivo Apotheke",
+      "imStamm": false
+    },
+    {
+      "name": "Sinceritas GmbH",
+      "imStamm": false
+    },
+    {
+      "name": "SOMAÍ Pharmaceuticals",
+      "imStamm": false
+    },
+    {
+      "name": "Spectrum Therapeutics",
+      "imStamm": false
+    },
+    {
+      "name": "SpectrumBotanics",
+      "imStamm": false
+    },
+    {
+      "name": "STADA",
+      "imStamm": false
+    },
+    {
+      "name": "Suprobion",
+      "imStamm": false
+    },
+    {
+      "name": "Tetra Pharm Technologies",
+      "imStamm": false
+    },
+    {
+      "name": "Therismos",
+      "imStamm": false
+    },
+    {
+      "name": "Tikun Olam",
+      "imStamm": false
+    },
+    {
+      "name": "Tilray",
+      "imStamm": true
+    },
+    {
+      "name": "Vayamed",
+      "imStamm": true
+    },
+    {
+      "name": "VERTANICAL",
+      "imStamm": false
+    },
+    {
+      "name": "WEECO Pharma",
+      "imStamm": false
+    },
+    {
+      "name": "WMG Pharma",
+      "imStamm": false
+    },
+    {
+      "name": "YouCann",
+      "imStamm": false
+    }
+  ]
+}
