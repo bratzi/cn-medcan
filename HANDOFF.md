@@ -200,6 +200,7 @@ Budgets, Akzeptanzkriterien und Reihenfolge. **Die Spec ist die Quelle - nicht d
   des Nutzers dort.
   **Fortschritt Welle 1 (Session 10, Branch `makeover/tp2-welle-1`, Ledger `.superpowers/sdd/2026-09-24-makeover-tp2-welle-1/progress.md`):**
   - Welle 1, Task 1 erledigt: textLinkKlassen, namenLinkKlassen, Blatt, Faktenliste (Branch makeover/tp2-welle-1).
+  - Welle 1, Task 2 erledigt: Buchtabelle, Leerzustand ohne Kasten (wirkt auf allen Seiten).
 
 - **⇢ EINGETAKTET FÜR EINE NEUE SESSION (Nutzer, 2026-09-24, Session 9): Marke und Medien professionell
   überarbeiten, für das gesamte Projekt.** Der Nutzer schickte das mitten in die Planung und sagte ausdrücklich:

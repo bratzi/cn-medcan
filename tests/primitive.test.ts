@@ -1,14 +1,23 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 
-import { createElement } from "react";
+import { createElement, Fragment } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 
 import { Textur } from "@/components/medien/Textur";
 import { Badge } from "@/components/ui/Badge";
 import { buttonKlassen } from "@/components/ui/Button";
 import { Blatt } from "@/components/ui/Blatt";
+import { EmptyState } from "@/components/ui/EmptyState";
 import { Faktenliste } from "@/components/ui/Faktenliste";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeaderCell,
+  TableRow,
+} from "@/components/ui/Table";
 import { namenLinkKlassen, textLinkKlassen } from "@/components/ui/textlink";
 
 test("Buttons sind Pillen", () => {
@@ -83,4 +92,27 @@ test("Faktenliste: je Paar ein dt und ein dd", () => {
   assert.match(html, /^<dl/);
   assert.equal(html.match(/<dt/g)?.length, 2);
   assert.equal(html.match(/<dd/g)?.length, 2);
+});
+
+test("Buchtabelle: kein Rahmen, kein Zebra, kräftige Linie unter dem Kopf", () => {
+  const kopf = createElement(TableHead, {
+    children: createElement(TableRow, { children: createElement(TableHeaderCell, { children: "Charge" }) }),
+  });
+  const rumpf = createElement(TableBody, {
+    children: createElement(TableRow, { children: createElement(TableCell, { children: "A1" }) }),
+  });
+  const html = renderToStaticMarkup(
+    createElement(Table, { caption: "Chargen", children: createElement(Fragment, null, kopf, rumpf) }),
+  );
+  assert.doesNotMatch(html, /even:bg-/);
+  assert.doesNotMatch(html, /rounded-lg|border border-border/);
+  assert.match(html, /border-b-2 border-border-strong/);
+  assert.match(html, /overflow-x-auto/);
+  assert.match(html, /tabindex="0"/);
+});
+
+test("Leerzustand ohne Kasten, Titel in Cormorant", () => {
+  const html = renderToStaticMarkup(createElement(EmptyState, { titel: "Noch nichts da." }));
+  assert.match(html, /\bfont-buch\b/);
+  assert.doesNotMatch(html, /\bborder\b|bg-surface-raised/);
 });
