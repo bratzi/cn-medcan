@@ -1,4 +1,5 @@
 import { Loop } from "@/components/medien/Loop";
+import { Button } from "@/components/ui";
 
 /**
  * Sektion 4 (Spec 5.1): die Schleife. Die Überschrift trägt die Aussage;
@@ -32,34 +33,42 @@ export function GemeinsamLernen() {
           </p>
         </div>
 
-        <div aria-hidden="true" data-story="schleife" className="relative mx-auto hidden aspect-square w-full max-w-xl md:block">
-          {/* Kein vector-effect="non-scaling-stroke" am Kreis: damit rechnete Chrome
-              die Strichlaenge in Bildschirmpixeln, pathLength aber in SVG-Einheiten,
-              und der Kreis blieb offen. */}
-          <svg viewBox="0 0 400 400" className="absolute inset-0 h-full w-full text-text">
-            <circle
-              data-story="schleife-linie"
-              cx="200"
-              cy="200"
-              r="160"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth={1.5}
-              pathLength={1}
-              strokeDasharray="1"
-            />
-          </svg>
-          <div className="absolute inset-1/4 overflow-hidden">
-            <Loop id="pflanze-loop" className="h-full" />
+        <div className="hidden flex-col items-center gap-6 md:flex">
+          <div aria-hidden="true" data-story="schleife" className="relative mx-auto aspect-square w-full max-w-xl">
+            {/* Kein vector-effect="non-scaling-stroke" am Kreis: damit rechnete Chrome
+                die Strichlaenge in Bildschirmpixeln, pathLength aber in SVG-Einheiten,
+                und der Kreis blieb offen. */}
+            <svg viewBox="0 0 400 400" className="absolute inset-0 h-full w-full text-text">
+              <circle
+                data-story="schleife-linie"
+                cx="200"
+                cy="200"
+                r="160"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={1.5}
+                pathLength={1}
+                strokeDasharray="1"
+              />
+            </svg>
+            <div className="absolute inset-1/4 overflow-hidden">
+              <Loop id="pflanze-loop" className="h-full" />
+            </div>
+            {STATIONEN.map((station) => (
+              <span
+                key={station.text}
+                className={`absolute bg-surface px-2 whitespace-nowrap ${station.ort} ${stationKlasse(station.wand)}`}
+              >
+                {station.text}
+              </span>
+            ))}
           </div>
-          {STATIONEN.map((station) => (
-            <span
-              key={station.text}
-              className={`absolute bg-surface px-2 whitespace-nowrap ${station.ort} ${stationKlasse(station.wand)}`}
-            >
-              {station.text}
-            </span>
-          ))}
+          {/* Pause fuer das Video (WCAG 2.2.2), ausserhalb des aria-hidden-Bildes.
+              Sichtbar erst, wenn die StoryBuehne das Video startet (loops.ts):
+              ohne JavaScript und bei reduzierter Bewegung laeuft nichts. */}
+          <Button variante="secondary" hidden data-loop-schalter="">
+            Video anhalten
+          </Button>
         </div>
 
         <ol aria-hidden="true" className="flex flex-col gap-6 border-l border-text pl-6 md:hidden">

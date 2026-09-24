@@ -29,3 +29,13 @@ test("gsap und lenis werden nur in components/story/bewegung importiert", () => 
     .filter((pfad) => /["'](gsap|lenis)(\/[\w]+)?["']/.test(readFileSync(pfad, "utf8")));
   assert.deepEqual(verstoesse, []);
 });
+
+test("jede Video-Schleife hat einen Schalter zum Anhalten (WCAG 2.2.2)", () => {
+  const ohneSchalter = ["app", "components"]
+    .flatMap(dateien)
+    .filter((pfad) => !pfad.endsWith(join("medien", "Loop.tsx")))
+    .filter((pfad) => /<Loop\b/.test(readFileSync(pfad, "utf8")))
+    .filter((pfad) => !/data-loop-schalter/.test(readFileSync(pfad, "utf8")));
+  assert.deepEqual(ohneSchalter, []);
+  assert.match(readFileSync(join("components", "story", "bewegung", "loops.ts"), "utf8"), /data-loop-schalter/);
+});
