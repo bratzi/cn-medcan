@@ -61,6 +61,13 @@ test("Schreiben: dieselben Ränder in GSAP und CSS, am Ende kein Schnitt", () =>
   assert.ok(SCHREIBEN_BIS.duration >= 0.6 && SCHREIBEN_BIS.duration <= 0.9, `${SCHREIBEN_BIS.duration} s`);
 });
 
+test("Fuß-Wortmarke: der Trigger löst aus, sobald sie ins Bild kommt (sichtbar sind nur rund 0,6 em)", () => {
+  const schluss = readFileSync(join("components", "story", "bewegung", "schluss.ts"), "utf8");
+  const trigger = /data-story="fuss-marke"[\s\S]*?scrollTrigger:\s*\{([^}]*)\}/.exec(schluss);
+  assert.ok(trigger, "Trigger der Fuß-Wortmarke fehlt");
+  assert.match(trigger[1], /start:\s*"top bottom"/);
+});
+
 test("Randspalte ohne Schwenk und Pin: wand.ts ist weg (Spec TP3 8.3)", () => {
   assert.equal(existsSync(join("components", "story", "bewegung", "wand.ts")), false);
   const start = readFileSync(join("components", "story", "bewegung", "start.ts"), "utf8");

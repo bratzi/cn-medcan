@@ -23,11 +23,14 @@ export const schluss: Choreografie = ({ gsap, SplitText }) => {
     );
   }
 
+  // Start "top bottom": die Marke läuft unten aus dem Fuß, sichtbar sind nur
+  // rund 0,6 em. Bei hohen, schmalen Fenstern erreichte ihre Oberkante 95 %
+  // der Höhe nie, und die Marke bliebe für immer geschnitten.
   const marke = document.querySelector<HTMLElement>('[data-story="fuss-marke"]');
   if (marke) {
     gsap.fromTo(marke, SCHREIBEN_AB, {
       ...SCHREIBEN_BIS,
-      scrollTrigger: { trigger: marke, start: "top 95%", once: true },
+      scrollTrigger: { trigger: marke, start: "top bottom", once: true },
     });
   }
 };
