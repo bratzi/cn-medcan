@@ -130,11 +130,9 @@ Budgets, Akzeptanzkriterien und Reihenfolge. **Die Spec ist die Quelle - nicht d
   keine Konsolenfehler; `/admin` → `/anmelden`. Medien der ersten Ansicht 551 KB bei 2296-px-Fenster (bekannt).
 - **Rulings, Befunde, zurückgestellte Kleinigkeiten** aus dem Ledger stehen jetzt am Ende des Plans
   (`docs/superpowers/plans/2026-09-24-makeover-gruenes-buch.md`, „Ausfuehrungsprotokoll“) - dort nachlesen.
-- **Aufräumen, vom Auto-Modus für Claude gesperrt, macht der Nutzer:** Ledger-Ordner
-  `.superpowers/sdd/2026-09-24-makeover-gruenes-buch/` löschen; lokalen Branch per
-  `git branch -D makeover/gruenes-buch` entfernen (`-d` verweigert, weil der Remote-Branch älter ist; vollständig
-  in `main`, geprüft mit `merge-base --is-ancestor`); optional Remote-Branch `git push origin --delete
-  makeover/gruenes-buch`.
+- **Aufgeräumt (Session 8, mit Erlaubnis des Nutzers):** Ledger-Ordner
+  `.superpowers/sdd/2026-09-24-makeover-gruenes-buch/` gelöscht, Branch `makeover/gruenes-buch` lokal und auf
+  GitHub gelöscht (beide vorher per `merge-base --is-ancestor` als vollständig in `main` geprüft).
 - **Live-Gate-Cookie:** das lokale `SITE_SESSION_SECRET` ist **nicht** das live gesetzte. Für Live-Prüfungen
   einmal per `fetch` POST auf `/api/zugang` mit `SITE_PASSWORD` aus `.env.local` anmelden (Wert nie ausgeben),
   Token aus `Set-Cookie` per `document.cookie` in den Browser. Messungen nur im **sichtbaren** Tab (im
@@ -155,14 +153,14 @@ Budgets, Akzeptanzkriterien und Reihenfolge. **Die Spec ist die Quelle - nicht d
 - **Als Nächstes: Teilprojekt 2** - eigene Spec für die übrigen Seiten (`/produkte`, `/apotheken`, `/reviews`,
   `/umfragen`, `/mitglied`, `/admin`, Formulare), Start mit `superpowers:brainstorming` (braucht den Nutzer),
   Design-Skills laden (Memory `design-skills-einsatz`). Offen für den Nutzer: Notiz-Freitext auf der Startseite
-  (HWG) ist so entschieden; 4 npm-audit „high“; Instagram-Handle; Aufräumen oben (Ledger-Ordner, Branch).
+  (HWG) ist so entschieden; 4 npm-audit „high“; Instagram-Handle.
 
 **Stand davor (2026-09-24, Session 6/7):**
 - Ausführungsart ist gewählt: **Native**, also `superpowers:executing-plans` in der Session
   (keine Subagents; Nutzer hat nach Abwägung der Kosten so entschieden). Nicht erneut fragen.
 - Gearbeitet wird auf dem Branch **`makeover/gruenes-buch`** (gepusht, `main` unberührt, also nichts
   live). Beim Start prüfen: `git branch --show-current` muss `makeover/gruenes-buch` zeigen.
-- **Ledger** (Fortschritt, Rulings): `.superpowers/sdd/2026-09-24-makeover-gruenes-buch/progress.md`,
+- **Ledger** (Fortschritt, Rulings; **gelöscht, Rulings stehen am Ende des Plans**): `.superpowers/sdd/2026-09-24-makeover-gruenes-buch/progress.md`,
   lokal, über `.git/info/exclude` ignoriert (nicht im Repo). Tasks mit `Task N: complete` sind fertig.
 - **Stand 2026-09-24 (Session 7): Makeover Teilprojekt 1 ist auf `main` und gepusht** (`768c5e5`, Fast-Forward
   von `makeover/gruenes-buch`, Go des Nutzers, Citrix getrennt). Workers Builds baut; **Live-Prüfung steht noch aus**
