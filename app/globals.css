@@ -106,8 +106,9 @@
   --color-blatt-700: oklch(0.42 0.081 170);
   --color-blatt-900: oklch(0.3 0.05 170);
 
-  --color-spray-400: oklch(0.72 0.15 305);
-  --color-spray-500: oklch(0.52 0.2 305);
+  /* Kopierstift-Violett: die Farbe der Handschrift (Spec TP3 5). */
+  --color-violett-400: oklch(0.72 0.15 305);
+  --color-violett-500: oklch(0.52 0.2 305);
 
   --color-danger-400: oklch(0.7 0.15 25);
   --color-danger-500: oklch(0.52 0.18 25);
@@ -128,8 +129,8 @@
   --color-accent-hover: var(--color-blatt-700);
   --color-accent-fg: var(--color-neutral-0);
   --color-accent-subtle: var(--color-blatt-100);
-  --color-spray: var(--color-spray-500);
-  --color-spray-fg: var(--color-neutral-0);
+  --color-kopierstift: var(--color-violett-500);
+  --color-kopierstift-fg: var(--color-neutral-0);
   --color-focus-ring: var(--color-blatt-600);
   --color-danger: var(--color-danger-500);
   --color-danger-fg: var(--color-neutral-0);
@@ -181,8 +182,8 @@
     --color-accent-hover: var(--color-blatt-500);
     --color-accent-fg: var(--color-neutral-1000);
     --color-accent-subtle: var(--color-blatt-900);
-    --color-spray: var(--color-spray-400);
-    --color-spray-fg: var(--color-neutral-1000);
+    --color-kopierstift: var(--color-violett-400);
+    --color-kopierstift-fg: var(--color-neutral-1000);
     --color-focus-ring: var(--color-blatt-400);
     --color-danger: var(--color-danger-400);
     --color-danger-fg: var(--color-neutral-1000);
@@ -213,8 +214,8 @@
   --color-accent-hover: var(--color-blatt-500);
   --color-accent-fg: var(--color-neutral-1000);
   --color-accent-subtle: var(--color-blatt-900);
-  --color-spray: var(--color-spray-400);
-  --color-spray-fg: var(--color-neutral-1000);
+  --color-kopierstift: var(--color-violett-400);
+  --color-kopierstift-fg: var(--color-neutral-1000);
   --color-focus-ring: var(--color-blatt-400);
   --color-danger: var(--color-danger-400);
   --color-danger-fg: var(--color-neutral-1000);
@@ -301,7 +302,7 @@
 
   /* Wand-Textur: Alpha-Maske aus der Pipeline, eingefaerbt in spray. */
   .wand-textur {
-    background-color: var(--color-spray);
+    background-color: var(--color-kopierstift);
     mask-size: cover;
     mask-position: center;
     mask-repeat: no-repeat;
@@ -342,15 +343,15 @@
      ueberschreiben kann (Utilities schlagen die Komponenten-Schicht). */
   .gb-tag {
     display: inline-block;
-    color: var(--color-spray);
+    color: var(--color-kopierstift);
     filter: url(#spray-rau);
     background-image: linear-gradient(
       115deg,
-      var(--color-spray) 30%,
+      var(--color-kopierstift) 30%,
       var(--color-blatt-400) 44%,
       var(--color-neutral-0) 52%,
-      var(--color-spray-400) 60%,
-      var(--color-spray) 74%
+      var(--color-violett-400) 60%,
+      var(--color-kopierstift) 74%
     );
     background-size: 300% 100%;
     background-position: 100% 0;
@@ -390,7 +391,7 @@
     line-height: 0.8;
     margin-bottom: -0.28em;
     margin-left: -0.04em;
-    color: var(--color-spray);
+    color: var(--color-kopierstift);
     transform: rotate(-6deg);
     filter: url(#spray-rau);
     pointer-events: none;

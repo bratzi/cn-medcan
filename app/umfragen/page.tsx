@@ -30,7 +30,7 @@ export const metadata: Metadata = {
 };
 
 /** Wand-Ueberschrift: kurz, Imperativ, in Sprühviolett (Guideline 8). */
-const WAND_TITEL = "font-wand text-tag text-spray";
+const WAND_TITEL = "font-wand text-tag text-kopierstift";
 
 function RundenZeile({ runde }: { runde: UmfrageUebersicht }) {
   return (

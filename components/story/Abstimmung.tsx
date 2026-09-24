@@ -67,7 +67,7 @@ export function Abstimmung() {
           <h2 id="abstimmung-titel" className="font-buch text-kapitel text-text text-balance">
             Was teste ich als Nächstes?
           </h2>
-          <p data-story="waehl-mit" className="relative -rotate-3 font-wand text-tag text-spray">
+          <p data-story="waehl-mit" className="relative -rotate-3 font-wand text-tag text-kopierstift">
             Wähl mit.
             <Textur id="drip" className="absolute top-full left-1/3 -z-10 h-16 w-6" />
           </p>

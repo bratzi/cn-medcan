@@ -16,7 +16,7 @@ const STATIONEN = [
 
 function stationKlasse(wand: boolean): string {
   // font-normal: text-h1 setzt 600, Sedgwick hat nur 400 (sonst künstlich fett).
-  return wand ? "font-wand text-h1 font-normal text-spray" : "font-buch text-h1 font-medium text-text";
+  return wand ? "font-wand text-h1 font-normal text-kopierstift" : "font-buch text-h1 font-medium text-text";
 }
 
 export function GemeinsamLernen() {

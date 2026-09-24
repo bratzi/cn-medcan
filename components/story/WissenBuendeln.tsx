@@ -28,7 +28,7 @@ async function WandReihe() {
       {wandTags(zahlen).map((text, index) => (
         <li key={text} data-story="wand-tag" className="relative isolate">
           <Textur id={TEXTUR[index % TEXTUR.length]} weich className="absolute -inset-8 -z-10 opacity-30" />
-          <span className={`block font-wand text-tag text-spray ${DREHUNG[index % DREHUNG.length]}`}>{text}</span>
+          <span className={`block font-wand text-tag text-kopierstift ${DREHUNG[index % DREHUNG.length]}`}>{text}</span>
         </li>
       ))}
     </ul>

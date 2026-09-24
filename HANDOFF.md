@@ -81,6 +81,15 @@ live gelesen. Claude durfte den Live-Zugriff diesmal selbst ausführen. Kontodet
    Änderungen an CRLF-Dateien per Node-Skript oder Edit-Werkzeug. Im Hintergrund-Tab des Browserwerkzeugs laufen
    Server Actions, Client-Navigationen und GSAP nicht sichtbar durch: solche Prüfungen im sichtbaren Tab.
 
+### Teilprojekt 3 „Marke und Medien“
+
+Spec: `docs/superpowers/specs/2026-09-24-makeover-teilprojekt-3-marke-medien-design.md`. Plan Welle 1:
+`docs/superpowers/plans/2026-09-24-makeover-tp3-welle-1.md` (Ausführung Native, direkt auf `main`, jeder Task
+gepusht und live geprüft; Dauerregel: kein lokales Dev-System).
+
+- Welle 1, Task 1 erledigt: Sprühviolett heißt Kopierstift (`violett-*`, `kopierstift*`), neue Paare gemessen
+  (surface-raised 5.53/6.88, surface-sunken 4.61/7.66).
+
 ### 0. Live-Stand und Sessionablauf
 
 Live-Adresse: **https://cn-medcan.w-helwich.workers.dev** (hinter dem Seitenpasswort = lokales
