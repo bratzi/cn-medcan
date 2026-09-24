@@ -97,6 +97,8 @@ gepusht und live geprüft; Dauerregel: kein lokales Dev-System).
   `schreiben.ts` als gemeinsamer Ablauf.
 - Welle 1, Task 5 erledigt: Wissen bündeln als Seite mit Randspalte (Zahl gedruckt, Wort von Hand), `wand.ts` und
   Schwenk raus.
+- Welle 1, Task 6 erledigt: Schleife (Stationen der Community von Hand, 32 px), „Wähl mit.“ von Hand, Wasserzeichen
+  und Drip raus, Stimmzettel-Skelett in Zettelform.
 
 ### 0. Live-Stand und Sessionablauf
 

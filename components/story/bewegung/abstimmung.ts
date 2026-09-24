@@ -1,17 +1,17 @@
+import { SCHREIBEN_AB, SCHREIBEN_BIS } from "./schreiben";
 import type { Choreografie } from "./typen";
 
 /**
- * Sektion 6: Spruehmarken und "Waehl mit." spruehen beim Eintritt auf.
- * Die Stimmabgabe selbst bewegt sich nicht (Spec 5.1).
+ * Sektion 6 (Spec TP3 8.6): "Wähl mit." und die Vermerke auf dem
+ * Stimmzettel ("von euch", das "x" der eigenen Stimme) werden beim
+ * Eintritt geschrieben. Die Stimmabgabe selbst bewegt sich nicht.
  */
 export const abstimmung: Choreografie = ({ gsap }) => {
-  const marken = gsap.utils.toArray<HTMLElement>('[data-story="waehl-mit"], [data-story="spruehmarke"]');
-  if (marken.length === 0) return;
-  gsap.from(marken, {
-    clipPath: "inset(0 100% 0 0)",
-    duration: 0.7,
+  const notizen = gsap.utils.toArray<HTMLElement>('[data-story="waehl-mit"], [data-story="vermerk"]');
+  if (notizen.length === 0) return;
+  gsap.fromTo(notizen, SCHREIBEN_AB, {
+    ...SCHREIBEN_BIS,
     stagger: 0.15,
-    ease: "power2.inOut",
     scrollTrigger: { trigger: '[data-story="abstimmung"]', start: "top 70%", once: true },
   });
 };

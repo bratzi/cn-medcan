@@ -2,21 +2,22 @@ import { Loop } from "@/components/medien/Loop";
 import { Button } from "@/components/ui";
 
 /**
- * Sektion 4 (Spec 5.1): die Schleife. Die Überschrift trägt die Aussage;
- * Kreis, Stationen und Video sind deren Bild und deshalb aria-hidden.
- * Die ersten beiden Stationen spricht die Community (Wand), die letzten
- * beiden das Buch.
+ * Sektion 4 (Spec 5.1, Spec TP3 8.4): die Schleife. Die Überschrift trägt
+ * die Aussage; Kreis, Stationen und Video sind deren Bild und deshalb
+ * aria-hidden. Die ersten beiden Stationen schreibt die Community von Hand,
+ * die letzten beiden druckt das Buch. Handschrift im Grad text-vermerk
+ * (32 px, die Mindestgröße): so groß wie die gedruckten Stationen, und am
+ * rechten Rand verdeckt sie das Video nicht.
  */
 const STATIONEN = [
-  { text: "Ihr schlagt vor.", wand: true, ort: "top-0 left-1/2 -translate-x-1/2" },
-  { text: "Ihr stimmt ab.", wand: true, ort: "top-1/2 right-0 -translate-y-1/2" },
-  { text: "Ich teste.", wand: false, ort: "bottom-0 left-1/2 -translate-x-1/2" },
-  { text: "Alle lesen.", wand: false, ort: "top-1/2 left-0 -translate-y-1/2" },
+  { text: "Ihr schlagt vor.", hand: true, ort: "top-0 left-1/2 -translate-x-1/2" },
+  { text: "Ihr stimmt ab.", hand: true, ort: "top-1/2 right-0 -translate-y-1/2" },
+  { text: "Ich teste.", hand: false, ort: "bottom-0 left-1/2 -translate-x-1/2" },
+  { text: "Alle lesen.", hand: false, ort: "top-1/2 left-0 -translate-y-1/2" },
 ] as const;
 
-function stationKlasse(wand: boolean): string {
-  // font-normal: text-h1 setzt 600, Sedgwick hat nur 400 (sonst künstlich fett).
-  return wand ? "font-wand text-h1 font-normal text-kopierstift" : "font-buch text-h1 font-medium text-text";
+function stationKlasse(hand: boolean): string {
+  return hand ? "font-hand text-vermerk text-kopierstift" : "font-buch text-h1 font-medium text-text";
 }
 
 export function GemeinsamLernen() {
@@ -57,7 +58,7 @@ export function GemeinsamLernen() {
             {STATIONEN.map((station) => (
               <span
                 key={station.text}
-                className={`absolute bg-surface px-2 whitespace-nowrap ${station.ort} ${stationKlasse(station.wand)}`}
+                className={`absolute bg-surface px-2 whitespace-nowrap ${station.ort} ${stationKlasse(station.hand)}`}
               >
                 {station.text}
               </span>
@@ -73,7 +74,7 @@ export function GemeinsamLernen() {
 
         <ol aria-hidden="true" className="flex flex-col gap-6 border-l border-text pl-6 md:hidden">
           {STATIONEN.map((station) => (
-            <li key={station.text} className={stationKlasse(station.wand)}>
+            <li key={station.text} className={stationKlasse(station.hand)}>
               {station.text}
             </li>
           ))}

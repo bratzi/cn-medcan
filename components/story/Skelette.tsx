@@ -37,11 +37,22 @@ export function DoppelseitenSkelett() {
   );
 }
 
+/** Auf dem Blatt des Stimmzettels (surface-raised) braucht das Skelett die tiefere Fläche. */
+const SKELETT_AUF_BLATT = "block bg-surface-sunken motion-safe:animate-pulse";
+
 export function StimmzettelSkelett() {
   return (
-    <div role="status" data-skelett="">
+    <div role="status" data-skelett="" className="border border-border-strong bg-surface-raised shadow-md">
       <SkelettAnsage text="Abstimmung wird geladen" />
-      <span aria-hidden="true" className={`${SKELETT_FLAECHE} h-96 w-full`} />
+      <div aria-hidden="true" className="border-b border-border px-6 py-4">
+        <span className={`${SKELETT_AUF_BLATT} h-6 w-32 rounded-full`} />
+      </div>
+      <div aria-hidden="true" className="flex flex-col gap-6 px-6 py-6">
+        <span className={`${SKELETT_AUF_BLATT} h-8 w-2/3`} />
+        {["w-3/4", "w-1/2", "w-2/3"].map((breite) => (
+          <span key={breite} className={`${SKELETT_AUF_BLATT} h-6 ${breite}`} />
+        ))}
+      </div>
     </div>
   );
 }

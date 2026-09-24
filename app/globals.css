@@ -437,12 +437,6 @@
     text-transform: uppercase;
     transform: rotate(-4deg);
   }
-
-  /* Ton-in-Ton-Tag hinter der Abstimmung (Spec 4.3, Doja-Merch). */
-  .wasserzeichen {
-    font-size: clamp(12rem, 45vw, 40rem);
-    line-height: 0.8;
-  }
 }
 
 @media (prefers-color-scheme: dark) {

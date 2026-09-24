@@ -7,6 +7,7 @@ import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 
 import { Randspalte } from "@/components/story/Randspalte";
+import { StimmzettelSkelett } from "@/components/story/Skelette";
 import type { Randnotiz } from "@/lib/query/community";
 
 const lies = (datei: string) => readFileSync(join(process.cwd(), datei), "utf8");
@@ -48,4 +49,28 @@ test("Wissen bündeln: Randspalte ab lg, kein Schwenk, keine Wand", () => {
   assert.match(quelle, /lg:grid-cols-\[minmax\(0,2fr\)_minmax\(0,1fr\)\]/);
   assert.match(quelle, /<Suspense fallback=\{<RandspaltenSkelett \/>\}>/);
   assert.doesNotMatch(quelle, /bg-surface-sunken|Textur|wand|font-wand/);
+});
+
+test("Schleife: die Community schreibt von Hand, das Buch druckt", () => {
+  const quelle = lies("components/story/GemeinsamLernen.tsx");
+  assert.match(quelle, /\{ text: "Ihr schlagt vor\.", hand: true,/);
+  assert.match(quelle, /\{ text: "Ihr stimmt ab\.", hand: true,/);
+  assert.match(quelle, /\{ text: "Ich teste\.", hand: false,/);
+  assert.match(quelle, /"font-hand text-vermerk text-kopierstift"/);
+  assert.doesNotMatch(quelle, /font-wand|wand:|Sedgwick/);
+});
+
+test("Abstimmung: „Wähl mit.“ von Hand, ohne Wasserzeichen und Drip", () => {
+  const quelle = lies("components/story/Abstimmung.tsx");
+  assert.match(quelle, /<p data-story="waehl-mit" className="font-hand text-notiz text-kopierstift">\s*Wähl mit\.\s*<\/p>/);
+  assert.doesNotMatch(quelle, /wasserzeichen|Textur|font-wand|rotate/);
+  assert.match(lies("components/story/bewegung/abstimmung.ts"), /SCHREIBEN_AB/);
+});
+
+test("Skelett des Stimmzettels hat die Form des Stimmzettels", () => {
+  const html = renderToStaticMarkup(createElement(StimmzettelSkelett));
+  assert.match(html, /role="status"/);
+  assert.match(html, /data-skelett=""/);
+  assert.match(html, /border border-border-strong bg-surface-raised shadow-md/);
+  assert.ok((html.match(/bg-surface-sunken/g)?.length ?? 0) >= 4);
 });
