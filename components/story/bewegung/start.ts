@@ -30,17 +30,34 @@ const SCROLL_CHOREOGRAFIEN: readonly Choreografie[] = [
 
 function wennInhaltGeladen(los: () => void): () => void {
   const fertig = () => document.querySelector("[data-skelett]") === null;
+  let beobachter: MutationObserver | null = null;
+  let abbrechen: (() => void) | null = null;
+  // Erst in einer Leerlaufphase starten: React hydriert die nachgestreamten
+  // Sektionen kurz nach dem Tausch. Setzte GSAP vorher Inline-Styles, meldete
+  // die Hydrierung Abweichungen an genau diesen Elementen.
+  const starte = () => {
+    if (typeof window.requestIdleCallback === "function") {
+      const id = window.requestIdleCallback(los, { timeout: 1000 });
+      abbrechen = () => window.cancelIdleCallback(id);
+    } else {
+      const id = window.setTimeout(los, 200);
+      abbrechen = () => window.clearTimeout(id);
+    }
+  };
   if (fertig()) {
-    los();
-    return () => undefined;
+    starte();
+  } else {
+    beobachter = new MutationObserver(() => {
+      if (!fertig()) return;
+      beobachter?.disconnect();
+      starte();
+    });
+    beobachter.observe(document.body, { childList: true, subtree: true });
   }
-  const beobachter = new MutationObserver(() => {
-    if (!fertig()) return;
-    beobachter.disconnect();
-    los();
-  });
-  beobachter.observe(document.body, { childList: true, subtree: true });
-  return () => beobachter.disconnect();
+  return () => {
+    beobachter?.disconnect();
+    abbrechen?.();
+  };
 }
 
 /**

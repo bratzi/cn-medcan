@@ -17,8 +17,10 @@ export const auftakt: Choreografie = ({ gsap, SplitText }) => {
     // Ab hier uebernimmt GSAP: der CSS-Notfall wird abgeschaltet, die Flaechen stehen.
     .set(einstieg, { animation: "none", opacity: 1 })
     .from(woerter, { yPercent: 40, opacity: 0, duration: 0.9, stagger: 0.14 })
-    .from('[data-story="unterzeile"]', { opacity: 0, y: 12, duration: 0.6 }, 0.1)
+    // fromTo statt from: der Zielwert kaeme sonst aus dem CSS-Einstieg (opacity 0),
+    // und die Zeile bliebe unsichtbar, weil die Buehne den Notfall abschaltet.
+    .fromTo('[data-story="unterzeile"]', { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.6 }, 0.1)
     .from('[data-story="tag"]', { clipPath: "inset(0 100% 0 0)", duration: 0.6, ease: "power2.inOut" }, ">-0.3")
     .from('[data-story="tag-drip"]', { clipPath: "inset(0 0 100% 0)", duration: 0.9, ease: "power1.in" })
-    .from('[data-story="intro"]', { opacity: 0, y: 12, duration: 0.6 }, "<");
+    .fromTo('[data-story="intro"]', { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.6 }, "<");
 };
