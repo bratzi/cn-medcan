@@ -28,6 +28,20 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 
 ## ⇢ Hier geht es weiter
 
+### ⇢ STAND SESSION 14, dritter Block (2026-09-24): live bis `9b91d4f`, alles grün
+- Auftakt: Bühnenvideo Pexels 7684711 (Nutzervorgabe) in Farbe, opacity 45 % plus Schleier, `buehne-dunkel`,
+  Wortmarke `plakat` mittig (gemessen), Film zoomt beim Scrollen, Pause-Knopf.
+- Farbe statt Schwarzweiß (Freisteller, trichom, Videos). `.farbverlauf` (Grün, Lila, Grün) auf einem Schlüsselwort je
+  Überschrift; Buzz-Sätze abwechselnd `ton="gruen"`/`"lila"`, opacity 15 %.
+- Manifest: Volltext über die Sektion, Reveal Wort für Wort (transparent.ts), Prüfpunkte als große Bilder (448 px) in
+  ungleichen Kreisen mit shape-outside.
+- Nur noch zwei Schriftfamilien: Newsreader (alles Gedruckte, auch Bedienung und Zahlen) und Inspiration. Geist raus.
+- Wir-Stimme auf Startseite und Abstimmungsseiten; Stempel „Gesetzt“ entfernt (gesetzte Plätze nicht sichtbar).
+- Fuß: Wortmarke absolut im Fuß hinter dem Inhalt.
+- Builds dauern nur noch ~3 Min; Status per `gh api repos/bratzi/cn-medcan/commits/<sha>/check-runs`.
+  Browser-Screenshots scheitern, wenn das Chrome-Fenster verdeckt ist (`document.visibilityState` = hidden).
+- **Offen:** 3D-Blätter (three installiert), Unterseiten im neuen Stil, Sichtprüfung dunkel/hell per Screenshot.
+
 ### ⇢ STAND SESSION 14, zweiter Block (2026-09-24): Referenz choreograffiti, Freisteller, Video (`21555d8`)
 - Nutzer: Name „Grünes Buch“ bleibt, Notizbuch-Bild weg, alle Downloads erlaubt. Stil nach choreograffiti.com: nur
   der Kopf-Schriftzug (riesig, Rand zu Rand, sitzt im Hintergrund, Bild davor), umgesetzt in UNSERER Handschrift.
