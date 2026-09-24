@@ -65,6 +65,33 @@ ab). (3) **3D-Moment: Blätter**, getrocknete Cannabisblätter aus Foto-Freistel
 nachgeladen). (4) **Hell/Dunkel-Schalter sofort, Standard Hell**: rechts im Kopf, Wahl gespeichert, ohne Aufblitzen
 (als kleiner Entwurf freigegeben, wird vor der Spec gebaut). Mobil erst mal nicht.
 
+**Stand Ende Session 13 (NÄCHSTE SESSION BEGINNT HIER):**
+- Nutzer: „Vergiss alles“ aus TP3 Welle 2 und den letzten Tasks; nur noch das Redesign nach der Referenz, mit den
+  Skills von **https://agenticskills.io/category/design** (Dauerregel, Memory `skillquelle-agenticskills`). Neu
+  installiert: `apple-design`, `animation-vocabulary`, `find-animation-opportunities`, `improve-animations`,
+  `review-animations` (Emil Kowalski). Noch prüfen: `impeccable`, `ui-ux-pro-max`, `web-design-engineer`,
+  `designer-skills-collection`.
+- **Hell/Dunkel-Schalter gebaut und gepusht** (`3b1e1b1`): `lib/thema.ts` (Skript im head, Schlüssel
+  `gruenes-buch-thema`), `components/layout/ThemaSchalter.tsx`, Kopf-Grid um eine Spalte erweitert, CSS
+  `.thema-ziel-*`. 147/147 Tests, Typecheck, Lint grün. **Live nicht geprüft** (Nutzer nicht angemeldet). Nutzer
+  hat noch nicht gesagt, ob der Schalter bleiben soll (angeboten: Rücknahme per Commit).
+- **Richtung für das Redesign vorgelegt, noch NICHT freigegeben** (Brainstorming, Pfad architektonisch):
+  1. Typo: eine freie Serif für alles Gedruckte, Kandidat **Newsreader** (Google, OFL, 200 bis 800, kursiv,
+     opsz); harte Skala (Titel 200 bis ~300 px, Manifest 200 bei 64 bis 100 px, Kapitel 800, Betonung kursiv);
+     Geist nur Bedienung/Katalog, Geist Mono Zahlen; Inspiration bleibt Logo und wird zusätzlich Textur
+     (Messwert-Notizen wie „Myrcen“, „Charge 24-117“ erscheinen im Hintergrund); Cormorant entfällt.
+  2. Ebenen: Karopapier mit Notizen hinten, Schrift Mitte, SW-Freisteller zwischen/vor den Buchstaben, 3D-Blätter
+     über allem; Auftakt mit riesigem grünem Serif-Titel und Handschrift-Wortmarke als Signatur; Bilder im Satz
+     (Lücken im Manifest), nicht als Block darunter.
+  3. Bilder SW-Freisteller (Pexels + rembg), AVIF/WebP bis 2400 px, Grün nur in der Schrift.
+  4. Bewegung: Manifest Wort für Wort grau zu schwarz, Schluss Kontur zu Füllung, 3D-Blätter (Three.js,
+     nachgeladen, federnd), Notizen erscheinen; Bedienung/Katalog/Formulare nicht animiert; reduzierte Bewegung
+     statisch. Mobil erst mal nicht.
+  5. Wellen: 1 Typo + Startseite, 2 Bilder + 3D, 3 Unterseiten.
+- **Nächster Schritt:** Nutzer die Richtung freigeben lassen (v. a. Newsreader), dann Spec schreiben
+  (`docs/superpowers/specs/`), vorher `better-colors`, `animate`, `emil-design-eng`, `better-ui`, `better-writing`
+  und die obigen Skills laden. Danach Plan (`superpowers:writing-plans`).
+
 **Offen aus Session 12, weiter gültig:** Live-Prüfung TP3 Welle 1 (Nutzer muss sich im Browser-Tab anmelden).
 
 ### NÄCHSTE SESSION (Stand Session 12, 2026-09-24): TP3 Welle 1 live prüfen, dann Plan TP3 Welle 2
