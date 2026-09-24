@@ -3,7 +3,7 @@
 > Übergabemedium zwischen Sessions. Wird nach jedem Arbeitsblock aktualisiert und committet.
 > Wer hier weiterarbeitet, liest diese Datei zuerst und braucht den Chatverlauf nicht.
 
-**Letzte Aktualisierung:** 2026-09-24 (Session 10, Welle 1 von TP2 live)
+**Letzte Aktualisierung:** 2026-09-24 (Session 11, Spec Teilprojekt 3 „Marke und Medien“ geschrieben)
 **Repo:** https://github.com/bratzi/cn-medcan (public)
 **Branch:** `main` (Makeover „Grünes Buch“ Teilprojekt 1 ist seit 2026-09-24 auf `main`)
 
@@ -28,18 +28,31 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 
 ## ⇢ Hier geht es weiter
 
-### ⇢ NÄCHSTE SESSION (Stand Ende Session 10, 2026-09-24): Marken- und Medien-Überarbeitung, dann Welle 2
+### ⇢ NÄCHSTE SESSION (Stand Session 11, 2026-09-24): Spec TP3 freigeben lassen, dann Plan TP3 Welle 1
 
-**Welle 1 von Teilprojekt 2 ist live** (Commit `6aa8937` auf `main`, Go des Nutzers, Session 10). Prüfbericht und
-Live-Prüfung unter „Teilprojekt 2“ in Abschnitt 1, alle Rulings im Plan `docs/superpowers/plans/2026-09-24-makeover-tp2-welle-1.md`
-(„Ausfuehrungsprotokoll“ am Ende).
+**Session 11:** Brainstorming zur Marken- und Medien-Überarbeitung abgeschlossen. **Spec geschrieben und committet:**
+`docs/superpowers/specs/2026-09-24-makeover-teilprojekt-3-marke-medien-design.md` (Teilprojekt 3). Kern der
+Nutzerentscheidungen: Konzept **„Buch und Handschrift“** (Graffiti, Sedgwick, Drips, Nebel, Marmor, „gb“-Tag
+entfallen ganz), Handschrift in **Inspiration** und **Kopierstift-Violett** (bisherige Sprühviolett-Werte, Token
+`kopierstift`), Logo = handschriftliche Wortmarke + Unterzeile „Charge für Charge“ + Signet „gB“, Motive **von Pexels,
+lokal freigestellt** (`rembg`), **in Farbe einheitlich gegradet**, kein `invert`/`multiply` mehr, Komposition
+**„Randnotizen“** mit Flat-Lay im Auftakt, Technik **browser-nativ** (CSS scroll-gekoppelte Tiefenebenen, React
+`<ViewTransition>`) **plus ein WebGL-Effekt** „Kopierstift läuft“ (eigener WebGL2-Baustein, nur Startseite).
+Zuschnitt: **drei Wellen** (1 Marke, 2 Medien, 3 Unterseiten), **vor** TP2 Welle 2. Die Entscheidungen mit „Claude“
+in Spec Abschnitt 2 hat Claude selbst getroffen (Nutzer wollte keine Einzelfreigaben mehr, Memory
+`entscheidungen-buendeln`). TP2-Spec trägt oben einen Verweis auf die abgelösten Teile.
 
-1. **Zuerst (Reihenfolge des Nutzers): die eingetaktete Marken- und Medien-Überarbeitung** als eigenes Vorhaben:
-   `superpowers:brainstorming` (architektonisch), Details und Kollisionen unter „Eingetaktet für eine neue Session“ in
-   Abschnitt 1 (Logo und Akzente in „Inspiration“, Medien awwwards-fähig, freigestellt statt invertiert, Drittanbieter-
-   Bilder mit Kostenangabe vorab). Skills laut Memory `design-skills-einsatz`.
-2. Der Nutzer kann `/interface-review` für Welle 1 starten (Spec TP2 9.12); Claude kann es nicht selbst starten.
-3. **Danach Welle 2** (Katalog: `/produkte`, `/apotheken`, `/apotheken/[slug]`): Plan mit `superpowers:writing-plans` aus
+**Betreiber-Konto live (Session 11, auf Wunsch des Nutzers):** das einzige Live-Konto hat per
+`wrangler d1 execute --remote` (Bootstrap aus `db/README.md`) Rolle `ADMIN` und `freigegeben = 1`, nach dem Update
+live gelesen. Claude durfte den Live-Zugriff diesmal selbst ausführen. Kontodetails gehören nicht ins Repo.
+
+1. **Zuerst:** Liegt die Freigabe der Spec TP3 noch nicht vor, den Nutzer einmal um Durchsicht bitten (Pflicht-Gate).
+   Nach Freigabe **`superpowers:writing-plans` für TP3 Welle 1 (Marke)** aus Spec Abschnitte 3 bis 6, 8, 12, 13,
+   Ausführung **Native**. Danach Welle 2 (Medien, erster Schritt: `rembg` installieren, einmal, bei Netzfehler
+   stoppen), dann Welle 3 (Unterseiten), je eigener Plan und Live-Gang.
+2. Der Nutzer kann `/interface-review` für TP2 Welle 1 starten (Spec TP2 9.12); Claude kann es nicht selbst starten.
+3. **Nach TP3: TP2 Welle 2** (Katalog: `/produkte`, `/apotheken`, `/apotheken/[slug]`), jetzt im Stil „Buch und
+   Handschrift“ und mit den Seitenkopf-Motiven aus TP3 Abschnitt 10. Plan mit `superpowers:writing-plans` aus
    Spec TP2 Abschnitt 5, Ausführung wieder **Native**. In den Plan übernehmen (Lehren aus Welle 1):
    - **Keine Suspense-Grenze um den Seiteninhalt** der Unterseiten (Nutzerentscheidung Session 10: ohne JS lesbar,
      Sprungziele, echte 404). Skelette nur, wo das nicht gilt.

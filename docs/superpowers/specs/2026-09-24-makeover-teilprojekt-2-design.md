@@ -4,6 +4,11 @@
 `docs/superpowers/specs/2026-09-23-makeover-gruenes-buch-design.md` (Teilprojekt 1, live) · **Pläne:** je Welle
 einer, entstehen nach der Freigabe mit `superpowers:writing-plans`, zuerst Welle 1.
 
+> **Abgelöst in Teilen durch Teilprojekt 3** (`2026-09-24-makeover-teilprojekt-3-marke-medien-design.md`): die Wand
+> (Sedgwick, Texturen) wird zur Handschrift in Inspiration und Kopierstift-Violett. Betroffen hier: 3.3 Zeile
+> „Wand-Überschrift“, 4.2 und alle Nennungen von Sedgwick, `Textur` und `darstellung="wand"`. Welle 2 bekommt dazu
+> die Seitenkopf-Motive `blatt` (`/produkte`) und `standgefaess` (`/apotheken`), TP3 Abschnitt 10.
+
 ## 1. Ausgangslage und Ziel
 
 Teilprojekt 1 hat die Marke festgelegt und die Startseite neu gebaut. Die übrigen Seiten erben seitdem nur Farben
