@@ -103,6 +103,9 @@ gepusht und live geprüft; Dauerregel: kein lokales Dev-System).
   /umfragen-Überschriften von Hand ohne Nebel.
 - Welle 1, Task 8 erledigt: Sedgwick, SprayFilter, Textur, Masken (drip, nebel, marmor) und alte Tokens entfernt; Suche
   nach Wand-Resten in app/components/lib als Test.
+- Welle 1, Task 9 erledigt: Signet „gB“ aus der Schriftdatei (OFL im Repo), `app/icon.png`, `app/apple-icon.png`,
+  `app/favicon.ico` neu, `assets/marke/signet-1080.png` für Instagram (nicht ausgeliefert). Befund: im 32/16-px-Favicon
+  sind die Haarstriche blass, „g“ und „B“ aber erkennbar.
 
 ### 0. Live-Stand und Sessionablauf
 
