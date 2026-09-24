@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import {
-  Cormorant_Garamond,
   Geist,
   Geist_Mono,
   Inspiration,
+  Newsreader,
 } from "next/font/google";
 import { Fuss } from "@/components/layout/Fuss";
 import { Kopf } from "@/components/layout/Kopf";
@@ -20,11 +20,12 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-/** Variabel (300 bis 700), normal und kursiv: zwei Dateien (Spec 6.4). */
-const cormorant = Cormorant_Garamond({
-  variable: "--font-cormorant",
+/** Die eine Serif (Spec Redesign 1): variabel 200 bis 800 mit optischer Größe, normal und kursiv. */
+const newsreader = Newsreader({
+  variable: "--font-newsreader",
   subsets: ["latin"],
   style: ["normal", "italic"],
+  axes: ["opsz"],
   display: "swap",
 });
 
@@ -53,7 +54,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="de"
       data-theme={THEMA_STANDARD}
       suppressHydrationWarning
-      className={`${geistSans.variable} ${geistMono.variable} ${cormorant.variable} ${inspiration.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} ${newsreader.variable} ${inspiration.variable} h-full antialiased`}
     >
       <head>
         <script dangerouslySetInnerHTML={{ __html: THEMA_SKRIPT }} />

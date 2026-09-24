@@ -95,14 +95,23 @@ test("Unterzeile: gedruckt, natürliche Schreibung, Versalien per CSS", () => {
   assert.doesNotMatch(html, /font-hand/);
 });
 
-test("Auftakt: die h1 ist die Wortmarke, ohne Grün, ohne Tag, nie per Einstieg versteckt", () => {
+test("Auftakt: h1 ist der grüne Serif-Titel, die Wortmarke signiert darunter, nie per Einstieg versteckt", () => {
   const quelle = lies("components/story/Auftakt.tsx");
-  const h1 = /<h1[^>]*>\s*<Wortmarke groesse="umschlag" \/>\s*<\/h1>/.exec(quelle)?.[0];
-  assert.ok(h1, "die h1 enthält nicht genau die Umschlag-Wortmarke");
-  assert.match(h1, /className="auftakt-marke /);
-  assert.doesNotMatch(h1, /data-story-einstieg/);
+  const h1 = /<h1[\s\S]*?<\/h1>/.exec(quelle)?.[0];
+  assert.ok(h1, "keine h1 im Auftakt");
+  assert.match(h1, /font-buch text-riesig text-accent/);
+  assert.doesNotMatch(h1, /data-story-einstieg|Wortmarke/);
+  assert.match(quelle, /<div aria-hidden="true" className="auftakt-marke [^"]*">\s*<Wortmarke groesse="signatur" \/>/);
   assert.match(quelle, /<Unterzeile className="auftakt-unterzeile /);
-  assert.doesNotMatch(quelle, /text-accent|uppercase|Textur|groesse="buehne"/);
+  assert.doesNotMatch(quelle, /uppercase|groesse="buehne"/);
+});
+
+test("Wortmarke als Signatur: einzeilig, Notiz-Grad, schreibt sich", () => {
+  const html = renderToStaticMarkup(createElement(Wortmarke, { groesse: "signatur" }));
+  assert.equal(html.match(/data-marke-zeile=""/g)?.length, 2);
+  assert.match(html, /\btext-notiz\b/);
+  assert.doesNotMatch(html, /text-umschlag/);
+  assert.equal(ohneTags(html), "Grünes Buch");
 });
 
 test("Fuß: die Wortmarke läuft angeschnitten aus, kein Tag, kein zweiter Name", () => {

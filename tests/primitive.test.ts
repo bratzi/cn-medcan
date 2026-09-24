@@ -100,7 +100,7 @@ test("Buchtabelle: kein Rahmen, kein Zebra, kräftige Linie unter dem Kopf", () 
   assert.match(html, /tabindex="0"/);
 });
 
-test("Leerzustand ohne Kasten, Titel in Cormorant", () => {
+test("Leerzustand ohne Kasten, Titel in Newsreader", () => {
   const html = renderToStaticMarkup(createElement(EmptyState, { titel: "Noch nichts da." }));
   assert.match(html, /\bfont-buch\b/);
   assert.doesNotMatch(html, /\bborder\b|bg-surface-raised/);

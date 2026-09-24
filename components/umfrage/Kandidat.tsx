@@ -23,7 +23,7 @@ export function stimmenAnteil(option: UmfrageOptionAnsicht, gesamt: number): num
 
 /**
  * Ein Kandidat auf dem Stimmzettel. Der Handelsname ist gedruckt
- * (Cormorant, Leitplanke 4). Die Herkunft ist sichtbar unterschieden:
+ * (Newsreader, Leitplanke 4). Die Herkunft ist sichtbar unterschieden:
  * gesetzte Plätze tragen den Stempel "Gesetzt", Community-Plätze den
  * Vermerk "von euch" von Hand (Spec TP3 8.6). Die eigene Stimme bekommt
  * zum Badge ein handgeschriebenes "x" vor dem Namen, nur als Bild.

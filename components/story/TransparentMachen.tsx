@@ -59,9 +59,9 @@ export function TransparentMachen() {
         <h2
           id="transparent-titel"
           data-story="manifest"
-          className="mt-16 max-w-5xl font-buch text-kapitel text-text text-balance"
+          className="mt-16 max-w-6xl font-buch text-manifest text-text text-balance"
         >
-          Hinter jedem Handelsnamen steckt eine Charge. Ich schreibe auf, was drin ist.
+          Hinter jedem Handelsnamen steckt eine Charge. <em className="italic">Ich schreibe auf,</em> was drin ist.
         </h2>
 
         <div className="mt-16 grid grid-cols-1 gap-16 md:grid-cols-2 md:gap-8">

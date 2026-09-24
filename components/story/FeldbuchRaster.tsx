@@ -1,15 +1,17 @@
 /**
  * Feines Spaltenraster und blasse Randnotizen hinter der Startseite
  * (Spec 4.7). Trägt keine Information, deshalb vollständig aria-hidden.
- * Die Notizen stehen in Cormorant kursiv wie Bleistift im Feldbuch, nicht
- * in Handschrift: sie sind die Stimme des Buchs, nicht der Community.
+ * Seit dem Redesign (Spec 1) stehen die Notizen in Handschrift, blass wie
+ * Bleistift im Feldbuch: Messwerte, notiert beim Probieren. Ab lg, nie Inhalt.
  */
 const RANDNOTIZEN = [
-  { text: "Ch. 24-117", links: "6%", oben: "14%", drehung: "-rotate-3" },
-  { text: "RF 11 %", links: "82%", oben: "31%", drehung: "rotate-2" },
-  { text: "Trichome dicht", links: "4%", oben: "47%", drehung: "-rotate-2" },
-  { text: "Glas geöffnet 9:40", links: "74%", oben: "63%", drehung: "rotate-3" },
-  { text: "Ch. 25-032", links: "10%", oben: "81%", drehung: "-rotate-1" },
+  { text: "Charge 24-117", links: "6%", oben: "12%" },
+  { text: "Myrcen", links: "80%", oben: "24%" },
+  { text: "Restfeuchte 11 %", links: "3%", oben: "38%" },
+  { text: "Trichome dicht", links: "76%", oben: "52%" },
+  { text: "Limonen", links: "8%", oben: "66%" },
+  { text: "Glas auf, 9:40", links: "72%", oben: "79%" },
+  { text: "Charge 25-032", links: "12%", oben: "90%" },
 ] as const;
 
 export function FeldbuchRaster() {
@@ -19,7 +21,7 @@ export function FeldbuchRaster() {
       {RANDNOTIZEN.map((notiz) => (
         <span
           key={notiz.text}
-          className={`absolute hidden font-buch text-h3 font-light italic text-text-muted opacity-40 lg:block ${notiz.drehung}`}
+          className="absolute hidden font-hand text-notiz text-text-muted opacity-30 lg:block"
           style={{ left: notiz.links, top: notiz.oben }}
         >
           {notiz.text}

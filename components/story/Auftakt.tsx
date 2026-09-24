@@ -10,11 +10,11 @@ import { bildQuelle } from "@/lib/medien";
 const LEIT_SIZES = "(min-width: 768px) 42vw, 64vw";
 
 /**
- * Sektion 1 (Spec TP3 8.1): der Umschlag. Die h1 ist die handschriftliche
- * Wortmarke, darunter die gedruckte Unterzeile. Beide schreiben sich per
+ * Sektion 1 (Spec Redesign 2): der Umschlag in Ebenen. Hinten die h1 als
+ * riesiger grüner Serif-Titel, davor das Motiv, darunter die handschriftliche
+ * Wortmarke als Signatur mit der gedruckten Unterzeile. Beide schreiben sich per
  * CSS (globals.css, `schreiben`) und stehen deshalb ohne JavaScript und bei
- * reduzierter Bewegung sofort da. Das Leitobjekt liegt bis TP3 Welle 2 wie
- * bisher über den Buchstaben.
+ * reduzierter Bewegung sofort da.
  *
  * `data-story-einstieg` markiert, was die StoryBuehne einblendet: nur
  * Oberzeile und Satz. Der Button "Wähl mit" trägt die Markierung bewusst
@@ -46,15 +46,23 @@ export function Auftakt() {
         </p>
 
         <div className="relative mt-4">
-          <h1 id="auftakt-titel" data-story="titel" className="auftakt-marke relative z-0">
-            <Wortmarke groesse="umschlag" />
+          <h1
+            id="auftakt-titel"
+            data-story="titel"
+            className="relative z-0 font-buch text-riesig text-accent text-balance"
+          >
+            Grünes <em className="italic">Buch</em>
           </h1>
-          <Unterzeile className="auftakt-unterzeile relative z-0 mt-4" />
+          {/* Signatur: dieselbe Marke noch einmal von Hand, für Vorleser bereits in der h1. */}
+          <div aria-hidden="true" className="auftakt-marke relative z-20 -mt-8 ml-[38vw] w-fit">
+            <Wortmarke groesse="signatur" />
+          </div>
+          <Unterzeile className="auftakt-unterzeile relative z-0 mt-8" />
 
           {/* Ohne z-index und ohne transform: beides schafft einen eigenen
               Stapelkontext, und multiply mischte dann nur mit dem leeren
               Wrapper statt mit Titel und Papier. Zentriert per my-auto. */}
-          <div className="pointer-events-none absolute inset-y-0 right-0 my-auto h-fit w-[64vw] md:right-[4vw] md:w-[42vw]">
+          <div className="pointer-events-none absolute inset-y-0 right-0 z-10 my-auto h-fit w-[64vw] md:right-[4vw] md:w-[42vw]">
             {/* Weicher Rand: der Grund des Fotos hat einen leichten Verlauf, ohne
                 Maske bliebe dessen Kante als Rechteck ueber dem Titel stehen. */}
             <Bild

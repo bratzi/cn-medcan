@@ -2,7 +2,7 @@ import { AB_TABLET, type Choreografie } from "./typen";
 
 /**
  * Sektion 2: Manifest Wort fuer Wort scroll-gekoppelt (Referenz, ueber
- * Deckkraft statt Farbe, Spec 13), dann ab Tablet der Zoom Blatt, Bluete,
+ * Farbe von Grau zu Tinte, Spec Redesign 4), dann ab Tablet der Zoom Blatt, Bluete,
  * Trichom an den Scrollweg der Notizen gekoppelt. Die Buehne klebt per CSS.
  */
 export const transparent: Choreografie = ({ gsap, SplitText, mm }) => {
@@ -11,9 +11,9 @@ export const transparent: Choreografie = ({ gsap, SplitText, mm }) => {
     const woerter = SplitText.create(manifest, { type: "words", tag: "span", aria: "auto" }).words;
     gsap.fromTo(
       woerter,
-      { opacity: 0.25 },
+      { color: "var(--color-border-strong)" },
       {
-        opacity: 1,
+        color: "var(--color-text)",
         stagger: 0.1,
         ease: "none",
         scrollTrigger: { trigger: manifest, start: "top 80%", end: "bottom 45%", scrub: true },

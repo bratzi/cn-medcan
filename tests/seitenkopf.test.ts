@@ -6,7 +6,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 
 import { Seitenkopf, seitenRahmen, ABSCHNITT_TITEL } from "@/components/layout/Seitenkopf";
 
-test("Seitenkopf: genau ein h1 in Cormorant 300, Satz darunter, keine Oberzeile", () => {
+test("Seitenkopf: genau ein h1 in Newsreader 200, Satz darunter, keine Oberzeile", () => {
   const html = renderToStaticMarkup(createElement(Seitenkopf, { titel: "Bewertungen", satz: "Ein Satz." }));
   assert.equal(html.match(/<h1/g)?.length, 1);
   assert.match(html, /font-buch text-kapitel font-light/);
@@ -27,7 +27,7 @@ test("Seitenrahmen: breit 1440, schmal 480 px", () => {
   assert.match(seitenRahmen(true), /\bmax-w-120\b/);
 });
 
-test("Abschnittstitel in Cormorant 500", () => {
+test("Abschnittstitel in Newsreader 500", () => {
   assert.match(ABSCHNITT_TITEL, /font-buch text-h1 font-medium/);
 });
 

@@ -10,7 +10,7 @@ export type EmptyStateProps = {
 };
 
 /**
- * Leerer Zustand (Spec TP2 3.9): ein Satz in Cormorant, darunter was hier
+ * Leerer Zustand (Spec TP2 3.9): ein Satz in Newsreader, darunter was hier
  * entsteht oder was zu tun ist, hoechstens eine Aktion. Kein Kasten: die
  * Seite ist Papier, der leere Platz braucht keinen Rahmen.
  */

@@ -10,7 +10,7 @@
   /* ---- Schriften ------------------------------------------------------- */
   --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, monospace;
-  --font-buch: var(--font-cormorant), Georgia, "Times New Roman", serif;
+  --font-buch: var(--font-newsreader), Georgia, "Times New Roman", serif;
   --font-hand: var(--font-inspiration), "Segoe Script", cursive;
 
   /* ---- Spacing: Basis 4px, nur gerade Stufen (8px-Raster) -------------- */
@@ -60,12 +60,25 @@
 
   /* ---- Display "Grünes Buch" (Spec 4.2) -------------------------------- */
   --text-kapitel: clamp(2.5rem, 1.5rem + 3.5vw, 5rem);
-  --text-kapitel--line-height: 1.1;
-  --text-kapitel--font-weight: 300;
+  --text-kapitel--line-height: 1.05;
+  --text-kapitel--font-weight: 200;
+  --text-kapitel--letter-spacing: -0.02em;
 
   --text-titel: clamp(3.5rem, 2rem + 6vw, 8rem);
-  --text-titel--line-height: 1.05;
-  --text-titel--font-weight: 300;
+  --text-titel--line-height: 1;
+  --text-titel--font-weight: 200;
+  --text-titel--letter-spacing: -0.03em;
+
+  /* Redesign 1: Manifest und Auftakt-Titel, Newsreader 200, nur Display. */
+  --text-manifest: clamp(3rem, 1.5rem + 4vw, 6.25rem);
+  --text-manifest--line-height: 1.02;
+  --text-manifest--font-weight: 200;
+  --text-manifest--letter-spacing: -0.025em;
+
+  --text-riesig: clamp(6rem, 1rem + 14vw, 18rem);
+  --text-riesig--line-height: 0.82;
+  --text-riesig--font-weight: 200;
+  --text-riesig--letter-spacing: -0.045em;
 
   /* ---- Handschrift (Spec TP3 4): Inspiration, nur 400, nie unter 32 px -- */
   /* Wortmarke im Kopf aller Seiten. */

@@ -32,7 +32,7 @@ wird. Daher kommen die Farbe der Handschrift und der eine WebGL-Effekt (Abschnit
   (`scripts/marke/signet.ts`): Favicon, App-Icon, Instagram-Profilbild.
 - Schutzraum: rundum mindestens die Höhe des „G“ der Wortmarke frei. Mindestgröße der Wortmarke 32 px.
 - Hell und dunkel über dieselben Tokens.
-- Verboten: Wortmarke in Cormorant oder Geist, Logo in Grün, verzerren, Schatten, Verläufe, Versalien
+- Verboten: Wortmarke in Newsreader oder Geist (der grüne Serif-Titel im Auftakt ist Satz, nicht Logo), Logo in Grün, verzerren, Schatten, Verläufe, Versalien
   der Wortmarke, gezeichnete Unterstreichungen oder Kringel.
 
 ## 3. Farben
@@ -124,15 +124,17 @@ Haarstriche hat. Datengrafiken stehen in Tinte (`text`), nicht in Grün. Kein re
 
 | Rolle | Schrift | Schnitte | Einsatz |
 |---|---|---|---|
-| Buch-Display | **Cormorant Garamond** | 300, 300 italic, 500 | 300: Kapitel, Manifest, große Zitate; 500: Schlusszeile, Handelsnamen im Eintrag; nur ab 40 px in 300 |
+| Buch-Display | **Newsreader** (OFL, variabel, opsz) | 200 bis 800, kursiv | 200: Auftakt-Titel, Manifest, Kapitel (nur ab 40 px); 500: Handelsnamen, Schlusszeile; 800 nur kurze Kapitelmarken; Betonung kursiv |
 | Text und Bedienung | **Geist** | variabel | Fließtext, Buttons, Formulare, Navigation, Unterzeile der Wortmarke |
 | Messwerte | **Geist Mono** | variabel | Noten, Chargen, Zahlen (`tabular-nums`), auch die Zahl neben einer Randnotiz |
-| Handschrift | **Inspiration** | 400 (einziger Schnitt) | Wortmarke, Randnotizen, „Wähl mit.“, Vermerke am Stimmzettel, Community-Überschriften auf `/umfragen` |
+| Handschrift | **Inspiration** | 400 (einziger Schnitt) | Wortmarke (auch als Signatur unter dem Auftakt-Titel), Randnotizen, „Wähl mit.“, Vermerke, Community-Überschriften auf `/umfragen`; blasse Messwert-Notizen im Hintergrund (aria-hidden) |
 
 | Token | Wert | Zeilenhöhe | Schrift |
 |---|---|---|---|
-| `text-titel` | `clamp(3.5rem, 2rem + 6vw, 8rem)` | 1.05 | Cormorant 300 |
-| `text-kapitel` | `clamp(2.5rem, 1.5rem + 3.5vw, 5rem)` | 1.1 | Cormorant 300 |
+| `text-riesig` | `clamp(6rem, 1rem + 14vw, 18rem)` | 0.82, −0.045em | Newsreader 200, nur Auftakt-Titel in Blattgrün |
+| `text-manifest` | `clamp(3rem, 1.5rem + 4vw, 6.25rem)` | 1.02, −0.025em | Newsreader 200 |
+| `text-titel` | `clamp(3.5rem, 2rem + 6vw, 8rem)` | 1, −0.03em | Newsreader 200 |
+| `text-kapitel` | `clamp(2.5rem, 1.5rem + 3.5vw, 5rem)` | 1.05, −0.02em | Newsreader 200 |
 | `text-umschlag` | `clamp(5rem, 1rem + 17vw, 20rem)` | 0.95 | Inspiration |
 | `text-notiz` | `clamp(2rem, 1.25rem + 3vw, 4.5rem)` | 1.2 | Inspiration |
 | `text-marke` | `2.5rem` | 1 | Inspiration |
@@ -140,7 +142,7 @@ Haarstriche hat. Datengrafiken stehen in Tinte (`text`), nicht in Grün. Kein re
 
 Handschrift nie unter 32 px, keine Versalien, keine Laufweite, keine synthetischen Schnitte, Texte in
 natürlicher Schreibung. Nie für Handelsnamen, Daten, Zahlen, Formulare, Fließtext, Rechtshinweise.
-Betonung im Druck über die Kursive derselben Familie. Verboten: Cormorant 300 unter 40 px; mehr als drei
+Betonung im Druck über die Kursive derselben Familie. Verboten: Newsreader unter 300 bei weniger als 40 px; mehr als drei
 Schriftgrade je Sektion.
 
 ## 5. Formen und Raster
