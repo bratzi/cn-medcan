@@ -1,5 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 
 import { alsPolygon, istLeereMatrix, netzPunkte } from "@/lib/netz";
 
@@ -28,4 +30,11 @@ test("Polygon-Schreibweise für SVG", () => {
 test("eine Matrix aus Nullen gilt als leer", () => {
   assert.equal(istLeereMatrix([0, 0, 0, 0, 0, 0, 0, 0]), true);
   assert.equal(istLeereMatrix([0, 0, 0.5, 0, 0, 0, 0, 0]), false);
+});
+
+test("Achsenbeschriftung steht als HTML-Text in fester Größe, nicht als SVG-Text", () => {
+  // SVG-Text schrumpft mit dem Diagramm: bei 390 px Breite 9 px, bei 320 px 6,5 px.
+  const quelle = readFileSync(join(process.cwd(), "components/story/Netzdiagramm.tsx"), "utf8");
+  assert.doesNotMatch(quelle, /<text\b/);
+  assert.match(quelle, /text-caption/);
 });

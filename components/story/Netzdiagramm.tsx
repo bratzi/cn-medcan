@@ -29,52 +29,54 @@ export function Netzdiagramm({ matrix }: { matrix: GeschmacksMatrix }) {
   const beschriftung = gleichmaessig(MAX, RADIUS + 28);
 
   return (
-    <figure className="flex flex-col items-center gap-4 rounded-t-full border border-text px-6 pt-16 pb-6">
-      <svg viewBox={`0 0 ${GROESSE} ${GROESSE}`} aria-hidden="true" className="w-full max-w-sm text-text">
-        {RINGE.map((ring) => (
+    // px-2 auf schmalen Breiten: jeder Pixel Innenabstand kostet das Diagramm Fläche.
+    <figure className="flex flex-col items-center gap-4 rounded-t-full border border-text px-2 pt-16 pb-6 sm:px-6">
+      <div className="relative w-full max-w-sm">
+        <svg viewBox={`0 0 ${GROESSE} ${GROESSE}`} aria-hidden="true" className="block w-full text-text">
+          {RINGE.map((ring) => (
+            <polygon
+              key={ring}
+              points={alsPolygon(gleichmaessig(ring))}
+              fill="none"
+              stroke="currentColor"
+              strokeOpacity={0.15}
+              vectorEffect="non-scaling-stroke"
+            />
+          ))}
+          {achsenEnden.map((punkt, index) => (
+            <line
+              key={GESCHMACKS_ACHSEN[index].key}
+              x1={MITTE}
+              y1={MITTE}
+              x2={punkt.x}
+              y2={punkt.y}
+              stroke="currentColor"
+              strokeOpacity={0.15}
+              vectorEffect="non-scaling-stroke"
+            />
+          ))}
           <polygon
-            key={ring}
-            points={alsPolygon(gleichmaessig(ring))}
-            fill="none"
+            points={alsPolygon(netzPunkte(werte, MAX, RADIUS, MITTE))}
+            fill="currentColor"
+            fillOpacity={0.12}
             stroke="currentColor"
-            strokeOpacity={0.15}
+            strokeWidth={1.5}
             vectorEffect="non-scaling-stroke"
           />
-        ))}
-        {achsenEnden.map((punkt, index) => (
-          <line
-            key={GESCHMACKS_ACHSEN[index].key}
-            x1={MITTE}
-            y1={MITTE}
-            x2={punkt.x}
-            y2={punkt.y}
-            stroke="currentColor"
-            strokeOpacity={0.15}
-            vectorEffect="non-scaling-stroke"
-          />
-        ))}
-        <polygon
-          points={alsPolygon(netzPunkte(werte, MAX, RADIUS, MITTE))}
-          fill="currentColor"
-          fillOpacity={0.12}
-          stroke="currentColor"
-          strokeWidth={1.5}
-          vectorEffect="non-scaling-stroke"
-        />
+        </svg>
+        {/* Beschriftung als HTML in fester Größe: SVG-Text schrumpfte mit dem
+            Diagramm (9 px bei 390 px Breite). Positionen in Prozent derselben Geometrie. */}
         {beschriftung.map((punkt, index) => (
-          <text
+          <span
             key={GESCHMACKS_ACHSEN[index].key}
-            x={punkt.x}
-            y={punkt.y}
-            textAnchor="middle"
-            dominantBaseline="middle"
-            fontSize={12}
-            className="fill-text-muted font-sans"
+            aria-hidden="true"
+            className="absolute -translate-x-1/2 -translate-y-1/2 text-caption whitespace-nowrap text-text-muted"
+            style={{ left: `${(punkt.x / GROESSE) * 100}%`, top: `${(punkt.y / GROESSE) * 100}%` }}
           >
             {GESCHMACKS_ACHSEN[index].label}
-          </text>
+          </span>
         ))}
-      </svg>
+      </div>
       <figcaption className="text-small text-text-muted">Geschmack, Skala 0 bis 5</figcaption>
       <ul className="sr-only">
         {GESCHMACKS_ACHSEN.map((achse) => (
