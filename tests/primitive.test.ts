@@ -17,6 +17,7 @@ import {
   TableHead,
   TableHeaderCell,
   TableRow,
+  type TableProps,
 } from "@/components/ui/Table";
 import { namenLinkKlassen, textLinkKlassen } from "@/components/ui/textlink";
 
@@ -95,14 +96,10 @@ test("Faktenliste: je Paar ein dt und ein dd", () => {
 });
 
 test("Buchtabelle: kein Rahmen, kein Zebra, kräftige Linie unter dem Kopf", () => {
-  const kopf = createElement(TableHead, {
-    children: createElement(TableRow, { children: createElement(TableHeaderCell, { children: "Charge" }) }),
-  });
-  const rumpf = createElement(TableBody, {
-    children: createElement(TableRow, { children: createElement(TableCell, { children: "A1" }) }),
-  });
+  const kopf = createElement(TableHead, null, createElement(TableRow, null, createElement(TableHeaderCell, null, "Charge")));
+  const rumpf = createElement(TableBody, null, createElement(TableRow, null, createElement(TableCell, null, "A1")));
   const html = renderToStaticMarkup(
-    createElement(Table, { caption: "Chargen", children: createElement(Fragment, null, kopf, rumpf) }),
+    createElement(Table, { caption: "Chargen" } as TableProps, createElement(Fragment, null, kopf, rumpf)),
   );
   assert.doesNotMatch(html, /even:bg-/);
   assert.doesNotMatch(html, /rounded-lg|border border-border/);
