@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { Textur } from "@/components/medien/Textur";
 import { Badge, Card, CardBody, CardFooter, CardHeader, buttonKlassen } from "@/components/ui";
 import { StimmFormular } from "@/components/umfrage/StimmFormular";
 import { cn } from "@/lib/cn";
@@ -32,6 +33,12 @@ type Props = {
   umfrage: UmfrageAnsicht;
   zustand: StimmZustand;
   className?: string;
+  /**
+   * "karte" (Standard, /umfragen) oder "wand" (Startseite, Spec 5.1
+   * Sektion 6): Stimmzettel an der Wand, gesetzte Plätze gestempelt,
+   * wählbare gesprüht markiert. Logik und Zustände sind dieselben.
+   */
+  darstellung?: "karte" | "wand";
 };
 
 function stimmenAnteil(option: UmfrageOptionAnsicht, gesamt: number): number {
@@ -51,30 +58,54 @@ function Kandidat({
   gesamt,
   gewaehlt,
   zeigeStimmen,
+  darstellung,
 }: {
   option: UmfrageOptionAnsicht;
   gesamt: number;
   gewaehlt: boolean;
   zeigeStimmen: boolean;
+  darstellung: "karte" | "wand";
 }) {
   const anteil = stimmenAnteil(option, gesamt);
+
+  const wand = darstellung === "wand";
+  const name = (
+    <Link
+      href={`/produkte/${option.slug}`}
+      className={cn(
+        // Auf dem Stimmzettel spricht das Buch: Handelsnamen in Cormorant (Brand Guideline 10).
+        wand ? "font-buch text-h3 font-medium" : "text-body font-medium",
+        "text-text underline underline-offset-2 wrap-break-word",
+      )}
+      title={option.handelsname}
+    >
+      {option.handelsname}
+    </Link>
+  );
 
   return (
     <li className="border-t border-border py-4 first:border-t-0 first:pt-0">
       <div className="flex flex-wrap items-baseline justify-between gap-2">
-        <Link
-          href={`/produkte/${option.slug}`}
-          className="text-body font-medium text-text underline underline-offset-2"
-          title={option.handelsname}
-        >
-          {option.handelsname}
-        </Link>
+        {wand && option.herkunft === "COMMUNITY" ? (
+          <span className="relative isolate inline-block min-w-0">
+            <Textur id="nebel" story="spruehmarke" weich className="absolute -inset-x-4 -inset-y-2 -z-10 opacity-40" />
+            {name}
+          </span>
+        ) : (
+          name
+        )}
 
         <span className="flex items-center gap-2">
           {option.herkunft === "GESETZT" ? (
-            <Badge variante="neutral" title="Vom Betreiber gesetzt, nicht zur Wahl gestellt">
-              Gesetzter Platz
-            </Badge>
+            wand ? (
+              <span className="stempel" title="Vom Betreiber gesetzt, nicht zur Wahl gestellt">
+                Gesetzt
+              </span>
+            ) : (
+              <Badge variante="neutral" title="Vom Betreiber gesetzt, nicht zur Wahl gestellt">
+                Gesetzter Platz
+              </Badge>
+            )
           ) : null}
           {option.istGewinner ? <Badge variante="success">Gewinner</Badge> : null}
           {gewaehlt ? <Badge variante="accent">Deine Stimme</Badge> : null}
@@ -172,7 +203,7 @@ function Aktionsbereich({ umfrage, zustand }: { umfrage: UmfrageAnsicht; zustand
 }
 
 /** Die laufende Umfrage als Kernelement. Server Component. */
-export function UmfrageKarte({ umfrage, zustand, className }: Props) {
+export function UmfrageKarte({ umfrage, zustand, className, darstellung = "karte" }: Props) {
   const zeigeStimmen = umfrage.phase !== "VORSCHLAG";
   // Die eigene Stimme haengt an derselben Bedingung wie die Zaehler: in der
   // Vorschlagsphase gibt es fachlich keine Stimmen, also darf dort auch kein
@@ -183,9 +214,10 @@ export function UmfrageKarte({ umfrage, zustand, className }: Props) {
 
   const frist = umfrage.phase === "VORSCHLAG" ? umfrage.vorschlagBisAm : umfrage.endetAm;
   const fristLabel = umfrage.phase === "VORSCHLAG" ? "Vorschläge bis" : "Abstimmung bis";
+  const Titel = darstellung === "wand" ? "h3" : "h2";
 
-  return (
-    <Card className={cn("border-accent", className)}>
+  const inhalt = (
+    <>
       <CardHeader className="flex flex-wrap items-center justify-between gap-4">
         <Badge variante="accent">{PHASEN_LABEL[umfrage.phase]}</Badge>
         {frist && umfrage.phase !== "BEENDET" ? (
@@ -200,7 +232,7 @@ export function UmfrageKarte({ umfrage, zustand, className }: Props) {
       </CardHeader>
 
       <CardBody>
-        <h2 className="max-w-[68ch] text-h2 text-text">{umfrage.titel}</h2>
+        <Titel className="max-w-[68ch] text-h2 text-text">{umfrage.titel}</Titel>
         {umfrage.beschreibung ? (
           <p className="mt-4 max-w-[68ch] text-body text-text-muted">{umfrage.beschreibung}</p>
         ) : null}
@@ -213,6 +245,7 @@ export function UmfrageKarte({ umfrage, zustand, className }: Props) {
               gesamt={umfrage.stimmenGesamt}
               gewaehlt={option.id === gewaehlteOption}
               zeigeStimmen={zeigeStimmen}
+              darstellung={darstellung}
             />
           ))}
         </ul>
@@ -227,6 +260,16 @@ export function UmfrageKarte({ umfrage, zustand, className }: Props) {
       <CardFooter>
         <Aktionsbereich umfrage={umfrage} zustand={zustand} />
       </CardFooter>
-    </Card>
+    </>
   );
+
+  if (darstellung === "wand") {
+    return (
+      <div className={cn("stimmzettel border border-border-strong bg-surface-raised shadow-lg", className)}>
+        {inhalt}
+      </div>
+    );
+  }
+
+  return <Card className={cn("border-accent", className)}>{inhalt}</Card>;
 }

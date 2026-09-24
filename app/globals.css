@@ -395,6 +395,29 @@
     filter: url(#spray-rau);
     pointer-events: none;
   }
+
+  /* Stempel fuer gesetzte Plaetze auf dem Stimmzettel (Spec 5.1, Sektion 6).
+     padding 4px oben/unten: optische Korrektur, der Rahmen traegt schon. */
+  .stempel {
+    display: inline-flex;
+    align-items: center;
+    border: 2px solid currentColor;
+    padding: 4px 8px;
+    color: var(--color-text-muted);
+    font-family: var(--font-sans);
+    font-size: var(--text-caption);
+    font-weight: 600;
+    line-height: 1;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    transform: rotate(-4deg);
+  }
+
+  /* Ton-in-Ton-Tag hinter der Abstimmung (Spec 4.3, Doja-Merch). */
+  .wasserzeichen {
+    font-size: clamp(12rem, 45vw, 40rem);
+    line-height: 0.8;
+  }
 }
 
 @media (prefers-color-scheme: dark) {

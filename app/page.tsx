@@ -1,6 +1,9 @@
+import { Abstimmung } from "@/components/story/Abstimmung";
+import { Apotheken } from "@/components/story/Apotheken";
 import { Auftakt } from "@/components/story/Auftakt";
 import { FeldbuchRaster } from "@/components/story/FeldbuchRaster";
 import { GemeinsamLernen } from "@/components/story/GemeinsamLernen";
+import { Katalog } from "@/components/story/Katalog";
 import { NeuesterEintrag } from "@/components/story/NeuesterEintrag";
 import { TransparentMachen } from "@/components/story/TransparentMachen";
 import { WissenBuendeln } from "@/components/story/WissenBuendeln";
@@ -24,6 +27,9 @@ export default function StartPage() {
       <WissenBuendeln />
       <GemeinsamLernen />
       <NeuesterEintrag />
+      <Abstimmung />
+      <Katalog />
+      <Apotheken />
     </div>
   );
 }
