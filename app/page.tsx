@@ -1,5 +1,7 @@
 import { Auftakt } from "@/components/story/Auftakt";
 import { FeldbuchRaster } from "@/components/story/FeldbuchRaster";
+import { GemeinsamLernen } from "@/components/story/GemeinsamLernen";
+import { NeuesterEintrag } from "@/components/story/NeuesterEintrag";
 import { TransparentMachen } from "@/components/story/TransparentMachen";
 import { WissenBuendeln } from "@/components/story/WissenBuendeln";
 
@@ -20,6 +22,8 @@ export default function StartPage() {
       <Auftakt />
       <TransparentMachen />
       <WissenBuendeln />
+      <GemeinsamLernen />
+      <NeuesterEintrag />
     </div>
   );
 }
