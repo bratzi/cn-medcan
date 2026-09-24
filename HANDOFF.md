@@ -175,9 +175,45 @@ Budgets, Akzeptanzkriterien und Reihenfolge. **Die Spec ist die Quelle - nicht d
      `istRedaktionell`); Katalog als **Zeilen** mit Vermerk **„Von mir getestet“** (Relation `take: 1`).
   **Spec geschrieben und committet:** `docs/superpowers/specs/2026-09-24-makeover-teilprojekt-2-design.md`
   (Wortlaut aller neuen Sätze in Abschnitt 7, Präzisierungen gegenüber dem Chat in Abschnitt 13).
-  **Als Nächstes:** Nutzer prüft die Spec (Pflicht-Gate aus `superpowers:brainstorming`). Nach Freigabe
-  `superpowers:writing-plans` für **Welle 1** (Kern), Nutzer wählt die Ausführungsart. Bei Änderungswünschen:
-  Spec anpassen, Selbstcheck (Platzhalter, Widersprüche, Mehrdeutigkeit), erneut vorlegen.
+  **Spec vom Nutzer freigegeben** („passt“). **Plan für Welle 1 geschrieben:**
+  `docs/superpowers/plans/2026-09-24-makeover-tp2-welle-1.md`, 13 Tasks, Branch `makeover/tp2-welle-1`,
+  Prüfskript `scripts/seiten-pruefen.ts` entsteht in Task 9. Ausführung wie in TP1 **Native**
+  (`superpowers:executing-plans`), sofern der Nutzer nichts anderes sagt. Beim Planen geklärt: Next 16.3.6 hat
+  `retry` in `error.tsx` stabil; Seed enthält nur eigene Bewertungen (Community-Stimme für die Sichtprüfung per
+  `wrangler d1 execute --local` anlegen und löschen, SQL im Plan Task 9 Step 7); `formatiereProzentSpanne` setzt
+  „22,0 – 28,0 %“ mit Gedankenstrich zwischen schmalen Leerzeichen, das Prüfskript erlaubt Zahlenbereiche.
+  **Als Nächstes:** siehe „Eingetaktet für eine neue Session“ direkt darunter und die Reihenfolge-Entscheidung
+  des Nutzers dort.
+
+- **⇢ EINGETAKTET FÜR EINE NEUE SESSION (Nutzer, 2026-09-24, Session 9): Marke und Medien professionell
+  überarbeiten, für das gesamte Projekt.** Der Nutzer schickte das mitten in die Planung und sagte ausdrücklich:
+  „das als task eintakten und nicht zwischendrin was neu beginnen erst abschließen die bisherigen tasks und den
+  eintakten für eine neue session“. Wortlaut der Anforderung (sinngemäß vollständig):
+  1. **Logo neu gestalten** mit der Google-Schrift **„Inspiration“** (Nutzer schickte die `<link>`-Einbindung
+     von fonts.googleapis.com; im Projekt gilt `next/font/google`, selbst gehostet, kein `<link>`). Das heutige
+     Logo gefällt ihm nicht.
+  2. **Akzente** sollen ebenfalls eher diese Schrift nutzen (heute: Sedgwick Ave Display für die Wand).
+  3. **Bilder und Video** sind ihm „zu laienhaft eingebaut“: sie sollen hochprofessionell, ansprechend und mit
+     den neuesten technischen Mitteln „awwwards-fähig“ eingebaut werden.
+  4. **„Die Bilder einfach negativ machen ist der falsche Ansatz“** (gemeint: Dunkelmodus `invert(1)` plus
+     `screen`, Spec TP1 4.5). **Ausgeschnittene (freigestellte) Bilder im Storytelling** verwenden.
+  5. Im Zweifel **Drittanbieter-Systeme** suchen, die passende Bilder erzeugen, die sich in Website und
+     Brand-Preset einfügen.
+  6. „Professionelle Umgestaltung dieser Aspekte bitte für das gesamte Projekt anwenden.“
+  **Kollisionen mit bisherigen Entscheidungen, im Brainstorming zu klären (nicht vorab entscheiden):**
+  Sedgwick wurde in TP1 nach Schriftvergleich gewählt (Spec TP1 4.2) und trägt das Konzept „Buch und Wand“;
+  „Inspiration“ ist eine Kalligrafie-/Skriptschrift, kein Graffiti: ersetzt sie die Wand ganz, nur das Logo, oder
+  wird das Konzept neu gefasst? Spec TP1 4.5 hat „Freistellen entfällt“ und Graustufen plus `multiply`
+  festgelegt; freigestellte Motive brauchen eine Freistell-Pipeline (z. B. `sharp` reicht nicht, Hintergrund-
+  entfernung nötig). Bildgenerierung über Drittanbieter: vorhandene Skills `ideogram4` (Text-zu-Bild),
+  `qwen-edit` (Bildbearbeitung, Freistellen/Umgestalten), `runpod` (GPU); **Kostenregel** aus Memory
+  `cn-medcan-projekt` beachten und Kosten vorher nennen; Leitplanken 1 bis 7 (kein Konsum, keine Figuren,
+  keine Blüten mit Handelsnamen) gelten auch für generierte Bilder. Motion/WebGL (OGL) wurde in TP1 aus
+  Gewichtsgründen verworfen; „neueste technologische Mittel“ neu bewerten (Budget 60 KB JS, Workers Free).
+  **Vorgehen:** `superpowers:brainstorming` (architektonisch, eigene Spec „Teilprojekt 3“ oder Nachtrag zu TP1),
+  Skills laut Memory `design-skills-einsatz`, v. a. `build-awwwards-quality-sites`, `design-taste-frontend`,
+  `better-typography`, `animate`, `emil-design-eng`; für Bilder `ideogram4`, `qwen-edit`.
+  **Reihenfolge gegenüber Welle 1:** entscheidet der Nutzer am Ende von Session 9 (Antwort unten eintragen).
   Beim Einlesen gefundener Kleinkram (für die Spec): `/produkte` rendert ein zweites `<main>` im Layout-`<main>`
   (ebenso `/zugang`); sichtbares „fuer“ in `ProduktCard` („Preis nur fuer Fachkreise“) und „oeffentlich“ auf
   `/zugang`; `/zugang`-Titel noch „cn-medcan“, eigener Button mit Deckkraft-Hover und `rounded-md`; Geviertstrich

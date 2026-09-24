@@ -1,6 +1,6 @@
 # Makeover „Grünes Buch“, Teilprojekt 2: die übrigen Seiten
 
-**Stand:** 2026-09-24 · **Status:** Entwurf, Freigabe durch den Nutzer steht aus · **Vorgänger:**
+**Stand:** 2026-09-24 · **Status:** freigegeben (Nutzer, 2026-09-24) · **Vorgänger:**
 `docs/superpowers/specs/2026-09-23-makeover-gruenes-buch-design.md` (Teilprojekt 1, live) · **Pläne:** je Welle
 einer, entstehen nach der Freigabe mit `superpowers:writing-plans`, zuerst Welle 1.
 
