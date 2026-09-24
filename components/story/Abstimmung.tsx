@@ -42,7 +42,7 @@ async function Stimmzettel() {
     );
   }
 
-  return <UmfrageKarte umfrage={umfrage} zustand={stimmZustand(mitglied, optionId)} darstellung="wand" />;
+  return <UmfrageKarte umfrage={umfrage} zustand={stimmZustand(mitglied, optionId)} />;
 }
 
 /** Sektion 6 (Spec 5.1): die Wand mit dem Stimmzettel. Ziel des Buttons "Wähl mit". */

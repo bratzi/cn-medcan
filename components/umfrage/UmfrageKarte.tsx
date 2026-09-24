@@ -1,7 +1,8 @@
 import Link from "next/link";
 
 import { Textur } from "@/components/medien/Textur";
-import { Badge, Card, CardBody, CardFooter, CardHeader, buttonKlassen } from "@/components/ui";
+import { Badge, buttonKlassen } from "@/components/ui";
+import { namenLinkKlassen } from "@/components/ui/textlink";
 import { StimmFormular } from "@/components/umfrage/StimmFormular";
 import { cn } from "@/lib/cn";
 import { formatiereDatum, formatiereRelativ } from "@/lib/format";
@@ -29,16 +30,19 @@ export type StimmZustand =
   | { art: "STIMMBERECHTIGT" }
   | { art: "ABGESTIMMT"; optionId: string };
 
+/** Wo der Stimmzettel steht: bestimmt nur die Ziele der Links. */
+export type StimmzettelOrt = "startseite" | "umfragen";
+
+const ZIELE: Record<StimmzettelOrt, { anmelden: string; vorschlagen: string }> = {
+  startseite: { anmelden: "/anmelden?weiter=%2F", vorschlagen: "/umfragen#vorschlaege" },
+  umfragen: { anmelden: "/anmelden?weiter=%2Fumfragen", vorschlagen: "#vorschlaege" },
+};
+
 type Props = {
   umfrage: UmfrageAnsicht;
   zustand: StimmZustand;
   className?: string;
-  /**
-   * "karte" (Standard, /umfragen) oder "wand" (Startseite, Spec 5.1
-   * Sektion 6): Stimmzettel an der Wand, gesetzte Plätze gestempelt,
-   * wählbare gesprüht markiert. Logik und Zustände sind dieselben.
-   */
-  darstellung?: "karte" | "wand";
+  ort?: StimmzettelOrt;
 };
 
 function stimmenAnteil(option: UmfrageOptionAnsicht, gesamt: number): number {
@@ -47,36 +51,26 @@ function stimmenAnteil(option: UmfrageOptionAnsicht, gesamt: number): number {
 }
 
 /**
- * Ein Kandidat.
- *
- * Gesetzte Plaetze tragen keinen Zaehler und keinen Balken: `stimmen` ist
- * dort `null` ("steht nicht zur Wahl"), nicht `0` ("niemand wollte sie").
- * Ein Balken auf 0 % wuerde genau diese falsche Aussage machen.
+ * Ein Kandidat. Auf dem Stimmzettel spricht das Buch: Handelsnamen in
+ * Cormorant (Brand Guideline 10). Gesetzte Plaetze tragen keinen Zaehler
+ * und keinen Balken: `stimmen` ist dort `null` ("steht nicht zur Wahl"),
+ * nicht `0` ("niemand wollte sie").
  */
 function Kandidat({
   option,
   gesamt,
   gewaehlt,
   zeigeStimmen,
-  darstellung,
 }: {
   option: UmfrageOptionAnsicht;
   gesamt: number;
   gewaehlt: boolean;
   zeigeStimmen: boolean;
-  darstellung: "karte" | "wand";
 }) {
-  const anteil = stimmenAnteil(option, gesamt);
-
-  const wand = darstellung === "wand";
   const name = (
     <Link
       href={`/produkte/${option.slug}`}
-      className={cn(
-        // Auf dem Stimmzettel spricht das Buch: Handelsnamen in Cormorant (Brand Guideline 10).
-        wand ? "font-buch text-h3 font-medium" : "text-body font-medium",
-        "text-text underline underline-offset-2 wrap-break-word",
-      )}
+      className={namenLinkKlassen("font-buch text-h3 font-medium wrap-break-word")}
       title={option.handelsname}
     >
       {option.handelsname}
@@ -86,7 +80,7 @@ function Kandidat({
   return (
     <li className="border-t border-border py-4 first:border-t-0 first:pt-0">
       <div className="flex flex-wrap items-baseline justify-between gap-2">
-        {wand && option.herkunft === "COMMUNITY" ? (
+        {option.herkunft === "COMMUNITY" ? (
           <span className="relative isolate inline-block min-w-0">
             <Textur id="nebel" story="spruehmarke" weich className="absolute -inset-x-4 -inset-y-2 -z-10 opacity-40" />
             {name}
@@ -97,15 +91,9 @@ function Kandidat({
 
         <span className="flex items-center gap-2">
           {option.herkunft === "GESETZT" ? (
-            wand ? (
-              <span className="stempel" title="Vom Betreiber gesetzt, nicht zur Wahl gestellt">
-                Gesetzt
-              </span>
-            ) : (
-              <Badge variante="neutral" title="Vom Betreiber gesetzt, nicht zur Wahl gestellt">
-                Gesetzter Platz
-              </Badge>
-            )
+            <span className="stempel" title="Von mir gesetzt, nicht zur Wahl gestellt">
+              Gesetzt
+            </span>
           ) : null}
           {option.istGewinner ? <Badge variante="success">Gewinner</Badge> : null}
           {gewaehlt ? <Badge variante="accent">Deine Stimme</Badge> : null}
@@ -118,11 +106,9 @@ function Kandidat({
       </div>
 
       {zeigeStimmen && option.stimmen !== null ? (
-        <span
-          aria-hidden="true"
-          className="mt-2 flex h-2 w-full overflow-hidden rounded-sm bg-surface-sunken"
-        >
-          <span className="block h-full rounded-sm bg-accent" style={{ width: `${anteil}%` }} />
+        <span aria-hidden="true" className="mt-2 flex h-2 w-full overflow-hidden bg-surface-sunken">
+          {/* Datengrafik in Tinte, nicht in Blattgruen: Gruen ist Bedienung. */}
+          <span className="block h-full bg-text" style={{ width: `${stimmenAnteil(option, gesamt)}%` }} />
         </span>
       ) : null}
     </li>
@@ -130,11 +116,19 @@ function Kandidat({
 }
 
 /** Die Zeile unter den Kandidaten: abstimmen, oder warum nicht. */
-function Aktionsbereich({ umfrage, zustand }: { umfrage: UmfrageAnsicht; zustand: StimmZustand }) {
+function Aktionsbereich({
+  umfrage,
+  zustand,
+  ort,
+}: {
+  umfrage: UmfrageAnsicht;
+  zustand: StimmZustand;
+  ort: StimmzettelOrt;
+}) {
   if (umfrage.phase === "BEENDET") {
     return (
       <p className="text-small text-text-muted">
-        Diese Runde ist abgeschlossen. Das Ergebnis ist verbindlich für die nächste Bewertung.
+        Diese Runde ist abgeschlossen. Das Ergebnis ist verbindlich für meine nächste Bewertung.
       </p>
     );
   }
@@ -145,7 +139,7 @@ function Aktionsbereich({ umfrage, zustand }: { umfrage: UmfrageAnsicht; zustand
         <p className="text-small text-text-muted">
           Es werden noch Sorten vorgeschlagen. Die Abstimmung beginnt danach.
         </p>
-        <Link href="/umfragen" className={buttonKlassen("secondary", "sm")}>
+        <Link href={ZIELE[ort].vorschlagen} className={buttonKlassen("secondary", "md")}>
           Sorte vorschlagen
         </Link>
       </div>
@@ -157,12 +151,9 @@ function Aktionsbereich({ umfrage, zustand }: { umfrage: UmfrageAnsicht; zustand
     return (
       <div className="flex flex-wrap items-center gap-4">
         <p className="text-small text-text-muted">
-          Abstimmen können nur freigegebene Mitglieder.
+          Abstimmen kannst du, sobald du angemeldet und freigeschaltet bist.
         </p>
-        <Link
-          href="/anmelden?weiter=%2F"
-          className={buttonKlassen("primary", "sm")}
-        >
+        <Link href={ZIELE[ort].anmelden} className={buttonKlassen("primary", "md")}>
           Anmelden
         </Link>
       </div>
@@ -172,11 +163,8 @@ function Aktionsbereich({ umfrage, zustand }: { umfrage: UmfrageAnsicht; zustand
   if (zustand.art === "FREIGABE_OFFEN") {
     return (
       <div className="flex flex-wrap items-center gap-2">
-        <Badge variante="warning">Freigabe ausstehend</Badge>
-        <p className="text-small text-text-muted">
-          Dein Konto wartet auf die manuelle Freigabe des Betreibers. Erst danach besteht
-          Stimmrecht.
-        </p>
+        <Badge variante="warning">Noch nicht freigeschaltet</Badge>
+        <p className="text-small text-text-muted">Sobald ich dein Konto freischalte, kannst du abstimmen.</p>
       </div>
     );
   }
@@ -193,32 +181,31 @@ function Aktionsbereich({ umfrage, zustand }: { umfrage: UmfrageAnsicht; zustand
   const waehlbar = umfrage.optionen.filter((option) => option.herkunft === "COMMUNITY");
   if (waehlbar.length === 0) {
     return (
-      <p className="text-small text-text-muted">
-        In dieser Runde stehen alle Plätze fest. Es gibt nichts zu wählen.
-      </p>
+      <p className="text-small text-text-muted">In dieser Runde stehen alle Plätze fest. Es gibt nichts zu wählen.</p>
     );
   }
 
   return <StimmFormular umfrageId={umfrage.id} optionen={waehlbar} />;
 }
 
-/** Die laufende Umfrage als Kernelement. Server Component. */
-export function UmfrageKarte({ umfrage, zustand, className, darstellung = "karte" }: Props) {
+/**
+ * Die laufende Runde als Stimmzettel an der Wand (Spec TP2 4.2), auf der
+ * Startseite und auf /umfragen gleich. Gesetzte Plaetze gestempelt, waehlbare
+ * gespruht markiert. Server Component.
+ */
+export function UmfrageKarte({ umfrage, zustand, className, ort = "startseite" }: Props) {
   const zeigeStimmen = umfrage.phase !== "VORSCHLAG";
   // Die eigene Stimme haengt an derselben Bedingung wie die Zaehler: in der
   // Vorschlagsphase gibt es fachlich keine Stimmen, also darf dort auch kein
-  // "Deine Stimme" stehen - sonst behauptet die Karte einen Zustand, den die
-  // Zahlen daneben nicht zeigen.
-  const gewaehlteOption =
-    zeigeStimmen && zustand.art === "ABGESTIMMT" ? zustand.optionId : null;
+  // "Deine Stimme" stehen.
+  const gewaehlteOption = zeigeStimmen && zustand.art === "ABGESTIMMT" ? zustand.optionId : null;
 
   const frist = umfrage.phase === "VORSCHLAG" ? umfrage.vorschlagBisAm : umfrage.endetAm;
   const fristLabel = umfrage.phase === "VORSCHLAG" ? "Vorschläge bis" : "Abstimmung bis";
-  const Titel = darstellung === "wand" ? "h3" : "h2";
 
-  const inhalt = (
-    <>
-      <CardHeader className="flex flex-wrap items-center justify-between gap-4">
+  return (
+    <div className={cn("stimmzettel border border-border-strong bg-surface-raised shadow-lg", className)}>
+      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-border px-6 py-4">
         <Badge variante="accent">{PHASEN_LABEL[umfrage.phase]}</Badge>
         {frist && umfrage.phase !== "BEENDET" ? (
           <p className="text-small text-text-muted">
@@ -229,10 +216,10 @@ export function UmfrageKarte({ umfrage, zustand, className, darstellung = "karte
             {` (${formatiereRelativ(frist)})`}
           </p>
         ) : null}
-      </CardHeader>
+      </div>
 
-      <CardBody>
-        <Titel className="max-w-[68ch] text-h2 text-text">{umfrage.titel}</Titel>
+      <div className="px-6 py-6">
+        <h3 className="max-w-[68ch] text-h2 text-text">{umfrage.titel}</h3>
         {umfrage.beschreibung ? (
           <p className="mt-4 max-w-[68ch] text-body text-text-muted">{umfrage.beschreibung}</p>
         ) : null}
@@ -245,7 +232,6 @@ export function UmfrageKarte({ umfrage, zustand, className, darstellung = "karte
               gesamt={umfrage.stimmenGesamt}
               gewaehlt={option.id === gewaehlteOption}
               zeigeStimmen={zeigeStimmen}
-              darstellung={darstellung}
             />
           ))}
         </ul>
@@ -255,21 +241,11 @@ export function UmfrageKarte({ umfrage, zustand, className, darstellung = "karte
             {`${ZAHL_FORMATTER.format(umfrage.stimmenGesamt)} ${umfrage.stimmenGesamt === 1 ? "abgegebene Stimme" : "abgegebene Stimmen"}`}
           </p>
         ) : null}
-      </CardBody>
-
-      <CardFooter>
-        <Aktionsbereich umfrage={umfrage} zustand={zustand} />
-      </CardFooter>
-    </>
-  );
-
-  if (darstellung === "wand") {
-    return (
-      <div className={cn("stimmzettel border border-border-strong bg-surface-raised shadow-lg", className)}>
-        {inhalt}
       </div>
-    );
-  }
 
-  return <Card className={cn("border-accent", className)}>{inhalt}</Card>;
+      <div className="border-t border-border bg-surface-raised px-6 py-4">
+        <Aktionsbereich umfrage={umfrage} zustand={zustand} ort={ort} />
+      </div>
+    </div>
+  );
 }
