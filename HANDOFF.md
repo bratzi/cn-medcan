@@ -28,6 +28,16 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 
 ## ⇢ Hier geht es weiter
 
+### ⇢ STAND SESSION 14 (2026-09-24): Redesign Welle 1 gepusht (`6f74318`)
+- Richtung und Schalter vom Nutzer freigegeben („ja“, wenig Zwischenfragen, pushen). Spec:
+  `docs/superpowers/specs/2026-09-24-redesign-referenz-design.md`.
+- Umgesetzt: Newsreader statt Cormorant; Grade `text-riesig`, `text-manifest`, Titel/Kapitel 200 mit negativer
+  Laufweite; Auftakt-h1 grüner Serif-Titel, Wortmarke als Signatur (`groesse="signatur"`), Motiv davor (z-10);
+  Manifest Wort für Wort Grau zu Tinte; Hintergrund-Notizen in Handschrift; Brand Preset (`docs/brand/gruenes-buch.md`,
+  `.claude/skills/ui-design-engine.md`) angepasst. 148/148 Tests, Typecheck, Lint, Farben grün.
+- **Offen:** Live-Prüfung (Browser-Anmeldung nötig), dann Welle 2 (SW-Freisteller, Three.js-Blätter: braucht
+  `three` als Abhängigkeit), Welle 3 Unterseiten (dort noch `font-light` auf Kapiteln).
+
 ### ⇢ NEUER ERSTER TASK (Session 13, 2026-09-24): Redesign nach Referenz moneyincheck.org
 
 **Auftrag des Nutzers (Session 13, sinngemäß):** Typografie, Look and Feel, Animationen, interaktive Elemente und
