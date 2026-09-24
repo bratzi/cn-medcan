@@ -17,6 +17,7 @@ import { herstellerProfil } from "@/lib/aromakarte";
 import { alsEintrag } from "@/components/review/eintrag";
 import {
   Faktenliste,
+  buttonKlassen,
   einzelLinkKlassen,
   Table,
   TableBody,
@@ -216,6 +217,11 @@ async function ProduktInhalt({ slug }: { slug: string }) {
               zeilen={Object.entries(intensitaet).map(([terpen, { mittel, anzahl }]) => ({ terpen, wert: mittel, anzahl }))}
             />
           </div>
+          <p className="mt-8">
+            <Link href={`/bewerten/${strain.slug}`} className={buttonKlassen("primary", "md")}>
+              Selbst bewerten
+            </Link>
+          </p>
           <Aufklaerung />
         </section>
       ) : null}

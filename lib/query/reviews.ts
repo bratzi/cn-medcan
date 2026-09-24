@@ -206,3 +206,63 @@ export async function reviewAuswahlFuerStrains(
     erstelltAm: satz.erstelltAm,
   }));
 }
+
+// ---------------------------------------------------------------------------
+//  Freigabeliste (nur /admin)
+// ---------------------------------------------------------------------------
+
+export type OffeneBewertung = {
+  id: string;
+  handelsname: string;
+  slug: string;
+  chargenNr: string | null;
+  autor: string | null;
+  aussehen: number;
+  geruch: number;
+  geschmack: number;
+  wirkung: number;
+  konsistenz: number;
+  notiz: string | null;
+  erstelltAm: Date;
+};
+
+/**
+ * Community-Bewertungen, die noch auf Freigabe warten - aelteste zuerst,
+ * weil die am laengsten warten. Redaktionelle Entwuerfe gehoeren nicht hierher.
+ */
+export async function offeneBewertungen(limit = 50): Promise<OffeneBewertung[]> {
+  const prisma = await getPrisma();
+  const saetze = await prisma.review.findMany({
+    where: { freigegeben: false, istRedaktionell: false },
+    orderBy: { erstelltAm: "asc" },
+    take: limit,
+    select: {
+      id: true,
+      aussehen: true,
+      geruch: true,
+      geschmack: true,
+      wirkung: true,
+      konsistenz: true,
+      notiz: true,
+      erstelltAm: true,
+      strain: { select: { handelsname: true, slug: true } },
+      charge: { select: { chargenNr: true } },
+      autor: { select: { anzeigename: true } },
+    },
+  });
+
+  return saetze.map((satz) => ({
+    id: satz.id,
+    handelsname: satz.strain.handelsname,
+    slug: satz.strain.slug,
+    chargenNr: satz.charge?.chargenNr ?? null,
+    autor: satz.autor?.anzeigename ?? null,
+    aussehen: satz.aussehen,
+    geruch: satz.geruch,
+    geschmack: satz.geschmack,
+    wirkung: satz.wirkung,
+    konsistenz: satz.konsistenz,
+    notiz: satz.notiz,
+    erstelltAm: satz.erstelltAm,
+  }));
+}

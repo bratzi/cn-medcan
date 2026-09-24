@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 
 import { adminErforderlich } from "@/lib/session";
 import { getPrisma } from "@/lib/prisma";
-import { freigabeEingabePruefen, rolleEingabePruefen } from "@/lib/admin-eingabe";
+import { freigabeEingabePruefen, reviewIdPruefen, rolleEingabePruefen } from "@/lib/admin-eingabe";
 
 export type AdminErgebnis = { ok: true } | { ok: false; fehler: string };
 
@@ -62,5 +62,55 @@ export async function rolleSetzen(formData: FormData): Promise<AdminErgebnis> {
   });
 
   revalidatePath("/admin");
+  return { ok: true };
+}
+
+/** Sorten-Slug einer Bewertung, fuer die Revalidierung der Produktseite. */
+async function reviewSlug(reviewId: string): Promise<string | null> {
+  const prisma = await getPrisma();
+  const satz = await prisma.review.findUnique({
+    where: { id: reviewId },
+    select: { strain: { select: { slug: true } } },
+  });
+  return satz?.strain.slug ?? null;
+}
+
+function bewertungPfadeNeuLaden(slug: string) {
+  revalidatePath("/admin");
+  revalidatePath("/");
+  revalidatePath(`/produkte/${slug}`);
+}
+
+/** Community-Bewertung freigeben - danach ist sie oeffentlich sichtbar. */
+export async function bewertungFreigeben(formData: FormData): Promise<AdminErgebnis> {
+  await adminErforderlich();
+
+  const geprueft = reviewIdPruefen(String(formData.get("reviewId") ?? ""));
+  if (!geprueft.ok) return geprueft;
+
+  const slug = await reviewSlug(geprueft.wert);
+  if (!slug) return { ok: false, fehler: "Die Bewertung gibt es nicht mehr." };
+
+  const prisma = await getPrisma();
+  await prisma.review.update({ where: { id: geprueft.wert }, data: { freigegeben: true } });
+
+  bewertungPfadeNeuLaden(slug);
+  return { ok: true };
+}
+
+/** Community-Bewertung verwerfen - sie wird geloescht, nicht nur versteckt. */
+export async function bewertungVerwerfen(formData: FormData): Promise<AdminErgebnis> {
+  await adminErforderlich();
+
+  const geprueft = reviewIdPruefen(String(formData.get("reviewId") ?? ""));
+  if (!geprueft.ok) return geprueft;
+
+  const slug = await reviewSlug(geprueft.wert);
+  if (!slug) return { ok: false, fehler: "Die Bewertung gibt es nicht mehr." };
+
+  const prisma = await getPrisma();
+  await prisma.review.delete({ where: { id: geprueft.wert } });
+
+  bewertungPfadeNeuLaden(slug);
   return { ok: true };
 }

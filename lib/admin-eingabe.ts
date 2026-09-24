@@ -78,3 +78,22 @@ export function rolleEingabePruefen(
 
   return { ok: true, wert: { mitgliedId, rolle } };
 }
+
+/** Id einer Bewertung zur Freigabe oder zum Verwerfen. */
+export function reviewIdPruefen(reviewIdRoh: string): AdminPruefErgebnis<string> {
+  const reviewId = idPruefen(reviewIdRoh);
+  return reviewId ? { ok: true, wert: reviewId } : { ok: false, fehler: "Keine Bewertung angegeben." };
+}
+
+/**
+ * Notiz fuer die Freigabeliste kuerzen - an einer Wortgrenze, mit Auslassung.
+ * Leere oder fehlende Notiz ergibt null.
+ */
+export function notizKuerzen(notiz: string | null | undefined, max = 140): string | null {
+  const text = (notiz ?? "").replace(/\s+/g, " ").trim();
+  if (text.length === 0) return null;
+  if (text.length <= max) return text;
+  const schnitt = text.slice(0, max);
+  const grenze = schnitt.lastIndexOf(" ");
+  return `${(grenze > max / 2 ? schnitt.slice(0, grenze) : schnitt).trimEnd()}…`;
+}
