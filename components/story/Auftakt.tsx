@@ -2,8 +2,7 @@ import Link from "next/link";
 import { preload } from "react-dom";
 
 import { Bild } from "@/components/medien/Bild";
-import { Textur } from "@/components/medien/Textur";
-import { Wortmarke } from "@/components/marke/Wortmarke";
+import { Unterzeile, Wortmarke } from "@/components/marke/Wortmarke";
 import { buttonKlassen } from "@/components/ui";
 import { bildQuelle } from "@/lib/medien";
 
@@ -11,17 +10,19 @@ import { bildQuelle } from "@/lib/medien";
 const LEIT_SIZES = "(min-width: 768px) 42vw, 64vw";
 
 /**
- * Sektion 1 (Spec 5.1): randfüllender Titel, das Leitobjekt liegt über den
- * Buchstaben (multiply), das "gb"-Tag sitzt schräg am Titel.
+ * Sektion 1 (Spec TP3 8.1): der Umschlag. Die h1 ist die handschriftliche
+ * Wortmarke, darunter die gedruckte Unterzeile. Beide schreiben sich per
+ * CSS (globals.css, `schreiben`) und stehen deshalb ohne JavaScript und bei
+ * reduzierter Bewegung sofort da. Das Leitobjekt liegt bis TP3 Welle 2 wie
+ * bisher über den Buchstaben.
  *
- * `data-story-einstieg` markiert, was die StoryBuehne einblendet. Ohne
- * JavaScript und bei reduzierter Bewegung ist alles sofort sichtbar
- * (globals.css). Der Button "Wähl mit" trägt die Markierung bewusst nicht:
- * er ist ab dem ersten Frame bedienbar.
+ * `data-story-einstieg` markiert, was die StoryBuehne einblendet: nur
+ * Oberzeile und Satz. Der Button "Wähl mit" trägt die Markierung bewusst
+ * nicht: er ist ab dem ersten Frame bedienbar.
  */
 export function Auftakt() {
   const leitobjekt = bildQuelle("leitobjekt");
-  // LCP-Bild: vor allen anderen Ressourcen anfordern (Spec 6.4).
+  // Größtes Bild der ersten Ansicht: vor allen anderen Ressourcen anfordern (Spec 6.4).
   preload(leitobjekt.src, {
     as: "image",
     imageSrcSet: leitobjekt.srcSet,
@@ -37,7 +38,7 @@ export function Auftakt() {
     >
       <div className="mx-auto w-full max-w-360">
         <p
-          data-story="unterzeile"
+          data-story="oberzeile"
           data-story-einstieg=""
           className="font-buch text-h2 font-medium italic text-text-muted sm:text-h1"
         >
@@ -45,16 +46,10 @@ export function Auftakt() {
         </p>
 
         <div className="relative mt-4">
-          <h1
-            id="auftakt-titel"
-            data-story="titel"
-            data-story-einstieg=""
-            className="relative z-0 font-buch text-auftakt uppercase text-accent"
-          >
-            {/* Das Leerzeichen hält den zugänglichen Namen "Grünes Buch" zusammen. */}
-            <span className="block">Grünes</span>{" "}
-            <span className="block">Buch</span>
+          <h1 id="auftakt-titel" data-story="titel" className="auftakt-marke relative z-0">
+            <Wortmarke groesse="umschlag" />
           </h1>
+          <Unterzeile className="auftakt-unterzeile relative z-0 mt-4" />
 
           {/* Ohne z-index und ohne transform: beides schafft einen eigenen
               Stapelkontext, und multiply mischte dann nur mit dem leeren
@@ -68,14 +63,6 @@ export function Auftakt() {
               prioritaet
               className="mask-radial-closest-side mask-radial-from-70% mask-radial-to-100%"
             />
-          </div>
-
-          <div
-            data-story-einstieg=""
-            className="absolute top-0 left-[40vw] z-20 flex -translate-y-1/3 flex-col items-center md:left-[46vw]"
-          >
-            <Wortmarke groesse="buehne" />
-            <Textur id="drip" story="tag-drip" className="h-24 w-8" />
           </div>
         </div>
 

@@ -39,3 +39,15 @@ test("jede Video-Schleife hat einen Schalter zum Anhalten (WCAG 2.2.2)", () => {
   assert.deepEqual(ohneSchalter, []);
   assert.match(readFileSync(join("components", "story", "bewegung", "loops.ts"), "utf8"), /data-loop-schalter/);
 });
+
+test("Wortmarke im Auftakt schreibt sich per CSS, nur bei erlaubter Bewegung, ohne Schnitt am Ende", () => {
+  const bloecke = [...css.matchAll(/@media \(prefers-reduced-motion: no-preference\) \{([\s\S]*?)\n\}/g)].map(
+    (treffer) => treffer[1],
+  );
+  const block = bloecke.find((inhalt) => inhalt.includes(".auftakt-marke"));
+  assert.ok(block, "Schreib-Einstieg fehlt oder steht ohne Bewegungsschutz");
+  assert.match(block, /\.auftakt-marke \[data-marke-zeile\]\s*\{\s*animation:\s*schreiben [^;]*\bbackwards;/);
+  assert.match(block, /\.auftakt-unterzeile\s*\{\s*animation:\s*schreiben [^;]*\bbackwards;/);
+  assert.doesNotMatch(block, /forwards|\bboth\b/);
+  assert.match(css, /@keyframes schreiben\s*\{/);
+});

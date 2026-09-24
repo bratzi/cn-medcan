@@ -91,6 +91,8 @@ gepusht und live geprüft; Dauerregel: kein lokales Dev-System).
   (surface-raised 5.53/6.88, surface-sunken 4.61/7.66).
 - Welle 1, Task 2 erledigt: Inspiration geladen, Handschrift-Grade `text-marke`, `text-umschlag`, `text-notiz`,
   `text-vermerk` (neu, 32 px).
+- Welle 1, Task 3 erledigt: Wortmarke handschriftlich (Kopf 40 px, Auftakt als h1 zweizeilig), Unterzeile „Charge für
+  Charge“, Tag und Drip im Auftakt raus, Einstieg per CSS.
 
 ### 0. Live-Stand und Sessionablauf
 

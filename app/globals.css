@@ -513,3 +513,35 @@
     opacity: 1;
   }
 }
+
+/* ==========================================================================
+   Geschriebener Einstieg der Wortmarke (Spec TP3 8.1, 11)
+   Nur CSS und nur bei erlaubter Bewegung: die Wortmarke steht ab dem ersten
+   Frame im HTML und braucht kein JavaScript. `backwards` hält den Schnitt nur
+   bis zum Start; danach ist clip-path weg, und Schwünge der Schreibschrift
+   dürfen über die Box hinausragen. Die Ränder gleichen SCHREIBEN_AB und
+   SCHREIBEN_BIS in components/story/bewegung/schreiben.ts.
+   ========================================================================== */
+
+@media (prefers-reduced-motion: no-preference) {
+  .auftakt-marke [data-marke-zeile] {
+    animation: schreiben 0.8s var(--ease-standard) 0.1s backwards;
+  }
+
+  .auftakt-marke [data-marke-zeile] + [data-marke-zeile] {
+    animation-delay: 0.8s;
+  }
+
+  .auftakt-unterzeile {
+    animation: schreiben 0.6s var(--ease-standard) 1.5s backwards;
+  }
+}
+
+@keyframes schreiben {
+  from {
+    clip-path: inset(-50% 120% -50% -20%);
+  }
+  to {
+    clip-path: inset(-50% -20% -50% -20%);
+  }
+}

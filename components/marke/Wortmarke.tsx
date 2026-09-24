@@ -1,42 +1,47 @@
 import { cn } from "@/lib/cn";
 
 type Props = {
-  groesse: "kopf" | "buehne";
+  groesse: "kopf" | "umschlag";
+  /** Nur umschlag: "Grünes Buch" in einer Zeile (Fuß) statt in zwei (Auftakt). */
+  einzeilig?: boolean;
   className?: string;
 };
 
 /**
- * Die Marke "Grünes Buch" (Spec 4.3).
+ * Die Marke "Grünes Buch" (Spec TP3 6): handschriftlich in Inspiration,
+ * immer in Kopierstift-Violett. Der Name ist echter Text, kein Bild; wo er
+ * nur Bild ist (Fuß), setzt der Aufrufer aria-hidden.
  *
- * kopf:   Wortmarke in Cormorant 500 mit kleinem "gb"-Tag als Aufkleber
- *         darüber (Kopf und Fuß). Der Name ist Text, das Tag aria-hidden.
- * buehne: nur der Aufkleber (Tag, darunter gesperrte Versalien) am
- *         Auftakt-Titel. Dort trägt die Überschrift den Namen, deshalb ist
- *         der ganze Aufkleber aria-hidden.
+ * kopf:     eine Zeile in text-marke (40 px), im Kopf aller Seiten.
+ * umschlag: text-umschlag, zweizeilig im Auftakt (dort als h1), einzeilig
+ *           im Fuß. Das Leerzeichen zwischen den Zeilen hält den
+ *           zugänglichen Namen "Grünes Buch" zusammen. An
+ *           `data-marke-zeile` hängt der geschriebene Einstieg (globals.css).
  */
-export function Wortmarke({ groesse, className }: Props) {
-  if (groesse === "buehne") {
-    return (
-      <span aria-hidden="true" data-story="tag" className={cn("gb-aufkleber inline-flex", className)}>
-        {/* gap-1 = 4px: Tag und Versalienzeile sind ein Zeichen, 8px risse es auseinander. */}
-        <span className="gb-kontur inline-flex -rotate-6 flex-col items-center gap-1 px-2">
-          <span className="gb-tag font-wand text-tag">gb</span>
-          <span className="font-sans text-caption uppercase tracking-gesperrt text-text">
-            Grünes Buch
-          </span>
-        </span>
-      </span>
-    );
+export function Wortmarke({ groesse, einzeilig = false, className }: Props) {
+  if (groesse === "kopf") {
+    return <span className={cn("font-hand text-marke text-kopierstift", className)}>Grünes Buch</span>;
   }
 
+  const zeile = einzeilig ? "inline-block" : "block";
   return (
-    <span className={cn("relative inline-flex items-end pt-4 pl-4", className)}>
-      <span className="relative font-buch text-wortmarke text-text">Grünes Buch</span>
-      <span aria-hidden="true" className="gb-aufkleber absolute top-0 left-0 z-10">
-        <span className="gb-kontur inline-flex -rotate-12">
-          <span className="gb-tag font-wand text-h2 font-normal">gb</span>
-        </span>
+    <span className={cn("block font-hand text-umschlag text-kopierstift", einzeilig && "whitespace-nowrap", className)}>
+      <span data-marke-zeile="" className={zeile}>
+        Grünes
+      </span>{" "}
+      <span data-marke-zeile="" className={zeile}>
+        Buch
       </span>
     </span>
+  );
+}
+
+/**
+ * Die Unterzeile der Wortmarke (Spec TP3 6): gedruckt in Geist 500,
+ * gespeichert in natürlicher Schreibung, Versalien und Laufweite per CSS.
+ */
+export function Unterzeile({ className }: { className?: string }) {
+  return (
+    <p className={cn("font-sans text-caption uppercase tracking-gesperrt text-text", className)}>Charge für Charge</p>
   );
 }

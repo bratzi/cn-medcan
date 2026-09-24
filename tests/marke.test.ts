@@ -3,6 +3,11 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 
+import { createElement } from "react";
+import { renderToStaticMarkup } from "react-dom/server";
+
+import { Unterzeile, Wortmarke } from "@/components/marke/Wortmarke";
+
 const lies = (datei: string) => readFileSync(join(process.cwd(), datei), "utf8");
 const css = lies("app/globals.css");
 
@@ -55,4 +60,47 @@ test("Handschrift: Inspiration mit Rückfall, nur 400, keine synthetischen Schni
     lies("app/layout.tsx"),
     /Inspiration\(\{[\s\S]*?variable: "--font-inspiration"[\s\S]*?weight: "400"[\s\S]*?adjustFontFallback: true/,
   );
+});
+
+const ohneTags = (html: string) => html.replace(/<[^>]+>/g, "");
+
+test("Wortmarke im Kopf: Handschrift in Kopierstift, echter Text", () => {
+  const html = renderToStaticMarkup(createElement(Wortmarke, { groesse: "kopf" }));
+  assert.match(html, /\bfont-hand\b/);
+  assert.match(html, /\btext-marke\b/);
+  assert.match(html, /\btext-kopierstift\b/);
+  assert.equal(ohneTags(html), "Grünes Buch");
+  assert.doesNotMatch(html, /font-buch|aria-hidden|uppercase|text-accent|gb/);
+});
+
+test("Wortmarke als Umschlag: zwei Zeilen, ein zugänglicher Name", () => {
+  const html = renderToStaticMarkup(createElement(Wortmarke, { groesse: "umschlag" }));
+  assert.equal(html.match(/data-marke-zeile=""/g)?.length, 2);
+  assert.match(html, /\btext-umschlag\b/);
+  assert.equal(ohneTags(html), "Grünes Buch");
+});
+
+test("Wortmarke einzeilig (Fuß): bricht nicht um", () => {
+  const html = renderToStaticMarkup(createElement(Wortmarke, { groesse: "umschlag", einzeilig: true }));
+  assert.match(html, /\bwhitespace-nowrap\b/);
+  assert.equal(html.match(/class="inline-block"/g)?.length, 2);
+});
+
+test("Unterzeile: gedruckt, natürliche Schreibung, Versalien per CSS", () => {
+  const html = renderToStaticMarkup(createElement(Unterzeile));
+  assert.match(html, /^<p /);
+  assert.equal(ohneTags(html), "Charge für Charge");
+  assert.match(html, /\buppercase\b/);
+  assert.match(html, /\btracking-gesperrt\b/);
+  assert.doesNotMatch(html, /font-hand/);
+});
+
+test("Auftakt: die h1 ist die Wortmarke, ohne Grün, ohne Tag, nie per Einstieg versteckt", () => {
+  const quelle = lies("components/story/Auftakt.tsx");
+  const h1 = /<h1[^>]*>\s*<Wortmarke groesse="umschlag" \/>\s*<\/h1>/.exec(quelle)?.[0];
+  assert.ok(h1, "die h1 enthält nicht genau die Umschlag-Wortmarke");
+  assert.match(h1, /className="auftakt-marke /);
+  assert.doesNotMatch(h1, /data-story-einstieg/);
+  assert.match(quelle, /<Unterzeile className="auftakt-unterzeile /);
+  assert.doesNotMatch(quelle, /text-accent|uppercase|Textur|groesse="buehne"/);
 });
