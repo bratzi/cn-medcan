@@ -2,13 +2,9 @@ import Link from "next/link";
 
 import { Wortmarke } from "@/components/marke/Wortmarke";
 import { MEDIEN, type MedienArt } from "@/lib/medien";
+import { HAUPTNAVIGATION, KONTO_LINK } from "@/lib/navigation";
 
-const LINKS = [
-  { href: "/reviews", text: "Einträge" },
-  { href: "/umfragen", text: "Abstimmungen" },
-  { href: "/produkte", text: "Produkte" },
-  { href: "/apotheken", text: "Apotheken" },
-] as const;
+const LINKS = [...HAUPTNAVIGATION, KONTO_LINK];
 
 const ART_LABEL: Record<MedienArt, string> = { foto: "Foto", maske: "Textur", video: "Video" };
 
