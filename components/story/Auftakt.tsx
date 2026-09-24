@@ -7,7 +7,7 @@ import { buttonKlassen } from "@/components/ui";
 import { bildQuelle } from "@/lib/medien";
 
 /** Tatsächliche Breite des Leitobjekts: bestimmt, welche Datei geladen wird. */
-const LEIT_SIZES = "(min-width: 768px) 42vw, 64vw";
+const LEIT_SIZES = "(min-width: 768px) 24vw, 48vw";
 
 /**
  * Sektion 1 (Spec Redesign 2): der Umschlag in Ebenen. Hinten die h1 als
@@ -45,7 +45,7 @@ export function Auftakt() {
           Cannabis, offen gelegt.
         </p>
 
-        <div className="relative mt-4">
+        <div className="relative mt-8">
           <h1
             id="auftakt-titel"
             data-story="titel"
@@ -54,7 +54,7 @@ export function Auftakt() {
             Grünes <em className="italic">Buch</em>
           </h1>
           {/* Signatur: dieselbe Marke noch einmal von Hand, für Vorleser bereits in der h1. */}
-          <div aria-hidden="true" className="auftakt-marke relative z-20 -mt-8 ml-[38vw] w-fit">
+          <div aria-hidden="true" className="auftakt-marke relative z-20 mt-4 w-fit">
             <Wortmarke groesse="signatur" />
           </div>
           <Unterzeile className="auftakt-unterzeile relative z-0 mt-8" />
@@ -62,7 +62,7 @@ export function Auftakt() {
           {/* Ohne z-index und ohne transform: beides schafft einen eigenen
               Stapelkontext, und multiply mischte dann nur mit dem leeren
               Wrapper statt mit Titel und Papier. Zentriert per my-auto. */}
-          <div className="pointer-events-none absolute inset-y-0 right-0 z-10 my-auto h-fit w-[64vw] md:right-[4vw] md:w-[42vw]">
+          <div className="pointer-events-none absolute top-[4vw] right-[2vw] z-10 h-fit w-[48vw] md:right-[10vw] md:w-[24vw]">
             {/* Weicher Rand: der Grund des Fotos hat einen leichten Verlauf, ohne
                 Maske bliebe dessen Kante als Rechteck ueber dem Titel stehen. */}
             <Bild
