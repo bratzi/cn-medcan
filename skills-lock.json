@@ -25,6 +25,11 @@
       "skillPath": "skills/better-colors/SKILL.md",
       "computedHash": "47c25cca097d0993190ca12b416ec0be08429d8086d99adcac4621aa0e1f110f"
     },
+    "better-interface": {
+      "source": "jakubkrehel/skills",
+      "sourceType": "github",
+      "skillPath": "skills/better-interface/SKILL.md"
+    },
     "better-layout": {
       "source": "jakubkrehel/skills",
       "sourceType": "github",
@@ -36,6 +41,16 @@
       "sourceType": "github",
       "skillPath": "skills/better-typography/SKILL.md",
       "computedHash": "3fb90fed3aeb57a6a545be4e4f285f0d1babdaff9644ec3526857437481747a1"
+    },
+    "better-ui": {
+      "source": "jakubkrehel/skills",
+      "sourceType": "github",
+      "skillPath": "skills/better-ui/SKILL.md"
+    },
+    "better-writing": {
+      "source": "jakubkrehel/skills",
+      "sourceType": "github",
+      "skillPath": "skills/better-writing/SKILL.md"
     },
     "build-awwwards-quality-sites": {
       "source": "MengTo/Skills",
