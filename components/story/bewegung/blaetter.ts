@@ -6,7 +6,7 @@
  * Canvas (sieben Finger, Mittelrippe), kein Bild-Download. Die Leinwand
  * liegt fest über allem und fängt keine Klicks.
  */
-const ANZAHL = 22;
+const ANZAHL = 5;
 const FINGER = [-78, -52, -26, 0, 26, 52, 78] as const;
 
 type Blatt = {
@@ -105,7 +105,7 @@ export async function starteBlaetter(scrollTempo: () => number): Promise<() => v
   }
   lage.needsUpdate = true;
   const materialien = bildmaps.map(
-    (map) => new THREE.MeshBasicMaterial({ map, transparent: true, side: THREE.DoubleSide, depthWrite: false, opacity: 0.85 }),
+    (map) => new THREE.MeshBasicMaterial({ map, transparent: true, side: THREE.DoubleSide, depthWrite: false, opacity: 0.3 }),
   );
 
   const hoehe = 2 * Math.tan((kamera.fov * Math.PI) / 360) * kamera.position.z;
@@ -113,7 +113,7 @@ export async function starteBlaetter(scrollTempo: () => number): Promise<() => v
   const blaetter: Blatt[] = [];
   const netze = Array.from({ length: ANZAHL }, (_, index) => {
     const netz = new THREE.Mesh(geometrie, materialien[index % 2]);
-    const skala = zufall(0.5, 1.2);
+    const skala = zufall(0.4, 0.8);
     netz.scale.set(skala, skala, skala);
     szene.add(netz);
     blaetter.push({

@@ -76,7 +76,7 @@ function MeineNote({ bewertung }: { bewertung: MeineBewertung | null }) {
   if (!bewertung) {
     return (
       <div className="flex flex-col gap-2 lg:items-end lg:text-right">
-        <p className="text-h3 font-normal text-text">Noch nicht von mir getestet.</p>
+        <p className="text-h3 font-normal text-text">Noch nicht von uns getestet.</p>
         <Link href="/umfragen" className={einzelLinkKlassen()}>
           Zur Abstimmung
         </Link>
@@ -87,7 +87,7 @@ function MeineNote({ bewertung }: { bewertung: MeineBewertung | null }) {
   const datum = formatiereDatum(bewertung.erstelltAm);
   return (
     <div className="flex flex-col gap-2 lg:items-end lg:text-right">
-      <p className="text-small text-text-muted">Meine Note</p>
+      <p className="text-small text-text-muted">Unsere Note</p>
       <p className="numeric text-kapitel font-normal text-text">
         {NOTE.format(bewertung.note)}
         <span aria-hidden="true" className="text-h3 text-text-muted">

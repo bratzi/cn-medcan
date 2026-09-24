@@ -27,7 +27,7 @@ const TAG = new Date("2026-09-12T12:00:00Z");
 
 test("Meine Note mit Datum und Charge", () => {
   const html = zeige({ ...BASIS, meineBewertung: { note: 4.6, erstelltAm: TAG, chargenNr: "CH-2401" } });
-  assert.match(html, /Meine Note/);
+  assert.match(html, /Unsere Note/);
   assert.match(html, />4,6</);
   assert.match(html, /Bewertet am 12\.09\.2026, Charge CH-2401/);
 });
@@ -40,7 +40,7 @@ test("Meine Note ohne Charge: nur das Datum", () => {
 
 test("ohne eigene Bewertung: noch nicht getestet, Weg zur Abstimmung", () => {
   const html = zeige(BASIS);
-  assert.match(html, /Noch nicht von mir getestet\./);
+  assert.match(html, /Noch nicht von uns getestet./);
   assert.match(html, /href="\/umfragen"[^>]*>Zur Abstimmung</);
   assert.doesNotMatch(html, /Meine Note/);
 });

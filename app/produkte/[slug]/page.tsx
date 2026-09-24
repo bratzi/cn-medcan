@@ -190,7 +190,7 @@ async function ProduktInhalt({ slug }: { slug: string }) {
       {eigene.length > 0 ? (
         <section aria-labelledby="meine-titel" className={cn(ABSTAND, "flex flex-col gap-8")}>
           <h2 id="meine-titel" className={ABSCHNITT_TITEL}>
-            {eigene.length === 1 ? "Meine Bewertung" : "Meine Bewertungen"}
+            {eigene.length === 1 ? "Unsere Bewertung" : "Unsere Bewertungen"}
           </h2>
           {eigene.map((review) => (
             <Doppelseite key={review.id} eintrag={alsEintrag(review, produkt)} umfang="voll" ueberschrift="h3" />
