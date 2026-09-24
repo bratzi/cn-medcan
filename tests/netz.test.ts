@@ -34,7 +34,7 @@ test("eine Matrix aus Nullen gilt als leer", () => {
 
 test("Achsenbeschriftung steht als HTML-Text in fester Größe, nicht als SVG-Text", () => {
   // SVG-Text schrumpft mit dem Diagramm: bei 390 px Breite 9 px, bei 320 px 6,5 px.
-  const quelle = readFileSync(join(process.cwd(), "components/story/Netzdiagramm.tsx"), "utf8");
+  const quelle = readFileSync(join(process.cwd(), "components/review/Netzdiagramm.tsx"), "utf8");
   assert.doesNotMatch(quelle, /<text\b/);
   assert.match(quelle, /text-caption/);
 });

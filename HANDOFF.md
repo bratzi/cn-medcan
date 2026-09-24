@@ -205,6 +205,7 @@ Budgets, Akzeptanzkriterien und Reihenfolge. **Die Spec ist die Quelle - nicht d
   - Welle 1, Task 4 erledigt: Navigation Kern zuerst (Kopf, Fuss, NavLink mit aria-current).
   - Welle 1, Task 5 erledigt: app/error.tsx im Buchstil (retry).
   - Welle 1, Task 6 erledigt: teileBewertungen, ReviewEintrag.istRedaktionell (eine Abfrage, Datenmodell unverändert).
+  - Welle 1, Task 7 erledigt: Doppelseite (auszug/voll, story) in components/review, Netzdiagramm umgezogen, Startseite nutzt sie.
 
 - **⇢ EINGETAKTET FÜR EINE NEUE SESSION (Nutzer, 2026-09-24, Session 9): Marke und Medien professionell
   überarbeiten, für das gesamte Projekt.** Der Nutzer schickte das mitten in die Planung und sagte ausdrücklich:
