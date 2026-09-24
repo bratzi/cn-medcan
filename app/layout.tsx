@@ -7,6 +7,7 @@ import {
 } from "next/font/google";
 import { Fuss } from "@/components/layout/Fuss";
 import { Kopf } from "@/components/layout/Kopf";
+import { THEMA_SKRIPT, THEMA_STANDARD } from "@/lib/thema";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -50,8 +51,13 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="de"
+      data-theme={THEMA_STANDARD}
+      suppressHydrationWarning
       className={`${geistSans.variable} ${geistMono.variable} ${cormorant.variable} ${inspiration.variable} h-full antialiased`}
     >
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: THEMA_SKRIPT }} />
+      </head>
       <body className="min-h-full flex flex-col">
         <a
           href="#inhalt"

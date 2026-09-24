@@ -59,9 +59,11 @@ neu bestimmt. Die rembg-Pipeline aus Spec TP3 7.2 bleibt als Werkzeug nutzbar.
   rundem Porträt, verstreuten Bildchen mit Bildunterschrift, Unterschrift als Bild; Fuß minimal, „say hello“ als
   Kritzel. Gebaut mit Vite, nicht Next.
 
-**Offen beim Nutzer (gefragt in Session 13):** Wortmarke Serif oder Handschrift; Bildwelt Schwarzweiß oder Farbe;
-3D-Moment (welches Objekt, oder keins); Hell/Dunkel-Schalter sofort vorziehen und welcher Standard. Antworten hier
-nachtragen, dann Spec schreiben.
+**Nutzerentscheidungen (Session 13):** (1) **Handschrift-Logo bleibt** (Inspiration, Kopierstift-Violett; die Serif
+führt alles andere). (2) **Bildwelt Schwarzweiß**, Farbe nur in der Schrift (löst TP3 „Farbe, einheitlich gegradet“
+ab). (3) **3D-Moment: Blätter**, getrocknete Cannabisblätter aus Foto-Freisteller segeln scroll-gekoppelt (Three.js,
+nachgeladen). (4) **Hell/Dunkel-Schalter sofort, Standard Hell**: rechts im Kopf, Wahl gespeichert, ohne Aufblitzen
+(als kleiner Entwurf freigegeben, wird vor der Spec gebaut). Mobil erst mal nicht.
 
 **Offen aus Session 12, weiter gültig:** Live-Prüfung TP3 Welle 1 (Nutzer muss sich im Browser-Tab anmelden).
 

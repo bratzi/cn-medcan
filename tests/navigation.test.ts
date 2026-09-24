@@ -31,8 +31,8 @@ test("Kopf: einzeilig erst ab lg, wo der Platz reicht; Leiste mit Luft für den 
   const { renderToStaticMarkup } = await import("react-dom/server");
   const { Kopf } = await import("@/components/layout/Kopf");
   const html = renderToStaticMarkup(createElement(Kopf));
-  assert.match(html, /lg:grid-cols-\[auto_1fr_auto\]/);
-  assert.doesNotMatch(html, /md:grid-cols-\[auto_1fr_auto\]/);
+  assert.match(html, /lg:grid-cols-\[auto_1fr_auto_auto]/);
+  assert.doesNotMatch(html, /md:grid-cols-\[auto_1fr_auto_auto]/);
   const leiste = html.match(/<ul class="([^"]*)"/)?.[1] ?? "";
   assert.match(leiste, /(^| )-my-2( |$)/);
   assert.match(leiste, /(^| )py-2( |$)/);

@@ -296,6 +296,14 @@
    ========================================================================== */
 
 @layer components {
+  /* Hell/Dunkel-Schalter: das Wort nennt das Ziel. Welches steht, entscheidet
+     allein data-theme, also ohne Aufblitzen vor dem Hydrieren; display:none
+     nimmt das andere Wort auch aus dem zugänglichen Namen. */
+  :root[data-theme="dark"] .thema-ziel-dunkel,
+  :root:not([data-theme="dark"]) .thema-ziel-hell {
+    display: none;
+  }
+
   /* Inspiration hat nur 400: keine künstlich fetten oder kursiven Schnitte. */
   .font-hand {
     font-synthesis: none;
