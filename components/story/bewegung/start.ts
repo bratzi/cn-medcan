@@ -1,6 +1,9 @@
+import { abstimmung } from "./abstimmung";
 import { auftakt } from "./auftakt";
+import { eintrag } from "./eintrag";
 import { beobachteLoops } from "./loops";
 import { schleife } from "./schleife";
+import { schluss } from "./schluss";
 import { transparent } from "./transparent";
 import { vorhang } from "./vorhang";
 import { wand } from "./wand";
@@ -15,7 +18,15 @@ import type { Choreografie, Werkzeug } from "./typen";
  * und alles unterhalb des Wand-Pins muss nach dem Pin entstehen. Der Vorhang
  * steht deshalb zuletzt, er deckt auch die Abstimmung unter dem Pin auf.
  */
-const SCROLL_CHOREOGRAFIEN: readonly Choreografie[] = [transparent, wand, schleife, vorhang];
+const SCROLL_CHOREOGRAFIEN: readonly Choreografie[] = [
+  transparent,
+  wand,
+  schleife,
+  eintrag,
+  abstimmung,
+  schluss,
+  vorhang,
+];
 
 function wennInhaltGeladen(los: () => void): () => void {
   const fertig = () => document.querySelector("[data-skelett]") === null;
