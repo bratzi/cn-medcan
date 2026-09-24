@@ -17,7 +17,7 @@ import {
   type Medium,
 } from "../../lib/medien";
 import { ladeDatei, pexelsJson, pexelsKey } from "./pexels";
-import { waehleSdVideo, zuGraustufenWebp, zuMaskePng, type PexelsVideoDatei } from "./verarbeitung";
+import { waehleSdVideo, zuGraustufenWebp, zuMaskePng, zuStandbildWebp, type PexelsVideoDatei } from "./verarbeitung";
 
 const ZIEL = join(process.cwd(), "public", "medien");
 
@@ -52,7 +52,7 @@ async function video(m: Medium, key: string) {
   const datei = waehleSdVideo(daten.video_files);
   if (!datei) throw new Error(`Video ${m.pexelsId}: keine MP4-Datei`);
   schreibe(`${m.datei}.mp4`, await ladeDatei(datei.link));
-  schreibe(`${m.datei}-standbild.webp`, await zuGraustufenWebp(await ladeDatei(daten.image), STANDBILD_BREITE));
+  schreibe(`${m.datei}-standbild.webp`, await zuStandbildWebp(await ladeDatei(daten.image), STANDBILD_BREITE));
 }
 
 async function main() {

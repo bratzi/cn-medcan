@@ -2,7 +2,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import sharp from "sharp";
 
-import { waehleSdVideo, zuGraustufenWebp, zuMaskePng } from "../scripts/medien/verarbeitung";
+import { waehleSdVideo, zuGraustufenWebp, zuMaskePng, zuStandbildWebp } from "../scripts/medien/verarbeitung";
 
 /** Ein Graustufenstreifen 4 x 1: schwarz, dunkelgrau, hellgrau, weiß. */
 async function streifen(): Promise<Buffer> {
@@ -69,4 +69,30 @@ test("Graustufen-WebP: dunkler Grund bleibt unverändert hell", async () => {
   const dunkel = await sharp({ create: { width: 40, height: 40, channels: 3, background: { r: 80, g: 80, b: 80 } } }).png().toBuffer();
   const { data } = await sharp(await zuGraustufenWebp(dunkel, 40)).grayscale().raw().toBuffer({ resolveWithObject: true });
   assert.ok(Math.abs(data[0] - 80) <= 4, `Grund ${data[0]}`);
+});
+
+test("Maske wird auf 3:2 zugeschnitten", async () => {
+  const hoch = await sharp({ create: { width: 300, height: 600, channels: 3, background: "#777" } }).png().toBuffer();
+  const meta = await sharp(await zuMaskePng(hoch, 90)).metadata();
+  assert.equal(meta.width, 90);
+  assert.equal(meta.height, 60);
+});
+
+test("Maske hat höchstens 16 Deckkraftstufen", async () => {
+  const verlauf = await sharp(Buffer.from(Array.from({ length: 256 }, (_, i) => i)), {
+    raw: { width: 256, height: 1, channels: 1 },
+  })
+    .png()
+    .toBuffer();
+  const stufen = new Set(await alphaWerte(await zuMaskePng(verlauf, 256)));
+  assert.ok(stufen.size <= 16, `${stufen.size} Stufen`);
+  for (const wert of stufen) assert.equal(wert % 17, 0, `Stufe ${wert}`);
+});
+
+test("Standbild wird ein Quadrat in der verlangten Kante", async () => {
+  const quer = await sharp({ create: { width: 1280, height: 720, channels: 3, background: "#333" } }).jpeg().toBuffer();
+  const meta = await sharp(await zuStandbildWebp(quer, 576)).metadata();
+  assert.equal(meta.format, "webp");
+  assert.equal(meta.width, 576);
+  assert.equal(meta.height, 576);
 });

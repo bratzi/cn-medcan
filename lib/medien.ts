@@ -32,7 +32,8 @@ export type Medium = {
 
 export const FOTO_BREITEN = [640, 1280, 1920] as const;
 export const MASKEN_BREITE = 960;
-export const STANDBILD_BREITE = 1280;
+/** Kante des quadratischen Video-Standbilds: der Loop steht in einem Fenster bis 288 px, Retina 2x. */
+export const STANDBILD_BREITE = 576;
 
 export const MEDIEN: readonly Medium[] = [
   {
