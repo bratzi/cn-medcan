@@ -7,6 +7,7 @@ import { EmptyState, buttonKlassen } from "@/components/ui";
 import { leererFilter } from "@/lib/query/filter";
 import { istFachkreis } from "@/lib/query/fachkreis";
 import { ladeStrainListe } from "@/lib/query/strains";
+import { sicher } from "@/lib/sicher";
 
 const ANZAHL = 6;
 
@@ -19,8 +20,18 @@ const EINSTIEGE = [
 
 /** Sechs Produkte als wischbare Reihe. Preise nur mit Freigabe (bestehende Logik). */
 async function Reihe() {
-  const fachkreis = await istFachkreis();
-  const liste = await ladeStrainListe(leererFilter(), fachkreis);
+  const liste = await sicher(
+    async () => ladeStrainListe(leererFilter(), await istFachkreis()),
+    null,
+    "Katalog-Reihe",
+  );
+  if (!liste) {
+    return (
+      <p className="border border-border bg-surface-raised p-8 text-body text-text">
+        Der Katalog lässt sich gerade nicht laden. Der Rest der Seite funktioniert weiter.
+      </p>
+    );
+  }
   // Bewusst in TypeScript zugeschnitten statt mit einer eigenen Abfrage.
   const eintraege = liste.eintraege.slice(0, ANZAHL);
 

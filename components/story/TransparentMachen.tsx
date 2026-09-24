@@ -4,6 +4,7 @@ import { Bild } from "@/components/medien/Bild";
 import { formatiereDatum } from "@/lib/format";
 import { BEWERTUNGS_ACHSEN } from "@/lib/query/bewertung";
 import { neuesteRedaktionelleReview } from "@/lib/query/reviews";
+import { sicher } from "@/lib/sicher";
 
 const ERLAEUTERUNG: Record<string, string> = Object.fromEntries(
   BEWERTUNGS_ACHSEN.map((achse) => [achse.key, achse.erlaeuterung]),
@@ -24,7 +25,10 @@ const BUEHNE_SIZES = "(min-width: 768px) 45vw, 100vw";
 
 /** Kopfzeile wie bei einer Zeitung: Stand ist das Datum des neuesten Eintrags. */
 async function Stand() {
-  const review = await neuesteRedaktionelleReview();
+  // undefined = Abfrage gescheitert: dieselbe Abfrage nutzt Sektion 5, die dann ihren
+  // eigenen Fehlersatz zeigt. Hier bleibt die Seite einfach stehen (Spec 5.2).
+  const review = await sicher(() => neuesteRedaktionelleReview(), undefined, "Stand der Kopfzeile");
+  if (review === undefined) return <>Stand gerade nicht abrufbar</>;
   if (!review) return <>Erste Ausgabe in Arbeit</>;
   return (
     <>

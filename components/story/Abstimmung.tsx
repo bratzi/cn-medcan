@@ -6,6 +6,7 @@ import { UmfrageKarte } from "@/components/umfrage/UmfrageKarte";
 import { stimmZustand } from "@/components/umfrage/stimmzustand";
 import { aktiveUmfrage, eigeneStimme } from "@/lib/query/umfragen";
 import { aktuellesMitglied } from "@/lib/session";
+import { sicher } from "@/lib/sicher";
 
 /**
  * Der Stimmzettel. Der Zustand entsteht hier und nur hier; die Karte zeigt
@@ -14,7 +15,25 @@ import { aktuellesMitglied } from "@/lib/session";
  * Mitglieder.
  */
 async function Stimmzettel() {
-  const [umfrage, mitglied] = await Promise.all([aktiveUmfrage(), aktuellesMitglied()]);
+  const geladen = await sicher(
+    async () => {
+      const [umfrage, mitglied] = await Promise.all([aktiveUmfrage(), aktuellesMitglied()]);
+      const optionId =
+        umfrage && mitglied?.freigegeben ? await eigeneStimme(umfrage.id, mitglied.mitgliedId) : null;
+      return { umfrage, mitglied, optionId };
+    },
+    null,
+    "Stimmzettel",
+  );
+  if (!geladen) {
+    return (
+      <p className="max-w-[48ch] border border-border-strong bg-surface-raised p-8 text-body text-text">
+        Die Abstimmung lässt sich gerade nicht laden. Der Rest der Seite funktioniert weiter.
+      </p>
+    );
+  }
+
+  const { umfrage, mitglied, optionId } = geladen;
   if (!umfrage) {
     return (
       <p className="max-w-[48ch] border border-border-strong bg-surface-raised p-8 text-body text-text">
@@ -23,7 +42,6 @@ async function Stimmzettel() {
     );
   }
 
-  const optionId = mitglied?.freigegeben ? await eigeneStimme(umfrage.id, mitglied.mitgliedId) : null;
   return <UmfrageKarte umfrage={umfrage} zustand={stimmZustand(mitglied, optionId)} darstellung="wand" />;
 }
 
