@@ -7,6 +7,9 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { Textur } from "@/components/medien/Textur";
 import { Badge } from "@/components/ui/Badge";
 import { buttonKlassen } from "@/components/ui/Button";
+import { Blatt } from "@/components/ui/Blatt";
+import { Faktenliste } from "@/components/ui/Faktenliste";
+import { namenLinkKlassen, textLinkKlassen } from "@/components/ui/textlink";
 
 test("Buttons sind Pillen", () => {
   for (const variante of ["primary", "secondary", "ghost"] as const) {
@@ -42,4 +45,42 @@ test("Textur weich: zweite Maskenebene blendet die Kanten aus", () => {
   assert.match(html, /radial-gradient/);
   assert.match(html, /mask-composite:intersect/);
   assert.doesNotMatch(renderToStaticMarkup(createElement(Textur, { id: "nebel" })), /radial-gradient/);
+});
+
+test("Textlinks: Blattgrün mit Unterstrich, Hover über Farbe", () => {
+  const klassen = textLinkKlassen();
+  assert.match(klassen, /\btext-accent\b/);
+  assert.match(klassen, /\bunderline\b/);
+  assert.match(klassen, /\bhover:text-accent-hover\b/);
+  assert.doesNotMatch(klassen, /opacity/);
+});
+
+test("Namenslinks: Tinte, Hover nur über die Unterstrichfarbe", () => {
+  const klassen = namenLinkKlassen();
+  assert.match(klassen, /\btext-text\b/);
+  assert.match(klassen, /\bdecoration-border-strong\b/);
+  assert.match(klassen, /\bhover:decoration-text\b/);
+  assert.doesNotMatch(klassen, /accent|opacity/);
+});
+
+test("Blatt ist eine eckige, erhabene Fläche", () => {
+  const html = renderToStaticMarkup(createElement(Blatt, null, "Formular"));
+  assert.match(html, /\bbg-surface-raised\b/);
+  assert.match(html, /\bborder-border-strong\b/);
+  assert.match(html, /\bshadow-md\b/);
+  assert.doesNotMatch(html, /rounded/);
+});
+
+test("Faktenliste: je Paar ein dt und ein dd", () => {
+  const html = renderToStaticMarkup(
+    createElement(Faktenliste, {
+      zeilen: [
+        { begriff: "PZN", wert: "123" },
+        { begriff: "Anbauland", wert: "Kanada" },
+      ],
+    }),
+  );
+  assert.match(html, /^<dl/);
+  assert.equal(html.match(/<dt/g)?.length, 2);
+  assert.equal(html.match(/<dd/g)?.length, 2);
 });

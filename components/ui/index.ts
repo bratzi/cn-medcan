@@ -1,6 +1,13 @@
 export { Badge } from "./Badge";
 export type { BadgeProps, BadgeVariante } from "./Badge";
 
+export { Blatt } from "./Blatt";
+
+export { Faktenliste } from "./Faktenliste";
+export type { Fakt } from "./Faktenliste";
+
+export { namenLinkKlassen, textLinkKlassen } from "./textlink";
+
 export { Button, buttonKlassen } from "./Button";
 export type { ButtonProps, ButtonGroesse, ButtonVariante } from "./Button";
 
