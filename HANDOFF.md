@@ -5,7 +5,7 @@
 
 **Letzte Aktualisierung:** 2026-09-24
 **Repo:** https://github.com/bratzi/cn-medcan (public)
-**Branch:** `main`
+**Branch:** `main` (Makeover „Grünes Buch“ Teilprojekt 1 ist seit 2026-09-24 auf `main`)
 
 ---
 
@@ -130,18 +130,17 @@ Budgets, Akzeptanzkriterien und Reihenfolge. **Die Spec ist die Quelle - nicht d
   live). Beim Start prüfen: `git branch --show-current` muss `makeover/gruenes-buch` zeigen.
 - **Ledger** (Fortschritt, Rulings): `.superpowers/sdd/2026-09-24-makeover-gruenes-buch/progress.md`,
   lokal, über `.git/info/exclude` ignoriert (nicht im Repo). Tasks mit `Task N: complete` sind fertig.
-- **Stand 2026-09-24 (Session 7): Makeover Teilprojekt 1 umgesetzt, Tasks 1 bis 15 fertig, Task 16 läuft**
-  (Branch `makeover/gruenes-buch`, Commits bis `3bf5c6f`, nur lokal, nicht gepusht, `main` unberührt).
-  Grün und frisch geprüft: 40/40 Tests, `npm run farben`, Typecheck, Lint, Build; JS-Budget 58.864 B gz (≤ 61.440).
-  Schlussreview (selbst, keine Subagents): 1 Befund behoben (`lib/sicher.ts`, Datenfehler kosten nicht mehr die Seite).
-  **Nicht verifiziert (Browser-Erweiterung getrennt):** Bewegung der Tasks 13–15 nach dem Strict-Mode-Fix
-  (SplitText, Lenis, Wand-Pin/Schwenk, Zähler, Schlusszeile), Task 16 Step 3 (ohne JS, reduzierte Bewegung,
-  Tastatur, hell/dunkel, 1440/390, LCP/CLS, Medien der ersten Ansicht, bestehende Seiten), Stimmzettel-Zustände
-  (lokal keine Runde). **Weiter:** Chrome neu starten, Browser-Prüfungen nachholen, dann Go + Citrix-Frage, dann
-  `git switch main && git merge --ff-only makeover/gruenes-buch && git push origin main`, live einmal prüfen.
-  Offene Punkte für den Nutzer: Video-Loop > 5 s ohne Pause (WCAG 2.2.2), Notiz-Freitext auf der Startseite (HWG),
-  `/interface-review` nur vom Nutzer startbar, 4 high npm-audit-Meldungen (bestehende Abhängigkeiten), Masken/Video
-  über Richtwerten (akzeptiert). Alle Rulings im Ledger (Zeilen mit `Ruling:` und `Final:`).
+- **Stand 2026-09-24 (Session 7): Makeover Teilprojekt 1 ist auf `main` und gepusht** (`768c5e5`, Fast-Forward
+  von `makeover/gruenes-buch`, Go des Nutzers, Citrix getrennt). Workers Builds baut; **Live-Prüfung steht noch aus**
+  (Plan Task 16 Step 8: leere Cloud-D1 → Leitsätze, „Das erste Kapitel …“, „Gerade läuft keine Runde …“,
+  Katalog-Leerzustand; LCP/CLS live; `/reviews`, `/umfragen`, `/produkte`, `/admin` 307). Danach Ledger-Workspace
+  `.superpowers/sdd/2026-09-24-makeover-gruenes-buch/` löschen und lokalen Branch `makeover/gruenes-buch` entfernen.
+  Geprüft: 43/43 Tests, Farben, Typecheck, Lint, Build, JS 58.968 B gz; Browser lokal: Bewegung (SplitText, Lenis,
+  Pin, Zähler, Schlusszeile), ohne JS vollständig, Tastatur, Fokus, 390 px, LCP 2,0 s/CLS 0 (Dev), keine Konsolenfehler.
+  Nicht verifiziert: reduzierte Bewegung (Windows-Einstellung blieb an), Stimmzettel-Zustände (keine Runde lokal).
+  Nutzer-Entscheidungen: Video-Loop ohne Pause und Notiz-Freitext auf der Startseite bleiben so; Medien verkleinert
+  (Masken 3:2 + 16 Stufen, Standbild 576 px, 1,9 MB → 0,45 MB). **Nutzer startet nach dem Clear `/interface-review`.**
+  Danach laut Plan: Teilprojekt 2 (eigene Spec für die übrigen Seiten). Offen: 4 npm-audit „high“ (bestehende Abh.).
 - Sichtprüfung: Browser-Erweiterung „Browser 1“; hängt ein Tab nach Hot Reload, frischen Tab öffnen (nicht aufgeben). Gate-Cookie lokal: der Browser hat
   schon eins; für `curl` erzeugt man es aus `.env.local` (`SITE_SESSION_SECRET`, Format in `lib/gate.ts`).
 - Skripte: `task-start`/`task-done` unter
