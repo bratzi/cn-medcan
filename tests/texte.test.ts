@@ -10,8 +10,23 @@ const ORDNER = [
   "components/layout",
   "components/marke",
   "components/medien",
+  "components/review",
+  "components/umfrage",
+  "components/ui",
 ];
-const DATEIEN = ["app/page.tsx", "app/layout.tsx"];
+const DATEIEN = [
+  "app/page.tsx",
+  "app/layout.tsx",
+  "app/error.tsx",
+  "app/reviews/page.tsx",
+  "app/umfragen/page.tsx",
+  "app/produkte/[slug]/page.tsx",
+  "components/produkt/Titelblatt.tsx",
+  "components/produkt/CannabinoidBar.tsx",
+  "components/produkt/TerpenChips.tsx",
+  "components/produkt/BestandTabelle.tsx",
+  "lib/navigation.ts",
+];
 
 /** Geviertstrich überall, Gedankenstrich nur als Trenner zwischen Leerzeichen. */
 const TRENNER = /—|\s–\s/;

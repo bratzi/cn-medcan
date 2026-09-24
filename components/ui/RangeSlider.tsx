@@ -18,7 +18,7 @@ export type RangeSliderProps = {
 /**
  * Zwei-Griff-Bereichsauswahl aus zwei gestapelten nativen Range-Inputs.
  * Bewusst nativ: Tastaturbedienung, Touch und Screenreader kommen vom Browser,
- * jeder Griff hat sein eigenes Label. Der Balken oben ist nur Redundanz —
+ * jeder Griff hat sein eigenes Label. Der Balken oben ist nur Redundanz:
  * die Zahlen stehen immer als Text daneben.
  */
 export function RangeSlider({

@@ -17,7 +17,7 @@ export type SelectProps = Omit<
   optionen: readonly SelectOption[];
   /** Label nur fuer Screenreader, siehe Field. */
   labelVersteckt?: boolean;
-  /** Erste, nicht-auswaehlbare Zeile — ersetzt kein Label. */
+  /** Erste, nicht-auswaehlbare Zeile. Ersetzt kein Label. */
   platzhalter?: string;
   hinweis?: string;
   fehler?: string;

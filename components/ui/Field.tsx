@@ -9,7 +9,7 @@ export type FeldAttribute = {
 };
 
 export type FieldProps = {
-  /** Muss eindeutig sein — verbindet `<label for>` mit dem Feld. */
+  /** Muss eindeutig sein: verbindet `<label for>` mit dem Feld. */
   id: string;
   label: string;
   /** Feld. Als Funktion aufgerufen bekommt es id und ARIA-Attribute geliefert. */

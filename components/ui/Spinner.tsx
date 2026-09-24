@@ -9,7 +9,7 @@ export type SpinnerProps = {
 /**
  * Ladeanzeige. Rotiert nur, wenn Bewegung erlaubt ist (`motion-safe`);
  * bei `prefers-reduced-motion: reduce` bleibt ein statischer Ring stehen und
- * der Statustext wird sichtbar — die Aussage haengt nie an der Animation.
+ * der Statustext wird sichtbar, die Aussage haengt nie an der Animation.
  */
 export function Spinner({ text = "Wird geladen", className }: SpinnerProps) {
   return (
