@@ -130,12 +130,18 @@ Budgets, Akzeptanzkriterien und Reihenfolge. **Die Spec ist die Quelle - nicht d
   live). Beim Start prüfen: `git branch --show-current` muss `makeover/gruenes-buch` zeigen.
 - **Ledger** (Fortschritt, Rulings): `.superpowers/sdd/2026-09-24-makeover-gruenes-buch/progress.md`,
   lokal, über `.git/info/exclude` ignoriert (nicht im Repo). Tasks mit `Task N: complete` sind fertig.
-- **Stand 2026-09-24 (Session 7): Tasks 1 bis 9 fertig** (Commits bis `8f4729f`, nur lokal auf dem Branch).
-  Weiter bei **Task 10** und ohne Rückfrage bis Task 16 (executing-plans: nicht zwischen Tasks anhalten).
-  Alle Abweichungen vom Plan stehen im Ledger (Zeilen mit `Ruling:`), u. a.: `duration-*` braucht die
-  `--transition-duration-*`-Aliase; ESLint ignoriert `.wrangler/**`; Leitobjekt ist jetzt 5712437 (Spiralheft),
-  Pipeline macht Weißabgleich; Auftakt-Wrapper ohne z-index/transform (sonst kein multiply); Masken/Video über
-  den Richtwerten, vom Nutzer akzeptiert, in Task 15 (web-perf) prüfen. CRLF-Dateien nicht auf LF umstellen.
+- **Stand 2026-09-24 (Session 7): Makeover Teilprojekt 1 umgesetzt, Tasks 1 bis 15 fertig, Task 16 läuft**
+  (Branch `makeover/gruenes-buch`, Commits bis `3bf5c6f`, nur lokal, nicht gepusht, `main` unberührt).
+  Grün und frisch geprüft: 40/40 Tests, `npm run farben`, Typecheck, Lint, Build; JS-Budget 58.864 B gz (≤ 61.440).
+  Schlussreview (selbst, keine Subagents): 1 Befund behoben (`lib/sicher.ts`, Datenfehler kosten nicht mehr die Seite).
+  **Nicht verifiziert (Browser-Erweiterung getrennt):** Bewegung der Tasks 13–15 nach dem Strict-Mode-Fix
+  (SplitText, Lenis, Wand-Pin/Schwenk, Zähler, Schlusszeile), Task 16 Step 3 (ohne JS, reduzierte Bewegung,
+  Tastatur, hell/dunkel, 1440/390, LCP/CLS, Medien der ersten Ansicht, bestehende Seiten), Stimmzettel-Zustände
+  (lokal keine Runde). **Weiter:** Chrome neu starten, Browser-Prüfungen nachholen, dann Go + Citrix-Frage, dann
+  `git switch main && git merge --ff-only makeover/gruenes-buch && git push origin main`, live einmal prüfen.
+  Offene Punkte für den Nutzer: Video-Loop > 5 s ohne Pause (WCAG 2.2.2), Notiz-Freitext auf der Startseite (HWG),
+  `/interface-review` nur vom Nutzer startbar, 4 high npm-audit-Meldungen (bestehende Abhängigkeiten), Masken/Video
+  über Richtwerten (akzeptiert). Alle Rulings im Ledger (Zeilen mit `Ruling:` und `Final:`).
 - Sichtprüfung: Browser-Erweiterung „Browser 1“; hängt ein Tab nach Hot Reload, frischen Tab öffnen (nicht aufgeben). Gate-Cookie lokal: der Browser hat
   schon eins; für `curl` erzeugt man es aus `.env.local` (`SITE_SESSION_SECRET`, Format in `lib/gate.ts`).
 - Skripte: `task-start`/`task-done` unter
