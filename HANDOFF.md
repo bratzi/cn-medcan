@@ -34,15 +34,20 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 (`docs/superpowers/plans/2026-09-24-makeover-tp3-welle-1.md`, Tasks 1 bis 11, je Commit auf `main` gepusht, letzter
 Code-Commit `fdeda51`). Lokal verifiziert: 141/141 Tests, Typecheck, Lint, `npm run farben`, keine Wand-Reste.
 Abschlussreview durch frischen Reviewer: 0 kritisch, 0 wichtig, 6 klein; einer hochgestuft und behoben (Fuß-Wortmarke,
-Trigger `top bottom`), der Rest unter Teilprojekt 3 als „zurückgestellt“. Details, Entscheidungen und Rulings: Ledger
-`.superpowers/sdd/2026-09-24-makeover-tp3-welle-1/progress.md` (gitignored) und Abschnitt Teilprojekt 3 unten.
+Trigger `top bottom`), der Rest unter Teilprojekt 3 als „zurückgestellt“. Entscheidungen und Rulings: Abschnitt
+Teilprojekt 3 unten.
 
-**Offen aus Welle 1 (zuerst erledigen):** die Live-Prüfung (Plan Task 11, Steps 2 bis 7). Grund: Workers Builds hat
-von 16:26 bis mindestens 16:57 UTC keinen der Pushes fertig gebaut (letztes Deployment 16:25 UTC, Plan-Commit);
-Vermutung: jeder neue Push bricht den laufenden Build ab. **Lehre: während einer Welle nicht nach jedem Task pushen,
-sondern an wenigen Prüfpunkten, und nach einem Push rund 15 Minuten nicht erneut pushen.** Für die Live-Prüfung muss
-der Nutzer sich im Browser-Tab einmal mit dem Seitenpasswort anmelden (das lokale Gate-Geheimnis gilt live nicht,
-`seiten-pruefen.ts` bekommt 307).
+**Welle 1 ist live seit 17:08 UTC** (Workers Build zu `fdeda51` erfolgreich, GitHub-Checkrun „success“). Die Builds
+zu den neun Pushes davor (16:26 bis 16:50 UTC) haben nie ein Ergebnis gemeldet: **jeder neue Push bricht offenbar den
+laufenden Build ab** (Build dauert rund 11 bis 14 Minuten). **Lehre: während einer Welle nicht nach jedem Task pushen,
+sondern an wenigen Prüfpunkten, und nach einem Push rund 15 Minuten nicht erneut pushen** (HANDOFF-only-Commits sind
+vom Build ausgenommen und stören nicht).
+
+**Offen aus Welle 1 (zuerst erledigen): die Live-Prüfung** (Plan Task 11, Steps 2 bis 7: Seitenregeln, Ansichten
+320 bis 1440 px hell und dunkel, Handschrift ≥ 32 px, ohne JavaScript, JS-Budget, LCP und CLS). Nicht gemacht, weil
+(a) das Gate-Cookie im Browser abgelaufen ist und das lokale Gate-Geheimnis live nicht gilt (`seiten-pruefen.ts` mit
+`PRUEF_BASIS` bekommt 307), der Nutzer muss sich einmal im Browser-Tab anmelden, und (b) die Browser-Erweiterung um
+17:10 UTC nicht verbunden war.
 
 **Neue Dauerregel des Nutzers (Session 12): kein lokales Dev-System.** Kein `next dev`, kein
 `opennextjs-cloudflare preview`, kein lokaler `next build`. Lokal nur `npm test`, Typecheck, Lint, `npm run farben`.
@@ -118,7 +123,8 @@ gepusht und live geprüft; Dauerregel: kein lokales Dev-System).
 - Welle 1, Task 10 erledigt: Brand Guideline und `ui-design-engine` auf „Buch und Handschrift“ umgeschrieben.
 - Welle 1, Task 11 (Abschlussprüfung): lokal grün (141/141, Typecheck, Lint, Farben, keine Reste). Design-Review
   `web-design-guidelines`: ein niedriger Befund (s. u.). Abschlussreview (frischer Reviewer): „with fixes“, einziger
-  Fix Fuß-Wortmarke-Trigger (`fdeda51`). **Live-Prüfung (Steps 2 bis 7): noch offen**, siehe „Hier geht es weiter“.
+  Fix Fuß-Wortmarke-Trigger (`fdeda51`). Live seit 17:08 UTC. **Live-Prüfung (Steps 2 bis 7): noch offen**, siehe
+  „Hier geht es weiter“.
 - Entscheidungen aus dem Plan (Nutzer hat den Plan mit „ja“ freigegeben): Token `text-vermerk` 32 px; Stationen der
   Schleife in `text-vermerk` statt `text-notiz`; Wortmarke im Auftakt schreibt sich per CSS (steht ohne JS); kleine
   Wortmarke im Fuß entfällt, große einzeilig; `Kandidat` eigene Datei; Randspalte und Stimmzettel bleiben gestreamt mit
