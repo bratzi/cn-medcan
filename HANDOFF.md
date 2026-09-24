@@ -3,7 +3,7 @@
 > Übergabemedium zwischen Sessions. Wird nach jedem Arbeitsblock aktualisiert und committet.
 > Wer hier weiterarbeitet, liest diese Datei zuerst und braucht den Chatverlauf nicht.
 
-**Letzte Aktualisierung:** 2026-09-24 (Session 8, Teilprojekt 1 live geprueft)
+**Letzte Aktualisierung:** 2026-09-24 (Session 8, interface-review und Korrekturen live)
 **Repo:** https://github.com/bratzi/cn-medcan (public)
 **Branch:** `main` (Makeover „Grünes Buch“ Teilprojekt 1 ist seit 2026-09-24 auf `main`)
 
@@ -95,7 +95,7 @@ ob Citrix getrennt ist, oder den Nutzer selbst pushen lassen.
 Das Browser-Werkzeug: Screenshots laufen hier oft in einen Timeout; `get_page_text`, `find` und
 `zoom` funktionieren. `form_input` setzt Felder im Dashboard zuverlaessig.
 
-### 1. Makeover „Grünes Buch“ - Teilprojekt 1 live, als Naechstes /interface-review und Teilprojekt 2
+### 1. Makeover „Grünes Buch“ - Teilprojekt 1 live und reviewt, als Naechstes Teilprojekt 2
 
 **Stand (2026-09-23, Session 4):** Brainstorming abgeschlossen, **Spec geschrieben und
 committet:** `docs/superpowers/specs/2026-09-23-makeover-gruenes-buch-design.md`.
@@ -140,10 +140,22 @@ Budgets, Akzeptanzkriterien und Reihenfolge. **Die Spec ist die Quelle - nicht d
   Token aus `Set-Cookie` per `document.cookie` in den Browser. Messungen nur im **sichtbaren** Tab (im
   Hintergrund-Tab gibt Chrome gestreamte Suspense-Inhalte nicht frei und misst kein LCP); `javascript_tool`
   wartet nicht auf Promises - Ergebnis in `window` ablegen und nachlesen.
-- **Als Nächstes:** der Nutzer startet `/interface-review` (Skill hat `disable-model-invocation`, Claude kann es
-  nicht). Danach **Teilprojekt 2**: eigene Spec für die übrigen Seiten, Start mit `superpowers:brainstorming`
-  (braucht den Nutzer). Offen für den Nutzer: Video-Loop ohne Pause (WCAG 2.2.2) und Notiz-Freitext auf der
-  Startseite (HWG) sind so entschieden; 4 npm-audit „high“; Instagram-Handle.
+- **`/interface-review` erledigt (Session 8)**, Umfang `26e691d..768c5e5`. Dafür `better-interface`,
+  `better-ui`, `better-writing` aus jakubkrehel/skills@267330e nachinstalliert (gelesen, keine Befehle/URLs;
+  `skills-lock.json` ohne `computedHash`, Verfahren des Skills-CLI nicht nachbildbar). Drei Befunde, alle
+  behoben, je mit Test RED→GREEN (Suite 46/46, Typecheck, Lint, Farben grün), im Browser lokal geprüft, **gepusht
+  (`5213e5a`) = live**, live einmal geprüft (`/` 200, Video-Schalter im HTML; Netzdiagramm live nicht sichtbar, D1 leer):
+  1. HIGH: Fehlersätze auf der Startseite ohne Ausweg → „Lade die Seite in ein paar Minuten neu …“ (`4610750`).
+  2. MEDIUM: Netzdiagramm-Beschriftung schrumpfte als SVG-Text auf 9,2 px (390) / 6,5 px (320) → HTML-Text
+     `text-caption` 13 px, prozentual positioniert, Figur `px-2 sm:px-6` (`db6d317`).
+  3. MEDIUM: Video-Schleife ohne Pause (WCAG 2.2.2) → Knopf „Video anhalten/abspielen“ unter der Schleife,
+     sichtbar erst wenn `loops.ts` läuft; Pause hält beim Wiedereintritt (`5213e5a`). Nutzer: „alles korrigieren“.
+  Vorbestehend, nicht behoben (Teilprojekt 2): `ProduktCard` nutzt noch Deckkraft-Hover.
+  Nicht verifiziert: reduzierte Bewegung gerendert, Dunkelmodus gerendert, Stimmzettel-Zustände, 200 % Textzoom.
+- **Als Nächstes: Teilprojekt 2** - eigene Spec für die übrigen Seiten (`/produkte`, `/apotheken`, `/reviews`,
+  `/umfragen`, `/mitglied`, `/admin`, Formulare), Start mit `superpowers:brainstorming` (braucht den Nutzer),
+  Design-Skills laden (Memory `design-skills-einsatz`). Offen für den Nutzer: Notiz-Freitext auf der Startseite
+  (HWG) ist so entschieden; 4 npm-audit „high“; Instagram-Handle; Aufräumen oben (Ledger-Ordner, Branch).
 
 **Stand davor (2026-09-24, Session 6/7):**
 - Ausführungsart ist gewählt: **Native**, also `superpowers:executing-plans` in der Session
