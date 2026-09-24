@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Suspense } from "react";
 
 import { AromaKarte, type AromaSerie } from "@/components/review/AromaKarte";
+import { AromaSpielwiese } from "@/components/review/AromaSpielwiese";
 import { SweetSpot } from "@/components/review/SweetSpot";
 import { Schlagwort } from "@/components/story/Schlagwort";
 import { buttonKlassen } from "@/components/ui";
@@ -34,6 +35,15 @@ async function Inhalt() {
         <Link href={`/produkte/${sorte.slug}`} className={buttonKlassen("secondary", "md")}>
           Zur Sorte
         </Link>
+      </div>
+      <div className="flex flex-col gap-6 lg:col-span-2">
+        <h3 className="font-buch text-h1 font-medium text-text">
+          Wie hast <em className="farbverlauf italic">du</em> sie geschmeckt?
+        </h3>
+        <p className="max-w-[60ch] text-body text-text-muted text-pretty">
+          Schieb die Regler und sieh zu, wie sich die Karte verändert. Hier wird nichts gespeichert.
+        </p>
+        <AromaSpielwiese titel={sorte.handelsname} terpene={sorte.terpene} />
       </div>
     </div>
   );

@@ -12,6 +12,7 @@ import { CommunityStimmen } from "@/components/review/CommunityStimmen";
 import { Doppelseite } from "@/components/review/Doppelseite";
 import { AromaKarte, type AromaSerie } from "@/components/review/AromaKarte";
 import { Aufklaerung } from "@/components/review/Aufklaerung";
+import { AromaSpielwiese } from "@/components/review/AromaSpielwiese";
 import { SweetSpot } from "@/components/review/SweetSpot";
 import { herstellerProfil } from "@/lib/aromakarte";
 import { alsEintrag } from "@/components/review/eintrag";
@@ -216,6 +217,16 @@ async function ProduktInhalt({ slug }: { slug: string }) {
               titel="Terpen-Intensität laut Community"
               zeilen={Object.entries(intensitaet).map(([terpen, { mittel, anzahl }]) => ({ terpen, wert: mittel, anzahl }))}
             />
+          </div>
+          <div className="mt-16 flex max-w-5xl flex-col gap-6">
+            <h3 className="font-buch text-h1 font-medium text-text">
+              Wie hast <em className="farbverlauf italic">du</em> sie geschmeckt?
+            </h3>
+            <p className="max-w-[60ch] text-body text-text-muted text-pretty">
+              Schieb die Regler und sieh zu, wie sich die Karte verändert. Hier wird nichts gespeichert; zum
+              Speichern einfach bewerten.
+            </p>
+            <AromaSpielwiese titel={strain.handelsname} terpene={strain.terpene} />
           </div>
           <p className="mt-8">
             <Link href={`/bewerten/${strain.slug}`} className={buttonKlassen("primary", "md")}>

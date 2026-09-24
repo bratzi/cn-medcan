@@ -27,6 +27,8 @@ type Props = {
   terpene: readonly KartenTerpen[];
   serien: readonly AromaSerie[];
   titel?: string;
+  /** Von außen hervorgehobene Achse (Regler in der Spielwiese); schlägt das Überfahren. */
+  hervorheben?: number | null;
 };
 
 const DAUER_MS = 900;
@@ -48,10 +50,11 @@ function balkenEnde(knoten: Punkt, wert: number, versatz: number): Punkt {
  * bei reduzierter Bewegung springt er. Die Werte stehen zusätzlich als
  * Tabelle für Screenreader, das SVG ist aria-hidden.
  */
-export function AromaKarte({ terpene, serien, titel = "Aroma-Karte" }: Props) {
+export function AromaKarte({ terpene, serien, titel = "Aroma-Karte", hervorheben = null }: Props) {
   const [ansicht, setAnsicht] = useState<"karte" | "netz">("karte");
   const [t, setT] = useState(0);
-  const [aktiv, setAktiv] = useState<number | null>(null);
+  const [ueberfahren, setAktiv] = useState<number | null>(null);
+  const aktiv = hervorheben ?? ueberfahren;
   const tRef = useRef(0);
 
   useEffect(() => {
