@@ -28,7 +28,44 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 
 ## ⇢ Hier geht es weiter
 
-### ⇢ NÄCHSTE SESSION (Stand Session 12, 2026-09-24): TP3 Welle 1 live prüfen, dann Plan TP3 Welle 2
+### ⇢ NEUER ERSTER TASK (Session 13, 2026-09-24): Redesign nach Referenz moneyincheck.org
+
+**Auftrag des Nutzers (Session 13, sinngemäß):** Typografie, Look and Feel, Animationen, interaktive Elemente und
+Bildqualität sind „weit entfernt“ von https://moneyincheck.org/. Mit den besten Skills die Referenz genau ansehen und
+eine hochprofessionelle Seite bauen, die mindestens so aussieht, angepasst an unser Thema. **Kostenlos bleiben**, gute
+freie Ressourcen suchen. Sagen, was gebraucht wird. Dazu: Typografie „zu einheitlich, nicht aufeinander abgestimmt“;
+Elemente „stacked untereinander, nicht in mehreren Ebenen“, Bilder hängen **unter** statt **hinter** dem Text. Dazu
+fehlt ein **Schalter Hell/Dunkel** (Nutzer sieht immer nur Schwarz, sein System steht auf dunkel). **Mobil erst mal
+nicht**, kommt später. Dieser Task steht vor allem anderen.
+
+**Stand:** Brainstorming läuft (`superpowers:brainstorming`, Pfad architektonisch: Fragen, Spec, Plan). Referenz
+analysiert (Desktop 1440). Plan TP3 Welle 2 **pausiert, nicht geschrieben**: Medien und Bewegung werden vom Redesign
+neu bestimmt. Die rembg-Pipeline aus Spec TP3 7.2 bleibt als Werkzeug nutzbar.
+
+**Analyse der Referenz (gemessen im Browser, 2026-09-24):**
+- Schrift: **eine** Serif, PP Editorial Old (Pangram Pangram, **kommerziell lizenzpflichtig**, nicht nutzbar), in
+  Schnitten 200, 200 kursiv, 400, 400 kursiv, 800; Größen von 11 bis 378 px. Betonung nur per Kursiv/Fett derselben
+  Familie. Dazu **eine** Handschrift, Liu Jian Mao Cao (Google Fonts, OFL), nur klein und grau als Textur
+  (Schachnotizen „Nf3“, „Bc4“, 24 bis 40 px, erscheinen nach und nach über die ganze Seite). Winzige Beschriftungen in
+  Helvetica.
+- Ebenen: Karopapier-Raster fest im Hintergrund; Titel „MONEY IN CHECK“ riesig in Grün, ein freigestelltes
+  **Schwarzweiß**-Motiv (Springer mit Geldrolle, 2427 px, WebP) steht **zwischen** den Buchstaben (z-index 2);
+  Handschrift-Notizen hinter dem Text; 3D-Geldscheine fliegen über alles.
+- Bewegung: **Lenis**, Manifest-Text Wort für Wort von Grau zu Schwarz scroll-gekoppelt, in Lücken des Textes laufen
+  kleine **Kritzel-Videos** (doodle-1 bis 6.mp4, 300 px breit), Schluss-Satz von Kontur zu Füllung, Fortschritt als
+  „N … S“-Leiste rechts, Datum und Uhrzeit live in einer Zeitungszeile. **Three.js r185** (Canvas `bills-gl`,
+  bildschirmfüllend): Geldscheine als gebogene Flächen mit Foto-Textur, scroll-gekoppelt.
+- Rest: Buch-Abschnitt mit Slider (Buchseiten), Preistabelle, grüner Pillen-Button, Pillen-E-Mail-Feld; Autor mit
+  rundem Porträt, verstreuten Bildchen mit Bildunterschrift, Unterschrift als Bild; Fuß minimal, „say hello“ als
+  Kritzel. Gebaut mit Vite, nicht Next.
+
+**Offen beim Nutzer (gefragt in Session 13):** Wortmarke Serif oder Handschrift; Bildwelt Schwarzweiß oder Farbe;
+3D-Moment (welches Objekt, oder keins); Hell/Dunkel-Schalter sofort vorziehen und welcher Standard. Antworten hier
+nachtragen, dann Spec schreiben.
+
+**Offen aus Session 12, weiter gültig:** Live-Prüfung TP3 Welle 1 (Nutzer muss sich im Browser-Tab anmelden).
+
+### NÄCHSTE SESSION (Stand Session 12, 2026-09-24): TP3 Welle 1 live prüfen, dann Plan TP3 Welle 2
 
 **Session 12:** Spec TP3 freigegeben, **Plan TP3 Welle 1 geschrieben, freigegeben („ja“) und vollständig umgesetzt**
 (`docs/superpowers/plans/2026-09-24-makeover-tp3-welle-1.md`, Tasks 1 bis 11, je Commit auf `main` gepusht, letzter
