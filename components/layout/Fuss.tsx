@@ -21,18 +21,18 @@ const TEXTLINK =
  */
 export function Fuss() {
   return (
-    <footer className="relative overflow-hidden border-t border-border bg-surface-raised">
+    <footer className="relative isolate overflow-hidden border-t border-border bg-surface-raised">
       <div className="mx-auto w-full max-w-360 px-4 pt-16 sm:px-8 sm:pt-24">
         {/* Vorgelesen wird nur die sr-only-Fassung: die sichtbaren Ebenen teilt
             die StoryBuehne in Wörter, und ein aria-label auf einem span lesen
             Screenreader nicht zuverlässig vor. */}
         <p data-story="schluss" className="schlusszeile font-buch text-titel font-medium text-text">
-          <span className="sr-only">Du liest mit. Du wählst mit.</span>
+          <span className="sr-only">Wir lesen mit. Wir wählen mit.</span>
           <span aria-hidden="true" className="schlusszeile-kontur">
-            Du liest mit. Du wählst mit.
+            Wir lesen mit. Wir wählen mit.
           </span>
           <span aria-hidden="true" className="schlusszeile-fuellung">
-            Du liest mit. Du wählst mit.
+            Wir lesen mit. Wir wählen mit.
           </span>
         </p>
       </div>
@@ -76,11 +76,11 @@ export function Fuss() {
         </details>
       </div>
 
-      {/* Zuletzt im Fuß: nur so läuft die Wortmarke über den negativen
-          Außenabstand unten aus dem Bild, statt Rechtshinweis und Navigation
-          zu verdecken. Der Name steht im Kopf, hier ist er Bild. */}
-      <span aria-hidden="true" data-story="fuss-marke" className="fuss-marke block select-none text-umschlag">
-        <Wortmarke groesse="umschlag" einzeilig />
+      {/* Die Wortmarke liegt IM Fuß hinter dem Inhalt (Spec Redesign 10), nicht
+          darunter: absolut am unteren Rand, angeschnitten, blass. Der Name steht
+          im Kopf, hier ist er Bild. */}
+      <span aria-hidden="true" data-story="fuss-marke" className="fuss-marke pointer-events-none absolute inset-x-0 bottom-0 -z-10 block select-none text-center text-plakat">
+        <Wortmarke groesse="plakat" />
       </span>
     </footer>
   );

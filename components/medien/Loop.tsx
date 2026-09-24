@@ -4,6 +4,8 @@ import { medium } from "@/lib/medien";
 type Props = {
   id: string;
   className?: string;
+  /** Bühnenvideo (Auftakt): in Farbe, kein Mischmodus, Metadaten sofort. */
+  buehne?: boolean;
 };
 
 /**
@@ -12,7 +14,7 @@ type Props = {
  * reduzierter Bewegung bleibt das Standbild stehen. Keine Hoehe in den
  * Klassen: Preflight setzt height:auto, Aufrufer duerfen h-full setzen.
  */
-export function Loop({ id, className }: Props) {
+export function Loop({ id, className, buehne = false }: Props) {
   const m = medium(id);
   if (m.art !== "video") throw new Error(`Medium "${id}" ist kein Video`);
   return (
@@ -25,8 +27,8 @@ export function Loop({ id, className }: Props) {
       muted
       loop
       playsInline
-      preload="none"
-      className={cn("medien-video block w-full object-cover", className)}
+      preload={buehne ? "metadata" : "none"}
+      className={cn(buehne ? "block w-full object-cover" : "medien-video block w-full object-cover", className)}
     >
       <source src={`/medien/${m.datei}.mp4`} type="video/mp4" />
     </video>

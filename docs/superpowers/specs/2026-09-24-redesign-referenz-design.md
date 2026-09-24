@@ -30,6 +30,17 @@ Manifest Wort für Wort von `text-muted` zu `text` (scroll-gekoppelt), Schluss K
 davor. Umsetzung in unserer Handschrift: Wortmarke als h1 in `text-plakat`, dazu je Sektion ein Buzz-Satz in
 `text-kulisse` blass dahinter. Die Handschrift-Notizen im Raster entfallen, das Notizbuch-Bild ebenso.
 
+## 8. Bühnenvideo (Nutzervorgabe)
+Auftakt über Pexels 7684711 (Hände, Blüte), bildschirmfüllend, Sektion `buehne-dunkel`, Film zoomt beim Scrollen, Wortmarke gleitet weg.
+
+## 9. Farbe und Manifest
+Schwarzweiß entfällt: Freisteller, Fotos und Videos in echten Farben, mehr Grün und Lila. Manifest als langer Text über die
+ganze Sektion, Reveal Wort für Wort (blass und versetzt bis Tinte, scrub). Aussehen, Geruch, Restfeuchte als kleine runde
+Bilder, um die der Text fließt.
+
+## 10. Wir-Stimme und Fuß
+Texte in der Wir-Form, gesetzte Plätze nicht erwähnt. Die Wortmarke im Fuß liegt im Fuß hinter dem Inhalt, nicht darunter.
+
 ## 6. Regeländerungen
 - `accent` darf zusätzlich den Auftakt-Titel färben (einzige Schrift in Grün).
 - Handschrift darf als aria-hidden-Textur im Hintergrund stehen (nur Grade ≥ 32 px).

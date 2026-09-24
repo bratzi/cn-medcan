@@ -28,7 +28,7 @@ async function EintragInhalt() {
       <div className="flex flex-col items-start gap-6 border border-border bg-surface-raised p-8 sm:p-12">
         <p className="font-buch text-kapitel text-text">Das erste Kapitel wird gerade geschrieben.</p>
         <p className="max-w-[48ch] text-body text-text-muted">
-          Welche Sorte ich zuerst teste, entscheidet die Abstimmung.
+          Welche Sorte wir zuerst testen, entscheidet die Abstimmung.
         </p>
         <Link href="#abstimmung" className={buttonKlassen("secondary", "md")}>
           Zur Abstimmung

@@ -374,9 +374,9 @@
   /* Die Wortmarke läuft unten angeschnitten aus dem Fuß (Spec TP3 8.9).
      em bezieht sich auf text-umschlag am selben Element. */
   .fuss-marke {
-    margin-bottom: -0.35em;
-    margin-left: -0.02em;
-    pointer-events: none;
+    /* Unterlängen laufen unten aus dem Fuß; blass wie die Buzz-Sätze. */
+    translate: 0 0.3em;
+    opacity: 0.35;
   }
 
   /* Stempel fuer gesetzte Plaetze auf dem Stimmzettel (Spec 5.1, Sektion 6).
@@ -484,4 +484,24 @@
   to {
     clip-path: inset(-50% -20% -50% -20%);
   }
+}
+
+/* ==========================================================================
+   Bühne dunkel (Spec Redesign 8): der Auftakt über dem Video trägt in
+   beiden Modi die dunklen Rollen, damit Schrift auf dem Film lesbar bleibt.
+   ========================================================================== */
+
+.buehne-dunkel {
+  --color-surface: var(--color-neutral-1000);
+  --color-border: var(--color-neutral-800);
+  --color-border-strong: var(--color-neutral-500);
+  --color-text: var(--color-neutral-50);
+  --color-text-muted: var(--color-neutral-400);
+  --color-accent: var(--color-blatt-400);
+  --color-accent-hover: var(--color-blatt-500);
+  --color-accent-fg: var(--color-neutral-1000);
+  --color-kopierstift: var(--color-violett-400);
+  --color-focus-ring: var(--color-blatt-400);
+  color: var(--color-text);
+  background-color: var(--color-surface);
 }

@@ -15,7 +15,7 @@ test("Kopierstift-Violett: Werte von Sprühviolett, neuer Name (Spec TP3 5)", ()
   assert.match(css, /--color-violett-400:\s*oklch\(0\.72 0\.15 305\);/);
   assert.match(css, /--color-violett-500:\s*oklch\(0\.52 0\.2 305\);/);
   assert.match(css, /--color-kopierstift:\s*var\(--color-violett-500\);/);
-  assert.equal(css.match(/--color-kopierstift:\s*var\(--color-violett-400\);/g)?.length, 2);
+  assert.equal(css.match(/--color-kopierstift:\s*var\(--color-violett-400\);/g)?.length, 3);
   assert.doesNotMatch(css, /--color-spray/);
 });
 
@@ -113,15 +113,15 @@ test("Wortmarke als Plakat: einzeilig, Plakat-Grad, schreibt sich", () => {
   assert.equal(ohneTags(html), "Grünes Buch");
 });
 
-test("Fuß: die Wortmarke läuft angeschnitten aus, kein Tag, kein zweiter Name", () => {
+test("Fuß: die Wortmarke liegt im Fuß hinter dem Inhalt, kein Tag, kein zweiter Name", () => {
   const fuss = lies("components/layout/Fuss.tsx");
   assert.match(
     fuss,
-    /<span aria-hidden="true" data-story="fuss-marke" className="fuss-marke block select-none text-umschlag">\s*<Wortmarke groesse="umschlag" einzeilig \/>\s*<\/span>/,
+    /<span aria-hidden="true" data-story="fuss-marke" className="fuss-marke [^"]*absolute[^"]*-z-10[^"]*">\s*<Wortmarke groesse="plakat" \/>\s*<\/span>/,
   );
   assert.equal(fuss.match(/<Wortmarke /g)?.length, 1);
   assert.doesNotMatch(fuss, /fuss-tag|font-wand|>\s*gb\s*</);
-  assert.match(css, /\.fuss-marke\s*\{[^}]*margin-bottom:\s*-0\.35em/);
+  assert.match(css, /\.fuss-marke\s*\{[^}]*translate:\s*0 0\.3em/);
   assert.doesNotMatch(css, /\.fuss-tag/);
   assert.match(lies("components/story/bewegung/schluss.ts"), /data-story="fuss-marke"/);
 });

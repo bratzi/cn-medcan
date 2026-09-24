@@ -55,9 +55,9 @@ test("Wissen bündeln: Randspalte ab lg, kein Schwenk, keine Wand", () => {
 
 test("Schleife: die Community schreibt von Hand, das Buch druckt", () => {
   const quelle = lies("components/story/GemeinsamLernen.tsx");
-  assert.match(quelle, /\{ text: "Ihr schlagt vor\.", hand: true }/);
-  assert.match(quelle, /\{ text: "Ihr stimmt ab\.", hand: true }/);
-  assert.match(quelle, /\{ text: "Ich teste\.", hand: false }/);
+  assert.match(quelle, /\{ text: "Wir schlagen vor\.", hand: true }/);
+  assert.match(quelle, /\{ text: "Wir stimmen ab\.", hand: true }/);
+  assert.match(quelle, /\{ text: "Wir testen\.", hand: false }/);
   assert.match(quelle, /"font-hand text-notiz text-kopierstift"/);
   assert.doesNotMatch(quelle, /font-wand|wand:|Sedgwick/);
 });

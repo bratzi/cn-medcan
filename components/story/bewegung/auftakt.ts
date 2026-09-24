@@ -18,3 +18,16 @@ export const auftakt: Choreografie = ({ gsap }) => {
     .fromTo('[data-story="oberzeile"]', { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.6 }, 0.1)
     .fromTo('[data-story="intro"]', { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.6 }, 0.4);
 };
+
+/**
+ * Sektion 1 (Spec Redesign 8): beim Hinausscrollen zoomt der Film langsam
+ * heran, die Wortmarke gleitet nach oben weg. Nur transform, scrub.
+ */
+export const auftaktFilm: Choreografie = ({ gsap }) => {
+  const film = document.querySelector<HTMLElement>('[data-story="auftakt-film"]');
+  const buehne = document.querySelector<HTMLElement>('[data-story="auftakt"]');
+  if (!film || !buehne) return;
+  const scrub = { trigger: buehne, start: "top top", end: "bottom top", scrub: true };
+  gsap.fromTo(film, { scale: 1 }, { scale: 1.15, ease: "none", scrollTrigger: scrub });
+  gsap.fromTo('[data-story="titel"]', { yPercent: 0 }, { yPercent: -30, ease: "none", scrollTrigger: { ...scrub } });
+};

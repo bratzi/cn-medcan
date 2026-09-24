@@ -1,5 +1,5 @@
 import { abstimmung } from "./abstimmung";
-import { auftakt } from "./auftakt";
+import { auftakt, auftaktFilm } from "./auftakt";
 import { eintrag } from "./eintrag";
 import { beobachteLoops } from "./loops";
 import { randnotizen } from "./randnotizen";
@@ -18,6 +18,7 @@ import type { Choreografie, Werkzeug } from "./typen";
  * Der Vorhang steht zuletzt; er deckt Sektion 3 und die Abstimmung auf.
  */
 const SCROLL_CHOREOGRAFIEN: readonly Choreografie[] = [
+  auftaktFilm,
   transparent,
   randnotizen,
   schleife,

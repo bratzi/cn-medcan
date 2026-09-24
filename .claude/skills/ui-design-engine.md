@@ -76,12 +76,15 @@ Komponenten nutzen nur semantische Tokens:
 - `--radius-sm/md/lg` sind 0: `rounded-sm/md/lg` ergeben eckige Flächen (Karten, Tafeln, Felder,
   Tabellen). Pillen ausdrücklich mit `rounded-full`: Buttons, Badges, Chips, Filter-Einstiege.
 - Einziger Bogen: der Rahmen um das Netzdiagramm (`rounded-t-full`).
+- Zweiter Bogen (Spec Redesign 9): runde Bildrahmen (`rounded-full`) für die Prüfpunkte im Manifest, um die der Text per `shape-outside` fließt.
 - Schatten nur als Ebenen-Signal (`shadow-md` Stimmzettel und Doppelseite, `shadow-lg` Dialoge).
   Freigestellte Motive tragen ihren Kontaktschatten aus der Pipeline, kein CSS-`drop-shadow`.
 - Fokus: die globale Regel in `globals.css` (2 px `focus-ring`, 2 px Abstand); der Umriss folgt dem
   Radius des Elements. Nie `outline: none`.
 
 ## 6. Medien
+- Seit Redesign 9 in **Farbe**: Freisteller mit Alpha (`scripts/medien/freistellen.py`, `freigestellt: true`, kein Mischmodus), Bühnenvideo im Auftakt (`Loop buehne`) in echten Farben. Schwarzweiß ist abgelöst.
+- Stimme der Startseite ist **wir** (Spec Redesign 10); gesetzte Plätze des Betreibers werden auf der Startseite nicht erwähnt.
 - Bilder und Videos **nur** über `components/medien/Bild` und `Loop`; ein `<img>` gibt es nur in
   `Bild.tsx`. Keine Next-Bildoptimierung, kein Hotlinking.
 - Jede Datei in `public/medien/` steht in `lib/medien.ts` (Test `tests/medien.test.ts`).

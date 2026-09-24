@@ -62,14 +62,14 @@ export function Abstimmung() {
       <div className="mx-auto grid w-full max-w-360 grid-cols-1 gap-12 lg:grid-cols-[2fr_3fr] lg:items-start">
         <div className="flex flex-col items-start gap-6">
           <h2 id="abstimmung-titel" className="font-buch text-kapitel text-text text-balance">
-            Was teste ich als Nächstes?
+            Was testen wir als Nächstes?
           </h2>
           <p data-story="waehl-mit" className="font-hand text-notiz text-kopierstift">
             Wähl mit.
           </p>
           <p className="max-w-[48ch] text-body text-text-muted text-pretty">
-            Gesetzte Plätze bestimme ich. Über die übrigen stimmen freigeschaltete Mitglieder ab, eine
-            Stimme pro Runde.
+            Freigeschaltete Mitglieder stimmen ab, eine Stimme pro Runde. Was gewinnt, kommt als
+            Nächstes auf den Tisch.
           </p>
         </div>
 

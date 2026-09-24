@@ -4,7 +4,7 @@ Freisteller-Pipeline (Spec Redesign 3), nur Entwicklungszeit.
     python scripts/medien/freistellen.py <pexelsId> <datei>
 
 Laedt das Original einmal von Pexels (2400 px), stellt es mit rembg
-(isnet-general-use) frei, setzt es in Graustufen mit Alpha, schneidet auf das
+(isnet-general-use) frei, behaelt die Farbe (leicht verstaerkt) mit Alpha, schneidet auf das
 Motiv zu und schreibt WebP in 640/1280/1920 nach public/medien. Gibt Masse,
 Urheber und Quelle fuer lib/medien.ts aus. Keine Wiederholung bei Fehlern.
 """
@@ -30,8 +30,11 @@ original = Image.open(io.BytesIO(hole(foto["src"]["original"] + "?auto=compress&
 original = ImageOps.exif_transpose(original).convert("RGB")
 frei = remove(original, session=new_session("isnet-general-use"))
 alpha = frei.split()[-1]
-grau = ImageOps.autocontrast(ImageOps.grayscale(original), cutoff=1)
-bild = Image.merge("LA", (grau, alpha))
+# Farbe (Spec Redesign 9): echte Farben, leicht kraeftiger, Alpha aus rembg.
+from PIL import ImageEnhance
+farbe = ImageEnhance.Color(ImageOps.autocontrast(original, cutoff=1)).enhance(1.25)
+bild = farbe.convert("RGBA")
+bild.putalpha(alpha)
 box = alpha.point(lambda a: 255 if a > 16 else 0).getbbox()
 rand = int(max(bild.size) * 0.02)
 bild = bild.crop((max(0, box[0] - rand), max(0, box[1] - rand), min(bild.width, box[2] + rand), min(bild.height, box[3] + rand)))

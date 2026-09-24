@@ -1,44 +1,25 @@
-import { AB_TABLET, type Choreografie } from "./typen";
+import type { Choreografie } from "./typen";
 
 /**
- * Sektion 2: Manifest Wort fuer Wort scroll-gekoppelt (Referenz, ueber
- * Farbe von Grau zu Tinte, Spec Redesign 4), dann ab Tablet der Zoom Blatt, Bluete,
- * Trichom an den Scrollweg der Notizen gekoppelt. Die Buehne klebt per CSS.
+ * Sektion 2 (Spec Redesign 9): das Manifest läuft über die ganze Sektion
+ * und deckt sich Wort für Wort auf, scroll-gekoppelt. Jedes Wort kommt aus
+ * blassem Rand-Grau und leicht versetzt, bis es in Tinte steht; betonte
+ * Wörter behalten ihre Farbe (die Farbe sitzt am em, nicht am Wort).
  */
-export const transparent: Choreografie = ({ gsap, SplitText, mm }) => {
-  const manifest = document.querySelector<HTMLElement>('[data-story="manifest"]');
-  if (manifest) {
-    const woerter = SplitText.create(manifest, { type: "words", tag: "span", aria: "auto" }).words;
+export const transparent: Choreografie = ({ gsap, SplitText }) => {
+  const zeilen = gsap.utils.toArray<HTMLElement>('[data-story="manifest"] [data-manifest-zeile]');
+  for (const zeile of zeilen) {
+    const woerter = SplitText.create(zeile, { type: "words", tag: "span", aria: "auto" }).words;
     gsap.fromTo(
       woerter,
-      { color: "var(--color-border-strong)" },
+      { opacity: 0.12, yPercent: 20 },
       {
-        color: "var(--color-text)",
-        stagger: 0.1,
+        opacity: 1,
+        yPercent: 0,
+        stagger: 0.08,
         ease: "none",
-        scrollTrigger: { trigger: manifest, start: "top 80%", end: "bottom 45%", scrub: true },
+        scrollTrigger: { trigger: zeile, start: "top 85%", end: "bottom 40%", scrub: 0.6 },
       },
     );
   }
-
-  mm.add(AB_TABLET, () => {
-    const notizen = document.querySelector('[data-story="notizen"]');
-    const stufen = gsap.utils.toArray<HTMLElement>('[data-story="buehne-bild"]');
-    if (!notizen || stufen.length === 0) return;
-
-    const ablauf = gsap.timeline({
-      scrollTrigger: { trigger: notizen, start: "top center", end: "bottom center", scrub: true },
-    });
-    // Ausgangslage: nur das erste Bild. Die Bilder mischen per multiply, ein
-    // oberes verdeckt ein unteres also nicht: der Vorgaenger muss weichen.
-    gsap.set(stufen, { opacity: (index: number) => (index === 0 ? 1 : 0) });
-    stufen.forEach((stufe, index) => {
-      const bild = stufe.querySelector("img");
-      if (index > 0) {
-        ablauf.to(stufe, { opacity: 1, duration: 0.4, ease: "none" });
-        ablauf.to(stufen[index - 1], { opacity: 0, duration: 0.4, ease: "none" }, "<");
-      }
-      if (bild) ablauf.fromTo(bild, { scale: 1 }, { scale: 1.3, duration: 1, ease: "none" }, "<");
-    });
-  });
 };

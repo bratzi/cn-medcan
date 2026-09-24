@@ -1,4 +1,4 @@
-import { Suspense } from "react";
+import { Suspense, type ReactNode } from "react";
 
 import { Bild } from "@/components/medien/Bild";
 import { formatiereDatum } from "@/lib/format";
@@ -11,18 +11,43 @@ const ERLAEUTERUNG: Record<string, string> = Object.fromEntries(
   BEWERTUNGS_ACHSEN.map((achse) => [achse.key, achse.erlaeuterung]),
 );
 
-/** Drei Feldbuch-Notizen, dazu der Zoom Blatt, Blüte, Trichom (Spec 5.1, Sektion 2). */
-const NOTIZEN = [
-  { titel: "Aussehen", bild: "frei-hoch", text: ERLAEUTERUNG.aussehen },
-  { titel: "Geruch", bild: "frei-paar", text: ERLAEUTERUNG.geruch },
+/**
+ * Die drei Prüfpunkte als kleine Randfiguren (Spec Redesign 9): runde Bilder,
+ * um die der Manifest-Text fließt (float mit shape-outside). Bewusst leise,
+ * der Text trägt die Sektion.
+ */
+const PUNKTE = [
+  { titel: "Aussehen", bild: "frei-hoch", text: ERLAEUTERUNG.aussehen, seite: "rechts" },
+  { titel: "Geruch", bild: "frei-paar", text: ERLAEUTERUNG.geruch, seite: "links" },
   {
     titel: "Restfeuchte",
     bild: "trichom",
     text: "Zwischen 8 und 13 Prozent ist gut. Darunter wird es staubig, darüber droht Schimmel.",
+    seite: "rechts",
   },
 ] as const;
 
-const BUEHNE_SIZES = "(min-width: 768px) 45vw, 100vw";
+function Punkt({ punkt }: { punkt: (typeof PUNKTE)[number] }) {
+  const seite = punkt.seite === "rechts" ? "float-right ml-8 md:ml-16" : "float-left mr-8 md:mr-16";
+  return (
+    <aside className={`${seite} mb-8 flex w-40 flex-col items-center gap-2 text-center md:w-56 [shape-outside:circle(50%)]`}>
+      <div className="aspect-square w-full overflow-hidden rounded-full bg-surface-sunken">
+        <Bild id={punkt.bild} sizes="(min-width: 768px) 224px, 160px" className="h-full object-cover" />
+      </div>
+      <h3 className="font-buch text-h3 font-medium text-text">{punkt.titel}</h3>
+      <p className="text-small text-text-muted text-pretty">{punkt.text}</p>
+    </aside>
+  );
+}
+
+/** Ein Absatz des Manifests: scroll-gekoppelt Wort für Wort sichtbar (transparent.ts). */
+function Zeile({ children }: { children: ReactNode }) {
+  return (
+    <p data-manifest-zeile="" className="font-buch text-manifest text-text">
+      {children}
+    </p>
+  );
+}
 
 /** Kopfzeile wie bei einer Zeitung: Stand ist das Datum des neuesten Eintrags. */
 async function Stand() {
@@ -58,40 +83,26 @@ export function TransparentMachen() {
           <span className="sm:text-right">Charge für Charge.</span>
         </div>
 
-        <h2
-          id="transparent-titel"
-          data-story="manifest"
-          className="mt-16 max-w-6xl font-buch text-manifest text-text text-balance"
-        >
-          Hinter jedem Handelsnamen steckt eine Charge. <em className="italic">Ich schreibe auf,</em> was drin ist.
-        </h2>
-
-        <div className="mt-16 grid grid-cols-1 gap-16 md:grid-cols-2 md:gap-8">
-          {/* Bühne ab Tablet: drei Bilder übereinander, per CSS sticky. Die
-              StoryBuehne blendet sie scroll-gekoppelt über; ohne Bewegung
-              steht das letzte oben. Die Bilder sind hier Wiederholung,
-              die zugänglichen stehen in den Notizen. */}
-          <div aria-hidden="true" className="hidden md:block">
-            <div className="sticky top-16 grid">
-              {NOTIZEN.map((notiz) => (
-                <div key={notiz.bild} data-story="buehne-bild" className="col-start-1 row-start-1 overflow-hidden">
-                  <Bild id={notiz.bild} sizes={BUEHNE_SIZES} dekorativ />
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <ol data-story="notizen" className="flex flex-col gap-16 md:gap-[40vh] md:py-[20vh]">
-            {NOTIZEN.map((notiz) => (
-              <li key={notiz.titel} className="flex flex-col gap-4">
-                <div className="md:hidden">
-                  <Bild id={notiz.bild} sizes="100vw" />
-                </div>
-                <h3 className="font-buch text-h1 font-medium text-text">{notiz.titel}</h3>
-                <p className="max-w-[48ch] text-body text-text-muted text-pretty">{notiz.text}</p>
-              </li>
-            ))}
-          </ol>
+        <div data-story="manifest" className="mt-16 flow-root">
+          <h2 id="transparent-titel" data-manifest-zeile="" className="font-buch text-manifest text-text text-balance">
+            Hinter jedem Handelsnamen steckt eine <em className="italic text-accent">Charge.</em> Wir schreiben auf, was
+            drin ist.
+          </h2>
+          <Punkt punkt={PUNKTE[0]} />
+          <Zeile>
+            Nicht, was auf der Dose steht. Sondern wie sie aussieht, wie sie riecht, wie sie sich anfühlt, wie
+            feucht sie ist und wie sie brennt.
+          </Zeile>
+          <Punkt punkt={PUNKTE[1]} />
+          <Zeile>
+            Jede Bewertung hängt an <em className="italic text-kopierstift">genau einer Charge.</em> Gleiches Schema,
+            jedes Mal, damit wir vergleichen können.
+          </Zeile>
+          <Punkt punkt={PUNKTE[2]} />
+          <Zeile>
+            Wir lesen, was wir gefunden haben. Wir stimmen ab, was als Nächstes drankommt. Und alle wissen
+            danach ein bisschen mehr.
+          </Zeile>
         </div>
       </div>
     </section>

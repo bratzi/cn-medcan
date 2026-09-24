@@ -6,14 +6,14 @@ import { Schlagwort } from "@/components/story/Schlagwort";
  * Sektion 4 (Spec Redesign 4): die Schleife. Das Video läuft blass und
  * bildschirmfüllend hinter der Sektion, davor stehen die vier Stationen
  * groß untereinander: die ersten beiden schreibt die Community von Hand,
- * die letzten beiden druckt das Buch. Die Überschrift trägt die Aussage,
+ * die letzten beiden druckt das Buch; alles in der Wir-Form (Spec Redesign 10). Die Überschrift trägt die Aussage,
  * die Stationen sind deren Bild und deshalb aria-hidden.
  */
 const STATIONEN = [
-  { text: "Ihr schlagt vor.", hand: true },
-  { text: "Ihr stimmt ab.", hand: true },
-  { text: "Ich teste.", hand: false },
-  { text: "Alle lesen.", hand: false },
+  { text: "Wir schlagen vor.", hand: true },
+  { text: "Wir stimmen ab.", hand: true },
+  { text: "Wir testen.", hand: false },
+  { text: "Wir lesen.", hand: false },
 ] as const;
 
 export function GemeinsamLernen() {
@@ -24,9 +24,9 @@ export function GemeinsamLernen() {
       className="relative isolate overflow-x-clip px-4 py-32 sm:px-8 sm:py-48"
     >
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-20 overflow-hidden">
-        <Loop id="pflanze-loop" className="h-full opacity-30" />
+        <Loop id="pflanze-loop" buehne className="h-full opacity-50" />
       </div>
-      <Schlagwort satz="ihr stimmt ab" />
+      <Schlagwort satz="wir stimmen ab" />
 
       <div className="mx-auto grid w-full max-w-360 grid-cols-1 items-end gap-16 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
         <ol aria-hidden="true" className="flex flex-col gap-2">
@@ -47,11 +47,11 @@ export function GemeinsamLernen() {
 
         <div className="flex flex-col items-start gap-6">
           <h2 id="lernen-titel" className="font-buch text-h1 font-medium text-text text-balance">
-            Ihr schlagt vor. Ihr stimmt ab. Ich teste. Alle lesen.
+            Wir schlagen vor. Wir stimmen ab. Wir testen. Wir lesen.
           </h2>
           <p className="max-w-[56ch] text-body text-text text-pretty">
-            In jeder Runde setze ich ein oder zwei Sorten selbst. Zwei weitere Plätze wählt ihr. Was
-            gewinnt, teste ich nach festem Schema, und der Eintrag steht danach hier für alle.
+            Jede Runde bringt neue Sorten auf die Liste. Was die meisten Stimmen holt, testen wir nach
+            festem Schema, und der Eintrag steht danach hier für alle.
           </p>
           {/* Pause fuer das Video (WCAG 2.2.2). Sichtbar erst, wenn die StoryBuehne
               das Video startet (loops.ts): ohne JavaScript laeuft nichts. */}

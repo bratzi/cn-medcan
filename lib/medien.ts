@@ -26,7 +26,7 @@ export type Medium = {
   urheber: string;
   /** Pexels-Seite des Motivs. */
   quelle: string;
-  /** Freisteller mit Alpha (scripts/medien/freistellen.py): kein Mischmodus, steht frei auf jedem Grund. */
+  /** Farbige Datei ohne Mischmodus: Freisteller mit Alpha (scripts/medien/freistellen.py) oder Farbfoto im runden Rahmen. */
   freigestellt?: boolean;
 };
 
@@ -36,13 +36,25 @@ export const STANDBILD_BREITE = 576;
 
 export const MEDIEN: readonly Medium[] = [
   {
+    id: "auftakt-loop",
+    art: "video",
+    pexelsId: 7684711,
+    datei: "auftakt-loop",
+    breite: 1920,
+    hoehe: 1080,
+    alt: "",
+    urheber: "ArtHouse Studio",
+    quelle: "https://www.pexels.com/video/person-hands-cigarette-dried-7684711/",
+    freigestellt: true,
+  },
+  {
     id: "frei-bluete",
     art: "foto",
     pexelsId: 12728515,
     datei: "frei-bluete",
     breite: 1133,
     hoehe: 903,
-    alt: "Getrocknete Cannabisblüte, freigestellt, in Schwarzweiß",
+    alt: "Getrocknete Cannabisblüte, freigestellt",
     urheber: "Brokkelen.nl",
     quelle: "https://www.pexels.com/photo/dried-cannabis-on-white-surface-12728515/",
     freigestellt: true,
@@ -54,7 +66,7 @@ export const MEDIEN: readonly Medium[] = [
     datei: "frei-hoch",
     breite: 1913,
     hoehe: 1942,
-    alt: "Cannabisblüte mit Stängel, freigestellt, in Schwarzweiß",
+    alt: "Cannabisblüte mit Stängel, freigestellt",
     urheber: "Kindel Media",
     quelle: "https://www.pexels.com/photo/close-up-photo-of-kush-on-white-background-7773105/",
     freigestellt: true,
@@ -66,7 +78,7 @@ export const MEDIEN: readonly Medium[] = [
     datei: "frei-paar",
     breite: 1606,
     hoehe: 1066,
-    alt: "Zwei Cannabisblüten, freigestellt, in Schwarzweiß",
+    alt: "Zwei Cannabisblüten, freigestellt",
     urheber: "Terrance Barksdale",
     quelle: "https://www.pexels.com/photo/weed-on-white-background-16662341/",
     freigestellt: true,
@@ -81,6 +93,7 @@ export const MEDIEN: readonly Medium[] = [
     alt: "Nahaufnahme einer Cannabisblüte mit Trichomen",
     urheber: "Stephen Leonardi",
     quelle: "https://www.pexels.com/photo/close-up-of-frosty-cannabis-bud-30439065/",
+    freigestellt: true,
   },
   {
     id: "pflanze-loop",
