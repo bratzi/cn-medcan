@@ -106,6 +106,7 @@ gepusht und live geprüft; Dauerregel: kein lokales Dev-System).
 - Welle 1, Task 9 erledigt: Signet „gB“ aus der Schriftdatei (OFL im Repo), `app/icon.png`, `app/apple-icon.png`,
   `app/favicon.ico` neu, `assets/marke/signet-1080.png` für Instagram (nicht ausgeliefert). Befund: im 32/16-px-Favicon
   sind die Haarstriche blass, „g“ und „B“ aber erkennbar.
+- Welle 1, Task 10 erledigt: Brand Guideline und `ui-design-engine` auf „Buch und Handschrift“ umgeschrieben.
 
 ### 0. Live-Stand und Sessionablauf
 
