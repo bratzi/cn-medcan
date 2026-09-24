@@ -208,6 +208,7 @@ Budgets, Akzeptanzkriterien und Reihenfolge. **Die Spec ist die Quelle - nicht d
   - Welle 1, Task 7 erledigt: Doppelseite (auszug/voll, story) in components/review, Netzdiagramm umgezogen, Startseite nutzt sie.
   - Welle 1, Task 8 erledigt: Titelblatt, CommunityStimmen, Balken und Chips in Tinte, BestandTabelle-Links.
   - Welle 1, Task 9 erledigt: Produktseite als vollständiger Eintrag, Prüfskript scripts/seiten-pruefen.ts (in Git Bash mit `MSYS_NO_PATHCONV=1` aufrufen), GlasHeader/TerpenMap/BewertungsListe entfernt. Befund, vorbestehend: `/produkte/<unbekannt>` liefert Status 200 und kein h1 im Server-HTML (notFound() innerhalb der Suspense-Grenze).
+  - Welle 1, Task 10 erledigt: /reviews mit Doppelseite und Inhaltsverzeichnis, ReviewKarte entfernt; ProduktCard sagt „für“ statt „fuer“ (vorgezogen aus Welle 2).
 
 - **⇢ EINGETAKTET FÜR EINE NEUE SESSION (Nutzer, 2026-09-24, Session 9): Marke und Medien professionell
   überarbeiten, für das gesamte Projekt.** Der Nutzer schickte das mitten in die Planung und sagte ausdrücklich:

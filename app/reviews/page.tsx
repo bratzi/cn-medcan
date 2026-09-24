@@ -1,7 +1,13 @@
 import type { Metadata } from "next";
+import Link from "next/link";
+import { Suspense } from "react";
 
-import { ReviewKarte } from "@/components/review/ReviewKarte";
-import { EmptyState } from "@/components/ui";
+import { ABSCHNITT_TITEL, Seitenkopf, seitenRahmen } from "@/components/layout/Seitenkopf";
+import { Doppelseite } from "@/components/review/Doppelseite";
+import { Inhaltsverzeichnis } from "@/components/review/Inhaltsverzeichnis";
+import { DoppelseitenSkelett } from "@/components/story/Skelette";
+import { EmptyState, buttonKlassen } from "@/components/ui";
+import { cn } from "@/lib/cn";
 import { redaktionelleReviews } from "@/lib/query/reviews";
 
 /**
@@ -13,40 +19,60 @@ export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Bewertungen",
-  description:
-    "Die Bewertungen des Betreibers nach festem Schema, jeweils gebunden an eine konkrete Charge.",
+  description: "Meine Bewertungen nach festem Schema, jeweils an eine konkrete Charge gebunden.",
 };
 
-export default async function ReviewsPage() {
+/** Das Buch selbst (Spec TP2 4.1): der neueste Eintrag gross, alle im Inhaltsverzeichnis. */
+async function ReviewsInhalt() {
   const reviews = await redaktionelleReviews();
 
-  return (
-    <div className="mx-auto w-full max-w-360 px-4 py-10 sm:px-8 sm:py-16">
-      <section>
-        <h1 className="max-w-[68ch] text-h1 text-text">Bewertungen</h1>
-        <p className="mt-4 max-w-[68ch] text-body text-text-muted">
-          Jede Bewertung folgt demselben Schema aus fünf Noten und der Restfeuchte und ist an
-          eine konkrete Charge gebunden. Welche Sorte als Nächstes bewertet wird, entscheiden
-          die Abstimmungen.
-        </p>
+  if (reviews.length === 0) {
+    return (
+      <EmptyState
+        titel="Das erste Kapitel wird gerade geschrieben."
+        beschreibung="Welche Sorte ich zuerst teste, entscheidet die Abstimmung."
+        aktion={
+          <Link href="/umfragen" className={buttonKlassen("secondary")}>
+            Zur Abstimmung
+          </Link>
+        }
+      />
+    );
+  }
 
-        <div className="mt-8">
-          {reviews.length === 0 ? (
-            <EmptyState
-              titel="Noch keine Bewertung"
-              beschreibung="Die erste Bewertung erscheint hier, sobald sie freigegeben ist."
-            />
-          ) : (
-            <ul className="grid grid-cols-1 gap-8 lg:grid-cols-2">
-              {reviews.map((review) => (
-                <li key={review.id} className="flex">
-                  <ReviewKarte review={review} className="w-full" />
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
+  return (
+    <div className="flex flex-col gap-16 sm:gap-24">
+      <section aria-labelledby="neueste-titel" className="flex flex-col gap-8">
+        <h2 id="neueste-titel" className={ABSCHNITT_TITEL}>
+          Der neueste Eintrag
+        </h2>
+        <Doppelseite eintrag={reviews[0]} umfang="auszug" ueberschrift="h3" />
       </section>
+
+      {reviews.length > 1 ? (
+        <section aria-labelledby="alle-titel" className="flex flex-col gap-8">
+          <h2 id="alle-titel" className={ABSCHNITT_TITEL}>
+            Alle Einträge
+          </h2>
+          <Inhaltsverzeichnis eintraege={reviews} />
+        </section>
+      ) : null}
     </div>
+  );
+}
+
+export default function ReviewsPage() {
+  return (
+    <>
+      <Seitenkopf
+        titel="Bewertungen"
+        satz="Jede Sorte teste ich nach demselben Schema und schreibe dazu, welche Charge es war."
+      />
+      <div className={cn(seitenRahmen(), "pt-12 pb-24 sm:pt-16")}>
+        <Suspense fallback={<DoppelseitenSkelett />}>
+          <ReviewsInhalt />
+        </Suspense>
+      </div>
+    </>
   );
 }

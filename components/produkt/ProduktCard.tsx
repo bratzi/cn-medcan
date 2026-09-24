@@ -67,7 +67,7 @@ export function ProduktCard({ strain, className }: Props) {
         </span>
         <span className="text-body font-medium text-text">
           {strain.preisNurFuerFachkreise && strain.guenstigsterPreisCent === null
-            ? "Preis nur fuer Fachkreise"
+            ? "Preis nur für Fachkreise"
             : formatierePreisProGramm(strain.guenstigsterPreisCent)}
         </span>
       </CardFooter>
