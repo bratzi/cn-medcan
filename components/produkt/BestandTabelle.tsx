@@ -23,6 +23,7 @@ import {
 } from "@/lib/labels";
 import { istBestandStatus, type BestandStatus } from "@/db/enums";
 import type { BestandEintrag } from "@/lib/query/strains";
+import { textLinkKlassen } from "@/components/ui/textlink";
 
 export type BestandTabelleProps = {
   bestaende: readonly BestandEintrag[];
@@ -84,7 +85,7 @@ export function BestandTabelle({ bestaende, fachkreis }: BestandTabelleProps) {
                 <TableCell>
                   <Link
                     href={`/apotheken/${bestand.apotheke.slug}`}
-                    className="rounded-sm text-accent underline hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring"
+                    className={textLinkKlassen()}
                   >
                     {bestand.apotheke.name}
                   </Link>

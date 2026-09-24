@@ -22,13 +22,13 @@ function prozentAnteil(wert: number): number {
   return Math.min(Math.max((wert / SKALA_MAX) * 100, 0), 100);
 }
 
-/** de-DE-Zahl ohne Einheit — fuer das `aria-label`, das "Prozent" ausschreibt. */
+/** de-DE-Zahl ohne Einheit, fuer das `aria-label`, das "Prozent" ausschreibt. */
 const VORLESE_FORMATTER = new Intl.NumberFormat("de-DE", {
   minimumFractionDigits: 1,
   maximumFractionDigits: 1,
 });
 
-/** Textbeschreibung fuer das `aria-label` — ohne Sonderzeichen, gut vorlesbar. */
+/** Textbeschreibung fuer das `aria-label`: ohne Sonderzeichen, gut vorlesbar. */
 function beschreibe(name: string, min: number | null, max: number | null): string {
   const von = min ?? max;
   const bis = max ?? min;
@@ -69,7 +69,7 @@ function Zeile({ name, min, max, balkenKlasse }: ZeileProps) {
         />
       </span>
 
-      {/* Die Zahl steht immer daneben — der Balken ist nur Redundanz. */}
+      {/* Die Zahl steht immer daneben, der Balken ist nur Redundanz. */}
       <span className="numeric w-32 shrink-0 text-right text-small text-text">
         {von === null && bis === null
           ? "k. A."
@@ -105,8 +105,8 @@ export function CannabinoidBar({
       aria-label={label}
       className={cn("flex flex-col gap-2", className)}
     >
-      <Zeile name="THC" min={thcVon} max={thcBis} balkenKlasse="bg-accent" />
-      <Zeile name="CBD" min={cbdVon} max={cbdBis} balkenKlasse="bg-border-strong" />
+      <Zeile name="THC" min={thcVon} max={thcBis} balkenKlasse="bg-text" />
+      <Zeile name="CBD" min={cbdVon} max={cbdBis} balkenKlasse="bg-text-muted" />
       <p className="text-caption text-text-muted">Skala 0 bis 35&nbsp;% des Gewichts</p>
     </div>
   );

@@ -206,6 +206,7 @@ Budgets, Akzeptanzkriterien und Reihenfolge. **Die Spec ist die Quelle - nicht d
   - Welle 1, Task 5 erledigt: app/error.tsx im Buchstil (retry).
   - Welle 1, Task 6 erledigt: teileBewertungen, ReviewEintrag.istRedaktionell (eine Abfrage, Datenmodell unverändert).
   - Welle 1, Task 7 erledigt: Doppelseite (auszug/voll, story) in components/review, Netzdiagramm umgezogen, Startseite nutzt sie.
+  - Welle 1, Task 8 erledigt: Titelblatt, CommunityStimmen, Balken und Chips in Tinte, BestandTabelle-Links.
 
 - **⇢ EINGETAKTET FÜR EINE NEUE SESSION (Nutzer, 2026-09-24, Session 9): Marke und Medien professionell
   überarbeiten, für das gesamte Projekt.** Der Nutzer schickte das mitten in die Planung und sagte ausdrücklich:

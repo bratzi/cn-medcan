@@ -18,7 +18,7 @@ export type TerpenChipsProps = {
 
 /**
  * Terpenprofil als Chips. Das dominante Terpen (Rang 1) ist durch Gewicht,
- * staerkeren Rahmen und den Zusatz "dominant" markiert — nicht durch Farbe.
+ * staerkeren Rahmen und den Zusatz "dominant" markiert, nicht durch Farbe.
  */
 export function TerpenChips({ terpene, className }: TerpenChipsProps) {
   if (terpene.length === 0) {
@@ -41,10 +41,9 @@ export function TerpenChips({ terpene, className }: TerpenChipsProps) {
           <li
             key={terpen.name}
             className={cn(
-              "inline-flex items-baseline gap-2 rounded-sm border px-2 py-1 text-small",
-              dominant
-                ? "border-accent border-2 bg-accent-subtle font-medium text-text"
-                : "border-border bg-surface-raised text-text",
+              // py-1 = 4px: Textzeile in einer Pille, wie beim Badge.
+              "inline-flex items-baseline gap-2 rounded-full border bg-surface-raised px-4 py-1 text-small text-text",
+              dominant ? "border-2 border-text font-medium" : "border-border-strong",
             )}
           >
             {/* Handelsnamen und Terpennamen stehen unveraendert. */}
