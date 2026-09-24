@@ -7,6 +7,7 @@ import { join } from "node:path";
 export const DATEIEN = [
   "app/produkte/[slug]/page.tsx",
   "app/reviews/page.tsx",
+  "app/umfragen/page.tsx",
   "components/produkt/BestandTabelle.tsx",
   "components/produkt/CannabinoidBar.tsx",
   "components/produkt/TerpenChips.tsx",
@@ -14,6 +15,7 @@ export const DATEIEN = [
   "components/review/CommunityStimmen.tsx",
   "components/review/Doppelseite.tsx",
   "components/review/Inhaltsverzeichnis.tsx",
+  "components/umfrage/UmfrageKarte.tsx",
 ];
 
 test("kein Deckkraft-Hover in den angefassten Dateien", () => {

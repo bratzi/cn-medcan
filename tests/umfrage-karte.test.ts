@@ -27,3 +27,9 @@ test("Anmelden führt auf die Seite zurück, auf der der Stimmzettel steht", () 
 test("Knöpfe mit 44 px", () => {
   assert.doesNotMatch(QUELLE, /buttonKlassen\("[a-z]+", "sm"\)/);
 });
+
+test("Formulare der Abstimmung sprechen in der Ich-Form", () => {
+  for (const datei of ["components/umfrage/StimmFormular.tsx", "components/umfrage/VorschlagFormular.tsx"]) {
+    assert.doesNotMatch(readFileSync(join(process.cwd(), datei), "utf8"), /Betreiber/, datei);
+  }
+});
