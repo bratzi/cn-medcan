@@ -3,7 +3,7 @@
 > Übergabemedium zwischen Sessions. Wird nach jedem Arbeitsblock aktualisiert und committet.
 > Wer hier weiterarbeitet, liest diese Datei zuerst und braucht den Chatverlauf nicht.
 
-**Letzte Aktualisierung:** 2026-09-24
+**Letzte Aktualisierung:** 2026-09-24 (Session 8, Teilprojekt 1 live geprueft)
 **Repo:** https://github.com/bratzi/cn-medcan (public)
 **Branch:** `main` (Makeover „Grünes Buch“ Teilprojekt 1 ist seit 2026-09-24 auf `main`)
 
@@ -95,7 +95,7 @@ ob Citrix getrennt ist, oder den Nutzer selbst pushen lassen.
 Das Browser-Werkzeug: Screenshots laufen hier oft in einen Timeout; `get_page_text`, `find` und
 `zoom` funktionieren. `form_input` setzt Felder im Dashboard zuverlaessig.
 
-### 1. Makeover „Grünes Buch“ - **damit beginnt die naechste Session**
+### 1. Makeover „Grünes Buch“ - Teilprojekt 1 live, als Naechstes /interface-review und Teilprojekt 2
 
 **Stand (2026-09-23, Session 4):** Brainstorming abgeschlossen, **Spec geschrieben und
 committet:** `docs/superpowers/specs/2026-09-23-makeover-gruenes-buch-design.md`.
@@ -123,7 +123,29 @@ Budgets, Akzeptanzkriterien und Reihenfolge. **Die Spec ist die Quelle - nicht d
   sich nicht aendern (innen 2296 px). Bei "Permission denied" sofort dem Nutzer sagen, dass ein
   Freigabe-Fenster wartet (Memory `freigabe-fenster-melden`).
 
-**⇢ Stand für die nächste Session (2026-09-24, Session 6, vor dem Clear): UMSETZUNG LÄUFT.**
+**⇢ Stand für die nächste Session (2026-09-24, Session 8): TEILPROJEKT 1 IST LIVE UND LIVE GEPRÜFT.**
+- **Live-Prüfung (Plan Task 16 Step 8) erledigt**, einmal im Browser, kein Polling: `/` 200 mit den drei
+  Leitsätzen, „Das erste Kapitel wird gerade geschrieben.“, „Gerade läuft keine Runde …“, Katalog-Leerzustand;
+  **LCP 364 ms** (Leitobjekt), **CLS 0**, TTFB 150 ms; `/reviews`, `/umfragen`, `/produkte` mit Leerzuständen,
+  keine Konsolenfehler; `/admin` → `/anmelden`. Medien der ersten Ansicht 551 KB bei 2296-px-Fenster (bekannt).
+- **Rulings, Befunde, zurückgestellte Kleinigkeiten** aus dem Ledger stehen jetzt am Ende des Plans
+  (`docs/superpowers/plans/2026-09-24-makeover-gruenes-buch.md`, „Ausfuehrungsprotokoll“) - dort nachlesen.
+- **Aufräumen, vom Auto-Modus für Claude gesperrt, macht der Nutzer:** Ledger-Ordner
+  `.superpowers/sdd/2026-09-24-makeover-gruenes-buch/` löschen; lokalen Branch per
+  `git branch -D makeover/gruenes-buch` entfernen (`-d` verweigert, weil der Remote-Branch älter ist; vollständig
+  in `main`, geprüft mit `merge-base --is-ancestor`); optional Remote-Branch `git push origin --delete
+  makeover/gruenes-buch`.
+- **Live-Gate-Cookie:** das lokale `SITE_SESSION_SECRET` ist **nicht** das live gesetzte. Für Live-Prüfungen
+  einmal per `fetch` POST auf `/api/zugang` mit `SITE_PASSWORD` aus `.env.local` anmelden (Wert nie ausgeben),
+  Token aus `Set-Cookie` per `document.cookie` in den Browser. Messungen nur im **sichtbaren** Tab (im
+  Hintergrund-Tab gibt Chrome gestreamte Suspense-Inhalte nicht frei und misst kein LCP); `javascript_tool`
+  wartet nicht auf Promises - Ergebnis in `window` ablegen und nachlesen.
+- **Als Nächstes:** der Nutzer startet `/interface-review` (Skill hat `disable-model-invocation`, Claude kann es
+  nicht). Danach **Teilprojekt 2**: eigene Spec für die übrigen Seiten, Start mit `superpowers:brainstorming`
+  (braucht den Nutzer). Offen für den Nutzer: Video-Loop ohne Pause (WCAG 2.2.2) und Notiz-Freitext auf der
+  Startseite (HWG) sind so entschieden; 4 npm-audit „high“; Instagram-Handle.
+
+**Stand davor (2026-09-24, Session 6/7):**
 - Ausführungsart ist gewählt: **Native**, also `superpowers:executing-plans` in der Session
   (keine Subagents; Nutzer hat nach Abwägung der Kosten so entschieden). Nicht erneut fragen.
 - Gearbeitet wird auf dem Branch **`makeover/gruenes-buch`** (gepusht, `main` unberührt, also nichts
