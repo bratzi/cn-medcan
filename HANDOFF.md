@@ -28,7 +28,18 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 
 ## ⇢ Hier geht es weiter
 
-### ⇢ NÄCHSTE SESSION (Stand Session 11, 2026-09-24): Spec TP3 freigeben lassen, dann Plan TP3 Welle 1
+### ⇢ NÄCHSTE SESSION (Stand Session 12, 2026-09-24): Plan TP3 Welle 1 ausführen (Native)
+
+**Session 12:** Spec TP3 vom Nutzer freigegeben („spec passt“). **Plan geschrieben:**
+`docs/superpowers/plans/2026-09-24-makeover-tp3-welle-1.md` (11 Tasks, Ausführung Native mit
+`superpowers:executing-plans`). Liegt dem Nutzer zur Durchsicht vor; ist sie da (oder sagt er „weiter“), ab Task 1
+ausführen. Oben im Plan stehen 7 Entscheidungen, die Claude selbst getroffen hat (u. a. Token `text-vermerk` 32 px,
+Wortmarke im Auftakt per CSS geschrieben, Randspalte und Stimmzettel bleiben gestreamt).
+
+**Neue Dauerregel des Nutzers (Session 12): kein lokales Dev-System.** Kein `next dev`, kein
+`opennextjs-cloudflare preview`, kein lokaler `next build`. Lokal nur `npm test`, Typecheck, Lint, `npm run farben`.
+Jeder Task wird nach `main` gepusht (Workers Builds stellt live), geprüft wird live per Browser-MCP. Der Push braucht
+damit kein eigenes Go mehr (so ausgelegt und dem Nutzer gesagt). Memory `live-statt-dev`.
 
 **Session 11:** Brainstorming zur Marken- und Medien-Überarbeitung abgeschlossen. **Spec geschrieben und committet:**
 `docs/superpowers/specs/2026-09-24-makeover-teilprojekt-3-marke-medien-design.md` (Teilprojekt 3). Kern der
@@ -46,9 +57,8 @@ in Spec Abschnitt 2 hat Claude selbst getroffen (Nutzer wollte keine Einzelfreig
 `wrangler d1 execute --remote` (Bootstrap aus `db/README.md`) Rolle `ADMIN` und `freigegeben = 1`, nach dem Update
 live gelesen. Claude durfte den Live-Zugriff diesmal selbst ausführen. Kontodetails gehören nicht ins Repo.
 
-1. **Zuerst:** Liegt die Freigabe der Spec TP3 noch nicht vor, den Nutzer einmal um Durchsicht bitten (Pflicht-Gate).
-   Nach Freigabe **`superpowers:writing-plans` für TP3 Welle 1 (Marke)** aus Spec Abschnitte 3 bis 6, 8, 12, 13,
-   Ausführung **Native**. Danach Welle 2 (Medien, erster Schritt: `rembg` installieren, einmal, bei Netzfehler
+1. **Zuerst:** Plan TP3 Welle 1 (`docs/superpowers/plans/2026-09-24-makeover-tp3-welle-1.md`) nach der Durchsicht
+   des Nutzers ausführen, Ausführung **Native**, jeder Task gepusht und live geprüft. Danach Welle 2 (Medien, erster Schritt: `rembg` installieren, einmal, bei Netzfehler
    stoppen), dann Welle 3 (Unterseiten), je eigener Plan und Live-Gang.
 2. Der Nutzer kann `/interface-review` für TP2 Welle 1 starten (Spec TP2 9.12); Claude kann es nicht selbst starten.
 3. **Nach TP3: TP2 Welle 2** (Katalog: `/produkte`, `/apotheken`, `/apotheken/[slug]`), jetzt im Stil „Buch und
