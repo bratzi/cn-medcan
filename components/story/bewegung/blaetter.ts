@@ -138,6 +138,26 @@ export async function starteBlaetter(scrollTempo: () => number): Promise<() => v
 
   let rahmen = 0;
   let zuletzt = performance.now();
+  let pausiert = false;
+  // Verborgenes Dokument: nichts zeichnen (rAF steht dann ohnehin; beim
+  // Zurückkehren springt dt nicht, weil zuletzt neu gesetzt wird).
+  const beiSichtbarkeit = () => {
+    pausiert = document.hidden;
+    if (!pausiert) {
+      zuletzt = performance.now();
+      cancelAnimationFrame(rahmen);
+      rahmen = requestAnimationFrame(schritt);
+    }
+  };
+  document.addEventListener("visibilitychange", beiSichtbarkeit);
+  // Kontextverlust (Treiber, Speicher): Leinwand still entfernen, Seite bleibt vollständig.
+  const beiVerlust = (ereignis: Event) => {
+    ereignis.preventDefault();
+    pausiert = true;
+    cancelAnimationFrame(rahmen);
+    leinwand.style.display = "none";
+  };
+  leinwand.addEventListener("webglcontextlost", beiVerlust);
   let wind = 0;
   const schritt = (jetzt: number) => {
     const dt = Math.min((jetzt - zuletzt) / 1000, 0.05);
@@ -156,13 +176,15 @@ export async function starteBlaetter(scrollTempo: () => number): Promise<() => v
       netz.rotation.set(blatt.dreh[0], blatt.dreh[1], blatt.dreh[2]);
     });
     renderer.render(szene, kamera);
-    rahmen = requestAnimationFrame(schritt);
+    if (!pausiert) rahmen = requestAnimationFrame(schritt);
   };
   rahmen = requestAnimationFrame(schritt);
 
   return () => {
     cancelAnimationFrame(rahmen);
     window.removeEventListener("resize", beiGroesse);
+    document.removeEventListener("visibilitychange", beiSichtbarkeit);
+    leinwand.removeEventListener("webglcontextlost", beiVerlust);
     geometrie.dispose();
     for (const material of materialien) material.dispose();
     for (const bildmap of bildmaps) bildmap.dispose();
