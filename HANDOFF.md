@@ -3,7 +3,7 @@
 > Übergabemedium zwischen Sessions. Wird nach jedem Arbeitsblock aktualisiert und committet.
 > Wer hier weiterarbeitet, liest diese Datei zuerst und braucht den Chatverlauf nicht.
 
-**Letzte Aktualisierung:** 2026-09-24 (Session 10, Welle 1 von TP2 umgesetzt, wartet auf Go)
+**Letzte Aktualisierung:** 2026-09-24 (Session 10, Welle 1 von TP2 live)
 **Repo:** https://github.com/bratzi/cn-medcan (public)
 **Branch:** `main` (Makeover „Grünes Buch“ Teilprojekt 1 ist seit 2026-09-24 auf `main`)
 
@@ -28,17 +28,35 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 
 ## ⇢ Hier geht es weiter
 
-### ⇢ NÄCHSTE SESSION (Stand Ende Session 9, 2026-09-24): Welle 1 von Teilprojekt 2 umsetzen
+### ⇢ NÄCHSTE SESSION (Stand Ende Session 10, 2026-09-24): Marken- und Medien-Überarbeitung, dann Welle 2
 
-1. `superpowers:executing-plans` mit `docs/superpowers/plans/2026-09-24-makeover-tp2-welle-1.md` starten,
-   **Native** (Nutzer hat gewählt, nicht erneut fragen). Task 1 Step 1 legt den Branch `makeover/tp2-welle-1` an.
-   Spec dazu: `docs/superpowers/specs/2026-09-24-makeover-teilprojekt-2-design.md` (freigegeben).
-2. Je Task die Skills aus **Skills** laden und in einem Satz nennen; nach jedem Task eine HANDOFF-Zeile im
-   Task-Commit. Fortschritt steht unter „Teilprojekt 2“ in Abschnitt 1 („Welle 1, Task N erledigt“).
-3. Task 13 endet mit Go des Nutzers, Push (ohne Citrix-Rückfrage), Live-Prüfung.
-4. **Danach** (eigene Session, vor Welle 2): die eingetaktete Marken- und Medien-Überarbeitung (Logo und Akzente
-   in „Inspiration“, Medien awwwards-fähig, freigestellt statt invertiert), Details unter „Eingetaktet für eine
-   neue Session“ in Abschnitt 1.
+**Welle 1 von Teilprojekt 2 ist live** (Commit `6aa8937` auf `main`, Go des Nutzers, Session 10). Prüfbericht und
+Live-Prüfung unter „Teilprojekt 2“ in Abschnitt 1, alle Rulings im Plan `docs/superpowers/plans/2026-09-24-makeover-tp2-welle-1.md`
+(„Ausfuehrungsprotokoll“ am Ende).
+
+1. **Zuerst (Reihenfolge des Nutzers): die eingetaktete Marken- und Medien-Überarbeitung** als eigenes Vorhaben:
+   `superpowers:brainstorming` (architektonisch), Details und Kollisionen unter „Eingetaktet für eine neue Session“ in
+   Abschnitt 1 (Logo und Akzente in „Inspiration“, Medien awwwards-fähig, freigestellt statt invertiert, Drittanbieter-
+   Bilder mit Kostenangabe vorab). Skills laut Memory `design-skills-einsatz`.
+2. Der Nutzer kann `/interface-review` für Welle 1 starten (Spec TP2 9.12); Claude kann es nicht selbst starten.
+3. **Danach Welle 2** (Katalog: `/produkte`, `/apotheken`, `/apotheken/[slug]`): Plan mit `superpowers:writing-plans` aus
+   Spec TP2 Abschnitt 5, Ausführung wieder **Native**. In den Plan übernehmen (Lehren aus Welle 1):
+   - **Keine Suspense-Grenze um den Seiteninhalt** der Unterseiten (Nutzerentscheidung Session 10: ohne JS lesbar,
+     Sprungziele, echte 404). Skelette nur, wo das nicht gilt.
+   - Viewport-Prüfung zusätzlich bei **800 px** (Kopf, Tabellen), „ohne JS“ mit echtem Blick auf `<div hidden id="S:…">`
+     im Roh-HTML, nicht nur „Markup vorhanden“.
+   - Zurückgestellt für Welle 2: Fokus-Ketten in `Select.tsx`/`RangeSlider.tsx`, BestandTabelle-Caption und HWG-Satz
+     (Spec-7-Wortlaut), `ProduktCard` Deckkraft-Hover und Vermerk, Scrollbalken der Navigationsleiste in schmalen
+     Desktop-Fenstern.
+   - Zurückgestellt ohne Welle: Produktseiten-Metadaten „Meine Bewertung“ auch ohne eigene Bewertung, Fokusreihenfolge
+     „Mein Konto“ im Kopf unter lg, Reel-iframe bei lg sehr hoch (`max-w-sm`), Skelett-Flächen der Startseite kaum
+     sichtbar, DSGVO-Frage Instagram-Reel (Nutzer).
+   - Vorbestehend aus TP1: zwei Hydrations-Meldungen im Dev-Overlay der Startseite (GSAP-Styles vor der Hydrierung
+     gestreamter Sektionen, `WissenBuendeln` und Doppelseite), Details unter „Teilprojekt 2“ in Abschnitt 1.
+4. Werkzeug-Hinweise aus Session 10: Git Bash wandelt `/pfad`-Argumente in Windows-Pfade um, daher
+   `MSYS_NO_PATHCONV=1 npx tsx scripts/seiten-pruefen.ts /…`. `sed -i` in Git Bash kann CRLF-Dateien auf LF umstellen,
+   Änderungen an CRLF-Dateien per Node-Skript oder Edit-Werkzeug. Im Hintergrund-Tab des Browserwerkzeugs laufen
+   Server Actions, Client-Navigationen und GSAP nicht sichtbar durch: solche Prüfungen im sichtbaren Tab.
 
 ### 0. Live-Stand und Sessionablauf
 
@@ -198,7 +216,7 @@ Budgets, Akzeptanzkriterien und Reihenfolge. **Die Spec ist die Quelle - nicht d
   „22,0 – 28,0 %“ mit Gedankenstrich zwischen schmalen Leerzeichen, das Prüfskript erlaubt Zahlenbereiche.
   **Als Nächstes:** siehe „Eingetaktet für eine neue Session“ direkt darunter und die Reihenfolge-Entscheidung
   des Nutzers dort.
-  **Fortschritt Welle 1 (Session 10, Branch `makeover/tp2-welle-1`, Ledger `.superpowers/sdd/2026-09-24-makeover-tp2-welle-1/progress.md`):**
+  **Fortschritt Welle 1 (Session 10; Branch `makeover/tp2-welle-1` nach dem Merge gelöscht, Ledger als „Ausfuehrungsprotokoll“ am Ende des Plans):**
   - Welle 1, Task 1 erledigt: textLinkKlassen, namenLinkKlassen, Blatt, Faktenliste (Branch makeover/tp2-welle-1).
   - Welle 1, Task 2 erledigt: Buchtabelle, Leerzustand ohne Kasten (wirkt auf allen Seiten).
   - Welle 1, Task 3 erledigt: Seitenkopf, seitenRahmen, ABSCHNITT_TITEL, TitelblattSkelett.
@@ -211,10 +229,13 @@ Budgets, Akzeptanzkriterien und Reihenfolge. **Die Spec ist die Quelle - nicht d
   - Welle 1, Task 10 erledigt: /reviews mit Doppelseite und Inhaltsverzeichnis, ReviewKarte entfernt; ProduktCard sagt „für“ statt „fuer“ (vorgezogen aus Welle 2).
   - Welle 1, Task 11 erledigt: UmfrageKarte nur noch Stimmzettel, Balken in Tinte, Begriffe freigeschaltet, ort-Prop.
   - Welle 1, Task 12 erledigt: /umfragen mit Wand-Tags, Stimmzettel, Vorschlagsblatt, Chronik; Stimm- und Vorschlagsformular in Ich-Form. Lokal gesehen: Vorschlagsphase freigeschaltet, Abstimmung stimmberechtigt und abgestimmt, anonym; nicht gesehen: angemeldet ohne Freischaltung.
-  - **Welle 1, Task 13 (Abschluss), Stand Session 10:** Welle 1 ist auf `makeover/tp2-welle-1` umgesetzt und geprüft, **noch nicht live**. Prüfbericht:
+  - **Welle 1, Task 13 (Abschluss), Stand Session 10:** Welle 1 ist **live** (`6aa8937`, Fast-Forward nach Go, Workers Builds). Prüfbericht:
     grün: `npm test`, Typecheck, eslint, `npm run farben`, Build; Prüfskript `/ /reviews /umfragen /produkte/nebelharz-22 /produkte/pfefferstern-extrakt /gibt-es-nicht` 6x ok.
     Browser (Hintergrund-Tab): Kopf und aria-current, 320/390/720 px ohne seitliches Überlaufen, Fokus überall sichtbar, hell/dunkel, Startseiten-Zähler auf Endwerten, Stimmzustände per SQL-Testrunde (freigeschaltet, stimmberechtigt, abgestimmt, anonym).
-    **Nicht verifiziert:** GSAP-Bewegung der Startseite (Hintergrund-Tab), Zustand "angemeldet ohne Freischaltung", Sprung auf `#eintrag-…` nach dem Fix im Browser (Erweiterung war getrennt; per HTML belegt: Ziel steht im ersten HTML).
+    **Live geprüft (einmal, kein Polling):** Gate-Login, `/` 200, `/reviews` 200 mit „Das erste Kapitel wird gerade geschrieben.“, `/umfragen` 200 mit „Gerade läuft keine Runde.“ und „Noch keine Runden.“, `/produkte` 200, `/produkte/gibt-es-nicht` **404**; auf `/reviews` und `/umfragen` keine versteckten Stream-Blöcke mehr.
+    **Lokal im sichtbaren Tab verifiziert:** Klick auf „Ganzen Eintrag lesen“ landet auf `#eintrag-…` (Client-Navigation, Ziel 32 px unter der Oberkante), Startseite: Doppelseite schlägt auf, Zähler laufen 0 → Endwerte.
+    **Nicht verifiziert:** Zustand „angemeldet ohne Freischaltung“ (kein solches Konto lokal).
+    **Befund, vorbestehend aus TP1 (nicht Welle 1):** Dev-Overlay meldet 2 Hydrations-Unterschiede (`style` an `wand-reihe` in `WissenBuendeln.tsx`, `clip-path` an `[data-story=doppelseite]`): `StoryBuehne` setzt GSAP-Styles, bevor React die nachgestreamten Sektionen hydriert. Nicht sichtbar, in Produktion still. Idee: Story-Ziele erst nach Hydrierung animieren oder `suppressHydrationWarning` an den Zielen.
     Abschlussprüfung parallel (Nutzerwunsch): Code-Review-Agent und Design-Review-Agent (Umfang: alle geänderten Oberflächen). Ein Korrekturdurchgang, jeder Fix mit Test RED→GREEN.
     **Nutzerentscheidung:** Suspense-Grenzen auf `/reviews`, `/umfragen`, Produktseite entfernt (Sprung auf den Eintrag, Lesbarkeit ohne JS, echte 404 vor Skeletten). Weitere Fixes: Kopf erst ab lg einzeilig, Fokusring in der Leiste, Badge-Kontrast hell (warning/accent in Tinte), Tabellen-Region, 44-px-Einzellinks, kleinere Doppelseiten-Überschrift auf Unterseiten, eine Phasennamen-Quelle, "freigeschaltet" auf der Startseite, Formular-Hover, lange Namen, Stimmzettel shadow-md.
     **Offen für den Nutzer:** DSGVO-Frage zum Instagram-Reel-iframe (Einwilligung/Zwei-Klick, sobald ein Reel hinterlegt ist). Zurückgestellte Kleinigkeiten und alle Rulings stehen im Ledger bzw. im Plan-Ausführungsprotokoll.
