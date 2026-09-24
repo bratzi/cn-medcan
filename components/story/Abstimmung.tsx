@@ -28,7 +28,7 @@ async function Stimmzettel() {
   if (!geladen) {
     return (
       <p className="max-w-[48ch] border border-border-strong bg-surface-raised p-8 text-body text-text">
-        Die Abstimmung lässt sich gerade nicht laden. Der Rest der Seite funktioniert weiter.
+        Die Abstimmung lässt sich gerade nicht laden. Lade die Seite in ein paar Minuten neu, der Rest funktioniert weiter.
       </p>
     );
   }

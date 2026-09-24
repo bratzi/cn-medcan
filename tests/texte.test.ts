@@ -35,3 +35,17 @@ test("neue Texte ohne Geviertstrich und ohne Gedankenstrich als Trenner", () => 
   }
   assert.deepEqual(treffer, []);
 });
+
+test("Fehlersätze der Startseite nennen einen Ausweg", () => {
+  const ohneAusweg: string[] = [];
+  for (const datei of dateienIn("components/story")) {
+    readFileSync(join(process.cwd(), datei), "utf8")
+      .split("\n")
+      .forEach((zeile, index) => {
+        if (/lässt sich gerade nicht laden/.test(zeile) && !/Lade die Seite in ein paar Minuten neu/.test(zeile)) {
+          ohneAusweg.push(`${datei}:${index + 1}: ${zeile.trim()}`);
+        }
+      });
+  }
+  assert.deepEqual(ohneAusweg, []);
+});

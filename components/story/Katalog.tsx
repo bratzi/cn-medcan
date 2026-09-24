@@ -28,7 +28,7 @@ async function Reihe() {
   if (!liste) {
     return (
       <p className="border border-border bg-surface-raised p-8 text-body text-text">
-        Der Katalog lässt sich gerade nicht laden. Der Rest der Seite funktioniert weiter.
+        Der Katalog lässt sich gerade nicht laden. Lade die Seite in ein paar Minuten neu, der Rest funktioniert weiter.
       </p>
     );
   }

@@ -84,7 +84,7 @@ async function EintragInhalt() {
     console.error("neuesteRedaktionelleReview fehlgeschlagen", fehler);
     return (
       <p className="border border-border bg-surface-raised p-8 text-body text-text">
-        Der neueste Eintrag lässt sich gerade nicht laden. Der Rest der Seite funktioniert weiter.
+        Der neueste Eintrag lässt sich gerade nicht laden. Lade die Seite in ein paar Minuten neu, der Rest funktioniert weiter.
       </p>
     );
   }
