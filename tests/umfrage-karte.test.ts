@@ -3,7 +3,10 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 
-const QUELLE = readFileSync(join(process.cwd(), "components/umfrage/UmfrageKarte.tsx"), "utf8");
+/** Der Stimmzettel und sein Kandidat (seit TP3 eigene Datei, damit er ohne Server Action rendert). */
+const QUELLE = ["components/umfrage/UmfrageKarte.tsx", "components/umfrage/Kandidat.tsx"]
+  .map((datei) => readFileSync(join(process.cwd(), datei), "utf8"))
+  .join("\n");
 
 test("Stimmbalken in Tinte, nicht in Blattgrün", () => {
   assert.doesNotMatch(QUELLE, /bg-accent\b/);

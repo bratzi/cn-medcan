@@ -8,7 +8,9 @@ import { renderToStaticMarkup } from "react-dom/server";
 
 import { Randspalte } from "@/components/story/Randspalte";
 import { StimmzettelSkelett } from "@/components/story/Skelette";
+import { Kandidat, type KandidatProps } from "@/components/umfrage/Kandidat";
 import type { Randnotiz } from "@/lib/query/community";
+import type { UmfrageOptionAnsicht } from "@/lib/query/umfragen";
 
 const lies = (datei: string) => readFileSync(join(process.cwd(), datei), "utf8");
 
@@ -73,4 +75,66 @@ test("Skelett des Stimmzettels hat die Form des Stimmzettels", () => {
   assert.match(html, /data-skelett=""/);
   assert.match(html, /border border-border-strong bg-surface-raised shadow-md/);
   assert.ok((html.match(/bg-surface-sunken/g)?.length ?? 0) >= 4);
+});
+
+function option(teil: Partial<UmfrageOptionAnsicht> = {}): UmfrageOptionAnsicht {
+  return {
+    id: "o1",
+    strainId: "s1",
+    handelsname: "Nebelharz 22 (fiktiv)",
+    slug: "nebelharz-22",
+    reihenfolge: 1,
+    herkunft: "COMMUNITY",
+    istGewinner: false,
+    stimmen: 3,
+    ergebnisReviewId: null,
+    ...teil,
+  };
+}
+
+function kandidat(teil: Partial<KandidatProps> = {}): string {
+  const props: KandidatProps = { option: option(), gesamt: 5, gewaehlt: false, zeigeStimmen: true, ...teil };
+  return renderToStaticMarkup(createElement("ul", null, createElement(Kandidat, props)));
+}
+
+test("Community-Platz: Vermerk „von euch“ von Hand, der Name gedruckt", () => {
+  const html = kandidat();
+  assert.match(html, /<span data-story="vermerk" class="font-hand text-vermerk text-kopierstift">von euch<\/span>/);
+  assert.doesNotMatch(html, /class="stempel"/);
+  const name = /<a [^>]*>Nebelharz 22 \(fiktiv\)<\/a>/.exec(html)?.[0] ?? "";
+  assert.match(name, /\bfont-buch\b/);
+  assert.doesNotMatch(name, /font-hand/);
+});
+
+test("Gesetzter Platz: Stempel, kein Vermerk, keine Handschrift", () => {
+  const html = kandidat({ option: option({ herkunft: "GESETZT", stimmen: null }) });
+  assert.match(html, /class="stempel"/);
+  assert.doesNotMatch(html, /von euch|font-hand/);
+});
+
+test("Eigene Stimme: handgeschriebenes x vor dem Namen, nur als Bild, dazu das Badge", () => {
+  const html = kandidat({ gewaehlt: true });
+  assert.match(
+    html,
+    /<span aria-hidden="true" data-story="vermerk" class="font-hand text-vermerk text-kopierstift">x<\/span><a /,
+  );
+  assert.match(html, /Deine Stimme/);
+});
+
+test("Ohne eigene Stimme kein x", () => {
+  assert.doesNotMatch(kandidat({ gewaehlt: false }), />x</);
+});
+
+test("Das x hängt an derselben Bedingung wie die Zähler: nie in der Vorschlagsphase", () => {
+  assert.match(
+    lies("components/umfrage/UmfrageKarte.tsx"),
+    /const gewaehlteOption = zeigeStimmen && zustand\.art === "ABGESTIMMT" \? zustand\.optionId : null;/,
+  );
+});
+
+test("/umfragen: Community-Überschriften von Hand, ohne Nebel und ohne Drehung", () => {
+  const quelle = lies("app/umfragen/page.tsx");
+  assert.match(quelle, /const HAND_TITEL = "font-hand text-notiz text-kopierstift";/);
+  assert.equal(quelle.match(/className=\{cn\(HAND_TITEL, "self-start"\)\}/g)?.length, 2);
+  assert.doesNotMatch(quelle, /Textur|font-wand|WAND_TITEL|rotate/);
 });

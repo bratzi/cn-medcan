@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { ABSCHNITT_TITEL, Seitenkopf, seitenRahmen } from "@/components/layout/Seitenkopf";
-import { Textur } from "@/components/medien/Textur";
 import { Badge, Blatt, EmptyState, buttonKlassen, namenLinkKlassen, textLinkKlassen } from "@/components/ui";
 import { UmfrageKarte } from "@/components/umfrage/UmfrageKarte";
 import { VorschlagFormular } from "@/components/umfrage/VorschlagFormular";
@@ -29,8 +28,8 @@ export const metadata: Metadata = {
   description: "Laufende und vergangene Runden: Ihr schlagt Sorten vor und wählt, was ich als Nächstes teste.",
 };
 
-/** Wand-Ueberschrift: kurz, Imperativ, in Sprühviolett (Guideline 8). */
-const WAND_TITEL = "font-wand text-tag text-kopierstift";
+/** Handschrift-Überschrift: kurz, Imperativ, in Kopierstift (Spec TP3 10). */
+const HAND_TITEL = "font-hand text-notiz text-kopierstift";
 
 function RundenZeile({ runde }: { runde: UmfrageUebersicht }) {
   return (
@@ -60,8 +59,8 @@ function RundenZeile({ runde }: { runde: UmfrageUebersicht }) {
 }
 
 /**
- * Hier spricht die Wand (Spec TP2 4.2): Tags in Sedgwick, Namen und
- * Begruendungen im Buchstil. Der Stimmzustand entsteht wie auf der
+ * Hier spricht die Community (Spec TP3 10): Überschriften von Hand,
+ * Namen und Begründungen gedruckt. Der Stimmzustand entsteht wie auf der
  * Startseite ueber stimmZustand(); ueber das Schreiben entscheidet die
  * Server Action erneut.
  */
@@ -85,7 +84,7 @@ async function UmfragenInhalt() {
       <section aria-labelledby="runde-titel" className="flex flex-col gap-8">
         {umfrage ? (
           <>
-            <h2 id="runde-titel" className={cn(WAND_TITEL, "-rotate-2 self-start")}>
+            <h2 id="runde-titel" className={cn(HAND_TITEL, "self-start")}>
               {umfrage.phase === "VORSCHLAG" ? "Schlag vor." : "Stimm ab."}
             </h2>
             <UmfrageKarte umfrage={umfrage} zustand={zustand} ort="umfragen" />
@@ -105,12 +104,9 @@ async function UmfragenInhalt() {
 
       {umfrage ? (
         <section id="vorschlaege" aria-labelledby="vorschlaege-titel" className="flex scroll-mt-8 flex-col gap-8">
-          <div className="relative isolate self-start">
-            <Textur id="nebel" weich className="absolute -inset-x-8 -inset-y-4 -z-10 opacity-40" />
-            <h2 id="vorschlaege-titel" className={cn(WAND_TITEL, "-rotate-1")}>
-              Eure Vorschläge.
-            </h2>
-          </div>
+          <h2 id="vorschlaege-titel" className={cn(HAND_TITEL, "self-start")}>
+            Eure Vorschläge.
+          </h2>
 
           {darfVorschlagen ? (
             <Blatt className="max-w-3xl">

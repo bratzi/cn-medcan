@@ -1,13 +1,12 @@
 import Link from "next/link";
 
-import { Textur } from "@/components/medien/Textur";
 import { Badge, buttonKlassen } from "@/components/ui";
-import { namenLinkKlassen } from "@/components/ui/textlink";
+import { Kandidat } from "@/components/umfrage/Kandidat";
 import { StimmFormular } from "@/components/umfrage/StimmFormular";
 import { PHASEN_LABEL } from "@/components/umfrage/phasen";
 import { cn } from "@/lib/cn";
 import { formatiereDatum, formatiereRelativ } from "@/lib/format";
-import type { UmfrageAnsicht, UmfrageOptionAnsicht } from "@/lib/query/umfragen";
+import type { UmfrageAnsicht } from "@/lib/query/umfragen";
 
 const ZAHL_FORMATTER = new Intl.NumberFormat("de-DE");
 
@@ -38,76 +37,6 @@ type Props = {
   className?: string;
   ort?: StimmzettelOrt;
 };
-
-function stimmenAnteil(option: UmfrageOptionAnsicht, gesamt: number): number {
-  if (option.stimmen === null || gesamt <= 0) return 0;
-  return Math.min(Math.max(option.stimmen / gesamt, 0), 1) * 100;
-}
-
-/**
- * Ein Kandidat. Auf dem Stimmzettel spricht das Buch: Handelsnamen in
- * Cormorant (Brand Guideline 10). Gesetzte Plaetze tragen keinen Zaehler
- * und keinen Balken: `stimmen` ist dort `null` ("steht nicht zur Wahl"),
- * nicht `0` ("niemand wollte sie").
- */
-function Kandidat({
-  option,
-  gesamt,
-  gewaehlt,
-  zeigeStimmen,
-}: {
-  option: UmfrageOptionAnsicht;
-  gesamt: number;
-  gewaehlt: boolean;
-  zeigeStimmen: boolean;
-}) {
-  const name = (
-    <Link
-      href={`/produkte/${option.slug}`}
-      className={namenLinkKlassen("min-w-0 font-buch text-h3 font-medium wrap-break-word")}
-      title={option.handelsname}
-    >
-      {option.handelsname}
-    </Link>
-  );
-
-  return (
-    <li className="border-t border-border py-4 first:border-t-0 first:pt-0">
-      <div className="flex flex-wrap items-baseline justify-between gap-2">
-        {option.herkunft === "COMMUNITY" ? (
-          <span className="relative isolate inline-block min-w-0">
-            <Textur id="nebel" story="spruehmarke" weich className="absolute -inset-x-4 -inset-y-2 -z-10 opacity-40" />
-            {name}
-          </span>
-        ) : (
-          name
-        )}
-
-        <span className="flex items-center gap-2">
-          {option.herkunft === "GESETZT" ? (
-            <span className="stempel" title="Von mir gesetzt, nicht zur Wahl gestellt">
-              Gesetzt
-            </span>
-          ) : null}
-          {option.istGewinner ? <Badge variante="success">Gewinner</Badge> : null}
-          {gewaehlt ? <Badge variante="accent">Deine Stimme</Badge> : null}
-          {zeigeStimmen && option.stimmen !== null ? (
-            <span className="numeric text-small text-text">
-              {`${ZAHL_FORMATTER.format(option.stimmen)} ${option.stimmen === 1 ? "Stimme" : "Stimmen"}`}
-            </span>
-          ) : null}
-        </span>
-      </div>
-
-      {zeigeStimmen && option.stimmen !== null ? (
-        <span aria-hidden="true" className="mt-2 flex h-2 w-full overflow-hidden bg-surface-sunken">
-          {/* Datengrafik in Tinte, nicht in Blattgruen: Gruen ist Bedienung. */}
-          <span className="block h-full bg-text" style={{ width: `${stimmenAnteil(option, gesamt)}%` }} />
-        </span>
-      ) : null}
-    </li>
-  );
-}
 
 /** Die Zeile unter den Kandidaten: abstimmen, oder warum nicht. */
 function Aktionsbereich({
@@ -183,9 +112,9 @@ function Aktionsbereich({
 }
 
 /**
- * Die laufende Runde als Stimmzettel an der Wand (Spec TP2 4.2), auf der
- * Startseite und auf /umfragen gleich. Gesetzte Plaetze gestempelt, waehlbare
- * gespruht markiert. Server Component.
+ * Die laufende Runde als Stimmzettel im Buch (Spec TP2 4.2, Spec TP3 8.6),
+ * auf der Startseite und auf /umfragen gleich. Gesetzte Plätze gestempelt,
+ * Community-Plätze von Hand vermerkt (Kandidat.tsx). Server Component.
  */
 export function UmfrageKarte({ umfrage, zustand, className, ort = "startseite" }: Props) {
   const zeigeStimmen = umfrage.phase !== "VORSCHLAG";

@@ -99,6 +99,8 @@ gepusht und live geprüft; Dauerregel: kein lokales Dev-System).
   Schwenk raus.
 - Welle 1, Task 6 erledigt: Schleife (Stationen der Community von Hand, 32 px), „Wähl mit.“ von Hand, Wasserzeichen
   und Drip raus, Stimmzettel-Skelett in Zettelform.
+- Welle 1, Task 7 erledigt: Stimmzettel mit „von euch“ und „x“ von Hand, `Kandidat` eigene Datei,
+  /umfragen-Überschriften von Hand ohne Nebel.
 
 ### 0. Live-Stand und Sessionablauf
 
