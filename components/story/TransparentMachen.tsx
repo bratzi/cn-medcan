@@ -85,7 +85,7 @@ export function TransparentMachen() {
 
         <div data-story="manifest" className="mt-16 flow-root">
           <h2 id="transparent-titel" data-manifest-zeile="" className="font-buch text-manifest text-text text-balance">
-            Hinter jedem Handelsnamen steckt eine <em className="italic text-accent">Charge.</em> Wir schreiben auf, was
+            Hinter jedem Handelsnamen steckt eine <em className="farbverlauf italic">Charge.</em> Wir schreiben auf, was
             drin ist.
           </h2>
           <Punkt punkt={PUNKTE[0]} />

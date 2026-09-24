@@ -10,7 +10,7 @@ export function Apotheken() {
       <Schlagwort satz="wo es das gibt" />
       <div className="mx-auto flex w-full max-w-360 flex-col items-start gap-6 border-t border-border pt-12">
         <h2 id="apotheken-titel" className="font-buch text-kapitel text-text">
-          Apotheken
+          <em className="farbverlauf italic">Apotheken</em>
         </h2>
         <p className="max-w-[56ch] text-body text-text-muted text-pretty">
           Zu jeder gelisteten Versandapotheke stehen Standort, Lieferzeit, akzeptierte Rezeptarten

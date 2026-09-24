@@ -62,7 +62,7 @@ export function Abstimmung() {
       <div className="mx-auto grid w-full max-w-360 grid-cols-1 gap-12 lg:grid-cols-[2fr_3fr] lg:items-start">
         <div className="flex flex-col items-start gap-6">
           <h2 id="abstimmung-titel" className="font-buch text-kapitel text-text text-balance">
-            Was testen wir als Nächstes?
+            Was testen wir als <em className="farbverlauf italic">Nächstes?</em>
           </h2>
           <p data-story="waehl-mit" className="font-hand text-notiz text-kopierstift">
             Wähl mit.

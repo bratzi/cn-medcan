@@ -65,12 +65,12 @@ async function Reihe() {
 export function Katalog() {
   return (
     <section aria-labelledby="katalog-titel" data-story="katalog" className="relative isolate overflow-x-clip px-4 py-24 sm:px-8 sm:py-32">
-      <Schlagwort satz="alles im Blick" />
+      <Schlagwort satz="alles im Blick" ton="gruen" />
       <div className="mx-auto flex w-full max-w-360 flex-col gap-8">
         <div className="flex flex-wrap items-end justify-between gap-6">
           <div className="flex max-w-2xl flex-col gap-4">
             <h2 id="katalog-titel" className="font-buch text-kapitel text-text">
-              Der Katalog
+              Der <em className="farbverlauf italic">Katalog</em>
             </h2>
             <p className="text-body text-text-muted text-pretty">
               Verschreibungspflichtige Cannabisarzneimittel nach ihren BfArM-Handelsnamen, mit

@@ -48,10 +48,10 @@ export function NeuesterEintrag() {
       data-story="eintrag"
       className="relative isolate overflow-x-clip bg-surface-sunken px-4 py-24 sm:px-8 sm:py-32"
     >
-      <Schlagwort satz="frisch probiert" />
+      <Schlagwort satz="frisch probiert" ton="gruen" />
       <div className="mx-auto flex w-full max-w-360 flex-col gap-12">
         <h2 id="eintrag-titel" className="font-buch text-kapitel text-text">
-          Der neueste Eintrag
+          Der <em className="farbverlauf italic">neueste</em> Eintrag
         </h2>
         <Suspense fallback={<DoppelseitenSkelett />}>
           <EintragInhalt />

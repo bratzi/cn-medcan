@@ -65,7 +65,7 @@ Komponenten nutzen nur semantische Tokens:
 - `accent` (Blattgrün) ist der einzige Bedienakzent, **ohne Ausnahme**: Buttons, Links, aktive
   Zustände, Fokus. Genau eine gefüllte Primäraktion pro Ansicht. Hover über `accent-hover`, nicht über
   Deckkraft.
-- `kopierstift` nur für Handschrift und Wortmarke; nie auf Buttons, Links oder Fokus. Gemessen auf
+- `kopierstift` für Handschrift, Wortmarke und seit Redesign 12 für `.farbverlauf` (je ein Schlüsselwort pro Überschrift, Grün, Lila, Grün) und die Buzz-Sätze (abwechselnd `ton="gruen"`/`"lila"`, `opacity-15`); nie auf Buttons, Links oder Fokus. Gemessen auf
   `surface`, `surface-raised` und `surface-sunken` (jeweils ≥ 4.5 in beiden Modi).
 - Datengrafiken in `text`/`text-muted` (Linie plus Fläche mit geringer Deckkraft), nicht in `accent`.
 - Verboten in Komponenten: Primitives (`blatt-*`, `violett-*`, `neutral-*`), Hex, `oklch()`,

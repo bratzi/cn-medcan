@@ -506,3 +506,15 @@
   color: var(--color-text);
   background-color: var(--color-surface);
 }
+
+/* Farbverlauf Grün, Lila, Grün (Spec Redesign 12) für je ein Schlüsselwort
+   einer Überschrift. Beide Enden tragen >= 4.5 auf surface, der Verlauf also
+   auch. Ohne background-clip-Unterstützung bleibt die Farbe accent. */
+.farbverlauf {
+  color: var(--color-accent);
+  background-image: linear-gradient(90deg, var(--color-accent), var(--color-kopierstift) 55%, var(--color-accent));
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  padding-inline-end: 0.08em;
+}
