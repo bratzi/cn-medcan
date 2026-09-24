@@ -1,20 +1,18 @@
 import { unstable_rethrow } from "next/navigation";
 import { Suspense } from "react";
 
-import { Textur } from "@/components/medien/Textur";
-import { WandSkelett } from "@/components/story/Skelette";
-import { wandTags, type CommunityZahlen } from "@/lib/query/community";
+import { Randspalte } from "@/components/story/Randspalte";
+import { RandspaltenSkelett } from "@/components/story/Skelette";
+import { randnotizen, type CommunityZahlen } from "@/lib/query/community";
 import { communityZahlen } from "@/lib/query/umfragen";
 
-const DREHUNG = ["-rotate-3", "rotate-2", "-rotate-1"] as const;
-const TEXTUR = ["nebel", "marmor", "nebel"] as const;
-
 /**
- * Die Tags der Wand: echte Zähler oder, wenn es nichts zu zählen gibt oder
- * die Abfrage scheitert, die drei Leitsätze (Spec 5.2). Ein Fehler hier darf
- * die Seite nicht kosten; Next-interne Unterbrechungen gehen trotzdem durch.
+ * Die Notizen der Randspalte: echte Zähler oder, wenn es nichts zu zählen
+ * gibt oder die Abfrage scheitert, die drei Leitsätze (Spec 5.2). Ein Fehler
+ * hier darf die Seite nicht kosten; Next-interne Unterbrechungen gehen
+ * trotzdem durch.
  */
-async function WandReihe() {
+async function RandspaltenInhalt() {
   let zahlen: CommunityZahlen | null = null;
   try {
     zahlen = await communityZahlen();
@@ -22,35 +20,29 @@ async function WandReihe() {
     unstable_rethrow(fehler);
     console.error("communityZahlen fehlgeschlagen", fehler);
   }
-
-  return (
-    <ul data-story="wand-reihe" className="wand-reihe flex flex-wrap items-center gap-x-16 gap-y-8">
-      {wandTags(zahlen).map((text, index) => (
-        <li key={text} data-story="wand-tag" className="relative isolate">
-          <Textur id={TEXTUR[index % TEXTUR.length]} weich className="absolute -inset-8 -z-10 opacity-30" />
-          <span className={`block font-wand text-tag text-kopierstift ${DREHUNG[index % DREHUNG.length]}`}>{text}</span>
-        </li>
-      ))}
-    </ul>
-  );
+  return <Randspalte notizen={randnotizen(zahlen)} />;
 }
 
-/** Sektion 3 (Spec 5.1): die Wand, erster Bruch in der Story. */
+/**
+ * Sektion 3 (Spec TP3 8.3): eine Buchseite mit Randspalte. Links der
+ * gedruckte Satz, ab lg rechts die Randnotizen der Community; darunter
+ * stehen sie direkt unter dem Satz. Grund ist das Papier, kein Schwenk.
+ */
 export function WissenBuendeln() {
   return (
     <section
       aria-labelledby="wissen-titel"
-      data-story="wand"
+      data-story="wissen"
       data-story-vorhang=""
-      className="relative overflow-hidden bg-surface-sunken px-4 py-24 sm:px-8 sm:py-32"
+      className="relative px-4 py-24 sm:px-8 sm:py-32"
     >
-      <div className="mx-auto w-full max-w-360">
+      <div className="mx-auto grid w-full max-w-360 grid-cols-1 gap-12 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)] lg:gap-16">
         <h2 id="wissen-titel" className="max-w-4xl font-buch text-kapitel text-text text-balance">
           Einer allein weiß wenig. Hier sammelt sich, was viele erfahren.
         </h2>
-        <div className="mt-16">
-          <Suspense fallback={<WandSkelett />}>
-            <WandReihe />
+        <div className="lg:border-s lg:border-border lg:ps-8">
+          <Suspense fallback={<RandspaltenSkelett />}>
+            <RandspaltenInhalt />
           </Suspense>
         </div>
       </div>

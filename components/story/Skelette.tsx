@@ -10,13 +10,13 @@ export function SkelettAnsage({ text }: { text: string }) {
   return <span className="sr-only">{text}</span>;
 }
 
-export function WandSkelett() {
+export function RandspaltenSkelett() {
   return (
-    <div role="status" data-skelett="" className="flex flex-wrap gap-8">
+    <div role="status" data-skelett="" className="flex flex-col gap-8">
       <SkelettAnsage text="Zahlen werden geladen" />
-      <span aria-hidden="true" className={`${SKELETT_FLAECHE} h-20 w-64`} />
-      <span aria-hidden="true" className={`${SKELETT_FLAECHE} h-20 w-56 -rotate-2`} />
-      <span aria-hidden="true" className={`${SKELETT_FLAECHE} h-20 w-48 rotate-1`} />
+      {["w-48", "w-56", "w-40"].map((breite) => (
+        <span key={breite} aria-hidden="true" className={`${SKELETT_FLAECHE} h-12 ${breite}`} />
+      ))}
     </div>
   );
 }

@@ -261,7 +261,7 @@ export async function umfragenUebersicht(limit = MAX_UMFRAGEN): Promise<UmfrageU
 }
 
 /**
- * Drei Zaehler fuer die Wand der Startseite (Spec 5.3).
+ * Drei Zaehler fuer die Randspalte der Startseite (Spec 5.3, Spec TP3 8.3).
  *
  * Eine Abfrage mit drei Unterabfragen statt drei `count()`: jede Query ist
  * ein Sub-Request. Tabellennamen wie in den @@map-Angaben des Schemas.

@@ -443,14 +443,6 @@
     font-size: clamp(12rem, 45vw, 40rem);
     line-height: 0.8;
   }
-
-  /* Schwenk der Wand ab Tablet; die Klasse setzt die StoryBuehne (Spec 5.1, Sektion 3). */
-  .ist-schwenk .wand-reihe {
-    flex-wrap: nowrap;
-    width: max-content;
-    column-gap: 20vw;
-    padding-inline: 10vw;
-  }
 }
 
 @media (prefers-color-scheme: dark) {

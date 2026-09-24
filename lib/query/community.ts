@@ -1,10 +1,11 @@
 /**
- * Community-Zahlen fuer die Wand der Startseite (Spec 5.3), ohne
- * Datenbankzugriff und ohne "server-only": die reine Zuordnung ist so
- * testbar. Die Abfrage selbst steht in lib/query/umfragen.ts.
+ * Community-Zahlen für die Randspalte der Startseite (Spec 5.3, Spec TP3
+ * 8.3), ohne Datenbankzugriff und ohne "server-only": die reine Zuordnung
+ * ist so testbar. Die Abfrage selbst steht in lib/query/umfragen.ts.
  *
- * Bewusst nur Zaehler: Vorschlaege tragen Handelsnamen und unmoderierten
- * Freitext, beides gehoert nicht als Graffiti auf die Startseite (Spec 2).
+ * Bewusst nur Zähler: Vorschläge tragen Handelsnamen und unmoderierten
+ * Freitext, beides gehört nicht in Handschrift auf die Startseite
+ * (Leitplanke 4).
  */
 
 export type CommunityZahlen = {
@@ -15,10 +16,11 @@ export type CommunityZahlen = {
 
 type Zeile = Partial<Record<keyof CommunityZahlen, unknown>>;
 
-/** Die Leitsaetze der Wand, wenn es noch nichts zu zaehlen gibt (Spec 5.2). */
-export const LEITSAETZE = ["Schlag vor.", "Stimm ab.", "Lies mit."] as const;
+/** Eine Randnotiz: Zahl gedruckt, Wort von Hand. Ohne Zahl ist sie ein Leitsatz. */
+export type Randnotiz = { zahl: number | null; wort: string };
 
-const ZAHL = new Intl.NumberFormat("de-DE");
+/** Die Leitsätze der Randspalte, wenn es noch nichts zu zählen gibt (Spec 5.2). */
+export const LEITSAETZE = ["Schlag vor.", "Stimm ab.", "Lies mit."] as const;
 
 /** D1 liefert COUNT je nach Adapter als number, bigint oder string. */
 function alsZahl(wert: unknown): number {
@@ -41,12 +43,16 @@ export function hatCommunityZahlen(zahlen: CommunityZahlen): boolean {
   return zahlen.stimmen + zahlen.vorschlaege + zahlen.runden > 0;
 }
 
-/** Die Tags der Wand: echte Zahlen, oder die Leitsaetze, wenn alles 0 ist oder die Abfrage fehlschlug. */
-export function wandTags(zahlen: CommunityZahlen | null): string[] {
-  if (!zahlen || !hatCommunityZahlen(zahlen)) return [...LEITSAETZE];
+/**
+ * Die Notizen der Randspalte: Zahl und Wort getrennt, Einzahl bei 1
+ * (Spec TP3 12). Die Leitsätze, wenn alles 0 ist oder die Abfrage
+ * fehlschlug.
+ */
+export function randnotizen(zahlen: CommunityZahlen | null): Randnotiz[] {
+  if (!zahlen || !hatCommunityZahlen(zahlen)) return LEITSAETZE.map((wort) => ({ zahl: null, wort }));
   return [
-    `${ZAHL.format(zahlen.stimmen)} ${zahlen.stimmen === 1 ? "Stimme" : "Stimmen"}`,
-    `${ZAHL.format(zahlen.vorschlaege)} ${zahlen.vorschlaege === 1 ? "Vorschlag" : "Vorschläge"}`,
-    `${ZAHL.format(zahlen.runden)} ${zahlen.runden === 1 ? "Runde" : "Runden"}`,
+    { zahl: zahlen.stimmen, wort: zahlen.stimmen === 1 ? "Stimme" : "Stimmen" },
+    { zahl: zahlen.vorschlaege, wort: zahlen.vorschlaege === 1 ? "Vorschlag" : "Vorschläge" },
+    { zahl: zahlen.runden, wort: zahlen.runden === 1 ? "Runde" : "Runden" },
   ];
 }

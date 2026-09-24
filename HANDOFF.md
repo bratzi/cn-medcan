@@ -95,6 +95,8 @@ gepusht und live geprüft; Dauerregel: kein lokales Dev-System).
   Charge“, Tag und Drip im Auftakt raus, Einstieg per CSS.
 - Welle 1, Task 4 erledigt: Fuß mit angeschnittener Wortmarke statt „gb“-Tag, kleine Wortmarke im Fuß entfällt,
   `schreiben.ts` als gemeinsamer Ablauf.
+- Welle 1, Task 5 erledigt: Wissen bündeln als Seite mit Randspalte (Zahl gedruckt, Wort von Hand), `wand.ts` und
+  Schwenk raus.
 
 ### 0. Live-Stand und Sessionablauf
 

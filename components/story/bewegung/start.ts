@@ -2,25 +2,24 @@ import { abstimmung } from "./abstimmung";
 import { auftakt } from "./auftakt";
 import { eintrag } from "./eintrag";
 import { beobachteLoops } from "./loops";
+import { randnotizen } from "./randnotizen";
 import { schleife } from "./schleife";
 import { schluss } from "./schluss";
 import { transparent } from "./transparent";
 import { vorhang } from "./vorhang";
-import { wand } from "./wand";
 import type { Choreografie, Werkzeug } from "./typen";
 
 /**
  * Scroll-Ablaeufe der Sektionen 2 bis 9. Sie starten erst, wenn kein
  * Skelett mehr steht: sonst messen sie eine Seite, deren Hoehe sich noch
- * aendert. Tasks 14 und 15 tragen hier ein.
+ * aendert.
  *
- * Reihenfolge = Seitenreihenfolge: ScrollTrigger misst in Anlegereihenfolge,
- * und alles unterhalb des Wand-Pins muss nach dem Pin entstehen. Der Vorhang
- * steht deshalb zuletzt, er deckt auch die Abstimmung unter dem Pin auf.
+ * Reihenfolge = Seitenreihenfolge: ScrollTrigger misst in Anlegereihenfolge.
+ * Der Vorhang steht zuletzt; er deckt Sektion 3 und die Abstimmung auf.
  */
 const SCROLL_CHOREOGRAFIEN: readonly Choreografie[] = [
   transparent,
-  wand,
+  randnotizen,
   schleife,
   eintrag,
   abstimmung,

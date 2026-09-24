@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { readdirSync, readFileSync, statSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
 
 import { SCHREIBEN_AB, SCHREIBEN_BIS } from "@/components/story/bewegung/schreiben";
@@ -59,4 +59,19 @@ test("Schreiben: dieselben Ränder in GSAP und CSS, am Ende kein Schnitt", () =>
   assert.ok(css.includes(`clip-path: ${SCHREIBEN_BIS.clipPath};`), "Endrand fehlt in @keyframes schreiben");
   assert.equal(SCHREIBEN_BIS.clearProps, "clipPath");
   assert.ok(SCHREIBEN_BIS.duration >= 0.6 && SCHREIBEN_BIS.duration <= 0.9, `${SCHREIBEN_BIS.duration} s`);
+});
+
+test("Randspalte ohne Schwenk und Pin: wand.ts ist weg (Spec TP3 8.3)", () => {
+  assert.equal(existsSync(join("components", "story", "bewegung", "wand.ts")), false);
+  const start = readFileSync(join("components", "story", "bewegung", "start.ts"), "utf8");
+  assert.match(start, /\brandnotizen\b/);
+  assert.doesNotMatch(start, /\bwand\b/);
+  assert.doesNotMatch(css, /ist-schwenk|wand-reihe/);
+});
+
+test("Randzahlen haben ein eigenes Attribut, data-zaehler bleibt der Doppelseite", () => {
+  const ablauf = readFileSync(join("components", "story", "bewegung", "randnotizen.ts"), "utf8");
+  assert.match(ablauf, /"\[data-randzahl\]"/);
+  assert.doesNotMatch(ablauf, /data-zaehler/);
+  assert.doesNotMatch(readFileSync(join("components", "story", "Randspalte.tsx"), "utf8"), /data-zaehler/);
 });
