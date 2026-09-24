@@ -1,13 +1,21 @@
 import { auftakt } from "./auftakt";
 import { beobachteLoops } from "./loops";
+import { schleife } from "./schleife";
+import { transparent } from "./transparent";
+import { vorhang } from "./vorhang";
+import { wand } from "./wand";
 import type { Choreografie, Werkzeug } from "./typen";
 
 /**
  * Scroll-Ablaeufe der Sektionen 2 bis 9. Sie starten erst, wenn kein
  * Skelett mehr steht: sonst messen sie eine Seite, deren Hoehe sich noch
  * aendert. Tasks 14 und 15 tragen hier ein.
+ *
+ * Reihenfolge = Seitenreihenfolge: ScrollTrigger misst in Anlegereihenfolge,
+ * und alles unterhalb des Wand-Pins muss nach dem Pin entstehen. Der Vorhang
+ * steht deshalb zuletzt, er deckt auch die Abstimmung unter dem Pin auf.
  */
-const SCROLL_CHOREOGRAFIEN: readonly Choreografie[] = [];
+const SCROLL_CHOREOGRAFIEN: readonly Choreografie[] = [transparent, wand, schleife, vorhang];
 
 function wennInhaltGeladen(los: () => void): () => void {
   const fertig = () => document.querySelector("[data-skelett]") === null;
