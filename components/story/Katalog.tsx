@@ -60,7 +60,7 @@ async function Reihe() {
   );
 }
 
-/** Sektion 7 (Spec 5.1): ruhiges Buch nach der Wand. */
+/** Sektion 7 (Spec 5.1): ruhiges Buch nach der Abstimmung. */
 export function Katalog() {
   return (
     <section aria-labelledby="katalog-titel" data-story="katalog" className="px-4 py-24 sm:px-8 sm:py-32">

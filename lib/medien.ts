@@ -9,7 +9,7 @@
  * Reine Daten, keine Abhaengigkeit: das Modul liegt im Request-Pfad.
  */
 
-export type MedienArt = "foto" | "maske" | "video";
+export type MedienArt = "foto" | "video";
 
 export type Medium = {
   /** Schluessel, unter dem Komponenten das Medium anfordern. */
@@ -21,17 +21,14 @@ export type Medium = {
   /** Masse des Originals: Seitenverhaeltnis fuer width/height, damit nichts springt. */
   breite: number;
   hoehe: number;
-  /** Pflicht bei Fotos. Masken und Videos sind dekorativ und bleiben leer. */
+  /** Pflicht bei Fotos. Videos sind dekorativ und bleiben leer. */
   alt: string;
   urheber: string;
   /** Pexels-Seite des Motivs. */
   quelle: string;
-  /** Nur Masken: helle Farbe auf dunklem Grund statt dunkel auf hell. */
-  maskeUmkehren?: boolean;
 };
 
 export const FOTO_BREITEN = [640, 1280, 1920] as const;
-export const MASKEN_BREITE = 960;
 /** Kante des quadratischen Video-Standbilds: der Loop steht in einem Fenster bis 288 px, Retina 2x. */
 export const STANDBILD_BREITE = 576;
 
@@ -81,41 +78,6 @@ export const MEDIEN: readonly Medium[] = [
     quelle: "https://www.pexels.com/photo/close-up-of-frosty-cannabis-bud-30439065/",
   },
   {
-    id: "drip",
-    art: "maske",
-    pexelsId: 4862581,
-    datei: "drip",
-    breite: 3750,
-    hoehe: 2500,
-    alt: "",
-    urheber: "Aleksandar Pasaric",
-    quelle: "https://www.pexels.com/photo/yellow-paint-dripping-on-orange-surface-4862581/",
-    // Gelbe Farbe laeuft ueber orangem Grund: die Farbe ist heller als der Grund.
-    maskeUmkehren: true,
-  },
-  {
-    id: "nebel",
-    art: "maske",
-    pexelsId: 1193879,
-    datei: "nebel",
-    breite: 5184,
-    hoehe: 3456,
-    alt: "",
-    urheber: "Dan Cristian Pădureț",
-    quelle: "https://www.pexels.com/photo/yellow-green-and-red-abstract-painting-1193879/",
-  },
-  {
-    id: "marmor",
-    art: "maske",
-    pexelsId: 33199141,
-    datei: "marmor",
-    breite: 3648,
-    hoehe: 5472,
-    alt: "",
-    urheber: "Landiva Weber",
-    quelle: "https://www.pexels.com/photo/abstract-marble-texture-in-purple-and-gray-hues-33199141/",
-  },
-  {
     id: "pflanze-loop",
     art: "video",
     pexelsId: 12361112,
@@ -145,8 +107,6 @@ export function dateienVon(m: Medium): string[] {
   switch (m.art) {
     case "foto":
       return fotoBreiten(m).map((breite) => `${m.datei}-${breite}.webp`);
-    case "maske":
-      return [`${m.datei}-maske.png`];
     case "video":
       return [`${m.datei}.mp4`, `${m.datei}-standbild.webp`];
   }

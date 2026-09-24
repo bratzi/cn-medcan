@@ -1,8 +1,8 @@
 import type { Choreografie } from "./typen";
 
 /**
- * Bruch in der Story: die Wand-Sektionen werden per clip-path von oben
- * aufgedeckt (Spec 4.6), gekoppelt an den Scrollweg beim Eintritt.
+ * Sektionswechsel als Vorhang: Sektionen mit data-story-vorhang werden per
+ * clip-path von oben aufgedeckt (Spec 4.6), gekoppelt an den Scrollweg beim Eintritt.
  */
 export const vorhang: Choreografie = ({ gsap }) => {
   for (const sektion of gsap.utils.toArray<HTMLElement>("[data-story-vorhang]")) {

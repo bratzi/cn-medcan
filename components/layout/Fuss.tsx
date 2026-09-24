@@ -6,7 +6,7 @@ import { HAUPTNAVIGATION, KONTO_LINK } from "@/lib/navigation";
 
 const LINKS = [...HAUPTNAVIGATION, KONTO_LINK];
 
-const ART_LABEL: Record<MedienArt, string> = { foto: "Foto", maske: "Textur", video: "Video" };
+const ART_LABEL: Record<MedienArt, string> = { foto: "Foto", video: "Video" };
 
 const TEXTLINK =
   "inline-flex min-h-11 items-center text-small text-accent underline underline-offset-4 " +

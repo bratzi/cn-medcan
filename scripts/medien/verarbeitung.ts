@@ -41,39 +41,6 @@ export async function zuGraustufenWebp(eingabe: Buffer, breite: number): Promise
 }
 
 /**
- * Wand-Textur als Alpha-Maske: Luminanz wird Deckkraft (Spec 4.5).
- * Dunkle Farbe auf hellem Grund wird deckend; mit `umkehren` helle Farbe
- * auf dunklem Grund. `normalise` spreizt den Tonwertumfang, damit auch
- * blasse Farbe eine kraeftige Maske ergibt. Die Farbe selbst bleibt
- * schwarz: eingefaerbt wird per CSS (`.wand-textur`).
- */
-export async function zuMaskePng(eingabe: Buffer, breite: number, umkehren = false): Promise<Buffer> {
-  const { data, info } = await sharp(eingabe)
-    .rotate()
-    // 3:2 aus der Mitte: die Texturen liegen hinter breiten, flachen Elementen;
-    // ein hochformatiges Original waere zum groessten Teil unsichtbar mitgeladen.
-    .resize({ width: breite, height: Math.round((breite * 2) / 3), fit: "cover", withoutEnlargement: true })
-    .grayscale()
-    .normalise()
-    .raw()
-    .toBuffer({ resolveWithObject: true });
-
-  const pixel = info.width * info.height;
-  const rgba = Buffer.alloc(pixel * 4);
-  for (let i = 0; i < pixel; i++) {
-    const helligkeit = data[i * info.channels];
-    const deckkraft = umkehren ? helligkeit : 255 - helligkeit;
-    // 16 Stufen (Vielfache von 17): sichtbar gleich, aber das Korn des Fotos
-    // blaeht die PNG nicht mehr auf (Nebel und Marmor sonst 0,5 bis 1 MB).
-    rgba[i * 4 + 3] = Math.round(deckkraft / 17) * 17;
-  }
-
-  return sharp(rgba, { raw: { width: info.width, height: info.height, channels: 4 } })
-    .png({ compressionLevel: 9, palette: true })
-    .toBuffer();
-}
-
-/**
  * Standbild eines Videos als Quadrat aus der Mitte, in Graustufen. Der Loop
  * erscheint nur in einem quadratischen Fenster (object-cover); alles darueber
  * hinaus waere mitgeladen, aber nie zu sehen.

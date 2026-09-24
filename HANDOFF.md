@@ -101,6 +101,8 @@ gepusht und live geprüft; Dauerregel: kein lokales Dev-System).
   und Drip raus, Stimmzettel-Skelett in Zettelform.
 - Welle 1, Task 7 erledigt: Stimmzettel mit „von euch“ und „x“ von Hand, `Kandidat` eigene Datei,
   /umfragen-Überschriften von Hand ohne Nebel.
+- Welle 1, Task 8 erledigt: Sedgwick, SprayFilter, Textur, Masken (drip, nebel, marmor) und alte Tokens entfernt; Suche
+  nach Wand-Resten in app/components/lib als Test.
 
 ### 0. Live-Stand und Sessionablauf
 

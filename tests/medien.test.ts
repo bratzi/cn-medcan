@@ -25,8 +25,7 @@ test("Fotos liegen in drei Breiten vor, nie breiter als das Original", () => {
   assert.deepEqual(dateienVon(beispiel("foto", 500)), ["x-500.webp"]);
 });
 
-test("Masken und Videos haben feste Dateinamen", () => {
-  assert.deepEqual(dateienVon(beispiel("maske")), ["x-maske.png"]);
+test("Videos haben feste Dateinamen", () => {
   assert.deepEqual(dateienVon(beispiel("video")), ["x.mp4", "x-standbild.webp"]);
 });
 

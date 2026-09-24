@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { readdirSync, readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
 
 import { createElement } from "react";
@@ -116,4 +116,38 @@ test("Fuß: die Wortmarke läuft angeschnitten aus, kein Tag, kein zweiter Name"
   assert.match(css, /\.fuss-marke\s*\{[^}]*margin-bottom:\s*-0\.35em/);
   assert.doesNotMatch(css, /\.fuss-tag/);
   assert.match(lies("components/story/bewegung/schluss.ts"), /data-story="fuss-marke"/);
+});
+
+function quellen(ordner: string): string[] {
+  return readdirSync(ordner).flatMap((name) => {
+    const pfad = join(ordner, name);
+    if (statSync(pfad).isDirectory()) return name === "generated" ? [] : quellen(pfad);
+    return /\.(ts|tsx|css)$/.test(name) ? [pfad] : [];
+  });
+}
+
+const QUELLEN = ["app", "components", "lib"].flatMap(quellen);
+
+test("keine Reste von Wand und Graffiti in app, components, lib (Spec TP3 15.2)", () => {
+  const treffer = QUELLEN.flatMap((pfad) =>
+    readFileSync(pfad, "utf8")
+      .split("\n")
+      .flatMap((zeile, index) =>
+        /font-wand|sedgwick|spray|textur|text-tag\b|text-auftakt|text-wortmarke|gb-/i.test(zeile)
+          ? [`${pfad}:${index + 1}: ${zeile.trim()}`]
+          : [],
+      ),
+  );
+  assert.deepEqual(treffer, []);
+});
+
+test("Handschrift nur in den Handschrift-Graden: nie unter 32 px (Spec TP3 15.3)", () => {
+  const GRAD = /text-(marke|umschlag|notiz|vermerk)\b/;
+  const treffer = QUELLEN.filter((pfad) => /\.tsx?$/.test(pfad) && !pfad.endsWith(join("marke", "Wortmarke.tsx")))
+    .flatMap((pfad) =>
+      readFileSync(pfad, "utf8")
+        .split("\n")
+        .flatMap((zeile, index) => (zeile.includes("font-hand") && !GRAD.test(zeile) ? [`${pfad}:${index + 1}`] : [])),
+    );
+  assert.deepEqual(treffer, []);
 });

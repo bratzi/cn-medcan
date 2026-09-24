@@ -4,11 +4,9 @@ import {
   Geist,
   Geist_Mono,
   Inspiration,
-  Sedgwick_Ave_Display,
 } from "next/font/google";
 import { Fuss } from "@/components/layout/Fuss";
 import { Kopf } from "@/components/layout/Kopf";
-import { SprayFilter } from "@/components/marke/SprayFilter";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -26,14 +24,6 @@ const cormorant = Cormorant_Garamond({
   variable: "--font-cormorant",
   subsets: ["latin"],
   style: ["normal", "italic"],
-  display: "swap",
-});
-
-/** Nur die Wand. Ein Schnitt, eine Datei. */
-const sedgwick = Sedgwick_Ave_Display({
-  variable: "--font-sedgwick",
-  subsets: ["latin"],
-  weight: "400",
   display: "swap",
 });
 
@@ -60,10 +50,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="de"
-      className={`${geistSans.variable} ${geistMono.variable} ${cormorant.variable} ${sedgwick.variable} ${inspiration.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} ${cormorant.variable} ${inspiration.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        <SprayFilter />
         <a
           href="#inhalt"
           className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:inline-flex focus:h-11 focus:items-center focus:rounded-full focus:bg-accent focus:px-4 focus:text-small focus:font-medium focus:text-accent-fg"

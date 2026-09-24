@@ -4,7 +4,6 @@ import assert from "node:assert/strict";
 import { createElement, Fragment } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 
-import { Textur } from "@/components/medien/Textur";
 import { Badge, type BadgeProps } from "@/components/ui/Badge";
 import { buttonKlassen } from "@/components/ui/Button";
 import { Blatt } from "@/components/ui/Blatt";
@@ -48,13 +47,6 @@ test("Badge bricht als Pille nicht um", () => {
   const html = renderToStaticMarkup(createElement(Badge, null, "1 Apotheke"));
   assert.match(html, /\brounded-full\b/);
   assert.match(html, /\bwhitespace-nowrap\b/);
-});
-
-test("Textur weich: zweite Maskenebene blendet die Kanten aus", () => {
-  const html = renderToStaticMarkup(createElement(Textur, { id: "nebel", weich: true }));
-  assert.match(html, /radial-gradient/);
-  assert.match(html, /mask-composite:intersect/);
-  assert.doesNotMatch(renderToStaticMarkup(createElement(Textur, { id: "nebel" })), /radial-gradient/);
 });
 
 test("Textlinks: Blattgrün mit Unterstrich, Hover über Farbe", () => {

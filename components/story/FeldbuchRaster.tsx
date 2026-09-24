@@ -2,7 +2,7 @@
  * Feines Spaltenraster und blasse Randnotizen hinter der Startseite
  * (Spec 4.7). Trägt keine Information, deshalb vollständig aria-hidden.
  * Die Notizen stehen in Cormorant kursiv wie Bleistift im Feldbuch, nicht
- * in Sedgwick: sie sind die Stimme des Buchs, nicht der Wand.
+ * in Handschrift: sie sind die Stimme des Buchs, nicht der Community.
  */
 const RANDNOTIZEN = [
   { text: "Ch. 24-117", links: "6%", oben: "14%", drehung: "-rotate-3" },

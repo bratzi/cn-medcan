@@ -9,7 +9,6 @@ import { existsSync, mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
 import {
-  MASKEN_BREITE,
   MEDIEN,
   STANDBILD_BREITE,
   dateienVon,
@@ -17,7 +16,7 @@ import {
   type Medium,
 } from "../../lib/medien";
 import { ladeDatei, pexelsJson, pexelsKey } from "./pexels";
-import { waehleSdVideo, zuGraustufenWebp, zuMaskePng, zuStandbildWebp, type PexelsVideoDatei } from "./verarbeitung";
+import { waehleSdVideo, zuGraustufenWebp, zuStandbildWebp, type PexelsVideoDatei } from "./verarbeitung";
 
 const ZIEL = join(process.cwd(), "public", "medien");
 
@@ -35,10 +34,6 @@ async function bild(m: Medium, key: string) {
     key,
   );
   const original = await ladeDatei(daten.src.original + ORIGINAL_PARAMETER);
-  if (m.art === "maske") {
-    schreibe(`${m.datei}-maske.png`, await zuMaskePng(original, MASKEN_BREITE, m.maskeUmkehren));
-    return;
-  }
   for (const breite of fotoBreiten(m)) {
     schreibe(`${m.datei}-${breite}.webp`, await zuGraustufenWebp(original, breite));
   }
