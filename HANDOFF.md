@@ -89,6 +89,8 @@ gepusht und live geprüft; Dauerregel: kein lokales Dev-System).
 
 - Welle 1, Task 1 erledigt: Sprühviolett heißt Kopierstift (`violett-*`, `kopierstift*`), neue Paare gemessen
   (surface-raised 5.53/6.88, surface-sunken 4.61/7.66).
+- Welle 1, Task 2 erledigt: Inspiration geladen, Handschrift-Grade `text-marke`, `text-umschlag`, `text-notiz`,
+  `text-vermerk` (neu, 32 px).
 
 ### 0. Live-Stand und Sessionablauf
 

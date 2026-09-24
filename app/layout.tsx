@@ -3,6 +3,7 @@ import {
   Cormorant_Garamond,
   Geist,
   Geist_Mono,
+  Inspiration,
   Sedgwick_Ave_Display,
 } from "next/font/google";
 import { Fuss } from "@/components/layout/Fuss";
@@ -36,6 +37,15 @@ const sedgwick = Sedgwick_Ave_Display({
   display: "swap",
 });
 
+/** Handschrift (Spec TP3 4): Wortmarke und Randnotizen. Ein Schnitt, eine Datei. */
+const inspiration = Inspiration({
+  variable: "--font-inspiration",
+  subsets: ["latin"],
+  weight: "400",
+  display: "swap",
+  adjustFontFallback: true,
+});
+
 export const metadata: Metadata = {
   title: {
     default: "Grünes Buch",
@@ -50,7 +60,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="de"
-      className={`${geistSans.variable} ${geistMono.variable} ${cormorant.variable} ${sedgwick.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} ${cormorant.variable} ${sedgwick.variable} ${inspiration.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
         <SprayFilter />

@@ -21,3 +21,38 @@ test("Farbprüfung misst Kopierstift auf allen drei Papieren", () => {
   }
   assert.doesNotMatch(skript, /spray/);
 });
+
+const HAND_GRADE = ["marke", "umschlag", "notiz", "vermerk"] as const;
+
+function token(name: string): string {
+  const treffer = new RegExp(`--text-${name}:\\s*([^;]+);`).exec(css);
+  assert.ok(treffer, `--text-${name} fehlt`);
+  return treffer[1].trim();
+}
+
+/** Kleinster Wert eines Grads in rem: fester Wert oder erstes Argument von clamp(). */
+function mindestRem(wert: string): number {
+  const treffer = /^(?:clamp\()?\s*([\d.]+)rem/.exec(wert);
+  assert.ok(treffer, `kein rem-Wert: ${wert}`);
+  return Number(treffer[1]);
+}
+
+test("Handschrift-Grade nie unter 32 px (Spec TP3 4)", () => {
+  for (const name of HAND_GRADE) assert.ok(mindestRem(token(name)) >= 2, `${name}: ${token(name)}`);
+  assert.equal(token("marke"), "2.5rem");
+  assert.equal(token("umschlag"), "clamp(5rem, 1rem + 17vw, 20rem)");
+  assert.equal(token("notiz"), "clamp(2rem, 1.25rem + 3vw, 4.5rem)");
+  assert.equal(token("vermerk"), "2rem");
+});
+
+test("Handschrift: Inspiration mit Rückfall, nur 400, keine synthetischen Schnitte", () => {
+  assert.match(css, /--font-hand:\s*var\(--font-inspiration\),[^;]*cursive;/);
+  for (const name of HAND_GRADE) {
+    assert.match(css, new RegExp(`--text-${name}--font-weight:\\s*400;`), name);
+  }
+  assert.match(css, /\.font-hand\s*\{[^}]*font-synthesis:\s*none/);
+  assert.match(
+    lies("app/layout.tsx"),
+    /Inspiration\(\{[\s\S]*?variable: "--font-inspiration"[\s\S]*?weight: "400"[\s\S]*?adjustFontFallback: true/,
+  );
+});

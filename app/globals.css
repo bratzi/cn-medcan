@@ -12,6 +12,7 @@
   --font-mono: var(--font-geist-mono), ui-monospace, monospace;
   --font-buch: var(--font-cormorant), Georgia, "Times New Roman", serif;
   --font-wand: var(--font-sedgwick), "Segoe Print", cursive;
+  --font-hand: var(--font-inspiration), "Segoe Script", cursive;
 
   /* ---- Spacing: Basis 4px, nur gerade Stufen (8px-Raster) -------------- */
   --spacing: 4px;
@@ -82,6 +83,28 @@
   --text-tag: clamp(2rem, 1rem + 4vw, 5rem);
   --text-tag--line-height: 1.1;
   --text-tag--font-weight: 400;
+
+  /* ---- Handschrift (Spec TP3 4): Inspiration, nur 400, nie unter 32 px -- */
+  /* Wortmarke im Kopf aller Seiten. */
+  --text-marke: 2.5rem;
+  --text-marke--line-height: 1;
+  --text-marke--font-weight: 400;
+
+  /* Wortmarke im Auftakt (zweizeilig, h1) und angeschnitten im Fuß. */
+  --text-umschlag: clamp(5rem, 1rem + 17vw, 20rem);
+  --text-umschlag--line-height: 0.95;
+  --text-umschlag--font-weight: 400;
+
+  /* Randnotizen, "Wähl mit.", Handschrift-Überschriften auf /umfragen.
+     Zeilenhöhe 1.2: lange Ober- und Unterlängen der Schreibschrift. */
+  --text-notiz: clamp(2rem, 1.25rem + 3vw, 4.5rem);
+  --text-notiz--line-height: 1.2;
+  --text-notiz--font-weight: 400;
+
+  /* Kurze Vermerke am Stimmzettel und in der Schleife: die Mindestgröße. */
+  --text-vermerk: 2rem;
+  --text-vermerk--line-height: 1.2;
+  --text-vermerk--font-weight: 400;
 
   --tracking-gesperrt: 0.3em;
 
@@ -290,6 +313,11 @@
    ========================================================================== */
 
 @layer components {
+  /* Inspiration hat nur 400: keine künstlich fetten oder kursiven Schnitte. */
+  .font-hand {
+    font-synthesis: none;
+  }
+
   /* Graustufen-Fotos vor hellem Grund verschmelzen mit dem Papier (Spec 4.5). */
   .medien-buch {
     mix-blend-mode: multiply;
