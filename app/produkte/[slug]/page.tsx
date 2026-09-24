@@ -12,6 +12,7 @@ import { CommunityStimmen } from "@/components/review/CommunityStimmen";
 import { Doppelseite } from "@/components/review/Doppelseite";
 import { AromaKarte, type AromaSerie } from "@/components/review/AromaKarte";
 import { Aufklaerung } from "@/components/review/Aufklaerung";
+import { SweetSpot } from "@/components/review/SweetSpot";
 import { herstellerProfil } from "@/lib/aromakarte";
 import { alsEintrag } from "@/components/review/eintrag";
 import {
@@ -35,7 +36,7 @@ import {
   formatiereProzentSpanne,
 } from "@/lib/format";
 import { bestrahlungLabel, darreichungsformLabel, kultivarTypLabel } from "@/lib/labels";
-import { teileBewertungen, verdichteGeschmacksMatrix } from "@/lib/query/bewertung";
+import { teileBewertungen, verdichteGeschmacksMatrix, mittleTerpenIntensitaet, parseTerpenIntensitaet } from "@/lib/query/bewertung";
 import { istFachkreis } from "@/lib/query/fachkreis";
 import { ladeStrainDetail, type StrainDetail, type UnternehmenEintrag } from "@/lib/query/strains";
 
@@ -151,6 +152,7 @@ async function ProduktInhalt({ slug }: { slug: string }) {
   const geschmack = verdichteGeschmacksMatrix(strain.reviews);
   const produkt = { handelsname: strain.handelsname, slug: strain.slug, terpene: strain.terpene };
   const hersteller = herstellerProfil(strain.terpene);
+  const intensitaet = mittleTerpenIntensitaet(strain.reviews.map((review) => parseTerpenIntensitaet(review.terpenIntensitaet)));
   const aromaSerien: AromaSerie[] = [
     ...(hersteller ? [{ name: "Laut Hersteller", ton: "gruen" as const, matrix: hersteller }] : []),
     ...(geschmack.anzahlBewertungen >= 1
@@ -207,6 +209,12 @@ async function ProduktInhalt({ slug }: { slug: string }) {
           </p>
           <div className="mt-4 max-w-4xl">
             <AromaKarte titel="Aroma-Karte" terpene={strain.terpene} serien={aromaSerien} />
+          </div>
+          <div className="mt-8 max-w-4xl">
+            <SweetSpot
+              titel="Terpen-Intensität laut Community"
+              zeilen={Object.entries(intensitaet).map(([terpen, { mittel, anzahl }]) => ({ terpen, wert: mittel, anzahl }))}
+            />
           </div>
           <Aufklaerung />
         </section>

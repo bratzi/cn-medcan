@@ -68,6 +68,7 @@ function stimme(id: string, note: number, notiz: string | null): ReviewEintrag {
     konsistenz: note,
     feuchtigkeitProzent: null,
     geschmacksMatrix: null,
+    terpenIntensitaet: null,
     notiz,
     instagramReelUrl: null,
     chargenNr: null,

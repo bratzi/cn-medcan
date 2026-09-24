@@ -518,3 +518,15 @@
   -webkit-text-fill-color: transparent;
   padding-inline-end: 0.08em;
 }
+
+/* Sweet-Spot-Spur (Spec Redesign 15): blass an den Rändern, grün in der Mitte. */
+.sweet-spot-spur {
+  background: linear-gradient(
+    90deg,
+    var(--color-border) 0%,
+    var(--color-accent-subtle) 30%,
+    var(--color-accent) 50%,
+    var(--color-accent-subtle) 70%,
+    var(--color-border) 100%
+  );
+}

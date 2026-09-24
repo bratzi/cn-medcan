@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import { InstagramEmbed, baueEmbedUrl } from "@/components/produkt/InstagramEmbed";
 import { AromaKarte, type AromaSerie } from "@/components/review/AromaKarte";
+import { SweetSpot } from "@/components/review/SweetSpot";
 import { herstellerProfil } from "@/lib/aromakarte";
 import { eintragAnker, eintragHref, type EintragDaten } from "@/components/review/eintrag";
 import { Badge, buttonKlassen, type BadgeVariante } from "@/components/ui";
@@ -142,6 +143,11 @@ export function Doppelseite({ eintrag, umfang, ueberschrift: Ueberschrift, story
 
       <div className="flex min-w-0 flex-col gap-8 p-6 sm:p-12">
         <AromaKarte titel="Aroma-Karte" terpene={eintrag.terpene} serien={aromaSerien(eintrag)} />
+        {voll ? (
+          <SweetSpot
+            zeilen={Object.entries(eintrag.terpenIntensitaet).map(([terpen, wert]) => ({ terpen, wert }))}
+          />
+        ) : null}
         {eintrag.notiz ? (
           <p
             className={cn(

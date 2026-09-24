@@ -33,3 +33,16 @@ test("Geometrie: acht Achsen links, Netz beginnt oben, Morph interpoliert", () =
   assert.equal(sanft(1), 1);
   assert.match(bogen({ x: 0, y: 0 }, { x: 100, y: 50 }), /^M0,0 C50,0 50,50 100,50$/);
 });
+
+import { mittleTerpenIntensitaet, parseTerpenIntensitaet } from "@/lib/query/bewertung";
+
+test("Terpen-Intensität: kaputt oder leer wird {}, Werte außerhalb 1-5 fallen durch, Mittel je Terpen", () => {
+  assert.deepEqual(parseTerpenIntensitaet(null), {});
+  assert.deepEqual(parseTerpenIntensitaet("kaputt"), {});
+  assert.deepEqual(parseTerpenIntensitaet('{"Myrcen":7}'), {});
+  assert.deepEqual(parseTerpenIntensitaet('{"Myrcen":3}'), { Myrcen: 3 });
+  assert.deepEqual(mittleTerpenIntensitaet([{ Myrcen: 3 }, { Myrcen: 4, Limonen: 2 }]), {
+    Myrcen: { mittel: 3.5, anzahl: 2 },
+    Limonen: { mittel: 2, anzahl: 1 },
+  });
+});

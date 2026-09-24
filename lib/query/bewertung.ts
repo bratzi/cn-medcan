@@ -251,3 +251,41 @@ export function teileBewertungen<T extends TeilbareBewertung>(
     communityMittel,
   };
 }
+
+// ---------------------------------------------------------------------------
+//  Terpen-Intensitaet (Spec Redesign 15)
+// ---------------------------------------------------------------------------
+
+/** Die Stufen der Sweet-Spot-Skala. 3 ist das Ziel, nicht 5. */
+export const INTENSITAETS_STUFEN = [
+  { wert: 1, label: "zu schwach" },
+  { wert: 2, label: "etwas schwach" },
+  { wert: 3, label: "Sweet Spot" },
+  { wert: 4, label: "etwas stark" },
+  { wert: 5, label: "zu stark" },
+] as const;
+
+export const terpenIntensitaetSchema = z.record(z.string().min(1), z.number().int().min(1).max(5));
+
+export type TerpenIntensitaet = z.infer<typeof terpenIntensitaetSchema>;
+
+/** Liest die JSON-Spalte; leer, fehlend oder kaputt ergibt ein leeres Objekt. */
+export function parseTerpenIntensitaet(roh: unknown): TerpenIntensitaet {
+  if (roh === null || roh === undefined) return {};
+  const ergebnis = terpenIntensitaetSchema.safeParse(entpacke(roh));
+  return ergebnis.success ? ergebnis.data : {};
+}
+
+/** Mittel je Terpen über mehrere Bewertungen, eine Nachkommastelle. */
+export function mittleTerpenIntensitaet(alle: readonly TerpenIntensitaet[]): Record<string, { mittel: number; anzahl: number }> {
+  const summen = new Map<string, { summe: number; anzahl: number }>();
+  for (const eintrag of alle) {
+    for (const [name, wert] of Object.entries(eintrag)) {
+      const bisher = summen.get(name) ?? { summe: 0, anzahl: 0 };
+      summen.set(name, { summe: bisher.summe + wert, anzahl: bisher.anzahl + 1 });
+    }
+  }
+  return Object.fromEntries(
+    [...summen].map(([name, { summe, anzahl }]) => [name, { mittel: Math.round((summe / anzahl) * 10) / 10, anzahl }]),
+  );
+}

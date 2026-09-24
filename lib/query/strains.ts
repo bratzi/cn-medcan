@@ -175,6 +175,8 @@ export type ReviewEintrag = {
   feuchtigkeitProzent: number | null;
   /** Rohes JSON - mit `parseGeschmacksMatrix` aus lib/query/bewertung.ts lesen. */
   geschmacksMatrix: unknown;
+  /** Rohes JSON - mit `parseTerpenIntensitaet` lesen. */
+  terpenIntensitaet: unknown;
   notiz: string | null;
   instagramReelUrl: string | null;
   chargenNr: string | null;
@@ -573,6 +575,7 @@ export async function ladeStrainDetail(
           konsistenz: true,
           feuchtigkeitProzent: true,
           geschmacksMatrix: true,
+          terpenIntensitaet: true,
           notiz: true,
           instagramReelUrl: true,
           erstelltAm: true,
@@ -654,6 +657,7 @@ export async function ladeStrainDetail(
       konsistenz: review.konsistenz,
       feuchtigkeitProzent: zuZahl(review.feuchtigkeitProzent),
       geschmacksMatrix: review.geschmacksMatrix,
+      terpenIntensitaet: review.terpenIntensitaet,
       notiz: review.notiz,
       instagramReelUrl: review.instagramReelUrl,
       chargenNr: review.charge?.chargenNr ?? null,

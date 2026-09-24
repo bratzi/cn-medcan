@@ -1,4 +1,9 @@
-import { parseGeschmacksMatrix, type GeschmacksMatrix } from "@/lib/query/bewertung";
+import {
+  parseGeschmacksMatrix,
+  parseTerpenIntensitaet,
+  type GeschmacksMatrix,
+  type TerpenIntensitaet,
+} from "@/lib/query/bewertung";
 import type { KartenTerpen } from "@/lib/aromakarte";
 import type { ReviewEintrag } from "@/lib/query/strains";
 
@@ -20,6 +25,8 @@ export type EintragDaten = {
   erstelltAm: Date;
   /** Terpene der Sorte für die Aroma-Karte (Bögen, Herstellerprofil). */
   terpene: KartenTerpen[];
+  /** Sweet Spot je Terpen (1-5, 3 = Ziel), leer ohne Angabe. */
+  terpenIntensitaet: TerpenIntensitaet;
 };
 
 /** Sprungziel des vollstaendigen Eintrags auf der Produktseite. */
@@ -55,5 +62,6 @@ export function alsEintrag(
     chargenNr: review.chargenNr,
     erstelltAm: review.erstelltAm,
     terpene: produkt.terpene ?? [],
+    terpenIntensitaet: parseTerpenIntensitaet(review.terpenIntensitaet),
   };
 }

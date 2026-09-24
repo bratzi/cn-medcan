@@ -256,6 +256,11 @@ model Review {
   /// und validiert. Niemals ungeprueft JSON.parse in einer Komponente.
   geschmacksMatrix String @map("geschmacks_matrix")
 
+  /// Terpen-Intensitaet (Spec Redesign 15): Terpenname zu 1-5, als JSON-Text.
+  /// 1 zu schwach, 3 Sweet Spot, 5 zu stark. Gelesen ueber
+  /// parseTerpenIntensitaet() in lib/query/bewertung.ts.
+  terpenIntensitaet String? @map("terpen_intensitaet")
+
   notiz String?
 
   /// Oeffentliche Instagram-Reel-URL zur Bewertung.

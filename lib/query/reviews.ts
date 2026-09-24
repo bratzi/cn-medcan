@@ -2,7 +2,12 @@ import "server-only";
 
 import { cache } from "react";
 
-import { parseGeschmacksMatrix, type GeschmacksMatrix } from "@/lib/query/bewertung";
+import {
+  parseGeschmacksMatrix,
+  parseTerpenIntensitaet,
+  type GeschmacksMatrix,
+  type TerpenIntensitaet,
+} from "@/lib/query/bewertung";
 import type { GeschmacksKategorie } from "@/db/enums";
 import type { KartenTerpen } from "@/lib/aromakarte";
 import { getPrisma } from "@/lib/prisma";
@@ -35,6 +40,7 @@ export type RedaktionelleReview = {
   chargenNr: string | null;
   erstelltAm: Date;
   terpene: KartenTerpen[];
+  terpenIntensitaet: TerpenIntensitaet;
 };
 
 /** Gezieltes `select`. Die Geschmacksmatrix braucht die Doppelseite der Startseite (Netzdiagramm). */
@@ -47,6 +53,7 @@ const AUSWAHL = {
   wirkung: true,
   konsistenz: true,
   geschmacksMatrix: true,
+  terpenIntensitaet: true,
   feuchtigkeitProzent: true,
   notiz: true,
   instagramReelUrl: true,
@@ -74,6 +81,7 @@ type Satz = {
   wirkung: number;
   konsistenz: number;
   geschmacksMatrix: string;
+  terpenIntensitaet: string | null;
   feuchtigkeitProzent: number | null;
   notiz: string | null;
   instagramReelUrl: string | null;
@@ -98,6 +106,7 @@ function zuAnsicht(satz: Satz): RedaktionelleReview {
     wirkung: satz.wirkung,
     konsistenz: satz.konsistenz,
     geschmacksMatrix: parseGeschmacksMatrix(satz.geschmacksMatrix),
+    terpenIntensitaet: parseTerpenIntensitaet(satz.terpenIntensitaet),
     feuchtigkeitProzent: satz.feuchtigkeitProzent,
     notiz: satz.notiz,
     instagramReelUrl: satz.instagramReelUrl,
