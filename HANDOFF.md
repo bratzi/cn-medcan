@@ -3,7 +3,7 @@
 > Übergabemedium zwischen Sessions. Wird nach jedem Arbeitsblock aktualisiert und committet.
 > Wer hier weiterarbeitet, liest diese Datei zuerst und braucht den Chatverlauf nicht.
 
-**Letzte Aktualisierung:** 2026-09-24 (Session 8, interface-review und Korrekturen live)
+**Letzte Aktualisierung:** 2026-09-24 (Session 9, Brainstorming Teilprojekt 2 läuft)
 **Repo:** https://github.com/bratzi/cn-medcan (public)
 **Branch:** `main` (Makeover „Grünes Buch“ Teilprojekt 1 ist seit 2026-09-24 auf `main`)
 
@@ -150,10 +150,35 @@ Budgets, Akzeptanzkriterien und Reihenfolge. **Die Spec ist die Quelle - nicht d
      sichtbar erst wenn `loops.ts` läuft; Pause hält beim Wiedereintritt (`5213e5a`). Nutzer: „alles korrigieren“.
   Vorbestehend, nicht behoben (Teilprojekt 2): `ProduktCard` nutzt noch Deckkraft-Hover.
   Nicht verifiziert: reduzierte Bewegung gerendert, Dunkelmodus gerendert, Stimmzettel-Zustände, 200 % Textzoom.
-- **Als Nächstes: Teilprojekt 2** - eigene Spec für die übrigen Seiten (`/produkte`, `/apotheken`, `/reviews`,
-  `/umfragen`, `/mitglied`, `/admin`, Formulare), Start mit `superpowers:brainstorming` (braucht den Nutzer),
-  Design-Skills laden (Memory `design-skills-einsatz`). Offen für den Nutzer: Notiz-Freitext auf der Startseite
-  (HWG) ist so entschieden; 4 npm-audit „high“; Instagram-Handle.
+- **Teilprojekt 2 - Brainstorming läuft (Session 9, 2026-09-24).** Pfad: architektonisch (Spec → Plan). Kein
+  Browser-Companion. Geladen: `ui-design-engine`, `design-taste-frontend` (Katalog/Tabellen/Admin laut Skill
+  außerhalb seines Geltungsbereichs), `better-layout`. **Entscheidungen des Nutzers:**
+  1. Umfang **„Optik + Kleinkram“**: alle übrigen Seiten im Stil Buch und Wand, dazu Korrekturen in ohnehin
+     angefassten Dateien (Hydrations-Sperre + `Meldung` in `AnmeldeFormular`/`RegistrierFormular`/`ProfilFormular`,
+     Texte ohne Geviert-/Gedankenstrich, Deckkraft-Hover weg, falscher Preis-Satz auf `/mitglied`). **Nicht** drin:
+     Review-Formular im Admin (kommt danach als eigenes Vorhaben), Datenmodell, `FACHKREIS_PASSWORD`-Ausbau.
+  2. Zuschnitt **eine Spec, drei Wellen** mit je eigenem Plan und Live-Gang: 1 Kern (`/reviews`, `/umfragen`,
+     `/produkte/[slug]`), 2 Katalog (`/produkte`, `/apotheken`, `/apotheken/[slug]`), 3 Konto (`/anmelden`,
+     `/registrieren`, `/zugang`, `/mitglied`, `/admin`, `not-found`).
+  3. Navigation **„Kern zuerst“**: 01 Bewertungen, 02 Abstimmung, 03 Produkte, 04 Apotheken, dazu „Mein Konto“
+     ohne Nummer als abgesetzte Pille rechts; Handy: Leiste unter der Wortmarke seitlich wischbar, nächster
+     Punkt schaut an.
+  4. Produktkopf **Titelblatt statt Glas**: `GlasHeader` (Nutzer-Ausnahme aus der Zeit vor dem Makeover) entfällt,
+     kein Herstellerbild (Leitplanke 5), Reel wandert zu seiner Bewertung.
+  5. Ansatz **A „Durchgehend Buch, Dichte je Seitentyp“**: gemeinsamer `Seitenkopf` (Cormorant `text-kapitel`,
+     ein Satz Du+Ich, keine Oberzeile), Gruppierung über Abstand/Haarlinien statt Karten, Flächen nur mit
+     Bedeutung (Formularblatt, Stimmzettel, Doppelseite); Kernseiten luftig mit Doppelseite/Stimmzettel der
+     Startseite, Katalog/Apotheken als Verzeichnis (mittlere Dichte), Admin als dichte Werkbank; Bewegung nur CSS.
+     Verworfen: B „Zwei Register“ (Katalog bliebe 0815), C „GSAP auf Kernseiten“ (bricht Regel 7, +60 KB JS).
+  **Als Nächstes:** Design in Abschnitten vorlegen (gemeinsame Bausteine, dann Welle 1 bis 3), je Abschnitt Okay
+  holen, dann Spec `docs/superpowers/specs/2026-09-24-makeover-teilprojekt-2-design.md` schreiben, committen,
+  Nutzer prüfen lassen, dann `superpowers:writing-plans` (Plan für Welle 1).
+  Beim Einlesen gefundener Kleinkram (für die Spec): `/produkte` rendert ein zweites `<main>` im Layout-`<main>`
+  (ebenso `/zugang`); sichtbares „fuer“ in `ProduktCard` („Preis nur fuer Fachkreise“) und „oeffentlich“ auf
+  `/zugang`; `/zugang`-Titel noch „cn-medcan“, eigener Button mit Deckkraft-Hover und `rounded-md`; Geviertstrich
+  im Seitentitel von `/produkte` und im `GlasHeader`; `Notenzeile` doppelt (`ReviewKarte`, `BewertungsListe`) und
+  Balken in `accent` statt Tinte (Guideline 3); viele `hover:opacity-70`-Links.
+  Offen für den Nutzer (unverändert): 4 npm-audit „high“; Instagram-Handle.
 
 **Stand davor (2026-09-24, Session 6/7):**
 - Ausführungsart ist gewählt: **Native**, also `superpowers:executing-plans` in der Session
