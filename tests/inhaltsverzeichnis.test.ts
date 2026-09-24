@@ -24,6 +24,7 @@ function eintrag(id: string, handelsname: string, note: number, chargenNr: strin
     instagramReelUrl: null,
     chargenNr,
     erstelltAm: new Date("2026-09-12T12:00:00Z"),
+    terpene: [],
   };
 }
 

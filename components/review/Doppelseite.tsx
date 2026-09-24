@@ -1,7 +1,8 @@
 import Link from "next/link";
 
 import { InstagramEmbed, baueEmbedUrl } from "@/components/produkt/InstagramEmbed";
-import { Netzdiagramm } from "@/components/review/Netzdiagramm";
+import { AromaKarte, type AromaSerie } from "@/components/review/AromaKarte";
+import { herstellerProfil } from "@/lib/aromakarte";
 import { eintragAnker, eintragHref, type EintragDaten } from "@/components/review/eintrag";
 import { Badge, buttonKlassen, type BadgeVariante } from "@/components/ui";
 import { cn } from "@/lib/cn";
@@ -42,6 +43,15 @@ export type DoppelseiteProps = {
  * Id und Ueberschrift sind je Eintrag eindeutig, damit mehrere Doppelseiten
  * auf einer Seite stehen koennen und "Ganzen Eintrag lesen" darauf springt.
  */
+/** Zwei Serien: was die Herstellerangaben erwarten lassen und was diese Bewertung gefunden hat. */
+function aromaSerien(eintrag: EintragDaten): AromaSerie[] {
+  const hersteller = herstellerProfil(eintrag.terpene);
+  const serien: AromaSerie[] = [];
+  if (hersteller) serien.push({ name: "Laut Hersteller", ton: "gruen", matrix: hersteller });
+  serien.push({ name: "Diese Bewertung", ton: "lila", matrix: eintrag.geschmacksMatrix });
+  return serien;
+}
+
 export function Doppelseite({ eintrag, umfang, ueberschrift: Ueberschrift, story = false }: DoppelseiteProps) {
   const voll = umfang === "voll";
   const achsen = voll ? BEWERTUNGS_ACHSEN : AUSZUG_ACHSEN;
@@ -131,7 +141,7 @@ export function Doppelseite({ eintrag, umfang, ueberschrift: Ueberschrift, story
       </div>
 
       <div className="flex min-w-0 flex-col gap-8 p-6 sm:p-12">
-        <Netzdiagramm matrix={eintrag.geschmacksMatrix} />
+        <AromaKarte titel="Aroma-Karte" terpene={eintrag.terpene} serien={aromaSerien(eintrag)} />
         {eintrag.notiz ? (
           <p
             className={cn(

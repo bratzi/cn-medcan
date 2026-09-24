@@ -3,6 +3,8 @@ import "server-only";
 import { cache } from "react";
 
 import { parseGeschmacksMatrix, type GeschmacksMatrix } from "@/lib/query/bewertung";
+import type { GeschmacksKategorie } from "@/db/enums";
+import type { KartenTerpen } from "@/lib/aromakarte";
 import { getPrisma } from "@/lib/prisma";
 
 /**
@@ -32,6 +34,7 @@ export type RedaktionelleReview = {
   instagramReelUrl: string | null;
   chargenNr: string | null;
   erstelltAm: Date;
+  terpene: KartenTerpen[];
 };
 
 /** Gezieltes `select`. Die Geschmacksmatrix braucht die Doppelseite der Startseite (Netzdiagramm). */
@@ -48,7 +51,17 @@ const AUSWAHL = {
   notiz: true,
   instagramReelUrl: true,
   erstelltAm: true,
-  strain: { select: { handelsname: true, slug: true } },
+  strain: {
+    select: {
+      handelsname: true,
+      slug: true,
+      // Aroma-Karte (Spec Redesign 14): die Terpene der Sorte, für Bögen und Herstellerprofil.
+      terpene: {
+        orderBy: { rang: "asc" },
+        select: { rang: true, konzentrationProzent: true, terpen: { select: { name: true, geschmack: true } } },
+      },
+    },
+  },
   charge: { select: { chargenNr: true } },
 } as const;
 
@@ -65,7 +78,11 @@ type Satz = {
   notiz: string | null;
   instagramReelUrl: string | null;
   erstelltAm: Date;
-  strain: { handelsname: string; slug: string };
+  strain: {
+    handelsname: string;
+    slug: string;
+    terpene: { rang: number; konzentrationProzent: number | null; terpen: { name: string; geschmack: string } }[];
+  };
   charge: { chargenNr: string } | null;
 };
 
@@ -86,6 +103,12 @@ function zuAnsicht(satz: Satz): RedaktionelleReview {
     instagramReelUrl: satz.instagramReelUrl,
     chargenNr: satz.charge?.chargenNr ?? null,
     erstelltAm: satz.erstelltAm,
+    terpene: satz.strain.terpene.map((eintrag) => ({
+      name: eintrag.terpen.name,
+      geschmack: eintrag.terpen.geschmack as GeschmacksKategorie,
+      konzentrationProzent: eintrag.konzentrationProzent,
+      rang: eintrag.rang,
+    })),
   };
 }
 

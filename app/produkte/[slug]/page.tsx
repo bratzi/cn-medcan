@@ -10,7 +10,9 @@ import { TerpenChips } from "@/components/produkt/TerpenChips";
 import { Titelblatt } from "@/components/produkt/Titelblatt";
 import { CommunityStimmen } from "@/components/review/CommunityStimmen";
 import { Doppelseite } from "@/components/review/Doppelseite";
-import { Netzdiagramm } from "@/components/review/Netzdiagramm";
+import { AromaKarte, type AromaSerie } from "@/components/review/AromaKarte";
+import { Aufklaerung } from "@/components/review/Aufklaerung";
+import { herstellerProfil } from "@/lib/aromakarte";
 import { alsEintrag } from "@/components/review/eintrag";
 import {
   Faktenliste,
@@ -147,7 +149,14 @@ async function ProduktInhalt({ slug }: { slug: string }) {
   const { eigene, community, meineNote, communityMittel } = teileBewertungen(strain.reviews);
   const neuesteEigene = eigene[0];
   const geschmack = verdichteGeschmacksMatrix(strain.reviews);
-  const produkt = { handelsname: strain.handelsname, slug: strain.slug };
+  const produkt = { handelsname: strain.handelsname, slug: strain.slug, terpene: strain.terpene };
+  const hersteller = herstellerProfil(strain.terpene);
+  const aromaSerien: AromaSerie[] = [
+    ...(hersteller ? [{ name: "Laut Hersteller", ton: "gruen" as const, matrix: hersteller }] : []),
+    ...(geschmack.anzahlBewertungen >= 1
+      ? [{ name: "Laut Community", ton: "lila" as const, matrix: geschmack.matrix }]
+      : []),
+  ];
   const packungsgroessen = [...new Set(strain.bestaende.map((bestand) => bestand.packungGramm))].sort(
     (a, b) => a - b,
   );
@@ -186,15 +195,20 @@ async function ProduktInhalt({ slug }: { slug: string }) {
         </section>
       ) : null}
 
-      {geschmack.anzahlBewertungen >= 2 ? (
+      {aromaSerien.length > 0 ? (
         <section aria-labelledby="geschmack-titel" className={cn(ABSTAND, "flex flex-col gap-4")}>
           <h2 id="geschmack-titel" className={ABSCHNITT_TITEL}>
-            Geschmacksprofil
+            Stimmt das Profil?
           </h2>
-          <p className="text-small text-text-muted">{`Aus ${geschmack.anzahlBewertungen} Bewertungen`}</p>
-          <div className="mt-4 max-w-xl">
-            <Netzdiagramm matrix={geschmack.matrix} />
+          <p className="max-w-[68ch] text-body text-text-muted text-pretty">
+            {geschmack.anzahlBewertungen >= 1
+              ? `Grün ist, was die Herstellerangaben erwarten lassen, Lila, was ${geschmack.anzahlBewertungen} Bewertungen gefunden haben.`
+              : "Grün ist, was die Herstellerangaben erwarten lassen. Mit den ersten Bewertungen kommt der Vergleich dazu."}
+          </p>
+          <div className="mt-4 max-w-4xl">
+            <AromaKarte titel="Aroma-Karte" terpene={strain.terpene} serien={aromaSerien} />
           </div>
+          <Aufklaerung />
         </section>
       ) : null}
 

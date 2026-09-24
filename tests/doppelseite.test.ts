@@ -26,6 +26,7 @@ function eintrag(teil: Partial<EintragDaten> = {}): EintragDaten {
     instagramReelUrl: null,
     chargenNr: "CH-2401",
     erstelltAm: new Date("2026-09-12T12:00:00Z"),
+    terpene: [],
     ...teil,
   };
 }

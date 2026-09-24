@@ -1,4 +1,5 @@
 import { parseGeschmacksMatrix, type GeschmacksMatrix } from "@/lib/query/bewertung";
+import type { KartenTerpen } from "@/lib/aromakarte";
 import type { ReviewEintrag } from "@/lib/query/strains";
 
 /** Was die Doppelseite braucht: eine Bewertung samt Produktname, Matrix geprueft. */
@@ -17,6 +18,8 @@ export type EintragDaten = {
   instagramReelUrl: string | null;
   chargenNr: string | null;
   erstelltAm: Date;
+  /** Terpene der Sorte für die Aroma-Karte (Bögen, Herstellerprofil). */
+  terpene: KartenTerpen[];
 };
 
 /** Sprungziel des vollstaendigen Eintrags auf der Produktseite. */
@@ -34,7 +37,7 @@ export function eintragHref(slug: string, id: string): string {
  */
 export function alsEintrag(
   review: ReviewEintrag,
-  produkt: { handelsname: string; slug: string },
+  produkt: { handelsname: string; slug: string; terpene?: KartenTerpen[] },
 ): EintragDaten {
   return {
     id: review.id,
@@ -51,5 +54,6 @@ export function alsEintrag(
     instagramReelUrl: review.instagramReelUrl,
     chargenNr: review.chargenNr,
     erstelltAm: review.erstelltAm,
+    terpene: produkt.terpene ?? [],
   };
 }
