@@ -1,5 +1,7 @@
 import { Auftakt } from "@/components/story/Auftakt";
 import { FeldbuchRaster } from "@/components/story/FeldbuchRaster";
+import { TransparentMachen } from "@/components/story/TransparentMachen";
+import { WissenBuendeln } from "@/components/story/WissenBuendeln";
 
 /**
  * Die Startseite als Scroll-Story (Spec 5.1). Sektion 9 ist der Fuß im
@@ -16,6 +18,8 @@ export default function StartPage() {
     <div className="relative isolate bg-surface">
       <FeldbuchRaster />
       <Auftakt />
+      <TransparentMachen />
+      <WissenBuendeln />
     </div>
   );
 }

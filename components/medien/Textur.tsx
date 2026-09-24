@@ -8,14 +8,25 @@ type Props = {
   className?: string;
   /** Ziel fuer die StoryBuehne (data-story), z. B. "tag-drip". */
   story?: string;
+  /**
+   * Weiche Kanten: eine zweite, radiale Maskenebene (intersect) blendet den
+   * Rand aus. Fuer Texturen als Hintergrund hinter Text, wo die Kante der
+   * Maske sonst als Rechteck stehen bliebe.
+   */
+  weich?: boolean;
 };
 
+const WEICHER_RAND = "radial-gradient(closest-side, #000 55%, transparent)";
+
 /** Wand-Textur: Alpha-Maske aus der Pipeline, eingefaerbt in spray. Rein dekorativ. */
-export function Textur({ id, className, story }: Props) {
+export function Textur({ id, className, story, weich = false }: Props) {
   const m = medium(id);
   if (m.art !== "maske") throw new Error(`Medium "${id}" ist keine Maske`);
-  const maske = `url(/medien/${m.datei}-maske.png)`;
-  const stil: CSSProperties = { maskImage: maske, WebkitMaskImage: maske };
+  const datei = `url(/medien/${m.datei}-maske.png)`;
+  const maske = weich ? `${datei}, ${WEICHER_RAND}` : datei;
+  const stil: CSSProperties = weich
+    ? { maskImage: maske, WebkitMaskImage: maske, maskComposite: "intersect", WebkitMaskComposite: "source-in" }
+    : { maskImage: maske, WebkitMaskImage: maske };
   return (
     <span
       aria-hidden="true"

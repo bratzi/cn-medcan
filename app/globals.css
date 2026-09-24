@@ -310,6 +310,13 @@
     -webkit-mask-repeat: no-repeat;
   }
 
+  /* Buehne in "Transparent machen": die Bilder liegen per multiply uebereinander,
+     ein oberes verdeckt ein unteres also nicht. Ohne Bewegung zeigt sie nur das
+     letzte; mit Bewegung setzt die StoryBuehne die Deckkraft selbst. */
+  [data-story="buehne-bild"]:not(:last-child) {
+    opacity: 0;
+  }
+
   /* Feldbuch-Raster hinter der Startseite (Spec 4.7). */
   .feldbuch-raster {
     background-image: linear-gradient(to right, var(--color-border) 1px, transparent 1px);
