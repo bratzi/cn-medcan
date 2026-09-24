@@ -203,6 +203,7 @@ Budgets, Akzeptanzkriterien und Reihenfolge. **Die Spec ist die Quelle - nicht d
   - Welle 1, Task 2 erledigt: Buchtabelle, Leerzustand ohne Kasten (wirkt auf allen Seiten).
   - Welle 1, Task 3 erledigt: Seitenkopf, seitenRahmen, ABSCHNITT_TITEL, TitelblattSkelett.
   - Welle 1, Task 4 erledigt: Navigation Kern zuerst (Kopf, Fuss, NavLink mit aria-current).
+  - Welle 1, Task 5 erledigt: app/error.tsx im Buchstil (retry).
 
 - **⇢ EINGETAKTET FÜR EINE NEUE SESSION (Nutzer, 2026-09-24, Session 9): Marke und Medien professionell
   überarbeiten, für das gesamte Projekt.** Der Nutzer schickte das mitten in die Planung und sagte ausdrücklich:
