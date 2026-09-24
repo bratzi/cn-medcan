@@ -456,3 +456,23 @@
     scroll-behavior: auto !important;
   }
 }
+
+/* ==========================================================================
+   Einstieg der Startseite (Spec 4.6, 9.3)
+   Ausgeblendet wird nur, wenn Skripte laufen und Bewegung erlaubt ist. Die
+   StoryBuehne blendet ein und nimmt dabei die Animation weg; laedt sie nicht,
+   blendet der Notfall nach 2,5 s ein. Ohne Skript greift der Block gar nicht.
+   ========================================================================== */
+
+@media (scripting: enabled) and (prefers-reduced-motion: no-preference) {
+  [data-story-einstieg] {
+    opacity: 0;
+    animation: einstieg-notfall 0s linear 2.5s forwards;
+  }
+}
+
+@keyframes einstieg-notfall {
+  to {
+    opacity: 1;
+  }
+}
