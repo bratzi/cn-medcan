@@ -413,15 +413,11 @@
     -webkit-text-stroke: 1px var(--color-text);
   }
 
-  /* Grosses Tag, das unten und links aus dem Fuss laeuft (Doja Pak). */
-  .fuss-tag {
-    font-size: clamp(10rem, 42vw, 38rem);
-    line-height: 0.8;
-    margin-bottom: -0.28em;
-    margin-left: -0.04em;
-    color: var(--color-kopierstift);
-    transform: rotate(-6deg);
-    filter: url(#spray-rau);
+  /* Die Wortmarke läuft unten angeschnitten aus dem Fuß (Spec TP3 8.9).
+     em bezieht sich auf text-umschlag am selben Element. */
+  .fuss-marke {
+    margin-bottom: -0.35em;
+    margin-left: -0.02em;
     pointer-events: none;
   }
 

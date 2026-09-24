@@ -13,10 +13,11 @@ const TEXTLINK =
   "transition-colors duration-fast ease-standard hover:text-accent-hover";
 
 /**
- * Fuß auf allen Seiten (Spec 5.1, Sektion 9). Die Schlusszeile steht
- * doppelt im selben Rasterfeld: unten als Kontur (aria-hidden), darüber
- * gefüllt. Auf der Startseite blendet die StoryBuehne die gefüllten Wörter
- * scroll-gekoppelt ein; ohne Bewegung ist die Zeile einfach gefüllt.
+ * Fuß auf allen Seiten (Spec 5.1, Sektion 9; Spec TP3 8.9). Die
+ * Schlusszeile steht doppelt im selben Rasterfeld: unten als Kontur
+ * (aria-hidden), darüber gefüllt. Auf der Startseite blendet die
+ * StoryBuehne die gefüllten Wörter scroll-gekoppelt ein und schreibt die
+ * Wortmarke; ohne Bewegung steht beides einfach da.
  */
 export function Fuss() {
   return (
@@ -37,14 +38,11 @@ export function Fuss() {
       </div>
 
       <div className="mx-auto grid w-full max-w-360 grid-cols-1 gap-12 px-4 pb-16 sm:grid-cols-[2fr_1fr] sm:px-8">
-        <div className="flex flex-col items-start gap-6">
-          <Wortmarke groesse="kopf" />
-          <p className="max-w-[68ch] text-caption text-text-muted">
-            Alle gelisteten Arzneimittel sind verschreibungspflichtig. Die Angaben dienen der
-            Information und ersetzen keine medizinische oder pharmazeutische Beratung. Eine Abgabe
-            von Arzneimitteln erfolgt über diese Seite nicht.
-          </p>
-        </div>
+        <p className="max-w-[68ch] text-caption text-text-muted">
+          Alle gelisteten Arzneimittel sind verschreibungspflichtig. Die Angaben dienen der
+          Information und ersetzen keine medizinische oder pharmazeutische Beratung. Eine Abgabe
+          von Arzneimitteln erfolgt über diese Seite nicht.
+        </p>
 
         <nav aria-label="Fußnavigation">
           <ul className="flex flex-col">
@@ -78,10 +76,11 @@ export function Fuss() {
         </details>
       </div>
 
-      {/* Zuletzt im Fuss: nur so laeuft das Tag ueber den negativen Aussenabstand
-          unten aus dem Bild, statt Rechtshinweis und Navigation zu verdecken. */}
-      <span aria-hidden="true" data-story="fuss-tag" className="fuss-tag block select-none font-wand">
-        gb
+      {/* Zuletzt im Fuß: nur so läuft die Wortmarke über den negativen
+          Außenabstand unten aus dem Bild, statt Rechtshinweis und Navigation
+          zu verdecken. Der Name steht im Kopf, hier ist er Bild. */}
+      <span aria-hidden="true" data-story="fuss-marke" className="fuss-marke block select-none text-umschlag">
+        <Wortmarke groesse="umschlag" einzeilig />
       </span>
     </footer>
   );

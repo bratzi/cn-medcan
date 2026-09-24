@@ -1,10 +1,11 @@
+import { SCHREIBEN_AB, SCHREIBEN_BIS } from "./schreiben";
 import type { Choreografie } from "./typen";
 
 /**
- * Sektion 9: die Schlusszeile steht als Kontur und fuellt sich Wort fuer
- * Wort scroll-gekoppelt (Referenz); das grosse Tag sprueht einmal.
- * aria "none": beide sichtbaren Ebenen sind aria-hidden, vorgelesen wird
- * die sr-only-Fassung im Fuss.
+ * Sektion 9: die Schlusszeile steht als Kontur und füllt sich Wort für
+ * Wort scroll-gekoppelt (Referenz); die Wortmarke unten im Fuß schreibt
+ * sich einmal (Spec TP3 8.9). aria "none": beide sichtbaren Ebenen der
+ * Schlusszeile sind aria-hidden, vorgelesen wird die sr-only-Fassung.
  */
 export const schluss: Choreografie = ({ gsap, SplitText }) => {
   const fuellung = document.querySelector<HTMLElement>(".schlusszeile-fuellung");
@@ -22,13 +23,11 @@ export const schluss: Choreografie = ({ gsap, SplitText }) => {
     );
   }
 
-  const tag = document.querySelector<HTMLElement>('[data-story="fuss-tag"]');
-  if (tag) {
-    gsap.from(tag, {
-      clipPath: "inset(0 100% 0 0)",
-      duration: 1.2,
-      ease: "power2.inOut",
-      scrollTrigger: { trigger: tag, start: "top 95%", once: true },
+  const marke = document.querySelector<HTMLElement>('[data-story="fuss-marke"]');
+  if (marke) {
+    gsap.fromTo(marke, SCHREIBEN_AB, {
+      ...SCHREIBEN_BIS,
+      scrollTrigger: { trigger: marke, start: "top 95%", once: true },
     });
   }
 };

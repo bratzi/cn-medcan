@@ -104,3 +104,16 @@ test("Auftakt: die h1 ist die Wortmarke, ohne Grün, ohne Tag, nie per Einstieg 
   assert.match(quelle, /<Unterzeile className="auftakt-unterzeile /);
   assert.doesNotMatch(quelle, /text-accent|uppercase|Textur|groesse="buehne"/);
 });
+
+test("Fuß: die Wortmarke läuft angeschnitten aus, kein Tag, kein zweiter Name", () => {
+  const fuss = lies("components/layout/Fuss.tsx");
+  assert.match(
+    fuss,
+    /<span aria-hidden="true" data-story="fuss-marke" className="fuss-marke block select-none text-umschlag">\s*<Wortmarke groesse="umschlag" einzeilig \/>\s*<\/span>/,
+  );
+  assert.equal(fuss.match(/<Wortmarke /g)?.length, 1);
+  assert.doesNotMatch(fuss, /fuss-tag|font-wand|>\s*gb\s*</);
+  assert.match(css, /\.fuss-marke\s*\{[^}]*margin-bottom:\s*-0\.35em/);
+  assert.doesNotMatch(css, /\.fuss-tag/);
+  assert.match(lies("components/story/bewegung/schluss.ts"), /data-story="fuss-marke"/);
+});

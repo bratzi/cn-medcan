@@ -3,6 +3,8 @@ import assert from "node:assert/strict";
 import { readdirSync, readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
 
+import { SCHREIBEN_AB, SCHREIBEN_BIS } from "@/components/story/bewegung/schreiben";
+
 const css = readFileSync(join(process.cwd(), "app/globals.css"), "utf8");
 
 test("Einstieg wird nur mit Skript und erlaubter Bewegung ausgeblendet, mit Notfall", () => {
@@ -50,4 +52,11 @@ test("Wortmarke im Auftakt schreibt sich per CSS, nur bei erlaubter Bewegung, oh
   assert.match(block, /\.auftakt-unterzeile\s*\{\s*animation:\s*schreiben [^;]*\bbackwards;/);
   assert.doesNotMatch(block, /forwards|\bboth\b/);
   assert.match(css, /@keyframes schreiben\s*\{/);
+});
+
+test("Schreiben: dieselben Ränder in GSAP und CSS, am Ende kein Schnitt", () => {
+  assert.ok(css.includes(`clip-path: ${SCHREIBEN_AB.clipPath};`), "Startrand fehlt in @keyframes schreiben");
+  assert.ok(css.includes(`clip-path: ${SCHREIBEN_BIS.clipPath};`), "Endrand fehlt in @keyframes schreiben");
+  assert.equal(SCHREIBEN_BIS.clearProps, "clipPath");
+  assert.ok(SCHREIBEN_BIS.duration >= 0.6 && SCHREIBEN_BIS.duration <= 0.9, `${SCHREIBEN_BIS.duration} s`);
 });

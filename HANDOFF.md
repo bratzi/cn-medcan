@@ -93,6 +93,8 @@ gepusht und live geprüft; Dauerregel: kein lokales Dev-System).
   `text-vermerk` (neu, 32 px).
 - Welle 1, Task 3 erledigt: Wortmarke handschriftlich (Kopf 40 px, Auftakt als h1 zweizeilig), Unterzeile „Charge für
   Charge“, Tag und Drip im Auftakt raus, Einstieg per CSS.
+- Welle 1, Task 4 erledigt: Fuß mit angeschnittener Wortmarke statt „gb“-Tag, kleine Wortmarke im Fuß entfällt,
+  `schreiben.ts` als gemeinsamer Ablauf.
 
 ### 0. Live-Stand und Sessionablauf
 
