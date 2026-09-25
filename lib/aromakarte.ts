@@ -13,10 +13,11 @@ export type KartenTerpen = { name: string; geschmack: GeschmacksKategorie; konze
 export const BREITE = 640;
 export const HOEHE = 480;
 export const MAX = 5;
-// Anteile an der Kartenbreite (bei BREITE=640 ergeben sie exakt die alten Werte 260/420);
-// so bleibt der Abstand der Spalten proportional, wenn die Karte breiter wird.
-const LINKS_ANTEIL = 260 / BREITE;
-const RECHTS_ANTEIL = 420 / BREITE;
+// Seit 2026-09-25 (Nutzer: Linien laenger, nicht groesser): die Achsenspalte bleibt
+// fest bei 260 (Platz fuer Beschriftung und Balken), die Terpenspalte haengt 220 vor
+// dem rechten Rand (Platz fuer die Namen). Bei breiter Karte wachsen nur die Boegen.
+const LINKS = 260;
+const RECHTS_ABSTAND = BREITE - 420;
 const OBEN = 48;
 const UNTEN = HOEHE - 48;
 export const RADIUS = 180;
@@ -42,13 +43,14 @@ function spalte(anzahl: number, index: number): number {
 
 /** Knoten der Geschmacksachsen in der Karten-Ansicht (linke Spalte). */
 export function achsenImKarte(breite: number = BREITE): Punkt[] {
-  const x = runde(LINKS_ANTEIL * breite);
+  void breite; // Spalte bleibt fest, Parameter für den gleichen Aufruf wie terpeneImKarte
+  const x = LINKS;
   return GESCHMACKS_ACHSEN.map((_, index) => ({ x, y: spalte(GESCHMACKS_ACHSEN.length, index) }));
 }
 
 /** Knoten der Terpene (rechte Spalte). */
 export function terpeneImKarte(anzahl: number, breite: number = BREITE): Punkt[] {
-  const x = runde(RECHTS_ANTEIL * breite);
+  const x = runde(breite - RECHTS_ABSTAND);
   return Array.from({ length: anzahl }, (_, index) => ({ x, y: spalte(anzahl, index) }));
 }
 

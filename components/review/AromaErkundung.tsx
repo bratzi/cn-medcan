@@ -31,7 +31,7 @@ const PROZENT = new Intl.NumberFormat("de-DE", {
 
 /**
  * Aroma-Erkundung in drei Schritten: Gesamteindruck, Terpene, Beschaffenheit,
- * jeder in voller Breite; das Community-Fazit aus allen drei steht zentral darüber (Nutzer 2026-09-25). Im Terpen-Schritt geschieht alles in der Karte: die Geschmacksbalken links
+ * jeder in voller Breite; das Community-Fazit aus allen drei steht danach (Nutzer 2026-09-25). Im Terpen-Schritt geschieht alles in der Karte: die Geschmacksbalken links
  * sind Regler; man zieht, wie stark man jede Geschmacksrichtung schmeckt,
  * und sieht als lila Serie das eigene Profil gegen die Herstellerangabe.
  * Lerneffekt: zur gezogenen Richtung leuchten die Terpene auf, die sie
@@ -50,7 +50,7 @@ export function AromaErkundung({
   children,
 }: {
   titel: string;
-  /** Symbolbild der Blüte, als Server-Teil hereingereicht. */
+  /** Sortenkopf (Symbolbild groß, Herstellerangaben) über der Karte, als Server-Teil hereingereicht. */
   bild?: React.ReactNode;
   terpene: readonly KartenTerpen[];
   serien: readonly AromaSerie[];
@@ -131,7 +131,76 @@ export function AromaErkundung({
 
   return (
     <div className="flex flex-col gap-16 md:gap-24">
-      {/* Community-Fazit zentral über den drei Schritten (Nutzer 2026-09-25): das Fazit
+      {gesamteindruck ? (
+        <Schritt nummer="1" titel="Gesamteindruck">
+          <GesamteindruckLeiste
+            {...gesamteindruck}
+            className="w-full"
+            bedienung={{
+              eigen: eigeneNoten,
+              aendern: (key, wert) => setEigeneNoten((alt) => ({ ...alt, [key]: wert })),
+            }}
+          />
+        </Schritt>
+      ) : null}
+
+      <Schritt nummer="2" titel="Terpene">
+        {treue || eigeneTreue !== null ? (
+          <p className="text-small text-text-muted">
+            {treue ? (
+              <>
+                Nähe zur Herstellerangabe: <span className="numeric text-text">{PROZENT.format(treue.wert)}</span>
+              </>
+            ) : null}
+            {eigeneTreue !== null ? (
+              <>
+                {treue ? " · " : ""}Dein Eindruck:{" "}
+                <span className="numeric text-kopierstift">{PROZENT.format(eigeneTreue)}</span>
+              </>
+            ) : null}
+          </p>
+        ) : null}
+        {bild}
+        <p className="max-w-[60ch] text-small text-text-muted text-pretty">
+          Zieh die lila Punkte links in der Karte: Wie stark schmeckst du jede Richtung? Dazu leuchten die
+          Terpene auf, die sie tragen. Hier wird nichts gespeichert.
+        </p>
+        <div className="w-full min-w-0">
+          <AromaKarte
+            titel={titel}
+            terpene={kartenTerpene}
+            serien={alleSerien}
+            staerken={staerken}
+            ergaenzt={ergaenzt.map((terpen) => terpen.name)}
+            regler={{
+              werte,
+              vergleich: hersteller ?? community,
+              aendern: (key, wert) =>
+                setEigen((alt) => ({ ...(alt ?? start), [key]: wert })),
+            }}
+            lernen={katalog}
+          />
+        </div>
+      </Schritt>
+
+      {beschaffenheit ? (
+        <Schritt nummer="3" titel="Beschaffenheit">
+          <BeschaffenheitsLeiste
+            {...beschaffenheit}
+            className="w-full"
+            bedienung={{
+              eigen: eigeneBeschaffenheit,
+              aendern: (schluessel, wert) =>
+                setEigeneBeschaffenheit((alt) => ({
+                  ...alt,
+                  [schluessel]: wert,
+                })),
+            }}
+          />
+        </Schritt>
+      ) : null}
+
+      {/* Community-Fazit nach allen drei Schritten (Nutzer 2026-09-25, zuvor darüber): das Fazit
           aus Gesamteindruck, Terpenen und Beschaffenheit, in der Handschrift des Logos,
           weil es die Stimme der Community ist (Ausnahme zu Regel 3, ui-design-engine). */}
       {fazit !== null ? (
@@ -166,75 +235,6 @@ export function AromaErkundung({
             Beschaffenheit, jede Stufe zu gleichen Teilen. 100 % heißt: alles top und genau wie angegeben.
           </p>
         </div>
-      ) : null}
-
-      {gesamteindruck ? (
-        <Schritt nummer="1" titel="Gesamteindruck">
-          <GesamteindruckLeiste
-            {...gesamteindruck}
-            className="w-full"
-            bedienung={{
-              eigen: eigeneNoten,
-              aendern: (key, wert) => setEigeneNoten((alt) => ({ ...alt, [key]: wert })),
-            }}
-          />
-        </Schritt>
-      ) : null}
-
-      <Schritt nummer="2" titel="Terpene">
-        {treue || eigeneTreue !== null ? (
-          <p className="text-small text-text-muted">
-            {treue ? (
-              <>
-                Nähe zur Herstellerangabe: <span className="numeric text-text">{PROZENT.format(treue.wert)}</span>
-              </>
-            ) : null}
-            {eigeneTreue !== null ? (
-              <>
-                {treue ? " · " : ""}Dein Eindruck:{" "}
-                <span className="numeric text-kopierstift">{PROZENT.format(eigeneTreue)}</span>
-              </>
-            ) : null}
-          </p>
-        ) : null}
-        <p className="max-w-[60ch] text-small text-text-muted text-pretty">
-          Zieh die lila Punkte links in der Karte: Wie stark schmeckst du jede Richtung? Dazu leuchten die
-          Terpene auf, die sie tragen. Hier wird nichts gespeichert.
-        </p>
-        <div className="w-full min-w-0">
-          <AromaKarte
-            titel={titel}
-            bild={bild}
-            terpene={kartenTerpene}
-            serien={alleSerien}
-            staerken={staerken}
-            ergaenzt={ergaenzt.map((terpen) => terpen.name)}
-            regler={{
-              werte,
-              vergleich: hersteller ?? community,
-              aendern: (key, wert) =>
-                setEigen((alt) => ({ ...(alt ?? start), [key]: wert })),
-            }}
-            lernen={katalog}
-          />
-        </div>
-      </Schritt>
-
-      {beschaffenheit ? (
-        <Schritt nummer="3" titel="Beschaffenheit">
-          <BeschaffenheitsLeiste
-            {...beschaffenheit}
-            className="w-full"
-            bedienung={{
-              eigen: eigeneBeschaffenheit,
-              aendern: (schluessel, wert) =>
-                setEigeneBeschaffenheit((alt) => ({
-                  ...alt,
-                  [schluessel]: wert,
-                })),
-            }}
-          />
-        </Schritt>
       ) : null}
 
       {bewegt || children ? (

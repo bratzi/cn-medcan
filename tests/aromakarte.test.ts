@@ -45,17 +45,16 @@ test("Geometrie: acht Achsen links, Netz beginnt oben, Morph interpoliert", () =
   assert.match(bogen({ x: 0, y: 0 }, { x: 100, y: 50 }), /^M0,0 C50,0 50,50 100,50$/);
 });
 
-test("Geometrie skaliert mit der Breite (volle Kartenbreite): Achsen und Terpene proportional, Standardaufrufe unveraendert", () => {
+test("Geometrie bei voller Breite: Achsen fest links, Terpene am rechten Rand, die Boegen werden laenger", () => {
   // Standardaufrufe (ohne breite) bleiben wie vorher: Maßstab bei 640.
   assert.equal(achsenImKarte()[0].x, 260);
   assert.equal(terpeneImKarte(3)[0].x, 420);
 
-  // Bei voller Breite (z. B. 1200) skalieren nur die x-Positionen der Spalten mit,
-  // proportional zu 260/640 bzw. 420/640.
+  // Bei 1200 bleibt die Achsenspalte bei 260, die Terpene rücken auf 1200 - 220.
   const achsenBreit = achsenImKarte(1200);
-  assert.equal(achsenBreit[0].x, 487.5);
+  assert.equal(achsenBreit[0].x, 260);
   const terpeneBreit = terpeneImKarte(3, 1200);
-  assert.equal(terpeneBreit[0].x, 787.5);
+  assert.equal(terpeneBreit[0].x, 980);
 });
 
 test("Das Netz bleibt bei jeder Breite gleich groß (RADIUS) und zentriert (mitteVon)", () => {

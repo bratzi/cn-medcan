@@ -29,8 +29,6 @@ type Props = {
   terpene: readonly KartenTerpen[];
   serien: readonly AromaSerie[];
   titel?: string;
-  /** Symbolbild der Blüte links zwischen Name und Legende (Nutzer 2026-09-25). */
-  bild?: React.ReactNode;
   /** Von außen hervorgehobene Achse (Regler in der Spielwiese); schlägt das Überfahren. */
   hervorheben?: number | null;
   /** Stärke je Terpen (0 bis 1) für das Leuchten der Pfade; sonst aus den Herstellerangaben. */
@@ -107,7 +105,6 @@ export function AromaKarte({
   terpene,
   serien: roheSerien,
   titel = "Aroma-Karte",
-  bild,
   hervorheben = null,
   staerken,
   ergaenzt = [],
@@ -218,7 +215,6 @@ export function AromaKarte({
         </div>
       </div>
 
-      {bild}
 
       <ul className="flex flex-wrap gap-6 text-small text-text">
         {serien.map((serie) => (
