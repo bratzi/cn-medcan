@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 /* ==========================================================================
-   Design-Tokens "Grünes Buch"
+   Design-Tokens "Book of Terpz"
    Marke: docs/brand/gruenes-buch.md · Regeln: .claude/skills/ui-design-engine.md
    Farbwerte prueft `npm run farben` gegen die Spec (scripts/farben-pruefen.mjs).
    ========================================================================== */
@@ -59,7 +59,7 @@
   --text-display--line-height: 3rem;
   --text-display--font-weight: 600;
 
-  /* ---- Display "Grünes Buch" (Spec 4.2) -------------------------------- */
+  /* ---- Display "Book of Terpz" (Spec 4.2) -------------------------------- */
   --text-kapitel: clamp(2.5rem, 1.5rem + 3.5vw, 5rem);
   --text-kapitel--line-height: 1.05;
   --text-kapitel--font-weight: 200;
@@ -87,7 +87,7 @@
   /* Redesign 7 (Referenz choreograffiti): Handschrift riesig von Rand zu Rand.
      plakat: die Wortmarke als Titel im Auftakt. kulisse: Buzz-Sätze blass
      hinter den Sektionen. Beide nie unter 32 px. */
-  --text-plakat: clamp(7rem, 1rem + 18vw, 26rem);
+  --text-plakat: clamp(6rem, 1rem + 15vw, 22rem);
   --text-plakat--line-height: 0.9;
   --text-plakat--font-weight: 400;
 

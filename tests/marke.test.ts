@@ -69,7 +69,7 @@ test("Wortmarke im Kopf: Handschrift in Kopierstift, echter Text", () => {
   assert.match(html, /\bfont-hand\b/);
   assert.match(html, /\btext-marke\b/);
   assert.match(html, /\btext-kopierstift\b/);
-  assert.equal(ohneTags(html), "Grünes Buch");
+  assert.equal(ohneTags(html), "Book of Terpz");
   assert.doesNotMatch(html, /font-buch|aria-hidden|uppercase|text-accent|gb/);
 });
 
@@ -77,7 +77,7 @@ test("Wortmarke als Umschlag: zwei Zeilen, ein zugänglicher Name", () => {
   const html = renderToStaticMarkup(createElement(Wortmarke, { groesse: "umschlag" }));
   assert.equal(html.match(/data-marke-zeile=""/g)?.length, 2);
   assert.match(html, /\btext-umschlag\b/);
-  assert.equal(ohneTags(html), "Grünes Buch");
+  assert.equal(ohneTags(html), "Book of Terpz");
 });
 
 test("Wortmarke einzeilig (Fuß): bricht nicht um", () => {
@@ -110,7 +110,7 @@ test("Wortmarke als Plakat: einzeilig, Plakat-Grad, schreibt sich", () => {
   assert.equal(html.match(/data-marke-zeile=""/g)?.length, 2);
   assert.match(html, /\btext-plakat\b/);
   assert.match(html, /\bwhitespace-nowrap\b/);
-  assert.equal(ohneTags(html), "Grünes Buch");
+  assert.equal(ohneTags(html), "Book of Terpz");
 });
 
 test("Fuß: die Wortmarke liegt im Fuß hinter dem Inhalt, kein Tag, kein zweiter Name", () => {

@@ -2,27 +2,27 @@ import { cn } from "@/lib/cn";
 
 type Props = {
   groesse: "kopf" | "umschlag" | "plakat";
-  /** Nur umschlag: "Grünes Buch" in einer Zeile (Fuß) statt in zwei (Auftakt). */
+  /** Nur umschlag: "Book of Terpz" in einer Zeile (Fuß) statt in zwei (Auftakt). */
   einzeilig?: boolean;
   className?: string;
 };
 
 /**
- * Die Marke "Grünes Buch" (Spec TP3 6): handschriftlich in Inspiration,
+ * Die Marke "Book of Terpz" (Spec TP3 6): handschriftlich in Inspiration,
  * immer in Kopierstift-Violett. Der Name ist echter Text, kein Bild; wo er
  * nur Bild ist (Fuß), setzt der Aufrufer aria-hidden.
  *
  * kopf:     eine Zeile in text-marke (40 px), im Kopf aller Seiten.
  * umschlag: text-umschlag, zweizeilig im Auftakt (dort als h1), einzeilig
  *           im Fuß. Das Leerzeichen zwischen den Zeilen hält den
- *           zugänglichen Namen "Grünes Buch" zusammen. An
+ *           zugänglichen Namen "Book of Terpz" zusammen. An
  *           `data-marke-zeile` hängt der geschriebene Einstieg (globals.css).
  * plakat:   einzeilig in text-plakat, als h1 im Auftakt von Rand zu Rand
  *           (Spec Redesign 7); schreibt sich wie der Umschlag.
  */
 export function Wortmarke({ groesse, einzeilig = false, className }: Props) {
   if (groesse === "kopf") {
-    return <span className={cn("font-hand text-marke text-kopierstift", className)}>Grünes Buch</span>;
+    return <span className={cn("font-hand text-marke text-kopierstift", className)}>Book of Terpz</span>;
   }
 
   const signatur = groesse === "plakat";
@@ -36,10 +36,10 @@ export function Wortmarke({ groesse, einzeilig = false, className }: Props) {
       )}
     >
       <span data-marke-zeile="" className={zeile}>
-        Grünes
+        Book of
       </span>{" "}
       <span data-marke-zeile="" className={zeile}>
-        Buch
+        Terpz
       </span>
     </span>
   );

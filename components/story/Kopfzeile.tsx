@@ -27,7 +27,7 @@ async function Stand() {
 export function Kopfzeile() {
   return (
     <div className="grid w-full grid-cols-1 gap-2 border-y border-border-strong px-4 py-2 font-sans text-caption uppercase tracking-gesperrt text-text-muted sm:grid-cols-3 sm:items-center sm:px-8">
-      <span>Grünes Buch</span>
+      <span>Book of Terpz</span>
       <span className="tabular-nums sm:text-center">
         <Suspense fallback={<>Stand wird geladen</>}>
           <Stand />

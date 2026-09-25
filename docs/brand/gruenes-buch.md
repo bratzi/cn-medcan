@@ -1,4 +1,4 @@
-# Grünes Buch: Brand Guideline
+# Book of Terpz: Brand Guideline
 
 Stand 2026-09-24 (TP3 „Marke und Medien“). Quellen der Entscheidungen:
 `docs/superpowers/specs/2026-09-23-makeover-gruenes-buch-design.md` und für Marke, Handschrift und Bildsprache
@@ -23,7 +23,7 @@ wird. Daher kommen die Farbe der Handschrift und der eine WebGL-Effekt (Abschnit
 
 ## 2. Name und Logo
 
-- **Wortmarke** „Grünes Buch“ in Inspiration (400), immer in `kopierstift`. Der Name ist echter Text,
+- **Wortmarke** „Book of Terpz“ in Inspiration (400), immer in `kopierstift`. Der Name ist echter Text,
   kein Bild. Im Kopf in `text-marke` (40 px, eine Zeile), im Auftakt als `h1` in `text-umschlag`
   (zweizeilig), im Fuß in `text-umschlag` einzeilig und unten angeschnitten.
 - **Unterzeile** „Charge für Charge“ in Geist 500, `text-caption`, Versalien per CSS, Laufweite 0,3 em,
@@ -228,5 +228,5 @@ dank, 420, Heilung, heilt, wirkt gegen.
 | Motiv | freigestelltes Blatt in Farbe auf dem Papier | Joint vor dunklem Grund, Foto negativ per `invert` |
 | Wirkung | Wirkung nur im vollständigen Eintrag | große Wirkungsnote auf der Startseite |
 | Zahlen | echte Zähler oder die Leitsätze | „Über 10.000 zufriedene Nutzer“ |
-| Trenner | „Grünes Buch. Charge für Charge.“ | „Grünes Buch — Charge für Charge“ |
+| Trenner | „Book of Terpz. Charge für Charge.“ | „Book of Terpz — Charge für Charge“ |
 | Formen | eckige Karte, Pillen-Button | abgerundete Karte, eckiger Button |

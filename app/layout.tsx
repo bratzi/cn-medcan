@@ -31,8 +31,8 @@ const inspiration = Inspiration({
 
 export const metadata: Metadata = {
   title: {
-    default: "Grünes Buch",
-    template: "%s · Grünes Buch",
+    default: "Book of Terpz",
+    template: "%s · Book of Terpz",
   },
   description:
     "Bewertungen verschreibungspflichtiger Cannabisarzneimittel nach festem Schema, jeweils an eine Charge gebunden. Die Community stimmt ab, welche Sorte als Nächstes bewertet wird.",
