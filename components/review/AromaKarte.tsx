@@ -327,7 +327,7 @@ export function AromaKarte({
                       className="transition-opacity duration-fast"
                     />
                     {ring !== null ? (
-                      <circle cx={ring} cy={knoten.y} r={8} fill="none" stroke={FARBE.lila} strokeOpacity={0.45} strokeWidth={2} />
+                      <circle cx={ring} cy={knoten.y} r={8.5} fill="none" stroke={FARBE.gruen} strokeOpacity={0.8} strokeWidth={2} />
                     ) : null}
                     <circle
                       cx={griff}

@@ -29,8 +29,8 @@ export function Auftakt() {
       className="buehne-dunkel relative isolate -mt-(--kopf-h,4rem) flex min-h-svh flex-col overflow-hidden pt-[calc(var(--kopf-h,4rem)+4rem)] pb-16 sm:pb-24"
     >
       <div aria-hidden="true" data-story="auftakt-film" className="pointer-events-none absolute inset-0 -z-10">
-        <Loop id="auftakt-loop" buehne className="h-full opacity-45" />
-        <div className="absolute inset-0 bg-linear-to-b from-surface/60 via-surface/30 to-surface" />
+        <Loop id="auftakt-loop" buehne className="h-full opacity-75" />
+        <div className="absolute inset-0 bg-linear-to-b from-surface/40 via-surface/5 to-surface" />
       </div>
 
       <div className="mx-auto w-full max-w-360 px-4 sm:px-8">

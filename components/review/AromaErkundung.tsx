@@ -11,17 +11,16 @@ import {
 } from "@/components/review/BeschaffenheitsLeiste";
 import type { KatalogEintrag } from "@/components/review/TerpenErgaenzen";
 import {
+  achsenIndex,
   ergaenztesTerpen,
+  MAX,
   herstellerProfil,
   herstellerTreue,
   terpenStaerken,
   type KartenTerpen,
   type Treue,
 } from "@/lib/aromakarte";
-import {
-  leereGeschmacksMatrix,
-  type GeschmacksMatrix,
-} from "@/lib/query/bewertung";
+import { GESCHMACKS_ACHSEN, leereGeschmacksMatrix, type GeschmacksMatrix } from "@/lib/query/bewertung";
 
 const PROZENT = new Intl.NumberFormat("de-DE", {
   style: "percent",
@@ -64,14 +63,12 @@ export function AromaErkundung({
   >({});
   const bewegt = eigen !== null || Object.keys(eigeneBeschaffenheit).length > 0;
 
-  // Karte: Herstellerterpene plus die, die die Community zusätzlich geschmeckt hat.
+  // Karte: alle bekannten Terpene. Was der Hersteller nicht angibt, steht grau
+  // daneben und wird farbig, sobald seine Geschmacksrichtung über 0 liegt.
   const angegeben = new Set(terpene.map((terpen) => terpen.name));
-  const ergaenzt: KartenTerpen[] = zeilen
-    .filter((zeile) => !angegeben.has(zeile.terpen))
-    .flatMap((zeile) => {
-      const eintrag = katalog.find((terpen) => terpen.name === zeile.terpen);
-      return eintrag ? [ergaenztesTerpen(eintrag.name, eintrag.geschmack)] : [];
-    });
+  const ergaenzt: KartenTerpen[] = katalog
+    .filter((terpen) => !angegeben.has(terpen.name))
+    .map((terpen) => ergaenztesTerpen(terpen.name, terpen.geschmack));
   const kartenTerpene = [...terpene, ...ergaenzt];
   const stufen = Object.fromEntries(
     zeilen.map((zeile) => [zeile.terpen, zeile.wert]),
@@ -82,6 +79,16 @@ export function AromaErkundung({
   // Start der Regler: was die Community geschmeckt hat, sonst die Herstellerangabe.
   const start = community ?? hersteller ?? leereGeschmacksMatrix();
   const werte = eigen ?? start;
+  // Stärke je Terpen: 0 (grau), solange seine Geschmacksrichtung bei 0 steht.
+  const basis = terpenStaerken(kartenTerpene, stufen);
+  const staerken = Object.fromEntries(
+    kartenTerpene.map((terpen) => {
+      const achse = GESCHMACKS_ACHSEN[achsenIndex(terpen.geschmack)];
+      const wert = achse ? werte[achse.key] : 0;
+      if (wert <= 0.05) return [terpen.name, 0];
+      return [terpen.name, angegeben.has(terpen.name) ? (basis[terpen.name] ?? 0) : Math.min(wert / MAX, 1) * 0.6];
+    }),
+  );
   const eigeneTreue =
     eigen && hersteller ? herstellerTreue(hersteller, eigen) : null;
   const alleSerien: AromaSerie[] = eigen
@@ -99,11 +106,11 @@ export function AromaErkundung({
           titel={titel}
           terpene={kartenTerpene}
           serien={alleSerien}
-          staerken={terpenStaerken(kartenTerpene, stufen)}
+          staerken={staerken}
           ergaenzt={ergaenzt.map((terpen) => terpen.name)}
           regler={{
             werte,
-            vergleich: community,
+            vergleich: hersteller ?? community,
             aendern: (key, wert) =>
               setEigen((alt) => ({ ...(alt ?? start), [key]: wert })),
           }}
