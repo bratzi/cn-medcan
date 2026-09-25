@@ -26,6 +26,9 @@ Fehler 1102 „Worker exceeded resource limits“, auch auf der Startseite.
 3. **Nutzerbezogene Teile** werden eigene async Server Components in eigenen `<Suspense>`-Grenzen (dynamische
    Löcher im gecachten Gerüst): eigene Stimme/Abstimm-Button, Preisanzeige, Freigabehinweis. Nur sie lesen
    Session bzw. Gate-Rolle und fragen D1 ab — klein, eine Abfrage je Loch.
+   **Präzisierung (Plan):** Die Lader in `lib/query/strains.ts` nehmen `fachkreis: boolean` schon als
+   Argument. Gecacht wird deshalb je Rollenwert (zwei Einträge); die Rolle liest eine ungecachte Komponente in
+   der Suspense-Grenze und reicht nur den Boolean hinein. Das ersetzt ein eigenes Preis-Loch auf Katalogseiten.
 4. **Filter auf `/produkte`** (`searchParams`): das Gerüst ist statisch, die Trefferliste ist eine gecachte
    Funktion mit dem normalisierten Filter als Cache-Schlüssel (Argumente von `"use cache"`).
 5. **Invalidierung:** Admin-Aktionen (Mitglied-/Vorschlagsfreigabe, Umfragephase, Review-Freigabe) rufen
