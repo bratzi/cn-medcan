@@ -1037,6 +1037,15 @@ export async function ladeStrainAuswahl(): Promise<StrainAuswahlEintrag[]> {
 export type AromaVorzeige = {
   handelsname: string;
   slug: string;
+  /** Stammdaten für den Sortenkopf (Nutzer 2026-09-25: man muss sehen, was bewertet wird). */
+  kultivarName: string | null;
+  kultivarTyp: KultivarTyp;
+  genetik: string | null;
+  herstellerName: string | null;
+  thcMinProzent: number;
+  thcMaxProzent: number;
+  cbdMinProzent: number;
+  cbdMaxProzent: number;
   /** Referenzbild (Medien-Id-Pfad) für das Symbolbild in der Karte. */
   herstellerBildPfad: string | null;
   terpene: TerpenEintrag[];
@@ -1066,6 +1075,14 @@ export async function ladeAromaVorzeige(): Promise<AromaVorzeige | null> {
     select: {
       handelsname: true,
       slug: true,
+      kultivarName: true,
+      kultivarTyp: true,
+      genetik: true,
+      thcMinProzent: true,
+      thcMaxProzent: true,
+      cbdMinProzent: true,
+      cbdMaxProzent: true,
+      hersteller: { select: { name: true } },
       herstellerBildPfad: true,
       terpene: {
         orderBy: { rang: "asc" },
@@ -1095,6 +1112,14 @@ export async function ladeAromaVorzeige(): Promise<AromaVorzeige | null> {
   return {
     handelsname: zeile.handelsname,
     slug: zeile.slug,
+    kultivarName: zeile.kultivarName,
+    kultivarTyp: alsKultivarTyp(zeile.kultivarTyp),
+    genetik: zeile.genetik,
+    herstellerName: zeile.hersteller?.name ?? null,
+    thcMinProzent: zuZahlPflicht(zeile.thcMinProzent),
+    thcMaxProzent: zuZahlPflicht(zeile.thcMaxProzent),
+    cbdMinProzent: zuZahlPflicht(zeile.cbdMinProzent),
+    cbdMaxProzent: zuZahlPflicht(zeile.cbdMaxProzent),
     herstellerBildPfad: zeile.herstellerBildPfad,
     terpene: zeile.terpene.map((eintrag) => ({
       name: eintrag.terpen.name,

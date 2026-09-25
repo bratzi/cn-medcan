@@ -57,7 +57,21 @@ export default async function BewertenPage({ params }: PageProps<"/bewerten/[slu
             chargen={strain.chargen.map((charge) => charge.chargenNr)}
             istBetreiber={mitglied.rolle === "ADMIN"}
             katalog={katalog}
-            kopf={<SortenKopf handelsname={strain.handelsname} bildPfad={strain.herstellerBildPfad} terpene={strain.terpene} />}
+            kopf={
+              <SortenKopf
+                handelsname={strain.handelsname}
+                bildPfad={strain.herstellerBildPfad}
+                kultivarName={strain.kultivarName}
+                kultivarTyp={strain.kultivarTyp}
+                genetik={strain.genetik}
+                herstellerName={strain.hersteller?.name ?? null}
+                thcMin={strain.thcMinProzent}
+                thcMax={strain.thcMaxProzent}
+                cbdMin={strain.cbdMinProzent}
+                cbdMax={strain.cbdMaxProzent}
+                terpene={strain.terpene}
+              />
+            }
             {...erkundungsDaten(strain.terpene, strain.reviews)}
           />
         )}

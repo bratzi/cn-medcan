@@ -21,7 +21,21 @@ async function Inhalt() {
     <div className="mt-16">
       <AromaErkundung
         titel={sorte.handelsname}
-        bild={<SortenKopf handelsname={sorte.handelsname} bildPfad={sorte.herstellerBildPfad} terpene={sorte.terpene} />}
+        bild={
+          <SortenKopf
+            handelsname={sorte.handelsname}
+            bildPfad={sorte.herstellerBildPfad}
+            kultivarName={sorte.kultivarName}
+            kultivarTyp={sorte.kultivarTyp}
+            genetik={sorte.genetik}
+            herstellerName={sorte.herstellerName}
+            thcMin={sorte.thcMinProzent}
+            thcMax={sorte.thcMaxProzent}
+            cbdMin={sorte.cbdMinProzent}
+            cbdMax={sorte.cbdMaxProzent}
+            terpene={sorte.terpene}
+          />
+        }
         terpene={sorte.terpene}
         katalog={katalog}
         {...erkundungsDaten(sorte.terpene, sorte.reviews)}
