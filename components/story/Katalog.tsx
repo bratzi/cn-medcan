@@ -68,7 +68,7 @@ export function Katalog() {
         <div className="flex flex-wrap items-end justify-between gap-6">
           <div className="flex max-w-2xl flex-col gap-4">
             <h2 id="katalog-titel" className="font-buch text-kapitel text-text">
-              Der <em className="farbverlauf italic">Katalog</em>
+              Der <em className="farbverlauf hand-betont">Katalog</em>
             </h2>
             <p className="text-body text-text-muted text-pretty">
               Verschreibungspflichtige Cannabisarzneimittel nach ihren BfArM-Handelsnamen, mit

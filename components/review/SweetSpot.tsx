@@ -70,7 +70,7 @@ export function SweetSpot({
     <section className="flex flex-col gap-4">
       <h3 className="font-buch text-h2 font-medium text-text text-balance">
         {titel ? `${titel}: ` : null}
-        <em className="farbverlauf italic">Sweet Spot</em> gesucht
+        <em className="farbverlauf hand-betont">Sweet Spot</em> gesucht
       </h3>
       <ul className="flex flex-col gap-6" onPointerLeave={() => bedienung?.aktivieren?.(null)}>
         {zeilen.map((zeile) => {

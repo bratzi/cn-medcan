@@ -532,3 +532,14 @@
     var(--color-border) 100%
   );
 }
+
+/* Betonung in Überschriften: Logo-Handschrift statt Kursiv, größer, weil die
+   Schreibschrift eine kleine x-Höhe hat. */
+.hand-betont {
+  font-family: var(--font-hand);
+  font-style: normal;
+  font-weight: 400;
+  font-size: 1.35em;
+  line-height: 0.8;
+  letter-spacing: 0;
+}

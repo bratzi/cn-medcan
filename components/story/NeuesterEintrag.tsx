@@ -49,7 +49,7 @@ export function NeuesterEintrag() {
     >
       <div className="mx-auto flex w-full max-w-360 flex-col gap-12">
         <h2 id="eintrag-titel" className="font-buch text-kapitel text-text">
-          Der <em className="farbverlauf italic">neueste</em> Eintrag
+          Der <em className="farbverlauf hand-betont">neueste</em> Eintrag
         </h2>
         <Suspense fallback={<DoppelseitenSkelett />}>
           <EintragInhalt />

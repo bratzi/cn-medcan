@@ -38,7 +38,7 @@ export function WissenBuendeln() {
     >
       <div className="mx-auto grid w-full max-w-360 grid-cols-1 gap-12 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)] lg:gap-16">
         <h2 id="wissen-titel" className="max-w-4xl font-buch text-kapitel text-text text-balance">
-          Einer allein weiß wenig. Hier sammelt sich, was <em className="farbverlauf italic">viele</em> erfahren.
+          Einer allein weiß wenig. Hier sammelt sich, was <em className="farbverlauf hand-betont">viele</em> erfahren.
         </h2>
         <div className="lg:border-s lg:border-border lg:ps-8">
           <Suspense fallback={<RandspaltenSkelett />}>

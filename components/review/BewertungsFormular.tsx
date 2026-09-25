@@ -195,7 +195,7 @@ export function BewertungsFormular({ strainId, handelsname, terpene, chargen, is
       {alleTerpene.length > 0 || katalog.length > 0 ? (
         <section className="flex flex-col gap-6">
           <h2 className="font-buch text-h1 font-medium text-text">
-            Terpen-Intensität: <em className="farbverlauf italic">Sweet Spot</em> gesucht
+            Terpen-Intensität: <em className="farbverlauf hand-betont">Sweet Spot</em> gesucht
           </h2>
           <p className="max-w-[60ch] text-body text-text-muted text-pretty">
             Zu viel von einem Terpen macht den Geschmack aufdringlich, zu wenig lässt ihn flach wirken. Wie stark

@@ -47,7 +47,7 @@ export function GemeinsamLernen() {
 
         <div className="flex flex-col items-start gap-6">
           <h2 id="lernen-titel" className="font-buch text-h1 font-medium text-text text-balance">
-            Wir schlagen vor. Wir stimmen ab. Wir testen. <em className="farbverlauf italic">Wir lesen.</em>
+            Wir schlagen vor. Wir stimmen ab. Wir testen. <em className="farbverlauf hand-betont">Wir lesen.</em>
           </h2>
           <p className="max-w-[56ch] text-body text-text text-pretty">
             Jede Runde bringt neue Sorten auf die Liste. Was die meisten Stimmen holt, testen wir nach

@@ -64,7 +64,7 @@ export function AromaSektion() {
       <Schlagwort satz="stimmt das?" ton="gruen" oben="top-8" />
       <div className="mx-auto w-full max-w-360">
         <h2 id="aroma-titel" className="max-w-4xl font-buch text-kapitel text-text text-balance">
-          Was der Hersteller verspricht, <em className="farbverlauf italic">prüfen wir nach.</em>
+          Was der Hersteller verspricht, <em className="farbverlauf hand-betont">prüfen wir nach.</em>
         </h2>
         <p className="mt-6 max-w-[60ch] text-body text-text-muted text-pretty">
           Grün ist das Profil, das die angegebenen Terpene erwarten lassen. Lila ist, was wir beim Probieren gefunden
