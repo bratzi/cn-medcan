@@ -28,6 +28,41 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 
 ## ⇢ Hier geht es weiter
 
+### ⇢ NÄCHSTE SESSION BEGINNT HIER (Stand 2026-09-25, Session 14 Ende): Sichtprüfung-Befunde abarbeiten
+Live bis `692eb12` (alle Builds grün). Live-D1 befüllt: 286 Sorten aus eigenem Produktstamm (`data/stamm/`, Import
+`scripts/stamm/sql-erzeugen.py` -> `data/stamm/import.sql`), 20 fiktive Bewertungen (`scripts/stamm/beispiel-bewertungen.py`,
+Notiz beginnt "Fiktive Beispielbewertung"), Beispielrunde "Herbstrunde 2026" (`data/stamm/beispiel-runde.sql`).
+Remote-D1 schreiben ist per Regel in `.claude/settings.local.json` erlaubt (`npx wrangler d1 execute cn-medcan-db --remote:*`,
+Befehl genau so beginnen, ohne `cd` davor). Browser-Tab muss sichtbar sein, sonst keine Screenshots / Suspense bleibt
+"lädt" (React zeigt gestreamte Inhalte erst per rAF).
+
+**Offene Befunde der Sichtprüfung (Desktop, hell), Skill build-awwwards-quality-sites, der Reihe nach beheben, dann einmal pushen:**
+1. **Hero „Video anhalten“:** weiße Pille ohne lesbaren Text. `.buehne-dunkel` (globals.css) setzt surface-raised /
+   surface-sunken nicht -> dort ergänzen (neutral-900/1000), Secondary-Button nutzt diese Tokens.
+2. **Startseite Abstimmung zeigt „Gerade läuft keine Runde“,** obwohl `/umfragen` die Herbstrunde live zeigt
+   (`components/story/Abstimmung.tsx` -> `aktiveUmfrage()` in lib/query/umfragen.ts, findUnique aktiv='AKTIV').
+   Ursache klären (Cache? anderer Fehlerpfad in `sicher`? Startseite force-dynamic). Darunter große Leerfläche.
+3. **Manifest-Bilder (TransparentMachen `Punkt`):** graue Blob-Fläche (`bg-surface-sunken`) wirkt wie Kasten, Freisteller
+   ragen oben raus / hart angeschnitten. Für freigestellte Bilder: `object-contain`, Innenabstand, Blob nur als zarte
+   Tönung (accent-subtle) oder ganz ohne Fläche.
+4. **Aroma-Karte (components/review/AromaKarte.tsx):** Achsen mit Wert 0 zeigen je zwei Punkte + Stummel -> in der
+   Karten-Ansicht bei Wert 0 Balken und Punkte ausblenden; Achsenknoten ruhiger (einfarbig). Beschriftung stößt an
+   lange Balken (Label-Versatz `punkt.x - 130` auf ca. -150).
+5. **Buzz-Satz „stimmt das?“** (AromaSektion) liegt mitten hinter den Kurven -> `oben="top-8"` oder weglassen.
+6. **Katalog-Karten** zeigen überall Badge „Nicht gelistet“ (ProduktCard, heißt: keine Apotheke mit Bestand) -> Text
+   neutraler („Bestand unbekannt“) oder Badge ohne Bestand weglassen.
+7. **Fuß:** lila Wortmarke im Hintergrund zu kräftig, überdeckt Links -> `.fuss-marke` opacity ~0.15, weiter nach unten.
+8. Danach: Mobil-Ansicht (390 px) und Dunkel-Modus einmal prüfen, reduzierte Bewegung.
+
+**Stand der Features (alles live):** Aroma-Karte mit Morph Karte/Netz, Hersteller vs. Community; Aroma-Spielwiese
+(offene Regler, `components/review/AromaSpielwiese.tsx`); Sweet Spot je Terpen; Bewertungsformular `/bewerten/[slug]`
+(ADMIN sofort redaktionell, Mitglieder -> Freigabe in /admin); 3D-Blätter (5 Stück, 30 %, pausieren bei hidden,
+Context-Loss); Hero-Film-Intro; zwei Schriftfamilien; Wir-Form.
+
+**Datenrecherche:** Keine Übernahme ganzer Fremd-Datenbanken (flowzz, medcanonestop): nur Namen als Suchliste, Fakten
+je Produkt aus mehreren Quellen. Dauerlösung für Vollständigkeit: ABDA-Artikelstamm-API (pharmazie.com, Lizenz) und
+Partner-Apotheken für Bestand. Netz schonen: keine Polling-Schleifen, kein Dev-Server (Memory netzwerk-schonen).
+
 ### ⇢ STAND SESSION 14, vierter Block (2026-09-25): live bis `17134f4`, Build erfolgreich
 - Aroma-Karte (`components/review/AromaKarte.tsx`, `lib/aromakarte.ts`): Poster mit 8 Geschmacksachsen, Terpenen und
   Bögen, Morph „Karte“/„Netz“ (~900 ms); Hersteller (Grün, `herstellerProfil()`) gegen Community (Lila). In Doppelseite,
