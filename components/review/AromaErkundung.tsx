@@ -4,7 +4,19 @@ import { useState } from "react";
 
 import { AromaKarte, type AromaSerie } from "@/components/review/AromaKarte";
 import { SweetSpot, type SweetSpotZeile } from "@/components/review/SweetSpot";
-import { achsenIndex, eindruckProfil, terpenStaerken, type KartenTerpen } from "@/lib/aromakarte";
+import { TerpenErgaenzen, type KatalogEintrag } from "@/components/review/TerpenErgaenzen";
+import {
+  achsenIndex,
+  eindruckProfil,
+  ergaenztesTerpen,
+  herstellerProfil,
+  herstellerTreue,
+  terpenStaerken,
+  type KartenTerpen,
+  type Treue,
+} from "@/lib/aromakarte";
+
+const PROZENT = new Intl.NumberFormat("de-DE", { style: "percent", maximumFractionDigits: 0 });
 
 /**
  * Aroma-Karte und Sweet Spot in einem (Spec Redesign 20, zusammengeführt):
@@ -19,6 +31,8 @@ export function AromaErkundung({
   serien,
   zeilen,
   intensitaetTitel,
+  katalog = [],
+  treue = null,
   children,
 }: {
   titel: string;
@@ -27,32 +41,84 @@ export function AromaErkundung({
   /** Community-Mittel je Terpen; Terpene ohne Bewertung starten im Sweet Spot. */
   zeilen: readonly SweetSpotZeile[];
   intensitaetTitel?: string;
+  /** Alle bekannten Terpene: für Terpene, die der Hersteller nicht angibt. */
+  katalog?: readonly KatalogEintrag[];
+  /** Herstellertreue aus allen Bewertungen der Sorte. */
+  treue?: Treue | null;
   children?: React.ReactNode;
 }) {
-  const alle: SweetSpotZeile[] = terpene.map(
-    (terpen) => zeilen.find((zeile) => zeile.terpen === terpen.name) ?? { terpen: terpen.name, wert: 3 },
-  );
   const [eigen, setEigen] = useState<Record<string, number>>({});
+  const [dazu, setDazu] = useState<string[]>([]);
+
+  // Ergänzt: was die Community zusätzlich geschmeckt hat, und was man selbst hinzufügt.
+  const angegeben = new Set(terpene.map((terpen) => terpen.name));
+  const ergaenztNamen = [
+    ...new Set([...zeilen.map((zeile) => zeile.terpen).filter((name) => !angegeben.has(name)), ...dazu]),
+  ];
+  const ergaenzt: KartenTerpen[] = ergaenztNamen.flatMap((name) => {
+    const eintrag = katalog.find((terpen) => terpen.name === name);
+    return eintrag ? [ergaenztesTerpen(eintrag.name, eintrag.geschmack)] : [];
+  });
+  const kartenTerpene = [...terpene, ...ergaenzt];
+  const alle: SweetSpotZeile[] = kartenTerpene.map(
+    (terpen) => ({
+      ...(zeilen.find((zeile) => zeile.terpen === terpen.name) ?? { terpen: terpen.name, wert: 3 }),
+      ergaenzt: !angegeben.has(terpen.name),
+    }),
+  );
   const [aktiv, setAktiv] = useState<number | null>(null);
 
   const bewegt = Object.keys(eigen).length > 0;
   const stufen = Object.fromEntries(alle.map((zeile) => [zeile.terpen, eigen[zeile.terpen] ?? zeile.wert]));
-  const eindruck = bewegt ? eindruckProfil(terpene, stufen) : null;
+  const eindruck = bewegt || dazu.length > 0 ? eindruckProfil(terpene, stufen, ergaenzt) : null;
+  const hersteller = herstellerProfil(terpene);
+  const eigeneTreue = eindruck && hersteller ? herstellerTreue(hersteller, eindruck) : null;
   const alleSerien: AromaSerie[] = eindruck
     ? [...serien.filter((serie) => serie.ton === "gruen"), { name: "Dein Eindruck", ton: "lila", matrix: eindruck }]
     : [...serien];
 
   const aktivieren = (name: string | null) => {
-    const terpen = name ? terpene.find((t) => t.name === name) : undefined;
+    const terpen = name ? kartenTerpene.find((t) => t.name === name) : undefined;
     setAktiv(terpen ? achsenIndex(terpen.geschmack) : null);
   };
 
   return (
     <div className="grid grid-cols-1 gap-16 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] lg:items-start">
       <div className="lg:sticky lg:top-24">
-        <AromaKarte titel={titel} terpene={terpene} serien={alleSerien} hervorheben={aktiv} staerken={terpenStaerken(terpene, stufen)} />
+        <AromaKarte
+          titel={titel}
+          terpene={kartenTerpene}
+          serien={alleSerien}
+          hervorheben={aktiv}
+          staerken={terpenStaerken(kartenTerpene, stufen)}
+          ergaenzt={ergaenzt.map((terpen) => terpen.name)}
+        />
       </div>
       <div className="flex flex-col items-start gap-8">
+        {treue || eigeneTreue !== null ? (
+          <dl className="flex flex-wrap gap-x-12 gap-y-4">
+            {treue ? (
+              <div className="flex flex-col gap-1">
+                <dt className="text-small text-text-muted">Herstellertreue</dt>
+                <dd className="numeric font-buch text-h1 font-medium text-text">{PROZENT.format(treue.wert)}</dd>
+                <dd className="text-caption text-text-muted">
+                  aus {treue.anzahl} {treue.anzahl === 1 ? "Bewertung" : "Bewertungen"}
+                </dd>
+              </div>
+            ) : null}
+            {eigeneTreue !== null ? (
+              <div className="flex flex-col gap-1" aria-live="polite">
+                <dt className="text-small text-text-muted">Dein Eindruck</dt>
+                <dd className="numeric font-buch text-h1 font-medium text-kopierstift">{PROZENT.format(eigeneTreue)}</dd>
+                <dd className="text-caption text-text-muted">nah an der Angabe</dd>
+              </div>
+            ) : null}
+          </dl>
+        ) : null}
+        <p className="-mt-4 max-w-[48ch] text-caption text-text-muted text-pretty">
+          Herstellertreue: wie nah das geschmeckte Profil an dem liegt, was die Herstellerangaben erwarten lassen. 100 %
+          heißt deckungsgleich.
+        </p>
         <SweetSpot
           titel={intensitaetTitel}
           zeilen={alle}
@@ -66,10 +132,18 @@ export function AromaErkundung({
           Schieb die Punkte: Wie stark hast du die Terpene geschmeckt? Die Karte zeigt dein Profil in Lila. Hier wird
           nichts gespeichert.
         </p>
-        {bewegt ? (
+        <TerpenErgaenzen
+          katalog={katalog}
+          vorhanden={kartenTerpene.map((terpen) => terpen.name)}
+          hinzufuegen={(terpen) => setDazu((alt) => [...alt, terpen.name])}
+        />
+        {bewegt || dazu.length > 0 ? (
           <button
             type="button"
-            onClick={() => setEigen({})}
+            onClick={() => {
+              setEigen({});
+              setDazu([]);
+            }}
             className="text-small text-accent underline underline-offset-4 hover:text-accent-hover"
           >
             Zurücksetzen

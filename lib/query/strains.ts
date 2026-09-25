@@ -1080,3 +1080,12 @@ export async function ladeAromaVorzeige(): Promise<AromaVorzeige | null> {
     reviews: zeile.reviews,
   };
 }
+
+/** Alle bekannten Terpene mit Geschmacksachse: zum Ergänzen, was der Hersteller nicht angibt. */
+export type KatalogTerpen = { name: string; geschmack: GeschmacksKategorie };
+
+export async function ladeTerpenKatalog(): Promise<KatalogTerpen[]> {
+  const prisma = await getPrisma();
+  const zeilen = await prisma.terpen.findMany({ orderBy: { name: "asc" }, select: { name: true, geschmack: true } });
+  return zeilen.map((zeile) => ({ name: zeile.name, geschmack: alsGeschmacksKategorie(zeile.geschmack) }));
+}

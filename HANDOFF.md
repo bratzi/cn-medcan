@@ -3,7 +3,7 @@
 > Übergabemedium zwischen Sessions. Wird nach jedem Arbeitsblock aktualisiert und committet.
 > Wer hier weiterarbeitet, liest diese Datei zuerst und braucht den Chatverlauf nicht.
 
-**Letzte Aktualisierung:** 2026-09-24 (Session 11, Spec Teilprojekt 3 „Marke und Medien“ geschrieben)
+**Letzte Aktualisierung:** 2026-09-25 (Session 15, Aroma-Erkundung, Herstellertreue)
 **Repo:** https://github.com/bratzi/cn-medcan (public)
 **Branch:** `main` (Makeover „Grünes Buch“ Teilprojekt 1 ist seit 2026-09-24 auf `main`)
 
@@ -28,7 +28,37 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 
 ## ⇢ Hier geht es weiter
 
-### ⇢ NÄCHSTE SESSION BEGINNT HIER (Stand 2026-09-25, Session 14 Ende): Sichtprüfung-Befunde abarbeiten
+### ⇢ NÄCHSTE SESSION BEGINNT HIER (Stand 2026-09-25, Session 15 Ende): Browser-Prüfung, dann Tasks unten
+Session 15 gepusht (letzter Commit siehe `git log`, Builds bis `dcec4bd` grün). Browser-Erweiterung war nicht
+verbunden: **nichts davon ist per Screenshot geprüft.** Zuerst Chrome mit Claude-Erweiterung, Fenster sichtbar.
+
+**Erledigt in Session 15 (Code, Tests 156/156 grün, tsc/eslint sauber):**
+- Sichtprüfung-Befunde 1, 3 bis 7 (Bühnen-Tokens, Manifest-Freisteller ohne Kasten, Aroma-Karte ohne Nullbalken,
+  Buzz-Satz oben, „Bestand unbekannt“, blassere Fußmarke). Befund 2 (Startseite „keine Runde“): im Code keine
+  Ursache, gleiche Funktion wie /umfragen; vermutlich Screenshot vor Beispielrunde -> live prüfen.
+- **Aroma-Karte + Sweet Spot zusammengeführt:** `components/review/AromaErkundung.tsx` (Startseite, Produktseite).
+  Sweet-Spot-Spuren sind die Regler (`SweetSpot` mit `bedienung`), „Dein Eindruck“ lila auf der Karte;
+  `AromaSpielwiese` gelöscht. Sichtbare sr-only-Caption („… Skala 0 bis 5“) behoben (Tabelle in div.sr-only).
+- **Karte:** nur aktive Achse farbig, Rest grau; Pfade leuchten/verbreitern nach Terpen-Stärke (`terpenStaerken`);
+  Balken gleiten (`useGleitend`), Skala 0..5 über den Balken, Werte an Balkenenden bei aktiver Achse.
+- **Terpene ergänzen, die der Hersteller nicht angibt:** `TerpenErgaenzen.tsx` + `ladeTerpenKatalog()`; in
+  AromaErkundung und im Bewertungsformular; Server Action erlaubt jetzt alle bekannten Terpene. Ergänzte Pfade
+  gestrichelt, zählen nur in den Eindruck (`eindruckProfil(…, ergaenzt)`).
+- **Herstellertreue (Koeffizient):** `herstellerTreue()` = Σmin/Σmax Hersteller- vs. Geschmacksprofil je
+  Bewertung, `mittlereHerstellerTreue()` über alle freigegebenen Bewertungen; angezeigt in AromaErkundung plus
+  Live-Wert „Dein Eindruck“.
+
+**Tasks für die nächste Session, der Reihe nach:**
+1. Browser-Prüfung live: Startseite (Aroma-Sektion: Regler, Karte grau/farbig, Leuchten, Skala, Ergänzen,
+   Herstellertreue; Abstimmung = Befund 2), Produktseite, `/bewerten/[slug]` (Terpen ergänzen, Speichern).
+2. Herstellertreue massenhaft erfassen und auswerten: je Bewertung beim Speichern mitschreiben (Spalte
+   `reviews.hersteller_treue`, Migration + Backfill), je Sorte im Katalog zeigen/sortieren/filtern, Rangliste
+   „Wer hält, was er verspricht“ (je Hersteller über alle Sorten). Ergänzte Terpene als eigene Kennzahl
+   („von Community zusätzlich geschmeckt“) aggregieren.
+3. Befund 8: Mobil (390 px), Dunkel-Modus, reduzierte Bewegung (Gleiten springt dann).
+4. Offene Sichtprüfung der Unterseiten im neuen Stil.
+
+### ⇢ STAND SESSION 14 Ende: Sichtprüfung-Befunde (in Session 15 abgearbeitet)
 Live bis `692eb12` (alle Builds grün). Live-D1 befüllt: 286 Sorten aus eigenem Produktstamm (`data/stamm/`, Import
 `scripts/stamm/sql-erzeugen.py` -> `data/stamm/import.sql`), 20 fiktive Bewertungen (`scripts/stamm/beispiel-bewertungen.py`,
 Notiz beginnt "Fiktive Beispielbewertung"), Beispielrunde "Herbstrunde 2026" (`data/stamm/beispiel-runde.sql`).

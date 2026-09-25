@@ -29,13 +29,15 @@ export async function bewertungSpeichern(formData: FormData): Promise<BewertungE
   const prisma = await getPrisma();
   const strain = await prisma.strain.findUnique({
     where: { id: String(formData.get("strainId") ?? "") },
-    select: { id: true, slug: true, aktiv: true, terpene: { select: { terpen: { select: { name: true } } } } },
+    select: { id: true, slug: true, aktiv: true },
   });
   if (!strain || !strain.aktiv) return { ok: false, fehler: "Diese Sorte gibt es nicht (mehr)." };
 
+  // Alle bekannten Terpene: auch solche, die der Hersteller nicht angibt, die man aber schmeckt.
+  const bekannte = await prisma.terpen.findMany({ select: { name: true } });
   const geprueft = bewertungPruefen(
     formData,
-    strain.terpene.map((eintrag) => eintrag.terpen.name),
+    bekannte.map((terpen) => terpen.name),
   );
   if (!geprueft.ok) return geprueft;
   const e = geprueft.wert;

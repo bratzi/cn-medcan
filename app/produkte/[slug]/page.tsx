@@ -13,7 +13,7 @@ import { Doppelseite } from "@/components/review/Doppelseite";
 import { type AromaSerie } from "@/components/review/AromaKarte";
 import { Aufklaerung } from "@/components/review/Aufklaerung";
 import { AromaErkundung } from "@/components/review/AromaErkundung";
-import { herstellerProfil } from "@/lib/aromakarte";
+import { herstellerProfil, mittlereHerstellerTreue } from "@/lib/aromakarte";
 import { alsEintrag } from "@/components/review/eintrag";
 import {
   Faktenliste,
@@ -37,9 +37,9 @@ import {
   formatiereProzentSpanne,
 } from "@/lib/format";
 import { bestrahlungLabel, darreichungsformLabel, kultivarTypLabel } from "@/lib/labels";
-import { teileBewertungen, verdichteGeschmacksMatrix, mittleTerpenIntensitaet, parseTerpenIntensitaet } from "@/lib/query/bewertung";
+import { parseGeschmacksMatrix, teileBewertungen, verdichteGeschmacksMatrix, mittleTerpenIntensitaet, parseTerpenIntensitaet } from "@/lib/query/bewertung";
 import { istFachkreis } from "@/lib/query/fachkreis";
-import { ladeStrainDetail, type StrainDetail, type UnternehmenEintrag } from "@/lib/query/strains";
+import { ladeStrainDetail, ladeTerpenKatalog, type StrainDetail, type UnternehmenEintrag } from "@/lib/query/strains";
 
 /**
  * Kein Prerender zur Buildzeit: es gibt derzeit keine zur Buildzeit
@@ -145,7 +145,7 @@ function Chargentabelle({ chargen }: { chargen: StrainDetail["chargen"] }) {
  */
 async function ProduktInhalt({ slug }: { slug: string }) {
   const fachkreis = await istFachkreis();
-  const strain = await ladeStrainDetail(slug, fachkreis);
+  const [strain, katalog] = await Promise.all([ladeStrainDetail(slug, fachkreis), ladeTerpenKatalog()]);
   if (!strain) notFound();
 
   const { eigene, community, meineNote, communityMittel } = teileBewertungen(strain.reviews);
@@ -214,6 +214,8 @@ async function ProduktInhalt({ slug }: { slug: string }) {
               terpene={strain.terpene}
               serien={aromaSerien}
               intensitaetTitel="Intensität"
+              katalog={katalog}
+              treue={mittlereHerstellerTreue(hersteller, strain.reviews.map((review) => parseGeschmacksMatrix(review.geschmacksMatrix)))}
               zeilen={Object.entries(intensitaet).map(([terpen, { mittel, anzahl }]) => ({ terpen, wert: mittel, anzahl }))}
             />
           </div>

@@ -6,7 +6,7 @@ import { Seitenkopf, seitenRahmen } from "@/components/layout/Seitenkopf";
 import { BewertungsFormular } from "@/components/review/BewertungsFormular";
 import { buttonKlassen } from "@/components/ui";
 import { cn } from "@/lib/cn";
-import { ladeStrainDetail } from "@/lib/query/strains";
+import { ladeStrainDetail, ladeTerpenKatalog } from "@/lib/query/strains";
 import { aktuellesMitglied } from "@/lib/session";
 
 export const metadata: Metadata = { title: "Bewerten" };
@@ -19,7 +19,11 @@ export const dynamic = "force-dynamic";
  */
 export default async function BewertenPage({ params }: PageProps<"/bewerten/[slug]">) {
   const { slug } = await params;
-  const [strain, mitglied] = await Promise.all([ladeStrainDetail(slug, false), aktuellesMitglied()]);
+  const [strain, mitglied, katalog] = await Promise.all([
+    ladeStrainDetail(slug, false),
+    aktuellesMitglied(),
+    ladeTerpenKatalog(),
+  ]);
   if (!strain) notFound();
 
   const zurueck = { href: `/produkte/${strain.slug}`, text: strain.handelsname };
@@ -50,6 +54,7 @@ export default async function BewertenPage({ params }: PageProps<"/bewerten/[slu
             terpene={strain.terpene}
             chargen={strain.chargen.map((charge) => charge.chargenNr)}
             istBetreiber={mitglied.rolle === "ADMIN"}
+            katalog={katalog}
           />
         )}
       </div>

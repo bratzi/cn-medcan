@@ -32,6 +32,8 @@ type Props = {
   hervorheben?: number | null;
   /** Stärke je Terpen (0 bis 1) für das Leuchten der Pfade; sonst aus den Herstellerangaben. */
   staerken?: Readonly<Record<string, number>>;
+  /** Namen der Terpene, die der Hersteller nicht angibt: Pfad gestrichelt. */
+  ergaenzt?: readonly string[];
 };
 
 const DAUER_MS = 900;
@@ -83,7 +85,7 @@ function balkenEnde(knoten: Punkt, wert: number, versatz: number): Punkt {
  * bei reduzierter Bewegung springt er. Die Werte stehen zusätzlich als
  * Tabelle für Screenreader, das SVG ist aria-hidden.
  */
-export function AromaKarte({ terpene, serien: roheSerien, titel = "Aroma-Karte", hervorheben = null, staerken }: Props) {
+export function AromaKarte({ terpene, serien: roheSerien, titel = "Aroma-Karte", hervorheben = null, staerken, ergaenzt = [] }: Props) {
   const [ansicht, setAnsicht] = useState<"karte" | "netz">("karte");
   const [t, setT] = useState(0);
   const [ueberfahren, setAktiv] = useState<number | null>(null);
@@ -199,6 +201,7 @@ export function AromaKarte({ terpene, serien: roheSerien, titel = "Aroma-Karte",
                   fill="none"
                   stroke={farbig ? farbe : GRAU}
                   strokeLinecap="round"
+                  strokeDasharray={ergaenzt.includes(terpen.name) ? "6 8" : undefined}
                   opacity={farbig ? 0.45 + 0.55 * kraft : 0.35}
                   style={{
                     strokeWidth: farbig ? 1.5 + 7 * kraft : 1.5,

@@ -6,6 +6,8 @@ export type SweetSpotZeile = {
   wert: number;
   /** Nur beim Mittel: wie viele Bewertungen dahinterstehen. */
   anzahl?: number;
+  /** Vom Hersteller nicht angegeben. */
+  ergaenzt?: boolean;
 };
 
 const WERT = new Intl.NumberFormat("de-DE", { maximumFractionDigits: 1 });
@@ -62,7 +64,10 @@ export function SweetSpot({
               onPointerEnter={() => bedienung?.aktivieren?.(zeile.terpen)}
             >
               <div className="flex items-baseline justify-between gap-4">
-                <span className="font-buch text-h3 font-medium text-text">{zeile.terpen}</span>
+                <span className="font-buch text-h3 font-medium text-text">
+                  {zeile.terpen}
+                  {zeile.ergaenzt ? <span className="ml-2 text-caption font-normal text-text-muted">nicht angegeben</span> : null}
+                </span>
                 <span className="numeric text-small text-text-muted">
                   {`${einordnung(gezeigt)} · ${WERT.format(gezeigt)} von 5`}
                   {bedienung && zeile.anzahl ? ` · Community ${WERT.format(zeile.wert)}` : ""}

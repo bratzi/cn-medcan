@@ -8,7 +8,8 @@ import { bewertungSpeichern } from "@/app/bewerten/aktionen";
 import { AromaKarte, type AromaSerie } from "@/components/review/AromaKarte";
 import { Button, Field, Input, Meldung } from "@/components/ui";
 import { useHydriert } from "@/components/ui/useHydriert";
-import { herstellerProfil, type KartenTerpen } from "@/lib/aromakarte";
+import { TerpenErgaenzen, type KatalogEintrag } from "@/components/review/TerpenErgaenzen";
+import { ergaenztesTerpen, herstellerProfil, type KartenTerpen } from "@/lib/aromakarte";
 import { MAX_NOTIZ } from "@/lib/bewertung-eingabe";
 import { cn } from "@/lib/cn";
 import {
@@ -25,6 +26,8 @@ type Props = {
   terpene: readonly KartenTerpen[];
   chargen: readonly string[];
   istBetreiber: boolean;
+  /** Alle bekannten Terpene, zum Ergänzen. */
+  katalog?: readonly KatalogEintrag[];
 };
 
 const WERT = new Intl.NumberFormat("de-DE", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
@@ -76,7 +79,9 @@ const NOTEN_STUFEN = [1, 2, 3, 4, 5].map((wert) => ({ wert, label: String(wert) 
  * aus den Herstellerangaben. Geprüft wird in der Server Action
  * (lib/bewertung-eingabe.ts); hier steht nur Bedienhilfe.
  */
-export function BewertungsFormular({ strainId, handelsname, terpene, chargen, istBetreiber }: Props) {
+export function BewertungsFormular({ strainId, handelsname, terpene, chargen, istBetreiber, katalog = [] }: Props) {
+  const [dazu, setDazu] = useState<KartenTerpen[]>([]);
+  const alleTerpene = [...terpene, ...dazu];
   const router = useRouter();
   const hydriert = useHydriert();
   const [matrix, setMatrix] = useState<GeschmacksMatrix>(leereGeschmacksMatrix);
@@ -183,11 +188,11 @@ export function BewertungsFormular({ strainId, handelsname, terpene, chargen, is
           ))}
         </div>
         <div className="lg:sticky lg:top-24">
-          <AromaKarte titel="Vorschau" terpene={terpene} serien={serien} />
+          <AromaKarte titel="Vorschau" terpene={alleTerpene} serien={serien} ergaenzt={dazu.map((terpen) => terpen.name)} />
         </div>
       </section>
 
-      {terpene.length > 0 ? (
+      {alleTerpene.length > 0 || katalog.length > 0 ? (
         <section className="flex flex-col gap-6">
           <h2 className="font-buch text-h1 font-medium text-text">
             Terpen-Intensität: <em className="farbverlauf italic">Sweet Spot</em> gesucht
@@ -196,15 +201,20 @@ export function BewertungsFormular({ strainId, handelsname, terpene, chargen, is
             Zu viel von einem Terpen macht den Geschmack aufdringlich, zu wenig lässt ihn flach wirken. Wie stark
             war jedes Terpen? Optional, je Terpen.
           </p>
-          {terpene.map((terpen) => (
+          {alleTerpene.map((terpen, index) => (
             <Stufen
               key={terpen.name}
               name={`terpen-${terpen.name}`}
-              legende={terpen.name}
+              legende={index >= terpene.length ? `${terpen.name} (nicht angegeben)` : terpen.name}
               stufen={INTENSITAETS_STUFEN}
               sweetSpot
             />
           ))}
+          <TerpenErgaenzen
+            katalog={katalog}
+            vorhanden={alleTerpene.map((terpen) => terpen.name)}
+            hinzufuegen={(terpen) => setDazu((alt) => [...alt, ergaenztesTerpen(terpen.name, terpen.geschmack)])}
+          />
         </section>
       ) : null}
 

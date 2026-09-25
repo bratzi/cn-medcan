@@ -5,14 +5,22 @@ import { AromaErkundung } from "@/components/review/AromaErkundung";
 import { type AromaSerie } from "@/components/review/AromaKarte";
 import { Schlagwort } from "@/components/story/Schlagwort";
 import { buttonKlassen } from "@/components/ui";
-import { herstellerProfil } from "@/lib/aromakarte";
-import { mittleTerpenIntensitaet, parseTerpenIntensitaet, verdichteGeschmacksMatrix } from "@/lib/query/bewertung";
-import { ladeAromaVorzeige } from "@/lib/query/strains";
+import { herstellerProfil, mittlereHerstellerTreue } from "@/lib/aromakarte";
+import {
+  mittleTerpenIntensitaet,
+  parseGeschmacksMatrix,
+  parseTerpenIntensitaet,
+  verdichteGeschmacksMatrix,
+} from "@/lib/query/bewertung";
+import { ladeAromaVorzeige, ladeTerpenKatalog } from "@/lib/query/strains";
 import { sicher } from "@/lib/sicher";
 
 /** Lädt die vorgeführte Sorte; ohne Daten entfällt die Sektion still (Spec 13.3). */
 async function Inhalt() {
-  const sorte = await sicher(() => ladeAromaVorzeige(), null, "Aroma-Karte der Startseite");
+  const [sorte, katalog] = await Promise.all([
+    sicher(() => ladeAromaVorzeige(), null, "Aroma-Karte der Startseite"),
+    sicher(() => ladeTerpenKatalog(), [], "Terpen-Katalog"),
+  ]);
   if (!sorte) return null;
 
   const hersteller = herstellerProfil(sorte.terpene);
@@ -29,6 +37,8 @@ async function Inhalt() {
         titel={sorte.handelsname}
         terpene={sorte.terpene}
         serien={serien}
+        katalog={katalog}
+        treue={mittlereHerstellerTreue(hersteller, sorte.reviews.map((review) => parseGeschmacksMatrix(review.geschmacksMatrix)))}
         zeilen={Object.entries(intensitaet).map(([terpen, { mittel, anzahl }]) => ({ terpen, wert: mittel, anzahl }))}
       >
         <Link href={`/produkte/${sorte.slug}`} className={buttonKlassen("secondary", "md")}>

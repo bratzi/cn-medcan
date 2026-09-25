@@ -105,8 +105,9 @@ export function sanft(t: number): number {
 export function eindruckProfil(
   terpene: readonly KartenTerpen[],
   stufen: Readonly<Record<string, number>>,
+  ergaenzt: readonly KartenTerpen[] = [],
 ): GeschmacksMatrix | null {
-  if (terpene.length === 0) return null;
+  if (terpene.length === 0 && ergaenzt.length === 0) return null;
   const roh = leereGeschmacksMatrix();
   const basis = leereGeschmacksMatrix();
   for (const terpen of terpene) {
@@ -116,7 +117,12 @@ export function eindruckProfil(
     basis[achse] += gewicht;
     roh[achse] += gewicht * ((stufen[terpen.name] ?? 3) / 3);
   }
-  const hoechster = Math.max(...Object.values(basis));
+  // Nicht angegebene Terpene: Gewicht 1, wie ein Terpen auf hinterem Rang.
+  for (const terpen of ergaenzt) {
+    const achse = ACHSE_ZU_KATEGORIE.get(terpen.geschmack);
+    if (achse) roh[achse] += (stufen[terpen.name] ?? 3) / 3;
+  }
+  const hoechster = Math.max(1, ...Object.values(basis));
   if (hoechster <= 0) return null;
   for (const achse of Object.keys(roh) as (keyof GeschmacksMatrix)[]) {
     roh[achse] = Math.min(MAX, Math.round((roh[achse] / hoechster) * MAX * 10) / 10);
@@ -141,4 +147,43 @@ export function terpenStaerken(
       hoechstes > 0 ? Math.min(1, (gewichte[index] * ((stufen[terpen.name] ?? 3) / 3)) / hoechstes) : 0,
     ]),
   );
+}
+
+/** Ein ergänztes Terpen als Kartenknoten: ohne Konzentration, hinterster Rang. */
+export function ergaenztesTerpen(name: string, geschmack: GeschmacksKategorie): KartenTerpen {
+  return { name, geschmack, konzentrationProzent: null, rang: 99 };
+}
+
+/**
+ * Herstellertreue: wie nah ein geschmecktes Profil an dem liegt, was die
+ * Herstellerangaben erwarten lassen. Summe der Minima durch Summe der Maxima
+ * über alle Achsen (gewichtete Jaccard-Ähnlichkeit), 0 bis 1. Ein leeres
+ * Profil ergibt null.
+ */
+export function herstellerTreue(hersteller: GeschmacksMatrix, profil: GeschmacksMatrix): number | null {
+  let minima = 0;
+  let maxima = 0;
+  for (const achse of Object.keys(hersteller) as (keyof GeschmacksMatrix)[]) {
+    minima += Math.min(hersteller[achse], profil[achse]);
+    maxima += Math.max(hersteller[achse], profil[achse]);
+  }
+  const summeProfil = Object.values(profil).reduce((a, b) => a + b, 0);
+  if (maxima <= 0 || summeProfil <= 0) return null;
+  return minima / maxima;
+}
+
+export type Treue = { wert: number; anzahl: number };
+
+/** Mittlere Herstellertreue über alle Bewertungen mit Geschmacksprofil; ohne Bewertungen null. */
+export function mittlereHerstellerTreue(
+  hersteller: GeschmacksMatrix | null,
+  profile: readonly GeschmacksMatrix[],
+): Treue | null {
+  if (!hersteller) return null;
+  const werte = profile.flatMap((profil) => {
+    const wert = herstellerTreue(hersteller, profil);
+    return wert === null ? [] : [wert];
+  });
+  if (werte.length === 0) return null;
+  return { wert: werte.reduce((a, b) => a + b, 0) / werte.length, anzahl: werte.length };
 }
