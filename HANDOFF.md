@@ -3,7 +3,7 @@
 > Übergabemedium zwischen Sessions. Wird nach jedem Arbeitsblock aktualisiert und committet.
 > Wer hier weiterarbeitet, liest diese Datei zuerst und braucht den Chatverlauf nicht.
 
-**Letzte Aktualisierung:** 2026-09-25 (Session 17, interaktive Aroma-Karte, Beschaffenheit, Cursor, Kopf/Fuß)
+**Letzte Aktualisierung:** 2026-09-25 (Session 17 Ende)
 **Repo:** https://github.com/bratzi/cn-medcan (public)
 **Branch:** `main` (Makeover „Grünes Buch“ Teilprojekt 1 ist seit 2026-09-24 auf `main`)
 
@@ -28,7 +28,27 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 
 ## ⇢ Hier geht es weiter
 
-### ⇢ NÄCHSTE SESSION BEGINNT HIER (Stand 2026-09-25, Session 17)
+### ⇢ NÄCHSTE SESSION BEGINNT HIER (Stand 2026-09-25, Session 17 Ende, alles gepusht bis `d682afa`)
+
+**Zuletzt in Session 17 (Code fertig, Tests 157/157; live per Screenshot noch NICHT gesehen, zuerst prüfen):**
+- Hell/Dunkel-Schalter als Lampe fest unten rechts (`ThemaSchalter`, Klasse `.thema-lampe`; aus dem Kopf entfernt;
+  Lampe an = hell). Übergänge beim Umschalten für einen Frame aus (better-ui).
+- Hero-Unterzeile „Cannabis, offen gelegt.“ größer (clamp 1.75–3.25 rem), Story-Texte kleiner (`--text-manifest`
+  clamp 2.5–5 rem), Hintergrund-Schlagworte hängen auf der oberen Sektionskante (`Schlagwort` oben=top-0
+  -translate-y-1/2). Prüfen, ob sie über der vorigen Sektion gut lesbar/nicht störend sind.
+- Im Auftritt heißen Produkte jetzt „Blüten“ (Navigation, Katalog, Apotheken, Produktseite). URL `/produkte` bleibt
+  vorerst; Umzug nach `/blueten` mit Weiterleitung ist offen.
+
+**GROSSER TASK (Nutzer 2026-09-25, als Nächstes einplanen, mit superpowers:brainstorming beginnen):**
+„Sorte vorschlagen“. Fehlt eine Blüte im Katalog, kann jedes angemeldete Mitglied sie eintragen (Name, Hersteller,
+Kultivar, THC/CBD, Terpene, Quelle). Der Betreiber prüft sie im Admin, kann sie anpassen und freigeben (oder
+ablehnen). Die vorschlagenden Mitglieder werden informiert: im System (Benachrichtigungen im Mitgliederbereich) und
+per Mail (Mailversand klären: Cloudflare Email Sending, Skill cloudflare:cloudflare-email-service). Datenmodell:
+Vorschlagstabelle mit Status (OFFEN/FREIGEGEBEN/ABGELEHNT), Verknüpfung zur angelegten Sorte, Dublettenprüfung
+gegen Handelsname/Slug. Später kommt vom Nutzer eine große JSON mit vielen Blüten-Daten zum Import (Nutzer sucht
+sie noch); der Import darf die Vorschläge nicht doppeln.
+
+### ⇢ STAND SESSION 17 (Zwischenstand)
 Live und per Screenshot geprüft bis `17fcd1b`: Kopf transparent/Papierstreifen, Kapitel-Navigation, Fuß als
 Kapitelverzeichnis, Aroma-Karte mit ziehbaren Geschmacksbalken + Lernzeile, Beschaffenheits-Leiste, Bud-Cursor.
 Das „Einfrieren“ war KEIN Code-Fehler. Hauptursache: Chrome-Fenster im Hintergrund/minimiert -> `document.visibilityState === "hidden"`, dann keine Frames, Screenshots/rAF hängen (per javascript_tool prüfen). Nutzer bitten, das Fenster nach vorn zu holen. Außerdem: Long-Task-Messung (PerformanceObserver) ergab 0 ms auf
