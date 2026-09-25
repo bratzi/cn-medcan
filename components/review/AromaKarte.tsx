@@ -11,6 +11,7 @@ import {
   HOEHE,
   MAX,
   mische,
+  mitteVon,
   netzPunkt,
   RADIUS,
   sanft,
@@ -119,6 +120,24 @@ export function AromaKarte({
   const [ueberfahren, setAktiv] = useState<number | null>(null);
   const aktiv = hervorheben ?? ueberfahren;
   const tRef = useRef(0);
+  // Misst die tatsächliche Breite der Karte: null vor der ersten Messung
+  // (SSR/erster Frame), danach die viewBox-Breite bei gleichem Maßstab wie
+  // früher (1,2), damit Striche, Schrift und Knoten fein bleiben und die
+  // Karte nur länger wird, nicht größer.
+  const messRef = useRef<HTMLDivElement>(null);
+  const [breite, setBreite] = useState<number | null>(null);
+
+  useEffect(() => {
+    const element = messRef.current;
+    if (!element) return;
+    const beobachter = new ResizeObserver((eintraege) => {
+      const gemessen = eintraege[0]?.contentRect.width;
+      if (!gemessen) return;
+      setBreite(Math.max(BREITE, Math.round(gemessen / 1.2)));
+    });
+    beobachter.observe(element);
+    return () => beobachter.disconnect();
+  }, []);
 
   useEffect(() => {
     const ziel = ansicht === "netz" ? 1 : 0;
@@ -152,14 +171,23 @@ export function AromaKarte({
   const achseFarbig = (index: number) =>
     aktiv === null ? serien.some((serie) => serie.matrix[GESCHMACKS_ACHSEN[index].key] > 0.05) : aktiv === index;
 
-  const karte = achsenImKarte();
-  const knoten = karte.map((punkt, index) => mische(punkt, netzPunkt(index, MAX, RADIUS + 34), t));
-  const terpenKnoten = terpeneImKarte(terpene.length);
+  // Vor der ersten Messung wie früher im Maßstab 640 (dann per max-w-3xl
+  // dargestellt); danach die gemessene viewBox-Breite. Das Netz (RADIUS)
+  // bleibt bei jeder Breite gleich groß, nur sein Mittelpunkt wandert mit.
+  const aktBreite = breite ?? BREITE;
+  const mitte = mitteVon(aktBreite);
+  const karte = achsenImKarte(aktBreite);
+  const knoten = karte.map((punkt, index) => mische(punkt, netzPunkt(index, MAX, RADIUS + 34, mitte), t));
+  const terpenKnoten = terpeneImKarte(terpene.length, aktBreite);
   const kartenSichtbar = 1 - t;
 
   const serienPunkte = serien.map((serie, s) =>
     GESCHMACKS_ACHSEN.map((achse, index) =>
-      mische(balkenEnde(karte[index], serie.matrix[achse.key], s * 6 - 3), netzPunkt(index, serie.matrix[achse.key]), t),
+      mische(
+        balkenEnde(karte[index], serie.matrix[achse.key], s * 6 - 3),
+        netzPunkt(index, serie.matrix[achse.key], RADIUS, mitte),
+        t,
+      ),
     ),
   );
 
@@ -196,8 +224,12 @@ export function AromaKarte({
         ))}
       </ul>
 
-      <div className="relative w-full" onMouseLeave={() => setAktiv(null)}>
-        <svg ref={svgRef} viewBox={`0 0 ${BREITE} ${HOEHE}`} aria-hidden="true" className="block w-full text-text">
+      <div
+        ref={messRef}
+        className={cn("relative w-full", breite === null && "mx-auto max-w-3xl")}
+        onMouseLeave={() => setAktiv(null)}
+      >
+        <svg ref={svgRef} viewBox={`0 0 ${aktBreite} ${HOEHE}`} aria-hidden="true" className="block w-full text-text">
           <defs>
             {/* Sweet-Spot-Stil der Regler-Spur: rechts 0, links 5 (Balken wachsen nach links). */}
             <linearGradient id={spurId} x1="1" x2="0" y1="0" y2="0">
@@ -211,14 +243,14 @@ export function AromaKarte({
             {RINGE.map((ring) => (
               <polygon
                 key={ring}
-                points={alsPolygon(GESCHMACKS_ACHSEN.map((_, index) => netzPunkt(index, ring)))}
+                points={alsPolygon(GESCHMACKS_ACHSEN.map((_, index) => netzPunkt(index, ring, RADIUS, mitte)))}
                 fill="none"
                 stroke="currentColor"
               />
             ))}
             {GESCHMACKS_ACHSEN.map((achse, index) => {
-              const ende = netzPunkt(index, MAX);
-              return <line key={achse.key} x1={BREITE / 2} y1={HOEHE / 2} x2={ende.x} y2={ende.y} stroke="currentColor" />;
+              const ende = netzPunkt(index, MAX, RADIUS, mitte);
+              return <line key={achse.key} x1={mitte.x} y1={mitte.y} x2={ende.x} y2={ende.y} stroke="currentColor" />;
             })}
           </g>
 
@@ -435,7 +467,7 @@ export function AromaKarte({
               aktiv === index ? "text-text" : "text-text-muted",
             )}
             style={{
-              left: `${((t < 0.5 ? punkt.x - 150 * kartenSichtbar : punkt.x) / BREITE) * 100}%`,
+              left: `${((t < 0.5 ? punkt.x - 150 * kartenSichtbar : punkt.x) / aktBreite) * 100}%`,
               top: `${(punkt.y / HOEHE) * 100}%`,
             }}
           >
@@ -451,7 +483,7 @@ export function AromaKarte({
               terpene.length > 6 ? "text-small" : "text-h3",
               (staerke[terpene[index].name] ?? 0) > 0 ? "text-text" : "text-text-muted",
             )}
-            style={{ left: `${(punkt.x / BREITE) * 100}%`, top: `${(punkt.y / HOEHE) * 100}%`, opacity: kartenSichtbar }}
+            style={{ left: `${(punkt.x / aktBreite) * 100}%`, top: `${(punkt.y / HOEHE) * 100}%`, opacity: kartenSichtbar }}
           >
             {terpene[index].name}
           </span>

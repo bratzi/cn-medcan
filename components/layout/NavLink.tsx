@@ -22,7 +22,7 @@ type Props = {
 export function NavLink({ href, className, aktivKlasse, children }: Props) {
   const aktiv = istAktiv(usePathname() ?? "", href);
   return (
-    <Link href={href} aria-current={aktiv ? "page" : undefined} className={cn(className, aktiv && aktivKlasse)}>
+    <Link href={href} prefetch={false} aria-current={aktiv ? "page" : undefined} className={cn(className, aktiv && aktivKlasse)}>
       {children}
     </Link>
   );

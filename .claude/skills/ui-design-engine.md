@@ -50,6 +50,7 @@ Schleife).
 - Große Grade tragen negative Laufweite aus dem Token; nie per Klasse überschreiben.
 - Auftakt (Referenz choreograffiti): die h1 ist die Wortmarke in `text-plakat` von Rand zu Rand.
 - Jede Startseiten-Sektion trägt einen Buzz-Satz (höchstens drei Wörter) über `components/story/Schlagwort` in `text-kulisse`, `text-border`, aria-hidden; Sektion `relative isolate overflow-x-clip`.
+- Ausnahme seit 2026-09-25 (Nutzer): das Community-Fazit (Prozentzahl) steht in `font-hand` mit `.farbverlauf`, weil es die Stimme der Community ist; sonst bleiben Zahlen gedruckt.
 - Inspiration nur 400 (`.font-hand` setzt `font-synthesis: none`) und **nie unter 32 px**: `font-hand`
   steht immer zusammen mit einem der vier Handschrift-Grade in derselben Zeile (Test `tests/marke.test.ts`).
 - Handschrift ohne Versalien, ohne Laufweite, ohne Drehung, in natürlicher Schreibung.

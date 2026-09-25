@@ -3,7 +3,7 @@
 > Übergabemedium zwischen Sessions. Wird nach jedem Arbeitsblock aktualisiert und committet.
 > Wer hier weiterarbeitet, liest diese Datei zuerst und braucht den Chatverlauf nicht.
 
-**Letzte Aktualisierung:** 2026-09-25 (Session 18 Ende)
+**Letzte Aktualisierung:** 2026-09-25 (Session 18, Save for Clear)
 **Repo:** https://github.com/bratzi/cn-medcan (public)
 **Branch:** `main` (Makeover „Grünes Buch“ Teilprojekt 1 ist seit 2026-09-24 auf `main`)
 
@@ -28,7 +28,41 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 
 ## ⇢ Hier geht es weiter
 
-### ⇢ NÄCHSTE SESSION BEGINNT HIER (Stand 2026-09-25, Session 18 Ende)
+### ⇢ NÄCHSTE SESSION BEGINNT HIER (Stand 2026-09-25, Session 18, Save for Clear ~16:25 UTC)
+
+**Reihenfolge für die nächste Session:**
+
+1. **Fehler 1102 „Worker exceeded resource limits“ (live, auch beim Neuladen der Startseite).** Ursache per
+   `npx wrangler tail cn-medcan --format json` belegt: Free-Plan = 10 ms CPU je Request; unsere Seiten brauchen
+   bis ~210 ms (/produkte 212, /reviews 201, /umfragen 78), weil alles `force-dynamic` ist (SSR + Prisma-7-WASM je
+   Abfrage). Cloudflare toleriert das nur gelegentlich; zusätzlich lösten Link-Prefetches je Seitenaufruf mehrere
+   solcher Renders aus. /admin wurde gezielt bei 10 ms abgebrochen.
+   - Erledigt (gepusht, live prüfen): /admin aufgeteilt (Vorschlagsprüfung jetzt `/admin/vorschlaege`, /admin
+     zählt nur) und `prefetch={false}` an Kopf (NavLink), Fuß und Blütenkarten (`tests/prefetch.test.ts`).
+   - Danach erneut messen (tail, Startseite neu laden). Wenn 1102 bleibt: **Nutzerentscheid nötig**:
+     (a) Workers Paid 5 $/Monat (30 s CPU, löst es sofort, bricht „alles kostenlos“), oder
+     (b) Caching nach `.claude/skills/edge-stack-master.md` §4: ISR/`unstable_cache` für Katalog, Startseiten-
+     Sektionen, Blütenseiten; braucht R2-Bucket `NEXT_INC_CACHE_R2_BUCKET` (+ Tag-Cache, `WORKER_SELF_REFERENCE`)
+     in wrangler.jsonc und OpenNext-Config; nutzerbezogene Teile (Preise/Fachkreis, eigene Stimme) bleiben dynamisch.
+     Empfehlung dem Nutzer vorlegen (Brainstorming, architektonisch).
+2. **Terpenlinien-Farbverlauf (Nutzerauftrag, noch nicht begonnen):** In `AromaKarte` färben sich die Bögen zu
+   den Terpenen je Geschmacksachse nach Abweichung stufenlos Violett↔Grün: lila Serie („Dein Eindruck“, sonst
+   „Laut Community“) höher als Hersteller → Violett; Hersteller höher (übertreibt) → Grün; Stärke nach
+   |Differenz|/5 (gedeckelt 1, gern leicht verstärkt); ohne Werte/Gleichstand heutige Farbe; graue Terpene bleiben
+   grau. `color-mix(in oklab, var(--color-kopierstift) X%, var(--color-accent))`, Mischanteil als reine Funktion in
+   `lib/aromakarte.ts` mit Test.
+3. **Live-Sichtprüfung** (Chrome muss vorn sein, `visibilityState` prüfen; bei hidden hängen Screenshots und
+   React 19 blendet gestreamte Suspense-Teile nicht ein):
+   Community-Fazit (neu, `lib/fazit.ts`: Mittel aus Gesamteindruck (1..5→0..1), Herstellertreue, Beschaffenheit
+   (0..5→0..1); groß in `font-hand text-umschlag farbverlauf`, „Dein Fazit“ bei bewegten Reglern; Herstellertreue
+   nur noch klein im Terpen-Schritt), Karte breit bei gleicher Feinheit (viewBox-Breite = Containerbreite/1,2 per
+   ResizeObserver), Storytelling (Abstand halbiert `mt-[18vh] md:mt-[25vh]`, Videos bis `lg:w-lg`, Text
+   `md:max-w-[20ch] leading-[1.08]`), Wortmarken-Konturen, Qualm, Symbolbilder.
+4. **Task 8 Rest:** Auf `/admin/vorschlaege` „Testblüte Vorschlag 1“ freigeben (Typ Hybrid, THC 20–24, CBD 0–1;
+   Nutzer hat die Freigabe erteilt), dann Zähler an „Mein Konto“, Benachrichtigung auf /mitglied,
+   /produkte/testbluete-vorschlag-1 prüfen. Danach fragen, ob die Testblüte gelöscht werden soll.
+
+### ⇢ STAND SESSION 18 (vor dem Save for Clear)
 
 **Blüte vorschlagen** (Spec `docs/superpowers/specs/2026-09-25-bluete-vorschlagen-design.md`, Plan
 `docs/superpowers/plans/2026-09-25-bluete-vorschlagen.md`): **Tasks 1–7 fertig und live**, Migration 0006 + Trigger

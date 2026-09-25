@@ -22,6 +22,7 @@ import {
   type Treue,
 } from "@/lib/aromakarte";
 import { GESCHMACKS_ACHSEN, leereGeschmacksMatrix, type GeschmacksMatrix } from "@/lib/query/bewertung";
+import { communityFazit } from "@/lib/fazit";
 
 const PROZENT = new Intl.NumberFormat("de-DE", {
   style: "percent",
@@ -30,7 +31,7 @@ const PROZENT = new Intl.NumberFormat("de-DE", {
 
 /**
  * Aroma-Erkundung in drei Schritten: Gesamteindruck, Terpene, Beschaffenheit,
- * jeder in voller Breite; die Herstellertreue steht zentral darüber (Nutzer 2026-09-25). Im Terpen-Schritt geschieht alles in der Karte: die Geschmacksbalken links
+ * jeder in voller Breite; das Community-Fazit aus allen drei steht zentral darüber (Nutzer 2026-09-25). Im Terpen-Schritt geschieht alles in der Karte: die Geschmacksbalken links
  * sind Regler; man zieht, wie stark man jede Geschmacksrichtung schmeckt,
  * und sieht als lila Serie das eigene Profil gegen die Herstellerangabe.
  * Lerneffekt: zur gezogenen Richtung leuchten die Terpene auf, die sie
@@ -107,37 +108,50 @@ export function AromaErkundung({
       ]
     : [...serien];
 
+  // Community-Fazit aus den drei Stufen; "Dein Fazit" setzt die eigenen Regler
+  // über die Community-Werte, sobald etwas bewegt wurde.
+  const fazit = communityFazit({
+    eindruck: gesamteindruck?.werte ?? {},
+    treue: treue?.wert ?? null,
+    beschaffenheit: beschaffenheit?.werte ?? {},
+  });
+  const { feuchte: _eigeneFeuchte, ...eigeneAchsen } = eigeneBeschaffenheit;
+  void _eigeneFeuchte;
+  const eigenesFazit = bewegt
+    ? communityFazit({
+        eindruck: { ...(gesamteindruck?.werte ?? {}), ...eigeneNoten },
+        treue: eigeneTreue ?? treue?.wert ?? null,
+        beschaffenheit: { ...(beschaffenheit?.werte ?? {}), ...eigeneAchsen },
+      })
+    : null;
+  const anzahlBewertungen = Math.max(treue?.anzahl ?? 0, gesamteindruck?.anzahl ?? 0, beschaffenheit?.anzahl ?? 0);
+
   return (
     <div className="flex flex-col gap-16 md:gap-24">
-      {/* Herstellertreue zentral über allen drei Schritten (Nutzer 2026-09-25). */}
-      {treue || eigeneTreue !== null ? (
+      {/* Community-Fazit zentral über den drei Schritten (Nutzer 2026-09-25): das Fazit
+          aus Gesamteindruck, Terpenen und Beschaffenheit, in der Handschrift des Logos,
+          weil es die Stimme der Community ist (Ausnahme zu Regel 3, ui-design-engine). */}
+      {fazit !== null ? (
         <div className="flex flex-col items-center gap-4 text-center">
-          <dl className="flex flex-wrap justify-center gap-x-16 gap-y-4">
-            {treue ? (
-              <div className="flex flex-col items-center gap-1">
-                <dt className="text-small text-text-muted">Herstellertreue</dt>
-                <dd className="numeric font-buch text-display font-medium text-text">
-                  {PROZENT.format(treue.wert)}
-                </dd>
-                <dd className="text-caption text-text-muted">
-                  aus {treue.anzahl}{" "}
-                  {treue.anzahl === 1 ? "Bewertung" : "Bewertungen"}
-                </dd>
-              </div>
-            ) : null}
-            {eigeneTreue !== null ? (
-              <div className="flex flex-col items-center gap-1" aria-live="polite">
-                <dt className="text-small text-text-muted">Dein Eindruck</dt>
-                <dd className="numeric font-buch text-display font-medium text-kopierstift">
-                  {PROZENT.format(eigeneTreue)}
-                </dd>
-                <dd className="text-caption text-text-muted">nah an der Angabe</dd>
+          <dl className="flex flex-wrap items-end justify-center gap-x-24 gap-y-8">
+            <div className="flex flex-col items-center gap-2">
+              <dt className="text-small uppercase tracking-wide text-text-muted">Community-Fazit</dt>
+              <dd className="farbverlauf font-hand text-umschlag leading-none">{PROZENT.format(fazit)}</dd>
+              <dd className="text-caption text-text-muted">
+                aus {anzahlBewertungen} {anzahlBewertungen === 1 ? "Bewertung" : "Bewertungen"}
+              </dd>
+            </div>
+            {eigenesFazit !== null ? (
+              <div className="flex flex-col items-center gap-2" aria-live="polite">
+                <dt className="text-small uppercase tracking-wide text-text-muted">Dein Fazit</dt>
+                <dd className="farbverlauf font-hand text-notiz leading-none">{PROZENT.format(eigenesFazit)}</dd>
+                <dd className="text-caption text-text-muted">aus deinen Reglern</dd>
               </div>
             ) : null}
           </dl>
-          <p className="max-w-[56ch] text-caption text-text-muted text-pretty">
-            Herstellertreue: wie nah das geschmeckte Profil an dem liegt, was die Herstellerangaben erwarten
-            lassen. 100 % heißt deckungsgleich.
+          <p className="max-w-[60ch] text-caption text-text-muted text-pretty">
+            Das Fazit aus den drei Stufen: Gesamteindruck, wie nah die Terpene an der Herstellerangabe liegen, und
+            Beschaffenheit, jede Stufe zu gleichen Teilen. 100 % heißt: alles top und genau wie angegeben.
           </p>
         </div>
       ) : null}
@@ -156,6 +170,21 @@ export function AromaErkundung({
       ) : null}
 
       <Schritt nummer="2" titel="Terpene">
+        {treue || eigeneTreue !== null ? (
+          <p className="text-small text-text-muted">
+            {treue ? (
+              <>
+                Nähe zur Herstellerangabe: <span className="numeric text-text">{PROZENT.format(treue.wert)}</span>
+              </>
+            ) : null}
+            {eigeneTreue !== null ? (
+              <>
+                {treue ? " · " : ""}Dein Eindruck:{" "}
+                <span className="numeric text-kopierstift">{PROZENT.format(eigeneTreue)}</span>
+              </>
+            ) : null}
+          </p>
+        ) : null}
         <p className="max-w-[60ch] text-small text-text-muted text-pretty">
           Zieh die lila Punkte links in der Karte: Wie stark schmeckst du jede Richtung? Dazu leuchten die
           Terpene auf, die sie tragen. Hier wird nichts gespeichert.

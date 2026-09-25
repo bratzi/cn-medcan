@@ -13,36 +13,54 @@ export type KartenTerpen = { name: string; geschmack: GeschmacksKategorie; konze
 export const BREITE = 640;
 export const HOEHE = 480;
 export const MAX = 5;
-const LINKS_X = 260;
-const RECHTS_X = 420;
+// Anteile an der Kartenbreite (bei BREITE=640 ergeben sie exakt die alten Werte 260/420);
+// so bleibt der Abstand der Spalten proportional, wenn die Karte breiter wird.
+const LINKS_ANTEIL = 260 / BREITE;
+const RECHTS_ANTEIL = 420 / BREITE;
 const OBEN = 48;
 const UNTEN = HOEHE - 48;
-export const MITTE: Punkt = { x: BREITE / 2, y: HOEHE / 2 };
 export const RADIUS = 180;
 
 const runde = (zahl: number) => Math.round(zahl * 10) / 10 + 0;
 
+/**
+ * Mittelpunkt des Netzes für eine gegebene Kartenbreite: bleibt in der Mitte
+ * der (ggf. breiteren) Karte; die Höhe und damit RADIUS ändern sich nicht,
+ * das Netz bleibt also immer gleich groß, nur zentriert auf breite/2.
+ */
+export function mitteVon(breite: number = BREITE): Punkt {
+  return { x: breite / 2, y: HOEHE / 2 };
+}
+
+export const MITTE: Punkt = mitteVon();
+
 /** Gleichmäßig verteilte y-Positionen einer Spalte. */
 function spalte(anzahl: number, index: number): number {
-  if (anzahl <= 1) return MITTE.y;
+  if (anzahl <= 1) return HOEHE / 2;
   return runde(OBEN + ((UNTEN - OBEN) / (anzahl - 1)) * index);
 }
 
 /** Knoten der Geschmacksachsen in der Karten-Ansicht (linke Spalte). */
-export function achsenImKarte(): Punkt[] {
-  return GESCHMACKS_ACHSEN.map((_, index) => ({ x: LINKS_X, y: spalte(GESCHMACKS_ACHSEN.length, index) }));
+export function achsenImKarte(breite: number = BREITE): Punkt[] {
+  const x = runde(LINKS_ANTEIL * breite);
+  return GESCHMACKS_ACHSEN.map((_, index) => ({ x, y: spalte(GESCHMACKS_ACHSEN.length, index) }));
 }
 
 /** Knoten der Terpene (rechte Spalte). */
-export function terpeneImKarte(anzahl: number): Punkt[] {
-  return Array.from({ length: anzahl }, (_, index) => ({ x: RECHTS_X, y: spalte(anzahl, index) }));
+export function terpeneImKarte(anzahl: number, breite: number = BREITE): Punkt[] {
+  const x = runde(RECHTS_ANTEIL * breite);
+  return Array.from({ length: anzahl }, (_, index) => ({ x, y: spalte(anzahl, index) }));
 }
 
-/** Punkt einer Achse im Netz: erste Achse oben, dann im Uhrzeigersinn; Wert 0 bis MAX. */
-export function netzPunkt(index: number, wert: number, radius = RADIUS): Punkt {
+/**
+ * Punkt einer Achse im Netz: erste Achse oben, dann im Uhrzeigersinn; Wert 0
+ * bis MAX. `mitte` folgt der Kartenbreite (siehe `mitteVon`), damit das Netz
+ * bei jeder Breite zentriert bleibt.
+ */
+export function netzPunkt(index: number, wert: number, radius = RADIUS, mitte: Punkt = MITTE): Punkt {
   const anteil = Math.min(Math.max(wert / MAX, 0), 1);
   const winkel = ((-90 + (360 / GESCHMACKS_ACHSEN.length) * index) * Math.PI) / 180;
-  return { x: runde(MITTE.x + Math.cos(winkel) * radius * anteil), y: runde(MITTE.y + Math.sin(winkel) * radius * anteil) };
+  return { x: runde(mitte.x + Math.cos(winkel) * radius * anteil), y: runde(mitte.y + Math.sin(winkel) * radius * anteil) };
 }
 
 export function mische(a: Punkt, b: Punkt, t: number): Punkt {

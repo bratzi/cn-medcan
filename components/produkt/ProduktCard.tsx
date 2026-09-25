@@ -42,6 +42,7 @@ export function ProduktCard({ strain, className }: Props) {
           <div className="min-w-0">
             <h3 className="text-h3 text-text">
               <Link
+                prefetch={false}
                 href={`/produkte/${strain.slug}`}
                 className="rounded-sm hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring"
               >

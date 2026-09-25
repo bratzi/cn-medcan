@@ -51,7 +51,7 @@ export function Fuss() {
           <ol className="flex flex-col gap-1">
             {LINKS.map((link, index) => (
               <li key={link.href}>
-                <Link href={link.href} className={KAPITEL}>
+                <Link href={link.href} prefetch={false} className={KAPITEL}>
                   <span aria-hidden="true" className="kapitel-nummer font-hand text-vermerk leading-none">
                     {index + 1}
                   </span>

@@ -1,7 +1,18 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 
-import { achsenImKarte, bogen, herstellerProfil, mische, netzPunkt, sanft, MITTE, RADIUS } from "@/lib/aromakarte";
+import {
+  achsenImKarte,
+  bogen,
+  herstellerProfil,
+  mische,
+  mitteVon,
+  netzPunkt,
+  sanft,
+  terpeneImKarte,
+  MITTE,
+  RADIUS,
+} from "@/lib/aromakarte";
 
 test("Herstellerprofil: dominantes Terpen setzt seine Achse auf 5, ohne Terpene null", () => {
   assert.equal(herstellerProfil([]), null);
@@ -32,6 +43,30 @@ test("Geometrie: acht Achsen links, Netz beginnt oben, Morph interpoliert", () =
   assert.equal(sanft(0), 0);
   assert.equal(sanft(1), 1);
   assert.match(bogen({ x: 0, y: 0 }, { x: 100, y: 50 }), /^M0,0 C50,0 50,50 100,50$/);
+});
+
+test("Geometrie skaliert mit der Breite (volle Kartenbreite): Achsen und Terpene proportional, Standardaufrufe unveraendert", () => {
+  // Standardaufrufe (ohne breite) bleiben wie vorher: Maßstab bei 640.
+  assert.equal(achsenImKarte()[0].x, 260);
+  assert.equal(terpeneImKarte(3)[0].x, 420);
+
+  // Bei voller Breite (z. B. 1200) skalieren nur die x-Positionen der Spalten mit,
+  // proportional zu 260/640 bzw. 420/640.
+  const achsenBreit = achsenImKarte(1200);
+  assert.equal(achsenBreit[0].x, 487.5);
+  const terpeneBreit = terpeneImKarte(3, 1200);
+  assert.equal(terpeneBreit[0].x, 787.5);
+});
+
+test("Das Netz bleibt bei jeder Breite gleich groß (RADIUS) und zentriert (mitteVon)", () => {
+  assert.deepEqual(mitteVon(), MITTE);
+  const mitteBreit = mitteVon(1200);
+  assert.deepEqual(mitteBreit, { x: 600, y: 240 });
+  // Radius bleibt 180, egal wie breit die Karte ist; nur der Mittelpunkt wandert.
+  assert.deepEqual(netzPunkt(0, 5, RADIUS, mitteBreit), { x: mitteBreit.x, y: mitteBreit.y - RADIUS });
+  assert.deepEqual(netzPunkt(0, 0, RADIUS, mitteBreit), mitteBreit);
+  // Ohne mitte-Argument unverändert (Standard bleibt 640).
+  assert.deepEqual(netzPunkt(0, 5), { x: MITTE.x, y: MITTE.y - RADIUS });
 });
 
 import { mittleTerpenIntensitaet, parseTerpenIntensitaet } from "@/lib/query/bewertung";
