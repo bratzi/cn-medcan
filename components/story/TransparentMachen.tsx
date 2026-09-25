@@ -174,8 +174,8 @@ export function TransparentMachen() {
             <UeberlaufWort wort="Terpenprofil." absatz />
           </h2>
           <Paar punkt={PUNKTE[0]} erster>
-            Erst das <Buzz>Overall.</Buzz> Nicht, was auf der Dose steht, sondern wie sie aussieht, wie sie riecht, wie
-            sie schmeckt.
+            Erst das <Buzz>Overall.</Buzz> Nicht, was auf der Dose steht, sondern wie es aussieht, wie es riecht, wie
+            es schmeckt und wie es sich anfühlt.
           </Paar>
           <Paar punkt={PUNKTE[1]}>
             Dann die <Buzz>Terpz:</Buzz> Jedes Terpen bekommt seine eigene Note. Daneben
