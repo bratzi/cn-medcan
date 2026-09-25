@@ -29,8 +29,8 @@ const PROZENT = new Intl.NumberFormat("de-DE", {
 });
 
 /**
- * Aroma-Erkundung in drei Schritten: Gesamteindruck, Terpene, Beschaffenheit
- * (Nutzer 2026-09-25). Im Terpen-Schritt geschieht alles in der Karte: die Geschmacksbalken links
+ * Aroma-Erkundung in drei Schritten: Gesamteindruck, Terpene, Beschaffenheit,
+ * jeder in voller Breite; die Herstellertreue steht zentral darüber (Nutzer 2026-09-25). Im Terpen-Schritt geschieht alles in der Karte: die Geschmacksbalken links
  * sind Regler; man zieht, wie stark man jede Geschmacksrichtung schmeckt,
  * und sieht als lila Serie das eigene Profil gegen die Herstellerangabe.
  * Lerneffekt: zur gezogenen Richtung leuchten die Terpene auf, die sie
@@ -109,8 +109,41 @@ export function AromaErkundung({
 
   return (
     <div className="flex flex-col gap-16 md:gap-24">
+      {/* Herstellertreue zentral über allen drei Schritten (Nutzer 2026-09-25). */}
+      {treue || eigeneTreue !== null ? (
+        <div className="flex flex-col items-center gap-4 text-center">
+          <dl className="flex flex-wrap justify-center gap-x-16 gap-y-4">
+            {treue ? (
+              <div className="flex flex-col items-center gap-1">
+                <dt className="text-small text-text-muted">Herstellertreue</dt>
+                <dd className="numeric font-buch text-display font-medium text-text">
+                  {PROZENT.format(treue.wert)}
+                </dd>
+                <dd className="text-caption text-text-muted">
+                  aus {treue.anzahl}{" "}
+                  {treue.anzahl === 1 ? "Bewertung" : "Bewertungen"}
+                </dd>
+              </div>
+            ) : null}
+            {eigeneTreue !== null ? (
+              <div className="flex flex-col items-center gap-1" aria-live="polite">
+                <dt className="text-small text-text-muted">Dein Eindruck</dt>
+                <dd className="numeric font-buch text-display font-medium text-kopierstift">
+                  {PROZENT.format(eigeneTreue)}
+                </dd>
+                <dd className="text-caption text-text-muted">nah an der Angabe</dd>
+              </div>
+            ) : null}
+          </dl>
+          <p className="max-w-[56ch] text-caption text-text-muted text-pretty">
+            Herstellertreue: wie nah das geschmeckte Profil an dem liegt, was die Herstellerangaben erwarten
+            lassen. 100 % heißt deckungsgleich.
+          </p>
+        </div>
+      ) : null}
+
       {gesamteindruck ? (
-        <Schritt nummer="01" titel="Gesamteindruck">
+        <Schritt nummer="1" titel="Gesamteindruck">
           <GesamteindruckLeiste
             {...gesamteindruck}
             className="w-full"
@@ -122,68 +155,31 @@ export function AromaErkundung({
         </Schritt>
       ) : null}
 
-      <Schritt nummer="02" titel="Terpene" breit>
-        <div className="grid grid-cols-1 gap-12 lg:grid-cols-[minmax(0,3fr)_minmax(0,1fr)] lg:items-start">
-          {/* Die Karte ist der Mittelpunkt: füllt ihre Spalte, zentriert. */}
-          <div className="mx-auto w-full min-w-0 max-w-3xl">
-            <AromaKarte
-              titel={titel}
-              terpene={kartenTerpene}
-              serien={alleSerien}
-              staerken={staerken}
-              ergaenzt={ergaenzt.map((terpen) => terpen.name)}
-              regler={{
-                werte,
-                vergleich: hersteller ?? community,
-                aendern: (key, wert) =>
-                  setEigen((alt) => ({ ...(alt ?? start), [key]: wert })),
-              }}
-              lernen={katalog}
-            />
-          </div>
-          <div className="flex flex-col items-start gap-6 lg:sticky lg:top-24">
-            {treue || eigeneTreue !== null ? (
-              <dl className="flex flex-wrap gap-x-12 gap-y-4">
-                {treue ? (
-                  <div className="flex flex-col gap-1">
-                    <dt className="text-small text-text-muted">Herstellertreue</dt>
-                    <dd className="numeric font-buch text-h1 font-medium text-text">
-                      {PROZENT.format(treue.wert)}
-                    </dd>
-                    <dd className="text-caption text-text-muted">
-                      aus {treue.anzahl}{" "}
-                      {treue.anzahl === 1 ? "Bewertung" : "Bewertungen"}
-                    </dd>
-                  </div>
-                ) : null}
-                {eigeneTreue !== null ? (
-                  <div className="flex flex-col gap-1" aria-live="polite">
-                    <dt className="text-small text-text-muted">Dein Eindruck</dt>
-                    <dd className="numeric font-buch text-h1 font-medium text-kopierstift">
-                      {PROZENT.format(eigeneTreue)}
-                    </dd>
-                    <dd className="text-caption text-text-muted">
-                      nah an der Angabe
-                    </dd>
-                  </div>
-                ) : null}
-              </dl>
-            ) : null}
-            <p className="-mt-2 max-w-[40ch] text-caption text-text-muted text-pretty">
-              Herstellertreue: wie nah das geschmeckte Profil an dem liegt, was die
-              Herstellerangaben erwarten lassen. 100 % heißt deckungsgleich.
-            </p>
-            <p className="max-w-[40ch] text-small text-text-muted text-pretty">
-              Zieh die lila Punkte links in der Karte: Wie stark schmeckst du jede
-              Richtung? Dazu leuchten die Terpene auf, die sie tragen. Hier wird
-              nichts gespeichert.
-            </p>
-          </div>
+      <Schritt nummer="2" titel="Terpene">
+        <p className="max-w-[60ch] text-small text-text-muted text-pretty">
+          Zieh die lila Punkte links in der Karte: Wie stark schmeckst du jede Richtung? Dazu leuchten die
+          Terpene auf, die sie tragen. Hier wird nichts gespeichert.
+        </p>
+        <div className="w-full min-w-0">
+          <AromaKarte
+            titel={titel}
+            terpene={kartenTerpene}
+            serien={alleSerien}
+            staerken={staerken}
+            ergaenzt={ergaenzt.map((terpen) => terpen.name)}
+            regler={{
+              werte,
+              vergleich: hersteller ?? community,
+              aendern: (key, wert) =>
+                setEigen((alt) => ({ ...(alt ?? start), [key]: wert })),
+            }}
+            lernen={katalog}
+          />
         </div>
       </Schritt>
 
       {beschaffenheit ? (
-        <Schritt nummer="03" titel="Beschaffenheit">
+        <Schritt nummer="3" titel="Beschaffenheit">
           <BeschaffenheitsLeiste
             {...beschaffenheit}
             className="w-full"
@@ -200,7 +196,7 @@ export function AromaErkundung({
       ) : null}
 
       {bewegt || children ? (
-        <div className="flex flex-wrap items-center gap-6">
+        <div className="flex flex-wrap items-center justify-center gap-6">
           {children}
           {bewegt ? (
             <button
@@ -223,27 +219,26 @@ export function AromaErkundung({
 
 /**
  * Ein Schritt der Erkundung (Nutzer 2026-09-25): erst der Gesamteindruck, dann
- * die Terpene in der Karte, zum Schluss die Beschaffenheit. Nummer gedruckt in
- * Ziffern, Titel im Buch-Schnitt; schmale Schritte bleiben im Lesemaß der Karte.
+ * die Terpene in der Karte, zum Schluss die Beschaffenheit, jeder in voller
+ * Breite. Die große Ziffer steht in der Handschrift der Sektionshintergründe,
+ * im Farbverlauf der Marke, damit die drei Schritte als Ablauf lesbar sind.
  */
 function Schritt({
   nummer,
   titel,
-  breit = false,
   children,
 }: {
   nummer: string;
   titel: string;
-  breit?: boolean;
   children: React.ReactNode;
 }) {
   return (
-    <section aria-label={titel} className={`flex w-full flex-col gap-6 ${breit ? "" : "max-w-3xl"}`}>
-      <h3 className="flex items-baseline gap-4 border-t border-border pt-6 font-buch text-h2 font-medium text-text">
-        <span aria-hidden="true" className="numeric text-small text-text-muted">
+    <section aria-label={`Schritt ${nummer}: ${titel}`} className="flex w-full flex-col gap-8">
+      <h3 className="flex items-end gap-6 border-t border-border pt-8 font-buch text-h2 font-medium text-text">
+        <span aria-hidden="true" className="farbverlauf font-hand text-umschlag leading-[0.8]">
           {nummer}
         </span>
-        {titel}
+        <span className="pb-4">{titel}</span>
       </h3>
       {children}
     </section>
