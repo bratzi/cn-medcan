@@ -4,7 +4,7 @@ import { useState } from "react";
 
 import { AromaKarte, type AromaSerie } from "@/components/review/AromaKarte";
 import { SweetSpot, type SweetSpotZeile } from "@/components/review/SweetSpot";
-import { achsenIndex, eindruckProfil, type KartenTerpen } from "@/lib/aromakarte";
+import { achsenIndex, eindruckProfil, terpenStaerken, type KartenTerpen } from "@/lib/aromakarte";
 
 /**
  * Aroma-Karte und Sweet Spot in einem (Spec Redesign 20, zusammengeführt):
@@ -36,9 +36,8 @@ export function AromaErkundung({
   const [aktiv, setAktiv] = useState<number | null>(null);
 
   const bewegt = Object.keys(eigen).length > 0;
-  const eindruck = bewegt
-    ? eindruckProfil(terpene, Object.fromEntries(alle.map((zeile) => [zeile.terpen, eigen[zeile.terpen] ?? zeile.wert])))
-    : null;
+  const stufen = Object.fromEntries(alle.map((zeile) => [zeile.terpen, eigen[zeile.terpen] ?? zeile.wert]));
+  const eindruck = bewegt ? eindruckProfil(terpene, stufen) : null;
   const alleSerien: AromaSerie[] = eindruck
     ? [...serien.filter((serie) => serie.ton === "gruen"), { name: "Dein Eindruck", ton: "lila", matrix: eindruck }]
     : [...serien];
@@ -51,7 +50,7 @@ export function AromaErkundung({
   return (
     <div className="grid grid-cols-1 gap-16 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] lg:items-start">
       <div className="lg:sticky lg:top-24">
-        <AromaKarte titel={titel} terpene={terpene} serien={alleSerien} hervorheben={aktiv} />
+        <AromaKarte titel={titel} terpene={terpene} serien={alleSerien} hervorheben={aktiv} staerken={terpenStaerken(terpene, stufen)} />
       </div>
       <div className="flex flex-col items-start gap-8">
         <SweetSpot

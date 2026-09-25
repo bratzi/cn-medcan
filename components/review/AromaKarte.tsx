@@ -15,6 +15,7 @@ import {
   RADIUS,
   sanft,
   terpeneImKarte,
+  terpenStaerken,
   type KartenTerpen,
   type Punkt,
 } from "@/lib/aromakarte";
@@ -29,12 +30,44 @@ type Props = {
   titel?: string;
   /** Von außen hervorgehobene Achse (Regler in der Spielwiese); schlägt das Überfahren. */
   hervorheben?: number | null;
+  /** Stärke je Terpen (0 bis 1) für das Leuchten der Pfade; sonst aus den Herstellerangaben. */
+  staerken?: Readonly<Record<string, number>>;
 };
 
 const DAUER_MS = 900;
 const WERT = new Intl.NumberFormat("de-DE", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
 const FARBE = { gruen: "var(--color-accent)", lila: "var(--color-kopierstift)" } as const;
+const GRAU = "var(--color-border-strong)";
 const RINGE = [1, 2, 3, 4, 5] as const;
+const SKALA = [0, 1, 2, 3, 4, 5] as const;
+const GLEIT_MS = 420;
+
+/**
+ * Gleitet Zahlenwerte weich zum Ziel, damit Balken und Flächen sichtbar
+ * wachsen oder schrumpfen, wenn sich die Werte ändern. Reduzierte Bewegung: Sprung.
+ */
+function useGleitend(ziel: readonly number[]): number[] {
+  const [wert, setWert] = useState<number[]>(() => [...ziel]);
+  const aktuell = useRef<number[]>([...ziel]);
+  const schluessel = ziel.join(",");
+  useEffect(() => {
+    const zielWerte = schluessel.split(",").map(Number);
+    const start = [...aktuell.current];
+    const sofort = start.length !== zielWerte.length || window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const beginn = performance.now();
+    let rahmen = 0;
+    const schritt = (jetzt: number) => {
+      const anteil = sofort ? 1 : sanft(Math.min((jetzt - beginn) / GLEIT_MS, 1));
+      const neu = zielWerte.map((z, i) => (start[i] ?? z) + (z - (start[i] ?? z)) * anteil);
+      aktuell.current = neu;
+      setWert(neu);
+      if (anteil < 1) rahmen = requestAnimationFrame(schritt);
+    };
+    rahmen = requestAnimationFrame(schritt);
+    return () => cancelAnimationFrame(rahmen);
+  }, [schluessel]);
+  return wert;
+}
 
 /** Wo der Wert einer Serie in der Karte sitzt: ein Balken links neben dem Achsenknoten. */
 function balkenEnde(knoten: Punkt, wert: number, versatz: number): Punkt {
@@ -50,7 +83,7 @@ function balkenEnde(knoten: Punkt, wert: number, versatz: number): Punkt {
  * bei reduzierter Bewegung springt er. Die Werte stehen zusätzlich als
  * Tabelle für Screenreader, das SVG ist aria-hidden.
  */
-export function AromaKarte({ terpene, serien, titel = "Aroma-Karte", hervorheben = null }: Props) {
+export function AromaKarte({ terpene, serien: roheSerien, titel = "Aroma-Karte", hervorheben = null, staerken }: Props) {
   const [ansicht, setAnsicht] = useState<"karte" | "netz">("karte");
   const [t, setT] = useState(0);
   const [ueberfahren, setAktiv] = useState<number | null>(null);
@@ -74,6 +107,20 @@ export function AromaKarte({ terpene, serien, titel = "Aroma-Karte", hervorheben
     rahmen = requestAnimationFrame(schritt);
     return () => cancelAnimationFrame(rahmen);
   }, [ansicht]);
+
+  // Werte gleiten weich, damit sichtbar wird, dass die Balkenlänge die Skala abbildet.
+  const flach = roheSerien.flatMap((serie) => GESCHMACKS_ACHSEN.map((achse) => serie.matrix[achse.key]));
+  const gleitend = useGleitend(flach);
+  const serien: AromaSerie[] = roheSerien.map((serie, s) => ({
+    ...serie,
+    matrix: Object.fromEntries(
+      GESCHMACKS_ACHSEN.map((achse, i) => [achse.key, gleitend[s * GESCHMACKS_ACHSEN.length + i] ?? serie.matrix[achse.key]]),
+    ) as GeschmacksMatrix,
+  }));
+  const staerke = staerken ?? terpenStaerken(terpene);
+  /** Farbig ist nur, was gerade aktiv ist: die hervorgehobene Achse, sonst jede Achse mit Wert. */
+  const achseFarbig = (index: number) =>
+    aktiv === null ? serien.some((serie) => serie.matrix[GESCHMACKS_ACHSEN[index].key] > 0.05) : aktiv === index;
 
   const karte = achsenImKarte();
   const knoten = karte.map((punkt, index) => mische(punkt, netzPunkt(index, MAX, RADIUS + 34), t));
@@ -142,17 +189,22 @@ export function AromaKarte({ terpene, serien, titel = "Aroma-Karte", hervorheben
             {terpene.map((terpen, index) => {
               const achse = achsenIndex(terpen.geschmack);
               if (achse < 0) return null;
-              const hervor = aktiv === null || aktiv === achse;
+              const farbig = achseFarbig(achse);
+              const farbe = FARBE[achse % 2 === 0 ? "gruen" : "lila"];
+              const kraft = staerke[terpen.name] ?? 0;
               return (
                 <path
                   key={terpen.name}
                   d={bogen(knoten[achse], terpenKnoten[index])}
                   fill="none"
-                  stroke={FARBE[achse % 2 === 0 ? "gruen" : "lila"]}
-                  strokeWidth={hervor ? 4 : 2}
+                  stroke={farbig ? farbe : GRAU}
                   strokeLinecap="round"
-                  opacity={hervor ? 0.9 : 0.2}
-                  className="transition-[opacity,stroke-width] duration-normal"
+                  opacity={farbig ? 0.45 + 0.55 * kraft : 0.35}
+                  style={{
+                    strokeWidth: farbig ? 1.5 + 7 * kraft : 1.5,
+                    filter: farbig && kraft > 0.15 ? `drop-shadow(0 0 ${2 + 10 * kraft}px ${farbe})` : "none",
+                  }}
+                  className="transition-[opacity,stroke-width,filter,stroke] duration-normal"
                 />
               );
             })}
@@ -180,13 +232,10 @@ export function AromaKarte({ terpene, serien, titel = "Aroma-Karte", hervorheben
                   y1={punkt.y}
                   x2={punkt.x}
                   y2={punkt.y}
-                  stroke={FARBE[serie.ton]}
-                  strokeWidth={4}
+                  stroke={achseFarbig(index) ? FARBE[serie.ton] : GRAU}
+                  strokeWidth={aktiv === index ? 6 : 4}
                   strokeLinecap="round"
-                  opacity={
-                    (serie.matrix[GESCHMACKS_ACHSEN[index].key] > 0 ? kartenSichtbar : 0) *
-                    (aktiv === null || aktiv === index ? 1 : 0.3)
-                  }
+                  opacity={(serie.matrix[GESCHMACKS_ACHSEN[index].key] > 0.05 ? kartenSichtbar : 0) * (achseFarbig(index) ? 1 : 0.6)}
                 />
               ))}
               {serienPunkte[s].map((punkt, index) => (
@@ -195,12 +244,54 @@ export function AromaKarte({ terpene, serien, titel = "Aroma-Karte", hervorheben
                   cx={punkt.x}
                   cy={punkt.y}
                   r={aktiv === index ? 6 : 4}
-                  fill={FARBE[serie.ton]}
-                  opacity={serie.matrix[GESCHMACKS_ACHSEN[index].key] > 0 ? 1 : t}
+                  fill={achseFarbig(index) || t > 0.5 ? FARBE[serie.ton] : GRAU}
+                  opacity={serie.matrix[GESCHMACKS_ACHSEN[index].key] > 0.05 ? 1 : t}
                 />
               ))}
             </g>
           ))}
+
+          {/* Skala über den Balken: Länge = Wert 0 bis 5. */}
+          <g opacity={kartenSichtbar * 0.7}>
+            {SKALA.map((stufe) => {
+              const x = balkenEnde(karte[0], stufe, 0).x;
+              const y = karte[0].y - 26;
+              return (
+                <g key={stufe}>
+                  <line
+                    x1={x}
+                    y1={y + 4}
+                    x2={x}
+                    y2={karte[karte.length - 1].y + 10}
+                    stroke="currentColor"
+                    strokeOpacity={0.15}
+                    strokeDasharray="2 4"
+                  />
+                  <text x={x} y={y} textAnchor="middle" fontSize={11} fill="currentColor" fillOpacity={0.6}>
+                    {stufe}
+                  </text>
+                </g>
+              );
+            })}
+          </g>
+          {aktiv !== null && kartenSichtbar > 0.5
+            ? serien.map((serie, s) => {
+                const ende = serienPunkte[s][aktiv];
+                return (
+                  <text
+                    key={`w-${serie.name}`}
+                    x={ende.x - 8}
+                    y={ende.y + (s === 0 ? -8 : 16)}
+                    textAnchor="end"
+                    fontSize={12}
+                    fontWeight={600}
+                    fill={FARBE[serie.ton]}
+                  >
+                    {WERT.format(serie.matrix[GESCHMACKS_ACHSEN[aktiv].key])}
+                  </text>
+                );
+              })
+            : null}
 
           {knoten.map((punkt, index) => (
             <circle

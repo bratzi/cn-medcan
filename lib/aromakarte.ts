@@ -123,3 +123,22 @@ export function eindruckProfil(
   }
   return roh;
 }
+
+/**
+ * Stärke je Terpen, 0 bis 1: Gewicht (Konzentration, sonst Rang) mal Stufe/3,
+ * bezogen auf das stärkste Terpen bei Stufe 5. Steuert, wie kräftig der Pfad
+ * eines Terpens in der Karte leuchtet.
+ */
+export function terpenStaerken(
+  terpene: readonly KartenTerpen[],
+  stufen: Readonly<Record<string, number>> = {},
+): Record<string, number> {
+  const gewichte = terpene.map((terpen) => terpen.konzentrationProzent ?? Math.max(1, 4 - terpen.rang));
+  const hoechstes = Math.max(0, ...gewichte) * (5 / 3);
+  return Object.fromEntries(
+    terpene.map((terpen, index) => [
+      terpen.name,
+      hoechstes > 0 ? Math.min(1, (gewichte[index] * ((stufen[terpen.name] ?? 3) / 3)) / hoechstes) : 0,
+    ]),
+  );
+}
