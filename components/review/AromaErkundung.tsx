@@ -131,6 +131,9 @@ export function AromaErkundung({
 
   return (
     <div className="flex flex-col gap-16 md:gap-24">
+      {/* Sortenkopf ganz oben (Nutzer 2026-09-25): erst sieht man, was bewertet wurde. */}
+      {bild}
+
       {gesamteindruck ? (
         <Schritt nummer="1" titel="Gesamteindruck">
           <GesamteindruckLeiste
@@ -160,7 +163,6 @@ export function AromaErkundung({
             ) : null}
           </p>
         ) : null}
-        {bild}
         <p className="max-w-[60ch] text-small text-text-muted text-pretty">
           Zieh die lila Punkte links in der Karte: Wie stark schmeckst du jede Richtung? Dazu leuchten die
           Terpene auf, die sie tragen. Hier wird nichts gespeichert.
@@ -275,14 +277,15 @@ function Schritt({
   children: React.ReactNode;
 }) {
   return (
-    <section aria-label={`Schritt ${nummer}: ${titel}`} className="relative isolate flex w-full flex-col gap-8">
-      {/* Ziffer über die ganze Höhe des Schritts im Hintergrund, blass wie die
-          Sektions-Schlagworte (Nutzer 2026-09-25); SVG, damit sie mit der Höhe skaliert. */}
+    <section aria-label={`Schritt ${nummer}: ${titel}`} className="relative isolate flex w-full flex-col gap-8 md:pl-24">
+      {/* Ziffer im Hintergrund, blass wie die Sektions-Schlagworte, in fester Höhe
+          für alle Schritte (Maß: Schritt 1) und halb links neben dem Inhalt, damit sie
+          lesbar bleibt (Nutzer 2026-09-25). */}
       <svg
         aria-hidden="true"
         viewBox="0 0 60 100"
         preserveAspectRatio="xMinYMid meet"
-        className="pointer-events-none absolute inset-y-0 left-0 -z-10 h-full w-auto select-none overflow-visible text-kopierstift opacity-15"
+        className="pointer-events-none absolute top-0 left-0 -z-10 h-[28rem] w-auto -translate-x-4 select-none overflow-visible text-kopierstift opacity-15"
       >
         <text x="0" y="88" style={{ fontSize: 118 }} className="font-hand text-kulisse" fill="currentColor">
           {nummer}

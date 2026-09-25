@@ -42,6 +42,7 @@ async function Inhalt() {
         </figure>
       ) : null}
       <div className="flex flex-col gap-4">
+        <h3 className="font-buch text-h2 font-medium text-text">{sorte.handelsname}</h3>
         <p className="text-small uppercase tracking-wide text-text-muted">Laut Hersteller</p>
         <ul className="flex flex-col gap-2">
           {sorte.terpene.map((terpen) => (
