@@ -5,7 +5,7 @@ import { Suspense } from "react";
 import { AktiveFilter } from "@/components/produkt/AktiveFilter";
 import { FilterLeiste } from "@/components/produkt/FilterLeiste";
 import { ProduktCard } from "@/components/produkt/ProduktCard";
-import { EmptyState, Spinner, buttonKlassen } from "@/components/ui";
+import { EmptyState, Spinner, buttonKlassen, textLinkKlassen } from "@/components/ui";
 import { parseStrainFilter, serialisiereFilter } from "@/lib/query/filter";
 import type { StrainFilter } from "@/lib/query/filter";
 import { istFachkreis } from "@/lib/query/fachkreis";
@@ -59,6 +59,11 @@ export default async function ProduktePage({ searchParams }: Props) {
   );
 }
 
+/** Einstieg "Bluete vorschlagen", mit dem Suchbegriff als Vorbelegung. */
+function vorschlagLink(suche: string | undefined): string {
+  return suche ? `/vorschlagen?name=${encodeURIComponent(suche)}` : "/vorschlagen";
+}
+
 async function Ergebnisbereich({ filter }: { filter: StrainFilter }) {
   const fachkreis = await istFachkreis();
   // Zwei parallele Abfragen: Liste und Facetten blockieren sich nicht.
@@ -89,11 +94,16 @@ async function Ergebnisbereich({ filter }: { filter: StrainFilter }) {
         {liste.eintraege.length === 0 ? (
           <EmptyState
             titel="Keine Blüten gefunden"
-            beschreibung="Zu dieser Filterkombination ist keine Blüte gelistet. Weniger Kriterien führen meist zu Treffern."
+            beschreibung="Zu dieser Filterkombination ist keine Blüte gelistet. Weniger Kriterien führen meist zu Treffern. Fehlt dir eine Blüte, schlag sie vor."
             aktion={
-              <Link href="/produkte" className={buttonKlassen("secondary")}>
-                Alle Filter zurücksetzen
-              </Link>
+              <div className="flex flex-wrap gap-4">
+                <Link href="/produkte" className={buttonKlassen("secondary")}>
+                  Alle Filter zurücksetzen
+                </Link>
+                <Link href={vorschlagLink(filter.q)} className={buttonKlassen("secondary")}>
+                  Blüte vorschlagen
+                </Link>
+              </div>
             }
           />
         ) : (
@@ -105,6 +115,13 @@ async function Ergebnisbereich({ filter }: { filter: StrainFilter }) {
             ))}
           </ul>
         )}
+
+        <p className="text-small text-text-muted">
+          Blüte fehlt?{" "}
+          <Link href={vorschlagLink(filter.q)} className={textLinkKlassen()}>
+            Schlag sie vor
+          </Link>
+        </p>
 
         {liste.seitenAnzahl > 1 ? (
           <nav

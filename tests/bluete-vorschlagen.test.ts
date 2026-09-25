@@ -22,3 +22,20 @@ test("Migration 0006 legt beide Tabellen samt Unique-Index an", () => {
   assert.match(sql, /CREATE UNIQUE INDEX "sorten_vorschlaege_mitglied_id_schluessel_key"/);
   assert.doesNotMatch(sql, /d1_migrations/);
 });
+
+test("Vorschlagen: Aktion prueft Anmeldung, nicht die Freigabe, und schreibt die Id nie aus dem Formular", () => {
+  const quelle = lies("app/vorschlagen/aktionen.ts");
+  assert.match(quelle, /^"use server";/);
+  assert.match(quelle, /await mitgliedErforderlich\(\)/);
+  assert.doesNotMatch(quelle, /freigabeErforderlich/);
+  assert.match(quelle, /mitgliedId: mitglied\.mitgliedId/);
+  assert.doesNotMatch(quelle, /formData\.get\("mitgliedId"\)/);
+  assert.match(quelle, /MAX_OFFENE_VORSCHLAEGE/);
+});
+
+test("Vorschlagen: Seite leitet ohne Anmeldung weiter, Katalog verlinkt mit Suchbegriff", () => {
+  assert.match(lies("app/vorschlagen/page.tsx"), /redirect\("\/anmelden\?weiter=%2Fvorschlagen"\)/);
+  const katalog = lies("app/produkte/page.tsx");
+  assert.match(katalog, /href=\{vorschlagLink\(filter\.q\)\}/);
+  assert.match(lies("components/umfrage/VorschlagFormular.tsx"), /href="\/vorschlagen"/);
+});

@@ -1,10 +1,11 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { vorschlagEinreichen } from "@/app/umfragen/aktionen";
-import { Button, Field, Select } from "@/components/ui";
+import { Button, Field, Select, textLinkKlassen } from "@/components/ui";
 import { useHydriert } from "@/components/ui/useHydriert";
 import type { SelectOption } from "@/components/ui";
 
@@ -63,8 +64,13 @@ export function VorschlagFormular({ umfrageId, strains }: Props) {
         required
         optionen={strains}
         platzhalter="Bitte auswählen"
-        hinweis="Nur Handelsnamen aus dem Katalog."
       />
+      <p className="-mt-4 text-small text-text-muted">
+        Nur Blüten aus dem Katalog. Fehlt eine?{" "}
+        <Link href="/vorschlagen" className={textLinkKlassen()}>
+          Schlag sie vor
+        </Link>
+      </p>
 
       <Field
         id="vorschlag-begruendung"
