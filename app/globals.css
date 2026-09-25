@@ -945,26 +945,33 @@ html.joint-cursor :is(input:not([type="range"]):not([type="radio"]):not([type="c
 }
 
 /* Konto: Pille mit Verlaufsrand, füllt sich beim Hover zart. */
+/* Nur der Rahmen im Verlauf, innen durchsichtig (Nutzer 2026-09-25: vorher
+   wirkte die Pille gefüllt, weil der Verlauf durch die halbtransparente
+   Füllung schien). Rahmen per Maske auf einem Pseudo-Element. */
 .konto-pille {
-  border: 1.5px solid transparent;
-  background:
-    linear-gradient(var(--color-surface), var(--color-surface)) padding-box,
-    linear-gradient(90deg, var(--color-accent), var(--color-kopierstift)) border-box;
+  position: relative;
+  background: transparent;
   transition: background 0.3s var(--ease-standard), box-shadow 0.3s var(--ease-standard);
 }
 
-.kopf:not([data-gescrollt]) .konto-pille {
-  background:
-    linear-gradient(color-mix(in oklab, var(--color-surface) 40%, transparent), color-mix(in oklab, var(--color-surface) 40%, transparent)) padding-box,
-    linear-gradient(90deg, var(--color-accent), var(--color-kopierstift)) border-box;
+.konto-pille::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1.5px;
+  background: linear-gradient(90deg, var(--color-accent), var(--color-kopierstift));
+  mask:
+    linear-gradient(#000 0 0) content-box exclude,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  pointer-events: none;
 }
 
 .konto-pille:hover,
 .konto-pille[aria-current="page"] {
-  background:
-    linear-gradient(color-mix(in oklab, var(--color-accent) 14%, var(--color-surface)), color-mix(in oklab, var(--color-kopierstift) 14%, var(--color-surface))) padding-box,
-    linear-gradient(90deg, var(--color-accent), var(--color-kopierstift)) border-box;
-  box-shadow: 0 0 0 4px color-mix(in oklab, var(--color-kopierstift) 12%, transparent);
+  background: color-mix(in oklab, var(--color-kopierstift) 8%, transparent);
+  box-shadow: 0 0 0 4px color-mix(in oklab, var(--color-kopierstift) 10%, transparent);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -985,17 +992,15 @@ html.joint-cursor :is(input:not([type="range"]):not([type="radio"]):not([type="c
   margin: -0.2em -0.3em -0.25em -0.25em;
 }
 
-/* Hell/Dunkel als Lampe (components/layout/ThemaSchalter.tsx): fest unten
-   rechts, Schatten statt Rahmen, 48 px Trefferfläche. Lampe an = hell. */
+/* Hell/Dunkel als Lampe (components/layout/ThemaSchalter.tsx): im Kopf oben
+   links vor der Wortmarke (Nutzer 2026-09-25), Schatten statt Rahmen, 44 px
+   Trefferfläche. Lampe an = hell. */
 .thema-lampe {
-  position: fixed;
-  right: 1.25rem;
-  bottom: 1.25rem;
-  z-index: 45;
+  flex: none;
   display: grid;
   place-items: center;
-  width: 3rem;
-  height: 3rem;
+  width: 2.75rem;
+  height: 2.75rem;
   border-radius: 9999px;
   color: var(--color-text);
   background: color-mix(in oklab, var(--color-surface-raised) 92%, transparent);

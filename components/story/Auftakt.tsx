@@ -77,14 +77,19 @@ export function Auftakt() {
         >
           Cannabis, offen gelegt.
         </p>
+        {/* Zentriert und breit unter der Oberzeile, kleiner Abstand (Nutzer 2026-09-25). */}
+        <p
+          data-story="intro"
+          data-story-einstieg=""
+          className="-mt-2 max-w-[72ch] text-center font-sans text-small uppercase leading-relaxed tracking-gesperrt text-text text-balance"
+        >
+          Wir testen Sorten nach festem Schema. Gemeinsam entscheiden wir, welche als Nächstes drankommt.
+        </p>
       </div>
 
       <div className="mx-auto w-full max-w-360 px-4 sm:px-8">
         <div className="mt-8 flex flex-wrap items-end justify-between gap-8">
           <div className="flex max-w-2xl flex-col items-start gap-6">
-            <p data-story="intro" data-story-einstieg="" className="max-w-[48ch] font-sans text-small uppercase leading-relaxed tracking-gesperrt text-text text-pretty">
-              Wir testen Sorten nach festem Schema. Gemeinsam entscheiden wir, welche als Nächstes drankommt.
-            </p>
             <Link href="#abstimmung" className={buttonKlassen("primary", "md")}>
               Wähl mit
             </Link>

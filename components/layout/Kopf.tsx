@@ -4,6 +4,7 @@ import { NavLink } from "@/components/layout/NavLink";
 import { Wortmarke } from "@/components/marke/Wortmarke";
 import { KontoZaehler } from "@/components/layout/KontoZaehler";
 import { KopfZustand } from "@/components/layout/KopfZustand";
+import { ThemaSchalter } from "@/components/layout/ThemaSchalter";
 import { HAUPTNAVIGATION, KONTO_LINK } from "@/lib/navigation";
 
 /**
@@ -25,7 +26,7 @@ import { HAUPTNAVIGATION, KONTO_LINK } from "@/lib/navigation";
 // Kapitel-Link: Nummer von Hand, Wort gedruckt, Unterstrich zieht sich beim
 // Hover wie ein Stiftstrich im Farbverlauf ein (globals.css .kapitel-link).
 const NAV_LINK =
-  "kapitel-link group inline-flex h-11 items-center gap-2 px-3 font-sans text-caption font-medium uppercase tracking-gesperrt whitespace-nowrap text-text " +
+  "kapitel-link group inline-flex h-11 items-center gap-2 px-3 font-sans text-[0.75rem] font-medium uppercase tracking-gesperrt whitespace-nowrap text-text " +
   "transition-colors duration-fast ease-standard";
 
 const AKTIV = "underline decoration-text decoration-2 underline-offset-8";
@@ -37,9 +38,13 @@ export function Kopf() {
   return (
     <header data-kopf="" className="kopf fixed inset-x-0 top-0 z-40">
       <div className="mx-auto grid w-full max-w-360 grid-cols-[1fr_auto_auto] items-center gap-x-4 gap-y-2 px-4 py-2 sm:px-8 lg:grid-cols-[auto_1fr_auto_auto]">
-        <Link href="/" className="inline-flex min-h-11 items-center justify-self-start px-2">
-          <Wortmarke groesse="kopf" />
-        </Link>
+        {/* Hell/Dunkel oben links vor der Wortmarke (Nutzer 2026-09-25, zuvor fest unten rechts). */}
+        <div className="flex items-center gap-2 justify-self-start">
+          <ThemaSchalter />
+          <Link href="/" className="inline-flex min-h-11 items-center px-2">
+            <Wortmarke groesse="kopf" />
+          </Link>
+        </div>
 
         <nav
           aria-label="Hauptnavigation"
@@ -58,7 +63,7 @@ export function Kopf() {
 
         <NavLink
           href={KONTO_LINK.href}
-          className="konto-pille col-start-3 row-start-1 inline-flex h-11 items-center rounded-full px-5 font-sans text-caption font-medium uppercase tracking-gesperrt text-text lg:col-start-4"
+          className="konto-pille col-start-3 row-start-1 inline-flex h-11 items-center rounded-full px-5 font-sans text-[0.75rem] font-medium uppercase tracking-gesperrt text-text lg:col-start-4"
           aktivKlasse={AKTIV}
         >
           {KONTO_LINK.text}
