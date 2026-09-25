@@ -25,7 +25,7 @@ import { HAUPTNAVIGATION, KONTO_LINK } from "@/lib/navigation";
 // Kapitel-Link: Nummer von Hand, Wort gedruckt, Unterstrich zieht sich beim
 // Hover wie ein Stiftstrich im Farbverlauf ein (globals.css .kapitel-link).
 const NAV_LINK =
-  "kapitel-link group inline-flex h-11 items-center gap-2 px-3 text-small font-medium whitespace-nowrap text-text " +
+  "kapitel-link group inline-flex h-11 items-center gap-2 px-3 font-sans text-caption font-medium uppercase tracking-gesperrt whitespace-nowrap text-text " +
   "transition-colors duration-fast ease-standard";
 
 const AKTIV = "underline decoration-text decoration-2 underline-offset-8";
@@ -58,7 +58,7 @@ export function Kopf() {
 
         <NavLink
           href={KONTO_LINK.href}
-          className="konto-pille col-start-3 row-start-1 inline-flex h-11 items-center rounded-full px-5 text-small font-medium text-text lg:col-start-4"
+          className="konto-pille col-start-3 row-start-1 inline-flex h-11 items-center rounded-full px-5 font-sans text-caption font-medium uppercase tracking-gesperrt text-text lg:col-start-4"
           aktivKlasse={AKTIV}
         >
           {KONTO_LINK.text}
