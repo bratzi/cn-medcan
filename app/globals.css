@@ -445,16 +445,17 @@
    ========================================================================== */
 
 @media (prefers-reduced-motion: no-preference) {
+  /* Langsamer und später (Nutzer 2026-09-25: war fertig, bevor man es sah). */
   .auftakt-marke [data-marke-zeile] {
-    animation: schreiben 0.8s var(--ease-standard) 0.1s backwards;
+    animation: schreiben 1.6s var(--ease-standard) 0.6s backwards;
   }
 
   .auftakt-marke [data-marke-zeile] + [data-marke-zeile] {
-    animation-delay: 0.8s;
+    animation-delay: 2s;
   }
 
   .auftakt-unterzeile {
-    animation: schreiben 0.6s var(--ease-standard) 1.5s backwards;
+    animation: schreiben 1.2s var(--ease-standard) 3.6s backwards;
   }
 }
 

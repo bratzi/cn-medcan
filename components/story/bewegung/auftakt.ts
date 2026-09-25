@@ -21,11 +21,12 @@ export const auftakt: Choreografie = ({ gsap }) => {
     .fromTo(
       '[data-story="auftakt-film"] video',
       { opacity: 0, scale: 1.08 },
-      { opacity: 0.75, scale: 1, duration: 1.8, ease: "power2.out", clearProps: "opacity,scale" },
+      { opacity: 0.75, scale: 1, duration: 3, ease: "power2.out", clearProps: "opacity,scale" },
       0,
     )
-    .fromTo('[data-story="oberzeile"]', { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.6 }, 0.1)
-    .fromTo('[data-story="intro"]', { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.6 }, 0.4);
+    // Später und länger (Nutzer 2026-09-25): erst die Wortmarke, dann die Zeilen.
+    .fromTo('[data-story="oberzeile"]', { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 1.4 }, 1.4)
+    .fromTo('[data-story="intro"]', { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 1.4 }, 2.6);
 };
 
 /**
