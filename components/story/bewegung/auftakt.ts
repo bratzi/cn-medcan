@@ -13,8 +13,10 @@ export const auftakt: Choreografie = ({ gsap }) => {
 
   gsap
     .timeline({ defaults: { ease: "power3.out" } })
-    // Ab hier übernimmt GSAP: der CSS-Notfall wird abgeschaltet, die Flächen stehen.
-    .set(einstieg, { animation: "none", opacity: 1 })
+    // Ab hier übernimmt GSAP: der CSS-Notfall wird abgeschaltet. Die Texte bleiben
+    // unsichtbar, bis ihre Einblendung startet (Nutzer 2026-09-25: vorher standen sie
+    // mit opacity 1 schon da und blendeten danach noch einmal ein).
+    .set(einstieg, { animation: "none", opacity: 0 })
     // fromTo statt from: der Zielwert käme sonst aus dem CSS-Einstieg (opacity 0),
     // und die Zeile bliebe unsichtbar, weil die Bühne den Notfall abschaltet.
     // Ziel 0.75 = opacity-75 am Video (Auftakt.tsx); danach übernimmt wieder die Klasse.
