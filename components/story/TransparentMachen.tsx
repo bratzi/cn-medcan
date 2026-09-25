@@ -156,7 +156,7 @@ export function TransparentMachen() {
             schreiben auf, was drin ist.
           </h2>
           <Paar punkt={PUNKTE[0]} erster>
-            Zuerst der <Buzz>Gesamteindruck.</Buzz> Nicht, was auf der Dose steht, sondern wie sie aussieht, wie sie riecht, wie
+            Der <Buzz>Gesamteindruck.</Buzz> Nicht, was auf der Dose steht, sondern wie sie aussieht, wie sie riecht, wie
             sie schmeckt.
           </Paar>
           <Paar punkt={PUNKTE[1]}>

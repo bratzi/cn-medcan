@@ -17,16 +17,21 @@ export const MAX = 5;
 // fest bei 260 (Platz fuer Beschriftung und Balken), die Terpenspalte haengt 220 vor
 // dem rechten Rand (Platz fuer die Namen). Bei breiter Karte wachsen nur die Boegen.
 const LINKS = 260;
-/** Platz links der Balken für die Achsennamen (bei BREITE: 260 - 110). */
-const BESCHRIFTUNG = LINKS - 110;
+/** Platz links der Balken für die Achsennamen: bei BREITE sind die Balken 110 lang. */
+const BESCHRIFTUNG = LINKS - 16 - 110;
 
 /**
- * Länge der Geschmacksbalken: 110 bei BREITE, danach wachsen sie mit 30 % der
- * zusätzlichen Breite mit (Nutzer 2026-09-25: Balken breiter, Bögen dafür
- * schmaler). Die Achsenspalte rückt um denselben Betrag nach rechts.
+ * Die Geschmacksachse wandert mit der halben Mehrbreite nach rechts (Nutzer
+ * 2026-09-25: Skala links und Terpenlinien rechts auf breiten Schirmen etwa
+ * 50:50); bei BREITE bleibt sie bei 260, damit schmale Karten Platz für die
+ * Bögen behalten. Die Balken füllen den Raum zwischen Beschriftung und Achse.
  */
+export function achsenX(breite: number = BREITE): number {
+  return runde(LINKS + Math.max(0, breite - BREITE) * 0.5);
+}
+
 export function balkenLaenge(breite: number = BREITE): number {
-  return runde(110 + Math.max(0, breite - BREITE) * 0.3);
+  return runde(achsenX(breite) - 16 - BESCHRIFTUNG);
 }
 const RECHTS_ABSTAND = BREITE - 420;
 const OBEN = 48;
@@ -54,7 +59,7 @@ function spalte(anzahl: number, index: number): number {
 
 /** Knoten der Geschmacksachsen in der Karten-Ansicht (linke Spalte). */
 export function achsenImKarte(breite: number = BREITE): Punkt[] {
-  const x = BESCHRIFTUNG + balkenLaenge(breite);
+  const x = achsenX(breite);
   return GESCHMACKS_ACHSEN.map((_, index) => ({ x, y: spalte(GESCHMACKS_ACHSEN.length, index) }));
 }
 

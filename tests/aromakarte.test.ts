@@ -47,16 +47,16 @@ test("Geometrie: acht Achsen links, Netz beginnt oben, Morph interpoliert", () =
   assert.match(bogen({ x: 0, y: 0 }, { x: 100, y: 50 }), /^M0,0 C50,0 50,50 100,50$/);
 });
 
-test("Geometrie bei voller Breite: Balken wachsen mit 30 % der Mehrbreite, Terpene am rechten Rand", () => {
+test("Geometrie: Achse wandert mit halber Mehrbreite (Skala links, Terpenlinien rechts), Terpene am rechten Rand", () => {
   // Standardaufrufe (ohne breite) bleiben wie vorher: Maßstab bei 640.
   assert.equal(achsenImKarte()[0].x, 260);
   assert.equal(terpeneImKarte(3)[0].x, 420);
 
-  // Bei 1200: Balken 110 + 560 * 0,3 = 278, Achsen bei 150 + 278, Terpene bei 1200 - 220.
+  // Achse bei 640 unverändert 260 (Balken 110), bei 1200 bei 260 + 280 = 540 (Balken 390, Bögen 440).
   assert.equal(balkenLaenge(), 110);
-  assert.equal(balkenLaenge(1200), 278);
+  assert.equal(balkenLaenge(1200), 390);
   const achsenBreit = achsenImKarte(1200);
-  assert.equal(achsenBreit[0].x, 428);
+  assert.equal(achsenBreit[0].x, 540);
   const terpeneBreit = terpeneImKarte(3, 1200);
   assert.equal(terpeneBreit[0].x, 980);
 });
