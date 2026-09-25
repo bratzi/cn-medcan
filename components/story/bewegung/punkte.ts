@@ -17,12 +17,12 @@
  */
 
 /** Weg der Video-Ebene bei Zeiger am Rand, in px. Die Linien laufen mit ihrer Tiefe weiter. */
-const WEG_PX = 10;
+const WEG_PX = 24; // Nutzer 2026-09-25: mehr Weg (vorher 10)
 /** Anteil des Restwegs je Frame: klein = weicher, träger. */
 const DAEMPFUNG = 0.12;
 /** Eigenbewegung: Kreisfrequenzen je Achse in 1/s (ungleich, damit die Bahn nicht wiederholt wirkt). */
-const EIGEN_X = 0.45;
-const EIGEN_Y = 0.31;
+const EIGEN_X = 1.1; // Nutzer 2026-09-25: schneller (vorher 0.45/0.31)
+const EIGEN_Y = 0.77;
 
 type Ebene = { element: HTMLElement; tiefe: number; x: number; y: number };
 
