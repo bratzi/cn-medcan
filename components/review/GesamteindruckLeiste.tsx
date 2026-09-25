@@ -37,6 +37,7 @@ export function GesamteindruckLeiste({
   className,
   bedienung,
   mitWirkung = false,
+  ohneTitel = false,
 }: Gesamteindruck & {
   className?: string;
   bedienung?: {
@@ -45,20 +46,30 @@ export function GesamteindruckLeiste({
   };
   /** Bewertungsmaske: Wirkung als zusätzliche Note (Pflicht beim Speichern). */
   mitWirkung?: boolean;
+  /** In der Erkundung trägt der Schritt die Überschrift; hier dann nur die Anzahl. */
+  ohneTitel?: boolean;
 }) {
   const achsen = mitWirkung ? BEWERTUNGS_ACHSEN : EINDRUCK_ACHSEN;
   const mittelWerte: Partial<Record<NotenKey, number>> = werte;
   if (!bedienung && Object.keys(werte).length === 0) return null;
   return (
     <section className={cn("flex flex-col gap-4", className)}>
-      <h3 className="font-buch text-h3 font-medium text-text">
-        Gesamteindruck
-        {anzahl > 0 ? (
-          <span className="ml-2 text-caption font-normal text-text-muted">
+      {ohneTitel ? (
+        anzahl > 0 ? (
+          <p className="text-caption text-text-muted">
             aus {anzahl} {anzahl === 1 ? "Bewertung" : "Bewertungen"}
-          </span>
-        ) : null}
-      </h3>
+          </p>
+        ) : null
+      ) : (
+        <h3 className="font-buch text-h3 font-medium text-text">
+          Gesamteindruck
+          {anzahl > 0 ? (
+            <span className="ml-2 text-caption font-normal text-text-muted">
+              aus {anzahl} {anzahl === 1 ? "Bewertung" : "Bewertungen"}
+            </span>
+          ) : null}
+        </h3>
+      )}
       <dl className="flex flex-col gap-4">
         {achsen.map((achse) => {
           const mittel = mittelWerte[achse.key];

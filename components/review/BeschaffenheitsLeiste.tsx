@@ -146,7 +146,14 @@ export function BeschaffenheitsLeiste({
   titel = "Beschaffenheit",
   className,
   bedienung,
-}: BeschaffenheitsWerte & { titel?: string; className?: string; bedienung?: BeschaffenheitsBedienung }) {
+  ohneTitel = false,
+}: BeschaffenheitsWerte & {
+  titel?: string;
+  className?: string;
+  bedienung?: BeschaffenheitsBedienung;
+  /** In der Erkundung trägt der Schritt die Überschrift; hier dann nur die Anzahl. */
+  ohneTitel?: boolean;
+}) {
   const achsen = BESCHAFFENHEIT_ACHSEN.filter((achse) => werte[achse.key] !== undefined || bedienung);
   const zeigeFeuchte = feuchte !== null || bedienung;
   if (achsen.length === 0 && !zeigeFeuchte) return null;
@@ -154,14 +161,22 @@ export function BeschaffenheitsLeiste({
   const feuchteWert = eigeneFeuchte ?? feuchte ?? 10;
   return (
     <section className={cn("flex flex-col gap-4", className)}>
-      <h3 className="font-buch text-h3 font-medium text-text">
-        {titel}
-        {anzahl ? (
-          <span className="ml-2 text-caption font-normal text-text-muted">
+      {ohneTitel ? (
+        anzahl ? (
+          <p className="text-caption text-text-muted">
             aus {anzahl} {anzahl === 1 ? "Bewertung" : "Bewertungen"}
-          </span>
-        ) : null}
-      </h3>
+          </p>
+        ) : null
+      ) : (
+        <h3 className="font-buch text-h3 font-medium text-text">
+          {titel}
+          {anzahl ? (
+            <span className="ml-2 text-caption font-normal text-text-muted">
+              aus {anzahl} {anzahl === 1 ? "Bewertung" : "Bewertungen"}
+            </span>
+          ) : null}
+        </h3>
+      )}
       <dl className="flex flex-col gap-4">
         {zeigeFeuchte ? (
           <div className="flex flex-col gap-1.5">

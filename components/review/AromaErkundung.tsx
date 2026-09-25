@@ -167,6 +167,7 @@ export function AromaErkundung({
             {...gesamteindruck}
             className="w-full"
             mitWirkung={eingabe}
+            ohneTitel
             bedienung={{
               eigen: eigeneNoten,
               aendern: (key, wert) => setEigeneNoten((alt) => ({ ...alt, [key]: wert })),
@@ -218,6 +219,7 @@ export function AromaErkundung({
           <BeschaffenheitsLeiste
             {...beschaffenheit}
             className="w-full"
+            ohneTitel
             bedienung={{
               eigen: eigeneBeschaffenheit,
               aendern: (schluessel, wert) =>
@@ -319,9 +321,9 @@ function Schritt({
           {nummer}
         </text>
       </svg>
-      {/* Zentriert in Logoschrift und Farbverlauf wie die Schlagworte (Nutzer 2026-09-25). */}
+      {/* Links in Logoschrift und Farbverlauf wie die Schlagworte (Nutzer 2026-09-25). */}
       <h3
-        className="farbverlauf border-t border-border pt-8 text-center font-hand text-erzaehlung leading-[0.9]"
+        className="farbverlauf border-t border-border pt-8 font-hand text-erzaehlung leading-[0.9]"
         style={{ fontSize: "calc(var(--text-kapitel) * 1.35)" }}
       >
         {titel}
