@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
 
 import { BewertungFreigabe } from "@/components/admin/BewertungFreigabe";
+import { BlueteVorschlaege } from "@/components/admin/BlueteVorschlaege";
 import { ErgebnisListe } from "@/components/admin/ErgebnisListe";
 import { MitgliedAktionen } from "@/components/admin/MitgliedAktionen";
 import { RundeAnlegenFormular } from "@/components/admin/RundeAnlegenFormular";
@@ -385,6 +386,10 @@ export default async function AdminPage() {
       <div className="mt-8 flex flex-col gap-8">
         <Suspense fallback={<Spinner text="Umfrage wird geladen" />}>
           <UmfrageBereich />
+        </Suspense>
+
+        <Suspense fallback={<Spinner text="Vorschläge werden geladen" />}>
+          <BlueteVorschlaege />
         </Suspense>
 
         <Suspense fallback={<Spinner text="Ergebnisse werden geladen" />}>
