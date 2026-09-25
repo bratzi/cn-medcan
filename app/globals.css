@@ -654,8 +654,7 @@ html.joint-cursor :is(input:not([type="range"]):not([type="radio"]):not([type="c
 }
 
 .joint-zeiger[data-gedrueckt] .joint-glut {
-  opacity: 1;
-  animation: joint-glimmen 0.9s ease-in-out infinite alternate;
+  opacity: calc(0.7 + var(--glut) * 0.3);
 }
 
 .joint-zeiger[data-gedrueckt] {
@@ -663,65 +662,15 @@ html.joint-cursor :is(input:not([type="range"]):not([type="radio"]):not([type="c
     drop-shadow(0 0 calc(2px + var(--glut) * 7px) color-mix(in oklab, #ff6a10 calc(50% + var(--glut) * 50%), transparent));
 }
 
-@keyframes joint-glimmen {
-  from {
-    opacity: 0.75;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-.joint-spur,
-.joint-rauch {
-  --drift: 0px;
-  --glut: 0;
+/* Qualm, Funken und Duftspur (components/layout/joint-rauch.ts): ein Canvas
+   über der Seite, direkt unter dem Zeiger, nie im Weg. */
+.joint-rauch-leinwand {
   position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
   z-index: 2147483646;
-  border-radius: 9999px;
   pointer-events: none;
-}
-
-/* Duftspur beim Bewegen: blass grünlich, verweht schnell. */
-.joint-spur {
-  width: 6px;
-  height: 6px;
-  margin: -3px 0 0 -3px;
-  background: color-mix(in oklab, #9ed9a6 70%, transparent);
-  filter: blur(2px);
-  opacity: 0.3;
-  animation: joint-spur 0.9s ease-out forwards;
-}
-
-@keyframes joint-spur {
-  to {
-    transform: translate(var(--drift), -14px) scale(2.2);
-    opacity: 0;
-  }
-}
-
-/* Qualm beim Klick: grau, steigt von der Spitze auf, dichter mit der Glut. */
-.joint-rauch {
-  width: 8px;
-  height: 8px;
-  margin: -4px 0 0 -4px;
-  background: #bdb8b2;
-  filter: blur(3px);
-  opacity: calc(0.4 + var(--glut) * 0.3);
-  animation: joint-rauch 1.8s ease-out forwards;
-}
-
-@keyframes joint-rauch {
-  to {
-    transform: translate(var(--drift), -64px) scale(3.6);
-    opacity: 0;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .joint-zeiger[data-gedrueckt] .joint-glut {
-    animation: none;
-  }
 }
 
 /* Storytelling-Prüfpunkte (TransparentMachen): Blob-Rand morpht, Inhalt

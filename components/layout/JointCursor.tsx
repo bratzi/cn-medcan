@@ -2,6 +2,8 @@
 
 import { useEffect, useRef } from "react";
 
+import { starteRauch, type RauchMaschine } from "@/components/layout/joint-rauch";
+
 /** Wie lange gehalten, bis die Glut ganz aufgeglüht ist (ms). */
 const GLUEHEN_VOLL_MS = 2500;
 
@@ -10,6 +12,8 @@ const GLUEHEN_VOLL_MS = 2500;
  * gedrehte Spitze oben links ist der Klickpunkt, der Filter zeigt nach unten
  * rechts. Beim Bewegen zieht er eine dezente Duftspur, beim Klicken glimmt die
  * Spitze und qualmt; je länger gehalten, desto heller die Glut und mehr Asche.
+ * Qualm, Funken und Duftspur zeichnet joint-rauch.ts auf einem Canvas; die
+ * Glut flackert unregelmäßig (zwei überlagerte Schwingungen), nie im Takt.
  * Nur mit feiner Maus; bei reduzierter Bewegung ohne Spur und Rauch.
  * Folgt dem Zeiger über transform im rAF, ohne React-Renders je Bewegung.
  */
@@ -31,32 +35,33 @@ export function JointCursor() {
     let gedrueckt = 0;
     let rauchZeit = 0;
     let spurZeit = 0;
-
-    const teilchen = (art: string, tx: number, ty: number, glut: number) => {
-      const s = document.createElement("span");
-      s.className = art;
-      s.setAttribute("aria-hidden", "true");
-      s.style.left = `${tx + (Math.random() - 0.5) * 6}px`;
-      s.style.top = `${ty + (Math.random() - 0.5) * 6}px`;
-      s.style.setProperty("--drift", `${(Math.random() - 0.5) * 30}px`);
-      s.style.setProperty("--glut", glut.toFixed(2));
-      document.body.appendChild(s);
-      s.addEventListener("animationend", () => s.remove(), { once: true });
-    };
+    let letzteZeit = 0;
+    let glutJetzt = 0;
+    const rauch: RauchMaschine | null = ruhig ? null : starteRauch();
 
     const zeichnen = (jetzt: number) => {
+      const dt = letzteZeit ? Math.min((jetzt - letzteZeit) / 1000, 0.05) : 0;
+      letzteZeit = jetzt;
       el.style.transform = `translate3d(${x}px, ${y}px, 0)`;
+      // Geschwindigkeit des Zeigers in px/s: der Qualm erbt einen Hauch davon.
+      const vx = dt ? (x - letztX) / dt : 0;
+      const vy = dt ? (y - letztY) / dt : 0;
       if (gedrueckt) {
         const glut = Math.min((jetzt - gedrueckt) / GLUEHEN_VOLL_MS, 1);
-        el.style.setProperty("--glut", glut.toFixed(3));
-        if (!ruhig && jetzt - rauchZeit > 110) {
+        glutJetzt = glut;
+        // Unregelmäßiges Flackern: zwei Schwingungen, die nie gleich takten.
+        const flackern = ruhig ? 1 : 0.82 + 0.18 * Math.sin(jetzt * 0.019) * Math.sin(jetzt * 0.0071 + 1.3);
+        el.style.setProperty("--glut", (glut * flackern).toFixed(3));
+        if (rauch && jetzt - rauchZeit > 70 - glut * 35) {
           rauchZeit = jetzt;
-          teilchen("joint-rauch", x + 2, y + 2, glut);
+          rauch.qualm(x + 3, y + 3, glut, vx, vy);
         }
-      } else if (!ruhig && jetzt - spurZeit > 70 && Math.hypot(x - letztX, y - letztY) > 14) {
+        if (rauch && Math.random() < (0.04 + glut * 0.16) * dt * 60) rauch.funken(x + 3, y + 3, glut);
+      } else if (rauch && jetzt - spurZeit > 70 && Math.hypot(x - letztX, y - letztY) > 3) {
         spurZeit = jetzt;
-        teilchen("joint-spur", letztX + 4, letztY + 4, 0);
+        rauch.spur(letztX + 4, letztY + 4);
       }
+      rauch?.schritt(dt, jetzt / 1000);
       letztX = x;
       letztY = y;
       rahmen = requestAnimationFrame(zeichnen);
@@ -74,7 +79,9 @@ export function JointCursor() {
       el.dataset.gedrueckt = "";
     };
     const hoch = () => {
+      if (gedrueckt && rauch) rauch.ausatmen(x + 3, y + 3, glutJetzt);
       gedrueckt = 0;
+      glutJetzt = 0;
       delete el.dataset.gedrueckt;
       el.style.setProperty("--glut", "0");
     };
@@ -89,6 +96,7 @@ export function JointCursor() {
 
     return () => {
       cancelAnimationFrame(rahmen);
+      rauch?.stoppen();
       wurzel.classList.remove("joint-cursor");
       window.removeEventListener("pointermove", bewegen);
       window.removeEventListener("pointerdown", runter);
