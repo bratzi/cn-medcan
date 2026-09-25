@@ -1,11 +1,13 @@
 import Link from "next/link";
 
+import { Bild } from "@/components/medien/Bild";
 import { Badge, Card, CardBody, CardFooter } from "@/components/ui";
 import { CannabinoidBar } from "@/components/produkt/CannabinoidBar";
 import { TerpenChips } from "@/components/produkt/TerpenChips";
 import { cn } from "@/lib/cn";
 import { formatierePreisProGramm } from "@/lib/format";
 import { darreichungsformLabel, kultivarTypLabel } from "@/lib/labels";
+import { blueteBild } from "@/lib/medien";
 import type { StrainListenEintrag } from "@/lib/query/strains";
 
 type Props = {
@@ -19,9 +21,22 @@ type Props = {
  */
 export function ProduktCard({ strain, className }: Props) {
   const verfuegbar = strain.anzahlApothekenVerfuegbar > 0;
+  const bild = blueteBild(strain.herstellerBildPfad);
 
   return (
     <Card className={cn("flex flex-col", className)}>
+      {bild ? (
+        // Referenzbild (Nutzer 2026-09-25): nicht die echte Sorte, deshalb als Symbolbild gekennzeichnet.
+        <figure className="relative flex aspect-4/3 items-center justify-center px-8 pt-8">
+          <Bild
+            id={bild}
+            dekorativ
+            sizes="(min-width: 1280px) 22vw, (min-width: 640px) 45vw, 90vw"
+            className="h-full w-full object-contain"
+          />
+          <figcaption className="absolute right-4 bottom-2 text-caption text-text-muted">Symbolbild</figcaption>
+        </figure>
+      ) : null}
       <CardBody className="flex flex-1 flex-col gap-4">
         <div className="flex items-start justify-between gap-4">
           <div className="min-w-0">

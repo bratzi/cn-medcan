@@ -208,7 +208,10 @@ dank, 420, Heilung, heilt, wirkt gegen.
 3. **Keine Maskottchen, Comicfiguren, Zauberer** (Jugendschutz).
 4. **Handelsnamen nie in Handschrift.** Namen stehen immer gedruckt.
 5. **Keine Blüten, die einem Handelsnamen zuzuordnen sind**; Pflanze, Blatt, Anbau, Labor,
-   Makro von Trichomen sind erlaubt.
+   Makro von Trichomen sind erlaubt. **Ausnahme seit 2026-09-25 (Nutzer):** zehn freie
+   Referenzbilder (Pexels, `bluete-01` bis `-10`) hängen zufällig an allen Blüten, sichtbar als
+   „Symbolbild“ auf Karte und Titelblatt. Vor einem öffentlichen Start neu entscheiden
+   (`strains.hersteller_bild_pfad` leeren schaltet sie ab).
 6. **Preise und Bestände** bleiben hinter der Freigabe (bestehende Logik, unverändert).
 7. **Rechtshinweise** stehen sachlich gedruckt, nie in Handschrift.
 

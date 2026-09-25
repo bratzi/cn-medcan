@@ -94,7 +94,7 @@ function Punkt({ punkt }: { punkt: (typeof PUNKTE)[number] }) {
 /** Ein Absatz des Manifests: scroll-gekoppelt Wort für Wort sichtbar (transparent.ts). */
 function Zeile({ children }: { children: ReactNode }) {
   return (
-    <p data-manifest-zeile="" className="mt-32 font-buch text-erzaehlung text-text md:mt-48">
+    <p data-manifest-zeile="" className="mt-[35vh] font-buch text-erzaehlung text-text md:mt-[50vh]">
       {children}
     </p>
   );

@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { Bild } from "@/components/medien/Bild";
 import { Badge } from "@/components/ui";
 import { einzelLinkKlassen } from "@/components/ui/textlink";
 import type { Darreichungsform, KultivarTyp } from "@/db/enums";
@@ -22,6 +23,8 @@ export type TitelblattProps = {
   cbdMax: number;
   /** Neueste eigene Bewertung; null = noch nicht getestet. */
   meineBewertung: MeineBewertung | null;
+  /** Referenzbild (Medien-Id) oder null; ein Symbolbild, nicht die echte Sorte. */
+  bild?: string | null;
 };
 
 function verfuegbarkeit(anzahl: number): string {
@@ -31,8 +34,9 @@ function verfuegbarkeit(anzahl: number): string {
 }
 
 /**
- * Titelblatt der Produktseite (Spec TP2 4.3), ersetzt den Glas-Kopf: Papier
- * statt Glas, kein Herstellerbild (Leitplanke 5), kein Reel (es steht bei
+ * Titelblatt der Blütenseite (Spec TP2 4.3), ersetzt den Glas-Kopf: Papier
+ * statt Glas. Seit 2026-09-25 mit Referenzbild als Symbolbild (Nutzer; Ausnahme
+ * zu Leitplanke 5 für die Testphase hinter dem Passwort), kein Reel (es steht bei
  * seiner Bewertung). Drei Schriftgrade (kapitel, h3, small); die Badges
  * haben als Bauteil ihre eigene Groesse.
  */
@@ -40,7 +44,7 @@ export function Titelblatt(props: TitelblattProps) {
   return (
     <section
       aria-labelledby="produkt-titel"
-      className="grid grid-cols-1 gap-8 border-b-2 border-border-strong pb-12 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end"
+      className="grid grid-cols-1 gap-8 border-b-2 border-border-strong pb-12 lg:grid-cols-[minmax(0,1fr)_auto_auto] lg:items-end"
     >
       <div className="flex min-w-0 flex-col gap-4">
         <h1
@@ -66,6 +70,12 @@ export function Titelblatt(props: TitelblattProps) {
           <span className="whitespace-nowrap">{`CBD ${formatiereProzentSpanne(props.cbdMin, props.cbdMax)}`}</span>
         </p>
       </div>
+      {props.bild ? (
+        <figure className="flex w-full max-w-xs flex-col items-end gap-2 justify-self-center lg:w-72">
+          <Bild id={props.bild} dekorativ sizes="(min-width: 1024px) 288px, 80vw" className="h-auto w-full" />
+          <figcaption className="text-caption text-text-muted">Symbolbild</figcaption>
+        </figure>
+      ) : null}
       <MeineNote bewertung={props.meineBewertung} />
     </section>
   );

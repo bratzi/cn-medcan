@@ -8,6 +8,7 @@ import { BestandTabelle } from "@/components/produkt/BestandTabelle";
 import { CannabinoidBar } from "@/components/produkt/CannabinoidBar";
 import { TerpenChips } from "@/components/produkt/TerpenChips";
 import { Titelblatt } from "@/components/produkt/Titelblatt";
+import { blueteBild } from "@/lib/medien";
 import { CommunityStimmen } from "@/components/review/CommunityStimmen";
 import { Doppelseite } from "@/components/review/Doppelseite";
 import { type AromaSerie } from "@/components/review/AromaKarte";
@@ -178,6 +179,7 @@ async function ProduktInhalt({ slug }: { slug: string }) {
         thcMax={strain.thcMaxProzent}
         cbdMin={strain.cbdMinProzent}
         cbdMax={strain.cbdMaxProzent}
+        bild={blueteBild(strain.herstellerBildPfad)}
         meineBewertung={
           neuesteEigene && meineNote !== null
             ? { note: meineNote, erstelltAm: neuesteEigene.erstelltAm, chargenNr: neuesteEigene.chargenNr }
@@ -270,7 +272,7 @@ async function ProduktInhalt({ slug }: { slug: string }) {
 
       <section aria-labelledby="daten-titel" className={ABSTAND}>
         <h2 id="daten-titel" className={ABSCHNITT_TITEL}>
-          Produktdaten
+          Angaben zur Blüte
         </h2>
         <div className="mt-8 grid grid-cols-1 gap-12 lg:grid-cols-2">
           <Faktenliste zeilen={produktFakten(strain)} />
@@ -324,7 +326,7 @@ async function ProduktInhalt({ slug }: { slug: string }) {
       <p className={cn(ABSTAND, "text-caption text-text-muted")}>
         {`Gemeldete Packungsgrößen: ${
           packungsgroessen.length > 0 ? packungsgroessen.map((gramm) => formatiereGramm(gramm)).join(", ") : "keine"
-        }. Stand der Produktdaten: ${formatiereDatum(strain.aktualisiertAm)}.`}
+        }. Stand der Angaben: ${formatiereDatum(strain.aktualisiertAm)}.`}
       </p>
     </>
   );
