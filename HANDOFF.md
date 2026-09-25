@@ -48,7 +48,9 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
    Alt: **Kopf-Typografie** (Header/Kopf-Navigation, `components/layout/Kopf.tsx`, NavLink) an die Hero-
    Typografie angleichen wie „Terpen für Terpen“: `font-sans uppercase tracking-gesperrt` (Größe passend, ≥ Regeln
    ui-design-engine; Handschrift-Ziffern gibt es im Kopf nicht mehr). Danach Live-Sichtprüfung aller Session-19-Punkte.
-1. **Caching (Nutzerentscheid: Caching statt Paid)** — superpowers:brainstorming, siehe unten Punkt 1.
+0b. **Aroma-Korrekturen (Session 20, `8a11309`, live noch nicht gesehen):** Boegen der Karte vom festen Achsenbereich (x=260) bis 220 vor den rechten Rand, Karte volle Breite wie die Beschaffenheits-Regler; Sortenkopf ueber der Karte in Schritt 2 (Bild bis 320 px, Terpene laut Hersteller mit %/Rang), AromaKarte ohne `bild`-Slot; Community-Fazit nach Schritt 3.
+1. **Caching: Spec + Plan fertig** (`docs/superpowers/specs/2026-09-25-caching-design.md`, `docs/superpowers/plans/2026-09-25-caching.md`), Nutzer: 5 min alte Daten reichen. Offen: Ausfuehrungsweg (Empfehlung: selbst in der Session), dann Task 1 (Spike /apotheken).
+   Alt: **Caching (Nutzerentscheid: Caching statt Paid)** — superpowers:brainstorming, siehe unten Punkt 1.
 
 #### (Vorheriger Stand Session 18)
 
