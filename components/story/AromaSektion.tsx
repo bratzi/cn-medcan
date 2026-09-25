@@ -5,6 +5,7 @@ import { AromaErkundung } from "@/components/review/AromaErkundung";
 import { erkundungsDaten } from "@/components/review/erkundung-daten";
 import { KartenBild, SortenKopf } from "@/components/review/SortenKopf";
 import { Schlagwort } from "@/components/story/Schlagwort";
+import { UeberlaufWort, ueberlaufPlatz } from "@/components/story/UeberlaufWort";
 import { buttonKlassen } from "@/components/ui";
 import { ladeAromaVorzeige, ladeTerpenKatalog } from "@/lib/query/strains";
 import { sicher } from "@/lib/sicher";
@@ -64,21 +65,12 @@ export function AromaSektion() {
       {/* Am Ende der Graphensektion, nicht am Anfang (Nutzer 2026-09-25). */}
       <Schlagwort satz="stimmt das?" ton="gruen" oben="bottom-0 translate-y-1/2" />
       <div className="mx-auto w-full max-w-360">
-        <h2 id="aroma-titel" className="max-w-4xl font-buch text-kapitel text-text text-balance">
-          Was der Hersteller verspricht,{" "}
-          {/* Übergroße Display-Zeile (Nutzer 2026-09-25): bündig mit der Überschrift, ragt
-              rechts aus dem Inhaltsbereich; Stil wie die Hero-Wortmarke (Verlauf, vier
-              driftende Konturen, ruhiger Puls). */}
-          <em className="relative isolate mt-2 block w-max not-italic whitespace-nowrap" style={{ fontSize: "clamp(5rem, 1rem + 17vw, 22rem)" }}>
-            {["marke-kontur-1", "marke-kontur-2", "marke-kontur-3", "marke-kontur-4"].map((klasse) => (
-              <span key={klasse} aria-hidden="true" className={`marke-kontur ${klasse} justify-start font-hand text-kulisse leading-[0.85]`} style={{ fontSize: "1em" }}>
-                <span>prüfen wir nach.</span>
-              </span>
-            ))}
-            <span className="fazit-puls farbverlauf font-hand text-kulisse leading-[0.85]" style={{ fontSize: "1em" }}>
-              prüfen wir nach.
-            </span>
-          </em>
+        <h2
+          id="aroma-titel"
+          className="relative isolate max-w-4xl font-buch text-kapitel text-text text-balance"
+          style={ueberlaufPlatz}
+        >
+          Was der Hersteller verspricht, <UeberlaufWort wort="prüfen wir nach." />
         </h2>
         <p className="mt-6 max-w-[60ch] text-body text-text-muted text-pretty">
           Erst der Gesamteindruck, dann die Terpene: Grün ist das Profil, das die Herstellerangaben erwarten lassen,

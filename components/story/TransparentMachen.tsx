@@ -2,6 +2,7 @@ import { LoopSchalter } from "@/components/medien/LoopSchalter";
 import type { ReactNode } from "react";
 
 import { Loop } from "@/components/medien/Loop";
+import { UeberlaufWort, ueberlaufPlatz } from "@/components/story/UeberlaufWort";
 
 /**
  * Die drei Prüfpunkte zwischen den Absätzen (Spec Redesign 9 und 13), seit
@@ -151,9 +152,15 @@ export function TransparentMachen() {
     >
       <div className="mx-auto w-full max-w-360">
         <div data-story="manifest">
-          <h2 id="transparent-titel" data-manifest-zeile="" className="mx-auto max-w-4xl text-center font-buch text-erzaehlung text-text text-balance">
-            Hinter jedem Handelsnamen steckt ein <Buzz>Terpenprofil.</Buzz> Wir
-            schreiben auf, was drin ist.
+          {/* Schlusswort übergroß hinter dem Satz (UeberlaufWort, Nutzer 2026-09-25); das
+              Wort-für-Wort-Aufdecken gilt nur dem Satz, nicht den Konturen. */}
+          <h2
+            id="transparent-titel"
+            className="relative isolate mx-auto max-w-4xl text-center font-buch text-erzaehlung text-text text-balance"
+            style={ueberlaufPlatz}
+          >
+            <span data-manifest-zeile="">Wir schreiben auf, was drin ist. Hinter jedem Handelsnamen steckt ein</span>{" "}
+            <UeberlaufWort wort="Terpenprofil." />
           </h2>
           <Paar punkt={PUNKTE[0]} erster>
             Der <Buzz>Gesamteindruck.</Buzz> Nicht, was auf der Dose steht, sondern wie sie aussieht, wie sie riecht, wie
