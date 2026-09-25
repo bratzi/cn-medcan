@@ -42,7 +42,7 @@ export function ThemaSchalter() {
           aus der Öffnung, drinnen eine Pflanze. Zelt in Textfarbe, Licht warm. */}
       <svg aria-hidden="true" viewBox="0 0 24 24" className="thema-lampe-an">
         <path d="M10.5 3.5V2h3v1.5" stroke="var(--color-text)" strokeLinejoin="round" />
-        <path d="M7.5 9.5h9V21h-9z" fill="currentColor" fillOpacity="0.35" stroke="none" />
+        <path d="M7.5 9.5h9V21h-9z" fill="currentColor" fillOpacity="0.8" stroke="none" />
         <path d="M12 21v-4.2" stroke="var(--color-accent)" strokeLinecap="round" />
         <path d="M12 18.4c-1.6-1.3-3-1.2-3.6-.4 1.2 1.1 2.5 1.2 3.6.4zM12 17.2c1.6-1.4 3-1.3 3.6-.5-1.2 1.1-2.5 1.2-3.6.5z" fill="var(--color-accent)" stroke="none" />
         <rect x="7" y="7.4" width="10" height="2.3" rx="1.15" fill="var(--color-surface)" stroke="var(--color-text)" />
