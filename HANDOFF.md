@@ -44,6 +44,11 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 - Secrets: SITE_PASSWORD neu, SITE_SESSION_SECRET rotiert (Nutzer selbst; Secret-Writes sind für Claude gesperrt,
   `wrangler deployments list` ist erlaubt).
 
+**1102-Befund (2026-09-25 abends):** `staticAssetsIncrementalCache` + `enableCacheInterception` (Commit 98fe2db)
+führte zu durchgehend 1102 auf JEDER Seite (tail: exceededCpu bei 10 ms); nach Revert lief die Seite wieder. Nicht
+erneut einschalten ohne Messung. Grundlast (Next + Proxy) liegt nahe/über 10 ms; Nutzer wurde Workers Paid (5 $)
+empfohlen, Entscheid offen (Regel: nie kostenpflichtig).
+
 **Caching:** Spike `4d5195b` (KV `260615e2b66348b9b9fb8b7def46c5a4`, D1 `cn-medcan-tags`
 `c71695ff-7eee-4c05-af39-2f39f0865b60` existieren weiter) brach den Cloudflare-Build (`"remote": true` am D1-Binding);
 per Revert zurück, Build lief danach. 1102 besteht weiter, sogar /zugang (exceededCpu, 10 ms). Nächster Versuch ohne
