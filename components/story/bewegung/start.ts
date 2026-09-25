@@ -5,6 +5,7 @@ import { starteBlaetter } from "./blaetter";
 
 const BLAETTER_AN = false;
 import { beobachteLoops } from "./loops";
+import { beobachtePunkte } from "./punkte";
 import { randnotizen } from "./randnotizen";
 import { schleife } from "./schleife";
 import { schluss } from "./schluss";
@@ -107,6 +108,8 @@ export async function starteBuehne(): Promise<() => void> {
   });
   window.addEventListener("load", neuMessen);
   const loops = beobachteLoops();
+  // Video-Blobs im Storytelling folgen dem Zeiger (nur feiner Zeiger, siehe punkte.ts).
+  const punkteStopp = beobachtePunkte();
 
   // 3D-Blätter vorerst aus (Nutzer 2026-09-25: passt nicht rein, Code bleibt für später).
   // Wieder an: BLAETTER_AN auf true. Nur ab Tablet: auf kleinen Geräten kostet WebGL zu viel Akku.
@@ -124,6 +127,7 @@ export async function starteBuehne(): Promise<() => void> {
     beendet = true;
     stoppeWarten();
     loops.stoppen();
+    punkteStopp();
     blaetterStopp?.();
     window.removeEventListener("load", neuMessen);
     for (const aufraeumen of aufraeumer.splice(0)) aufraeumen();

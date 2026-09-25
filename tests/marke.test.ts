@@ -89,7 +89,7 @@ test("Wortmarke einzeilig (Fuß): bricht nicht um", () => {
 test("Unterzeile: gedruckt, natürliche Schreibung, Versalien per CSS", () => {
   const html = renderToStaticMarkup(createElement(Unterzeile));
   assert.match(html, /^<p /);
-  assert.equal(ohneTags(html), "Charge für Charge");
+  assert.equal(ohneTags(html), "Terpen für Terpen");
   assert.match(html, /\buppercase\b/);
   assert.match(html, /\btracking-gesperrt\b/);
   assert.doesNotMatch(html, /font-hand/);
@@ -150,7 +150,7 @@ test("keine Reste von Wand und Graffiti in app, components, lib (Spec TP3 15.2)"
 });
 
 test("Handschrift nur in den Handschrift-Graden: nie unter 32 px (Spec TP3 15.3)", () => {
-  const GRAD = /text-(marke|umschlag|notiz|vermerk|plakat|kulisse|manifest)\b/;
+  const GRAD = /text-(marke|umschlag|notiz|vermerk|plakat|kulisse|manifest|erzaehlung)\b/;
   const treffer = QUELLEN.filter((pfad) => /\.tsx?$/.test(pfad) && !pfad.endsWith(join("marke", "Wortmarke.tsx")))
     .flatMap((pfad) =>
       readFileSync(pfad, "utf8")

@@ -76,6 +76,14 @@
   --text-manifest--font-weight: 200;
   --text-manifest--letter-spacing: -0.025em;
 
+  /* Storytelling (TransparentMachen, Nutzer 2026-09-25): eine Stufe kleiner als
+     das Manifest, damit die Video-Blobs Luft haben. Untergrenze 40 px, weil
+     Newsreader 200 nur ab 40 px steht (ui-design-engine Regel 3). */
+  --text-erzaehlung: clamp(2.5rem, 1.75rem + 1.8vw, 3.75rem);
+  --text-erzaehlung--line-height: 1.18;
+  --text-erzaehlung--font-weight: 200;
+  --text-erzaehlung--letter-spacing: -0.02em;
+
   /* Redesign 7 (Referenz choreograffiti): Handschrift riesig von Rand zu Rand.
      plakat: die Wortmarke als Titel im Auftakt. kulisse: Buzz-Sätze blass
      hinter den Sektionen. Beide nie unter 32 px. */
@@ -723,6 +731,16 @@ html.joint-cursor :is(input:not([type="range"]):not([type="radio"]):not([type="c
     animation: blob-morph 10s ease-in-out infinite alternate;
   }
 
+  /* Die Linien morphen im eigenen Takt: sie laufen gegen die Videokante und
+     gegeneinander, statt starr mitzufahren. */
+  .blob-linie-gruen {
+    animation: blob-morph 13s ease-in-out infinite alternate-reverse;
+  }
+
+  .blob-linie-lila {
+    animation: blob-morph 17s ease-in-out infinite alternate;
+  }
+
   .bild-zoom {
     animation: bild-zoom 18s ease-in-out infinite alternate;
   }
@@ -739,24 +757,24 @@ html.joint-cursor :is(input:not([type="range"]):not([type="radio"]):not([type="c
 
 @keyframes blob-morph {
   0% {
-    border-radius: 72% 28% 61% 39% / 40% 67% 33% 60%;
-    rotate: -4deg;
+    border-radius: 58% 42% 54% 46% / 46% 57% 43% 54%;
+    rotate: -3deg;
   }
   25% {
-    border-radius: 34% 66% 30% 70% / 68% 36% 64% 32%;
-    rotate: 3deg;
+    border-radius: 44% 56% 42% 58% / 57% 45% 55% 43%;
+    rotate: 2deg;
   }
   50% {
-    border-radius: 58% 42% 76% 24% / 30% 58% 42% 70%;
-    rotate: -2deg;
+    border-radius: 54% 46% 60% 40% / 42% 53% 47% 58%;
+    rotate: -1deg;
   }
   75% {
-    border-radius: 27% 73% 44% 56% / 62% 28% 72% 38%;
-    rotate: 5deg;
+    border-radius: 42% 58% 49% 51% / 55% 41% 59% 45%;
+    rotate: 4deg;
   }
   100% {
-    border-radius: 66% 34% 38% 62% / 52% 74% 26% 48%;
-    rotate: -3deg;
+    border-radius: 56% 44% 45% 55% / 50% 60% 40% 50%;
+    rotate: -2deg;
   }
 }
 
@@ -790,6 +808,25 @@ html.joint-cursor :is(input:not([type="range"]):not([type="radio"]):not([type="c
   to {
     transform: translateY(-10px) rotate(1.5deg) scale(1.05);
   }
+}
+
+/* Linien um die Video-Blobs im Storytelling (TransparentMachen): Grün und
+   Violett der Marke, dünn, leicht transparent, damit das Video führt. Die
+   Zeigerbewegung setzt bewegung/punkte.ts direkt als translate. */
+.blob-linie {
+  border-radius: 55% 45% 50% 50% / 48% 55% 45% 52%;
+  border-style: solid;
+  border-width: 1.5px;
+  opacity: 0.75;
+}
+
+.blob-linie-gruen {
+  border-color: var(--color-accent);
+}
+
+.blob-linie-lila {
+  border-color: var(--color-kopierstift);
+  opacity: 0.6;
 }
 
 /* Kopf (components/layout/Kopf.tsx): fest, transparent; beim Scrollen ein

@@ -51,6 +51,6 @@ export function Wortmarke({ groesse, einzeilig = false, className }: Props) {
  */
 export function Unterzeile({ className }: { className?: string }) {
   return (
-    <p className={cn("font-sans text-caption uppercase tracking-gesperrt text-text", className)}>Charge für Charge</p>
+    <p className={cn("font-sans text-caption uppercase tracking-gesperrt text-text", className)}>Terpen für Terpen</p>
   );
 }

@@ -45,7 +45,8 @@ Größen: `text-caption` 13, `text-small` 14, `text-body` 16, `text-h3` 20, `tex
 (clamp 5 bis 20rem, Wortmarke im Auftakt und im Fuß), `text-notiz` (clamp 2 bis 4.5rem, Randnotizen,
 „Wähl mit.“, Überschriften auf `/umfragen`), `text-vermerk` (2rem, Vermerke am Stimmzettel und in der
 Schleife).
-- Newsreader im Text: 400, 500, 600; Newsreader 200 **nur ab 40 px** (`text-manifest`, `text-titel`, `text-kapitel`), sonst 500; 800 nur für kurze Kapitelmarken.
+- Newsreader im Text: 400, 500, 600; Newsreader 200 **nur ab 40 px** (`text-manifest`, `text-erzaehlung`, `text-titel`, `text-kapitel`), sonst 500; 800 nur für kurze Kapitelmarken.
+- `text-erzaehlung` (clamp 2.5 bis 3.75rem, 200) ist der Grad des Storytellings (TransparentMachen), eine Stufe unter `text-manifest`; `font-hand` darf ihn tragen.
 - Große Grade tragen negative Laufweite aus dem Token; nie per Klasse überschreiben.
 - Auftakt (Referenz choreograffiti): die h1 ist die Wortmarke in `text-plakat` von Rand zu Rand.
 - Jede Startseiten-Sektion trägt einen Buzz-Satz (höchstens drei Wörter) über `components/story/Schlagwort` in `text-kulisse`, `text-border`, aria-hidden; Sektion `relative isolate overflow-x-clip`.
@@ -69,6 +70,7 @@ Komponenten nutzen nur semantische Tokens:
   `surface`, `surface-raised` und `surface-sunken` (jeweils ≥ 4.5 in beiden Modi).
 - Datengrafiken in `text`/`text-muted` (Linie plus Fläche mit geringer Deckkraft), nicht in `accent`.
   Ausnahme seit Spec Redesign 14: AromaKarte und SweetSpot nutzen `accent` (Hersteller) und `kopierstift` (Community) als Reihenfarben.
+  Ausnahme seit 2026-09-25 (Nutzer): die zwei Linien um die Video-Blobs im Storytelling (`.blob-linie`) in `accent` und `kopierstift`, reine Dekoration, aria-hidden.
 - Verboten in Komponenten: Primitives (`blatt-*`, `violett-*`, `neutral-*`), Hex, `oklch()`,
   Tailwind-Standardpaletten, `dark:`-Farbvarianten. Dark Mode entsteht allein über die Tokens.
 - Wer ein Token ändert, ändert die Tabelle in `scripts/farben-pruefen.mjs` mit und lässt `npm run farben` laufen.

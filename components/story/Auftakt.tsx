@@ -3,6 +3,7 @@ import Link from "next/link";
 import { preload } from "react-dom";
 
 import { Loop } from "@/components/medien/Loop";
+import { Kopfzeile } from "@/components/story/Kopfzeile";
 import { Unterzeile, Wortmarke } from "@/components/marke/Wortmarke";
 import { buttonKlassen } from "@/components/ui";
 
@@ -27,7 +28,7 @@ export function Auftakt() {
     <section
       aria-labelledby="auftakt-titel"
       data-story="auftakt"
-      className="buehne-dunkel relative isolate -mt-(--kopf-h,4rem) flex min-h-svh flex-col overflow-hidden pt-[calc(var(--kopf-h,4rem)+4rem)] pb-16 sm:pb-24"
+      className="buehne-dunkel relative isolate -mt-(--kopf-h,4rem) flex min-h-svh flex-col overflow-hidden pt-[calc(var(--kopf-h,4rem)+4rem)] pb-8"
     >
       <div aria-hidden="true" data-story="auftakt-film" className="pointer-events-none absolute inset-0 -z-10">
         <Loop id="auftakt-loop" buehne className="h-full opacity-75" />
@@ -65,6 +66,10 @@ export function Auftakt() {
             <LoopSchalter />
             <Unterzeile className="auftakt-unterzeile" />
           </div>
+        </div>
+        {/* Kopfzeile am Fuß der ersten Ansicht: ohne Scrollen sichtbar. */}
+        <div className="mt-8">
+          <Kopfzeile />
         </div>
       </div>
     </section>
