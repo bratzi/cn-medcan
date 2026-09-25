@@ -20,7 +20,7 @@ export const metadata: Metadata = {
 /**
  * Dynamisches Rendern: die Liste haengt an Suchparametern und am
  * Fachkreis-Status (Cookie), und die Datenbank ist zur Buildzeit nicht
- * erreichbar. Diese Zeile faellt weg, sobald ISR mit den R2-Bindings
+ * erreichbar. Diese Zeile faellt weg, sobald ISR mit den Cache-Bindings (KV)
  * (NEXT_INC_CACHE_R2_BUCKET, WORKER_SELF_REFERENCE) eingerichtet ist —
  * siehe .claude/skills/edge-stack-master.md, Abschnitt 6.
  */

@@ -10,7 +10,7 @@ import { ladeApothekenListe } from "@/lib/query/strains";
 /**
  * Kein Prerender zur Buildzeit: es gibt derzeit keine erreichbare Datenbank,
  * ein statischer Render wuerde beim Build fehlschlagen. Entfaellt, sobald ISR
- * und die R2-Bindings stehen.
+ * und die Cache-Bindings (KV, D1-Tags) stehen.
  */
 export const dynamic = "force-dynamic";
 

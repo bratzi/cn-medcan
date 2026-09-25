@@ -11,7 +11,7 @@ import { redaktionelleReviews } from "@/lib/query/reviews";
 /**
  * Kein Prerender zur Buildzeit: es gibt derzeit keine erreichbare Datenbank.
  * Anders als `/` und `/umfragen` ist diese Seite nicht nutzerbezogen - sie
- * ist der erste Kandidat fuer ISR, sobald die R2-Bindings stehen.
+ * ist der erste Kandidat fuer ISR, sobald die Cache-Bindings (KV, D1-Tags) stehen.
  */
 export const dynamic = "force-dynamic";
 

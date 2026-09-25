@@ -42,7 +42,7 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
    - Danach erneut messen (tail, Startseite neu laden). Wenn 1102 bleibt: **Nutzerentscheid nötig**:
      (a) Workers Paid 5 $/Monat (30 s CPU, löst es sofort, bricht „alles kostenlos“), oder
      (b) Caching nach `.claude/skills/edge-stack-master.md` §4: ISR/`unstable_cache` für Katalog, Startseiten-
-     Sektionen, Blütenseiten; braucht R2-Bucket `NEXT_INC_CACHE_R2_BUCKET` (+ Tag-Cache, `WORKER_SELF_REFERENCE`)
+     Sektionen, Blütenseiten; braucht KV `NEXT_INC_CACHE_KV` hinter Regional Cache, D1-Tag-Cache (+ Tag-Cache, `WORKER_SELF_REFERENCE`)
      in wrangler.jsonc und OpenNext-Config; nutzerbezogene Teile (Preise/Fachkreis, eigene Stimme) bleiben dynamisch.
      Empfehlung dem Nutzer vorlegen (Brainstorming, architektonisch).
 2. **Terpenlinien-Farbverlauf (Nutzerauftrag, noch nicht begonnen):** In `AromaKarte` färben sich die Bögen zu

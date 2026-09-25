@@ -92,7 +92,7 @@ model Strain {
   cbdMaxProzent           Float   @map("cbd_max_prozent")
   bestrahlung             String  @default("UNBEKANNT")
   anbauland               String?
-  /// Pfad zum Produktbild des Herstellers (unter /public oder R2).
+  /// Pfad zum Produktbild des Herstellers (unter /public).
   herstellerBildPfad      String? @map("hersteller_bild_pfad")
   beschreibung            String?
   verschreibungspflichtig Boolean @default(true)

@@ -47,7 +47,7 @@ import { ladeStrainDetail, ladeTerpenKatalog, type StrainDetail, type Unternehme
 /**
  * Kein Prerender zur Buildzeit: es gibt derzeit keine zur Buildzeit
  * erreichbare Datenbank - das D1-Binding existiert erst im Request. Entfaellt,
- * sobald ISR und die R2-Bindings stehen; dann gehoert hier
+ * sobald ISR und die Cache-Bindings (KV, D1-Tags) stehen; dann gehoert hier
  * `generateStaticParams` hin (edge-stack-master, Caching-Kaskade Stufe 1).
  */
 export const dynamic = "force-dynamic";

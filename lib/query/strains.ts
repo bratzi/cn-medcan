@@ -706,8 +706,8 @@ const ALLE_GESCHMAECKER: GeschmacksKategorie[] = [
  * waere fachlich richtig (Daten fuer alle Nutzer gleich, duerfen Minuten alt
  * sein). Es ist hier bewusst NICHT eingebaut: laut
  * .claude/skills/edge-stack-master.md, Abschnitt 6, braucht ISR unter
- * @opennextjs/cloudflare zusaetzliche Infrastruktur (R2-Binding
- * NEXT_INC_CACHE_R2_BUCKET, Service-Binding WORKER_SELF_REFERENCE, ggf.
+ * @opennextjs/cloudflare zusaetzliche Infrastruktur (KV-Binding
+ * NEXT_INC_CACHE_KV, D1-Tag-Cache, Service-Binding WORKER_SELF_REFERENCE, ggf.
  * NEXT_CACHE_DO_QUEUE) in wrangler.jsonc und der OpenNext-Cache-Konfiguration.
  * Diese Dateien liegen ausserhalb des Auftrags dieser Abfrageschicht - ein
  * Caching-Aufruf ohne die Bindings "funktioniert" nur in `next dev` und fiele

@@ -173,12 +173,15 @@ Reihenfolge der Prüfung — nimm immer die **oberste** Stufe, die die Anforderu
 Nicht cachen: nutzerbezogene Antworten (§5), alles hinter Auth, alles mit `Set-Cookie`.
 
 **Wenn ISR genutzt wird, braucht OpenNext eigene Infrastruktur** (Quelle: https://opennext.js.org/cloudflare/caching):
-- ein **R2-Bucket** mit Binding **`NEXT_INC_CACHE_R2_BUCKET`** als Incremental Cache (optional
-  `NEXT_INC_CACHE_R2_PREFIX`, Default `incremental-cache`),
+- **Kein R2** (Nutzer 2026-09-25: Projekt strikt kostenfrei, R2 rechnet über dem Free-Tier ab). Incremental
+  Cache stattdessen **KV** (Binding `NEXT_INC_CACHE_KV`) hinter dem **Regional Cache** (Cache API, spart
+  KV-Lesezugriffe); Free-Plan-Grenzen sind hart (Fehler statt Rechnung), Revalidate-Intervalle so wählen,
+  dass 1000 KV-Schreibvorgänge/Tag nie erreicht werden. Tag-Cache über **D1** (`NEXT_TAG_CACHE_D1`),
 - ein **Service-Binding `WORKER_SELF_REFERENCE`**, das auf den eigenen Worker (`cn-medcan`) zeigt,
 - für zeitbasierte Revalidation zusätzlich eine Durable-Object-Queue (`NEXT_CACHE_DO_QUEUE`), für
   On-Demand-Revalidation zusätzlich ein Tag-Cache-Binding,
-- KV ist als Incremental-Cache-Backend laut OpenNext **nicht empfohlen** (eventual consistency).
+- KV ist laut OpenNext wegen eventual consistency nur zweite Wahl; wir nehmen es bewusst in Kauf (Minuten alte
+  Katalogdaten sind vertretbar, Preise/Fachkreis und eigene Stimmen bleiben dynamisch).
 
 Konsequenz: Eine Änderung, die `revalidate` oder `unstable_cache` einführt, ohne diese Bindings in
 `wrangler.jsonc` und die OpenNext-Cache-Konfiguration zu ergänzen, ist unvollständig — es "funktioniert" in
