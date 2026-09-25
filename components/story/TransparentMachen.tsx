@@ -2,38 +2,35 @@ import { LoopSchalter } from "@/components/medien/LoopSchalter";
 import type { ReactNode } from "react";
 
 import { Loop } from "@/components/medien/Loop";
-import { BEWERTUNGS_ACHSEN } from "@/lib/query/bewertung";
-
-const ERLAEUTERUNG: Record<string, string> = Object.fromEntries(
-  BEWERTUNGS_ACHSEN.map((achse) => [achse.key, achse.erlaeuterung]),
-);
 
 /**
- * Die drei Prüfpunkte zwischen den Absätzen (Spec Redesign 9 und 13): große
+ * Die drei Prüfpunkte zwischen den Absätzen (Spec Redesign 9 und 13), seit
+ * 2026-09-25 in der Reihenfolge der Bewertung: Gesamteindruck, Terpene,
+ * Beschaffenheit (wie die Aroma-Erkundung). Große
  * Bilder in ungleichen, leicht verlaufenen Kreisen (unperfekt mit Absicht),
  * um die der Manifest-Text fließt (float mit shape-outside: ellipse).
  */
 const PUNKTE = [
   {
-    titel: "Aussehen",
+    titel: "Gesamteindruck",
     video: "aussehen-loop",
-    text: ERLAEUTERUNG.aussehen,
+    text: "Aussehen, Geruch, Geschmack und Konsistenz, jeweils von 1 bis 5. Der erste Blick auf die Blüte.",
     seite: "rechts",
     form: "rounded-[62%_38%_55%_45%/48%_60%_40%_52%] rotate-3",
     verzoegerung: "0s",
   },
   {
-    titel: "Geruch",
+    titel: "Terpene",
     video: "geruch-loop",
-    text: ERLAEUTERUNG.geruch,
+    text: "Jedes Terpen einzeln, neben der Angabe des Herstellers. Die Abweichung steht daneben.",
     seite: "links",
     form: "rounded-[45%_55%_40%_60%/58%_42%_62%_38%] -rotate-2",
     verzoegerung: "-5s",
   },
   {
-    titel: "Restfeuchte",
+    titel: "Beschaffenheit",
     video: "feuchte-loop",
-    text: "Zwischen 8 und 13 Prozent ist gut. Darunter wird es staubig, darüber droht Schimmel.",
+    text: "Chlorophyll, Bud-Dichte, Terpendichte, Trichome und Restfeuchte. Zwischen 8 und 13 Prozent Feuchte ist gut.",
     seite: "rechts",
     form: "rounded-[55%_45%_62%_38%/42%_56%_44%_58%] rotate-1",
     verzoegerung: "-9s",
@@ -115,8 +112,8 @@ export function TransparentMachen() {
           </h2>
           <Punkt punkt={PUNKTE[0]} />
           <Zeile>
-            Nicht nur, was auf der Dose steht. Sondern wie sie aussieht, wie sie riecht, wie feucht sie ist und
-            welches Terpen wie stark durchkommt.
+            Zuerst der Gesamteindruck. Nicht, was auf der Dose steht, sondern wie sie aussieht, wie sie riecht, wie
+            sie schmeckt.
           </Zeile>
           <Punkt punkt={PUNKTE[1]} />
           <Zeile>
@@ -125,8 +122,8 @@ export function TransparentMachen() {
           </Zeile>
           <Punkt punkt={PUNKTE[2]} />
           <Zeile>
-            Wir bewerten, was wir gefunden haben. Wir stimmen ab, was als Nächstes drankommt. Und alle wissen
-            danach ein bisschen mehr.
+            Zum Schluss die Beschaffenheit: Dichte, Trichome, Feuchte. Dann stimmen wir ab, was als Nächstes
+            drankommt, und alle wissen danach ein bisschen mehr.
           </Zeile>
         </div>
       </div>
