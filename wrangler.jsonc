@@ -33,28 +33,9 @@
 			"database_name": "cn-medcan-db",
 			"database_id": "cdee3489-a940-4353-b164-c58e7a1226f7",
 			"preview_database_id": "PLATZHALTER-wrangler-d1-create-ausfuehren",
-			"migrations_dir": "migrations",
-			// Build liest die echte DB (Spec Caching 2026-09-25): Seiten werden beim
-			// Build vollstaendig vorgerendert und danach alle 5 Minuten erneuert.
-			"remote": true
-		},
-		// Tags fuer revalidateTag (Spec Caching 2026-09-25). Eigene DB, damit
-		// Migrationen der Fachdaten sie nicht beruehren; die Tabelle legt
-		// `opennextjs-cloudflare deploy` (populateCache) selbst an.
-		{
-			"binding": "NEXT_TAG_CACHE_D1",
-			"database_name": "cn-medcan-tags",
-			"database_id": "c71695ff-7eee-4c05-af39-2f39f0865b60"
+			"migrations_dir": "migrations"
 		}
-	],
-
-	// Next-Cache (Spec Caching 2026-09-25): Seiten- und Datencache in KV, davor
-	// der Regional Cache von OpenNext. Free-Plan, hart begrenzt (1000 Schreib-
-	// vorgaenge/Tag); kein R2 (Nutzerregel: nie kostenpflichtig).
-	"kv_namespaces": [
-		{ "binding": "NEXT_INC_CACHE_KV", "id": "260615e2b66348b9b9fb8b7def46c5a4" }
-	],
-	"services": [{ "binding": "WORKER_SELF_REFERENCE", "service": "cn-medcan" }]
+	]
 
 	// Secrets werden NICHT hier gesetzt, sondern mit `wrangler secret put <NAME>`.
 	// Lokal liegen sie in .dev.vars bzw. .env.local (beide gitignored).

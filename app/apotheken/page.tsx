@@ -8,11 +8,11 @@ import { rezeptStatusLabel } from "@/lib/labels";
 import { ladeApothekenListe } from "@/lib/query/strains";
 
 /**
- * ISR (Spec Caching 2026-09-25): vorgerendert beim Build gegen die echte DB
- * ("remote" in wrangler.jsonc), danach hoechstens 5 Minuten alt. Die Seite ist
- * fuer alle gleich, sie liest weder Sitzung noch Rolle.
+ * Kein Prerender zur Buildzeit: es gibt derzeit keine erreichbare Datenbank,
+ * ein statischer Render wuerde beim Build fehlschlagen. Entfaellt, sobald ISR
+ * und die Cache-Bindings (KV, D1-Tags) stehen.
  */
-export const revalidate = 300;
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Apotheken",
