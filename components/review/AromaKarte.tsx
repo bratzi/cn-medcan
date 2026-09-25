@@ -138,7 +138,7 @@ export function AromaKarte({
     const beobachter = new ResizeObserver((eintraege) => {
       const gemessen = eintraege[0]?.contentRect.width;
       if (!gemessen) return;
-      setBreite(Math.max(BREITE, Math.round(gemessen / 1.2)));
+      setBreite(Math.max(BREITE, Math.round(gemessen)));
     });
     beobachter.observe(element);
     return () => beobachter.disconnect();
@@ -200,13 +200,16 @@ export function AromaKarte({
   const aktiveAchse = aktiv === null ? null : GESCHMACKS_ACHSEN[aktiv];
 
   return (
-    <figure className="flex flex-col gap-6">
-      {/* Kopf der Karte: Blütenbild links, daneben Name, Ansicht und Legende (Nutzer 2026-09-25). */}
-      <div className={cn("grid grid-cols-1 items-center gap-6", bild ? "sm:grid-cols-[auto_minmax(0,1fr)] sm:gap-8" : null)}>
-      {bild ? <div className="w-32 sm:w-40 lg:w-48">{bild}</div> : null}
-      <div className="flex min-w-0 flex-col gap-6">
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <figcaption className="font-buch text-h2 font-medium text-text">{titel}</figcaption>
+    <figure aria-label={titel} className="flex flex-col gap-6">
+      {/* Kopf der Karte (Nutzer 2026-09-26): links der Name in Logoschrift mit Verlauf wie im
+          Sortenkopf, darunter groß das Blütenbild; rechts Ansicht und Legende. */}
+      <div className="flex flex-wrap items-start justify-between gap-8">
+      <div className="flex min-w-0 flex-col items-start gap-4">
+        <p className="farbverlauf font-hand text-erzaehlung text-balance wrap-break-word leading-[0.9]">{titel}</p>
+        {bild ? <div className="w-48 sm:w-64 lg:w-80">{bild}</div> : null}
+      </div>
+      <div className="flex flex-col items-end gap-6">
+      <div className="flex flex-wrap items-center justify-end gap-4">
         <div role="group" aria-label="Ansicht" className="inline-flex rounded-full border border-border-strong p-1">
           {(["karte", "netz"] as const).map((wahl) => (
             <button
@@ -295,8 +298,9 @@ export function AromaKarte({
                   strokeDasharray={ergaenzt.includes(terpen.name) ? "6 8" : undefined}
                   opacity={farbig ? 0.45 + 0.55 * kraft : 0.35}
                   style={{
-                    strokeWidth: farbig ? 1.5 + 7 * kraft : 1.5,
-                    filter: farbig && kraft > 0.15 ? `drop-shadow(0 0 ${2 + 10 * kraft}px ${farbe})` : "none",
+                    // Filigraner (Nutzer 2026-09-26): dünnere Striche, schwächerer Schein.
+                    strokeWidth: farbig ? 1 + 3.5 * kraft : 1,
+                    filter: farbig && kraft > 0.15 ? `drop-shadow(0 0 ${1 + 5 * kraft}px ${farbe})` : "none",
                   }}
                   className="transition-[opacity,stroke-width,filter,stroke] duration-normal"
                 />

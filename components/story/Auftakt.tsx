@@ -65,7 +65,8 @@ export function Auftakt() {
             </span>
           ))}
           {/* marke-puls: pulsiert wie das Community-Fazit (Nutzer 2026-09-25). */}
-          <h1 id="auftakt-titel" className="auftakt-marke marke-puls relative flex justify-center">
+          {/* Ein Tick dicker (Nutzer 2026-09-26): Inspiration hat nur einen Schnitt, daher feine Kontur. */}
+          <h1 id="auftakt-titel" className="auftakt-marke marke-puls relative flex justify-center" style={{ WebkitTextStroke: "0.012em var(--color-kopierstift)" }}>
             <Wortmarke groesse="plakat" />
           </h1>
         </div>

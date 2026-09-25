@@ -28,12 +28,16 @@ export function ProduktCard({ strain, className }: Props) {
         // Referenzbild (Nutzer 2026-09-25): nicht die echte Sorte, deshalb als Symbolbild gekennzeichnet.
         // Feste Höhe (Nutzer 2026-09-25): ein Bild mit großem Eigenformat verzog sonst die Kachelreihe.
         <figure className="relative flex h-56 items-center justify-center overflow-hidden px-8 pt-8 pb-6">
-          <Bild
-            id={bild}
-            dekorativ
-            sizes="(min-width: 1280px) 22vw, (min-width: 640px) 45vw, 90vw"
-            className="h-full! min-h-0 w-full object-contain"
-          />
+          {/* Bild führt auch zur Sorte (Nutzer 2026-09-26); für Tastatur und Screenreader
+              reicht der Link am Namen, daher hier ohne Tabstopp. */}
+          <Link prefetch={false} href={`/produkte/${strain.slug}`} tabIndex={-1} aria-hidden="true" className="flex h-full w-full items-center justify-center">
+            <Bild
+              id={bild}
+              dekorativ
+              sizes="(min-width: 1280px) 22vw, (min-width: 640px) 45vw, 90vw"
+              className="h-full! min-h-0 w-full object-contain"
+            />
+          </Link>
           <figcaption className="absolute right-4 bottom-2 text-caption text-text-muted">Symbolbild</figcaption>
         </figure>
       ) : null}

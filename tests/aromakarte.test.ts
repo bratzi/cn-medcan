@@ -50,15 +50,15 @@ test("Geometrie: acht Achsen links, Netz beginnt oben, Morph interpoliert", () =
 test("Geometrie: Achse wandert mit halber Mehrbreite (Skala links, Terpenlinien rechts), Terpene am rechten Rand", () => {
   // Standardaufrufe (ohne breite) bleiben wie vorher: Maßstab bei 640.
   assert.equal(achsenImKarte()[0].x, 260);
-  assert.equal(terpeneImKarte(3)[0].x, 420);
+  assert.equal(terpeneImKarte(3)[0].x, 490);
 
-  // Achse bei 640 unverändert 260 (Balken 110), bei 1200 bei 260 + 280 = 540 (Balken 390, Bögen 440).
-  assert.equal(balkenLaenge(), 110);
-  assert.equal(balkenLaenge(1200), 390);
+  // Balken ab dem linken Rand: bei 640 Achse 260 (Balken 244), bei 1200 bei 260 + 280 = 540 (Balken 524).
+  assert.equal(balkenLaenge(), 244);
+  assert.equal(balkenLaenge(1200), 524);
   const achsenBreit = achsenImKarte(1200);
   assert.equal(achsenBreit[0].x, 540);
   const terpeneBreit = terpeneImKarte(3, 1200);
-  assert.equal(terpeneBreit[0].x, 980);
+  assert.equal(terpeneBreit[0].x, 1050);
 });
 
 test("Das Netz bleibt bei jeder Breite gleich groß (RADIUS) und zentriert (mitteVon)", () => {
