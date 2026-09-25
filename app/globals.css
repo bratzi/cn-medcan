@@ -865,7 +865,7 @@ html.joint-cursor :is(input:not([type="range"]):not([type="radio"]):not([type="c
   }
 }
 
-/* Community-Fazit (AromaErkundung): pulsiert ruhig, nur transform. */
+/* Community-Fazit (AromaErkundung) und Hero-Wortmarke (Auftakt): pulsieren ruhig, nur transform. */
 @media (prefers-reduced-motion: no-preference) {
   .fazit-puls {
     display: inline-block;
