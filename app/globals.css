@@ -796,45 +796,78 @@ html.joint-cursor :is(input:not([type="range"]):not([type="radio"]):not([type="c
   opacity: 0.6;
 }
 
-/* Bahnen um die Wortmarke im Auftakt (Auftakt.tsx): quadratische Ringe, stark
-   gekippt, erscheinen als flache Ellipsen quer durch die Buchstaben. Innen
-   kreist die Linie in ihrer Ebene und morpht wie die Linien um die Videos;
-   so wirkt es, als flögen sie um die Schrift. Außen setzt punkte.ts nur
-   `translate` (Zeigerfolge); die Kippung bleibt in `transform`. */
-.marke-buehne {
-  perspective: 1400px;
-}
-
-.marke-bahn {
-  --breite: 116%;
-  position: absolute;
-  top: 50%;
-  left: calc((100% - var(--breite)) / 2);
-  width: var(--breite);
-  aspect-ratio: 1;
-  /* Prozent-Ränder beziehen sich auf die Breite: -Breite/2 zentriert das Quadrat. */
-  margin-top: calc(var(--breite) / -2);
-  pointer-events: none;
-  transform: rotateX(var(--kippen, 74deg)) rotateY(var(--neigen, 0deg));
-}
-
-.marke-bahn > .blob-linie {
+/* Konturen hinter der Wortmarke im Auftakt (Auftakt.tsx): dieselbe Schrift,
+   nur als Umriss, in Grün- und Violetttönen, leicht versetzt. Günstig: kein 3D,
+   keine Form-Animation, nur transform auf je einer Ebene; der Zeiger verschiebt
+   die Ebene per `translate` (bewegung/punkte.ts). */
+.marke-kontur {
   position: absolute;
   inset: 0;
-  border-width: var(--strich, 1.5px);
+  z-index: -1;
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.marke-kontur > span {
+  --versatz-x: 0.02em;
+  --versatz-y: 0.015em;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  -webkit-text-stroke: var(--strich, 1px) var(--kontur);
+  transform: translate(var(--versatz-x), var(--versatz-y));
+}
+
+.marke-kontur-1 > span {
+  --kontur: var(--color-kopierstift);
+  --strich: 1.5px;
+  --versatz-x: -0.025em;
+  --versatz-y: 0.02em;
+  --drift: 9s;
+}
+
+.marke-kontur-2 > span {
+  --kontur: var(--color-accent);
+  --strich: 1px;
+  --versatz-x: 0.03em;
+  --versatz-y: -0.018em;
+  --drift: 12s;
+}
+
+.marke-kontur-3 > span {
+  --kontur: color-mix(in oklab, var(--color-kopierstift) 55%, var(--color-surface));
+  --strich: 1px;
+  --versatz-x: 0.045em;
+  --versatz-y: 0.03em;
+  --drift: 15s;
+}
+
+.marke-kontur-4 > span {
+  --kontur: color-mix(in oklab, var(--color-accent) 55%, var(--color-surface));
+  --strich: 1px;
+  --versatz-x: -0.04em;
+  --versatz-y: -0.028em;
+  --drift: 11s;
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  .marke-bahn > .blob-linie {
-    animation:
-      marke-kreisen var(--kreisen, 26s) linear infinite var(--richtung, normal),
-      var(--form, blob-morph) var(--morph, 11s) ease-in-out infinite alternate;
+  /* Schreibt sich mit der Wortmarke, dann ruhige Drift gegenläufig zum Versatz. */
+  .marke-kontur [data-marke-zeile] {
+    animation: schreiben 0.8s var(--ease-standard) 0.3s backwards;
+  }
+
+  .marke-kontur [data-marke-zeile] + [data-marke-zeile] {
+    animation-delay: 1s;
+  }
+
+  .marke-kontur > span {
+    animation: kontur-drift var(--drift, 10s) ease-in-out infinite alternate;
   }
 }
 
-@keyframes marke-kreisen {
+@keyframes kontur-drift {
   to {
-    transform: rotate(360deg);
+    transform: translate(calc(var(--versatz-x) * -1), calc(var(--versatz-y) * -1));
   }
 }
 

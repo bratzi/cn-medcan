@@ -8,16 +8,16 @@ import { Unterzeile, Wortmarke } from "@/components/marke/Wortmarke";
 import { buttonKlassen } from "@/components/ui";
 
 /**
- * Bahnen um die Wortmarke: violett und grün, jede anders gekippt, anders groß,
- * anders schnell im Kreisen und anders stark im Morphen (sanft oder stark).
- * Die Werte sind Komposition (Regel 2: story darf in % und Grad setzen).
+ * Konturen hinter der Wortmarke (Nutzer 2026-09-25, statt der 3D-Bahnen): die
+ * Schrift noch einmal übereinander, nur als Umriss, in Grün- und Violetttönen,
+ * leicht versetzt. Jede driftet ruhig in eigenem Takt (globals.css,
+ * .marke-kontur-N); mit der Maus darüber folgen sie verschieden tief.
  */
-const BAHNEN = [
-  { farbe: "blob-linie-lila", tiefe: "2", stil: { "--kippen": "74deg", "--neigen": "-6deg", "--breite": "116%", "--kreisen": "26s", "--form": "blob-morph", "--morph": "11s", "--strich": "2px" } },
-  { farbe: "blob-linie-gruen", tiefe: "3", stil: { "--kippen": "66deg", "--neigen": "8deg", "--breite": "106%", "--kreisen": "19s", "--richtung": "reverse", "--form": "blob-morph-stark", "--morph": "14s", "--strich": "1.5px" } },
-  { farbe: "blob-linie-lila", tiefe: "1.4", stil: { "--kippen": "80deg", "--neigen": "-14deg", "--breite": "128%", "--kreisen": "34s", "--form": "blob-morph-stark", "--morph": "9s", "--strich": "1px" } },
-  { farbe: "blob-linie-lila", tiefe: "3.6", stil: { "--kippen": "58deg", "--neigen": "18deg", "--breite": "96%", "--kreisen": "15s", "--richtung": "reverse", "--form": "blob-morph", "--morph": "7s", "--strich": "1.5px" } },
-  { farbe: "blob-linie-gruen", tiefe: "1", stil: { "--kippen": "84deg", "--neigen": "-2deg", "--breite": "138%", "--kreisen": "42s", "--form": "blob-morph", "--morph": "16s", "--strich": "1px" } },
+const KONTUREN = [
+  { klasse: "marke-kontur-1", tiefe: "1.4" },
+  { klasse: "marke-kontur-2", tiefe: "2.2" },
+  { klasse: "marke-kontur-3", tiefe: "3" },
+  { klasse: "marke-kontur-4", tiefe: "1" },
 ] as const;
 
 /**
@@ -52,20 +52,17 @@ export function Auftakt() {
           Unterzeile in derselben aufrechten Druckschrift wie das Storytelling,
           leicht und deutlich kleiner, damit die Handschrift allein führt. */}
       <div className="flex flex-1 flex-col items-center justify-center gap-4 px-4 py-8 sm:gap-6 sm:px-8">
-        {/* Linien, die in gekippter Bahn um die Buchstaben kreisen und dabei morphen,
-            wie die Linien um die Videos im Storytelling (Nutzer 2026-09-25). Mit der
-            Maus darüber folgen sie dem Zeiger (bewegung/punkte.ts). Reine Dekoration,
-            deshalb neben der h1: die h1 bleibt genau die Wortmarke. */}
-        <div data-story="titel" data-punkt="" className="marke-buehne relative flex justify-center">
-          {BAHNEN.map((bahn, index) => (
+        {/* Konturen der Wortmarke dahinter: reine Dekoration, deshalb neben der h1;
+            die h1 bleibt genau die Wortmarke. */}
+        <div data-story="titel" data-punkt="" className="relative flex justify-center">
+          {KONTUREN.map((kontur) => (
             <span
-              key={index}
+              key={kontur.klasse}
               aria-hidden="true"
-              data-punkt-tiefe={bahn.tiefe}
-              className="marke-bahn"
-              style={bahn.stil as unknown as React.CSSProperties}
+              data-punkt-tiefe={kontur.tiefe}
+              className={`marke-kontur ${kontur.klasse}`}
             >
-              <span className={`blob-linie ${bahn.farbe}`} />
+              <Wortmarke groesse="plakat" />
             </span>
           ))}
           <h1 id="auftakt-titel" className="auftakt-marke relative flex justify-center">
