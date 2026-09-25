@@ -3,7 +3,7 @@
 import { useState } from "react";
 
 import { AromaKarte, type AromaSerie } from "@/components/review/AromaKarte";
-import type { SweetSpotZeile } from "@/components/review/SweetSpot";
+import { SweetSpot, type SweetSpotZeile } from "@/components/review/SweetSpot";
 import {
   BeschaffenheitsLeiste,
   type BeschaffenheitsSchluessel,
@@ -81,8 +81,12 @@ export function AromaErkundung({
     Partial<Record<BeschaffenheitsSchluessel, number>>
   >({});
   const [eigeneNoten, setEigeneNoten] = useState<Partial<Record<NotenKey, number>>>({});
+  const [eigeneIntensitaet, setEigeneIntensitaet] = useState<Record<string, number>>({});
   const bewegt =
-    eigen !== null || Object.keys(eigeneBeschaffenheit).length > 0 || Object.keys(eigeneNoten).length > 0;
+    eigen !== null ||
+    Object.keys(eigeneBeschaffenheit).length > 0 ||
+    Object.keys(eigeneNoten).length > 0 ||
+    Object.keys(eigeneIntensitaet).length > 0;
 
   // Karte: alle bekannten Terpene. Was der Hersteller nicht angibt, steht grau
   // daneben und wird farbig, sobald seine Geschmacksrichtung über 0 liegt.
@@ -91,8 +95,14 @@ export function AromaErkundung({
     .filter((terpen) => !angegeben.has(terpen.name))
     .map((terpen) => ergaenztesTerpen(terpen.name, terpen.geschmack));
   const kartenTerpene = [...terpene, ...ergaenzt];
-  const stufen = Object.fromEntries(
-    zeilen.map((zeile) => [zeile.terpen, zeile.wert]),
+  const stufen = {
+    ...Object.fromEntries(zeilen.map((zeile) => [zeile.terpen, zeile.wert])),
+    ...eigeneIntensitaet,
+  };
+  // Sweet Spot in der Maske (Nutzer 2026-09-26: wieder erfassen): je Herstellerterpen
+  // eine Spur, Start am Community-Mittel, ohne Bewertung im Sweet Spot (3).
+  const sweetSpotZeilen: SweetSpotZeile[] = terpene.map(
+    (terpen) => zeilen.find((zeile) => zeile.terpen === terpen.name) ?? { terpen: terpen.name, wert: 3 },
   );
 
   const hersteller = herstellerProfil(terpene);
@@ -159,6 +169,9 @@ export function AromaErkundung({
             <input key={key} type="hidden" name={`beschaffenheit-${key}`} value={Math.round((wert ?? 0) * 2) / 2} />
           ))}
           {eigeneFeuchte !== undefined ? <input type="hidden" name="feuchtigkeit" value={eigeneFeuchte} /> : null}
+          {Object.entries(eigeneIntensitaet).map(([terpen, wert]) => (
+            <input key={terpen} type="hidden" name={`terpen-${terpen}`} value={wert} />
+          ))}
         </div>
       ) : null}
       {/* Sortenkopf ganz oben (Nutzer 2026-09-25): erst sieht man, was bewertet wurde. */}
@@ -216,6 +229,18 @@ export function AromaErkundung({
             lernen={katalog}
           />
         </div>
+        {eingabe ? (
+          <SweetSpot
+            titel="Terpen-Intensität"
+            quer
+            zeilen={sweetSpotZeilen}
+            bedienung={{
+              eigen: eigeneIntensitaet,
+              // Ganze Stufen, wie die Server Action sie annimmt (lib/bewertung-eingabe.ts).
+              aendern: (terpen, wert) => setEigeneIntensitaet((alt) => ({ ...alt, [terpen]: Math.round(wert) })),
+            }}
+          />
+        ) : null}
       </Schritt>
 
       {beschaffenheit ? (
@@ -283,6 +308,7 @@ export function AromaErkundung({
                 setEigen(null);
                 setEigeneBeschaffenheit({});
                 setEigeneNoten({});
+                setEigeneIntensitaet({});
               }}
               className="min-h-11 text-small text-accent underline underline-offset-4 hover:text-accent-hover"
             >
