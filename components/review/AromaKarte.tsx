@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 
 import {
   achsenImKarte,
@@ -111,6 +111,7 @@ export function AromaKarte({
   lernen,
 }: Props) {
   const svgRef = useRef<SVGSVGElement>(null);
+  const spurId = `spur-${useId().replace(/:/g, "")}`;
   // Beim Ziehen folgen die Balken dem Griff sofort, sonst gleiten sie.
   const ziehtRef = useRef(false);
   const [ansicht, setAnsicht] = useState<"karte" | "netz">("karte");
@@ -199,7 +200,7 @@ export function AromaKarte({
         <svg ref={svgRef} viewBox={`0 0 ${BREITE} ${HOEHE}`} aria-hidden="true" className="block w-full text-text">
           <defs>
             {/* Sweet-Spot-Stil der Regler-Spur: rechts 0, links 5 (Balken wachsen nach links). */}
-            <linearGradient id="spur-verlauf" x1="1" x2="0" y1="0" y2="0">
+            <linearGradient id={spurId} x1="1" x2="0" y1="0" y2="0">
               <stop offset="0%" stopColor="var(--color-border)" />
               <stop offset="60%" stopColor="var(--color-accent-subtle)" />
               <stop offset="100%" stopColor="var(--color-accent)" />
@@ -321,7 +322,7 @@ export function AromaKarte({
                       width={rechts - links + 8}
                       height={8}
                       rx={4}
-                      fill="url(#spur-verlauf)"
+                      fill={`url(#${spurId})`}
                       opacity={aktiv === index ? 0.9 : 0.35}
                       className="transition-opacity duration-fast"
                     />
