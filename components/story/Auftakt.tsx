@@ -81,9 +81,11 @@ export function Auftakt() {
         <p
           data-story="intro"
           data-story-einstieg=""
-          className="-mt-2 max-w-[72ch] text-center font-sans text-small uppercase leading-relaxed tracking-gesperrt text-text text-balance"
+          className="-mt-2 w-full max-w-5xl text-center font-sans text-small uppercase leading-relaxed tracking-gesperrt text-text text-balance"
         >
-          Wir testen Sorten nach festem Schema. Gemeinsam entscheiden wir, welche als Nächstes drankommt.
+          {/* Ab md genau zwei Zeilen, je Satz eine, breit gezogen (Nutzer 2026-09-25). */}
+          <span className="md:block">Wir testen Sorten nach festem Schema.</span>{" "}
+          <span className="md:block">Gemeinsam entscheiden wir, welche als Nächstes drankommt.</span>
         </p>
       </div>
 
