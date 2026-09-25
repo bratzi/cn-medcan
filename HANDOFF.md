@@ -52,6 +52,15 @@ per `javascript_tool` scrollen (`scrollIntoView`) statt `find`+`scroll_to`; hän
   mit Handschrift-Ziffern (text-vermerk, ≥32 px-Regel) und Stiftstrich, Konto-Pille mit Verlaufsrand.
 - Fuß: Kapitelverzeichnis, Unterschrift, „Zurück zum Anfang“, Wortmarke im Verlauf.
 
+**Nachtrag Session 17 (bis `ddc5294`, live geprüft per DOM):**
+- Jede Sorte direkt bewertbar: Knopf „Diese Sorte bewerten“ oben auf jeder Produktseite, „Stimmen der Community“
+  immer sichtbar (leer: „Erste Bewertung abgeben“). Umfragen pushen nur, Bewerten ist unabhängig davon.
+- Noten im Formular als Regler 1–5 (`NotenRegler`, kein stiller Vorgabewert); Gesamteindruck-Block
+  (`GesamteindruckLeiste`, ohne Wirkung wegen HWG) neben dem Graphen, verschiebbar.
+- Joint-Cursor, Videos überall in normaler Farbe (keine Filter), Storytelling mit 3 Themen-Videos, Blob-Morph stärker,
+  Glanz automatisch (3,5 s), Hero-Video 75 %, Hero-Unterzeile unter der Wortmarke, Aroma-Sektion direkt nach dem
+  Storytelling, Referenzkreis am Herstellerwert, nicht angegebene Terpene ab Geschmack 0,5 farbig.
+
 **Offen:**
 1. Kopf: `backdrop-filter` kommt nicht an (computed none) -> Ursache prüfen (evtl. Lightning CSS).
 2. Mobil 390 px (Kopf zweizeilig + fixed: Abstand prüfen), Hell-Modus des Kopfs über dem Auftakt.
