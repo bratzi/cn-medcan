@@ -66,13 +66,18 @@ export function AromaSektion() {
       <div className="mx-auto w-full max-w-360">
         <h2 id="aroma-titel" className="max-w-4xl font-buch text-kapitel text-text text-balance">
           Was der Hersteller verspricht,{" "}
-          {/* Übergroße Display-Zeile (Nutzer 2026-09-25): ragt links über den Inhaltsrand
-              in den Leerraum, Kontur macht die einstrichige Handschrift kräftiger. */}
-          <em
-            className="gross-hand farbverlauf -ml-[4vw] block font-hand text-kulisse not-italic whitespace-nowrap leading-[0.85] md:-ml-[6vw]"
-            style={{ fontSize: "clamp(5rem, 1rem + 17vw, 22rem)" }}
-          >
-            prüfen wir nach.
+          {/* Übergroße Display-Zeile (Nutzer 2026-09-25): bündig mit der Überschrift, ragt
+              rechts aus dem Inhaltsbereich; Stil wie die Hero-Wortmarke (Verlauf, vier
+              driftende Konturen, ruhiger Puls). */}
+          <em className="relative isolate mt-2 block w-max not-italic whitespace-nowrap" style={{ fontSize: "clamp(5rem, 1rem + 17vw, 22rem)" }}>
+            {["marke-kontur-1", "marke-kontur-2", "marke-kontur-3", "marke-kontur-4"].map((klasse) => (
+              <span key={klasse} aria-hidden="true" className={`marke-kontur ${klasse} justify-start font-hand text-kulisse leading-[0.85]`} style={{ fontSize: "1em" }}>
+                <span>prüfen wir nach.</span>
+              </span>
+            ))}
+            <span className="fazit-puls farbverlauf font-hand text-kulisse leading-[0.85]" style={{ fontSize: "1em" }}>
+              prüfen wir nach.
+            </span>
           </em>
         </h2>
         <p className="mt-6 max-w-[60ch] text-body text-text-muted text-pretty">
