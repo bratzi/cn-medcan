@@ -16,7 +16,10 @@ import {
   type Treue,
 } from "@/lib/aromakarte";
 
-const PROZENT = new Intl.NumberFormat("de-DE", { style: "percent", maximumFractionDigits: 0 });
+const PROZENT = new Intl.NumberFormat("de-DE", {
+  style: "percent",
+  maximumFractionDigits: 0,
+});
 
 /**
  * Aroma-Karte und Sweet Spot in einem (Spec Redesign 20, zusammengeführt):
@@ -54,8 +57,12 @@ export function AromaErkundung({
   const angegeben = new Set(terpene.map((terpen) => terpen.name));
   const ergaenztNamen = [
     ...new Set([
-      ...zeilen.map((zeile) => zeile.terpen).filter((name) => !angegeben.has(name)),
-      ...katalog.map((terpen) => terpen.name).filter((name) => !angegeben.has(name)),
+      ...zeilen
+        .map((zeile) => zeile.terpen)
+        .filter((name) => !angegeben.has(name)),
+      ...katalog
+        .map((terpen) => terpen.name)
+        .filter((name) => !angegeben.has(name)),
     ]),
   ];
   const ergaenzt: KartenTerpen[] = ergaenztNamen.flatMap((name) => {
@@ -63,28 +70,34 @@ export function AromaErkundung({
     return eintrag ? [ergaenztesTerpen(eintrag.name, eintrag.geschmack)] : [];
   });
   const kartenTerpene = [...terpene, ...ergaenzt];
-  const alle: SweetSpotZeile[] = kartenTerpene.map(
-    (terpen) => ({
-      ...(zeilen.find((zeile) => zeile.terpen === terpen.name) ?? {
-        terpen: terpen.name,
-        wert: angegeben.has(terpen.name) ? 3 : 0,
-      }),
-      ergaenzt: !angegeben.has(terpen.name),
+  const alle: SweetSpotZeile[] = kartenTerpene.map((terpen) => ({
+    ...(zeilen.find((zeile) => zeile.terpen === terpen.name) ?? {
+      terpen: terpen.name,
+      wert: angegeben.has(terpen.name) ? 3 : 0,
     }),
-  );
+    ergaenzt: !angegeben.has(terpen.name),
+  }));
   const [aktiv, setAktiv] = useState<number | null>(null);
 
   const bewegt = Object.keys(eigen).length > 0;
-  const stufen = Object.fromEntries(alle.map((zeile) => [zeile.terpen, eigen[zeile.terpen] ?? zeile.wert]));
+  const stufen = Object.fromEntries(
+    alle.map((zeile) => [zeile.terpen, eigen[zeile.terpen] ?? zeile.wert]),
+  );
   const eindruck = bewegt ? eindruckProfil(terpene, stufen, ergaenzt) : null;
   const hersteller = herstellerProfil(terpene);
-  const eigeneTreue = eindruck && hersteller ? herstellerTreue(hersteller, eindruck) : null;
+  const eigeneTreue =
+    eindruck && hersteller ? herstellerTreue(hersteller, eindruck) : null;
   const alleSerien: AromaSerie[] = eindruck
-    ? [...serien.filter((serie) => serie.ton === "gruen"), { name: "Dein Eindruck", ton: "lila", matrix: eindruck }]
+    ? [
+        ...serien.filter((serie) => serie.ton === "gruen"),
+        { name: "Dein Eindruck", ton: "lila", matrix: eindruck },
+      ]
     : [...serien];
 
   const aktivieren = (name: string | null) => {
-    const terpen = name ? kartenTerpene.find((t) => t.name === name) : undefined;
+    const terpen = name
+      ? kartenTerpene.find((t) => t.name === name)
+      : undefined;
     setAktiv(terpen ? achsenIndex(terpen.geschmack) : null);
   };
 
@@ -92,21 +105,25 @@ export function AromaErkundung({
     <div className="grid grid-cols-1 gap-12 lg:grid-cols-[minmax(0,3fr)_minmax(0,1fr)] lg:items-start">
       {/* Links Karte und Regler direkt darunter: man sieht beim Schieben, was sich tut. */}
       <div className="flex min-w-0 flex-col gap-6">
-        <AromaKarte
-          titel={titel}
-          terpene={kartenTerpene}
-          serien={alleSerien}
-          hervorheben={aktiv}
-          staerken={terpenStaerken(kartenTerpene, stufen)}
-          ergaenzt={ergaenzt.map((terpen) => terpen.name)}
-        />
+        {/* Schmaler als die Spalte: so passen Karte und Regler zusammen auf den Bildschirm. */}
+        <div className="w-full max-w-xl">
+          <AromaKarte
+            titel={titel}
+            terpene={kartenTerpene}
+            serien={alleSerien}
+            hervorheben={aktiv}
+            staerken={terpenStaerken(kartenTerpene, stufen)}
+            ergaenzt={ergaenzt.map((terpen) => terpen.name)}
+          />
+        </div>
         <SweetSpot
           titel={intensitaetTitel}
           zeilen={alle}
           quer
           bedienung={{
             eigen,
-            aendern: (terpen, wert) => setEigen((alt) => ({ ...alt, [terpen]: wert })),
+            aendern: (terpen, wert) =>
+              setEigen((alt) => ({ ...alt, [terpen]: wert })),
             aktivieren,
           }}
         />
@@ -117,28 +134,36 @@ export function AromaErkundung({
             {treue ? (
               <div className="flex flex-col gap-1">
                 <dt className="text-small text-text-muted">Herstellertreue</dt>
-                <dd className="numeric font-buch text-h1 font-medium text-text">{PROZENT.format(treue.wert)}</dd>
+                <dd className="numeric font-buch text-h1 font-medium text-text">
+                  {PROZENT.format(treue.wert)}
+                </dd>
                 <dd className="text-caption text-text-muted">
-                  aus {treue.anzahl} {treue.anzahl === 1 ? "Bewertung" : "Bewertungen"}
+                  aus {treue.anzahl}{" "}
+                  {treue.anzahl === 1 ? "Bewertung" : "Bewertungen"}
                 </dd>
               </div>
             ) : null}
             {eigeneTreue !== null ? (
               <div className="flex flex-col gap-1" aria-live="polite">
                 <dt className="text-small text-text-muted">Dein Eindruck</dt>
-                <dd className="numeric font-buch text-h1 font-medium text-kopierstift">{PROZENT.format(eigeneTreue)}</dd>
-                <dd className="text-caption text-text-muted">nah an der Angabe</dd>
+                <dd className="numeric font-buch text-h1 font-medium text-kopierstift">
+                  {PROZENT.format(eigeneTreue)}
+                </dd>
+                <dd className="text-caption text-text-muted">
+                  nah an der Angabe
+                </dd>
               </div>
             ) : null}
           </dl>
         ) : null}
         <p className="-mt-2 max-w-[40ch] text-caption text-text-muted text-pretty">
-          Herstellertreue: wie nah das geschmeckte Profil an dem liegt, was die Herstellerangaben erwarten lassen. 100 %
-          heißt deckungsgleich.
+          Herstellertreue: wie nah das geschmeckte Profil an dem liegt, was die
+          Herstellerangaben erwarten lassen. 100 % heißt deckungsgleich.
         </p>
         <p className="max-w-[40ch] text-small text-text-muted text-pretty">
-          Schieb die Punkte: Wie stark hast du die Terpene geschmeckt? Terpene bei 0 bleiben grau, hochgezogen werden sie
-          farbig. Die Karte zeigt dein Profil in Lila. Hier wird nichts gespeichert.
+          Schieb die Punkte: Wie stark hast du die Terpene geschmeckt? Terpene
+          bei 0 bleiben grau, hochgezogen werden sie farbig. Die Karte zeigt
+          dein Profil in Lila. Hier wird nichts gespeichert.
         </p>
         {bewegt ? (
           <button

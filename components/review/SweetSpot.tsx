@@ -90,12 +90,12 @@ export function SweetSpot({
               key={zeile.terpen}
               className={cn(
                 "flex flex-col gap-2",
-                quer && "w-60 shrink-0 snap-start rounded-lg border border-border bg-surface-raised p-4",
+                quer && "w-56 shrink-0 snap-start rounded-lg border border-border bg-surface-raised p-4",
                 quer && gezeigt < 0.05 && "opacity-70",
               )}
               onPointerEnter={() => bedienung?.aktivieren?.(zeile.terpen)}
             >
-              <div className="flex items-baseline justify-between gap-4">
+              <div className={cn("flex gap-4", quer ? "flex-col gap-0" : "items-baseline justify-between")}>
                 <span className={cn("font-buch font-medium text-text", quer ? "text-body" : "text-h3")}>
                   {zeile.terpen}
                   {zeile.ergaenzt ? <span className="ml-2 text-caption font-normal text-text-muted">nicht angegeben</span> : null}
@@ -162,11 +162,13 @@ export function SweetSpot({
                 ) : null}
               </div>
               <div aria-hidden="true" className="relative h-5 text-caption text-text-muted">
-                <span className="absolute left-0">zu schwach</span>
-                <span className="absolute -translate-x-1/2" style={{ left: `${anteil(3)}%` }}>
-                  Sweet Spot
-                </span>
-                <span className="absolute right-0">zu stark</span>
+                <span className="absolute left-0">{quer ? "schwach" : "zu schwach"}</span>
+                {quer ? null : (
+                  <span className="absolute -translate-x-1/2" style={{ left: `${anteil(3)}%` }}>
+                    Sweet Spot
+                  </span>
+                )}
+                <span className="absolute right-0">{quer ? "stark" : "zu stark"}</span>
               </div>
             </li>
           );
