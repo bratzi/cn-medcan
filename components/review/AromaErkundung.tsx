@@ -113,8 +113,8 @@ export function AromaErkundung({
       <div className="grid grid-cols-1 gap-12 lg:grid-cols-[minmax(0,3fr)_minmax(0,1fr)] lg:items-start">
         {/* Links Karte und Regler direkt darunter: man sieht beim Schieben, was sich tut. */}
         <div className="flex min-w-0 flex-col gap-6">
-          {/* Schmaler als die Spalte: so passen Karte und Regler zusammen auf den Bildschirm. */}
-          <div className="w-full max-w-xl">
+          {/* Die Karte ist der Mittelpunkt: füllt ihre Spalte, zentriert. */}
+          <div className="mx-auto w-full max-w-3xl">
             <AromaKarte
               titel={titel}
               terpene={kartenTerpene}

@@ -592,7 +592,8 @@
 }
 
 /* Bud-Cursor (components/layout/BudCursor.tsx): ersetzt den Mauszeiger nur
-   bei feiner Maus; Textfelder behalten den Textcursor. */
+   bei feiner Maus; Textfelder behalten den Textcursor. Ruhe: schwarzweiß.
+   Bewegen: dezente Duftspur. Klick: grün, qualmt und glüht, röstet (--roest). */
 html.bud-cursor,
 html.bud-cursor * {
   cursor: none !important;
@@ -605,19 +606,17 @@ html.bud-cursor :is(input:not([type="range"]):not([type="radio"]):not([type="che
 .bud-zeiger {
   --roest: 0;
   position: fixed;
-  top: -9px;
-  left: -9px;
+  top: -14px;
+  left: -14px;
   z-index: 2147483647;
   pointer-events: none;
   opacity: 0;
   transition: opacity 0.2s;
-  /* Dezent: grau, mit hauchfeinem Rand, damit er auf Hell und Dunkel erkennbar bleibt. */
-  color: #8a8a8a;
-  filter: drop-shadow(0 0 1px color-mix(in oklab, var(--color-surface) 80%, transparent));
+  filter: grayscale(1) drop-shadow(0 0 1px color-mix(in oklab, var(--color-surface) 85%, transparent));
 }
 
 .bud-zeiger[data-sichtbar] {
-  opacity: 0.85;
+  opacity: 0.9;
 }
 
 .bud-zeiger svg {
@@ -625,53 +624,93 @@ html.bud-cursor :is(input:not([type="range"]):not([type="radio"]):not([type="che
   transition: transform 0.15s var(--ease-standard);
 }
 
-.bud-zeiger .bud-koerper,
-.bud-zeiger .bud-haerchen {
-  fill: currentColor;
-  transition: fill 0.2s;
+.bud-koerper {
+  fill: #5f9e5c;
 }
 
-.bud-zeiger .bud-haerchen {
-  fill: #d0d0d0;
+.bud-blatt {
+  fill: #3f7a45;
 }
 
-/* Klick: grün. Gehalten: röstet über --roest (0 bis 1) ins Braune. */
+.bud-stiel,
+.bud-schuppen {
+  stroke: #2f5a33;
+}
+
+.bud-haerchen {
+  fill: #d98a3a;
+}
+
+.bud-koerper,
+.bud-blatt,
+.bud-haerchen {
+  transition: fill 0.3s;
+}
+
+/* Klick: Farbe an, glüht und röstet mit der Haltedauer. */
 .bud-zeiger[data-gedrueckt] {
   opacity: 1;
+  filter: drop-shadow(0 0 calc(2px + var(--roest) * 8px) color-mix(in oklab, #ff7a1a calc(40% + var(--roest) * 60%), transparent));
 }
 
 .bud-zeiger[data-gedrueckt] svg {
-  transform: scale(1.15);
+  transform: scale(1.1);
 }
 
 .bud-zeiger[data-gedrueckt] .bud-koerper {
-  fill: color-mix(in oklab, #4f9d5b calc((1 - var(--roest)) * 100%), #6b3f1d);
+  fill: color-mix(in oklab, #5f9e5c calc((1 - var(--roest)) * 100%), #6b3f1d);
+}
+
+.bud-zeiger[data-gedrueckt] .bud-blatt {
+  fill: color-mix(in oklab, #3f7a45 calc((1 - var(--roest)) * 100%), #3a2412);
 }
 
 .bud-zeiger[data-gedrueckt] .bud-haerchen {
-  fill: color-mix(in oklab, #d98a3a calc((1 - var(--roest)) * 100%), #2a1a0e);
+  fill: color-mix(in oklab, #d98a3a calc((1 - var(--roest)) * 100%), #ff5a0a);
 }
 
-/* Duftschwaden: kleine Wölkchen, steigen auf und verwehen; je gerösteter, desto dunkler. */
-.bud-schwade {
+/* Duftspur beim Bewegen: blass, klein, verweht schnell. */
+.bud-spur,
+.bud-rauch {
   --drift: 0px;
   --roest: 0;
   position: fixed;
   z-index: 2147483646;
-  width: 8px;
-  height: 8px;
-  margin: -4px 0 0 -4px;
   border-radius: 9999px;
   pointer-events: none;
-  background: color-mix(in oklab, #9ed9a6 calc((1 - var(--roest)) * 100%), #8a7a6a);
-  filter: blur(2px);
-  opacity: 0.6;
-  animation: bud-schwade 1.4s ease-out forwards;
 }
 
-@keyframes bud-schwade {
+.bud-spur {
+  width: 6px;
+  height: 6px;
+  margin: -3px 0 0 -3px;
+  background: color-mix(in oklab, #9ed9a6 70%, transparent);
+  filter: blur(2px);
+  opacity: 0.35;
+  animation: bud-spur 0.9s ease-out forwards;
+}
+
+@keyframes bud-spur {
   to {
-    transform: translate(var(--drift), -48px) scale(3);
+    transform: translate(var(--drift), -14px) scale(2.2);
+    opacity: 0;
+  }
+}
+
+/* Qualm beim Klick: grau, steigt auf, wird mit dem Rösten dichter. */
+.bud-rauch {
+  width: 9px;
+  height: 9px;
+  margin: -4.5px 0 0 -4.5px;
+  background: color-mix(in oklab, #b8b8b8 calc((1 - var(--roest)) * 100%), #6d6258);
+  filter: blur(3px);
+  opacity: calc(0.45 + var(--roest) * 0.3);
+  animation: bud-rauch 1.6s ease-out forwards;
+}
+
+@keyframes bud-rauch {
+  to {
+    transform: translate(var(--drift), -60px) scale(3.4);
     opacity: 0;
   }
 }
