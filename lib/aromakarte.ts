@@ -95,3 +95,31 @@ export function achsenIndex(kategorie: GeschmacksKategorie): number {
 export function sanft(t: number): number {
   return t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2;
 }
+
+/**
+ * Das Herstellerprofil, wenn man die Terpene stärker oder schwächer schmeckt:
+ * Stufe 3 (Sweet Spot) lässt ein Terpen unverändert, 1 halbiert es fast,
+ * 5 verstärkt es. Skaliert auf denselben Höchstwert wie das Herstellerprofil,
+ * damit die Abweichung auf der Karte sichtbar bleibt.
+ */
+export function eindruckProfil(
+  terpene: readonly KartenTerpen[],
+  stufen: Readonly<Record<string, number>>,
+): GeschmacksMatrix | null {
+  if (terpene.length === 0) return null;
+  const roh = leereGeschmacksMatrix();
+  const basis = leereGeschmacksMatrix();
+  for (const terpen of terpene) {
+    const achse = ACHSE_ZU_KATEGORIE.get(terpen.geschmack);
+    if (!achse) continue;
+    const gewicht = terpen.konzentrationProzent ?? Math.max(1, 4 - terpen.rang);
+    basis[achse] += gewicht;
+    roh[achse] += gewicht * ((stufen[terpen.name] ?? 3) / 3);
+  }
+  const hoechster = Math.max(...Object.values(basis));
+  if (hoechster <= 0) return null;
+  for (const achse of Object.keys(roh) as (keyof GeschmacksMatrix)[]) {
+    roh[achse] = Math.min(MAX, Math.round((roh[achse] / hoechster) * MAX * 10) / 10);
+  }
+  return roh;
+}

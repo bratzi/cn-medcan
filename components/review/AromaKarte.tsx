@@ -254,7 +254,8 @@ export function AromaKarte({ terpene, serien, titel = "Aroma-Karte", hervorheben
           : "Über eine Geschmacksrichtung fahren, um die Werte zu vergleichen."}
       </p>
 
-      <table className="sr-only">
+      <div className="sr-only">
+      <table>
         <caption>{`${titel}, Skala 0 bis 5`}</caption>
         <thead>
           <tr>
@@ -277,6 +278,7 @@ export function AromaKarte({ terpene, serien, titel = "Aroma-Karte", hervorheben
           ))}
         </tbody>
       </table>
+      </div>
     </figure>
   );
 }

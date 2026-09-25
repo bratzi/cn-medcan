@@ -10,10 +10,9 @@ import { TerpenChips } from "@/components/produkt/TerpenChips";
 import { Titelblatt } from "@/components/produkt/Titelblatt";
 import { CommunityStimmen } from "@/components/review/CommunityStimmen";
 import { Doppelseite } from "@/components/review/Doppelseite";
-import { AromaKarte, type AromaSerie } from "@/components/review/AromaKarte";
+import { type AromaSerie } from "@/components/review/AromaKarte";
 import { Aufklaerung } from "@/components/review/Aufklaerung";
-import { AromaSpielwiese } from "@/components/review/AromaSpielwiese";
-import { SweetSpot } from "@/components/review/SweetSpot";
+import { AromaErkundung } from "@/components/review/AromaErkundung";
 import { herstellerProfil } from "@/lib/aromakarte";
 import { alsEintrag } from "@/components/review/eintrag";
 import {
@@ -209,24 +208,14 @@ async function ProduktInhalt({ slug }: { slug: string }) {
               ? `Grün ist, was die Herstellerangaben erwarten lassen, Lila, was ${geschmack.anzahlBewertungen} Bewertungen gefunden haben.`
               : "Grün ist, was die Herstellerangaben erwarten lassen. Mit den ersten Bewertungen kommt der Vergleich dazu."}
           </p>
-          <div className="mt-4 max-w-4xl">
-            <AromaKarte titel="Aroma-Karte" terpene={strain.terpene} serien={aromaSerien} />
-          </div>
-          <div className="mt-8 max-w-4xl">
-            <SweetSpot
-              titel="Terpen-Intensität laut Community"
+          <div className="mt-4">
+            <AromaErkundung
+              titel={strain.handelsname}
+              terpene={strain.terpene}
+              serien={aromaSerien}
+              intensitaetTitel="Intensität"
               zeilen={Object.entries(intensitaet).map(([terpen, { mittel, anzahl }]) => ({ terpen, wert: mittel, anzahl }))}
             />
-          </div>
-          <div className="mt-16 flex max-w-5xl flex-col gap-6">
-            <h3 className="font-buch text-h1 font-medium text-text">
-              Wie hast <em className="farbverlauf italic">du</em> sie geschmeckt?
-            </h3>
-            <p className="max-w-[60ch] text-body text-text-muted text-pretty">
-              Schieb die Regler und sieh zu, wie sich die Karte verändert. Hier wird nichts gespeichert; zum
-              Speichern einfach bewerten.
-            </p>
-            <AromaSpielwiese titel={strain.handelsname} terpene={strain.terpene} />
           </div>
           <p className="mt-8">
             <Link href={`/bewerten/${strain.slug}`} className={buttonKlassen("primary", "md")}>

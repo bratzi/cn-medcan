@@ -145,6 +145,7 @@ export function Doppelseite({ eintrag, umfang, ueberschrift: Ueberschrift, story
         <AromaKarte titel="Aroma-Karte" terpene={eintrag.terpene} serien={aromaSerien(eintrag)} />
         {voll ? (
           <SweetSpot
+            titel="Terpen-Intensität"
             zeilen={Object.entries(eintrag.terpenIntensitaet).map(([terpen, wert]) => ({ terpen, wert }))}
           />
         ) : null}
