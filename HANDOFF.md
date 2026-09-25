@@ -3,7 +3,7 @@
 > Übergabemedium zwischen Sessions. Wird nach jedem Arbeitsblock aktualisiert und committet.
 > Wer hier weiterarbeitet, liest diese Datei zuerst und braucht den Chatverlauf nicht.
 
-**Letzte Aktualisierung:** 2026-09-25 (Session 16, Browser-Prüfung, Regler-Fix, Aroma-Layout, Handschrift)
+**Letzte Aktualisierung:** 2026-09-25 (Session 17, interaktive Aroma-Karte, Beschaffenheit, Cursor, Kopf/Fuß)
 **Repo:** https://github.com/bratzi/cn-medcan (public)
 **Branch:** `main` (Makeover „Grünes Buch“ Teilprojekt 1 ist seit 2026-09-24 auf `main`)
 
@@ -28,7 +28,38 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 
 ## ⇢ Hier geht es weiter
 
-### ⇢ NÄCHSTE SESSION BEGINNT HIER (Stand 2026-09-25, Session 16 Ende)
+### ⇢ NÄCHSTE SESSION BEGINNT HIER (Stand 2026-09-25, Session 17)
+Live und per Screenshot geprüft bis `17fcd1b`: Kopf transparent/Papierstreifen, Kapitel-Navigation, Fuß als
+Kapitelverzeichnis, Aroma-Karte mit ziehbaren Geschmacksbalken + Lernzeile, Beschaffenheits-Leiste, Bud-Cursor.
+Das „Einfrieren“ aus Session 16 war KEIN Code-Fehler: Long-Task-Messung (PerformanceObserver) ergab 0 ms auf
+Startseite und Produktseite; es hängt nur der Browser-Tab bei `find`/`scroll_to`/`read_page` (MCP). Workaround:
+per `javascript_tool` scrollen (`scrollIntoView`) statt `find`+`scroll_to`; hängt ein Tab, schließen und neu anlegen.
+
+**Erledigt in Session 17:**
+- Aroma-Karte: Geschmacksbalken links sind Regler (Sweet-Spot-Spur, Griff, Einrasten am Community-Wert, sr-only
+  Range-Inputs für Tastatur); Sweet-Spot-Boxen entfernt; Lerneffekt „<Geschmack> steckt vor allem in <Terpene>“
+  (`lernen={katalog}`); „Dein Eindruck“ = Herstellertreue der gezogenen Matrix.
+- Beschaffenheit im Bewertungsschema: Spalte `reviews.beschaffenheit` (JSON, Migration 0005, live + in d1_migrations
+  eingetragen), Achsen in `BESCHAFFENHEIT_ACHSEN` (Chlorophyll, Bud-Dichte, Terpendichte, Trichomfarbe, 0–5, mehr ist
+  besser), Restfeuchte bleibt `feuchtigkeit_prozent`. Formular: `BeschaffenheitsRegler`; Anzeige:
+  `BeschaffenheitsLeiste` (neben der Karte gemittelt, in der Doppelseite ohne Feuchte). 20 Beispielbewertungen live
+  mit abgeleiteten Werten befüllt (Trichomfarbe überall 2,5).
+- Bud-Cursor (`components/layout/BudCursor.tsx`): 28 px, Duftspur beim Bewegen, Klick qualmt/glüht/röstet.
+- Verlaufsschrift nicht mehr abgeschnitten (Padding + negativer Rand in `.farbverlauf`), Plakat kleiner.
+- 3D-Blätter aus (`BLAETTER_AN = false` in components/story/bewegung/start.ts).
+- Storytelling-Prüfpunkte: Blob-Morph, leichter Zoom, Bildwechsel/Schweben, Restfeuchte als Video (pflanze-loop).
+- Kopf fest+transparent (`KopfZustand`: --kopf-h, data-gescrollt, buehne-dunkel über dem Auftakt), Kapitel-Links
+  mit Handschrift-Ziffern (text-vermerk, ≥32 px-Regel) und Stiftstrich, Konto-Pille mit Verlaufsrand.
+- Fuß: Kapitelverzeichnis, Unterschrift, „Zurück zum Anfang“, Wortmarke im Verlauf.
+
+**Offen:**
+1. Kopf: `backdrop-filter` kommt nicht an (computed none) -> Ursache prüfen (evtl. Lightning CSS).
+2. Mobil 390 px (Kopf zweizeilig + fixed: Abstand prüfen), Hell-Modus des Kopfs über dem Auftakt.
+3. Bewertungsformular live testen (Beschaffenheit-Regler, Terpene mit Stufe 0) – Anmeldung nötig.
+4. Netz-Ansicht: Achsenknoten auf Beschriftungen. Beispielrunde neu eröffnen? (Nutzer fragen)
+5. Herstellertreue massenhaft (Spalte, Rangliste), siehe Session-15-Liste.
+
+### ⇢ STAND SESSION 16 Ende
 Alles gepusht bis `c4210e8`. **Live NICHT per Screenshot geprüft:** `c421d6c`, `d30644b`, `c4210e8` und Hover-Glanz
 (Chrome hing zuletzt: Tab eingefroren, nachdem ein resize_window auf 390 px fehlschlug und der Viewport ~2300 px breit
 wurde; Chrome wurde neu gestartet). Zuerst: Browser verbinden, Fenster normal groß, dann prüfen.

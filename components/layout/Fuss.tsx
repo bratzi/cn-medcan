@@ -41,7 +41,7 @@ export function Fuss() {
       <div className="mx-auto grid w-full max-w-360 grid-cols-1 gap-12 px-4 pt-16 pb-24 sm:px-8 md:grid-cols-[1fr_1.4fr_1fr] md:items-start">
         <div className="flex flex-col items-start gap-6">
           <Unterzeile className="text-text-muted" />
-          <a href="#inhalt" className="farbverlauf font-hand text-notiz transition-opacity duration-fast hover:opacity-80">
+          <a href="#inhalt" className="farbverlauf font-hand text-notiz whitespace-nowrap transition-opacity duration-fast hover:opacity-80">
             Zurück zum Anfang ↑
           </a>
         </div>
