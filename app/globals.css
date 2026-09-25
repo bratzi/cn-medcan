@@ -993,11 +993,14 @@ html.joint-cursor :is(input:not([type="range"]):not([type="radio"]):not([type="c
   margin: -0.2em -0.3em -0.25em -0.25em;
 }
 
-/* Hell/Dunkel als Lampe (components/layout/ThemaSchalter.tsx): im Kopf oben
+/* Hell/Dunkel als Lampe (components/layout/ThemaSchalter.tsx): fest in der Fensterecke oben
    links vor der Wortmarke (Nutzer 2026-09-25), Schatten statt Rahmen, 44 px
    Trefferfläche. Lampe an = hell. */
 .thema-lampe {
-  flex: none;
+  position: fixed;
+  top: 0.5rem;
+  left: 0.75rem;
+  z-index: 50;
   display: grid;
   place-items: center;
   width: 2.75rem;

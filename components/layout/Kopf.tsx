@@ -37,14 +37,13 @@ const AKTIV_WORT = "kapitel-wort";
 export function Kopf() {
   return (
     <header data-kopf="" className="kopf fixed inset-x-0 top-0 z-40">
-      <div className="mx-auto grid w-full max-w-360 grid-cols-[1fr_auto_auto] items-center gap-x-4 gap-y-2 px-4 py-2 sm:px-8 lg:grid-cols-[auto_1fr_auto_auto]">
-        {/* Hell/Dunkel oben links vor der Wortmarke (Nutzer 2026-09-25, zuvor fest unten rechts). */}
-        <div className="flex items-center gap-2 justify-self-start">
-          <ThemaSchalter />
-          <Link href="/" className="inline-flex min-h-11 items-center px-2">
-            <Wortmarke groesse="kopf" />
-          </Link>
-        </div>
+      {/* Hell/Dunkel fest in der linken oberen Fensterecke, außerhalb des Inhalts
+          (Nutzer 2026-09-25); bis der Rand breit genug ist, rückt der Kopf dafür ein. */}
+      <ThemaSchalter />
+      <div className="mx-auto grid w-full max-w-360 grid-cols-[1fr_auto_auto] items-center gap-x-4 gap-y-2 py-2 pr-4 pl-16 sm:pr-8 sm:pl-20 min-[1640px]:pl-8 lg:grid-cols-[auto_1fr_auto_auto]">
+        <Link href="/" className="inline-flex min-h-11 items-center justify-self-start px-2">
+          <Wortmarke groesse="kopf" />
+        </Link>
 
         <nav
           aria-label="Hauptnavigation"
