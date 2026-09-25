@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Suspense } from "react";
 
 import { mittleBeschaffenheit } from "@/components/review/BeschaffenheitsLeiste";
+import { mittleNoten } from "@/components/review/GesamteindruckLeiste";
 import { AromaErkundung } from "@/components/review/AromaErkundung";
 import { type AromaSerie } from "@/components/review/AromaKarte";
 import { Schlagwort } from "@/components/story/Schlagwort";
@@ -42,6 +43,7 @@ async function Inhalt() {
         katalog={katalog}
         treue={mittlereHerstellerTreue(hersteller, sorte.reviews.map((review) => parseGeschmacksMatrix(review.geschmacksMatrix)))}
         zeilen={Object.entries(intensitaet).map(([terpen, { mittel, anzahl }]) => ({ terpen, wert: mittel, anzahl }))}
+        gesamteindruck={mittleNoten(sorte.reviews)}
         beschaffenheit={mittleBeschaffenheit(
           sorte.reviews.map((review) => ({
             beschaffenheit: parseBeschaffenheit(review.beschaffenheit),

@@ -9,6 +9,7 @@ import {
   type BeschaffenheitsSchluessel,
   type BeschaffenheitsWerte,
 } from "@/components/review/BeschaffenheitsLeiste";
+import { GesamteindruckLeiste, type EindruckKey, type Gesamteindruck } from "@/components/review/GesamteindruckLeiste";
 import type { KatalogEintrag } from "@/components/review/TerpenErgaenzen";
 import {
   achsenIndex,
@@ -42,6 +43,7 @@ export function AromaErkundung({
   katalog = [],
   treue = null,
   beschaffenheit,
+  gesamteindruck,
   children,
 }: {
   titel: string;
@@ -55,13 +57,17 @@ export function AromaErkundung({
   treue?: Treue | null;
   /** Restfeuchte und Beschaffenheit, gemittelt über die Bewertungen. */
   beschaffenheit?: BeschaffenheitsWerte;
+  /** Allgemeine Noten 1 bis 5, gemittelt über die Bewertungen. */
+  gesamteindruck?: Gesamteindruck;
   children?: React.ReactNode;
 }) {
   const [eigen, setEigen] = useState<GeschmacksMatrix | null>(null);
   const [eigeneBeschaffenheit, setEigeneBeschaffenheit] = useState<
     Partial<Record<BeschaffenheitsSchluessel, number>>
   >({});
-  const bewegt = eigen !== null || Object.keys(eigeneBeschaffenheit).length > 0;
+  const [eigeneNoten, setEigeneNoten] = useState<Partial<Record<EindruckKey, number>>>({});
+  const bewegt =
+    eigen !== null || Object.keys(eigeneBeschaffenheit).length > 0 || Object.keys(eigeneNoten).length > 0;
 
   // Karte: alle bekannten Terpene. Was der Hersteller nicht angibt, steht grau
   // daneben und wird farbig, sobald seine Geschmacksrichtung über 0 liegt.
@@ -156,6 +162,16 @@ export function AromaErkundung({
           Richtung? Dazu leuchten die Terpene auf, die sie tragen. Hier wird
           nichts gespeichert.
         </p>
+        {gesamteindruck ? (
+          <GesamteindruckLeiste
+            {...gesamteindruck}
+            className="w-full"
+            bedienung={{
+              eigen: eigeneNoten,
+              aendern: (key, wert) => setEigeneNoten((alt) => ({ ...alt, [key]: wert })),
+            }}
+          />
+        ) : null}
         {beschaffenheit ? (
           <BeschaffenheitsLeiste
             {...beschaffenheit}
@@ -176,6 +192,7 @@ export function AromaErkundung({
             onClick={() => {
               setEigen(null);
               setEigeneBeschaffenheit({});
+              setEigeneNoten({});
             }}
             className="text-small text-accent underline underline-offset-4 hover:text-accent-hover"
           >

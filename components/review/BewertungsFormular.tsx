@@ -9,12 +9,12 @@ import { AromaKarte, type AromaSerie } from "@/components/review/AromaKarte";
 import { Button, Field, Input, Meldung } from "@/components/ui";
 import { useHydriert } from "@/components/ui/useHydriert";
 import { BeschaffenheitsRegler } from "@/components/review/BeschaffenheitsRegler";
+import { NotenRegler } from "@/components/review/NotenRegler";
 import type { KatalogEintrag } from "@/components/review/TerpenErgaenzen";
 import { ergaenztesTerpen, herstellerProfil, terpenStaerken, type KartenTerpen } from "@/lib/aromakarte";
 import { MAX_NOTIZ } from "@/lib/bewertung-eingabe";
 import { cn } from "@/lib/cn";
 import {
-  BEWERTUNGS_ACHSEN,
   GESCHMACKS_ACHSEN,
   INTENSITAETS_STUFEN,
   leereGeschmacksMatrix,
@@ -82,7 +82,6 @@ function Stufen({
 /** Terpen-Stufen mit 0: bewusst nicht geschmeckt. */
 const TERPEN_STUFEN = [{ wert: 0, label: "nicht geschmeckt" }, ...INTENSITAETS_STUFEN] as const;
 
-const NOTEN_STUFEN = [1, 2, 3, 4, 5].map((wert) => ({ wert, label: String(wert) }));
 
 /**
  * Bewertungsformular (Spec Redesign 17). Noten und Intensität als
@@ -169,12 +168,10 @@ export function BewertungsFormular({ strainId, handelsname, terpene, chargen, is
 
       <section className="flex flex-col gap-6">
         <h2 className="font-buch text-h1 font-medium text-text">Noten</h2>
-        {BEWERTUNGS_ACHSEN.map((achse) => (
-          <div key={achse.key} className="flex flex-col gap-1">
-            <Stufen name={`note-${achse.key}`} legende={`${achse.label} (1 bis 5)`} stufen={NOTEN_STUFEN} />
-            <p className="text-caption text-text-muted">{achse.erlaeuterung}</p>
-          </div>
-        ))}
+        <p className="max-w-[60ch] text-body text-text-muted text-pretty">
+          Dein Gesamteindruck, unabhängig von den Terpenen: je Punkt 1 bis 5.
+        </p>
+        <NotenRegler />
       </section>
 
       <section className="flex flex-col gap-6">

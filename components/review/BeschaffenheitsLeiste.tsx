@@ -60,7 +60,7 @@ type SpurProps = {
  * Sweet-Spot-Spur), rastet am Vergleichswert ein; Tastatur über ein
  * unsichtbares Range-Input darüber.
  */
-function Spur({ label, wert, max, schritt, band, ring, aendern }: SpurProps) {
+export function Spur({ label, wert, max, schritt, band, ring, aendern }: SpurProps) {
   const anteil = (w: number) => (Math.min(Math.max(w, 0), max) / max) * 100;
   const wertAm = (spur: HTMLElement, clientX: number) => {
     const rect = spur.getBoundingClientRect();

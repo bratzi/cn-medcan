@@ -39,6 +39,7 @@ import {
 import { bestrahlungLabel, darreichungsformLabel, kultivarTypLabel } from "@/lib/labels";
 import { parseGeschmacksMatrix, teileBewertungen, verdichteGeschmacksMatrix, mittleTerpenIntensitaet, parseBeschaffenheit, parseTerpenIntensitaet } from "@/lib/query/bewertung";
 import { mittleBeschaffenheit } from "@/components/review/BeschaffenheitsLeiste";
+import { mittleNoten } from "@/components/review/GesamteindruckLeiste";
 import { istFachkreis } from "@/lib/query/fachkreis";
 import { ladeStrainDetail, ladeTerpenKatalog, type StrainDetail, type UnternehmenEintrag } from "@/lib/query/strains";
 
@@ -184,6 +185,19 @@ async function ProduktInhalt({ slug }: { slug: string }) {
         }
       />
 
+      {/* Jede Sorte ist bewertbar, unabhängig von einer Umfrage; die Umfrage rückt
+          eine Sorte nur zeitweise nach vorn. */}
+      <p className="mt-8 flex flex-wrap items-center gap-4">
+        <Link href={`/bewerten/${strain.slug}`} className={buttonKlassen("primary", "md")}>
+          Diese Sorte bewerten
+        </Link>
+        <a href="#community-titel" className="text-small text-accent underline underline-offset-4 hover:text-accent-hover">
+          {community.length > 0
+            ? `${community.length} ${community.length === 1 ? "Bewertung" : "Bewertungen"} der Community lesen`
+            : "Noch keine Community-Bewertung"}
+        </a>
+      </p>
+
       {strain.beschreibung ? (
         <p className="mt-8 max-w-[68ch] text-body text-pretty text-text">{strain.beschreibung}</p>
       ) : null}
@@ -217,6 +231,7 @@ async function ProduktInhalt({ slug }: { slug: string }) {
               katalog={katalog}
               treue={mittlereHerstellerTreue(hersteller, strain.reviews.map((review) => parseGeschmacksMatrix(review.geschmacksMatrix)))}
               zeilen={Object.entries(intensitaet).map(([terpen, { mittel, anzahl }]) => ({ terpen, wert: mittel, anzahl }))}
+              gesamteindruck={mittleNoten(strain.reviews)}
               beschaffenheit={mittleBeschaffenheit(
                 strain.reviews.map((review) => ({
                   beschaffenheit: parseBeschaffenheit(review.beschaffenheit),
@@ -238,7 +253,20 @@ async function ProduktInhalt({ slug }: { slug: string }) {
         <div className={ABSTAND}>
           <CommunityStimmen bewertungen={community} mittel={communityMittel} />
         </div>
-      ) : null}
+      ) : (
+        <section aria-labelledby="community-titel" className={cn(ABSTAND, "flex flex-col items-start gap-4")}>
+          <h2 id="community-titel" className={ABSCHNITT_TITEL}>
+            Stimmen der Community
+          </h2>
+          <p className="max-w-[60ch] text-body text-text-muted text-pretty">
+            Zu {strain.handelsname} gibt es noch keine Bewertung aus der Community. Gib die erste ab: Aussehen, Geruch,
+            Geschmack, Konsistenz, Aroma und Beschaffenheit, gebunden an deine Charge.
+          </p>
+          <Link href={`/bewerten/${strain.slug}`} className={buttonKlassen("secondary", "md")}>
+            Erste Bewertung abgeben
+          </Link>
+        </section>
+      )}
 
       <section aria-labelledby="daten-titel" className={ABSTAND}>
         <h2 id="daten-titel" className={ABSCHNITT_TITEL}>

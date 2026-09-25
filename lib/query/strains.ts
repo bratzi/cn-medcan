@@ -1039,7 +1039,16 @@ export type AromaVorzeige = {
   slug: string;
   terpene: TerpenEintrag[];
   /** Rohe Spalten der freigegebenen Bewertungen; verdichtet wird in der Sektion. */
-  reviews: { geschmacksMatrix: unknown; terpenIntensitaet: unknown; beschaffenheit: unknown; feuchtigkeitProzent: number | null }[];
+  reviews: {
+    geschmacksMatrix: unknown;
+    terpenIntensitaet: unknown;
+    beschaffenheit: unknown;
+    feuchtigkeitProzent: number | null;
+    aussehen: number;
+    geruch: number;
+    geschmack: number;
+    konsistenz: number;
+  }[];
 };
 
 /**
@@ -1066,7 +1075,16 @@ export async function ladeAromaVorzeige(): Promise<AromaVorzeige | null> {
       reviews: {
         where: { freigegeben: true },
         take: 50,
-        select: { geschmacksMatrix: true, terpenIntensitaet: true, beschaffenheit: true, feuchtigkeitProzent: true },
+        select: {
+          geschmacksMatrix: true,
+          terpenIntensitaet: true,
+          beschaffenheit: true,
+          feuchtigkeitProzent: true,
+          aussehen: true,
+          geruch: true,
+          geschmack: true,
+          konsistenz: true,
+        },
       },
     },
   });
