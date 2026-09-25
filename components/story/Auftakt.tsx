@@ -85,7 +85,7 @@ export function Auftakt() {
         >
           {/* Ab md genau zwei Zeilen, je Satz eine, breit gezogen (Nutzer 2026-09-25). */}
           <span className="md:block">Wir testen Sorten nach festem Schema.</span>{" "}
-          <span className="md:block">Gemeinsam entscheiden wir, welche als Nächstes drankommt.</span>
+          <span className="md:block">Kollektiven Geschmack kultivieren · Terpene schmecken &amp; verstehen · mit der Community neue Maßstäbe definieren.</span>
         </p>
       </div>
 
