@@ -3,7 +3,7 @@
 > Übergabemedium zwischen Sessions. Wird nach jedem Arbeitsblock aktualisiert und committet.
 > Wer hier weiterarbeitet, liest diese Datei zuerst und braucht den Chatverlauf nicht.
 
-**Letzte Aktualisierung:** 2026-09-25 (Session 18, Save for Clear)
+**Letzte Aktualisierung:** 2026-09-25 (Session 19, Save for Clear)
 **Repo:** https://github.com/bratzi/cn-medcan (public)
 **Branch:** `main` (Makeover „Grünes Buch“ Teilprojekt 1 ist seit 2026-09-24 auf `main`)
 
@@ -28,7 +28,29 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 
 ## ⇢ Hier geht es weiter
 
-### ⇢ NÄCHSTE SESSION BEGINNT HIER (Stand 2026-09-25, Session 18, Save for Clear ~16:25 UTC)
+### ⇢ NÄCHSTE SESSION BEGINNT HIER (Stand 2026-09-25, Session 19, Save for Clear)
+
+**Neu aus Session 19 (alles gepusht bis `60a7a88`, Tests 191/191, live noch NICHT per Screenshot gesehen):**
+- Hero-Zeile „Cannabis, offen gelegt.“ in `uppercase tracking-gesperrt` (font-sans), Grad bleibt.
+- Aroma-Karte: Symbolbild (`blueteBild(herstellerBildPfad)`) links zwischen Name und Legende, als `bild`-Slot
+  von AromaSektion (Server) über AromaErkundung in AromaKarte.
+- Schrittziffern 1/2/3 als SVG über die volle Schritthöhe im Hintergrund (`text-kopierstift opacity-15`, -z-10).
+- Schlagworte zwischen die Sektionen: „stimmt das?“, „was drin ist“, „wir stimmen ab“ je `bottom-0 translate-y-1/2`.
+  Aroma-Karte NICHT transparenter gemacht (kein Hintergrund vorhanden; Linien verblassen hieße schlechter lesbar):
+  live prüfen, ob „stimmt das?“ jetzt frei ist, sonst Nutzer fragen.
+- Story-Hervorhebungen (TransparentMachen) inline `fontSize: calc(var(--text-kapitel) * 1.35)` wie „prüfen wir nach“.
+- Community-Fazit: vier `marke-kontur-N`-Konturen wie die Hero-Wortmarke + `.fazit-puls` (globals.css).
+- Hinweis: Tests laufen mit `npm test` (tsx --test), NICHT vitest.
+
+**Reihenfolge für die nächste Session:**
+
+0. **Neuer Task: Kopf-Typografie** (Header/Kopf-Navigation, `components/layout/Kopf.tsx`, NavLink) an die Hero-
+   Typografie angleichen wie „Terpen für Terpen“: `font-sans uppercase tracking-gesperrt` (Größe passend, ≥ Regeln
+   ui-design-engine; Handschrift-Ziffern gibt es im Kopf nicht mehr). Danach Live-Sichtprüfung aller Session-19-Punkte.
+1. **Caching (Nutzerentscheid: Caching statt Paid)** — superpowers:brainstorming, siehe unten Punkt 1.
+
+#### (Vorheriger Stand Session 18)
+
 
 **Reihenfolge für die nächste Session:**
 
