@@ -8,6 +8,19 @@ import { Unterzeile, Wortmarke } from "@/components/marke/Wortmarke";
 import { buttonKlassen } from "@/components/ui";
 
 /**
+ * Bahnen um die Wortmarke: violett und grün, jede anders gekippt, anders groß,
+ * anders schnell im Kreisen und anders stark im Morphen (sanft oder stark).
+ * Die Werte sind Komposition (Regel 2: story darf in % und Grad setzen).
+ */
+const BAHNEN = [
+  { farbe: "blob-linie-lila", tiefe: "2", stil: { "--kippen": "74deg", "--neigen": "-6deg", "--breite": "116%", "--kreisen": "26s", "--form": "blob-morph", "--morph": "11s", "--strich": "2px" } },
+  { farbe: "blob-linie-gruen", tiefe: "3", stil: { "--kippen": "66deg", "--neigen": "8deg", "--breite": "106%", "--kreisen": "19s", "--richtung": "reverse", "--form": "blob-morph-stark", "--morph": "14s", "--strich": "1.5px" } },
+  { farbe: "blob-linie-lila", tiefe: "1.4", stil: { "--kippen": "80deg", "--neigen": "-14deg", "--breite": "128%", "--kreisen": "34s", "--form": "blob-morph-stark", "--morph": "9s", "--strich": "1px" } },
+  { farbe: "blob-linie-lila", tiefe: "3.6", stil: { "--kippen": "58deg", "--neigen": "18deg", "--breite": "96%", "--kreisen": "15s", "--richtung": "reverse", "--form": "blob-morph", "--morph": "7s", "--strich": "1.5px" } },
+  { farbe: "blob-linie-gruen", tiefe: "1", stil: { "--kippen": "84deg", "--neigen": "-2deg", "--breite": "138%", "--kreisen": "42s", "--form": "blob-morph", "--morph": "16s", "--strich": "1px" } },
+] as const;
+
+/**
  * Sektion 1 (Spec Redesign 7 und 8): der Umschlag als Filmbühne. Das Video
  * füllt die erste Ansicht in Schwarzweiß, ein Verlauf dunkelt es zur Schrift
  * hin ab, die Sektion trägt dunkle Rollen (`buehne-dunkel`). Die h1 ist die
@@ -39,9 +52,26 @@ export function Auftakt() {
           Unterzeile in derselben aufrechten Druckschrift wie das Storytelling,
           leicht und deutlich kleiner, damit die Handschrift allein führt. */}
       <div className="flex flex-1 flex-col items-center justify-center gap-4 px-4 py-8 sm:gap-6 sm:px-8">
-        <h1 id="auftakt-titel" data-story="titel" className="auftakt-marke relative flex justify-center">
-          <Wortmarke groesse="plakat" />
-        </h1>
+        {/* Linien, die in gekippter Bahn um die Buchstaben kreisen und dabei morphen,
+            wie die Linien um die Videos im Storytelling (Nutzer 2026-09-25). Mit der
+            Maus darüber folgen sie dem Zeiger (bewegung/punkte.ts). Reine Dekoration,
+            deshalb neben der h1: die h1 bleibt genau die Wortmarke. */}
+        <div data-story="titel" data-punkt="" className="marke-buehne relative flex justify-center">
+          {BAHNEN.map((bahn, index) => (
+            <span
+              key={index}
+              aria-hidden="true"
+              data-punkt-tiefe={bahn.tiefe}
+              className="marke-bahn"
+              style={bahn.stil as unknown as React.CSSProperties}
+            >
+              <span className={`blob-linie ${bahn.farbe}`} />
+            </span>
+          ))}
+          <h1 id="auftakt-titel" className="auftakt-marke relative flex justify-center">
+            <Wortmarke groesse="plakat" />
+          </h1>
+        </div>
         <p
           data-story="oberzeile"
           data-story-einstieg=""

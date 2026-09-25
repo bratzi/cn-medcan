@@ -680,14 +680,11 @@ html.joint-cursor :is(input:not([type="range"]):not([type="radio"]):not([type="c
     animation: blob-morph 10s ease-in-out infinite alternate;
   }
 
-  /* Die Linien morphen im eigenen Takt: sie laufen gegen die Videokante und
-     gegeneinander, statt starr mitzufahren. */
-  .blob-linie-gruen {
-    animation: blob-morph 13s ease-in-out infinite alternate-reverse;
-  }
-
-  .blob-linie-lila {
-    animation: blob-morph 17s ease-in-out infinite alternate;
+  /* Die Linien um die Videos morphen im eigenen Takt (Werte je Ring in
+     TransparentMachen: --form, --dauer, --richtung, --verzug). */
+  .blob-linie[data-takt] {
+    animation: var(--form, blob-morph) var(--dauer, 13s) ease-in-out var(--verzug, 0s) infinite
+      var(--richtung, alternate);
   }
 
   .bild-zoom {
@@ -724,6 +721,27 @@ html.joint-cursor :is(input:not([type="range"]):not([type="radio"]):not([type="c
   100% {
     border-radius: 56% 44% 45% 55% / 50% 60% 40% 50%;
     rotate: -2deg;
+  }
+}
+
+/* Stärkeres Morphen für einzelne Linien (Videos, Wortmarke): weiter weg vom
+   Kreis und mehr Drehung als blob-morph. */
+@keyframes blob-morph-stark {
+  0% {
+    border-radius: 70% 30% 62% 38% / 38% 68% 32% 62%;
+    rotate: -8deg;
+  }
+  33% {
+    border-radius: 32% 68% 28% 72% / 70% 34% 66% 30%;
+    rotate: 6deg;
+  }
+  66% {
+    border-radius: 60% 40% 78% 22% / 28% 60% 40% 72%;
+    rotate: -4deg;
+  }
+  100% {
+    border-radius: 26% 74% 42% 58% / 64% 26% 74% 36%;
+    rotate: 9deg;
   }
 }
 
@@ -776,6 +794,48 @@ html.joint-cursor :is(input:not([type="range"]):not([type="radio"]):not([type="c
 .blob-linie-lila {
   border-color: var(--color-kopierstift);
   opacity: 0.6;
+}
+
+/* Bahnen um die Wortmarke im Auftakt (Auftakt.tsx): quadratische Ringe, stark
+   gekippt, erscheinen als flache Ellipsen quer durch die Buchstaben. Innen
+   kreist die Linie in ihrer Ebene und morpht wie die Linien um die Videos;
+   so wirkt es, als flögen sie um die Schrift. Außen setzt punkte.ts nur
+   `translate` (Zeigerfolge); die Kippung bleibt in `transform`. */
+.marke-buehne {
+  perspective: 1400px;
+}
+
+.marke-bahn {
+  --breite: 116%;
+  position: absolute;
+  top: 50%;
+  left: calc((100% - var(--breite)) / 2);
+  width: var(--breite);
+  aspect-ratio: 1;
+  /* Prozent-Ränder beziehen sich auf die Breite: -Breite/2 zentriert das Quadrat. */
+  margin-top: calc(var(--breite) / -2);
+  pointer-events: none;
+  transform: rotateX(var(--kippen, 74deg)) rotateY(var(--neigen, 0deg));
+}
+
+.marke-bahn > .blob-linie {
+  position: absolute;
+  inset: 0;
+  border-width: var(--strich, 1.5px);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .marke-bahn > .blob-linie {
+    animation:
+      marke-kreisen var(--kreisen, 26s) linear infinite var(--richtung, normal),
+      var(--form, blob-morph) var(--morph, 11s) ease-in-out infinite alternate;
+  }
+}
+
+@keyframes marke-kreisen {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* Kopf (components/layout/Kopf.tsx): fest, transparent; beim Scrollen ein

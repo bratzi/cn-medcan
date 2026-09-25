@@ -38,8 +38,19 @@ const PUNKTE = [
 ] as const;
 
 /**
+ * Linien um jedes Video: violett und grün, verschieden weit weg, verschieden
+ * schnell und verschieden stark im Morphen; beim Zeiger verschieden tief.
+ */
+const RINGE = [
+  { farbe: "blob-linie-gruen", abstand: "-inset-4", tiefe: "1.6", stil: { "--form": "blob-morph", "--dauer": "13s", "--richtung": "alternate-reverse" } },
+  { farbe: "blob-linie-lila", abstand: "-inset-8", tiefe: "2.4", stil: { "--form": "blob-morph-stark", "--dauer": "17s" } },
+  { farbe: "blob-linie-lila", abstand: "-inset-2", tiefe: "1.2", stil: { "--form": "blob-morph-stark", "--dauer": "8s", "--richtung": "alternate-reverse" } },
+  { farbe: "blob-linie-gruen", abstand: "-inset-12", tiefe: "3.2", stil: { "--form": "blob-morph", "--dauer": "23s" } },
+] as const;
+
+/**
  * Ein Prüfpunkt: je ein Video zum Thema füllt den Blob randlos; der Blob
- * morpht langsam (blob-morph), das Video zoomt leicht (bild-zoom). Zwei
+ * morpht langsam (blob-morph), das Video zoomt leicht (bild-zoom). Vier
  * Linien in Grün und Violett morphen im eigenen Takt um die Kante mit
  * (blob-linie). Mit der Maus über dem Video folgen Video und Linien dem
  * Zeiger in drei Tiefen (bewegung/punkte.ts, data-punkt-tiefe).
@@ -52,18 +63,16 @@ function Punkt({ punkt }: { punkt: (typeof PUNKTE)[number] }) {
       className={`${seite} my-24 flex w-56 flex-col items-center gap-6 text-center md:my-32 md:w-sm [shape-margin:2.5rem] [shape-outside:ellipse(50%_45%)]`}
     >
       <div data-punkt="" className="relative aspect-square w-full">
-        <span
-          aria-hidden="true"
-          data-punkt-tiefe="1.6"
-          className="blob-linie blob-linie-gruen pointer-events-none absolute -inset-4"
-          style={{ animationDelay: punkt.verzoegerung }}
-        />
-        <span
-          aria-hidden="true"
-          data-punkt-tiefe="2.4"
-          className="blob-linie blob-linie-lila pointer-events-none absolute -inset-8"
-          style={{ animationDelay: punkt.verzoegerung }}
-        />
+        {RINGE.map((ring, index) => (
+          <span
+            key={index}
+            aria-hidden="true"
+            data-punkt-tiefe={ring.tiefe}
+            data-takt=""
+            className={`blob-linie ${ring.farbe} pointer-events-none absolute ${ring.abstand}`}
+            style={{ ...ring.stil, "--verzug": punkt.verzoegerung } as unknown as React.CSSProperties}
+          />
+        ))}
         <div
           data-punkt-tiefe="1"
           className={`blob-morph relative h-full w-full overflow-hidden ${punkt.form}`}
