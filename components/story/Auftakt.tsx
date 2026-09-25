@@ -33,23 +33,21 @@ export function Auftakt() {
         <div className="absolute inset-0 bg-linear-to-b from-surface/40 via-surface/5 to-surface" />
       </div>
 
-      <div className="mx-auto w-full max-w-360 px-4 sm:px-8">
+      {/* Wortmarke und Unterzeile als eine Gruppe auf gemeinsamer Achse: die
+          Unterzeile in derselben aufrechten Druckschrift wie das Storytelling,
+          leicht und deutlich kleiner, damit die Handschrift allein führt. */}
+      <div className="flex flex-1 flex-col items-center justify-center gap-4 px-4 py-8 sm:gap-6 sm:px-8">
+        <h1 id="auftakt-titel" data-story="titel" className="auftakt-marke relative flex justify-center">
+          <Wortmarke groesse="plakat" />
+        </h1>
         <p
           data-story="oberzeile"
           data-story-einstieg=""
-          className="font-buch text-h2 font-medium italic text-text sm:text-h1"
+          className="max-w-[28ch] text-center font-buch text-h2 font-light tracking-tight text-balance text-text/85 sm:text-h1 sm:font-light"
         >
           Cannabis, offen gelegt.
         </p>
       </div>
-
-      <h1
-        id="auftakt-titel"
-        data-story="titel"
-        className="auftakt-marke relative flex flex-1 items-center justify-center py-8"
-      >
-        <Wortmarke groesse="plakat" />
-      </h1>
 
       <div className="mx-auto w-full max-w-360 px-4 sm:px-8">
         <div className="mt-8 flex flex-wrap items-end justify-between gap-8">
