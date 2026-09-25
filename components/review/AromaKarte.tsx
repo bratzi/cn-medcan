@@ -4,6 +4,7 @@ import { useEffect, useId, useRef, useState } from "react";
 
 import {
   achsenImKarte,
+  balkenLaenge,
   achsenIndex,
   alsPolygon,
   bogen,
@@ -88,8 +89,8 @@ function useGleitend(ziel: readonly number[], sofortRef?: { current: boolean }):
 }
 
 /** Wo der Wert einer Serie in der Karte sitzt: ein Balken links neben dem Achsenknoten. */
-function balkenEnde(knoten: Punkt, wert: number, versatz: number): Punkt {
-  return { x: knoten.x - 16 - (wert / MAX) * 110, y: knoten.y + versatz };
+function balkenEnde(knoten: Punkt, wert: number, versatz: number, laenge = 110): Punkt {
+  return { x: knoten.x - 16 - (wert / MAX) * laenge, y: knoten.y + versatz };
 }
 
 /**
@@ -177,6 +178,7 @@ export function AromaKarte({
   const aktBreite = breite ?? BREITE;
   const mitte = mitteVon(aktBreite);
   const karte = achsenImKarte(aktBreite);
+  const balken = balkenLaenge(aktBreite);
   const knoten = karte.map((punkt, index) => mische(punkt, netzPunkt(index, MAX, RADIUS + 34, mitte), t));
   const terpenKnoten = terpeneImKarte(terpene.length, aktBreite);
   const kartenSichtbar = 1 - t;
@@ -184,7 +186,7 @@ export function AromaKarte({
   const serienPunkte = serien.map((serie, s) =>
     GESCHMACKS_ACHSEN.map((achse, index) =>
       mische(
-        balkenEnde(karte[index], serie.matrix[achse.key], s * 6 - 3),
+        balkenEnde(karte[index], serie.matrix[achse.key], s * 6 - 3, balken),
         netzPunkt(index, serie.matrix[achse.key], RADIUS, mitte),
         t,
       ),
@@ -334,10 +336,10 @@ export function AromaKarte({
           {regler && kartenSichtbar > 0.5
             ? karte.map((knoten, index) => {
                 const key = GESCHMACKS_ACHSEN[index].key;
-                const links = balkenEnde(knoten, MAX, 0).x;
-                const rechts = balkenEnde(knoten, 0, 0).x;
-                const griff = balkenEnde(knoten, regler.werte[key], 0).x;
-                const ring = regler.vergleich ? balkenEnde(knoten, regler.vergleich[key], 0).x : null;
+                const links = balkenEnde(knoten, MAX, 0, balken).x;
+                const rechts = balkenEnde(knoten, 0, 0, balken).x;
+                const griff = balkenEnde(knoten, regler.werte[key], 0, balken).x;
+                const ring = regler.vergleich ? balkenEnde(knoten, regler.vergleich[key], 0, balken).x : null;
                 const wertAus = (clientX: number, clientY: number) => {
                   const ctm = svgRef.current?.getScreenCTM();
                   if (!ctm) return regler.werte[key];
@@ -345,27 +347,28 @@ export function AromaKarte({
                   const roh = Math.min(Math.max(((rechts - p.x) / (rechts - links)) * MAX, 0), MAX);
                   const vergleich = regler.vergleich?.[key];
                   if (vergleich !== undefined && Math.abs(roh - vergleich) <= 0.15) return vergleich;
-                  return Math.round(roh * 10) / 10;
+                  // Halbe Schritte wie beim Speichern: leichter zu treffen (Nutzer 2026-09-25).
+                  return Math.round(roh * 2) / 2;
                 };
                 return (
                   <g key={`r-${key}`} opacity={kartenSichtbar}>
                     <rect
                       x={links - 4}
-                      y={knoten.y - 4}
+                      y={knoten.y - 5}
                       width={rechts - links + 8}
-                      height={8}
-                      rx={4}
+                      height={10}
+                      rx={5}
                       fill={`url(#${spurId})`}
                       opacity={aktiv === index ? 0.9 : 0.35}
                       className="transition-opacity duration-fast"
                     />
                     {ring !== null ? (
-                      <circle cx={ring} cy={knoten.y} r={8.5} fill="none" stroke={FARBE.gruen} strokeOpacity={0.8} strokeWidth={2} />
+                      <circle cx={ring} cy={knoten.y} r={11.5} fill="none" stroke={FARBE.gruen} strokeOpacity={0.8} strokeWidth={2} />
                     ) : null}
                     <circle
                       cx={griff}
                       cy={knoten.y}
-                      r={aktiv === index ? 9 : 7}
+                      r={aktiv === index ? 12 : 10}
                       fill={FARBE.lila}
                       stroke="var(--color-surface)"
                       strokeWidth={2.5}
@@ -374,9 +377,9 @@ export function AromaKarte({
                     {/* Trefferfläche: Ziehen setzt den Wert; Tastatur über die Regler unter der Karte. */}
                     <rect
                       x={links - 12}
-                      y={knoten.y - 16}
+                      y={knoten.y - 22}
                       width={rechts - links + 24}
-                      height={32}
+                      height={44}
                       fill="transparent"
                       className="cursor-grab touch-none active:cursor-grabbing"
                       style={{ pointerEvents: "all" }}
@@ -403,7 +406,7 @@ export function AromaKarte({
           {/* Skala über den Balken: Länge = Wert 0 bis 5. */}
           <g opacity={kartenSichtbar * 0.7}>
             {SKALA.map((stufe) => {
-              const x = balkenEnde(karte[0], stufe, 0).x;
+              const x = balkenEnde(karte[0], stufe, 0, balken).x;
               const y = karte[0].y - 26;
               return (
                 <g key={stufe}>

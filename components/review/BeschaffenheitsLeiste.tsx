@@ -72,7 +72,9 @@ export function Spur({ label, wert, max, schritt, band, ring, aendern }: SpurPro
     <div
       className={cn(
         "relative h-2 rounded-full bg-border outline-offset-8 outline-focus-ring has-[input:focus-visible]:outline-2",
-        aendern && "cursor-pointer touch-none",
+        // Als Regler (Nutzer 2026-09-25: leichter zu bedienen): dickere Spur und
+        // 44 px Trefferhöhe über ein Pseudo-Element, der Griff größer.
+        aendern && "h-3 cursor-pointer touch-none before:absolute before:inset-x-0 before:-inset-y-4 before:content-['']",
       )}
       onPointerDown={
         aendern
@@ -111,7 +113,7 @@ export function Spur({ label, wert, max, schritt, band, ring, aendern }: SpurPro
         aria-hidden="true"
         className={cn(
           "pointer-events-none absolute top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-surface bg-kopierstift shadow-sm",
-          aendern ? "size-5" : "size-4",
+          aendern ? "size-7" : "size-4",
         )}
         style={{ left: `${anteil(wert)}%` }}
       />
