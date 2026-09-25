@@ -27,12 +27,13 @@ export function ProduktCard({ strain, className }: Props) {
     <Card className={cn("flex flex-col", className)}>
       {bild ? (
         // Referenzbild (Nutzer 2026-09-25): nicht die echte Sorte, deshalb als Symbolbild gekennzeichnet.
-        <figure className="relative flex aspect-4/3 items-center justify-center px-8 pt-8">
+        // Feste Höhe (Nutzer 2026-09-25): ein Bild mit großem Eigenformat verzog sonst die Kachelreihe.
+        <figure className="relative flex h-56 items-center justify-center overflow-hidden px-8 pt-8 pb-6">
           <Bild
             id={bild}
             dekorativ
             sizes="(min-width: 1280px) 22vw, (min-width: 640px) 45vw, 90vw"
-            className="h-full w-full object-contain"
+            className="h-full! min-h-0 w-full object-contain"
           />
           <figcaption className="absolute right-4 bottom-2 text-caption text-text-muted">Symbolbild</figcaption>
         </figure>
