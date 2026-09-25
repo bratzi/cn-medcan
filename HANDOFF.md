@@ -45,6 +45,7 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
      Sektionen, Blütenseiten; braucht KV `NEXT_INC_CACHE_KV` hinter Regional Cache, D1-Tag-Cache (+ Tag-Cache, `WORKER_SELF_REFERENCE`)
      in wrangler.jsonc und OpenNext-Config; nutzerbezogene Teile (Preise/Fachkreis, eigene Stimme) bleiben dynamisch.
      Empfehlung dem Nutzer vorlegen (Brainstorming, architektonisch).
+   - **NUTZERENTSCHEID 2026-09-25: Caching (b) ist eingeplant, kein Paid.** Mit superpowers:brainstorming starten.
 2. **Terpenlinien-Farbverlauf (Nutzerauftrag, noch nicht begonnen):** In `AromaKarte` färben sich die Bögen zu
    den Terpenen je Geschmacksachse nach Abweichung stufenlos Violett↔Grün: lila Serie („Dein Eindruck“, sonst
    „Laut Community“) höher als Hersteller → Violett; Hersteller höher (übertreibt) → Grün; Stärke nach
