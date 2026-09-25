@@ -40,6 +40,7 @@ const PROZENT = new Intl.NumberFormat("de-DE", {
 export function AromaErkundung({
   titel,
   bild,
+  kartenBild,
   terpene,
   serien,
   zeilen,
@@ -53,6 +54,8 @@ export function AromaErkundung({
   titel: string;
   /** Sortenkopf (Symbolbild groß, Herstellerangaben) über der Karte, als Server-Teil hereingereicht. */
   bild?: React.ReactNode;
+  /** Blütenbild im Kopf der Aroma-Karte (Nutzer 2026-09-25). */
+  kartenBild?: React.ReactNode;
   terpene: readonly KartenTerpen[];
   serien: readonly AromaSerie[];
   /** Community-Mittel je Terpen; Terpene ohne Bewertung starten im Sweet Spot. */
@@ -199,6 +202,7 @@ export function AromaErkundung({
         <div className="w-full min-w-0">
           <AromaKarte
             titel={titel}
+            bild={kartenBild}
             terpene={kartenTerpene}
             serien={alleSerien}
             staerken={staerken}

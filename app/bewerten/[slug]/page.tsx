@@ -5,7 +5,7 @@ import { notFound } from "next/navigation";
 import { Seitenkopf, seitenRahmen } from "@/components/layout/Seitenkopf";
 import { BewertungsFormular } from "@/components/review/BewertungsFormular";
 import { erkundungsDaten } from "@/components/review/erkundung-daten";
-import { SortenKopf } from "@/components/review/SortenKopf";
+import { KartenBild, SortenKopf } from "@/components/review/SortenKopf";
 import { buttonKlassen } from "@/components/ui";
 import { cn } from "@/lib/cn";
 import { ladeStrainDetail, ladeTerpenKatalog } from "@/lib/query/strains";
@@ -57,6 +57,7 @@ export default async function BewertenPage({ params }: PageProps<"/bewerten/[slu
             chargen={strain.chargen.map((charge) => charge.chargenNr)}
             istBetreiber={mitglied.rolle === "ADMIN"}
             katalog={katalog}
+            kartenBild={<KartenBild bildPfad={strain.herstellerBildPfad} />}
             kopf={
               <SortenKopf
                 handelsname={strain.handelsname}

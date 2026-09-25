@@ -13,6 +13,7 @@ import { Doppelseite } from "@/components/review/Doppelseite";
 import { type AromaSerie } from "@/components/review/AromaKarte";
 import { Aufklaerung } from "@/components/review/Aufklaerung";
 import { AromaErkundung } from "@/components/review/AromaErkundung";
+import { KartenBild } from "@/components/review/SortenKopf";
 import { herstellerProfil, mittlereHerstellerTreue } from "@/lib/aromakarte";
 import { alsEintrag } from "@/components/review/eintrag";
 import {
@@ -223,6 +224,7 @@ async function ProduktInhalt({ slug }: { slug: string }) {
           <div className="mt-4">
             <AromaErkundung
               titel={strain.handelsname}
+              kartenBild={<KartenBild bildPfad={strain.herstellerBildPfad} />}
               terpene={strain.terpene}
               serien={aromaSerien}
               katalog={katalog}

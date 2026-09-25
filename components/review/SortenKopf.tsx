@@ -118,3 +118,15 @@ export function SortenKopf(props: SortenKopfProps) {
     </section>
   );
 }
+
+/** Kleines Blütenbild für den Kopf der Aroma-Karte; ohne Bild nichts. */
+export function KartenBild({ bildPfad }: { bildPfad: string | null }) {
+  const bildId = blueteBild(bildPfad);
+  if (!bildId) return null;
+  return (
+    <figure className="flex flex-col items-start gap-1">
+      <Bild id={bildId} dekorativ sizes="192px" className="aspect-square w-full object-contain" />
+      <figcaption className="text-caption text-text-muted">Symbolbild</figcaption>
+    </figure>
+  );
+}

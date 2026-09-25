@@ -31,6 +31,8 @@ type Props = {
   terpene: readonly KartenTerpen[];
   serien: readonly AromaSerie[];
   titel?: string;
+  /** Blütenbild im Kopf der Karte, links neben Name und Legende (Server-Teil). */
+  bild?: React.ReactNode;
   /** Von außen hervorgehobene Achse (Regler in der Spielwiese); schlägt das Überfahren. */
   hervorheben?: number | null;
   /** Stärke je Terpen (0 bis 1) für das Leuchten der Pfade; sonst aus den Herstellerangaben. */
@@ -107,6 +109,7 @@ export function AromaKarte({
   terpene,
   serien: roheSerien,
   titel = "Aroma-Karte",
+  bild,
   hervorheben = null,
   staerken,
   ergaenzt = [],
@@ -198,6 +201,10 @@ export function AromaKarte({
 
   return (
     <figure className="flex flex-col gap-6">
+      {/* Kopf der Karte: Blütenbild links, daneben Name, Ansicht und Legende (Nutzer 2026-09-25). */}
+      <div className={cn("grid grid-cols-1 items-center gap-6", bild ? "sm:grid-cols-[auto_minmax(0,1fr)] sm:gap-8" : null)}>
+      {bild ? <div className="w-32 sm:w-40 lg:w-48">{bild}</div> : null}
+      <div className="flex min-w-0 flex-col gap-6">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <figcaption className="font-buch text-h2 font-medium text-text">{titel}</figcaption>
         <div role="group" aria-label="Ansicht" className="inline-flex rounded-full border border-border-strong p-1">
@@ -227,6 +234,8 @@ export function AromaKarte({
           </li>
         ))}
       </ul>
+      </div>
+      </div>
 
       <div
         ref={messRef}

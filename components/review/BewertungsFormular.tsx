@@ -26,6 +26,8 @@ type Props = {
   katalog?: readonly KatalogEintrag[];
   /** Sortenkopf (Server-Teil), ganz oben wie auf der Startseite. */
   kopf: React.ReactNode;
+  /** Blütenbild im Kopf der Aroma-Karte. */
+  kartenBild?: React.ReactNode;
   /** Daten der Erkundung aus den bisherigen Bewertungen (erkundungsDaten). */
   serien: readonly AromaSerie[];
   treue: Treue | null;
@@ -49,6 +51,7 @@ export function BewertungsFormular({
   istBetreiber,
   katalog = [],
   kopf,
+  kartenBild,
   ...daten
 }: Props) {
   const router = useRouter();
@@ -91,7 +94,7 @@ export function BewertungsFormular({
     <form onSubmit={absenden} className="flex flex-col gap-16 md:gap-24">
       <input type="hidden" name="strainId" value={strainId} />
 
-      <AromaErkundung titel={handelsname} bild={kopf} terpene={terpene} katalog={katalog} eingabe {...daten} />
+      <AromaErkundung titel={handelsname} bild={kopf} kartenBild={kartenBild} terpene={terpene} katalog={katalog} eingabe {...daten} />
 
       <section className="flex flex-col gap-6 border-t border-border pt-8">
         <h2 className="font-buch text-h2 font-medium text-text">Charge und Notiz</h2>
