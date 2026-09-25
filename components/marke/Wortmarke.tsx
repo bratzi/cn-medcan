@@ -22,7 +22,16 @@ type Props = {
  */
 export function Wortmarke({ groesse, einzeilig = false, className }: Props) {
   if (groesse === "kopf") {
-    return <span className={cn("font-hand text-marke text-kopierstift", className)}>Book of Terpz</span>;
+    // Etwas kräftiger (Nutzer 2026-09-26): Inspiration hat nur einen Schnitt,
+    // eine feine Kontur in der Schriftfarbe verdickt den Strich.
+    return (
+      <span
+        className={cn("font-hand text-marke text-kopierstift", className)}
+        style={{ WebkitTextStroke: "0.025em currentColor" }}
+      >
+        Book of Terpz
+      </span>
+    );
   }
 
   const signatur = groesse === "plakat";
