@@ -3,7 +3,7 @@ import Link from "next/link";
 import { NavLink } from "@/components/layout/NavLink";
 import { ThemaSchalter } from "@/components/layout/ThemaSchalter";
 import { Wortmarke } from "@/components/marke/Wortmarke";
-import { buttonKlassen } from "@/components/ui/Button";
+import { KopfZustand } from "@/components/layout/KopfZustand";
 import { HAUPTNAVIGATION, KONTO_LINK } from "@/lib/navigation";
 
 /**
@@ -22,20 +22,24 @@ import { HAUPTNAVIGATION, KONTO_LINK } from "@/lib/navigation";
  * Die Leiste scrollt seitlich; overflow-x schneidet dann auch senkrecht ab,
  * deshalb py-2 (mit -my-2 ausgeglichen) als Platz für den Fokusring.
  */
+// Kapitel-Link: Nummer von Hand, Wort gedruckt, Unterstrich zieht sich beim
+// Hover wie ein Stiftstrich im Farbverlauf ein (globals.css .kapitel-link).
 const NAV_LINK =
-  "group inline-flex h-11 items-center gap-2 rounded-full px-4 text-small font-medium whitespace-nowrap text-text " +
-  "transition-colors duration-fast ease-standard hover:bg-surface-sunken";
+  "kapitel-link group inline-flex h-11 items-center gap-2 px-3 text-small font-medium whitespace-nowrap text-text " +
+  "transition-colors duration-fast ease-standard";
+
+const THEMA_LINK =
+  "inline-flex h-11 items-center px-3 text-small font-medium whitespace-nowrap text-text-muted " +
+  "transition-colors duration-fast ease-standard hover:text-text";
 
 const AKTIV = "underline decoration-text decoration-2 underline-offset-8";
 
-/** Aktiv-Markierung nur am Wort: die Nummer ist Dekoration (aria-hidden). */
-const AKTIV_WORT =
-  "group-aria-[current=page]:underline group-aria-[current=page]:decoration-text " +
-  "group-aria-[current=page]:decoration-2 group-aria-[current=page]:underline-offset-8";
+/** Das Wort trägt den Stiftstrich; die Nummer ist Dekoration (aria-hidden). */
+const AKTIV_WORT = "kapitel-wort";
 
 export function Kopf() {
   return (
-    <header className="relative z-10 border-b border-border bg-surface">
+    <header data-kopf="" className="kopf fixed inset-x-0 top-0 z-40">
       <div className="mx-auto grid w-full max-w-360 grid-cols-[1fr_auto_auto] items-center gap-x-4 gap-y-2 px-4 py-2 sm:px-8 lg:grid-cols-[auto_1fr_auto_auto]">
         <Link href="/" className="inline-flex min-h-11 items-center justify-self-start px-2">
           <Wortmarke groesse="kopf" />
@@ -49,8 +53,8 @@ export function Kopf() {
             {HAUPTNAVIGATION.map((eintrag, index) => (
               <li key={eintrag.href} className="shrink-0 snap-start">
                 <NavLink href={eintrag.href} className={NAV_LINK} aktivKlasse="">
-                  <span aria-hidden="true" className="numeric text-caption text-text-muted">
-                    {String(index + 1).padStart(2, "0")}
+                  <span aria-hidden="true" className="kapitel-nummer font-hand text-vermerk leading-none">
+                    {index + 1}
                   </span>
                   <span className={AKTIV_WORT}>{eintrag.text}</span>
                 </NavLink>
@@ -59,16 +63,17 @@ export function Kopf() {
           </ul>
         </nav>
 
-        <ThemaSchalter className={`${NAV_LINK} col-start-2 row-start-1 lg:col-start-3`} />
+        <ThemaSchalter className={`${THEMA_LINK} col-start-2 row-start-1 lg:col-start-3`} />
 
         <NavLink
           href={KONTO_LINK.href}
-          className={buttonKlassen("secondary", "md", "col-start-3 row-start-1 lg:col-start-4")}
+          className="konto-pille col-start-3 row-start-1 inline-flex h-11 items-center rounded-full px-5 text-small font-medium text-text lg:col-start-4"
           aktivKlasse={AKTIV}
         >
           {KONTO_LINK.text}
         </NavLink>
       </div>
+      <KopfZustand />
     </header>
   );
 }

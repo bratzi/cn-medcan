@@ -782,3 +782,98 @@ html.bud-cursor :is(input:not([type="range"]):not([type="radio"]):not([type="che
     transform: translateY(-10px) rotate(1.5deg) scale(1.05);
   }
 }
+
+/* Kopf (components/layout/Kopf.tsx): fest, transparent; beim Scrollen ein
+   Streifen Papier. Über dem Auftakt leiht KopfZustand die Bühnen-Tokens. */
+.kopf {
+  background: transparent;
+  border-bottom: 1px solid transparent;
+  transition:
+    background-color 0.35s var(--ease-standard),
+    border-color 0.35s var(--ease-standard),
+    backdrop-filter 0.35s var(--ease-standard);
+}
+
+.kopf[data-gescrollt] {
+  background: color-mix(in oklab, var(--color-surface) 82%, transparent);
+  border-bottom-color: var(--color-border);
+  backdrop-filter: blur(12px) saturate(1.2);
+  -webkit-backdrop-filter: blur(12px) saturate(1.2);
+}
+
+/* Kapitel-Nummer von Hand, im Verlauf. */
+.kapitel-nummer {
+  background-image: linear-gradient(90deg, var(--color-accent), var(--color-kopierstift));
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  padding: 0.15em 0.2em;
+  margin: -0.15em -0.1em -0.15em -0.2em;
+  translate: 0 0.08em;
+  opacity: 0.85;
+}
+
+/* Stiftstrich unter dem Wort: zieht sich beim Hover von links ein, bleibt beim aktiven Kapitel. */
+.kapitel-wort {
+  position: relative;
+}
+
+.kapitel-wort::after {
+  content: "";
+  position: absolute;
+  inset-inline: -0.1em;
+  bottom: -0.35em;
+  height: 2px;
+  border-radius: 9999px;
+  background: linear-gradient(90deg, var(--color-accent), var(--color-kopierstift));
+  transform: scaleX(0) rotate(-1deg);
+  transform-origin: left center;
+  transition: transform 0.45s var(--ease-standard);
+}
+
+.kapitel-link:hover .kapitel-wort::after,
+.kapitel-link:focus-visible .kapitel-wort::after,
+.kapitel-link[aria-current="page"] .kapitel-wort::after {
+  transform: scaleX(1) rotate(-1deg);
+}
+
+/* Konto: Pille mit Verlaufsrand, füllt sich beim Hover zart. */
+.konto-pille {
+  border: 1.5px solid transparent;
+  background:
+    linear-gradient(var(--color-surface), var(--color-surface)) padding-box,
+    linear-gradient(90deg, var(--color-accent), var(--color-kopierstift)) border-box;
+  transition: background 0.3s var(--ease-standard), box-shadow 0.3s var(--ease-standard);
+}
+
+.kopf:not([data-gescrollt]) .konto-pille {
+  background:
+    linear-gradient(color-mix(in oklab, var(--color-surface) 40%, transparent), color-mix(in oklab, var(--color-surface) 40%, transparent)) padding-box,
+    linear-gradient(90deg, var(--color-accent), var(--color-kopierstift)) border-box;
+}
+
+.konto-pille:hover,
+.konto-pille[aria-current="page"] {
+  background:
+    linear-gradient(color-mix(in oklab, var(--color-accent) 14%, var(--color-surface)), color-mix(in oklab, var(--color-kopierstift) 14%, var(--color-surface))) padding-box,
+    linear-gradient(90deg, var(--color-accent), var(--color-kopierstift)) border-box;
+  box-shadow: 0 0 0 4px color-mix(in oklab, var(--color-kopierstift) 12%, transparent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .kapitel-wort::after,
+  .kopf,
+  .konto-pille {
+    transition: none;
+  }
+}
+
+/* Wortmarke im Fuß: derselbe Verlauf wie im Auftakt, blass. */
+.fuss-marke [data-marke-zeile] {
+  background-image: linear-gradient(90deg, var(--color-accent), var(--color-kopierstift) 55%, var(--color-accent));
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  padding: 0.2em 0.3em 0.25em 0.25em;
+  margin: -0.2em -0.3em -0.25em -0.25em;
+}

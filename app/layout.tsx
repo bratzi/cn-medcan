@@ -59,7 +59,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
 
         <Kopf />
 
-        <main id="inhalt" className="flex-1">
+        <main id="inhalt" className="flex-1 pt-(--kopf-h,4rem)">
           {children}
         </main>
 

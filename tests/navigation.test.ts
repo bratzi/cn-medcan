@@ -44,5 +44,7 @@ test("Kopf: Aktiv-Markierung nur am Wort, nicht an der Nummer", async () => {
   const { renderToStaticMarkup } = await import("react-dom/server");
   const { Kopf } = await import("@/components/layout/Kopf");
   const html = renderToStaticMarkup(createElement(Kopf));
-  assert.match(html, /group-aria-\[current=page\]:underline/);
+  // Stiftstrich (globals.css .kapitel-wort::after) sitzt am Wort, die Nummer bleibt aria-hidden.
+  assert.match(html, /<span class="kapitel-wort">/);
+  assert.match(html, /<span aria-hidden="true" class="kapitel-nummer/);
 });

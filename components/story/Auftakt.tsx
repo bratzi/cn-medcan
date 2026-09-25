@@ -26,7 +26,7 @@ export function Auftakt() {
     <section
       aria-labelledby="auftakt-titel"
       data-story="auftakt"
-      className="buehne-dunkel relative isolate flex min-h-svh flex-col overflow-hidden pt-16 pb-16 sm:pb-24"
+      className="buehne-dunkel relative isolate -mt-(--kopf-h,4rem) flex min-h-svh flex-col overflow-hidden pt-[calc(var(--kopf-h,4rem)+4rem)] pb-16 sm:pb-24"
     >
       <div aria-hidden="true" data-story="auftakt-film" className="pointer-events-none absolute inset-0 -z-10">
         <Loop id="auftakt-loop" buehne className="h-full opacity-45" />
