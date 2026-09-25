@@ -68,6 +68,7 @@ async function herstellerSichern(name: string): Promise<string | null> {
 
 function neuLaden(slug?: string) {
   revalidatePath("/admin");
+  revalidatePath("/admin/vorschlaege");
   revalidatePath("/mitglied");
   revalidatePath("/produkte");
   if (slug) revalidatePath(`/produkte/${slug}`);

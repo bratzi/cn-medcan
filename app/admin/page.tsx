@@ -1,9 +1,9 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
+import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 
 import { BewertungFreigabe } from "@/components/admin/BewertungFreigabe";
-import { BlueteVorschlaege } from "@/components/admin/BlueteVorschlaege";
 import { ErgebnisListe } from "@/components/admin/ErgebnisListe";
 import { MitgliedAktionen } from "@/components/admin/MitgliedAktionen";
 import { RundeAnlegenFormular } from "@/components/admin/RundeAnlegenFormular";
@@ -11,6 +11,7 @@ import { RundeSteuerung } from "@/components/admin/RundeSteuerung";
 import { VorschlagListe } from "@/components/admin/VorschlagListe";
 import {
   Badge,
+  buttonKlassen,
   Card,
   CardBody,
   CardHeader,
@@ -363,6 +364,36 @@ async function MitgliederBereich({ eigeneMitgliedId }: { eigeneMitgliedId: strin
   );
 }
 
+/**
+ * Nur die Zahl der offenen Blütenvorschläge; geprüft wird auf /admin/vorschlaege.
+ * Eine Zählabfrage statt der ganzen Prüfung: mit ihr sprengte /admin live die
+ * 10-ms-CPU-Grenze (2026-09-25).
+ */
+async function VorschlaegeKarte() {
+  const prisma = await getPrisma();
+  const offen = await prisma.sortenVorschlag.count({ where: { status: "OFFEN" } });
+  return (
+    <section aria-labelledby="vorschlaege-karte-titel">
+      <Card>
+        <CardHeader>
+          <h2 id="vorschlaege-karte-titel" className="text-h3 text-text">
+            Vorgeschlagene Blüten
+          </h2>
+        </CardHeader>
+        <CardBody className="flex flex-wrap items-center justify-between gap-4">
+          <p className="text-body text-text">
+            <span className="numeric">{offen}</span> {offen === 1 ? "Vorschlag wartet" : "Vorschläge warten"} auf
+            Prüfung.
+          </p>
+          <Link href="/admin/vorschlaege" className={buttonKlassen(offen > 0 ? "primary" : "secondary")}>
+            Zur Prüfung
+          </Link>
+        </CardBody>
+      </Card>
+    </section>
+  );
+}
+
 export default async function AdminPage() {
   const mitglied = await aktuellesMitglied();
   if (!mitglied) redirect("/anmelden?weiter=%2Fadmin");
@@ -388,8 +419,8 @@ export default async function AdminPage() {
           <UmfrageBereich />
         </Suspense>
 
-        <Suspense fallback={<Spinner text="Vorschläge werden geladen" />}>
-          <BlueteVorschlaege />
+        <Suspense fallback={<Spinner text="Vorschläge werden gezählt" />}>
+          <VorschlaegeKarte />
         </Suspense>
 
         <Suspense fallback={<Spinner text="Ergebnisse werden geladen" />}>

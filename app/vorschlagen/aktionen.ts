@@ -71,5 +71,6 @@ export async function blueteVorschlagen(formData: FormData): Promise<VorschlagEr
 
   revalidatePath("/mitglied");
   revalidatePath("/admin");
+  revalidatePath("/admin/vorschlaege");
   return { ok: true };
 }

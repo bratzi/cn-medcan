@@ -58,7 +58,7 @@ const RINGE = [
  */
 function Punkt({ punkt }: { punkt: (typeof PUNKTE)[number] }) {
   return (
-    <aside className="flex w-56 shrink-0 flex-col items-center gap-6 text-center md:w-sm">
+    <aside className="flex w-64 shrink-0 flex-col items-center gap-6 text-center md:w-md lg:w-lg">
       <div data-punkt="" className="relative aspect-square w-full">
         {RINGE.map((ring, index) => (
           <span
@@ -106,11 +106,11 @@ function Paar({
   const videoLinks = punkt.seite === "links";
   return (
     <div
-      className={`${erster ? "mt-24 md:mt-32" : "mt-[35vh] md:mt-[50vh]"} flex flex-col items-center gap-12 md:flex-row md:gap-24`}
+      className={`${erster ? "mt-24 md:mt-32" : "mt-[18vh] md:mt-[25vh]"} flex flex-col items-center gap-12 md:flex-row md:justify-center md:gap-24`}
     >
       <p
         data-manifest-zeile=""
-        className={`font-buch text-erzaehlung text-text md:flex-1 ${videoLinks ? "md:order-2" : ""}`}
+        className={`font-buch text-erzaehlung leading-[1.08] text-text md:max-w-[20ch] ${videoLinks ? "md:order-2" : ""}`}
       >
         {children}
       </p>
