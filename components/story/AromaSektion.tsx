@@ -64,7 +64,15 @@ export function AromaSektion() {
       <Schlagwort satz="stimmt das?" ton="gruen" oben="bottom-0 translate-y-1/2" />
       <div className="mx-auto w-full max-w-360">
         <h2 id="aroma-titel" className="max-w-4xl font-buch text-kapitel text-text text-balance">
-          Was der Hersteller verspricht, <em className="farbverlauf hand-betont">prüfen wir nach.</em>
+          Was der Hersteller verspricht,{" "}
+          {/* Übergroße Display-Zeile (Nutzer 2026-09-25): ragt links über den Inhaltsrand
+              in den Leerraum, Kontur macht die einstrichige Handschrift kräftiger. */}
+          <em
+            className="gross-hand farbverlauf -ml-[4vw] block font-hand text-kulisse not-italic whitespace-nowrap leading-[0.85] md:-ml-[6vw]"
+            style={{ fontSize: "clamp(5rem, 1rem + 17vw, 22rem)" }}
+          >
+            prüfen wir nach.
+          </em>
         </h2>
         <p className="mt-6 max-w-[60ch] text-body text-text-muted text-pretty">
           Erst der Gesamteindruck, dann die Terpene: Grün ist das Profil, das die Herstellerangaben erwarten lassen,

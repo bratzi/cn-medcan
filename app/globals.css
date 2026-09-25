@@ -524,6 +524,13 @@
 
 /* Betonung in Überschriften: Logo-Handschrift statt Kursiv, größer, weil die
    Schreibschrift eine kleine x-Höhe hat. */
+/* Übergroße Handschrift-Zeile (AromaSektion): feine Kontur in der Markenfarbe,
+   damit die einstrichige Schrift in Plakatgröße Gewicht bekommt. */
+.gross-hand {
+  -webkit-text-stroke: 0.014em color-mix(in oklab, var(--color-kopierstift) 60%, var(--color-accent));
+  padding-inline-end: 0.1em;
+}
+
 .hand-betont {
   font-family: var(--font-hand);
   font-style: normal;
