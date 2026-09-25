@@ -28,7 +28,29 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 
 ## ⇢ Hier geht es weiter
 
-### ⇢ NÄCHSTE SESSION BEGINNT HIER (Stand 2026-09-25, Session 19, Save for Clear)
+### ⇢ STAND SESSION 20 (2026-09-25)
+
+**Gepusht (live noch nicht per Sichtprüfung gesehen; Gate-Passwort neu, Nutzer muss im Chrome-Tab anmelden):**
+- Kopf-Navigation in gesperrten Versalien; Hero-Wortmarke pulsiert (`.marke-puls` an der h1).
+- Aroma-Erkundung: `SortenKopf` (components/review/SortenKopf.tsx) als großes Titelblatt ganz oben (Bild, Kultivar,
+  Typ, THC/CBD, Hersteller, Genetik, Terpenbalken), Daten über `erkundungsDaten()` (components/review/erkundung-daten.ts);
+  Fazit nach Schritt 3; Schrittziffern feste Höhe 28rem, Inhalt `md:pl-24`; Karte: Terpenspalte 220 vor rechtem Rand,
+  Balkenlänge `balkenLaenge()` = 110 + 30 % der Mehrbreite; Regler halbe Schritte, größere Griffe/Trefferflächen.
+- Bewertungsmaske /bewerten/[slug] = AromaErkundung mit `eingabe` (versteckte Felder note-*, geschmack-*,
+  beschaffenheit-*, feuchtigkeit; Wirkung als 5. Note nur dort); NotenRegler/BeschaffenheitsRegler gelöscht.
+  **Terpen-Intensität (Sweet Spot) wird in der Maske nicht mehr erfasst** — Nutzer ggf. fragen.
+- Blütenkacheln feste Bildhöhe h-56 (`h-full!`, weil Bild selbst h-auto setzt und cn nicht mergt).
+- Storytelling: Buchschrift, je Absatz ein Schlagwort `Buzz` (Logoschrift, Farbverlauf).
+- Secrets: SITE_PASSWORD neu, SITE_SESSION_SECRET rotiert (Nutzer selbst; Secret-Writes sind für Claude gesperrt,
+  `wrangler deployments list` ist erlaubt).
+
+**Caching:** Spike `4d5195b` (KV `260615e2b66348b9b9fb8b7def46c5a4`, D1 `cn-medcan-tags`
+`c71695ff-7eee-4c05-af39-2f39f0865b60` existieren weiter) brach den Cloudflare-Build (`"remote": true` am D1-Binding);
+per Revert zurück, Build lief danach. 1102 besteht weiter, sogar /zugang (exceededCpu, 10 ms). Nächster Versuch ohne
+Build-DB: Seiten zur Laufzeit cachen (ISR ohne Buildzeit-Prerender, z. B. `generateStaticParams` leer bzw.
+dynamische Erstbefüllung), Spec/Plan anpassen, Nutzer vorlegen. Build-Log bei Fehlern im Dashboard lesen lassen.
+
+### (Vorher) NÄCHSTE SESSION BEGINNT HIER (Stand 2026-09-25, Session 19, Save for Clear)
 
 **Neu aus Session 19 (alles gepusht bis `60a7a88`, Tests 191/191, live noch NICHT per Screenshot gesehen):**
 - Hero-Zeile „Cannabis, offen gelegt.“ in `uppercase tracking-gesperrt` (font-sans), Grad bleibt.
