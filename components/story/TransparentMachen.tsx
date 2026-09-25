@@ -8,7 +8,7 @@ import { Loop } from "@/components/medien/Loop";
  * 2026-09-25 in der Reihenfolge der Bewertung: Gesamteindruck, Terpene,
  * Beschaffenheit (wie die Aroma-Erkundung). Große
  * Bilder in ungleichen, leicht verlaufenen Kreisen (unperfekt mit Absicht),
- * um die der Manifest-Text fließt (float mit shape-outside: ellipse).
+ * neben denen der Absatz steht (Paar, seit 2026-09-25 nebeneinander statt umflossen).
  */
 const PUNKTE = [
   {
@@ -57,11 +57,8 @@ const RINGE = [
  * Reduzierte Bewegung: alles steht, das Standbild bleibt (globals.css).
  */
 function Punkt({ punkt }: { punkt: (typeof PUNKTE)[number] }) {
-  const seite = punkt.seite === "rechts" ? "float-right ml-10 md:ml-16" : "float-left mr-10 md:mr-16";
   return (
-    <aside
-      className={`${seite} my-24 flex w-56 flex-col items-center gap-6 text-center md:my-32 md:w-sm [shape-margin:2.5rem] [shape-outside:ellipse(50%_45%)]`}
-    >
+    <aside className="flex w-56 shrink-0 flex-col items-center gap-6 text-center md:w-sm">
       <div data-punkt="" className="relative aspect-square w-full">
         {RINGE.map((ring, index) => (
           <span
@@ -91,12 +88,34 @@ function Punkt({ punkt }: { punkt: (typeof PUNKTE)[number] }) {
   );
 }
 
-/** Ein Absatz des Manifests: scroll-gekoppelt Wort für Wort sichtbar (transparent.ts). */
-function Zeile({ children }: { children: ReactNode }) {
+/**
+ * Absatz und Video als Paar (Nutzer 2026-09-25): nebeneinander, vertikal mittig
+ * zueinander, das Video im Wechsel rechts und links. Der große Abstand liegt
+ * zwischen den Paaren, nie zwischen Video und Text. Der Absatz deckt sich
+ * scroll-gekoppelt Wort für Wort auf (transparent.ts).
+ */
+function Paar({
+  punkt,
+  erster = false,
+  children,
+}: {
+  punkt: (typeof PUNKTE)[number];
+  erster?: boolean;
+  children: ReactNode;
+}) {
+  const videoLinks = punkt.seite === "links";
   return (
-    <p data-manifest-zeile="" className="mt-[35vh] font-buch text-erzaehlung text-text md:mt-[50vh]">
-      {children}
-    </p>
+    <div
+      className={`${erster ? "mt-24 md:mt-32" : "mt-[35vh] md:mt-[50vh]"} flex flex-col items-center gap-12 md:flex-row md:gap-24`}
+    >
+      <p
+        data-manifest-zeile=""
+        className={`font-buch text-erzaehlung text-text md:flex-1 ${videoLinks ? "md:order-2" : ""}`}
+      >
+        {children}
+      </p>
+      <Punkt punkt={punkt} />
+    </div>
   );
 }
 
@@ -114,26 +133,23 @@ export function TransparentMachen() {
       className="relative isolate overflow-x-clip px-4 py-24 sm:px-8 sm:py-32"
     >
       <div className="mx-auto w-full max-w-360">
-        <div data-story="manifest" className="flow-root">
+        <div data-story="manifest">
           <h2 id="transparent-titel" data-manifest-zeile="" className="font-buch text-erzaehlung text-text text-balance">
             Hinter jedem Handelsnamen steckt ein <em className="farbverlauf font-hand text-erzaehlung not-italic">Terpenprofil.</em> Wir
             schreiben auf, was drin ist.
           </h2>
-          <Punkt punkt={PUNKTE[0]} />
-          <Zeile>
+          <Paar punkt={PUNKTE[0]} erster>
             Zuerst der Gesamteindruck. Nicht, was auf der Dose steht, sondern wie sie aussieht, wie sie riecht, wie
             sie schmeckt.
-          </Zeile>
-          <Punkt punkt={PUNKTE[1]} />
-          <Zeile>
+          </Paar>
+          <Paar punkt={PUNKTE[1]}>
             Jedes Terpen bekommt seine <em className="farbverlauf font-hand text-erzaehlung not-italic">eigene Note.</em> Daneben
             steht, was der Hersteller angibt, und wie weit die Community davon abweicht.
-          </Zeile>
-          <Punkt punkt={PUNKTE[2]} />
-          <Zeile>
+          </Paar>
+          <Paar punkt={PUNKTE[2]}>
             Zum Schluss die Beschaffenheit: Dichte, Trichome, Feuchte. Dann stimmen wir ab, was als Nächstes
             drankommt, und alle wissen danach ein bisschen mehr.
-          </Zeile>
+          </Paar>
         </div>
       </div>
     </section>
