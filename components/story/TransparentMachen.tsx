@@ -88,7 +88,7 @@ function Punkt({ punkt }: { punkt: (typeof PUNKTE)[number] }) {
           tiefe="2"
           ton={punkt.glas}
           className="-inset-[18%]"
-          versatz={punkt.seite === "links" ? ["8%", "8%"] : ["-8%", "8%"]}
+          versatz={punkt.seite === "links" ? ["12%", "6%"] : ["-12%", "6%"]}
         />
       </div>
       {/* Pause fuer die Videos (WCAG 2.2.2); sichtbar erst, wenn loops.ts sie startet. */}
