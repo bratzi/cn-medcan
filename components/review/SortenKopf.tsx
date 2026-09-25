@@ -50,7 +50,13 @@ export function SortenKopf(props: SortenKopfProps) {
       <div className="flex min-w-0 flex-col gap-8">
         <div className="flex flex-col gap-4">
           <p className="text-small uppercase tracking-gesperrt text-text-muted">Das bewerten wir</p>
-          <h3 className="font-buch text-kapitel text-balance text-text wrap-break-word hyphens-auto">{props.handelsname}</h3>
+          {/* Logoschrift im Farbverlauf wie die Schlagworte (Nutzer 2026-09-25). */}
+          <h3
+            className="farbverlauf font-hand text-balance wrap-break-word leading-[0.9]"
+            style={{ fontSize: "calc(var(--text-kapitel) * 1.35)" }}
+          >
+            {props.handelsname}
+          </h3>
           {props.kultivarName ? (
             <p className="font-buch text-h3 font-medium italic text-text">{props.kultivarName}</p>
           ) : null}
