@@ -2,6 +2,8 @@ import { abstimmung } from "./abstimmung";
 import { auftakt, auftaktFilm } from "./auftakt";
 import { eintrag } from "./eintrag";
 import { starteBlaetter } from "./blaetter";
+
+const BLAETTER_AN = false;
 import { beobachteLoops } from "./loops";
 import { randnotizen } from "./randnotizen";
 import { schleife } from "./schleife";
@@ -106,9 +108,10 @@ export async function starteBuehne(): Promise<() => void> {
   window.addEventListener("load", neuMessen);
   const loops = beobachteLoops();
 
-  // 3D-Blätter nur ab Tablet: auf kleinen Geräten kostet WebGL zu viel Akku.
+  // 3D-Blätter vorerst aus (Nutzer 2026-09-25: passt nicht rein, Code bleibt für später).
+  // Wieder an: BLAETTER_AN auf true. Nur ab Tablet: auf kleinen Geräten kostet WebGL zu viel Akku.
   let blaetterStopp: (() => void) | null = null;
-  if (window.matchMedia(AB_TABLET).matches) {
+  if (BLAETTER_AN && window.matchMedia(AB_TABLET).matches) {
     void starteBlaetter(() => lenis.velocity)
       .then((stopp) => {
         if (beendet) stopp();

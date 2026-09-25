@@ -79,7 +79,7 @@
   /* Redesign 7 (Referenz choreograffiti): Handschrift riesig von Rand zu Rand.
      plakat: die Wortmarke als Titel im Auftakt. kulisse: Buzz-Sätze blass
      hinter den Sektionen. Beide nie unter 32 px. */
-  --text-plakat: clamp(8rem, 1rem + 21vw, 34rem);
+  --text-plakat: clamp(7rem, 1rem + 18vw, 26rem);
   --text-plakat--line-height: 0.9;
   --text-plakat--font-weight: 400;
 
@@ -518,7 +518,13 @@
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  padding-inline-end: 0.08em;
+  /* Schreibschrift-Schwünge ragen über die Zeichenbox hinaus; der Verlauf wird
+     nur innerhalb der Box gemalt. Mehr Malfläche, per negativem Rand
+     ausgeglichen, damit sich das Layout nicht verschiebt. */
+  padding: 0.2em 0.3em 0.25em 0.25em;
+  margin: -0.2em -0.3em -0.25em -0.25em;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
 }
 
 /* Sweet-Spot-Spur (Spec Redesign 15): blass an den Rändern, grün in der Mitte. */
@@ -562,7 +568,13 @@
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  padding-inline-end: 0.08em;
+  /* Schreibschrift-Schwünge ragen über die Zeichenbox hinaus; der Verlauf wird
+     nur innerhalb der Box gemalt. Mehr Malfläche, per negativem Rand
+     ausgeglichen, damit sich das Layout nicht verschiebt. */
+  padding: 0.2em 0.3em 0.25em 0.25em;
+  margin: -0.2em -0.3em -0.25em -0.25em;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
 }
 
 @media (hover: hover) and (prefers-reduced-motion: no-preference) {
@@ -576,5 +588,90 @@
 
   .auftakt-marke:hover [data-marke-zeile] + [data-marke-zeile] {
     transition-delay: 0.12s;
+  }
+}
+
+/* Bud-Cursor (components/layout/BudCursor.tsx): ersetzt den Mauszeiger nur
+   bei feiner Maus; Textfelder behalten den Textcursor. */
+html.bud-cursor,
+html.bud-cursor * {
+  cursor: none !important;
+}
+
+html.bud-cursor :is(input:not([type="range"]):not([type="radio"]):not([type="checkbox"]), textarea, [contenteditable]) {
+  cursor: text !important;
+}
+
+.bud-zeiger {
+  --roest: 0;
+  position: fixed;
+  top: -9px;
+  left: -9px;
+  z-index: 2147483647;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s;
+  /* Dezent: grau, mit hauchfeinem Rand, damit er auf Hell und Dunkel erkennbar bleibt. */
+  color: #8a8a8a;
+  filter: drop-shadow(0 0 1px color-mix(in oklab, var(--color-surface) 80%, transparent));
+}
+
+.bud-zeiger[data-sichtbar] {
+  opacity: 0.85;
+}
+
+.bud-zeiger svg {
+  display: block;
+  transition: transform 0.15s var(--ease-standard);
+}
+
+.bud-zeiger .bud-koerper,
+.bud-zeiger .bud-haerchen {
+  fill: currentColor;
+  transition: fill 0.2s;
+}
+
+.bud-zeiger .bud-haerchen {
+  fill: #d0d0d0;
+}
+
+/* Klick: grün. Gehalten: röstet über --roest (0 bis 1) ins Braune. */
+.bud-zeiger[data-gedrueckt] {
+  opacity: 1;
+}
+
+.bud-zeiger[data-gedrueckt] svg {
+  transform: scale(1.15);
+}
+
+.bud-zeiger[data-gedrueckt] .bud-koerper {
+  fill: color-mix(in oklab, #4f9d5b calc((1 - var(--roest)) * 100%), #6b3f1d);
+}
+
+.bud-zeiger[data-gedrueckt] .bud-haerchen {
+  fill: color-mix(in oklab, #d98a3a calc((1 - var(--roest)) * 100%), #2a1a0e);
+}
+
+/* Duftschwaden: kleine Wölkchen, steigen auf und verwehen; je gerösteter, desto dunkler. */
+.bud-schwade {
+  --drift: 0px;
+  --roest: 0;
+  position: fixed;
+  z-index: 2147483646;
+  width: 8px;
+  height: 8px;
+  margin: -4px 0 0 -4px;
+  border-radius: 9999px;
+  pointer-events: none;
+  background: color-mix(in oklab, #9ed9a6 calc((1 - var(--roest)) * 100%), #8a7a6a);
+  filter: blur(2px);
+  opacity: 0.6;
+  animation: bud-schwade 1.4s ease-out forwards;
+}
+
+@keyframes bud-schwade {
+  to {
+    transform: translate(var(--drift), -48px) scale(3);
+    opacity: 0;
   }
 }
