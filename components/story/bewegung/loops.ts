@@ -13,7 +13,12 @@ export function beobachteLoops(): { stoppen: () => void } {
   const inDerNaehe = new Set<HTMLVideoElement>();
   let angehalten = false;
 
-  const abspielen = (video: HTMLVideoElement) => void video.play().catch(() => undefined);
+  const abspielen = (video: HTMLVideoElement) => {
+    // Eigenes Tempo je Video (data-tempo, z. B. Hero langsamer).
+    const tempo = Number(video.dataset.tempo);
+    if (tempo > 0) video.playbackRate = tempo;
+    void video.play().catch(() => undefined);
+  };
   const beschriften = () => {
     for (const knopf of schalter) {
       knopf.setAttribute("aria-label", angehalten ? "Video abspielen" : "Video anhalten");

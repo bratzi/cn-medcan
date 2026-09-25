@@ -107,7 +107,7 @@ function Paar({
   const videoLinks = punkt.seite === "links";
   return (
     <div
-      className={`${erster ? "mt-24 md:mt-32" : "mt-[18vh] md:mt-[25vh]"} flex flex-col items-center gap-12 md:flex-row md:justify-center md:gap-24`}
+      className={`${erster ? "mt-32 md:mt-48" : "mt-[18vh] md:mt-[25vh]"} flex flex-col items-center gap-12 md:flex-row md:justify-center md:gap-24`}
     >
       {/* Buchschrift; nur das eine Schlagwort je Absatz (Buzz) steht in der Logoschrift (Nutzer 2026-09-25). */}
       <p
@@ -151,7 +151,7 @@ export function TransparentMachen() {
     >
       <div className="mx-auto w-full max-w-360">
         <div data-story="manifest">
-          <h2 id="transparent-titel" data-manifest-zeile="" className="font-buch text-erzaehlung text-text text-balance">
+          <h2 id="transparent-titel" data-manifest-zeile="" className="mx-auto max-w-4xl text-center font-buch text-erzaehlung text-text text-balance">
             Hinter jedem Handelsnamen steckt ein <Buzz>Terpenprofil.</Buzz> Wir
             schreiben auf, was drin ist.
           </h2>
