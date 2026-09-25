@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { signIn } from "@/lib/auth-client";
+import { zaehlerZuruecksetzen } from "@/components/layout/konto-zaehler-speicher";
 import { Button, Input } from "@/components/ui";
 import { fehlertext } from "./fehlertexte";
 
@@ -36,6 +37,7 @@ export function AnmeldeFormular({ weiter }: Props) {
 
     // refresh() ist nicht optional: die Serverkomponenten haben noch den
     // abgemeldeten Zustand im Cache, sonst zeigt /mitglied die Anmeldeseite.
+    zaehlerZuruecksetzen();
     router.push(weiter);
     router.refresh();
   }

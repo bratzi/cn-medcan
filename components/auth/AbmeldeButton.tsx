@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { signOut } from "@/lib/auth-client";
+import { zaehlerZuruecksetzen } from "@/components/layout/konto-zaehler-speicher";
 import { Button } from "@/components/ui";
 
 export function AbmeldeButton() {
@@ -15,6 +16,7 @@ export function AbmeldeButton() {
     await signOut();
     // Ohne refresh() behalten die Serverkomponenten die alte Sitzung im
     // Cache und zeigen weiter den angemeldeten Zustand.
+    zaehlerZuruecksetzen();
     router.push("/");
     router.refresh();
   }

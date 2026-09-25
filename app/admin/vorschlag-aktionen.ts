@@ -8,7 +8,7 @@ import { istEindeutigkeitsfehler } from "@/lib/prisma-fehler";
 import { benachrichtigen, nachrichtenFuer, textAbgelehnt, textFreigegeben } from "@/lib/benachrichtigung";
 import { blueteVorhanden, terpenNamen } from "@/lib/query/vorschlaege";
 import { strainIdAusSlug, unternehmensIdAusSchluessel, unternehmensSchluessel } from "@/lib/stamm-id";
-import { blueteFreigabePruefen, freigabeKonflikt } from "@/lib/vorschlag-eingabe";
+import { blueteFreigabePruefen, freigabeKonflikt, terpeneNachtragen } from "@/lib/vorschlag-eingabe";
 import type { BenachrichtigungArt, VorschlagStatus } from "@/db/enums";
 
 export type AdminVorschlagErgebnis = { ok: true } | { ok: false; fehler: string };
@@ -121,20 +121,25 @@ export async function blueteFreigeben(formData: FormData): Promise<AdminVorschla
     } catch (fehler) {
       if (!istEindeutigkeitsfehler(fehler)) throw fehler;
     }
+  }
 
-    if (w.terpene.length) {
-      const terpene = await prisma.terpen.findMany({
-        where: { name: { in: w.terpene } },
-        select: { id: true, name: true },
-      });
-      const idNachName = new Map(terpene.map((t) => [t.name, t.id]));
-      await prisma.strainTerpen.deleteMany({ where: { strainId } });
-      await prisma.strainTerpen.createMany({
-        data: w.terpene
-          .filter((name) => idNachName.has(name))
-          .map((name, index) => ({ strainId, terpenId: idNachName.get(name)!, rang: index + 1 })),
-      });
-    }
+  // Terpene auch beim zweiten Klick nachholen, wenn der erste nach dem Anlegen
+  // abbrach; eine vorhandene Bluete mit eigenen Terpenen bleibt, wie sie ist.
+  const gleicheId = vorhanden?.id === strainId;
+  const vorhandeneTerpene =
+    w.terpene.length && gleicheId ? await prisma.strainTerpen.count({ where: { strainId } }) : 0;
+  if (terpeneNachtragen({ gewaehlt: w.terpene.length, neuAngelegt: !vorhanden, gleicheId, vorhandeneTerpene })) {
+    const terpene = await prisma.terpen.findMany({
+      where: { name: { in: w.terpene } },
+      select: { id: true, name: true },
+    });
+    const idNachName = new Map(terpene.map((t) => [t.name, t.id]));
+    await prisma.strainTerpen.deleteMany({ where: { strainId } });
+    await prisma.strainTerpen.createMany({
+      data: w.terpene
+        .filter((name) => idNachName.has(name))
+        .map((name, index) => ({ strainId, terpenId: idNachName.get(name)!, rang: index + 1 })),
+    });
   }
 
   const slug = vorhanden?.slug ?? w.slug;

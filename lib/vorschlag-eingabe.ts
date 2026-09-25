@@ -294,3 +294,19 @@ export function terpeneLesen(json: string | null): string[] {
     return [];
   }
 }
+
+/**
+ * Terpene der Freigabe schreiben? Ja, wenn die Bluete gerade angelegt wurde,
+ * oder wenn sie mit genau dieser Id schon steht, aber noch keine Terpene hat
+ * (ein erster Klick brach nach dem Anlegen ab). Eine Import-Bluete mit eigenen
+ * Terpenen bleibt unangetastet (Review 2026-09-25, Important 1).
+ */
+export function terpeneNachtragen(lage: {
+  gewaehlt: number;
+  neuAngelegt: boolean;
+  gleicheId: boolean;
+  vorhandeneTerpene: number;
+}): boolean {
+  if (lage.gewaehlt === 0) return false;
+  return lage.neuAngelegt || (lage.gleicheId && lage.vorhandeneTerpene === 0);
+}

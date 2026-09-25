@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { signUp } from "@/lib/auth-client";
+import { zaehlerZuruecksetzen } from "@/components/layout/konto-zaehler-speicher";
 import { profilSpeichern } from "@/app/mitglied/aktionen";
 import { Button, Input } from "@/components/ui";
 import { fehlertext } from "./fehlertexte";
@@ -61,6 +62,7 @@ export function RegistrierFormular({ weiter }: Props) {
       await profilSpeichern(nachtrag).catch(() => undefined);
     }
 
+    zaehlerZuruecksetzen();
     router.push(weiter);
     router.refresh();
   }
