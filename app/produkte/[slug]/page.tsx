@@ -214,7 +214,6 @@ async function ProduktInhalt({ slug }: { slug: string }) {
               titel={strain.handelsname}
               terpene={strain.terpene}
               serien={aromaSerien}
-              intensitaetTitel="Intensität"
               katalog={katalog}
               treue={mittlereHerstellerTreue(hersteller, strain.reviews.map((review) => parseGeschmacksMatrix(review.geschmacksMatrix)))}
               zeilen={Object.entries(intensitaet).map(([terpen, { mittel, anzahl }]) => ({ terpen, wert: mittel, anzahl }))}

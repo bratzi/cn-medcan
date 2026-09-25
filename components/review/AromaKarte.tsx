@@ -34,6 +34,18 @@ type Props = {
   staerken?: Readonly<Record<string, number>>;
   /** Namen der Terpene, die der Hersteller nicht angibt: Pfad gestrichelt. */
   ergaenzt?: readonly string[];
+  /**
+   * Macht die Balken links zu Reglern: man zieht den eigenen Wert je
+   * Geschmacksrichtung direkt in der Karte (0 bis 5). `vergleich` zeigt einen
+   * Ring, an dem der Griff einrastet.
+   */
+  regler?: {
+    werte: GeschmacksMatrix;
+    vergleich?: GeschmacksMatrix;
+    aendern: (key: keyof GeschmacksMatrix, wert: number) => void;
+  };
+  /** Alle bekannten Terpene: zeigt zur aktiven Geschmacksrichtung, welche Terpene sie tragen. */
+  lernen?: readonly { name: string; geschmack: KartenTerpen["geschmack"] }[];
 };
 
 const DAUER_MS = 900;
@@ -48,14 +60,17 @@ const GLEIT_MS = 420;
  * Gleitet Zahlenwerte weich zum Ziel, damit Balken und Flächen sichtbar
  * wachsen oder schrumpfen, wenn sich die Werte ändern. Reduzierte Bewegung: Sprung.
  */
-function useGleitend(ziel: readonly number[]): number[] {
+function useGleitend(ziel: readonly number[], sofortRef?: { current: boolean }): number[] {
   const [wert, setWert] = useState<number[]>(() => [...ziel]);
   const aktuell = useRef<number[]>([...ziel]);
   const schluessel = ziel.join(",");
   useEffect(() => {
     const zielWerte = schluessel.split(",").map(Number);
     const start = [...aktuell.current];
-    const sofort = start.length !== zielWerte.length || window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const sofort =
+      sofortRef?.current === true ||
+      start.length !== zielWerte.length ||
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const beginn = performance.now();
     let rahmen = 0;
     const schritt = (jetzt: number) => {
@@ -67,7 +82,7 @@ function useGleitend(ziel: readonly number[]): number[] {
     };
     rahmen = requestAnimationFrame(schritt);
     return () => cancelAnimationFrame(rahmen);
-  }, [schluessel]);
+  }, [schluessel, sofortRef]);
   return wert;
 }
 
@@ -85,7 +100,19 @@ function balkenEnde(knoten: Punkt, wert: number, versatz: number): Punkt {
  * bei reduzierter Bewegung springt er. Die Werte stehen zusätzlich als
  * Tabelle für Screenreader, das SVG ist aria-hidden.
  */
-export function AromaKarte({ terpene, serien: roheSerien, titel = "Aroma-Karte", hervorheben = null, staerken, ergaenzt = [] }: Props) {
+export function AromaKarte({
+  terpene,
+  serien: roheSerien,
+  titel = "Aroma-Karte",
+  hervorheben = null,
+  staerken,
+  ergaenzt = [],
+  regler,
+  lernen,
+}: Props) {
+  const svgRef = useRef<SVGSVGElement>(null);
+  // Beim Ziehen folgen die Balken dem Griff sofort, sonst gleiten sie.
+  const ziehtRef = useRef(false);
   const [ansicht, setAnsicht] = useState<"karte" | "netz">("karte");
   const [t, setT] = useState(0);
   const [ueberfahren, setAktiv] = useState<number | null>(null);
@@ -112,7 +139,7 @@ export function AromaKarte({ terpene, serien: roheSerien, titel = "Aroma-Karte",
 
   // Werte gleiten weich, damit sichtbar wird, dass die Balkenlänge die Skala abbildet.
   const flach = roheSerien.flatMap((serie) => GESCHMACKS_ACHSEN.map((achse) => serie.matrix[achse.key]));
-  const gleitend = useGleitend(flach);
+  const gleitend = useGleitend(flach, ziehtRef);
   const serien: AromaSerie[] = roheSerien.map((serie, s) => ({
     ...serie,
     matrix: Object.fromEntries(
@@ -169,7 +196,15 @@ export function AromaKarte({ terpene, serien: roheSerien, titel = "Aroma-Karte",
       </ul>
 
       <div className="relative w-full" onMouseLeave={() => setAktiv(null)}>
-        <svg viewBox={`0 0 ${BREITE} ${HOEHE}`} aria-hidden="true" className="block w-full text-text">
+        <svg ref={svgRef} viewBox={`0 0 ${BREITE} ${HOEHE}`} aria-hidden="true" className="block w-full text-text">
+          <defs>
+            {/* Sweet-Spot-Stil der Regler-Spur: rechts 0, links 5 (Balken wachsen nach links). */}
+            <linearGradient id="spur-verlauf" x1="1" x2="0" y1="0" y2="0">
+              <stop offset="0%" stopColor="var(--color-border)" />
+              <stop offset="60%" stopColor="var(--color-accent-subtle)" />
+              <stop offset="100%" stopColor="var(--color-accent)" />
+            </linearGradient>
+          </defs>
           {/* Netz-Raster, blendet mit dem Morph ein. */}
           <g opacity={t * 0.18}>
             {RINGE.map((ring) => (
@@ -260,6 +295,76 @@ export function AromaKarte({ terpene, serien: roheSerien, titel = "Aroma-Karte",
               ))}
             </g>
           ))}
+
+          {/* Regler: je Achse eine Spur im Sweet-Spot-Stil, Griff am eigenen Wert. */}
+          {regler && kartenSichtbar > 0.5
+            ? karte.map((knoten, index) => {
+                const key = GESCHMACKS_ACHSEN[index].key;
+                const links = balkenEnde(knoten, MAX, 0).x;
+                const rechts = balkenEnde(knoten, 0, 0).x;
+                const griff = balkenEnde(knoten, regler.werte[key], 0).x;
+                const ring = regler.vergleich ? balkenEnde(knoten, regler.vergleich[key], 0).x : null;
+                const wertAus = (clientX: number, clientY: number) => {
+                  const ctm = svgRef.current?.getScreenCTM();
+                  if (!ctm) return regler.werte[key];
+                  const p = new DOMPoint(clientX, clientY).matrixTransform(ctm.inverse());
+                  const roh = Math.min(Math.max(((rechts - p.x) / (rechts - links)) * MAX, 0), MAX);
+                  const vergleich = regler.vergleich?.[key];
+                  if (vergleich !== undefined && Math.abs(roh - vergleich) <= 0.15) return vergleich;
+                  return Math.round(roh * 10) / 10;
+                };
+                return (
+                  <g key={`r-${key}`} opacity={kartenSichtbar}>
+                    <rect
+                      x={links - 4}
+                      y={knoten.y - 4}
+                      width={rechts - links + 8}
+                      height={8}
+                      rx={4}
+                      fill="url(#spur-verlauf)"
+                      opacity={aktiv === index ? 0.9 : 0.35}
+                      className="transition-opacity duration-fast"
+                    />
+                    {ring !== null ? (
+                      <circle cx={ring} cy={knoten.y} r={8} fill="none" stroke={FARBE.lila} strokeOpacity={0.45} strokeWidth={2} />
+                    ) : null}
+                    <circle
+                      cx={griff}
+                      cy={knoten.y}
+                      r={aktiv === index ? 9 : 7}
+                      fill={FARBE.lila}
+                      stroke="var(--color-surface)"
+                      strokeWidth={2.5}
+                      style={{ filter: "drop-shadow(0 1px 2px rgb(0 0 0 / 0.3))" }}
+                    />
+                    {/* Trefferfläche: Ziehen setzt den Wert; Tastatur über die Regler unter der Karte. */}
+                    <rect
+                      x={links - 12}
+                      y={knoten.y - 16}
+                      width={rechts - links + 24}
+                      height={32}
+                      fill="transparent"
+                      className="cursor-grab touch-none active:cursor-grabbing"
+                      style={{ pointerEvents: "all" }}
+                      onPointerEnter={() => setAktiv(index)}
+                      onPointerDown={(e) => {
+                        e.currentTarget.setPointerCapture(e.pointerId);
+                        ziehtRef.current = true;
+                        setAktiv(index);
+                        regler.aendern(key, wertAus(e.clientX, e.clientY));
+                      }}
+                      onPointerMove={(e) => {
+                        if (!e.currentTarget.hasPointerCapture(e.pointerId)) return;
+                        regler.aendern(key, wertAus(e.clientX, e.clientY));
+                      }}
+                      onPointerUp={() => {
+                        ziehtRef.current = false;
+                      }}
+                    />
+                  </g>
+                );
+              })
+            : null}
 
           {/* Skala über den Balken: Länge = Wert 0 bis 5. */}
           <g opacity={kartenSichtbar * 0.7}>
@@ -356,8 +461,32 @@ export function AromaKarte({ terpene, serien: roheSerien, titel = "Aroma-Karte",
         {aktiveAchse
           ? `${aktiveAchse.label}: ` +
             serien.map((serie) => `${serie.name} ${WERT.format(serie.matrix[aktiveAchse.key])}`).join(" · ")
-          : "Über eine Geschmacksrichtung fahren, um die Werte zu vergleichen."}
+          : regler
+            ? "Zieh die lila Punkte links: Wie stark hast du jede Geschmacksrichtung geschmeckt?"
+            : "Über eine Geschmacksrichtung fahren, um die Werte zu vergleichen."}
       </p>
+      {aktiveAchse && lernen ? <TerpenLernen achse={aktiv!} lernen={lernen} /> : null}
+
+      {regler ? (
+        <fieldset className="sr-only">
+          <legend>Dein Eindruck je Geschmacksrichtung, 0 bis 5</legend>
+          {GESCHMACKS_ACHSEN.map((achse, index) => (
+            <label key={achse.key}>
+              {achse.label}
+              <input
+                type="range"
+                min={0}
+                max={MAX}
+                step={0.1}
+                value={regler.werte[achse.key]}
+                onFocus={() => setAktiv(index)}
+                onBlur={() => setAktiv(null)}
+                onChange={(e) => regler.aendern(achse.key, Number(e.target.value))}
+              />
+            </label>
+          ))}
+        </fieldset>
+      ) : null}
 
       <div className="sr-only">
       <table>
@@ -385,5 +514,23 @@ export function AromaKarte({ terpene, serien: roheSerien, titel = "Aroma-Karte",
       </table>
       </div>
     </figure>
+  );
+}
+
+/** Lerneffekt: welche Terpene eine Geschmacksrichtung tragen. */
+function TerpenLernen({ achse, lernen }: { achse: number; lernen: NonNullable<Props["lernen"]> }) {
+  const namen = lernen.filter((terpen) => achsenIndex(terpen.geschmack) === achse).map((terpen) => terpen.name);
+  if (namen.length === 0) return null;
+  return (
+    <p className="-mt-4 text-small text-text-muted text-pretty">
+      <span className="font-medium text-text">{GESCHMACKS_ACHSEN[achse].label}</span> steckt vor allem in{" "}
+      {namen.map((name, index) => (
+        <span key={name}>
+          {index > 0 ? (index === namen.length - 1 ? " und " : ", ") : null}
+          <span className="font-medium text-accent">{name}</span>
+        </span>
+      ))}
+      .
+    </p>
   );
 }
