@@ -3,7 +3,7 @@
 > Übergabemedium zwischen Sessions. Wird nach jedem Arbeitsblock aktualisiert und committet.
 > Wer hier weiterarbeitet, liest diese Datei zuerst und braucht den Chatverlauf nicht.
 
-**Letzte Aktualisierung:** 2026-09-25 (Session 19, Save for Clear)
+**Letzte Aktualisierung:** 2026-09-25 (Session 20, Save for Clear)
 **Repo:** https://github.com/bratzi/cn-medcan (public)
 **Branch:** `main` (Makeover „Grünes Buch“ Teilprojekt 1 ist seit 2026-09-24 auf `main`)
 
@@ -28,7 +28,32 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 
 ## ⇢ Hier geht es weiter
 
-### ⇢ STAND SESSION 20 (2026-09-25)
+### ⇢ NÄCHSTE SESSION BEGINNT HIER (Stand 2026-09-25, Session 20, Save for Clear)
+
+Alles gepusht und deployt (Tests 192/192). Nutzerregel neu: **Apotheken und Preise nur „in Aussicht“, nicht
+einplanen** (Memory apotheken-preise-zurueckgestellt) — Block B Schritt 7 entfällt damit bis auf Weiteres.
+
+**Session 20 zusätzlich (nach dem Stand unten):** Grow-Zelt als Theme-Schalter (fest oben links in der
+Fensterecke, `.thema-lampe`), Hero: Button „Bewerte jetzt mit“ (Verlaufsrahmen `.konto-pille`, Zeigerfolge über
+`data-punkt`), Intro zweizeilig nowrap („… neue Maßstäbe definieren.“), Einstieg: Texte bis zur Einblendung
+opacity 0 (Timeline setzt nicht mehr 1), Notfall 8 s; Kopf 12 px, Kopfband „since 2026 · Terpz 4 Nerdz“;
+Storytelling: Buchschrift + je Absatz `Buzz`, Überschrift zentriert, Video-Titel in Logoschrift, Videos driften
+selbst (`punkte.ts`, WEG_PX 24); „So läuft eine Runde“ neu (Runde als Event, Bewerten geht immer);
+„prüfen wir nach.“ übergroß im Wortmarken-Stil (Konturen + Puls), ragt rechts raus; Erkundung: Schritte
+Overall/Terpz/Qualität links in Logoschrift, keine Doppeltitel (`ohneTitel`), Karten-Kopf mit `KartenBild`,
+Achse `achsenX()` wandert mit halber Mehrbreite, Bögen Violett↔Grün (`abweichungsAnteil`).
+
+**Reihenfolge nächste Session:**
+1. **Live-Sichtprüfung** (Nutzer muss im Chrome-Tab mit neuem Passwort angemeldet sein): Hero-Button und
+   Einstieg, „prüfen wir nach.“, Aroma-Karte (Bild, 50:50, Farbverlauf der Bögen), Bewertungsmaske
+   /bewerten/apples-bananas (Speichern testen!), So läuft eine Runde, Blütenkacheln.
+2. Nutzerfrage offen: sollen andere Buttons („Zu den Blüten“, „Zur Sorte“) auch mit der Maus mitgehen?
+3. Bewertungsmaske erfasst die Terpen-Intensität (Sweet Spot) nicht mehr — Nutzer fragen, ob sie zurück soll.
+4. Task 8 Rest: Testblüte im Admin freigeben, Benachrichtigung prüfen (braucht Login).
+5. **1102/CPU:** Seite läuft derzeit; Nutzer hat Workers Paid (5 $) noch nicht entschieden. Nichts am Request-Pfad
+   ändern ohne Messung (`wrangler tail` + curl; `wrangler deployments list` ist erlaubt, Secret-Writes nicht).
+
+### ⇢ STAND SESSION 20 (2026-09-25, Zwischenstand)
 
 **Gepusht (live noch nicht per Sichtprüfung gesehen; Gate-Passwort neu, Nutzer muss im Chrome-Tab anmelden):**
 - Kopf-Navigation in gesperrten Versalien; Hero-Wortmarke pulsiert (`.marke-puls` an der h1).
