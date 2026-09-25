@@ -526,9 +526,9 @@
   background: linear-gradient(
     90deg,
     var(--color-border) 0%,
-    var(--color-accent-subtle) 30%,
-    var(--color-accent) 50%,
-    var(--color-accent-subtle) 70%,
+    var(--color-accent-subtle) 40%,
+    var(--color-accent) 60%,
+    var(--color-accent-subtle) 80%,
     var(--color-border) 100%
   );
 }

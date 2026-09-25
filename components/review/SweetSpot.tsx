@@ -1,3 +1,6 @@
+"use client";
+
+import { cn } from "@/lib/cn";
 import { INTENSITAETS_STUFEN } from "@/lib/query/bewertung";
 
 export type SweetSpotZeile = {
@@ -13,12 +16,28 @@ export type SweetSpotZeile = {
 const WERT = new Intl.NumberFormat("de-DE", { maximumFractionDigits: 1 });
 
 function einordnung(wert: number): string {
+  if (wert < 0.5) return "nicht geschmeckt";
   const naechste = INTENSITAETS_STUFEN.reduce((a, b) => (Math.abs(b.wert - wert) < Math.abs(a.wert - wert) ? b : a));
   return naechste.label;
 }
 
+/** Skala 0 bis 5, wie die Aroma-Karte; 0 heißt nicht geschmeckt. */
+const MAX = 5;
+
 function anteil(wert: number): number {
-  return ((Math.min(Math.max(wert, 1), 5) - 1) / 4) * 100;
+  return (Math.min(Math.max(wert, 0), MAX) / MAX) * 100;
+}
+
+/**
+ * Wert unter dem Zeiger: genau die Position des sichtbaren Punkts, ohne den
+ * Daumen-Einzug des nativen Reglers. Nahe am Vergleichswert rastet er dort
+ * ein, damit gleiche Werte auch übereinander stehen.
+ */
+function wertAmZeiger(spur: HTMLElement, clientX: number, vergleich?: number): number {
+  const rect = spur.getBoundingClientRect();
+  const roh = Math.min(Math.max((clientX - rect.left) / rect.width, 0), 1) * MAX;
+  if (vergleich !== undefined && Math.abs(roh - vergleich) <= 0.15) return vergleich;
+  return Math.round(roh * 10) / 10;
 }
 
 type Bedienung = {
@@ -32,7 +51,7 @@ type Bedienung = {
  * Terpen-Intensität (Spec Redesign 15): je Terpen eine Skala von zu schwach
  * bis zu stark, der Sweet Spot liegt in der Mitte. Zu viel Terpen macht den
  * Geschmack aufdringlich, zu wenig lässt ihn flach wirken; gesucht ist die
- * Mitte. Die Markierung sitzt bei (wert - 1) / 4 der Breite.
+ * Stufe 3. Die Markierung sitzt bei wert / 5 der Breite, 0 heißt nicht geschmeckt.
  *
  * Mit `bedienung` wird jede Spur zum Regler: der Punkt zeigt den eigenen
  * Wert, ein blasser Ring den Wert der Bewertung oder Community.
@@ -74,7 +93,33 @@ export function SweetSpot({
                   {!bedienung && zeile.anzahl ? ` · ${zeile.anzahl} Bewertungen` : ""}
                 </span>
               </div>
-              <div className="sweet-spot-spur relative h-3 rounded-full outline-offset-8 outline-focus-ring has-[input:focus-visible]:outline-2">
+              <div
+                className={cn(
+                  "sweet-spot-spur relative h-3 rounded-full outline-offset-8 outline-focus-ring has-[input:focus-visible]:outline-2",
+                  bedienung && "cursor-pointer touch-none",
+                )}
+                onPointerDown={
+                  bedienung
+                    ? (e) => {
+                        const spur = e.currentTarget;
+                        spur.setPointerCapture(e.pointerId);
+                        spur.querySelector("input")?.focus();
+                        bedienung.aendern(zeile.terpen, wertAmZeiger(spur, e.clientX, zeile.anzahl ? zeile.wert : undefined));
+                      }
+                    : undefined
+                }
+                onPointerMove={
+                  bedienung
+                    ? (e) => {
+                        if (!e.currentTarget.hasPointerCapture(e.pointerId)) return;
+                        bedienung.aendern(
+                          zeile.terpen,
+                          wertAmZeiger(e.currentTarget, e.clientX, zeile.anzahl ? zeile.wert : undefined),
+                        );
+                      }
+                    : undefined
+                }
+              >
                 {bedienung && zeile.anzahl ? (
                   <span
                     aria-hidden="true"
@@ -90,23 +135,25 @@ export function SweetSpot({
                 {bedienung ? (
                   <input
                     type="range"
-                    min={1}
-                    max={5}
-                    step={0.5}
+                    min={0}
+                    max={MAX}
+                    step={0.1}
                     value={gezeigt}
                     aria-label={`${zeile.terpen}: Intensität`}
                     aria-valuetext={`${einordnung(gezeigt)}, ${WERT.format(gezeigt)} von 5`}
                     onFocus={() => bedienung.aktivieren?.(zeile.terpen)}
                     onBlur={() => bedienung.aktivieren?.(null)}
                     onChange={(e) => bedienung.aendern(zeile.terpen, Number(e.target.value))}
-                    className="absolute inset-x-0 top-1/2 h-11 w-full -translate-y-1/2 cursor-pointer opacity-0"
+                    className="pointer-events-none absolute inset-x-0 top-1/2 h-11 w-full -translate-y-1/2 opacity-0"
                   />
                 ) : null}
               </div>
-              <div aria-hidden="true" className="flex justify-between text-caption text-text-muted">
-                <span>zu schwach</span>
-                <span>Sweet Spot</span>
-                <span>zu stark</span>
+              <div aria-hidden="true" className="relative h-5 text-caption text-text-muted">
+                <span className="absolute left-0">zu schwach</span>
+                <span className="absolute -translate-x-1/2" style={{ left: `${anteil(3)}%` }}>
+                  Sweet Spot
+                </span>
+                <span className="absolute right-0">zu stark</span>
               </div>
             </li>
           );
