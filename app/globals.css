@@ -871,6 +871,11 @@ html.joint-cursor :is(input:not([type="range"]):not([type="radio"]):not([type="c
     display: inline-block;
     animation: fazit-puls 3.2s ease-in-out infinite;
   }
+
+  /* Die h1 ist schon Block (flex), deshalb ohne display. */
+  .marke-puls {
+    animation: fazit-puls 3.2s ease-in-out infinite;
+  }
 }
 
 @keyframes fazit-puls {

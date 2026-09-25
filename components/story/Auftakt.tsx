@@ -65,11 +65,9 @@ export function Auftakt() {
               <Wortmarke groesse="plakat" />
             </span>
           ))}
-          <h1 id="auftakt-titel" className="auftakt-marke relative flex justify-center">
-            {/* Pulsiert wie das Community-Fazit (Nutzer 2026-09-25). */}
-            <span className="fazit-puls">
-              <Wortmarke groesse="plakat" />
-            </span>
+          {/* marke-puls: pulsiert wie das Community-Fazit (Nutzer 2026-09-25). */}
+          <h1 id="auftakt-titel" className="auftakt-marke marke-puls relative flex justify-center">
+            <Wortmarke groesse="plakat" />
           </h1>
         </div>
         <p
