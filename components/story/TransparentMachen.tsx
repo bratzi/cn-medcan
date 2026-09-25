@@ -52,7 +52,7 @@ function Punkt({ punkt }: { punkt: (typeof PUNKTE)[number] }) {
   const seite = punkt.seite === "rechts" ? "float-right ml-10 md:ml-16" : "float-left mr-10 md:mr-16";
   return (
     <aside
-      className={`${seite} my-16 flex w-56 flex-col items-center gap-6 text-center md:my-24 md:w-sm [shape-margin:2.5rem] [shape-outside:ellipse(50%_45%)]`}
+      className={`${seite} my-24 flex w-56 flex-col items-center gap-6 text-center md:my-32 md:w-sm [shape-margin:2.5rem] [shape-outside:ellipse(50%_45%)]`}
     >
       <div data-punkt="" className="relative aspect-square w-full">
         <span
@@ -88,7 +88,7 @@ function Punkt({ punkt }: { punkt: (typeof PUNKTE)[number] }) {
 /** Ein Absatz des Manifests: scroll-gekoppelt Wort für Wort sichtbar (transparent.ts). */
 function Zeile({ children }: { children: ReactNode }) {
   return (
-    <p data-manifest-zeile="" className="mt-24 font-buch text-erzaehlung text-text md:mt-32">
+    <p data-manifest-zeile="" className="mt-32 font-buch text-erzaehlung text-text md:mt-48">
       {children}
     </p>
   );

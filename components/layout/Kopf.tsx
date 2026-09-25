@@ -6,8 +6,8 @@ import { KopfZustand } from "@/components/layout/KopfZustand";
 import { HAUPTNAVIGATION, KONTO_LINK } from "@/lib/navigation";
 
 /**
- * Hauptnavigation, Kern zuerst (Spec TP2 3.1). Die Nummern sind Dekoration
- * und aria-hidden. "Mein Konto" steht abgesetzt als Pille ohne Nummer.
+ * Hauptnavigation, Kern zuerst (Spec TP2 3.1). Seit 2026-09-25 ohne Kapitelnummern
+ * (Nutzer). "Mein Konto" steht abgesetzt als Pille.
  * Die aktive Seite markiert NavLink: aria-current plus Unterstrich in Tinte.
  *
  * Bewusst ein fester Link "Mein Konto" statt "Anmelden"/"Mein Konto" je nach
@@ -45,12 +45,9 @@ export function Kopf() {
           className="col-span-3 row-start-2 -mx-4 min-w-0 sm:-mx-8 lg:col-span-1 lg:col-start-2 lg:row-start-1 lg:mx-0 lg:justify-self-end"
         >
           <ul className="-my-2 flex snap-x scroll-px-4 gap-2 overflow-x-auto px-4 py-2 sm:scroll-px-8 sm:px-8 lg:-mx-2 lg:px-2">
-            {HAUPTNAVIGATION.map((eintrag, index) => (
+            {HAUPTNAVIGATION.map((eintrag) => (
               <li key={eintrag.href} className="shrink-0 snap-start">
                 <NavLink href={eintrag.href} className={NAV_LINK} aktivKlasse="">
-                  <span aria-hidden="true" className="kapitel-nummer font-hand text-vermerk leading-none">
-                    {index + 1}
-                  </span>
                   <span className={AKTIV_WORT}>{eintrag.text}</span>
                 </NavLink>
               </li>

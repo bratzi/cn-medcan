@@ -56,7 +56,7 @@ Schleife).
 - Betonung im Druck über die Kursive derselben Familie.
 - `text-balance` auf Überschriften, `text-pretty` auf Beschreibungen, `wrap-break-word` wo lange
   Handelsnamen stehen. Höchstens drei Schriftgrade je Sektion.
-- Laufweite: `tracking-gesperrt` (0.3em) nur in der Unterzeile der Wortmarke; kleine Versalien-Zeilen `tracking-wide`.
+- Laufweite: `tracking-gesperrt` (0.3em) in der Unterzeile der Wortmarke und seit 2026-09-25 (Nutzer) für alle Nebentexte im Auftakt (Intro, Kopfzeile): `font-sans` Versalien in `text-caption`/`text-small`; sonst kleine Versalien-Zeilen `tracking-wide`.
 
 ## 4. Farbe
 Komponenten nutzen nur semantische Tokens:

@@ -46,10 +46,10 @@ export function NeuesterEintrag() {
     <section
       aria-labelledby="eintrag-titel"
       data-story="eintrag"
-      className="relative isolate overflow-x-clip bg-surface-sunken px-4 py-24 sm:px-8 sm:py-32"
+      className="relative isolate overflow-x-clip bg-linear-to-b from-transparent via-surface-sunken to-transparent px-4 py-24 sm:px-8 sm:py-32"
     >
-      {/* Aus dem Storytelling hierher gerückt: oben auf der Seite überlud es (Nutzer 2026-09-25). */}
-      <Schlagwort satz="was drin ist" ton="gruen" />
+      {/* Unter dem Eintrag, nicht darüber (Nutzer 2026-09-25). */}
+      <Schlagwort satz="was drin ist" ton="gruen" oben="bottom-0" />
       <div className="mx-auto flex w-full max-w-360 flex-col gap-12">
         <h2 id="eintrag-titel" className="font-buch text-kapitel text-text">
           Der <em className="farbverlauf hand-betont">neueste</em> Eintrag

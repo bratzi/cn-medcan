@@ -39,12 +39,12 @@ test("Kopf: einzeilig erst ab lg, wo der Platz reicht; Leiste mit Luft für den 
   assert.doesNotMatch(leiste, /lg:px-0|md:px-0/);
 });
 
-test("Kopf: Aktiv-Markierung nur am Wort, nicht an der Nummer", async () => {
+test("Kopf: Aktiv-Markierung am Wort, keine Kapitelnummern mehr", async () => {
   const { createElement } = await import("react");
   const { renderToStaticMarkup } = await import("react-dom/server");
   const { Kopf } = await import("@/components/layout/Kopf");
   const html = renderToStaticMarkup(createElement(Kopf));
-  // Stiftstrich (globals.css .kapitel-wort::after) sitzt am Wort, die Nummer bleibt aria-hidden.
+  // Stiftstrich (globals.css .kapitel-wort::after) sitzt am Wort; Nummern entfallen (Nutzer 2026-09-25).
   assert.match(html, /<span class="kapitel-wort">/);
-  assert.match(html, /<span aria-hidden="true" class="kapitel-nummer/);
+  assert.doesNotMatch(html, /kapitel-nummer/);
 });

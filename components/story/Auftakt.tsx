@@ -54,7 +54,7 @@ export function Auftakt() {
       <div className="mx-auto w-full max-w-360 px-4 sm:px-8">
         <div className="mt-8 flex flex-wrap items-end justify-between gap-8">
           <div className="flex max-w-2xl flex-col items-start gap-6">
-            <p data-story="intro" data-story-einstieg="" className="text-body text-text text-pretty sm:text-h3 sm:font-normal">
+            <p data-story="intro" data-story-einstieg="" className="max-w-[48ch] font-sans text-small uppercase leading-relaxed tracking-gesperrt text-text text-pretty">
               Wir testen Sorten nach festem Schema. Gemeinsam entscheiden wir, welche als Nächstes drankommt.
             </p>
             <Link href="#abstimmung" className={buttonKlassen("primary", "md")}>
@@ -67,10 +67,10 @@ export function Auftakt() {
             <Unterzeile className="auftakt-unterzeile" />
           </div>
         </div>
-        {/* Kopfzeile am Fuß der ersten Ansicht: ohne Scrollen sichtbar. */}
-        <div className="mt-8">
-          <Kopfzeile />
-        </div>
+      </div>
+      {/* Kopfzeile am Fuß der ersten Ansicht: ohne Scrollen sichtbar, über die volle Breite. */}
+      <div className="mt-8">
+        <Kopfzeile />
       </div>
     </section>
   );
