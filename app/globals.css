@@ -329,15 +329,8 @@
     font-synthesis: none;
   }
 
-  /* Graustufen-Fotos vor hellem Grund verschmelzen mit dem Papier (Spec 4.5). */
-  .medien-buch {
-    mix-blend-mode: multiply;
-  }
-
-  .medien-video {
-    filter: grayscale(1);
-    mix-blend-mode: multiply;
-  }
+  /* Bilder und Videos in normaler Farbe, in Hell wie Dunkel: kein Graustufen-,
+     Negativ- oder Mischmodus (Nutzer 2026-09-25). Die Klassen bleiben als Haken. */
 
   /* Buehne in "Transparent machen": die Bilder liegen per multiply uebereinander,
      ein oberes verdeckt ein unteres also nicht. Ohne Bewegung zeigt sie nur das
@@ -398,28 +391,6 @@
   }
 }
 
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) .medien-buch {
-    filter: invert(1);
-    mix-blend-mode: screen;
-  }
-
-  /* Videos nicht invertieren: im Dunkeln laufen sie so, wie sie sind. */
-  :root:not([data-theme="light"]) .medien-video {
-    filter: none;
-    mix-blend-mode: normal;
-  }
-}
-
-:root[data-theme="dark"] .medien-buch {
-  filter: invert(1);
-  mix-blend-mode: screen;
-}
-
-:root[data-theme="dark"] .medien-video {
-  filter: none;
-  mix-blend-mode: normal;
-}
 
 /* ==========================================================================
    Reduced motion
