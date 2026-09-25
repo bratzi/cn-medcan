@@ -3,7 +3,7 @@
 > Übergabemedium zwischen Sessions. Wird nach jedem Arbeitsblock aktualisiert und committet.
 > Wer hier weiterarbeitet, liest diese Datei zuerst und braucht den Chatverlauf nicht.
 
-**Letzte Aktualisierung:** 2026-09-25 (Session 15, Aroma-Erkundung, Herstellertreue)
+**Letzte Aktualisierung:** 2026-09-25 (Session 16, Browser-Prüfung, Regler-Fix, Aroma-Layout, Handschrift)
 **Repo:** https://github.com/bratzi/cn-medcan (public)
 **Branch:** `main` (Makeover „Grünes Buch“ Teilprojekt 1 ist seit 2026-09-24 auf `main`)
 
@@ -28,7 +28,39 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 
 ## ⇢ Hier geht es weiter
 
-### ⇢ NÄCHSTE SESSION BEGINNT HIER (Stand 2026-09-25, Session 15 Ende): Browser-Prüfung, dann Tasks unten
+### ⇢ NÄCHSTE SESSION BEGINNT HIER (Stand 2026-09-25, Session 16 Ende)
+Alles gepusht bis `c4210e8`. **Live NICHT per Screenshot geprüft:** `c421d6c`, `d30644b`, `c4210e8` und Hover-Glanz
+(Chrome hing zuletzt: Tab eingefroren, nachdem ein resize_window auf 390 px fehlschlug und der Viewport ~2300 px breit
+wurde; Chrome wurde neu gestartet). Zuerst: Browser verbinden, Fenster normal groß, dann prüfen.
+
+**Erledigt in Session 16 (Tests 156/156 via `npm test`; NICHT vitest, das sammelt nur .claude/skills ein):**
+- **Produktseiten mit Bewertungen stürzten ab** (React #441; Worker-Log per `npx wrangler tail cn-medcan --format json`:
+  „Event handlers cannot be passed to Client Component props“). `SweetSpot.tsx` ist jetzt `"use client"`. Live geprüft ok.
+- **Regler-Bug (Nutzer):** Skala 0..5 (0 = nicht geschmeckt), Schritt 0,1, Wert aus Zeigerposition (`wertAmZeiger`, kein
+  Daumen-Versatz des nativen Range mehr), rastet ±0,15 am Community-Wert ein (Punkt und Ring deckungsgleich). Sweet Spot
+  (3) sitzt bei 60 %, Gradient in `.sweet-spot-spur` angepasst. Live geprüft ok.
+- **Handschrift statt Kursiv:** alle `farbverlauf italic` -> `farbverlauf hand-betont` (Inspiration, 1.35em, globals.css).
+  Abstimmung: „Nächstes?“ schlicht, „Wähl mit.“ mit `farbverlauf font-hand`. Test in tests/handschrift.test.ts angepasst.
+- **Wortmarke im Auftakt:** Farbverlauf wie Buzzwords + Glanzstreifen beim Hover (`.auftakt-marke [data-marke-zeile]`).
+- **Aroma-Erkundung:** Auswahlliste „Terpen ergänzen“ entfernt; alle Katalog-Terpene von Anfang an da, nicht angegebene
+  bei 0 und grau (Bogen, Knoten, Name), hochgezogen farbig (AromaKarte: `farbig = achseFarbig && kraft > 0`). Layout:
+  links Karte + Regler kompakt quer scrollbar direkt darunter (`SweetSpot quer`), rechts Kennzahlen/Texte (sticky).
+- **Bewertungsformular:** alle Terpene da, Block „Vom Hersteller nicht angegeben“, Stufe 0 „nicht geschmeckt“
+  (Schema min 0 in lib/bewertung-eingabe.ts und terpenIntensitaetSchema), Vorschau-Karte grau bis gewählt.
+
+**Befunde / offen, der Reihe nach:**
+1. Live-Screenshot-Prüfung der obigen ungeprüften Commits (Startseite Aroma-Sektion, /produkte/apples-bananas,
+   /bewerten/apples-bananas, Hover-Glanz). Nutzer will Karte und Regler auf einen Blick.
+2. Seite fror im sehr breiten Fenster ein -> prüfen, ob echtes Performance-Problem (3D-Blätter? Glanz-Transition auf
+   riesigem background-clip:text?) oder nur Browserzustand.
+3. Netz-Ansicht: schwarze Achsenknoten liegen auf den Beschriftungen.
+4. Sehr breites Fenster (~2300 px): Hero-Wortmarke abgeschnitten („Grünes B…“).
+5. Befund 2 ist KEIN Bug: Herbstrunde wurde am 24.09. beendet (Phase BEENDET). Nutzer fragen, ob neu eröffnen
+   (data/stamm/beispiel-runde.sql setzt aktiv, aber istGewinner-Flags bleiben).
+6. Mobil 390 px (resize_window klappt nicht; ggf. Nutzer bitten, Fenster schmal zu ziehen), reduzierte Bewegung.
+7. Danach Task „Herstellertreue massenhaft“ (siehe unten, Session-15-Liste Punkt 2).
+
+### ⇢ STAND SESSION 15 Ende: Browser-Prüfung, dann Tasks unten
 Session 15 gepusht (letzter Commit siehe `git log`, Builds bis `dcec4bd` grün). Browser-Erweiterung war nicht
 verbunden: **nichts davon ist per Screenshot geprüft.** Zuerst Chrome mit Claude-Erweiterung, Fenster sichtbar.
 
