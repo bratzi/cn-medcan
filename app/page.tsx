@@ -26,9 +26,9 @@ export default function StartPage() {
       <FeldbuchRaster />
       <Auftakt />
       <TransparentMachen />
+      <AromaSektion />
       <WissenBuendeln />
       <GemeinsamLernen />
-      <AromaSektion />
       <NeuesterEintrag />
       <Abstimmung />
       <Katalog />
