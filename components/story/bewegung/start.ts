@@ -108,7 +108,7 @@ export async function starteBuehne(): Promise<() => void> {
   });
   window.addEventListener("load", neuMessen);
   const loops = beobachteLoops();
-  // Video-Blobs im Storytelling folgen dem Zeiger (nur feiner Zeiger, siehe punkte.ts).
+  // Video-Blobs im Storytelling folgen dem Zeiger und bewegen sich sonst selbst (siehe punkte.ts).
   const punkteStopp = beobachtePunkte();
 
   // 3D-Blätter vorerst aus (Nutzer 2026-09-25: passt nicht rein, Code bleibt für später).
