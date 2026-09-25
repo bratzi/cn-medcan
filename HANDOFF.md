@@ -31,7 +31,7 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 ### ⇢ NÄCHSTE SESSION BEGINNT HIER (Stand 2026-09-25, Session 17)
 Live und per Screenshot geprüft bis `17fcd1b`: Kopf transparent/Papierstreifen, Kapitel-Navigation, Fuß als
 Kapitelverzeichnis, Aroma-Karte mit ziehbaren Geschmacksbalken + Lernzeile, Beschaffenheits-Leiste, Bud-Cursor.
-Das „Einfrieren“ aus Session 16 war KEIN Code-Fehler: Long-Task-Messung (PerformanceObserver) ergab 0 ms auf
+Das „Einfrieren“ war KEIN Code-Fehler. Hauptursache: Chrome-Fenster im Hintergrund/minimiert -> `document.visibilityState === "hidden"`, dann keine Frames, Screenshots/rAF hängen (per javascript_tool prüfen). Nutzer bitten, das Fenster nach vorn zu holen. Außerdem: Long-Task-Messung (PerformanceObserver) ergab 0 ms auf
 Startseite und Produktseite; es hängt nur der Browser-Tab bei `find`/`scroll_to`/`read_page` (MCP). Workaround:
 per `javascript_tool` scrollen (`scrollIntoView`) statt `find`+`scroll_to`; hängt ein Tab, schließen und neu anlegen.
 
