@@ -79,14 +79,16 @@ export function AromaErkundung({
   // Start der Regler: was die Community geschmeckt hat, sonst die Herstellerangabe.
   const start = community ?? hersteller ?? leereGeschmacksMatrix();
   const werte = eigen ?? start;
-  // Stärke je Terpen: 0 (grau), solange seine Geschmacksrichtung bei 0 steht.
+  // Stärke je Terpen: Herstellerterpene leuchten nach ihrer Angabe; nicht
+  // angegebene bleiben grau, bis ihre Geschmacksrichtung spürbar ist (ab 0,5),
+  // kleine Community-Rauschwerte färben sie also nicht.
   const basis = terpenStaerken(kartenTerpene, stufen);
   const staerken = Object.fromEntries(
     kartenTerpene.map((terpen) => {
+      if (angegeben.has(terpen.name)) return [terpen.name, basis[terpen.name] ?? 0];
       const achse = GESCHMACKS_ACHSEN[achsenIndex(terpen.geschmack)];
       const wert = achse ? werte[achse.key] : 0;
-      if (wert <= 0.05) return [terpen.name, 0];
-      return [terpen.name, angegeben.has(terpen.name) ? (basis[terpen.name] ?? 0) : Math.min(wert / MAX, 1) * 0.6];
+      return [terpen.name, wert < 0.5 ? 0 : Math.min(wert / MAX, 1) * 0.6];
     }),
   );
   const eigeneTreue =
