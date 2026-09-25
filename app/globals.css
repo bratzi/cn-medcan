@@ -560,6 +560,33 @@
   box-decoration-break: clone;
 }
 
+/* Derselbe Glanz für die übergroßen Schlusswörter (UeberlaufWort, Nutzer 2026-09-26). */
+.glanz-wort {
+  display: inline-block;
+  background-image:
+    linear-gradient(
+      105deg,
+      transparent 35%,
+      color-mix(in oklab, white 75%, transparent) 50%,
+      transparent 65%
+    ),
+    linear-gradient(90deg, var(--color-accent), var(--color-kopierstift) 55%, var(--color-accent));
+  background-size: 250% 100%, 100% 100%;
+  background-position: 130% 0, 0 0;
+  background-repeat: no-repeat;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  padding: 0.2em 0.3em 0.25em 0.25em;
+  margin: -0.2em -0.3em -0.25em -0.25em;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .glanz-wort {
+    animation: marke-glanz 3.5s var(--ease-standard) 2s infinite;
+  }
+}
+
 /* Glanz läuft von selbst: alle 3,5 s einmal von links nach rechts, dann Ruhe.
    Die zweite Zeile folgt knapp versetzt. */
 @media (prefers-reduced-motion: no-preference) {

@@ -35,8 +35,10 @@ export function UeberlaufWort({ wort, absatz = false }: { wort: string; absatz?:
             <span>{wort}</span>
           </span>
         ))}
-        <span className="fazit-puls farbverlauf font-hand text-kulisse leading-[0.85]" style={{ fontSize: "1em" }}>
-          {wort}
+        {/* Glanz wie die Hero-Wortmarke (glanz-wort) im inneren Span, weil fazit-puls
+            außen schon die Animation belegt. */}
+        <span className="fazit-puls block font-hand text-kulisse leading-[0.85]" style={{ fontSize: "1em" }}>
+          <span className="glanz-wort">{wort}</span>
         </span>
       </em>
     </span>
