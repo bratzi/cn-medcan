@@ -19,9 +19,9 @@ export const MAX = 5;
 const LINKS = 260;
 /**
  * Balken beginnen am linken Rand (Nutzer 2026-09-26: Karte über die volle Breite
- * wie die Balken von Overall und Qualität); die Achsennamen stehen im Balken.
+ * wie die Balken von Overall und Qualität); die Achsennamen stehen im Balken. 14 Rand, damit Skala und Griffe bei 5 nicht abgeschnitten werden.
  */
-const BESCHRIFTUNG = 0;
+const BESCHRIFTUNG = 14;
 
 /**
  * Die Geschmacksachse wandert mit der halben Mehrbreite nach rechts (Nutzer

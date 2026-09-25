@@ -52,9 +52,9 @@ test("Geometrie: Achse wandert mit halber Mehrbreite (Skala links, Terpenlinien 
   assert.equal(achsenImKarte()[0].x, 260);
   assert.equal(terpeneImKarte(3)[0].x, 490);
 
-  // Balken ab dem linken Rand: bei 640 Achse 260 (Balken 244), bei 1200 bei 260 + 280 = 540 (Balken 524).
-  assert.equal(balkenLaenge(), 244);
-  assert.equal(balkenLaenge(1200), 524);
+  // Balken ab dem linken Rand: bei 640 Achse 260 (Balken 230), bei 1200 bei 260 + 280 = 540 (Balken 510).
+  assert.equal(balkenLaenge(), 230);
+  assert.equal(balkenLaenge(1200), 510);
   const achsenBreit = achsenImKarte(1200);
   assert.equal(achsenBreit[0].x, 540);
   const terpeneBreit = terpeneImKarte(3, 1200);
