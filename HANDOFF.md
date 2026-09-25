@@ -44,7 +44,8 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 
 **Reihenfolge für die nächste Session:**
 
-0. **Neuer Task: Kopf-Typografie** (Header/Kopf-Navigation, `components/layout/Kopf.tsx`, NavLink) an die Hero-
+0. **Kopf-Typografie ERLEDIGT (Session 20, `c9ccc91`):** NAV_LINK und Konto-Pille jetzt `font-sans text-caption uppercase tracking-gesperrt`; Regel in ui-design-engine Z. 60 ergaenzt. Live noch nicht gesehen (Deploy lief noch, Chrome-Tab hidden). Bei ~940 px Zeilenbreite pruefen, ob lg einzeilig bleibt.
+   Alt: **Kopf-Typografie** (Header/Kopf-Navigation, `components/layout/Kopf.tsx`, NavLink) an die Hero-
    Typografie angleichen wie „Terpen für Terpen“: `font-sans uppercase tracking-gesperrt` (Größe passend, ≥ Regeln
    ui-design-engine; Handschrift-Ziffern gibt es im Kopf nicht mehr). Danach Live-Sichtprüfung aller Session-19-Punkte.
 1. **Caching (Nutzerentscheid: Caching statt Paid)** — superpowers:brainstorming, siehe unten Punkt 1.
