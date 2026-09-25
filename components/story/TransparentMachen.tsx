@@ -1,7 +1,7 @@
+import { LoopSchalter } from "@/components/medien/LoopSchalter";
 import { Suspense, type ReactNode } from "react";
 
 import { Loop } from "@/components/medien/Loop";
-import { Button } from "@/components/ui";
 import { formatiereDatum } from "@/lib/format";
 import { BEWERTUNGS_ACHSEN } from "@/lib/query/bewertung";
 import { neuesteRedaktionelleReview } from "@/lib/query/reviews";
@@ -60,9 +60,7 @@ function Punkt({ punkt }: { punkt: (typeof PUNKTE)[number] }) {
         <Loop id={punkt.video} className="bild-zoom h-full" />
       </div>
       {/* Pause fuer die Videos (WCAG 2.2.2); sichtbar erst, wenn loops.ts sie startet. */}
-      <Button variante="ghost" groesse="sm" hidden data-loop-schalter="">
-        Video anhalten
-      </Button>
+      <LoopSchalter />
       <h3 className="font-buch text-h3 font-medium text-text">{punkt.titel}</h3>
       <p className="text-small text-text-muted text-pretty">{punkt.text}</p>
     </aside>

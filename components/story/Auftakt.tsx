@@ -1,9 +1,10 @@
+import { LoopSchalter } from "@/components/medien/LoopSchalter";
 import Link from "next/link";
 import { preload } from "react-dom";
 
 import { Loop } from "@/components/medien/Loop";
 import { Unterzeile, Wortmarke } from "@/components/marke/Wortmarke";
-import { Button, buttonKlassen } from "@/components/ui";
+import { buttonKlassen } from "@/components/ui";
 
 /**
  * Sektion 1 (Spec Redesign 7 und 8): der Umschlag als Filmbühne. Das Video
@@ -61,9 +62,7 @@ export function Auftakt() {
           </div>
           <div className="flex flex-col items-end gap-4">
             {/* Pause fuer die Videos (WCAG 2.2.2); erscheint erst, wenn loops.ts sie startet. */}
-            <Button variante="secondary" groesse="sm" hidden data-loop-schalter="">
-              Video anhalten
-            </Button>
+            <LoopSchalter />
             <Unterzeile className="auftakt-unterzeile" />
           </div>
         </div>

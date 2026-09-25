@@ -15,7 +15,10 @@ export function beobachteLoops(): { stoppen: () => void } {
 
   const abspielen = (video: HTMLVideoElement) => void video.play().catch(() => undefined);
   const beschriften = () => {
-    for (const knopf of schalter) knopf.textContent = angehalten ? "Video abspielen" : "Video anhalten";
+    for (const knopf of schalter) {
+      knopf.setAttribute("aria-label", angehalten ? "Video abspielen" : "Video anhalten");
+      knopf.toggleAttribute("data-angehalten", angehalten);
+    }
   };
   const umschalten = () => {
     angehalten = !angehalten;

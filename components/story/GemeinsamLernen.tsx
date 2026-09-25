@@ -1,5 +1,5 @@
+import { LoopSchalter } from "@/components/medien/LoopSchalter";
 import { Loop } from "@/components/medien/Loop";
-import { Button } from "@/components/ui";
 import { Schlagwort } from "@/components/story/Schlagwort";
 
 /**
@@ -55,9 +55,7 @@ export function GemeinsamLernen() {
           </p>
           {/* Pause fuer das Video (WCAG 2.2.2). Sichtbar erst, wenn die StoryBuehne
               das Video startet (loops.ts): ohne JavaScript laeuft nichts. */}
-          <Button variante="secondary" hidden data-loop-schalter="">
-            Video anhalten
-          </Button>
+          <LoopSchalter />
         </div>
       </div>
     </section>

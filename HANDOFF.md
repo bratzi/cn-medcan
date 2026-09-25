@@ -36,6 +36,7 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 - Hero-Unterzeile „Cannabis, offen gelegt.“ größer (clamp 1.75–3.25 rem), Story-Texte kleiner (`--text-manifest`
   clamp 2.5–5 rem), Hintergrund-Schlagworte hängen auf der oberen Sektionskante (`Schlagwort` oben=top-0
   -translate-y-1/2). Prüfen, ob sie über der vorigen Sektion gut lesbar/nicht störend sind.
+- Video-Anhalten als dezentes Pause/Play-Symbol (`LoopSchalter`, loops.ts setzt aria-label + data-angehalten).
 - Im Auftritt heißen Produkte jetzt „Blüten“ (Navigation, Katalog, Apotheken, Produktseite). URL `/produkte` bleibt
   vorerst; Umzug nach `/blueten` mit Weiterleitung ist offen.
 

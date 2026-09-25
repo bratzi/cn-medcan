@@ -949,3 +949,53 @@ html.joint-cursor :is(input:not([type="range"]):not([type="radio"]):not([type="c
   scale: 0.25;
   filter: blur(4px);
 }
+
+/* Anhalten/Abspielen der Videos (components/medien/LoopSchalter.tsx): dezentes
+   Symbol, 44 px Trefferfläche, Pause beim Laufen, Play wenn angehalten. */
+.loop-schalter {
+  display: inline-grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 9999px;
+  color: var(--color-text);
+  opacity: 0.55;
+  transition-property: opacity, scale, background-color;
+  transition-duration: 150ms;
+  transition-timing-function: cubic-bezier(0.2, 0, 0, 1);
+}
+
+.loop-schalter[hidden] {
+  display: none;
+}
+
+.loop-schalter:hover,
+.loop-schalter:focus-visible {
+  opacity: 1;
+  background: color-mix(in oklab, var(--color-text) 8%, transparent);
+}
+
+.loop-schalter:active {
+  scale: 0.96;
+}
+
+.loop-schalter:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+.loop-schalter svg {
+  grid-area: 1 / 1;
+  width: 1.125rem;
+  height: 1.125rem;
+  fill: currentColor;
+}
+
+.loop-schalter .loop-schalter-play,
+.loop-schalter[data-angehalten] .loop-schalter-pause {
+  display: none;
+}
+
+.loop-schalter[data-angehalten] .loop-schalter-play {
+  display: block;
+}
