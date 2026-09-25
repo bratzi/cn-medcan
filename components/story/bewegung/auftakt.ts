@@ -25,8 +25,18 @@ export const auftakt: Choreografie = ({ gsap }) => {
       0,
     )
     // Später und länger (Nutzer 2026-09-25): erst die Wortmarke, dann die Zeilen.
-    .fromTo('[data-story="oberzeile"]', { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 1.4 }, 1.4)
-    .fromTo('[data-story="intro"]', { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 1.4 }, 2.6);
+    .fromTo(
+      '[data-story="oberzeile"]',
+      { opacity: 0, y: 24, filter: "blur(8px)" },
+      { opacity: 1, y: 0, filter: "blur(0px)", duration: 2.2, ease: "power2.out", clearProps: "filter" },
+      1.8,
+    )
+    .fromTo(
+      '[data-story="intro"]',
+      { opacity: 0, y: 24, filter: "blur(8px)" },
+      { opacity: 1, y: 0, filter: "blur(0px)", duration: 2.2, ease: "power2.out", clearProps: "filter" },
+      3.4,
+    );
 };
 
 /**

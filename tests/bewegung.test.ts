@@ -11,7 +11,7 @@ test("Einstieg wird nur mit Skript und erlaubter Bewegung ausgeblendet, mit Notf
   const block = /@media \(scripting: enabled\) and \(prefers-reduced-motion: no-preference\)\s*\{([\s\S]*?)\n\}/.exec(css);
   assert.ok(block, "Block @media (scripting: enabled) and (prefers-reduced-motion: no-preference) fehlt");
   assert.match(block[1], /\[data-story-einstieg\]\s*\{[^}]*opacity:\s*0/);
-  assert.match(block[1], /animation:\s*einstieg-notfall\s+0s\s+linear\s+2\.5s\s+forwards/);
+  assert.match(block[1], /animation:\s*einstieg-notfall\s+0s\s+linear\s+8s\s+forwards/);
   assert.match(css, /@keyframes einstieg-notfall\s*\{\s*to\s*\{\s*opacity:\s*1;?\s*\}\s*\}/);
 });
 
