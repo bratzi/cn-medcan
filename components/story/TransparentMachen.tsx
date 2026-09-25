@@ -32,8 +32,8 @@ function Punkt({ punkt }: { punkt: (typeof PUNKTE)[number] }) {
   const seite = punkt.seite === "rechts" ? "float-right ml-8 md:ml-24" : "float-left mr-8 md:mr-24";
   return (
     <aside className={`${seite} my-16 flex w-56 flex-col items-center gap-4 text-center md:w-md [shape-outside:ellipse(50%_45%)]`}>
-      <div className={`aspect-square w-full overflow-hidden bg-surface-sunken ${punkt.form}`}>
-        <Bild id={punkt.bild} sizes="(min-width: 768px) 448px, 224px" className="h-full object-cover" />
+      <div className={`aspect-square w-full bg-accent-subtle/40 p-6 md:p-10 ${punkt.form}`}>
+        <Bild id={punkt.bild} sizes="(min-width: 768px) 448px, 224px" className="h-full object-contain" />
       </div>
       <h3 className="font-buch text-h3 font-medium text-text">{punkt.titel}</h3>
       <p className="text-small text-text-muted text-pretty">{punkt.text}</p>

@@ -41,7 +41,7 @@ export function ProduktCard({ strain, className }: Props) {
           <Badge variante={verfuegbar ? "success" : "neutral"}>
             {verfuegbar
               ? `${strain.anzahlApothekenVerfuegbar} Apotheke${strain.anzahlApothekenVerfuegbar === 1 ? "" : "n"}`
-              : "Nicht gelistet"}
+              : "Bestand unbekannt"}
           </Badge>
         </div>
 

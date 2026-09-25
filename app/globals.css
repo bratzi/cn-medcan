@@ -376,8 +376,8 @@
      em bezieht sich auf text-umschlag am selben Element. */
   .fuss-marke {
     /* Unterlängen laufen unten aus dem Fuß; blass wie die Buzz-Sätze. */
-    translate: 0 0.3em;
-    opacity: 0.35;
+    translate: 0 0.45em;
+    opacity: 0.15;
   }
 
   /* Stempel fuer gesetzte Plaetze auf dem Stimmzettel (Spec 5.1, Sektion 6).
@@ -494,6 +494,8 @@
 
 .buehne-dunkel {
   --color-surface: var(--color-neutral-1000);
+  --color-surface-raised: var(--color-neutral-900);
+  --color-surface-sunken: var(--color-neutral-900);
   --color-border: var(--color-neutral-800);
   --color-border-strong: var(--color-neutral-500);
   --color-text: var(--color-neutral-50);

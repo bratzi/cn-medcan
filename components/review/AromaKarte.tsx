@@ -183,7 +183,10 @@ export function AromaKarte({ terpene, serien, titel = "Aroma-Karte", hervorheben
                   stroke={FARBE[serie.ton]}
                   strokeWidth={4}
                   strokeLinecap="round"
-                  opacity={kartenSichtbar * (aktiv === null || aktiv === index ? 1 : 0.3)}
+                  opacity={
+                    (serie.matrix[GESCHMACKS_ACHSEN[index].key] > 0 ? kartenSichtbar : 0) *
+                    (aktiv === null || aktiv === index ? 1 : 0.3)
+                  }
                 />
               ))}
               {serienPunkte[s].map((punkt, index) => (
@@ -193,6 +196,7 @@ export function AromaKarte({ terpene, serien, titel = "Aroma-Karte", hervorheben
                   cy={punkt.y}
                   r={aktiv === index ? 6 : 4}
                   fill={FARBE[serie.ton]}
+                  opacity={serie.matrix[GESCHMACKS_ACHSEN[index].key] > 0 ? 1 : t}
                 />
               ))}
             </g>
@@ -204,7 +208,7 @@ export function AromaKarte({ terpene, serien, titel = "Aroma-Karte", hervorheben
               cx={punkt.x}
               cy={punkt.y}
               r={aktiv === index ? 8 : 6}
-              fill={FARBE[index % 2 === 0 ? "gruen" : "lila"]}
+              fill="currentColor"
             />
           ))}
         </svg>
@@ -224,7 +228,7 @@ export function AromaKarte({ terpene, serien, titel = "Aroma-Karte", hervorheben
               aktiv === index ? "text-text" : "text-text-muted",
             )}
             style={{
-              left: `${((t < 0.5 ? punkt.x - 130 * kartenSichtbar : punkt.x) / BREITE) * 100}%`,
+              left: `${((t < 0.5 ? punkt.x - 150 * kartenSichtbar : punkt.x) / BREITE) * 100}%`,
               top: `${(punkt.y / HOEHE) * 100}%`,
             }}
           >
