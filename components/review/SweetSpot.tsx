@@ -71,14 +71,14 @@ export function SweetSpot({
   if (zeilen.length === 0) return null;
   return (
     <section className="flex flex-col gap-4">
-      <h3 className="font-buch text-h2 font-medium text-text text-balance">
+      <h3 className={cn("font-buch font-medium text-text text-balance", quer ? "text-h3" : "text-h2")}>
         {titel ? `${titel}: ` : null}
         <em className="farbverlauf hand-betont">Sweet Spot</em> gesucht
       </h3>
       <ul
         className={
           quer
-            ? "-mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-4 sm:-mx-8 sm:px-8"
+            ? "flex snap-x snap-mandatory gap-3 overflow-x-auto pb-3"
             : "flex flex-col gap-6"
         }
         onPointerLeave={() => bedienung?.aktivieren?.(null)}>
@@ -90,13 +90,13 @@ export function SweetSpot({
               key={zeile.terpen}
               className={cn(
                 "flex flex-col gap-2",
-                quer && "w-72 shrink-0 snap-start rounded-lg border border-border bg-surface-raised p-6 sm:w-80",
+                quer && "w-60 shrink-0 snap-start rounded-lg border border-border bg-surface-raised p-4",
                 quer && gezeigt < 0.05 && "opacity-70",
               )}
               onPointerEnter={() => bedienung?.aktivieren?.(zeile.terpen)}
             >
               <div className="flex items-baseline justify-between gap-4">
-                <span className="font-buch text-h3 font-medium text-text">
+                <span className={cn("font-buch font-medium text-text", quer ? "text-body" : "text-h3")}>
                   {zeile.terpen}
                   {zeile.ergaenzt ? <span className="ml-2 text-caption font-normal text-text-muted">nicht angegeben</span> : null}
                 </span>

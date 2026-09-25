@@ -89,8 +89,9 @@ export function AromaErkundung({
   };
 
   return (
-    <div className="flex flex-col gap-12">
-      <div className="mx-auto w-full max-w-4xl">
+    <div className="grid grid-cols-1 gap-12 lg:grid-cols-[minmax(0,3fr)_minmax(0,1fr)] lg:items-start">
+      {/* Links Karte und Regler direkt darunter: man sieht beim Schieben, was sich tut. */}
+      <div className="flex min-w-0 flex-col gap-6">
         <AromaKarte
           titel={titel}
           terpene={kartenTerpene}
@@ -99,8 +100,18 @@ export function AromaErkundung({
           staerken={terpenStaerken(kartenTerpene, stufen)}
           ergaenzt={ergaenzt.map((terpen) => terpen.name)}
         />
+        <SweetSpot
+          titel={intensitaetTitel}
+          zeilen={alle}
+          quer
+          bedienung={{
+            eigen,
+            aendern: (terpen, wert) => setEigen((alt) => ({ ...alt, [terpen]: wert })),
+            aktivieren,
+          }}
+        />
       </div>
-      <div className="flex flex-col items-center gap-8 text-center">
+      <div className="flex flex-col items-start gap-6 lg:sticky lg:top-24">
         {treue || eigeneTreue !== null ? (
           <dl className="flex flex-wrap gap-x-12 gap-y-4">
             {treue ? (
@@ -121,23 +132,11 @@ export function AromaErkundung({
             ) : null}
           </dl>
         ) : null}
-        <p className="-mt-4 max-w-[60ch] text-caption text-text-muted text-pretty">
+        <p className="-mt-2 max-w-[40ch] text-caption text-text-muted text-pretty">
           Herstellertreue: wie nah das geschmeckte Profil an dem liegt, was die Herstellerangaben erwarten lassen. 100 %
           heißt deckungsgleich.
         </p>
-      </div>
-      <SweetSpot
-        titel={intensitaetTitel}
-        zeilen={alle}
-        quer
-        bedienung={{
-          eigen,
-          aendern: (terpen, wert) => setEigen((alt) => ({ ...alt, [terpen]: wert })),
-          aktivieren,
-        }}
-      />
-      <div className="flex flex-col items-start gap-6">
-        <p className="max-w-[60ch] text-small text-text-muted text-pretty">
+        <p className="max-w-[40ch] text-small text-text-muted text-pretty">
           Schieb die Punkte: Wie stark hast du die Terpene geschmeckt? Terpene bei 0 bleiben grau, hochgezogen werden sie
           farbig. Die Karte zeigt dein Profil in Lila. Hier wird nichts gespeichert.
         </p>
