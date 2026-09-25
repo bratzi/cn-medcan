@@ -31,24 +31,37 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 ### ⇢ NÄCHSTE SESSION BEGINNT HIER (Stand 2026-09-25, Session 18 Ende)
 
 **Blüte vorschlagen** (Spec `docs/superpowers/specs/2026-09-25-bluete-vorschlagen-design.md`, Plan
-`docs/superpowers/plans/2026-09-25-bluete-vorschlagen.md`, Ledger `.superpowers/sdd/2026-09-25-bluete-vorschlagen/progress.md`):
-- Tasks 1–7 umgesetzt (TDD, Tests grün). Migration 0006 + Trigger **live angewendet** (remote, 25.09. ~15:25 UTC).
-- Mail kommt später (Nutzerentscheid: kostet Domain + Workers Paid); Benachrichtigungen nur im Mitgliederbereich.
-- Neue Blüten/Hersteller bekommen die Import-Id (`lib/stamm-id.ts`, uuid5 wie `scripts/stamm/sql-erzeugen.py`).
-- Offen: Task 8 Live-Prüfung (Vorschlag anlegen, im Admin freigeben, Zähler/Benachrichtigung sehen) und das
-  Schlussreview des ganzen Stands. Späterer JSON-Import: Anbindung an offene Vorschläge nach Spec 4.4.
+`docs/superpowers/plans/2026-09-25-bluete-vorschlagen.md`): **Tasks 1–7 fertig und live**, Migration 0006 + Trigger
+remote angewendet. Schlussreview (Opus): 0 kritisch, 2 wichtig (beide behoben mit Tests: Terpene beim zweiten Klick
+nachholen; Zähler lädt bei Navigation und nach An-/Abmelden neu), dazu hochgestuft: Zähler zeigt nach „gelesen“ keine
+alte Zahl mehr. Tests 185/185.
+- **Live geprüft (DOM):** /vorschlagen legt an („Danke!“), Doppelvorschlag wird abgewiesen, vorhandene Blüte
+  („Apples & Bananas“) → Meldung mit Link; /mitglied zeigt „Benachrichtigungen“ und „Meine Vorschläge“.
+- **Offen (braucht Chrome im Vordergrund):** Im Admin „Testblüte Vorschlag 1“ freigeben (Typ Hybrid, THC 20–24,
+  CBD 0–1), dann Zähler an „Mein Konto“ und die Benachrichtigung prüfen, /produkte/testbluete-vorschlag-1 aufrufen.
+  Danach Testblüte löschen oder behalten (Nutzer fragen). Im Hintergrund-Tab hydriert /admin nicht: React 19 blendet
+  nachgestreamte Suspense-Abschnitte per requestAnimationFrame ein, das steht bei `visibilityState: hidden`.
+- **Kleinpunkte aus dem Review (bewusst verschoben):** „gelesen“ markiert alle statt nur die 20 angezeigten;
+  P2002 bei strain.create pauschal geschluckt (Race mit Import); gleichzeitige Freigabe aus zwei Tabs kann bei
+  createMany werfen; `\b` in unternehmensSchluessel nur ASCII; Treffer auf IMPORTEUR wird nicht BEIDES; korrigierter
+  Name mit gleicher Id ohne Hinweis; inaktive Blüten in blueteVorhanden; Hersteller Freitext statt Auswahl (Spec
+  4.2); Doppelvorschlag-Meldung ohne Link; Anmelde-Weiterleitung verliert `?name=`; Leerzustand zeigt zwei
+  Einstiege; Test für Schreibvarianten fehlt; updateMany mit bis 200 Ids (D1 max 98 Bind-Werte); schema.prisma CRLF.
+- Mail kommt später (Nutzerentscheid); späterer JSON-Import: Anbindung an offene Vorschläge nach Spec 4.4.
 
 **Startseite und Auftritt (Session 18, alles gepusht):**
 - Hero: Kopfzeile „Grünes Buch · Stand · Terps for nerds“ als Band über die volle Breite unten in der ersten
   Ansicht (live gemessen: liegt in 100svh), dünn und gedämpft; Hero-Nebentexte in gesperrten Versalien
   (`tracking-gesperrt`, Regel in ui-design-engine angepasst); Unterzeile „Terpen für Terpen“.
-- Wortmarke: fünf kreisende, gekippte Bahnen in Violett/Grün (`.marke-bahn`, Werte je Bahn in `Auftakt.tsx`),
-  Zeigerfolge über `bewegung/punkte.ts`.
+- Wortmarke: vier versetzte Konturen der Schrift in Grün/Violett (`.marke-kontur-N`, nur transform-Drift), statt
+  der verworfenen 3D-Bahnen (Nutzer: zu viel, zu teuer). Zeigerfolge über `bewegung/punkte.ts`.
 - Kopf ohne Kapitelnummern. „Produkt“ im Auftritt überall „Blüte“ (URL `/produkte` bleibt).
 - Storytelling: ohne Chargen; Stationen Gesamteindruck, Terpene, Beschaffenheit (wie die Aroma-Erkundung);
-  Grad `text-erzaehlung`; Absätze mit `mt-[35vh] md:mt-[50vh]`; je Video vier morphende Linien (`RINGE`,
+  Grad `text-erzaehlung`; Absatz und Video als Paar nebeneinander (`Paar`), Abstand `mt-[35vh] md:mt-[50vh]`
+  zwischen den Paaren; je Video vier morphende Linien (`RINGE`,
   `blob-morph`/`blob-morph-stark`), Zeigerfolge.
-- Aroma-Erkundung in drei Schritten (01 Gesamteindruck, 02 Terpene mit Karte, 03 Beschaffenheit).
+- Aroma-Erkundung in drei Schritten voller Breite mit großen Handschrift-Ziffern (1 Gesamteindruck, 2 Terpene mit
+  Karte, 3 Beschaffenheit), Herstellertreue zentral darüber.
 - Schlagworte: keins im Storytelling; „stimmt das?“ am Ende der Aroma-Sektion, „was drin ist“ unter dem
   neuesten Eintrag; Eintrags-Hintergrund verläuft weich (Gradient statt harter Fläche); Schleifenvideo blendet aus.
 - Joint-Cursor: Canvas-Qualm (`components/layout/joint-rauch.ts`), Funken, flackernde Glut, Ausatmen.
