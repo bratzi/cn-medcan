@@ -999,3 +999,25 @@ html.joint-cursor :is(input:not([type="range"]):not([type="radio"]):not([type="c
 .loop-schalter[data-angehalten] .loop-schalter-play {
   display: block;
 }
+
+/* Hintergrundvideo einer Sektion (GemeinsamLernen): läuft oben und unten weich
+   ins Papier aus, statt an der Sektionskante hart abzubrechen. In der
+   ausgeblendeten Kante hängen die Schlagworte (Schlagwort oben=top-0) und
+   bleiben so lesbar (Nutzer 2026-09-25). */
+.video-einbettung {
+  --video-kante: min(16rem, 30%);
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent,
+    #000 var(--video-kante),
+    #000 calc(100% - var(--video-kante)),
+    transparent
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    transparent,
+    #000 var(--video-kante),
+    #000 calc(100% - var(--video-kante)),
+    transparent
+  );
+}

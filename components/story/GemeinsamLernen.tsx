@@ -4,16 +4,16 @@ import { Schlagwort } from "@/components/story/Schlagwort";
 
 /**
  * Sektion 4 (Spec Redesign 4): die Schleife. Das Video läuft blass und
- * bildschirmfüllend hinter der Sektion, davor stehen die vier Stationen
+ * bildschirmfüllend hinter der Sektion und blendet oben und unten weich aus, davor stehen die vier Stationen
  * groß untereinander: die ersten beiden schreibt die Community von Hand,
- * die letzten beiden druckt das Buch; alles in der Wir-Form (Spec Redesign 10). Die Überschrift trägt die Aussage,
- * die Stationen sind deren Bild und deshalb aria-hidden.
+ * die letzten beiden druckt das Buch; alles in der Wir-Form (Spec Redesign 10). Die Überschrift trägt die Aussage
+ * (nur sr-only), die Stationen sind deren sichtbares Bild und deshalb aria-hidden.
  */
 const STATIONEN = [
   { text: "Wir schlagen vor.", hand: true },
   { text: "Wir stimmen ab.", hand: true },
   { text: "Wir testen.", hand: false },
-  { text: "Wir lesen.", hand: false },
+  { text: "Wir bewerten.", hand: false },
 ] as const;
 
 export function GemeinsamLernen() {
@@ -23,7 +23,7 @@ export function GemeinsamLernen() {
       data-story="lernen"
       className="relative isolate overflow-x-clip px-4 py-32 sm:px-8 sm:py-48"
     >
-      <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-20 overflow-hidden">
+      <div aria-hidden="true" className="video-einbettung pointer-events-none absolute inset-0 -z-20 overflow-hidden">
         <Loop id="pflanze-loop" buehne className="h-full opacity-50" />
       </div>
       <Schlagwort satz="wir stimmen ab" />
@@ -46,8 +46,10 @@ export function GemeinsamLernen() {
         </ol>
 
         <div className="flex flex-col items-start gap-6">
-          <h2 id="lernen-titel" className="font-buch text-h1 font-medium text-text text-balance">
-            Wir schlagen vor. Wir stimmen ab. Wir testen. <em className="farbverlauf hand-betont">Wir lesen.</em>
+          {/* Die Stationen links sagen es schon sichtbar; die Überschrift bleibt
+              nur für Screenreader und als Sprungziel (Nutzer 2026-09-25). */}
+          <h2 id="lernen-titel" className="sr-only">
+            Wir schlagen vor. Wir stimmen ab. Wir testen. Wir bewerten.
           </h2>
           <p className="max-w-[56ch] text-body text-text text-pretty">
             Jede Runde bringt neue Sorten auf die Liste. Was die meisten Stimmen holt, testen wir nach
