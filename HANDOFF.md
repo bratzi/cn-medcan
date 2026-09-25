@@ -3,7 +3,7 @@
 > Übergabemedium zwischen Sessions. Wird nach jedem Arbeitsblock aktualisiert und committet.
 > Wer hier weiterarbeitet, liest diese Datei zuerst und braucht den Chatverlauf nicht.
 
-**Letzte Aktualisierung:** 2026-09-25 (Session 17 Ende)
+**Letzte Aktualisierung:** 2026-09-25 (Session 18)
 **Repo:** https://github.com/bratzi/cn-medcan (public)
 **Branch:** `main` (Makeover „Grünes Buch“ Teilprojekt 1 ist seit 2026-09-24 auf `main`)
 
@@ -28,7 +28,22 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 
 ## ⇢ Hier geht es weiter
 
-### ⇢ NÄCHSTE SESSION BEGINNT HIER (Stand 2026-09-25, Session 17 Ende, alles gepusht bis `d682afa`)
+### ⇢ NÄCHSTE SESSION BEGINNT HIER (Stand 2026-09-25, Session 18)
+
+**Session 18:**
+- Live per DOM bestätigt (Stand `ae3201e`): Navigation „Blüten“, Lampe unten rechts, Pause-Symbole. Screenshot-Sicht-
+  prüfung steht noch aus (Chrome-Fenster war im Hintergrund, `visibilityState: hidden`).
+- Nutzerwunsch umgesetzt (`540c23c`, gepusht 14:23 UTC): Schleife „04 Wir bewerten.“ statt „Wir lesen.“, die doppelte
+  Überschrift rechts nur noch `sr-only`, Hintergrundvideo blendet oben/unten weich aus (`.video-einbettung`, mask-image,
+  Kante min(16rem, 30%)), damit die Schlagworte zwischen den Sektionen lesbar sind. **Live-Sichtprüfung offen.**
+- **„Blüte vorschlagen“:** Spec geschrieben: `docs/superpowers/specs/2026-09-25-bluete-vorschlagen-design.md`.
+  Nutzer entschied: **Mail erst später** (jeder Versandweg kostet: CF Email Sending nur Workers Paid + eigene Domain),
+  jetzt nur Benachrichtigungen im Mitgliederbereich. Alle anderen Entscheidungen in der Spec mit (E) markiert.
+  Kernfund: neue Blüten müssen `id = uuid5(NS, "s:"+slug)` wie `scripts/stamm/sql-erzeugen.py` bekommen, sonst bricht
+  der spätere JSON-Import am Unique-Index `slug` ab.
+  **Nächster Schritt:** Nutzer prüft die Spec; nach Freigabe `superpowers:writing-plans`, dann umsetzen.
+
+### ⇢ STAND SESSION 17 Ende (alles gepusht bis `d682afa`)
 
 **Zuletzt in Session 17 (Code fertig, Tests 157/157; live per Screenshot noch NICHT gesehen, zuerst prüfen):**
 - Hell/Dunkel-Schalter als Lampe fest unten rechts (`ThemaSchalter`, Klasse `.thema-lampe`; aus dem Kopf entfernt;
