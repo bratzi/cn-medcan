@@ -591,127 +591,145 @@
   }
 }
 
-/* Bud-Cursor (components/layout/BudCursor.tsx): ersetzt den Mauszeiger nur
-   bei feiner Maus; Textfelder behalten den Textcursor. Ruhe: schwarzweiß.
-   Bewegen: dezente Duftspur. Klick: grün, qualmt und glüht, röstet (--roest). */
-html.bud-cursor,
-html.bud-cursor * {
+/* Joint-Cursor (components/layout/JointCursor.tsx): ersetzt den Mauszeiger nur
+   bei feiner Maus, Textfelder behalten den Textcursor. Angestellt wie der Pfeil,
+   Klickpunkt an der Spitze. Klick: Glut und Asche (--glut 0 bis 1). */
+html.joint-cursor,
+html.joint-cursor * {
   cursor: none !important;
 }
 
-html.bud-cursor :is(input:not([type="range"]):not([type="radio"]):not([type="checkbox"]), textarea, [contenteditable]) {
+html.joint-cursor :is(input:not([type="range"]):not([type="radio"]):not([type="checkbox"]), textarea, [contenteditable]) {
   cursor: text !important;
 }
 
-.bud-zeiger {
-  --roest: 0;
+.joint-zeiger {
+  --glut: 0;
   position: fixed;
-  top: -14px;
-  left: -14px;
+  top: -1px;
+  left: -1px;
   z-index: 2147483647;
   pointer-events: none;
   opacity: 0;
   transition: opacity 0.2s;
-  filter: grayscale(1) drop-shadow(0 0 1px color-mix(in oklab, var(--color-surface) 85%, transparent));
+  filter: drop-shadow(0 1px 1.5px rgb(0 0 0 / 0.35));
 }
 
-.bud-zeiger[data-sichtbar] {
-  opacity: 0.9;
-}
-
-.bud-zeiger svg {
-  display: block;
-  transition: transform 0.15s var(--ease-standard);
-}
-
-.bud-koerper {
-  fill: #5f9e5c;
-}
-
-.bud-blatt {
-  fill: #3f7a45;
-}
-
-.bud-stiel,
-.bud-schuppen {
-  stroke: #2f5a33;
-}
-
-.bud-haerchen {
-  fill: #d98a3a;
-}
-
-.bud-koerper,
-.bud-blatt,
-.bud-haerchen {
-  transition: fill 0.3s;
-}
-
-/* Klick: Farbe an, glüht und röstet mit der Haltedauer. */
-.bud-zeiger[data-gedrueckt] {
+.joint-zeiger[data-sichtbar] {
   opacity: 1;
-  filter: drop-shadow(0 0 calc(2px + var(--roest) * 8px) color-mix(in oklab, #ff7a1a calc(40% + var(--roest) * 60%), transparent));
 }
 
-.bud-zeiger[data-gedrueckt] svg {
-  transform: scale(1.1);
+.joint-zeiger svg {
+  display: block;
 }
 
-.bud-zeiger[data-gedrueckt] .bud-koerper {
-  fill: color-mix(in oklab, #5f9e5c calc((1 - var(--roest)) * 100%), #6b3f1d);
+.joint-papier {
+  fill: #f4efe4;
+  stroke: #b9ad97;
+  stroke-width: 0.6;
+  stroke-linejoin: round;
 }
 
-.bud-zeiger[data-gedrueckt] .bud-blatt {
-  fill: color-mix(in oklab, #3f7a45 calc((1 - var(--roest)) * 100%), #3a2412);
+.joint-filter {
+  fill: #c9a878;
+  stroke: #9a7c52;
+  stroke-width: 0.6;
 }
 
-.bud-zeiger[data-gedrueckt] .bud-haerchen {
-  fill: color-mix(in oklab, #d98a3a calc((1 - var(--roest)) * 100%), #ff5a0a);
+.joint-linie {
+  stroke: #cfc5b2;
+  stroke-width: 0.5;
+  fill: none;
 }
 
-/* Duftspur beim Bewegen: blass, klein, verweht schnell. */
-.bud-spur,
-.bud-rauch {
+.joint-asche,
+.joint-glut {
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.joint-asche {
+  fill: color-mix(in oklab, #8c8580 calc((1 - var(--glut)) * 100%), #4a4542);
+}
+
+.joint-glut {
+  fill: color-mix(in oklab, #ff8a2a calc((1 - var(--glut)) * 100%), #ffd36a);
+  filter: blur(0.4px);
+}
+
+/* Klick: die Spitze glimmt, Asche setzt an, die Glut leuchtet mit der Haltedauer auf. */
+.joint-zeiger[data-gedrueckt] .joint-asche {
+  opacity: calc(0.5 + var(--glut) * 0.5);
+}
+
+.joint-zeiger[data-gedrueckt] .joint-glut {
+  opacity: 1;
+  animation: joint-glimmen 0.9s ease-in-out infinite alternate;
+}
+
+.joint-zeiger[data-gedrueckt] {
+  filter: drop-shadow(0 1px 1.5px rgb(0 0 0 / 0.35))
+    drop-shadow(0 0 calc(2px + var(--glut) * 7px) color-mix(in oklab, #ff6a10 calc(50% + var(--glut) * 50%), transparent));
+}
+
+@keyframes joint-glimmen {
+  from {
+    opacity: 0.75;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.joint-spur,
+.joint-rauch {
   --drift: 0px;
-  --roest: 0;
+  --glut: 0;
   position: fixed;
   z-index: 2147483646;
   border-radius: 9999px;
   pointer-events: none;
 }
 
-.bud-spur {
+/* Duftspur beim Bewegen: blass grünlich, verweht schnell. */
+.joint-spur {
   width: 6px;
   height: 6px;
   margin: -3px 0 0 -3px;
   background: color-mix(in oklab, #9ed9a6 70%, transparent);
   filter: blur(2px);
-  opacity: 0.35;
-  animation: bud-spur 0.9s ease-out forwards;
+  opacity: 0.3;
+  animation: joint-spur 0.9s ease-out forwards;
 }
 
-@keyframes bud-spur {
+@keyframes joint-spur {
   to {
     transform: translate(var(--drift), -14px) scale(2.2);
     opacity: 0;
   }
 }
 
-/* Qualm beim Klick: grau, steigt auf, wird mit dem Rösten dichter. */
-.bud-rauch {
-  width: 9px;
-  height: 9px;
-  margin: -4.5px 0 0 -4.5px;
-  background: color-mix(in oklab, #b8b8b8 calc((1 - var(--roest)) * 100%), #6d6258);
+/* Qualm beim Klick: grau, steigt von der Spitze auf, dichter mit der Glut. */
+.joint-rauch {
+  width: 8px;
+  height: 8px;
+  margin: -4px 0 0 -4px;
+  background: #bdb8b2;
   filter: blur(3px);
-  opacity: calc(0.45 + var(--roest) * 0.3);
-  animation: bud-rauch 1.6s ease-out forwards;
+  opacity: calc(0.4 + var(--glut) * 0.3);
+  animation: joint-rauch 1.8s ease-out forwards;
 }
 
-@keyframes bud-rauch {
+@keyframes joint-rauch {
   to {
-    transform: translate(var(--drift), -60px) scale(3.4);
+    transform: translate(var(--drift), -64px) scale(3.6);
     opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .joint-zeiger[data-gedrueckt] .joint-glut {
+    animation: none;
   }
 }
 

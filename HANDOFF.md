@@ -44,7 +44,7 @@ per `javascript_tool` scrollen (`scrollIntoView`) statt `find`+`scroll_to`; hän
   besser), Restfeuchte bleibt `feuchtigkeit_prozent`. Formular: `BeschaffenheitsRegler`; Anzeige:
   `BeschaffenheitsLeiste` (neben der Karte gemittelt, in der Doppelseite ohne Feuchte). 20 Beispielbewertungen live
   mit abgeleiteten Werten befüllt (Trichomfarbe überall 2,5).
-- Bud-Cursor (`components/layout/BudCursor.tsx`): 28 px, Duftspur beim Bewegen, Klick qualmt/glüht/röstet.
+- Joint-Cursor (`components/layout/JointCursor.tsx`, ersetzt den Bud): angestellt wie der Pfeil, Klickpunkt an der Spitze, Duftspur beim Bewegen, Klick glimmt/qualmt/Asche.
 - Verlaufsschrift nicht mehr abgeschnitten (Padding + negativer Rand in `.farbverlauf`), Plakat kleiner.
 - 3D-Blätter aus (`BLAETTER_AN = false` in components/story/bewegung/start.ts).
 - Storytelling-Prüfpunkte: Blob-Morph, leichter Zoom, Bildwechsel/Schweben, Restfeuchte als Video (pflanze-loop).
