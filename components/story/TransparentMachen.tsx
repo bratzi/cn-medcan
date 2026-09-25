@@ -1,6 +1,8 @@
 import { Suspense, type ReactNode } from "react";
 
 import { Bild } from "@/components/medien/Bild";
+import { Loop } from "@/components/medien/Loop";
+import { Button } from "@/components/ui";
 import { formatiereDatum } from "@/lib/format";
 import { BEWERTUNGS_ACHSEN } from "@/lib/query/bewertung";
 import { neuesteRedaktionelleReview } from "@/lib/query/reviews";
@@ -17,24 +19,67 @@ const ERLAEUTERUNG: Record<string, string> = Object.fromEntries(
  * um die der Manifest-Text fließt (float mit shape-outside: ellipse).
  */
 const PUNKTE = [
-  { titel: "Aussehen", bild: "frei-hoch", text: ERLAEUTERUNG.aussehen, seite: "rechts", form: "rounded-[62%_38%_55%_45%/48%_60%_40%_52%] rotate-3" },
-  { titel: "Geruch", bild: "frei-paar", text: ERLAEUTERUNG.geruch, seite: "links", form: "rounded-[45%_55%_40%_60%/58%_42%_62%_38%] -rotate-2" },
+  {
+    titel: "Aussehen",
+    bilder: ["frei-hoch", "frei-bluete"],
+    text: ERLAEUTERUNG.aussehen,
+    seite: "rechts",
+    form: "rounded-[62%_38%_55%_45%/48%_60%_40%_52%] rotate-3",
+    verzoegerung: "0s",
+  },
+  {
+    titel: "Geruch",
+    bilder: ["frei-paar"],
+    text: ERLAEUTERUNG.geruch,
+    seite: "links",
+    form: "rounded-[45%_55%_40%_60%/58%_42%_62%_38%] -rotate-2",
+    verzoegerung: "-5s",
+  },
   {
     titel: "Restfeuchte",
-    bild: "trichom",
+    video: "pflanze-loop",
     text: "Zwischen 8 und 13 Prozent ist gut. Darunter wird es staubig, darüber droht Schimmel.",
     seite: "rechts",
     form: "rounded-[55%_45%_62%_38%/42%_56%_44%_58%] rotate-1",
+    verzoegerung: "-9s",
   },
 ] as const;
 
+/**
+ * Ein Prüfpunkt: der Blob morpht langsam (blob-morph), das Innere zoomt leicht
+ * (bild-zoom); mehrere Freisteller blenden im Wechsel (bild-wechsel), ein Video
+ * füllt den Blob randlos. Reduzierte Bewegung: alles steht (globals.css).
+ */
 function Punkt({ punkt }: { punkt: (typeof PUNKTE)[number] }) {
   const seite = punkt.seite === "rechts" ? "float-right ml-8 md:ml-24" : "float-left mr-8 md:mr-24";
   return (
     <aside className={`${seite} my-16 flex w-56 flex-col items-center gap-4 text-center md:w-md [shape-outside:ellipse(50%_45%)]`}>
-      <div className={`aspect-square w-full bg-accent-subtle/40 p-6 md:p-10 ${punkt.form}`}>
-        <Bild id={punkt.bild} sizes="(min-width: 768px) 448px, 224px" className="h-full object-contain" />
+      <div
+        className={`blob-morph relative aspect-square w-full ${punkt.form} ${"video" in punkt ? "overflow-hidden" : "bg-accent-subtle/40 p-6 md:p-10"}`}
+        style={{ animationDelay: punkt.verzoegerung }}
+      >
+        {"video" in punkt ? (
+          <Loop id={punkt.video} className="bild-zoom h-full" />
+        ) : (
+          <div className={`relative h-full ${punkt.bilder.length > 1 ? "bild-wechsel" : "bild-schweben"}`}>
+            {punkt.bilder.map((id, index) => (
+              <Bild
+                key={id}
+                id={id}
+                dekorativ={index > 0}
+                sizes="(min-width: 768px) 448px, 224px"
+                className={`bild-zoom h-full object-contain ${index > 0 ? "absolute inset-0" : ""}`}
+              />
+            ))}
+          </div>
+        )}
       </div>
+      {"video" in punkt ? (
+        // Pause fuer das Video (WCAG 2.2.2); sichtbar erst, wenn loops.ts es startet.
+        <Button variante="ghost" groesse="sm" hidden data-loop-schalter="">
+          Video anhalten
+        </Button>
+      ) : null}
       <h3 className="font-buch text-h3 font-medium text-text">{punkt.titel}</h3>
       <p className="text-small text-text-muted text-pretty">{punkt.text}</p>
     </aside>

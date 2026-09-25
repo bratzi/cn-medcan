@@ -675,3 +675,71 @@ html.bud-cursor :is(input:not([type="range"]):not([type="radio"]):not([type="che
     opacity: 0;
   }
 }
+
+/* Storytelling-Prüfpunkte (TransparentMachen): Blob-Rand morpht, Inhalt
+   zoomt leicht, Freisteller wechseln oder schweben. */
+@media (prefers-reduced-motion: no-preference) {
+  .blob-morph {
+    animation: blob-morph 16s ease-in-out infinite alternate;
+  }
+
+  .bild-zoom {
+    animation: bild-zoom 18s ease-in-out infinite alternate;
+  }
+
+  .bild-wechsel > :nth-child(2) {
+    opacity: 0;
+    animation: bild-wechsel 12s ease-in-out infinite, bild-zoom 18s ease-in-out infinite alternate;
+  }
+
+  .bild-schweben > * {
+    animation: bild-schweben 7s ease-in-out infinite alternate;
+  }
+}
+
+@keyframes blob-morph {
+  0% {
+    border-radius: 62% 38% 55% 45% / 48% 60% 40% 52%;
+  }
+  33% {
+    border-radius: 45% 55% 40% 60% / 58% 42% 62% 38%;
+  }
+  66% {
+    border-radius: 55% 45% 62% 38% / 42% 56% 44% 58%;
+  }
+  100% {
+    border-radius: 38% 62% 45% 55% / 55% 45% 58% 42%;
+  }
+}
+
+@keyframes bild-zoom {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.08);
+  }
+}
+
+@keyframes bild-wechsel {
+  0%,
+  40% {
+    opacity: 0;
+  }
+  50%,
+  90% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes bild-schweben {
+  from {
+    transform: translateY(0) rotate(-1deg) scale(1);
+  }
+  to {
+    transform: translateY(-10px) rotate(1.5deg) scale(1.05);
+  }
+}
