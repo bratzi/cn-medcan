@@ -53,12 +53,13 @@ test("Wissen bündeln: Randspalte ab lg, kein Schwenk, keine Wand", () => {
   assert.doesNotMatch(quelle, /bg-surface-sunken|Textur|wand|font-wand/);
 });
 
-test("Schleife: die Community schreibt von Hand, das Buch druckt", () => {
+test("Schleife: jede Station gedruckt, das Verb als Schlagwort von Hand (Nutzer 2026-09-25)", () => {
   const quelle = lies("components/story/GemeinsamLernen.tsx");
-  assert.match(quelle, /\{ text: "Wir schlagen vor\.", hand: true }/);
-  assert.match(quelle, /\{ text: "Wir stimmen ab\.", hand: true }/);
-  assert.match(quelle, /\{ text: "Wir testen\.", hand: false }/);
-  assert.match(quelle, /"font-hand text-notiz text-kopierstift"/);
+  for (const verb of ["schlagen vor.", "stimmen ab.", "testen.", "bewerten."]) {
+    assert.ok(quelle.includes(`verb: "${verb}"`), `Station fehlt: ${verb}`);
+  }
+  assert.match(quelle, /className="font-buch text-erzaehlung/);
+  assert.match(quelle, /className="farbverlauf font-hand text-erzaehlung/);
   assert.doesNotMatch(quelle, /font-wand|wand:|Sedgwick/);
 });
 
