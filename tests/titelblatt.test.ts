@@ -52,9 +52,9 @@ test("Titelblatt: Papier statt Glas, kein Bild, langer Name bricht um", () => {
   assert.match(html, /hyphens-auto/);
 });
 
-test("Verfügbarkeit in der Einzahl", () => {
-  assert.match(zeige({ ...BASIS, anzahlApothekenVerfuegbar: 1 }), /Bei 1 Apotheke verfügbar/);
-  assert.match(zeige({ ...BASIS, anzahlApothekenVerfuegbar: 0 }), /Derzeit nicht lieferbar/);
+test("Keine Verfügbarkeit im Titelblatt: Apotheken nur in Aussicht (Nutzer 2026-09-25)", () => {
+  assert.doesNotMatch(zeige({ ...BASIS, anzahlApothekenVerfuegbar: 1 }), /Apotheke/);
+  assert.doesNotMatch(zeige({ ...BASIS, anzahlApothekenVerfuegbar: 0 }), /lieferbar/);
 });
 
 function stimme(id: string, note: number, notiz: string | null): ReviewEintrag {

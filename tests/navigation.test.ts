@@ -3,14 +3,14 @@ import assert from "node:assert/strict";
 
 import { HAUPTNAVIGATION, KONTO_LINK, istAktiv } from "@/lib/navigation";
 
-test("Kern zuerst: Bewertungen, Abstimmung, Blüten, Apotheken", () => {
+test("Kern zuerst: Bewertungen, Abstimmung, Blüten; Apotheken nur in Aussicht", () => {
   assert.deepEqual(
     HAUPTNAVIGATION.map((eintrag) => eintrag.href),
-    ["/reviews", "/umfragen", "/produkte", "/apotheken"],
+    ["/reviews", "/umfragen", "/produkte"],
   );
   assert.deepEqual(
     HAUPTNAVIGATION.map((eintrag) => eintrag.text),
-    ["Bewertungen", "Abstimmung", "Blüten", "Apotheken"],
+    ["Bewertungen", "Abstimmung", "Blüten"],
   );
   assert.deepEqual(KONTO_LINK, { href: "/mitglied", text: "Mein Konto" });
 });

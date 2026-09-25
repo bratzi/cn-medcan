@@ -81,11 +81,11 @@ export function Auftakt() {
         <p
           data-story="intro"
           data-story-einstieg=""
-          className="-mt-2 w-full max-w-5xl text-center font-sans text-small uppercase leading-relaxed tracking-gesperrt text-text text-balance"
+          className="-mt-2 w-full text-center font-sans text-small uppercase leading-relaxed tracking-gesperrt text-text text-balance"
         >
-          {/* Ab md genau zwei Zeilen, je Satz eine, breit gezogen (Nutzer 2026-09-25). */}
-          <span className="md:block">Wir testen Sorten nach festem Schema.</span>{" "}
-          <span className="md:block">Kollektiven Geschmack kultivieren · Terpene schmecken &amp; verstehen · mit der Community neue Maßstäbe definieren.</span>
+          {/* Ab md genau zwei Zeilen, je Satz eine, ohne Umbruch und damit breiter als die übrigen Texte (Nutzer 2026-09-25). */}
+          <span className="md:block md:whitespace-nowrap">Wir testen Sorten nach festem Schema.</span>{" "}
+          <span className="md:block md:whitespace-nowrap">Kollektiven Geschmack kultivieren · Terpene schmecken &amp; verstehen · neue Maßstäbe definieren.</span>
         </p>
       </div>
 

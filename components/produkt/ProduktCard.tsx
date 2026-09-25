@@ -5,7 +5,6 @@ import { Badge, Card, CardBody, CardFooter } from "@/components/ui";
 import { CannabinoidBar } from "@/components/produkt/CannabinoidBar";
 import { TerpenChips } from "@/components/produkt/TerpenChips";
 import { cn } from "@/lib/cn";
-import { formatierePreisProGramm } from "@/lib/format";
 import { darreichungsformLabel, kultivarTypLabel } from "@/lib/labels";
 import { blueteBild } from "@/lib/medien";
 import type { StrainListenEintrag } from "@/lib/query/strains";
@@ -20,7 +19,7 @@ type Props = {
  * ausser dem umschliessenden Link.
  */
 export function ProduktCard({ strain, className }: Props) {
-  const verfuegbar = strain.anzahlApothekenVerfuegbar > 0;
+  // Apotheken und Preise seit 2026-09-25 nur in Aussicht (Nutzer): keine Badges, kein Preis.
   const bild = blueteBild(strain.herstellerBildPfad);
 
   return (
@@ -55,11 +54,6 @@ export function ProduktCard({ strain, className }: Props) {
             ) : null}
           </div>
 
-          <Badge variante={verfuegbar ? "success" : "neutral"}>
-            {verfuegbar
-              ? `${strain.anzahlApothekenVerfuegbar} Apotheke${strain.anzahlApothekenVerfuegbar === 1 ? "" : "n"}`
-              : "Bestand unbekannt"}
-          </Badge>
         </div>
 
         <div className="flex flex-wrap gap-2">
@@ -81,11 +75,6 @@ export function ProduktCard({ strain, className }: Props) {
       <CardFooter className="flex items-baseline justify-between gap-4">
         <span className="text-small text-text-muted">
           {strain.herstellerName ?? "Hersteller unbekannt"}
-        </span>
-        <span className="text-body font-medium text-text">
-          {strain.preisNurFuerFachkreise && strain.guenstigsterPreisCent === null
-            ? "Preis nur für Fachkreise"
-            : formatierePreisProGramm(strain.guenstigsterPreisCent)}
         </span>
       </CardFooter>
     </Card>

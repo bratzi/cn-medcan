@@ -27,12 +27,6 @@ export type TitelblattProps = {
   bild?: string | null;
 };
 
-function verfuegbarkeit(anzahl: number): string {
-  if (anzahl === 0) return "Derzeit nicht lieferbar";
-  if (anzahl === 1) return "Bei 1 Apotheke verfügbar";
-  return `Bei ${anzahl} Apotheken verfügbar`;
-}
-
 /**
  * Titelblatt der Blütenseite (Spec TP2 4.3), ersetzt den Glas-Kopf: Papier
  * statt Glas. Seit 2026-09-25 mit Referenzbild als Symbolbild (Nutzer; Ausnahme
@@ -59,9 +53,6 @@ export function Titelblatt(props: TitelblattProps) {
         <div className="flex flex-wrap gap-2">
           <Badge variante="neutral">{kultivarTypLabel[props.kultivarTyp]}</Badge>
           <Badge variante="neutral">{darreichungsformLabel[props.darreichungsform]}</Badge>
-          <Badge variante={props.anzahlApothekenVerfuegbar > 0 ? "success" : "danger"}>
-            {verfuegbarkeit(props.anzahlApothekenVerfuegbar)}
-          </Badge>
         </div>
         <p className="numeric text-h3 font-normal text-text">
           <span className="whitespace-nowrap">{`THC ${formatiereProzentSpanne(props.thcMin, props.thcMax)}`}</span>

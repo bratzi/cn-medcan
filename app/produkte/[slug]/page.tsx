@@ -4,7 +4,6 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { ABSCHNITT_TITEL, seitenRahmen } from "@/components/layout/Seitenkopf";
-import { BestandTabelle } from "@/components/produkt/BestandTabelle";
 import { CannabinoidBar } from "@/components/produkt/CannabinoidBar";
 import { TerpenChips } from "@/components/produkt/TerpenChips";
 import { Titelblatt } from "@/components/produkt/Titelblatt";
@@ -33,7 +32,6 @@ import type { Bestrahlung } from "@/db/enums";
 import { cn } from "@/lib/cn";
 import {
   formatiereDatum,
-  formatiereGramm,
   formatiereProzent,
   formatiereProzentSpanne,
 } from "@/lib/format";
@@ -163,9 +161,6 @@ async function ProduktInhalt({ slug }: { slug: string }) {
       ? [{ name: "Laut Community", ton: "lila" as const, matrix: geschmack.matrix }]
       : []),
   ];
-  const packungsgroessen = [...new Set(strain.bestaende.map((bestand) => bestand.packungGramm))].sort(
-    (a, b) => a - b,
-  );
 
   return (
     <>
@@ -311,22 +306,9 @@ async function ProduktInhalt({ slug }: { slug: string }) {
         </div>
       </section>
 
-      <section aria-labelledby="bestaende-titel" className={ABSTAND}>
-        <h2 id="bestaende-titel" className={ABSCHNITT_TITEL}>
-          Apothekenbestände
-        </h2>
-        <p className="mt-2 max-w-[68ch] text-small text-text-muted">
-          Von den Apotheken gemeldeter Stand, keine Verfügbarkeitszusage.
-        </p>
-        <div className="mt-8">
-          <BestandTabelle bestaende={strain.bestaende} fachkreis={fachkreis} />
-        </div>
-      </section>
-
+      {/* Apotheken, Bestände und Preise seit 2026-09-25 nur in Aussicht (Nutzer). */}
       <p className={cn(ABSTAND, "text-caption text-text-muted")}>
-        {`Gemeldete Packungsgrößen: ${
-          packungsgroessen.length > 0 ? packungsgroessen.map((gramm) => formatiereGramm(gramm)).join(", ") : "keine"
-        }. Stand der Angaben: ${formatiereDatum(strain.aktualisiertAm)}.`}
+        {`Apotheken und Preise: in Aussicht. Stand der Angaben: ${formatiereDatum(strain.aktualisiertAm)}.`}
       </p>
     </>
   );
