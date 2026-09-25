@@ -549,18 +549,18 @@
   box-decoration-break: clone;
 }
 
-/* Glanz läuft von selbst: alle 7 s einmal von links nach rechts, dann Ruhe.
+/* Glanz läuft von selbst: alle 3,5 s einmal von links nach rechts, dann Ruhe.
    Die zweite Zeile folgt knapp versetzt. */
 @media (prefers-reduced-motion: no-preference) {
   /* Zusammen mit dem geschriebenen Einstieg (schreiben), sonst überschriebe der Glanz ihn. */
   .auftakt-marke [data-marke-zeile] {
     animation:
       schreiben 0.8s var(--ease-standard) 0.1s backwards,
-      marke-glanz 7s var(--ease-standard) 2.4s infinite;
+      marke-glanz 3.5s var(--ease-standard) 2s infinite;
   }
 
   .auftakt-marke [data-marke-zeile] + [data-marke-zeile] {
-    animation-delay: 0.8s, 2.55s;
+    animation-delay: 0.8s, 2.12s;
   }
 }
 
@@ -568,7 +568,7 @@
   0% {
     background-position: 130% 0, 0 0;
   }
-  22%,
+  32%,
   100% {
     background-position: -30% 0, 0 0;
   }
