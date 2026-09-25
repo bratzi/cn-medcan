@@ -28,7 +28,7 @@ const text = (roh: unknown) => (typeof roh === "string" ? roh.trim() : "");
 
 const note = z.coerce.number().int().min(1).max(5);
 const achse = z.coerce.number().min(0).max(5).multipleOf(0.5);
-const intensitaet = z.coerce.number().int().min(1).max(5);
+const intensitaet = z.coerce.number().int().min(0).max(5);
 
 /** Reel nur als oeffentliche Instagram-URL. */
 const REEL = /^https:\/\/(www\.)?instagram\.com\/(reel|p)\/[A-Za-z0-9_-]+\/?(\?.*)?$/;
@@ -36,7 +36,7 @@ const REEL = /^https:\/\/(www\.)?instagram\.com\/(reel|p)\/[A-Za-z0-9_-]+\/?(\?.
 /**
  * Liest ein Formular. Erwartete Felder: strainId, chargenNr, note-<achse>
  * (1-5), feuchtigkeit (Prozent, optional), geschmack-<achse> (0-5 in
- * halben Schritten), terpen-<Name> (1-5, nur fuer uebergebene Terpene),
+ * halben Schritten), terpen-<Name> (0-5, 0 = nicht geschmeckt, nur fuer uebergebene Terpene),
  * notiz, instagramReelUrl.
  */
 export function bewertungPruefen(formular: Lesbar, terpenNamen: readonly string[]): Pruefung {
@@ -77,7 +77,7 @@ export function bewertungPruefen(formular: Lesbar, terpenNamen: readonly string[
     const roh = formular.get(`terpen-${name}`);
     if (roh === null || roh === undefined || roh === "") continue;
     const wert = intensitaet.safeParse(roh);
-    if (!wert.success) return { ok: false, fehler: `${name}: Intensität von 1 bis 5 wählen.` };
+    if (!wert.success) return { ok: false, fehler: `${name}: Intensität von 0 bis 5 wählen.` };
     terpenIntensitaet[name] = wert.data;
   }
 

@@ -8,8 +8,8 @@ import { bewertungSpeichern } from "@/app/bewerten/aktionen";
 import { AromaKarte, type AromaSerie } from "@/components/review/AromaKarte";
 import { Button, Field, Input, Meldung } from "@/components/ui";
 import { useHydriert } from "@/components/ui/useHydriert";
-import { TerpenErgaenzen, type KatalogEintrag } from "@/components/review/TerpenErgaenzen";
-import { ergaenztesTerpen, herstellerProfil, type KartenTerpen } from "@/lib/aromakarte";
+import type { KatalogEintrag } from "@/components/review/TerpenErgaenzen";
+import { ergaenztesTerpen, herstellerProfil, terpenStaerken, type KartenTerpen } from "@/lib/aromakarte";
 import { MAX_NOTIZ } from "@/lib/bewertung-eingabe";
 import { cn } from "@/lib/cn";
 import {
@@ -40,11 +40,13 @@ function Stufen({
   legende,
   stufen,
   sweetSpot = false,
+  onWahl,
 }: {
   name: string;
   legende: string;
   stufen: readonly { wert: number; label: string }[];
   sweetSpot?: boolean;
+  onWahl?: (wert: number) => void;
 }) {
   return (
     <fieldset className="flex flex-col gap-2 border-0 p-0">
@@ -52,7 +54,13 @@ function Stufen({
       <div className="flex flex-wrap gap-2">
         {stufen.map((stufe) => (
           <label key={stufe.wert} className="cursor-pointer">
-            <input type="radio" name={name} value={stufe.wert} className="peer sr-only" />
+            <input
+              type="radio"
+              name={name}
+              value={stufe.wert}
+              onChange={onWahl ? () => onWahl(stufe.wert) : undefined}
+              className="peer sr-only"
+            />
             <span
               className={cn(
                 "inline-flex h-11 items-center rounded-full border border-border-strong px-4 text-small text-text transition-colors duration-fast ease-standard",
@@ -70,6 +78,9 @@ function Stufen({
   );
 }
 
+/** Terpen-Stufen mit 0: bewusst nicht geschmeckt. */
+const TERPEN_STUFEN = [{ wert: 0, label: "nicht geschmeckt" }, ...INTENSITAETS_STUFEN] as const;
+
 const NOTEN_STUFEN = [1, 2, 3, 4, 5].map((wert) => ({ wert, label: String(wert) }));
 
 /**
@@ -80,8 +91,16 @@ const NOTEN_STUFEN = [1, 2, 3, 4, 5].map((wert) => ({ wert, label: String(wert) 
  * (lib/bewertung-eingabe.ts); hier steht nur Bedienhilfe.
  */
 export function BewertungsFormular({ strainId, handelsname, terpene, chargen, istBetreiber, katalog = [] }: Props) {
-  const [dazu, setDazu] = useState<KartenTerpen[]>([]);
+  // Alle bekannten Terpene stehen bereit; nicht angegebene starten bei 0 (grau).
+  const angegeben = new Set(terpene.map((terpen) => terpen.name));
+  const dazu: KartenTerpen[] = katalog
+    .filter((terpen) => !angegeben.has(terpen.name))
+    .map((terpen) => ergaenztesTerpen(terpen.name, terpen.geschmack));
   const alleTerpene = [...terpene, ...dazu];
+  const [gewaehlt, setGewaehlt] = useState<Record<string, number>>({});
+  const stufenJeTerpen = Object.fromEntries(
+    alleTerpene.map((terpen) => [terpen.name, gewaehlt[terpen.name] ?? (angegeben.has(terpen.name) ? 3 : 0)]),
+  );
   const router = useRouter();
   const hydriert = useHydriert();
   const [matrix, setMatrix] = useState<GeschmacksMatrix>(leereGeschmacksMatrix);
@@ -188,7 +207,13 @@ export function BewertungsFormular({ strainId, handelsname, terpene, chargen, is
           ))}
         </div>
         <div className="lg:sticky lg:top-24">
-          <AromaKarte titel="Vorschau" terpene={alleTerpene} serien={serien} ergaenzt={dazu.map((terpen) => terpen.name)} />
+          <AromaKarte
+            titel="Vorschau"
+            terpene={alleTerpene}
+            serien={serien}
+            staerken={terpenStaerken(alleTerpene, stufenJeTerpen)}
+            ergaenzt={dazu.map((terpen) => terpen.name)}
+          />
         </div>
       </section>
 
@@ -201,20 +226,35 @@ export function BewertungsFormular({ strainId, handelsname, terpene, chargen, is
             Zu viel von einem Terpen macht den Geschmack aufdringlich, zu wenig lässt ihn flach wirken. Wie stark
             war jedes Terpen? Optional, je Terpen.
           </p>
-          {alleTerpene.map((terpen, index) => (
+          {terpene.map((terpen) => (
             <Stufen
               key={terpen.name}
               name={`terpen-${terpen.name}`}
-              legende={index >= terpene.length ? `${terpen.name} (nicht angegeben)` : terpen.name}
-              stufen={INTENSITAETS_STUFEN}
+              legende={terpen.name}
+              stufen={TERPEN_STUFEN}
               sweetSpot
+              onWahl={(wert) => setGewaehlt((alt) => ({ ...alt, [terpen.name]: wert }))}
             />
           ))}
-          <TerpenErgaenzen
-            katalog={katalog}
-            vorhanden={alleTerpene.map((terpen) => terpen.name)}
-            hinzufuegen={(terpen) => setDazu((alt) => [...alt, ergaenztesTerpen(terpen.name, terpen.geschmack)])}
-          />
+          {dazu.length > 0 ? (
+            <>
+              <h3 className="mt-4 font-buch text-h3 font-medium text-text">Vom Hersteller nicht angegeben</h3>
+              <p className="-mt-4 max-w-[60ch] text-small text-text-muted text-pretty">
+                Steht nicht auf der Dose. Wenn du es trotzdem schmeckst, wähl eine Stufe; auf der Karte wird es dann
+                farbig.
+              </p>
+              {dazu.map((terpen) => (
+                <Stufen
+                  key={terpen.name}
+                  name={`terpen-${terpen.name}`}
+                  legende={terpen.name}
+                  stufen={TERPEN_STUFEN}
+                  sweetSpot
+                  onWahl={(wert) => setGewaehlt((alt) => ({ ...alt, [terpen.name]: wert }))}
+                />
+              ))}
+            </>
+          ) : null}
         </section>
       ) : null}
 

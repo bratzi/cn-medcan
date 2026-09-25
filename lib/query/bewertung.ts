@@ -265,7 +265,7 @@ export const INTENSITAETS_STUFEN = [
   { wert: 5, label: "zu stark" },
 ] as const;
 
-export const terpenIntensitaetSchema = z.record(z.string().min(1), z.number().int().min(1).max(5));
+export const terpenIntensitaetSchema = z.record(z.string().min(1), z.number().int().min(0).max(5));
 
 export type TerpenIntensitaet = z.infer<typeof terpenIntensitaetSchema>;
 
