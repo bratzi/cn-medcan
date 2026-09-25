@@ -41,7 +41,18 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
   jetzt nur Benachrichtigungen im Mitgliederbereich. Alle anderen Entscheidungen in der Spec mit (E) markiert.
   Kernfund: neue Blüten müssen `id = uuid5(NS, "s:"+slug)` wie `scripts/stamm/sql-erzeugen.py` bekommen, sonst bricht
   der spätere JSON-Import am Unique-Index `slug` ab.
-  **Nächster Schritt:** Nutzer prüft die Spec; nach Freigabe `superpowers:writing-plans`, dann umsetzen.
+  Spec vom Nutzer freigegeben („ja“). **Plan:** `docs/superpowers/plans/2026-09-25-bluete-vorschlagen.md` (8 Tasks,
+  TDD). Zusätzlicher Fund: auch Hersteller brauchen die Import-Id (`uuid5("u:"+schluessel)`). Zähler im Kopf per
+  `GET /api/benachrichtigungen` im Browser, weil der Kopf keine Sitzung liest.
+  **Nächster Schritt:** Nutzer prüft den Plan und wählt die Ausführung (Subagent oder Native), dann Task 1.
+- Startseite, Nutzerwünsche (`1fa72cf`, gepusht 14:42 UTC, **live noch nicht gesehen**):
+  Kopfzeile „Grünes Buch · Stand · Terpen für Terpen“ jetzt unten im Auftakt (`components/story/Kopfzeile.tsx`),
+  Unterzeile der Wortmarke „Terpen für Terpen“ statt „Charge für Charge“. Storytelling ohne Chargen: Terpenprofil,
+  jedes Terpen eigene Note, Abweichung Community/Hersteller; neuer Grad `text-erzaehlung` (clamp 2.5–3.75 rem);
+  Blobs mit `shape-margin` 2.5 rem und weicherer Rundung; zwei Linien (`.blob-linie`, Grün accent, Violett
+  kopierstift) morphen im eigenen Takt; Video und Linien folgen dem Zeiger (`bewegung/punkte.ts`, nur feiner Zeiger).
+  Schlagworte: keins mehr im Storytelling, „was drin ist“ jetzt beim neuesten Eintrag, „stimmt das?“ nicht mehr auf
+  der Kante (oben=top-32). Live prüfen: passt der Auftakt samt Kopfzeile in 100svh (auch Laptop-Höhe ~800 px)?
 
 ### ⇢ STAND SESSION 17 Ende (alles gepusht bis `d682afa`)
 
