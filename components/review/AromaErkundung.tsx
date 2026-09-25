@@ -4,7 +4,7 @@ import { useState } from "react";
 
 import { AromaKarte, type AromaSerie } from "@/components/review/AromaKarte";
 import { SweetSpot, type SweetSpotZeile } from "@/components/review/SweetSpot";
-import { TerpenErgaenzen, type KatalogEintrag } from "@/components/review/TerpenErgaenzen";
+import type { KatalogEintrag } from "@/components/review/TerpenErgaenzen";
 import {
   achsenIndex,
   eindruckProfil,
@@ -48,12 +48,15 @@ export function AromaErkundung({
   children?: React.ReactNode;
 }) {
   const [eigen, setEigen] = useState<Record<string, number>>({});
-  const [dazu, setDazu] = useState<string[]>([]);
 
-  // Ergänzt: was die Community zusätzlich geschmeckt hat, und was man selbst hinzufügt.
+  // Alle bekannten Terpene stehen bereit. Was der Hersteller nicht angibt,
+  // startet bei 0 (grau), außer die Community hat es schon geschmeckt.
   const angegeben = new Set(terpene.map((terpen) => terpen.name));
   const ergaenztNamen = [
-    ...new Set([...zeilen.map((zeile) => zeile.terpen).filter((name) => !angegeben.has(name)), ...dazu]),
+    ...new Set([
+      ...zeilen.map((zeile) => zeile.terpen).filter((name) => !angegeben.has(name)),
+      ...katalog.map((terpen) => terpen.name).filter((name) => !angegeben.has(name)),
+    ]),
   ];
   const ergaenzt: KartenTerpen[] = ergaenztNamen.flatMap((name) => {
     const eintrag = katalog.find((terpen) => terpen.name === name);
@@ -62,7 +65,10 @@ export function AromaErkundung({
   const kartenTerpene = [...terpene, ...ergaenzt];
   const alle: SweetSpotZeile[] = kartenTerpene.map(
     (terpen) => ({
-      ...(zeilen.find((zeile) => zeile.terpen === terpen.name) ?? { terpen: terpen.name, wert: 3 }),
+      ...(zeilen.find((zeile) => zeile.terpen === terpen.name) ?? {
+        terpen: terpen.name,
+        wert: angegeben.has(terpen.name) ? 3 : 0,
+      }),
       ergaenzt: !angegeben.has(terpen.name),
     }),
   );
@@ -70,7 +76,7 @@ export function AromaErkundung({
 
   const bewegt = Object.keys(eigen).length > 0;
   const stufen = Object.fromEntries(alle.map((zeile) => [zeile.terpen, eigen[zeile.terpen] ?? zeile.wert]));
-  const eindruck = bewegt || dazu.length > 0 ? eindruckProfil(terpene, stufen, ergaenzt) : null;
+  const eindruck = bewegt ? eindruckProfil(terpene, stufen, ergaenzt) : null;
   const hersteller = herstellerProfil(terpene);
   const eigeneTreue = eindruck && hersteller ? herstellerTreue(hersteller, eindruck) : null;
   const alleSerien: AromaSerie[] = eindruck
@@ -83,8 +89,8 @@ export function AromaErkundung({
   };
 
   return (
-    <div className="grid grid-cols-1 gap-16 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] lg:items-start">
-      <div className="lg:sticky lg:top-24">
+    <div className="flex flex-col gap-12">
+      <div className="mx-auto w-full max-w-4xl">
         <AromaKarte
           titel={titel}
           terpene={kartenTerpene}
@@ -94,7 +100,7 @@ export function AromaErkundung({
           ergaenzt={ergaenzt.map((terpen) => terpen.name)}
         />
       </div>
-      <div className="flex flex-col items-start gap-8">
+      <div className="flex flex-col items-center gap-8 text-center">
         {treue || eigeneTreue !== null ? (
           <dl className="flex flex-wrap gap-x-12 gap-y-4">
             {treue ? (
@@ -115,35 +121,30 @@ export function AromaErkundung({
             ) : null}
           </dl>
         ) : null}
-        <p className="-mt-4 max-w-[48ch] text-caption text-text-muted text-pretty">
+        <p className="-mt-4 max-w-[60ch] text-caption text-text-muted text-pretty">
           Herstellertreue: wie nah das geschmeckte Profil an dem liegt, was die Herstellerangaben erwarten lassen. 100 %
           heißt deckungsgleich.
         </p>
-        <SweetSpot
-          titel={intensitaetTitel}
-          zeilen={alle}
-          bedienung={{
-            eigen,
-            aendern: (terpen, wert) => setEigen((alt) => ({ ...alt, [terpen]: wert })),
-            aktivieren,
-          }}
-        />
-        <p className="max-w-[48ch] text-small text-text-muted text-pretty">
-          Schieb die Punkte: Wie stark hast du die Terpene geschmeckt? Die Karte zeigt dein Profil in Lila. Hier wird
-          nichts gespeichert.
+      </div>
+      <SweetSpot
+        titel={intensitaetTitel}
+        zeilen={alle}
+        quer
+        bedienung={{
+          eigen,
+          aendern: (terpen, wert) => setEigen((alt) => ({ ...alt, [terpen]: wert })),
+          aktivieren,
+        }}
+      />
+      <div className="flex flex-col items-start gap-6">
+        <p className="max-w-[60ch] text-small text-text-muted text-pretty">
+          Schieb die Punkte: Wie stark hast du die Terpene geschmeckt? Terpene bei 0 bleiben grau, hochgezogen werden sie
+          farbig. Die Karte zeigt dein Profil in Lila. Hier wird nichts gespeichert.
         </p>
-        <TerpenErgaenzen
-          katalog={katalog}
-          vorhanden={kartenTerpene.map((terpen) => terpen.name)}
-          hinzufuegen={(terpen) => setDazu((alt) => [...alt, terpen.name])}
-        />
-        {bewegt || dazu.length > 0 ? (
+        {bewegt ? (
           <button
             type="button"
-            onClick={() => {
-              setEigen({});
-              setDazu([]);
-            }}
+            onClick={() => setEigen({})}
             className="text-small text-accent underline underline-offset-4 hover:text-accent-hover"
           >
             Zurücksetzen

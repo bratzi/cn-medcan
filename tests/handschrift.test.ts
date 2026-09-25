@@ -64,7 +64,7 @@ test("Schleife: die Community schreibt von Hand, das Buch druckt", () => {
 
 test("Abstimmung: „Wähl mit.“ von Hand, ohne Wasserzeichen und Drip", () => {
   const quelle = lies("components/story/Abstimmung.tsx");
-  assert.match(quelle, /<p data-story="waehl-mit" className="font-hand text-notiz text-kopierstift">\s*Wähl mit\.\s*<\/p>/);
+  assert.match(quelle, /<p data-story="waehl-mit" className="farbverlauf font-hand text-notiz">\s*Wähl mit\.\s*<\/p>/);
   assert.doesNotMatch(quelle, /wasserzeichen|Textur|font-wand|rotate/);
   assert.match(lies("components/story/bewegung/abstimmung.ts"), /SCHREIBEN_AB/);
 });

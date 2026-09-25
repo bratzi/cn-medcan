@@ -191,9 +191,10 @@ export function AromaKarte({ terpene, serien: roheSerien, titel = "Aroma-Karte",
             {terpene.map((terpen, index) => {
               const achse = achsenIndex(terpen.geschmack);
               if (achse < 0) return null;
-              const farbig = achseFarbig(achse);
-              const farbe = FARBE[achse % 2 === 0 ? "gruen" : "lila"];
               const kraft = staerke[terpen.name] ?? 0;
+              // Ein Terpen bei 0 bleibt grau, auch auf aktiver Achse.
+              const farbig = achseFarbig(achse) && kraft > 0;
+              const farbe = FARBE[achse % 2 === 0 ? "gruen" : "lila"];
               return (
                 <path
                   key={terpen.name}
@@ -212,7 +213,13 @@ export function AromaKarte({ terpene, serien: roheSerien, titel = "Aroma-Karte",
               );
             })}
             {terpenKnoten.map((punkt, index) => (
-              <circle key={terpene[index].name} cx={punkt.x} cy={punkt.y} r={6} fill="currentColor" />
+              <circle
+                key={terpene[index].name}
+                cx={punkt.x}
+                cy={punkt.y}
+                r={6}
+                fill={(staerke[terpene[index].name] ?? 0) > 0 ? "currentColor" : GRAU}
+              />
             ))}
           </g>
 
@@ -333,7 +340,11 @@ export function AromaKarte({ terpene, serien: roheSerien, titel = "Aroma-Karte",
           <span
             key={terpene[index].name}
             aria-hidden="true"
-            className="absolute -translate-y-1/2 pl-4 font-buch text-h3 font-medium whitespace-nowrap text-text"
+            className={cn(
+              "absolute -translate-y-1/2 pl-4 font-buch font-medium whitespace-nowrap transition-colors duration-normal",
+              terpene.length > 6 ? "text-small" : "text-h3",
+              (staerke[terpene[index].name] ?? 0) > 0 ? "text-text" : "text-text-muted",
+            )}
             style={{ left: `${(punkt.x / BREITE) * 100}%`, top: `${(punkt.y / HOEHE) * 100}%`, opacity: kartenSichtbar }}
           >
             {terpene[index].name}

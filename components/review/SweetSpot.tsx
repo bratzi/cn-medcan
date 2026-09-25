@@ -60,10 +60,13 @@ export function SweetSpot({
   zeilen,
   titel,
   bedienung,
+  quer = false,
 }: {
   zeilen: readonly SweetSpotZeile[];
   titel?: string;
   bedienung?: Bedienung;
+  /** Spuren als Karten nebeneinander, horizontal scrollbar (wie der Katalog). */
+  quer?: boolean;
 }) {
   if (zeilen.length === 0) return null;
   return (
@@ -72,14 +75,24 @@ export function SweetSpot({
         {titel ? `${titel}: ` : null}
         <em className="farbverlauf hand-betont">Sweet Spot</em> gesucht
       </h3>
-      <ul className="flex flex-col gap-6" onPointerLeave={() => bedienung?.aktivieren?.(null)}>
+      <ul
+        className={
+          quer
+            ? "-mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-4 sm:-mx-8 sm:px-8"
+            : "flex flex-col gap-6"
+        }
+        onPointerLeave={() => bedienung?.aktivieren?.(null)}>
         {zeilen.map((zeile) => {
           const eigen = bedienung?.eigen[zeile.terpen];
           const gezeigt = eigen ?? zeile.wert;
           return (
             <li
               key={zeile.terpen}
-              className="flex flex-col gap-2"
+              className={cn(
+                "flex flex-col gap-2",
+                quer && "w-72 shrink-0 snap-start rounded-lg border border-border bg-surface-raised p-6 sm:w-80",
+                quer && gezeigt < 0.05 && "opacity-70",
+              )}
               onPointerEnter={() => bedienung?.aktivieren?.(zeile.terpen)}
             >
               <div className="flex items-baseline justify-between gap-4">
