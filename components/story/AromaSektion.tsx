@@ -71,7 +71,7 @@ export function AromaSektion() {
       data-story="aroma"
       className="relative isolate overflow-x-clip px-4 py-24 sm:px-8 sm:py-32"
     >
-      <Schlagwort satz="stimmt das?" ton="gruen" oben="top-8" />
+      <Schlagwort satz="stimmt das?" ton="gruen" />
       <div className="mx-auto w-full max-w-360">
         <h2 id="aroma-titel" className="max-w-4xl font-buch text-kapitel text-text text-balance">
           Was der Hersteller verspricht, <em className="farbverlauf hand-betont">prüfen wir nach.</em>

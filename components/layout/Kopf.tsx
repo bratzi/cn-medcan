@@ -1,7 +1,6 @@
 import Link from "next/link";
 
 import { NavLink } from "@/components/layout/NavLink";
-import { ThemaSchalter } from "@/components/layout/ThemaSchalter";
 import { Wortmarke } from "@/components/marke/Wortmarke";
 import { KopfZustand } from "@/components/layout/KopfZustand";
 import { HAUPTNAVIGATION, KONTO_LINK } from "@/lib/navigation";
@@ -27,10 +26,6 @@ import { HAUPTNAVIGATION, KONTO_LINK } from "@/lib/navigation";
 const NAV_LINK =
   "kapitel-link group inline-flex h-11 items-center gap-2 px-3 text-small font-medium whitespace-nowrap text-text " +
   "transition-colors duration-fast ease-standard";
-
-const THEMA_LINK =
-  "inline-flex h-11 items-center px-3 text-small font-medium whitespace-nowrap text-text-muted " +
-  "transition-colors duration-fast ease-standard hover:text-text";
 
 const AKTIV = "underline decoration-text decoration-2 underline-offset-8";
 
@@ -62,8 +57,6 @@ export function Kopf() {
             ))}
           </ul>
         </nav>
-
-        <ThemaSchalter className={`${THEMA_LINK} col-start-2 row-start-1 lg:col-start-3`} />
 
         <NavLink
           href={KONTO_LINK.href}

@@ -71,7 +71,7 @@
   --text-titel--letter-spacing: -0.03em;
 
   /* Redesign 1: Manifest und Auftakt-Titel, Newsreader 200, nur Display. */
-  --text-manifest: clamp(3rem, 1.5rem + 4vw, 6.25rem);
+  --text-manifest: clamp(2.5rem, 1.25rem + 3.2vw, 5rem);
   --text-manifest--line-height: 1.14;
   --text-manifest--font-weight: 200;
   --text-manifest--letter-spacing: -0.025em;
@@ -885,4 +885,67 @@ html.joint-cursor :is(input:not([type="range"]):not([type="radio"]):not([type="c
   -webkit-text-fill-color: transparent;
   padding: 0.2em 0.3em 0.25em 0.25em;
   margin: -0.2em -0.3em -0.25em -0.25em;
+}
+
+/* Hell/Dunkel als Lampe (components/layout/ThemaSchalter.tsx): fest unten
+   rechts, Schatten statt Rahmen, 48 px Trefferfläche. Lampe an = hell. */
+.thema-lampe {
+  position: fixed;
+  right: 1.25rem;
+  bottom: 1.25rem;
+  z-index: 45;
+  display: grid;
+  place-items: center;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 9999px;
+  color: var(--color-text);
+  background: color-mix(in oklab, var(--color-surface-raised) 92%, transparent);
+  box-shadow:
+    0 0 0 1px color-mix(in oklab, var(--color-text) 8%, transparent),
+    0 2px 4px color-mix(in oklab, black 10%, transparent),
+    0 8px 20px color-mix(in oklab, black 12%, transparent);
+  transition-property: scale, box-shadow;
+  transition-duration: 150ms;
+  transition-timing-function: cubic-bezier(0.2, 0, 0, 1);
+}
+
+.thema-lampe:hover {
+  box-shadow:
+    0 0 0 1px color-mix(in oklab, var(--color-kopierstift) 35%, transparent),
+    0 2px 4px color-mix(in oklab, black 10%, transparent),
+    0 10px 28px color-mix(in oklab, var(--color-kopierstift) 22%, transparent);
+}
+
+.thema-lampe:active {
+  scale: 0.96;
+}
+
+.thema-lampe:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 3px;
+}
+
+.thema-lampe svg {
+  grid-area: 1 / 1;
+  width: 1.5rem;
+  height: 1.5rem;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  transition-property: opacity, scale, filter;
+  transition-duration: 300ms;
+  transition-timing-function: cubic-bezier(0.2, 0, 0, 1);
+}
+
+/* An (hell): Birne leuchtet warm. */
+.thema-lampe-an {
+  color: #e8a531;
+  filter: drop-shadow(0 0 6px color-mix(in oklab, #ffcf5a 70%, transparent));
+}
+
+:root[data-theme="dark"] .thema-lampe-an,
+:root:not([data-theme="dark"]) .thema-lampe-aus {
+  opacity: 0;
+  scale: 0.25;
+  filter: blur(4px);
 }

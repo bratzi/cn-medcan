@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inspiration, Newsreader } from "next/font/google";
 import { JointCursor } from "@/components/layout/JointCursor";
+import { ThemaSchalter } from "@/components/layout/ThemaSchalter";
 import { Fuss } from "@/components/layout/Fuss";
 import { Kopf } from "@/components/layout/Kopf";
 import { THEMA_SKRIPT, THEMA_STANDARD } from "@/lib/thema";
@@ -64,6 +65,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         </main>
 
         <Fuss />
+        <ThemaSchalter />
         <JointCursor />
       </body>
     </html>

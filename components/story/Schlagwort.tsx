@@ -10,7 +10,9 @@ const TON = { gruen: "text-accent", lila: "text-kopierstift" } as const;
 export function Schlagwort({
   satz,
   ton = "lila",
-  oben = "top-1/2 -translate-y-1/2",
+  // Auf der oberen Kante der Sektion: der Satz hängt zwischen den Sektionen,
+  // wo der meiste freie Raum ist (Nutzer 2026-09-25).
+  oben = "top-0 -translate-y-1/2",
 }: {
   satz: string;
   /** Grün und Lila wechseln sich von Sektion zu Sektion ab (Spec Redesign 12). */

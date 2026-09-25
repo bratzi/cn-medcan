@@ -48,16 +48,17 @@ test("Layout: startet hell, Skript im head, DOM gewinnt beim Hydrieren", () => {
   assert.match(layout, /<head>\s*<script dangerouslySetInnerHTML=\{\{ __html: THEMA_SKRIPT \}\} \/>\s*<\/head>/);
 });
 
-test("Schalter: ein Knopf, das Wort nennt das Ziel, per CSS ohne Aufblitzen", async () => {
+test("Schalter: eine Lampe, der zugängliche Name nennt das Ziel, per CSS ohne Aufblitzen", async () => {
   const { ThemaSchalter } = await import("@/components/layout/ThemaSchalter");
   const html = renderToStaticMarkup(createElement(ThemaSchalter));
   assert.match(html, /^<button type="button"/);
-  assert.match(html, /class="thema-ziel-dunkel">Dunkel<span class="sr-only"> darstellen<\/span>/);
-  assert.match(html, /class="thema-ziel-hell">Hell<span class="sr-only"> darstellen<\/span>/);
+  assert.match(html, /class="sr-only thema-ziel-dunkel">Licht aus, dunkel darstellen</);
+  assert.match(html, /class="sr-only thema-ziel-hell">Licht an, hell darstellen</);
   const css = lies("app/globals.css");
   assert.match(css, /:root\[data-theme="dark"\] \.thema-ziel-dunkel,\s*:root:not\(\[data-theme="dark"\]\) \.thema-ziel-hell \{\s*display: none;/);
 });
 
-test("Kopf trägt den Schalter", () => {
-  assert.match(lies("components/layout/Kopf.tsx"), /<ThemaSchalter /);
+test("Schalter sitzt fest im Layout, nicht mehr im Kopf", () => {
+  assert.match(lies("app/layout.tsx"), /<ThemaSchalter \/>/);
+  assert.doesNotMatch(lies("components/layout/Kopf.tsx"), /ThemaSchalter/);
 });

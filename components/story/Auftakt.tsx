@@ -43,7 +43,7 @@ export function Auftakt() {
         <p
           data-story="oberzeile"
           data-story-einstieg=""
-          className="max-w-[28ch] text-center font-buch text-h2 font-light tracking-tight text-balance text-text/85 sm:text-h1 sm:font-light"
+          className="max-w-[28ch] text-center font-buch text-[clamp(1.75rem,1rem+2.4vw,3.25rem)] leading-tight font-light tracking-tight text-balance text-text/90"
         >
           Cannabis, offen gelegt.
         </p>
