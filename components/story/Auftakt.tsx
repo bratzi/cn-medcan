@@ -5,7 +5,6 @@ import { preload } from "react-dom";
 import { Loop } from "@/components/medien/Loop";
 import { Kopfzeile } from "@/components/story/Kopfzeile";
 import { Unterzeile, Wortmarke } from "@/components/marke/Wortmarke";
-import { buttonKlassen } from "@/components/ui";
 
 /**
  * Konturen hinter der Wortmarke (Nutzer 2026-09-25, statt der 3D-Bahnen): die
@@ -30,7 +29,7 @@ const KONTUREN = [
  * Standbild stehen (loops.ts startet das Video nur mit der StoryBuehne).
  *
  * `data-story-einstieg` markiert, was die StoryBuehne einblendet: nur
- * Oberzeile und Satz. Der Button "Bewerte" trägt die Markierung bewusst
+ * Oberzeile und Satz. Der Button "Bewerte jetzt mit" trägt die Markierung bewusst
  * nicht: er ist ab dem ersten Frame bedienbar.
  */
 export function Auftakt() {
@@ -89,11 +88,18 @@ export function Auftakt() {
         </p>
       </div>
 
-      {/* "Bewerte" zentriert im freien Raum unter dem Intro (Nutzer 2026-09-25), führt zu den Blüten. */}
+      {/* "Bewerte jetzt mit" zentriert im freien Raum unter dem Intro, Verlaufsrahmen wie
+          "Mein Konto", folgt dem Zeiger wie die Storytelling-Videos (Nutzer 2026-09-25). */}
       <div className="flex flex-1 items-center justify-center px-4 py-8">
-        <Link href="/produkte" className={buttonKlassen("primary", "lg")}>
-          Bewerte
-        </Link>
+        <div data-punkt="" className="p-6">
+          <Link
+            href="/produkte"
+            data-punkt-tiefe="1"
+            className="konto-pille inline-flex h-14 items-center rounded-full px-10 font-sans text-small font-medium uppercase tracking-gesperrt text-text"
+          >
+            Bewerte jetzt mit
+          </Link>
+        </div>
       </div>
 
       <div className="mx-auto w-full max-w-360 px-4 sm:px-8">

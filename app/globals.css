@@ -1053,10 +1053,10 @@ html.joint-cursor :is(input:not([type="range"]):not([type="radio"]):not([type="c
   transition-timing-function: cubic-bezier(0.2, 0, 0, 1);
 }
 
-/* An (hell): Birne leuchtet warm. */
+/* Offen (hell): Licht aus dem Grow-Zelt, warm, mit Schein. */
 .thema-lampe-an {
-  color: #e8a531;
-  filter: drop-shadow(0 0 6px color-mix(in oklab, #ffcf5a 70%, transparent));
+  color: #f0b43c;
+  filter: drop-shadow(0 0 5px color-mix(in oklab, #ffcf5a 60%, transparent));
 }
 
 :root[data-theme="dark"] .thema-lampe-an,
