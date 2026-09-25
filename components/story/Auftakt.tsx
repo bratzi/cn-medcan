@@ -30,7 +30,7 @@ const KONTUREN = [
  * Standbild stehen (loops.ts startet das Video nur mit der StoryBuehne).
  *
  * `data-story-einstieg` markiert, was die StoryBuehne einblendet: nur
- * Oberzeile und Satz. Der Button "Wähl mit" trägt die Markierung bewusst
+ * Oberzeile und Satz. Der Button "Bewerte" trägt die Markierung bewusst
  * nicht: er ist ab dem ersten Frame bedienbar.
  */
 export function Auftakt() {
@@ -51,7 +51,7 @@ export function Auftakt() {
       {/* Wortmarke und Unterzeile als eine Gruppe auf gemeinsamer Achse: die
           Unterzeile in derselben aufrechten Druckschrift wie das Storytelling,
           leicht und deutlich kleiner, damit die Handschrift allein führt. */}
-      <div className="flex flex-1 flex-col items-center justify-center gap-4 px-4 py-8 sm:gap-6 sm:px-8">
+      <div className="flex flex-[2] flex-col items-center justify-center gap-4 px-4 py-8 sm:gap-6 sm:px-8">
         {/* Konturen der Wortmarke dahinter: reine Dekoration, deshalb neben der h1;
             die h1 bleibt genau die Wortmarke. */}
         <div data-story="titel" data-punkt="" className="relative flex justify-center">
@@ -89,13 +89,15 @@ export function Auftakt() {
         </p>
       </div>
 
+      {/* "Bewerte" zentriert im freien Raum unter dem Intro (Nutzer 2026-09-25), führt zu den Blüten. */}
+      <div className="flex flex-1 items-center justify-center px-4 py-8">
+        <Link href="/produkte" className={buttonKlassen("primary", "lg")}>
+          Bewerte
+        </Link>
+      </div>
+
       <div className="mx-auto w-full max-w-360 px-4 sm:px-8">
-        <div className="mt-8 flex flex-wrap items-end justify-between gap-8">
-          <div className="flex max-w-2xl flex-col items-start gap-6">
-            <Link href="#abstimmung" className={buttonKlassen("primary", "md")}>
-              Wähl mit
-            </Link>
-          </div>
+        <div className="flex justify-end">
           <div className="flex flex-col items-end gap-4">
             {/* Pause fuer die Videos (WCAG 2.2.2); erscheint erst, wenn loops.ts sie startet. */}
             <LoopSchalter />

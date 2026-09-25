@@ -5,7 +5,7 @@ import type { Choreografie } from "./typen";
  * Film blendet aus leichter Nähe auf (das <video>, nicht der Container: den
  * zoomt auftaktFilm beim Scrollen, ein Element gehört genau einer
  * Animation). Wortmarke und Unterzeile schreiben sich per CSS; Oberzeile und
- * Satz folgen. Navigation und "Wähl mit" sind nie ausgeblendet.
+ * Satz folgen. Navigation und "Bewerte" sind nie ausgeblendet.
  */
 export const auftakt: Choreografie = ({ gsap }) => {
   const einstieg = gsap.utils.toArray<HTMLElement>("[data-story-einstieg]");

@@ -1,6 +1,9 @@
+import Link from "next/link";
+
 import { LoopSchalter } from "@/components/medien/LoopSchalter";
 import { Loop } from "@/components/medien/Loop";
 import { Schlagwort } from "@/components/story/Schlagwort";
+import { buttonKlassen } from "@/components/ui";
 
 /**
  * Sektion 4 (Spec Redesign 4): die Schleife. Das Video läuft blass und
@@ -8,8 +11,8 @@ import { Schlagwort } from "@/components/story/Schlagwort";
  * Seit 2026-09-25 (Nutzer: Typografie und Anordnung überarbeiten): links die
  * Einleitung, rechts die vier Stationen als Zeilen mit Trennlinie; die Ziffer
  * in der Logoschrift, der Satz einheitlich in der Buchschrift, das Verb als
- * Schlagwort wie im Storytelling. Die Überschrift trägt die Aussage (sr-only),
- * die Stationen sind deren sichtbares Bild und deshalb aria-hidden.
+ * Schlagwort wie im Storytelling. Die Überschrift sagt, worum es geht (Runde als
+ * Event, Bewerten geht immer); die Stationen sind Bild dazu und aria-hidden.
  */
 const STATIONEN = [
   { wir: "Wir", verb: "schlagen vor." },
@@ -34,15 +37,21 @@ export function GemeinsamLernen() {
       <div className="mx-auto grid w-full max-w-360 grid-cols-1 gap-16 lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] lg:gap-24">
         <div className="flex flex-col items-start gap-6 lg:sticky lg:top-32 lg:self-start">
           <p className="text-small uppercase tracking-gesperrt text-text-muted">So läuft eine Runde</p>
-          {/* Die Stationen rechts sagen es schon sichtbar; die Überschrift bleibt
-              nur für Screenreader und als Sprungziel (Nutzer 2026-09-25). */}
-          <h2 id="lernen-titel" className="sr-only">
-            Wir schlagen vor. Wir stimmen ab. Wir testen. Wir bewerten.
+          {/* Wie die anderen Sektionen: Überschrift in der Buchschrift mit einem
+              Schlagwort, darunter Fließtext (Nutzer 2026-09-25). */}
+          <h2 id="lernen-titel" className="font-buch text-kapitel text-text text-balance">
+            Eine Sorte, gemeinsam <em className="farbverlauf font-hand text-erzaehlung not-italic leading-[0.8]" style={{ fontSize: "calc(var(--text-kapitel) * 1.35)" }}>bewertet.</em>
           </h2>
-          <p className="max-w-[44ch] font-buch text-h2 leading-snug text-text text-pretty">
-            Jede Runde bringt neue Sorten auf die Liste. Was die meisten Stimmen holt, testen wir nach festem
-            Schema, und der Eintrag steht danach hier für alle.
+          <p className="max-w-[56ch] text-body text-text-muted text-pretty">
+            Jede Runde ist ein kleines Event: Wir schlagen Sorten vor, stimmen gemeinsam ab, und die Gewinnerin
+            testen und bewerten wir alle zusammen. Die Runde rückt eine Sorte nach vorn, mehr nicht.
           </p>
+          <p className="max-w-[56ch] text-body text-text-muted text-pretty">
+            Bewerten kannst du jede Blüte jederzeit, auch ohne Abstimmung und ohne Runde.
+          </p>
+          <Link href="/produkte" className={buttonKlassen("secondary", "md")}>
+            Zu den Blüten
+          </Link>
           {/* Pause fuer das Video (WCAG 2.2.2). Sichtbar erst, wenn die StoryBuehne
               das Video startet (loops.ts): ohne JavaScript laeuft nichts. */}
           <LoopSchalter />

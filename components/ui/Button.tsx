@@ -2,7 +2,7 @@ import type { ButtonHTMLAttributes } from "react";
 import { cn } from "@/lib/cn";
 
 export type ButtonVariante = "primary" | "secondary" | "ghost";
-export type ButtonGroesse = "md" | "sm";
+export type ButtonGroesse = "md" | "sm" | "lg";
 
 const BASIS =
   "inline-flex items-center justify-center gap-2 rounded-full border " +
@@ -21,6 +21,7 @@ const VARIANTEN: Record<ButtonVariante, string> = {
 
 /** h-11 = 44px: Mindest-Touch-Target, deshalb kein 8px-Vielfaches. */
 const GROESSEN: Record<ButtonGroesse, string> = {
+  lg: "h-14 px-10 text-h3",
   md: "h-11 px-6 text-body",
   sm: "h-9 px-4 text-small",
 };
