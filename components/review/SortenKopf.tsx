@@ -128,7 +128,7 @@ export function KartenBild({ bildPfad }: { bildPfad: string | null }) {
     <figure className="flex flex-col items-start gap-1">
       {/* Glas über einem Teil der Blüte wie bei den Story-Videos (Nutzer 2026-09-26). */}
       <div className="relative w-full">
-        <Bild id={bildId} dekorativ sizes="320px" className="h-auto w-full object-contain" />
+        <Bild id={bildId} dekorativ sizes="(min-width: 1024px) 40vw, 90vw" className="h-auto w-full object-contain" />
         <GlasMaske ton="lila" className="-right-3 -bottom-3 h-1/2 w-1/2" />
       </div>
       <figcaption className="text-caption text-text-muted">Symbolbild</figcaption>

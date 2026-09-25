@@ -3,7 +3,7 @@ import { Suspense } from "react";
 
 import { AromaErkundung } from "@/components/review/AromaErkundung";
 import { erkundungsDaten } from "@/components/review/erkundung-daten";
-import { KartenBild, SortenKopf } from "@/components/review/SortenKopf";
+import { SortenKopf } from "@/components/review/SortenKopf";
 import { Schlagwort } from "@/components/story/Schlagwort";
 import { UeberlaufWort, ueberlaufPlatz } from "@/components/story/UeberlaufWort";
 import { buttonKlassen } from "@/components/ui";
@@ -37,7 +37,6 @@ async function Inhalt() {
             terpene={sorte.terpene}
           />
         }
-        kartenBild={<KartenBild bildPfad={sorte.herstellerBildPfad} />}
         terpene={sorte.terpene}
         katalog={katalog}
         {...erkundungsDaten(sorte.terpene, sorte.reviews)}

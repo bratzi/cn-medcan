@@ -31,8 +31,8 @@ type Props = {
   terpene: readonly KartenTerpen[];
   serien: readonly AromaSerie[];
   titel?: string;
-  /** Blütenbild im Kopf der Karte, links neben Name und Legende (Server-Teil). */
-  bild?: React.ReactNode;
+  /** Name über der Karte ausblenden (Terpz-Schritt, Nutzer 2026-09-26: gehört dort nicht hin). */
+  ohneTitel?: boolean;
   /** Von außen hervorgehobene Achse (Regler in der Spielwiese); schlägt das Überfahren. */
   hervorheben?: number | null;
   /** Stärke je Terpen (0 bis 1) für das Leuchten der Pfade; sonst aus den Herstellerangaben. */
@@ -109,7 +109,7 @@ export function AromaKarte({
   terpene,
   serien: roheSerien,
   titel = "Aroma-Karte",
-  bild,
+  ohneTitel = false,
   hervorheben = null,
   staerken,
   ergaenzt = [],
@@ -201,13 +201,11 @@ export function AromaKarte({
 
   return (
     <figure aria-label={titel} className="flex flex-col gap-6">
-      {/* Kopf der Karte (Nutzer 2026-09-26): links der Name in Logoschrift mit Verlauf wie im
-          Sortenkopf, darunter groß das Blütenbild; rechts Ansicht und Legende. */}
-      <div className="flex flex-wrap items-start justify-between gap-8">
-      <div className="flex min-w-0 flex-col items-start gap-4">
+      {/* Kopf der Karte: links der Name in Logoschrift mit Verlauf, rechts Ansicht und Legende. */}
+      <div className={cn("flex flex-wrap items-start gap-8", ohneTitel ? "justify-end" : "justify-between")}>
+      {ohneTitel ? null : (
         <p className="farbverlauf font-hand text-erzaehlung text-balance wrap-break-word leading-[0.9]">{titel}</p>
-        {bild ? <div className="w-48 sm:w-64 lg:w-80">{bild}</div> : null}
-      </div>
+      )}
       <div className="flex flex-col items-end gap-6">
       <div className="flex flex-wrap items-center justify-end gap-4">
         <div role="group" aria-label="Ansicht" className="inline-flex rounded-full border border-border-strong p-1">

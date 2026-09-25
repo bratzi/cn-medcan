@@ -114,12 +114,9 @@ export function Doppelseite({ eintrag, umfang, ueberschrift: Ueberschrift, story
           {voll ? <>Bewertung vom {datum}</> : eintrag.handelsname}
         </Ueberschrift>
 
-        {/* Blütenbild zwischen Titel und Noten, wie in der Blütenübersicht (Nutzer 2026-09-26). */}
-        {eintrag.bildPfad ? (
-          <div className="w-48 sm:w-64">
-            <KartenBild bildPfad={eintrag.bildPfad} />
-          </div>
-        ) : null}
+        {/* Blütenbild zwischen Titel und Noten über die volle Breite der Karte,
+            dasselbe wie in der Blütenübersicht (Nutzer 2026-09-26). */}
+        {eintrag.bildPfad ? <KartenBild bildPfad={eintrag.bildPfad} /> : null}
 
         <dl className="grid grid-cols-2 gap-6">
           {achsen.map((achse) => (
@@ -151,12 +148,7 @@ export function Doppelseite({ eintrag, umfang, ueberschrift: Ueberschrift, story
       </div>
 
       <div className="flex min-w-0 flex-col gap-8 p-6 sm:p-12">
-        <AromaKarte
-          titel={eintrag.handelsname}
-          bild={eintrag.bildPfad ? <KartenBild bildPfad={eintrag.bildPfad} /> : undefined}
-          terpene={eintrag.terpene}
-          serien={aromaSerien(eintrag)}
-        />
+        <AromaKarte titel="Aroma-Karte" terpene={eintrag.terpene} serien={aromaSerien(eintrag)} />
         {voll ? (
           <SweetSpot
             titel="Terpen-Intensität"
