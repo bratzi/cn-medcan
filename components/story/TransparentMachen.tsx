@@ -122,6 +122,21 @@ function Paar({
 }
 
 /**
+ * Prägnantes Schlagwort im Absatz (Nutzer 2026-09-25: in jedem Absatz eines,
+ * koloriert): Farbverlauf der Marke, größer als der Fließgrad.
+ */
+function Buzz({ children }: { children: ReactNode }) {
+  return (
+    <em
+      className="farbverlauf font-hand text-erzaehlung not-italic leading-[0.8]"
+      style={{ fontSize: "calc(var(--text-kapitel) * 1.35)" }}
+    >
+      {children}
+    </em>
+  );
+}
+
+/**
  * Sektion 2: das Manifest. Seit 2026-09-25 ohne Chargen (Nutzer: nicht mehr
  * relevant); es trägt, was die Bewertung ausmacht: jedes Terpen einzeln und
  * die Abweichung zwischen Community und Herstellerangabe. Die Kopfzeile mit
@@ -137,19 +152,19 @@ export function TransparentMachen() {
       <div className="mx-auto w-full max-w-360">
         <div data-story="manifest">
           <h2 id="transparent-titel" data-manifest-zeile="" className="font-hand text-erzaehlung text-text text-balance">
-            Hinter jedem Handelsnamen steckt ein <em className="farbverlauf font-hand text-erzaehlung not-italic leading-[0.8]" style={{ fontSize: "calc(var(--text-kapitel) * 1.35)" }}>Terpenprofil.</em> Wir
+            Hinter jedem Handelsnamen steckt ein <Buzz>Terpenprofil.</Buzz> Wir
             schreiben auf, was drin ist.
           </h2>
           <Paar punkt={PUNKTE[0]} erster>
-            Zuerst der Gesamteindruck. Nicht, was auf der Dose steht, sondern wie sie aussieht, wie sie riecht, wie
+            Zuerst der <Buzz>Gesamteindruck.</Buzz> Nicht, was auf der Dose steht, sondern wie sie aussieht, wie sie riecht, wie
             sie schmeckt.
           </Paar>
           <Paar punkt={PUNKTE[1]}>
-            Jedes Terpen bekommt seine <em className="farbverlauf font-hand text-erzaehlung not-italic leading-[0.8]" style={{ fontSize: "calc(var(--text-kapitel) * 1.35)" }}>eigene Note.</em> Daneben
+            Jedes Terpen bekommt seine <Buzz>eigene Note.</Buzz> Daneben
             steht, was der Hersteller angibt, und wie weit die Community davon abweicht.
           </Paar>
           <Paar punkt={PUNKTE[2]}>
-            Zum Schluss die Beschaffenheit: Dichte, Trichome, Feuchte. Dann stimmen wir ab, was als Nächstes
+            Zum Schluss die <Buzz>Beschaffenheit:</Buzz> Dichte, Trichome, Feuchte. Dann stimmen wir ab, was als Nächstes
             drankommt, und alle wissen danach ein bisschen mehr.
           </Paar>
         </div>
