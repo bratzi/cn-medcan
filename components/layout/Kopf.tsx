@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import { NavLink } from "@/components/layout/NavLink";
 import { Wortmarke } from "@/components/marke/Wortmarke";
+import { KontoZaehler } from "@/components/layout/KontoZaehler";
 import { KopfZustand } from "@/components/layout/KopfZustand";
 import { HAUPTNAVIGATION, KONTO_LINK } from "@/lib/navigation";
 
@@ -61,6 +62,7 @@ export function Kopf() {
           aktivKlasse={AKTIV}
         >
           {KONTO_LINK.text}
+          <KontoZaehler />
         </NavLink>
       </div>
       <KopfZustand />

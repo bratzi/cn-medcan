@@ -37,3 +37,13 @@ export async function profilSpeichern(formData: FormData): Promise<ProfilErgebni
   revalidatePath("/mitglied");
   return { ok: true };
 }
+
+/** Alle Benachrichtigungen des angemeldeten Mitglieds als gelesen markieren. */
+export async function benachrichtigungenGelesen(): Promise<void> {
+  const mitglied = await mitgliedErforderlich();
+  const prisma = await getPrisma();
+  await prisma.benachrichtigung.updateMany({
+    where: { mitgliedId: mitglied.mitgliedId, gelesenAm: null },
+    data: { gelesenAm: new Date() },
+  });
+}

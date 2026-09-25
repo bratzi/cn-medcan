@@ -3,7 +3,7 @@
 > Übergabemedium zwischen Sessions. Wird nach jedem Arbeitsblock aktualisiert und committet.
 > Wer hier weiterarbeitet, liest diese Datei zuerst und braucht den Chatverlauf nicht.
 
-**Letzte Aktualisierung:** 2026-09-25 (Session 18)
+**Letzte Aktualisierung:** 2026-09-25 (Session 18 Ende)
 **Repo:** https://github.com/bratzi/cn-medcan (public)
 **Branch:** `main` (Makeover „Grünes Buch“ Teilprojekt 1 ist seit 2026-09-24 auf `main`)
 
@@ -28,31 +28,35 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 
 ## ⇢ Hier geht es weiter
 
-### ⇢ NÄCHSTE SESSION BEGINNT HIER (Stand 2026-09-25, Session 18)
+### ⇢ NÄCHSTE SESSION BEGINNT HIER (Stand 2026-09-25, Session 18 Ende)
 
-**Session 18:**
-- Live per DOM bestätigt (Stand `ae3201e`): Navigation „Blüten“, Lampe unten rechts, Pause-Symbole. Screenshot-Sicht-
-  prüfung steht noch aus (Chrome-Fenster war im Hintergrund, `visibilityState: hidden`).
-- Nutzerwunsch umgesetzt (`540c23c`, gepusht 14:23 UTC): Schleife „04 Wir bewerten.“ statt „Wir lesen.“, die doppelte
-  Überschrift rechts nur noch `sr-only`, Hintergrundvideo blendet oben/unten weich aus (`.video-einbettung`, mask-image,
-  Kante min(16rem, 30%)), damit die Schlagworte zwischen den Sektionen lesbar sind. **Live-Sichtprüfung offen.**
-- **„Blüte vorschlagen“:** Spec geschrieben: `docs/superpowers/specs/2026-09-25-bluete-vorschlagen-design.md`.
-  Nutzer entschied: **Mail erst später** (jeder Versandweg kostet: CF Email Sending nur Workers Paid + eigene Domain),
-  jetzt nur Benachrichtigungen im Mitgliederbereich. Alle anderen Entscheidungen in der Spec mit (E) markiert.
-  Kernfund: neue Blüten müssen `id = uuid5(NS, "s:"+slug)` wie `scripts/stamm/sql-erzeugen.py` bekommen, sonst bricht
-  der spätere JSON-Import am Unique-Index `slug` ab.
-  Spec vom Nutzer freigegeben („ja“). **Plan:** `docs/superpowers/plans/2026-09-25-bluete-vorschlagen.md` (8 Tasks,
-  TDD). Zusätzlicher Fund: auch Hersteller brauchen die Import-Id (`uuid5("u:"+schluessel)`). Zähler im Kopf per
-  `GET /api/benachrichtigungen` im Browser, weil der Kopf keine Sitzung liest.
-  **Nächster Schritt:** Nutzer prüft den Plan und wählt die Ausführung (Subagent oder Native), dann Task 1.
-- Startseite, Nutzerwünsche (`1fa72cf`, gepusht 14:42 UTC, **live noch nicht gesehen**):
-  Kopfzeile „Grünes Buch · Stand · Terpen für Terpen“ jetzt unten im Auftakt (`components/story/Kopfzeile.tsx`),
-  Unterzeile der Wortmarke „Terpen für Terpen“ statt „Charge für Charge“. Storytelling ohne Chargen: Terpenprofil,
-  jedes Terpen eigene Note, Abweichung Community/Hersteller; neuer Grad `text-erzaehlung` (clamp 2.5–3.75 rem);
-  Blobs mit `shape-margin` 2.5 rem und weicherer Rundung; zwei Linien (`.blob-linie`, Grün accent, Violett
-  kopierstift) morphen im eigenen Takt; Video und Linien folgen dem Zeiger (`bewegung/punkte.ts`, nur feiner Zeiger).
-  Schlagworte: keins mehr im Storytelling, „was drin ist“ jetzt beim neuesten Eintrag, „stimmt das?“ nicht mehr auf
-  der Kante (oben=top-32). Live prüfen: passt der Auftakt samt Kopfzeile in 100svh (auch Laptop-Höhe ~800 px)?
+**Blüte vorschlagen** (Spec `docs/superpowers/specs/2026-09-25-bluete-vorschlagen-design.md`, Plan
+`docs/superpowers/plans/2026-09-25-bluete-vorschlagen.md`, Ledger `.superpowers/sdd/2026-09-25-bluete-vorschlagen/progress.md`):
+- Tasks 1–7 umgesetzt (TDD, Tests grün). Migration 0006 + Trigger **live angewendet** (remote, 25.09. ~15:25 UTC).
+- Mail kommt später (Nutzerentscheid: kostet Domain + Workers Paid); Benachrichtigungen nur im Mitgliederbereich.
+- Neue Blüten/Hersteller bekommen die Import-Id (`lib/stamm-id.ts`, uuid5 wie `scripts/stamm/sql-erzeugen.py`).
+- Offen: Task 8 Live-Prüfung (Vorschlag anlegen, im Admin freigeben, Zähler/Benachrichtigung sehen) und das
+  Schlussreview des ganzen Stands. Späterer JSON-Import: Anbindung an offene Vorschläge nach Spec 4.4.
+
+**Startseite und Auftritt (Session 18, alles gepusht):**
+- Hero: Kopfzeile „Grünes Buch · Stand · Terps for nerds“ als Band über die volle Breite unten in der ersten
+  Ansicht (live gemessen: liegt in 100svh), dünn und gedämpft; Hero-Nebentexte in gesperrten Versalien
+  (`tracking-gesperrt`, Regel in ui-design-engine angepasst); Unterzeile „Terpen für Terpen“.
+- Wortmarke: fünf kreisende, gekippte Bahnen in Violett/Grün (`.marke-bahn`, Werte je Bahn in `Auftakt.tsx`),
+  Zeigerfolge über `bewegung/punkte.ts`.
+- Kopf ohne Kapitelnummern. „Produkt“ im Auftritt überall „Blüte“ (URL `/produkte` bleibt).
+- Storytelling: ohne Chargen; Stationen Gesamteindruck, Terpene, Beschaffenheit (wie die Aroma-Erkundung);
+  Grad `text-erzaehlung`; Absätze mit `mt-[35vh] md:mt-[50vh]`; je Video vier morphende Linien (`RINGE`,
+  `blob-morph`/`blob-morph-stark`), Zeigerfolge.
+- Aroma-Erkundung in drei Schritten (01 Gesamteindruck, 02 Terpene mit Karte, 03 Beschaffenheit).
+- Schlagworte: keins im Storytelling; „stimmt das?“ am Ende der Aroma-Sektion, „was drin ist“ unter dem
+  neuesten Eintrag; Eintrags-Hintergrund verläuft weich (Gradient statt harter Fläche); Schleifenvideo blendet aus.
+- Joint-Cursor: Canvas-Qualm (`components/layout/joint-rauch.ts`), Funken, flackernde Glut, Ausatmen.
+- Referenzbilder: zehn freigestellte Pexels-Blüten `bluete-01..10` (lib/medien.ts), **zufällig allen 286 Blüten
+  zugeordnet (lokal + live, `strains.hersteller_bild_pfad`)**, als „Symbolbild“ auf Karte und Titelblatt.
+  Ausnahme zu Leitplanke 5 in `docs/brand/gruenes-buch.md` dokumentiert: vor öffentlichem Start neu entscheiden.
+- **Nicht per Screenshot gesehen** (Chrome war die ganze Session im Hintergrund, `visibilityState: hidden`):
+  Linien/Bahnen, Qualm, Bilder, Abstände. Nur per DOM gemessen. Zuerst Chrome nach vorn, dann Sichtprüfung.
 
 ### ⇢ STAND SESSION 17 Ende (alles gepusht bis `d682afa`)
 
