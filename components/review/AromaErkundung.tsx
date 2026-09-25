@@ -6,6 +6,7 @@ import { AromaKarte, type AromaSerie } from "@/components/review/AromaKarte";
 import type { SweetSpotZeile } from "@/components/review/SweetSpot";
 import {
   BeschaffenheitsLeiste,
+  type BeschaffenheitsSchluessel,
   type BeschaffenheitsWerte,
 } from "@/components/review/BeschaffenheitsLeiste";
 import type { KatalogEintrag } from "@/components/review/TerpenErgaenzen";
@@ -58,6 +59,10 @@ export function AromaErkundung({
   children?: React.ReactNode;
 }) {
   const [eigen, setEigen] = useState<GeschmacksMatrix | null>(null);
+  const [eigeneBeschaffenheit, setEigeneBeschaffenheit] = useState<
+    Partial<Record<BeschaffenheitsSchluessel, number>>
+  >({});
+  const bewegt = eigen !== null || Object.keys(eigeneBeschaffenheit).length > 0;
 
   // Karte: Herstellerterpene plus die, die die Community zusätzlich geschmeckt hat.
   const angegeben = new Set(terpene.map((terpen) => terpen.name));
@@ -143,12 +148,26 @@ export function AromaErkundung({
           nichts gespeichert.
         </p>
         {beschaffenheit ? (
-          <BeschaffenheitsLeiste {...beschaffenheit} className="w-full" />
+          <BeschaffenheitsLeiste
+            {...beschaffenheit}
+            className="w-full"
+            bedienung={{
+              eigen: eigeneBeschaffenheit,
+              aendern: (schluessel, wert) =>
+                setEigeneBeschaffenheit((alt) => ({
+                  ...alt,
+                  [schluessel]: wert,
+                })),
+            }}
+          />
         ) : null}
-        {eigen ? (
+        {bewegt ? (
           <button
             type="button"
-            onClick={() => setEigen(null)}
+            onClick={() => {
+              setEigen(null);
+              setEigeneBeschaffenheit({});
+            }}
             className="text-small text-accent underline underline-offset-4 hover:text-accent-hover"
           >
             Zurücksetzen

@@ -1,6 +1,5 @@
 import { Suspense, type ReactNode } from "react";
 
-import { Bild } from "@/components/medien/Bild";
 import { Loop } from "@/components/medien/Loop";
 import { Button } from "@/components/ui";
 import { formatiereDatum } from "@/lib/format";
@@ -21,7 +20,7 @@ const ERLAEUTERUNG: Record<string, string> = Object.fromEntries(
 const PUNKTE = [
   {
     titel: "Aussehen",
-    bilder: ["frei-hoch", "frei-bluete"],
+    video: "aussehen-loop",
     text: ERLAEUTERUNG.aussehen,
     seite: "rechts",
     form: "rounded-[62%_38%_55%_45%/48%_60%_40%_52%] rotate-3",
@@ -29,7 +28,7 @@ const PUNKTE = [
   },
   {
     titel: "Geruch",
-    bilder: ["frei-paar"],
+    video: "geruch-loop",
     text: ERLAEUTERUNG.geruch,
     seite: "links",
     form: "rounded-[45%_55%_40%_60%/58%_42%_62%_38%] -rotate-2",
@@ -37,7 +36,7 @@ const PUNKTE = [
   },
   {
     titel: "Restfeuchte",
-    video: "pflanze-loop",
+    video: "feuchte-loop",
     text: "Zwischen 8 und 13 Prozent ist gut. Darunter wird es staubig, darüber droht Schimmel.",
     seite: "rechts",
     form: "rounded-[55%_45%_62%_38%/42%_56%_44%_58%] rotate-1",
@@ -46,40 +45,24 @@ const PUNKTE = [
 ] as const;
 
 /**
- * Ein Prüfpunkt: der Blob morpht langsam (blob-morph), das Innere zoomt leicht
- * (bild-zoom); mehrere Freisteller blenden im Wechsel (bild-wechsel), ein Video
- * füllt den Blob randlos. Reduzierte Bewegung: alles steht (globals.css).
+ * Ein Prüfpunkt: je ein Video zum Thema füllt den Blob randlos; der Blob
+ * morpht langsam (blob-morph), das Video zoomt leicht (bild-zoom).
+ * Reduzierte Bewegung: alles steht, das Standbild bleibt (globals.css).
  */
 function Punkt({ punkt }: { punkt: (typeof PUNKTE)[number] }) {
   const seite = punkt.seite === "rechts" ? "float-right ml-8 md:ml-24" : "float-left mr-8 md:mr-24";
   return (
     <aside className={`${seite} my-16 flex w-56 flex-col items-center gap-4 text-center md:w-md [shape-outside:ellipse(50%_45%)]`}>
       <div
-        className={`blob-morph relative aspect-square w-full ${punkt.form} ${"video" in punkt ? "overflow-hidden" : "bg-accent-subtle/40 p-6 md:p-10"}`}
+        className={`blob-morph relative aspect-square w-full overflow-hidden ${punkt.form}`}
         style={{ animationDelay: punkt.verzoegerung }}
       >
-        {"video" in punkt ? (
-          <Loop id={punkt.video} className="bild-zoom h-full" />
-        ) : (
-          <div className={`relative h-full ${punkt.bilder.length > 1 ? "bild-wechsel" : "bild-schweben"}`}>
-            {punkt.bilder.map((id, index) => (
-              <Bild
-                key={id}
-                id={id}
-                dekorativ={index > 0}
-                sizes="(min-width: 768px) 448px, 224px"
-                className={`bild-zoom h-full object-contain ${index > 0 ? "absolute inset-0" : ""}`}
-              />
-            ))}
-          </div>
-        )}
+        <Loop id={punkt.video} className="bild-zoom h-full" />
       </div>
-      {"video" in punkt ? (
-        // Pause fuer das Video (WCAG 2.2.2); sichtbar erst, wenn loops.ts es startet.
-        <Button variante="ghost" groesse="sm" hidden data-loop-schalter="">
-          Video anhalten
-        </Button>
-      ) : null}
+      {/* Pause fuer die Videos (WCAG 2.2.2); sichtbar erst, wenn loops.ts sie startet. */}
+      <Button variante="ghost" groesse="sm" hidden data-loop-schalter="">
+        Video anhalten
+      </Button>
       <h3 className="font-buch text-h3 font-medium text-text">{punkt.titel}</h3>
       <p className="text-small text-text-muted text-pretty">{punkt.text}</p>
     </aside>

@@ -404,9 +404,10 @@
     mix-blend-mode: screen;
   }
 
+  /* Videos nicht invertieren: im Dunkeln laufen sie so, wie sie sind. */
   :root:not([data-theme="light"]) .medien-video {
-    filter: grayscale(1) invert(1);
-    mix-blend-mode: screen;
+    filter: none;
+    mix-blend-mode: normal;
   }
 }
 
@@ -416,8 +417,8 @@
 }
 
 :root[data-theme="dark"] .medien-video {
-  filter: grayscale(1) invert(1);
-  mix-blend-mode: screen;
+  filter: none;
+  mix-blend-mode: normal;
 }
 
 /* ==========================================================================
