@@ -162,7 +162,7 @@ export function AromaErkundung({
       {bild}
 
       {gesamteindruck ? (
-        <Schritt nummer="1" titel="Gesamteindruck">
+        <Schritt nummer="1" titel="Overall">
           <GesamteindruckLeiste
             {...gesamteindruck}
             className="w-full"
@@ -175,7 +175,7 @@ export function AromaErkundung({
         </Schritt>
       ) : null}
 
-      <Schritt nummer="2" titel="Terpene">
+      <Schritt nummer="2" titel="Terpz">
         {treue || eigeneTreue !== null ? (
           <p className="text-small text-text-muted">
             {treue ? (
@@ -214,7 +214,7 @@ export function AromaErkundung({
       </Schritt>
 
       {beschaffenheit ? (
-        <Schritt nummer="3" titel="Beschaffenheit">
+        <Schritt nummer="3" titel="Qualität">
           <BeschaffenheitsLeiste
             {...beschaffenheit}
             className="w-full"
@@ -319,7 +319,13 @@ function Schritt({
           {nummer}
         </text>
       </svg>
-      <h3 className="border-t border-border pt-8 font-buch text-h2 font-medium text-text">{titel}</h3>
+      {/* Zentriert in Logoschrift und Farbverlauf wie die Schlagworte (Nutzer 2026-09-25). */}
+      <h3
+        className="farbverlauf border-t border-border pt-8 text-center font-hand text-erzaehlung leading-[0.9]"
+        style={{ fontSize: "calc(var(--text-kapitel) * 1.35)" }}
+      >
+        {titel}
+      </h3>
       {children}
     </section>
   );
