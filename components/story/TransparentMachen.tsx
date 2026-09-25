@@ -87,7 +87,8 @@ function Punkt({ punkt }: { punkt: (typeof PUNKTE)[number] }) {
         <GlasMaske
           tiefe="2"
           ton={punkt.glas}
-          className={`-bottom-4 h-2/5 w-3/5 ${punkt.seite === "links" ? "-right-6" : "-left-6"}`}
+          className="-inset-[18%]"
+          versatz={punkt.seite === "links" ? ["8%", "8%"] : ["-8%", "8%"]}
         />
       </div>
       {/* Pause fuer die Videos (WCAG 2.2.2); sichtbar erst, wenn loops.ts sie startet. */}

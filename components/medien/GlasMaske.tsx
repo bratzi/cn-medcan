@@ -7,11 +7,23 @@ import { cn } from "@/lib/cn";
  * Größe, der Elternteil braucht `relative`. Mit `tiefe` folgt sie dem Zeiger
  * (bewegung/punkte.ts). Bei reduzierter Bewegung steht sie.
  */
-export function GlasMaske({ ton, tiefe, className }: { ton: "lila" | "gruen"; tiefe?: string; className?: string }) {
+export function GlasMaske({
+  ton,
+  tiefe,
+  versatz,
+  className,
+}: {
+  ton: "lila" | "gruen";
+  tiefe?: string;
+  /** Versatz gegen das Bild [x, y], z. B. ["14%", "12%"]: bei gleicher Größe deckt es so rund drei Viertel ab. */
+  versatz?: readonly [string, string];
+  className?: string;
+}) {
   return (
     <span
       aria-hidden="true"
       data-punkt-tiefe={tiefe}
+      style={versatz ? ({ "--glas-x": versatz[0], "--glas-y": versatz[1] } as React.CSSProperties) : undefined}
       className={cn("glas-maske", ton === "gruen" ? "glas-gruen" : "glas-lila", className)}
     />
   );
