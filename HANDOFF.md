@@ -49,6 +49,10 @@ wurde; Chrome wurde neu gestartet). Zuerst: Browser verbinden, Fenster normal gr
   (Schema min 0 in lib/bewertung-eingabe.ts und terpenIntensitaetSchema), Vorschau-Karte grau bis gewählt.
 
 **Befunde / offen, der Reihe nach:**
+0. **KRITISCH: Seiten mit Aroma-Erkundung frieren ein** (Renderer hängt, CDP-Timeout 45 s), auch nach Chrome-Neustart,
+   zuletzt /produkte/apples-bananas auf Stand `c4210e8`. Vorher (bis `1c5fd52`) lief die Seite. Verdacht: Render-/Effekt-
+   Schleife seit `c421d6c` (alle Katalog-Terpene in der Karte, `staerken`/`useGleitend` in AromaKarte mit neuem Objekt je
+   Render?) oder die Glanz-Transition. Mit systematic-debugging eingrenzen (Commits einzeln prüfen), zuerst beheben.
 1. Live-Screenshot-Prüfung der obigen ungeprüften Commits (Startseite Aroma-Sektion, /produkte/apples-bananas,
    /bewerten/apples-bananas, Hover-Glanz). Nutzer will Karte und Regler auf einen Blick.
 2. Seite fror im sehr breiten Fenster ein -> prüfen, ob echtes Performance-Problem (3D-Blätter? Glanz-Transition auf
