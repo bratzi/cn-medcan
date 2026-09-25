@@ -17,11 +17,11 @@ export const auftakt: Choreografie = ({ gsap }) => {
     .set(einstieg, { animation: "none", opacity: 1 })
     // fromTo statt from: der Zielwert käme sonst aus dem CSS-Einstieg (opacity 0),
     // und die Zeile bliebe unsichtbar, weil die Bühne den Notfall abschaltet.
-    // Ziel 0.45 = opacity-45 am Video (Auftakt.tsx); danach übernimmt wieder die Klasse.
+    // Ziel 0.75 = opacity-75 am Video (Auftakt.tsx); danach übernimmt wieder die Klasse.
     .fromTo(
       '[data-story="auftakt-film"] video',
       { opacity: 0, scale: 1.08 },
-      { opacity: 0.45, scale: 1, duration: 1.8, ease: "power2.out", clearProps: "opacity,scale" },
+      { opacity: 0.75, scale: 1, duration: 1.8, ease: "power2.out", clearProps: "opacity,scale" },
       0,
     )
     .fromTo('[data-story="oberzeile"]', { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.6 }, 0.1)
