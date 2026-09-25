@@ -12,6 +12,9 @@ export const EINDRUCK_ACHSEN = BEWERTUNGS_ACHSEN.filter((achse) => achse.key !==
 
 export type EindruckKey = (typeof EINDRUCK_ACHSEN)[number]["key"];
 
+/** Alle Noten, mit Wirkung: nur in der Bewertungsmaske (Pflichtfeld), nie öffentlich. */
+export type NotenKey = (typeof BEWERTUNGS_ACHSEN)[number]["key"];
+
 export type Gesamteindruck = { werte: Partial<Record<EindruckKey, number>>; anzahl: number };
 
 /** Mittel je Note über alle Bewertungen, eine Nachkommastelle. */
@@ -33,13 +36,18 @@ export function GesamteindruckLeiste({
   anzahl,
   className,
   bedienung,
+  mitWirkung = false,
 }: Gesamteindruck & {
   className?: string;
   bedienung?: {
-    eigen: Readonly<Partial<Record<EindruckKey, number>>>;
-    aendern: (key: EindruckKey, wert: number) => void;
+    eigen: Readonly<Partial<Record<NotenKey, number>>>;
+    aendern: (key: NotenKey, wert: number) => void;
   };
+  /** Bewertungsmaske: Wirkung als zusätzliche Note (Pflicht beim Speichern). */
+  mitWirkung?: boolean;
 }) {
+  const achsen = mitWirkung ? BEWERTUNGS_ACHSEN : EINDRUCK_ACHSEN;
+  const mittelWerte: Partial<Record<NotenKey, number>> = werte;
   if (!bedienung && Object.keys(werte).length === 0) return null;
   return (
     <section className={cn("flex flex-col gap-4", className)}>
@@ -52,8 +60,8 @@ export function GesamteindruckLeiste({
         ) : null}
       </h3>
       <dl className="flex flex-col gap-4">
-        {EINDRUCK_ACHSEN.map((achse) => {
-          const mittel = werte[achse.key];
+        {achsen.map((achse) => {
+          const mittel = mittelWerte[achse.key];
           const wert = bedienung?.eigen[achse.key] ?? mittel ?? 3;
           // Skala 1 bis 5 auf die Spur 0 bis 4 abgebildet.
           return (

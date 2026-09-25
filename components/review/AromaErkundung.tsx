@@ -9,7 +9,7 @@ import {
   type BeschaffenheitsSchluessel,
   type BeschaffenheitsWerte,
 } from "@/components/review/BeschaffenheitsLeiste";
-import { GesamteindruckLeiste, type EindruckKey, type Gesamteindruck } from "@/components/review/GesamteindruckLeiste";
+import { GesamteindruckLeiste, type Gesamteindruck, type NotenKey } from "@/components/review/GesamteindruckLeiste";
 import type { KatalogEintrag } from "@/components/review/TerpenErgaenzen";
 import {
   achsenIndex,
@@ -21,7 +21,7 @@ import {
   type KartenTerpen,
   type Treue,
 } from "@/lib/aromakarte";
-import { GESCHMACKS_ACHSEN, leereGeschmacksMatrix, type GeschmacksMatrix } from "@/lib/query/bewertung";
+import { BEWERTUNGS_ACHSEN, GESCHMACKS_ACHSEN, leereGeschmacksMatrix, type GeschmacksMatrix } from "@/lib/query/bewertung";
 import { communityFazit } from "@/lib/fazit";
 
 const PROZENT = new Intl.NumberFormat("de-DE", {
@@ -47,6 +47,7 @@ export function AromaErkundung({
   treue = null,
   beschaffenheit,
   gesamteindruck,
+  eingabe = false,
   children,
 }: {
   titel: string;
@@ -64,13 +65,19 @@ export function AromaErkundung({
   beschaffenheit?: BeschaffenheitsWerte;
   /** Allgemeine Noten 1 bis 5, gemittelt über die Bewertungen. */
   gesamteindruck?: Gesamteindruck;
+  /**
+   * Bewertungsmaske (Nutzer 2026-09-25: sieht exakt aus wie die Startseite):
+   * die Regler sind die Eingabe, ihre Werte gehen als versteckte Felder ins
+   * umschließende Formular (Feldnamen wie lib/bewertung-eingabe.ts).
+   */
+  eingabe?: boolean;
   children?: React.ReactNode;
 }) {
   const [eigen, setEigen] = useState<GeschmacksMatrix | null>(null);
   const [eigeneBeschaffenheit, setEigeneBeschaffenheit] = useState<
     Partial<Record<BeschaffenheitsSchluessel, number>>
   >({});
-  const [eigeneNoten, setEigeneNoten] = useState<Partial<Record<EindruckKey, number>>>({});
+  const [eigeneNoten, setEigeneNoten] = useState<Partial<Record<NotenKey, number>>>({});
   const bewegt =
     eigen !== null || Object.keys(eigeneBeschaffenheit).length > 0 || Object.keys(eigeneNoten).length > 0;
 
@@ -118,11 +125,14 @@ export function AromaErkundung({
     treue: treue?.wert ?? null,
     beschaffenheit: beschaffenheit?.werte ?? {},
   });
-  const { feuchte: _eigeneFeuchte, ...eigeneAchsen } = eigeneBeschaffenheit;
-  void _eigeneFeuchte;
+  const { feuchte: eigeneFeuchte, ...eigeneAchsen } = eigeneBeschaffenheit;
+  // Wirkung zählt nicht ins Fazit (steht nicht auf der öffentlichen Karte).
+  const { wirkung: _wirkung, ...eigeneEindruecke } = eigeneNoten;
+  void _wirkung;
+  const mittelNoten: Partial<Record<NotenKey, number>> = gesamteindruck?.werte ?? {};
   const eigenesFazit = bewegt
     ? communityFazit({
-        eindruck: { ...(gesamteindruck?.werte ?? {}), ...eigeneNoten },
+        eindruck: { ...(gesamteindruck?.werte ?? {}), ...eigeneEindruecke },
         treue: eigeneTreue ?? treue?.wert ?? null,
         beschaffenheit: { ...(beschaffenheit?.werte ?? {}), ...eigeneAchsen },
       })
@@ -131,6 +141,23 @@ export function AromaErkundung({
 
   return (
     <div className="flex flex-col gap-16 md:gap-24">
+      {eingabe ? (
+        // Werte der Regler fürs umschließende Formular: Noten immer (Pflicht, Start
+        // am Community-Mittel, sonst 3), Geschmack immer, Beschaffenheit und
+        // Restfeuchte nur, was bewegt wurde (optional).
+        <div hidden>
+          {BEWERTUNGS_ACHSEN.map(({ key }) => (
+            <input key={key} type="hidden" name={`note-${key}`} value={Math.round(eigeneNoten[key] ?? mittelNoten[key] ?? 3)} />
+          ))}
+          {GESCHMACKS_ACHSEN.map(({ key }) => (
+            <input key={key} type="hidden" name={`geschmack-${key}`} value={Math.round(werte[key] * 2) / 2} />
+          ))}
+          {Object.entries(eigeneAchsen).map(([key, wert]) => (
+            <input key={key} type="hidden" name={`beschaffenheit-${key}`} value={Math.round((wert ?? 0) * 2) / 2} />
+          ))}
+          {eigeneFeuchte !== undefined ? <input type="hidden" name="feuchtigkeit" value={eigeneFeuchte} /> : null}
+        </div>
+      ) : null}
       {/* Sortenkopf ganz oben (Nutzer 2026-09-25): erst sieht man, was bewertet wurde. */}
       {bild}
 
@@ -139,6 +166,7 @@ export function AromaErkundung({
           <GesamteindruckLeiste
             {...gesamteindruck}
             className="w-full"
+            mitWirkung={eingabe}
             bedienung={{
               eigen: eigeneNoten,
               aendern: (key, wert) => setEigeneNoten((alt) => ({ ...alt, [key]: wert })),
@@ -165,7 +193,7 @@ export function AromaErkundung({
         ) : null}
         <p className="max-w-[60ch] text-small text-text-muted text-pretty">
           Zieh die lila Punkte links in der Karte: Wie stark schmeckst du jede Richtung? Dazu leuchten die
-          Terpene auf, die sie tragen. Hier wird nichts gespeichert.
+          Terpene auf, die sie tragen.{eingabe ? "" : " Hier wird nichts gespeichert."}
         </p>
         <div className="w-full min-w-0">
           <AromaKarte
