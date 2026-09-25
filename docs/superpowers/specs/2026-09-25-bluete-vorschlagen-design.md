@@ -62,7 +62,7 @@ Der Name grenzt sich vom bestehenden `UmfrageVorschlag` ab (dort schlagen Mitgli
 | `kultivarName` | String? | |
 | `kultivarTyp` | String? | INDICA/SATIVA/HYBRID/RUDERALIS oder leer („weiß ich nicht“) |
 | `thcProzent`, `cbdProzent` | Float? | ein Wert je Cannabinoid, wie auf der Packung |
-| `terpene` | String? | JSON-Liste der Terpennamen aus dem Katalog, optional mit Prozent |
+| `terpene` | String? | JSON-Liste von bis zu 3 Terpennamen aus dem Katalog, in Rangfolge (ohne Prozent) |
 | `quelle` | String | Pflicht: URL oder kurzer Text („Packung“, „Apotheke XY“) |
 | `notiz` | String? | Freitext für den Betreiber, max. 500 Zeichen |
 | `status` | String | OFFEN / FREIGEGEBEN / ABGELEHNT (neue Werteliste `VORSCHLAG_STATUS` in `db/enums.ts`, Trigger in `db/constraints.sql`) |
@@ -104,6 +104,10 @@ Id nach derselben Regel (`lib/stamm-id.ts`, uuid v5 per `crypto.subtle` SHA-1, g
 `6f1c2b8e-…`). Ein Test prüft die Gleichheit mit einem Wert, den das Python-Skript erzeugt.
 Ein späterer Import aktualisiert die Blüte dann einfach mit seinen Daten.
 
+Dasselbe gilt für neu angelegte Hersteller: der Import vergibt `unternehmen.id = uuid5(NS, "u:" + schluessel)`
+(Schlüssel = Name kleingeschrieben, ohne Zusätze wie „GmbH“, „Pharma“), und `unternehmen` hat einen
+Unique-Index auf `(name, rolle)`. Die Freigabe legt Hersteller deshalb mit derselben Id-Regel an.
+
 ## 4. Abläufe
 
 ### 4.1 Vorschlagen (Mitglied)
@@ -141,8 +145,7 @@ Ein späterer Import aktualisiert die Blüte dann einfach mit seinen Daten.
   4. Alle offenen Vorschläge mit diesem Schlüssel auf FREIGEGEBEN setzen, `strainId` setzen.
   5. Je Mitglied eine Benachrichtigung.
   Jeder Schritt ist wiederholbar; bricht einer ab, führt ein zweiter Klick zum selben Ergebnis.
-  Schritte 3 bis 5 laufen als `prisma.$transaction([...])`-Batch nur dann, wenn der D1-Adapter das als
-  Batch ausführt; das wird beim Plan geprüft (Skill `prisma-driver-adapter-implementation`).
+  Kein `$transaction`: Prisma führt es gegen D1 als Einzelabfragen aus (db/README.md), es brächte nichts.
 - **Ablehnen:** mit optionaler Begründung (sichtbar für das Mitglied), setzt alle offenen Vorschläge
   des Schlüssels auf ABGELEHNT, Benachrichtigung an alle.
 - **Zusammenführen (E):** Wurde die Blüte unter anderem Namen vorgeschlagen, als sie im Katalog
@@ -152,12 +155,13 @@ Ein späterer Import aktualisiert die Blüte dann einfach mit seinen Daten.
 ### 4.3 Benachrichtigen (Mitglied)
 
 - Im Kopf trägt die Konto-Pille einen Zähler ungelesener Benachrichtigungen (Zahl in `numeric`, mit
-  `sr-only`-Text „3 ungelesene Benachrichtigungen“). Die Abfrage ist ein `count` auf dem Index, nur
-  für angemeldete Mitglieder.
+  `sr-only`-Text „3 ungelesene Benachrichtigungen“). Der Kopf liest bewusst keine Sitzung (sonst wäre
+  jede Seite dynamisch); der Zähler holt die Zahl deshalb im Browser von `GET /api/benachrichtigungen`
+  (ein `count` auf dem Index, 0 ohne Anmeldung) und merkt sie sich 60 Sekunden in `sessionStorage`.
 - In `/mitglied`: Abschnitt „Benachrichtigungen“ (neueste zuerst, 20 Stück) und „Meine Vorschläge“
   mit Status-Badge (Klartext plus Formmarker: offen, im Katalog, abgelehnt mit Begründung).
-- **(E)** Gelesen wird beim Öffnen von `/mitglied` für alle angezeigten gesetzt, kein einzelnes
-  Wegklicken. Einfach und reicht für die Mengen dieses Projekts.
+- **(E)** Gelesen wird beim Öffnen von `/mitglied` für alle angezeigten gesetzt (eine Server Action,
+  die der Abschnitt nach dem Anzeigen einmal aufruft), kein einzelnes Wegklicken.
 
 ### 4.4 Späterer JSON-Import
 
