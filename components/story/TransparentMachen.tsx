@@ -108,11 +108,10 @@ function Paar({
     <div
       className={`${erster ? "mt-24 md:mt-32" : "mt-[18vh] md:mt-[25vh]"} flex flex-col items-center gap-12 md:flex-row md:justify-center md:gap-24`}
     >
-      {/* Logoschrift (Nutzer 2026-09-25): Überschrift und Texte des Storytellings
-          stehen in der Handschrift der Wortmarke, Ausnahme zu Regel 3 (ui-design-engine). */}
+      {/* Buchschrift; nur das eine Schlagwort je Absatz (Buzz) steht in der Logoschrift (Nutzer 2026-09-25). */}
       <p
         data-manifest-zeile=""
-        className={`font-hand text-erzaehlung leading-[1.08] text-text md:max-w-[20ch] ${videoLinks ? "md:order-2" : ""}`}
+        className={`font-buch text-erzaehlung leading-[1.08] text-text md:max-w-[20ch] ${videoLinks ? "md:order-2" : ""}`}
       >
         {children}
       </p>
@@ -151,7 +150,7 @@ export function TransparentMachen() {
     >
       <div className="mx-auto w-full max-w-360">
         <div data-story="manifest">
-          <h2 id="transparent-titel" data-manifest-zeile="" className="font-hand text-erzaehlung text-text text-balance">
+          <h2 id="transparent-titel" data-manifest-zeile="" className="font-buch text-erzaehlung text-text text-balance">
             Hinter jedem Handelsnamen steckt ein <Buzz>Terpenprofil.</Buzz> Wir
             schreiben auf, was drin ist.
           </h2>
