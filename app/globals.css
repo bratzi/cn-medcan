@@ -543,3 +543,38 @@
   line-height: 0.8;
   letter-spacing: 0;
 }
+
+/* Wortmarke im Auftakt: Verlauf wie die Buzzwords, dazu ein Glanzstreifen,
+   der beim Hover einmal über den Schriftzug zieht. Je Zeile geclippt, damit
+   der geschriebene Einstieg (schreiben) weiter greift. */
+.auftakt-marke [data-marke-zeile] {
+  background-image:
+    linear-gradient(
+      105deg,
+      transparent 35%,
+      color-mix(in oklab, white 75%, transparent) 50%,
+      transparent 65%
+    ),
+    linear-gradient(90deg, var(--color-accent), var(--color-kopierstift) 55%, var(--color-accent));
+  background-size: 250% 100%, 100% 100%;
+  background-position: 130% 0, 0 0;
+  background-repeat: no-repeat;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  padding-inline-end: 0.08em;
+}
+
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .auftakt-marke [data-marke-zeile] {
+    transition: background-position 1.1s var(--ease-standard);
+  }
+
+  .auftakt-marke:hover [data-marke-zeile] {
+    background-position: -30% 0, 0 0;
+  }
+
+  .auftakt-marke:hover [data-marke-zeile] + [data-marke-zeile] {
+    transition-delay: 0.12s;
+  }
+}
