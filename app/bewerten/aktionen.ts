@@ -66,6 +66,7 @@ export async function bewertungSpeichern(formData: FormData): Promise<BewertungE
       feuchtigkeitProzent: e.feuchtigkeitProzent,
       geschmacksMatrix: JSON.stringify(e.geschmacksMatrix),
       terpenIntensitaet: Object.keys(e.terpenIntensitaet).length > 0 ? JSON.stringify(e.terpenIntensitaet) : null,
+      beschaffenheit: Object.keys(e.beschaffenheit).length > 0 ? JSON.stringify(e.beschaffenheit) : null,
       notiz: e.notiz,
       instagramReelUrl: istBetreiber ? e.instagramReelUrl : null,
     },

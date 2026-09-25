@@ -37,7 +37,8 @@ import {
   formatiereProzentSpanne,
 } from "@/lib/format";
 import { bestrahlungLabel, darreichungsformLabel, kultivarTypLabel } from "@/lib/labels";
-import { parseGeschmacksMatrix, teileBewertungen, verdichteGeschmacksMatrix, mittleTerpenIntensitaet, parseTerpenIntensitaet } from "@/lib/query/bewertung";
+import { parseGeschmacksMatrix, teileBewertungen, verdichteGeschmacksMatrix, mittleTerpenIntensitaet, parseBeschaffenheit, parseTerpenIntensitaet } from "@/lib/query/bewertung";
+import { mittleBeschaffenheit } from "@/components/review/BeschaffenheitsLeiste";
 import { istFachkreis } from "@/lib/query/fachkreis";
 import { ladeStrainDetail, ladeTerpenKatalog, type StrainDetail, type UnternehmenEintrag } from "@/lib/query/strains";
 
@@ -217,6 +218,12 @@ async function ProduktInhalt({ slug }: { slug: string }) {
               katalog={katalog}
               treue={mittlereHerstellerTreue(hersteller, strain.reviews.map((review) => parseGeschmacksMatrix(review.geschmacksMatrix)))}
               zeilen={Object.entries(intensitaet).map(([terpen, { mittel, anzahl }]) => ({ terpen, wert: mittel, anzahl }))}
+              beschaffenheit={mittleBeschaffenheit(
+                strain.reviews.map((review) => ({
+                  beschaffenheit: parseBeschaffenheit(review.beschaffenheit),
+                  feuchte: review.feuchtigkeitProzent,
+                })),
+              )}
             />
           </div>
           <p className="mt-8">

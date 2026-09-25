@@ -4,6 +4,10 @@ import { useState } from "react";
 
 import { AromaKarte, type AromaSerie } from "@/components/review/AromaKarte";
 import { SweetSpot, type SweetSpotZeile } from "@/components/review/SweetSpot";
+import {
+  BeschaffenheitsLeiste,
+  type BeschaffenheitsWerte,
+} from "@/components/review/BeschaffenheitsLeiste";
 import type { KatalogEintrag } from "@/components/review/TerpenErgaenzen";
 import {
   achsenIndex,
@@ -36,6 +40,7 @@ export function AromaErkundung({
   intensitaetTitel,
   katalog = [],
   treue = null,
+  beschaffenheit,
   children,
 }: {
   titel: string;
@@ -48,6 +53,8 @@ export function AromaErkundung({
   katalog?: readonly KatalogEintrag[];
   /** Herstellertreue aus allen Bewertungen der Sorte. */
   treue?: Treue | null;
+  /** Restfeuchte und Beschaffenheit, gemittelt über die Bewertungen. */
+  beschaffenheit?: BeschaffenheitsWerte;
   children?: React.ReactNode;
 }) {
   const [eigen, setEigen] = useState<Record<string, number>>({});
@@ -102,80 +109,87 @@ export function AromaErkundung({
   };
 
   return (
-    <div className="grid grid-cols-1 gap-12 lg:grid-cols-[minmax(0,3fr)_minmax(0,1fr)] lg:items-start">
-      {/* Links Karte und Regler direkt darunter: man sieht beim Schieben, was sich tut. */}
-      <div className="flex min-w-0 flex-col gap-6">
-        {/* Schmaler als die Spalte: so passen Karte und Regler zusammen auf den Bildschirm. */}
-        <div className="w-full max-w-xl">
-          <AromaKarte
-            titel={titel}
-            terpene={kartenTerpene}
-            serien={alleSerien}
-            hervorheben={aktiv}
-            staerken={terpenStaerken(kartenTerpene, stufen)}
-            ergaenzt={ergaenzt.map((terpen) => terpen.name)}
-          />
+    <div className="flex flex-col gap-8">
+      <div className="grid grid-cols-1 gap-12 lg:grid-cols-[minmax(0,3fr)_minmax(0,1fr)] lg:items-start">
+        {/* Links Karte und Regler direkt darunter: man sieht beim Schieben, was sich tut. */}
+        <div className="flex min-w-0 flex-col gap-6">
+          {/* Schmaler als die Spalte: so passen Karte und Regler zusammen auf den Bildschirm. */}
+          <div className="w-full max-w-xl">
+            <AromaKarte
+              titel={titel}
+              terpene={kartenTerpene}
+              serien={alleSerien}
+              hervorheben={aktiv}
+              staerken={terpenStaerken(kartenTerpene, stufen)}
+              ergaenzt={ergaenzt.map((terpen) => terpen.name)}
+            />
+          </div>
         </div>
-        <SweetSpot
-          titel={intensitaetTitel}
-          zeilen={alle}
-          quer
-          bedienung={{
-            eigen,
-            aendern: (terpen, wert) =>
-              setEigen((alt) => ({ ...alt, [terpen]: wert })),
-            aktivieren,
-          }}
-        />
+        <div className="flex flex-col items-start gap-6 lg:sticky lg:top-24">
+          {treue || eigeneTreue !== null ? (
+            <dl className="flex flex-wrap gap-x-12 gap-y-4">
+              {treue ? (
+                <div className="flex flex-col gap-1">
+                  <dt className="text-small text-text-muted">
+                    Herstellertreue
+                  </dt>
+                  <dd className="numeric font-buch text-h1 font-medium text-text">
+                    {PROZENT.format(treue.wert)}
+                  </dd>
+                  <dd className="text-caption text-text-muted">
+                    aus {treue.anzahl}{" "}
+                    {treue.anzahl === 1 ? "Bewertung" : "Bewertungen"}
+                  </dd>
+                </div>
+              ) : null}
+              {eigeneTreue !== null ? (
+                <div className="flex flex-col gap-1" aria-live="polite">
+                  <dt className="text-small text-text-muted">Dein Eindruck</dt>
+                  <dd className="numeric font-buch text-h1 font-medium text-kopierstift">
+                    {PROZENT.format(eigeneTreue)}
+                  </dd>
+                  <dd className="text-caption text-text-muted">
+                    nah an der Angabe
+                  </dd>
+                </div>
+              ) : null}
+            </dl>
+          ) : null}
+          <p className="-mt-2 max-w-[40ch] text-caption text-text-muted text-pretty">
+            Herstellertreue: wie nah das geschmeckte Profil an dem liegt, was
+            die Herstellerangaben erwarten lassen. 100 % heißt deckungsgleich.
+          </p>
+          <p className="max-w-[40ch] text-small text-text-muted text-pretty">
+            Schieb die Punkte: Wie stark hast du die Terpene geschmeckt? Terpene
+            bei 0 bleiben grau, hochgezogen werden sie farbig. Die Karte zeigt
+            dein Profil in Lila. Hier wird nichts gespeichert.
+          </p>
+          {beschaffenheit ? (
+            <BeschaffenheitsLeiste {...beschaffenheit} className="w-full" />
+          ) : null}
+          {bewegt ? (
+            <button
+              type="button"
+              onClick={() => setEigen({})}
+              className="text-small text-accent underline underline-offset-4 hover:text-accent-hover"
+            >
+              Zurücksetzen
+            </button>
+          ) : null}
+          {children}
+        </div>
       </div>
-      <div className="flex flex-col items-start gap-6 lg:sticky lg:top-24">
-        {treue || eigeneTreue !== null ? (
-          <dl className="flex flex-wrap gap-x-12 gap-y-4">
-            {treue ? (
-              <div className="flex flex-col gap-1">
-                <dt className="text-small text-text-muted">Herstellertreue</dt>
-                <dd className="numeric font-buch text-h1 font-medium text-text">
-                  {PROZENT.format(treue.wert)}
-                </dd>
-                <dd className="text-caption text-text-muted">
-                  aus {treue.anzahl}{" "}
-                  {treue.anzahl === 1 ? "Bewertung" : "Bewertungen"}
-                </dd>
-              </div>
-            ) : null}
-            {eigeneTreue !== null ? (
-              <div className="flex flex-col gap-1" aria-live="polite">
-                <dt className="text-small text-text-muted">Dein Eindruck</dt>
-                <dd className="numeric font-buch text-h1 font-medium text-kopierstift">
-                  {PROZENT.format(eigeneTreue)}
-                </dd>
-                <dd className="text-caption text-text-muted">
-                  nah an der Angabe
-                </dd>
-              </div>
-            ) : null}
-          </dl>
-        ) : null}
-        <p className="-mt-2 max-w-[40ch] text-caption text-text-muted text-pretty">
-          Herstellertreue: wie nah das geschmeckte Profil an dem liegt, was die
-          Herstellerangaben erwarten lassen. 100 % heißt deckungsgleich.
-        </p>
-        <p className="max-w-[40ch] text-small text-text-muted text-pretty">
-          Schieb die Punkte: Wie stark hast du die Terpene geschmeckt? Terpene
-          bei 0 bleiben grau, hochgezogen werden sie farbig. Die Karte zeigt
-          dein Profil in Lila. Hier wird nichts gespeichert.
-        </p>
-        {bewegt ? (
-          <button
-            type="button"
-            onClick={() => setEigen({})}
-            className="text-small text-accent underline underline-offset-4 hover:text-accent-hover"
-          >
-            Zurücksetzen
-          </button>
-        ) : null}
-        {children}
-      </div>
+      <SweetSpot
+        titel={intensitaetTitel}
+        zeilen={alle}
+        quer
+        bedienung={{
+          eigen,
+          aendern: (terpen, wert) =>
+            setEigen((alt) => ({ ...alt, [terpen]: wert })),
+          aktivieren,
+        }}
+      />
     </div>
   );
 }

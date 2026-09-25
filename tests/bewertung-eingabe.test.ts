@@ -35,3 +35,11 @@ test("fehlende Note, falsche Stufe, kaputte Reel-URL werden abgewiesen", () => {
   assert.equal(bewertungPruefen(formular({ feuchtigkeit: "45" }), []).ok, false);
   assert.ok(bewertungPruefen(formular({ instagramReelUrl: "https://www.instagram.com/reel/AbC_12/" }), []).ok);
 });
+
+test("Beschaffenheit: nur bewegte Regler, 0 bis 5 in halben Schritten", () => {
+  const e = bewertungPruefen(formular({ "beschaffenheit-budDichte": "4.5", "beschaffenheit-chlorophyll": "0" }), []);
+  assert.ok(e.ok);
+  if (e.ok) assert.deepEqual(e.wert.beschaffenheit, { chlorophyll: 0, budDichte: 4.5 });
+  assert.equal(bewertungPruefen(formular({ "beschaffenheit-terpenDichte": "5.5" }), []).ok, false);
+  assert.equal(bewertungPruefen(formular({ "beschaffenheit-trichomFarbe": "2.3" }), []).ok, false);
+});

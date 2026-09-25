@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import { InstagramEmbed, baueEmbedUrl } from "@/components/produkt/InstagramEmbed";
 import { AromaKarte, type AromaSerie } from "@/components/review/AromaKarte";
+import { BeschaffenheitsLeiste } from "@/components/review/BeschaffenheitsLeiste";
 import { SweetSpot } from "@/components/review/SweetSpot";
 import { herstellerProfil } from "@/lib/aromakarte";
 import { eintragAnker, eintragHref, type EintragDaten } from "@/components/review/eintrag";
@@ -148,6 +149,9 @@ export function Doppelseite({ eintrag, umfang, ueberschrift: Ueberschrift, story
             titel="Terpen-Intensität"
             zeilen={Object.entries(eintrag.terpenIntensitaet).map(([terpen, wert]) => ({ terpen, wert }))}
           />
+        ) : null}
+        {voll ? (
+          <BeschaffenheitsLeiste werte={eintrag.beschaffenheit} feuchte={null} />
         ) : null}
         {eintrag.notiz ? (
           <p

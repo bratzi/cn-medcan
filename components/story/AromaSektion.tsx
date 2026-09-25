@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Suspense } from "react";
 
+import { mittleBeschaffenheit } from "@/components/review/BeschaffenheitsLeiste";
 import { AromaErkundung } from "@/components/review/AromaErkundung";
 import { type AromaSerie } from "@/components/review/AromaKarte";
 import { Schlagwort } from "@/components/story/Schlagwort";
@@ -9,6 +10,7 @@ import { herstellerProfil, mittlereHerstellerTreue } from "@/lib/aromakarte";
 import {
   mittleTerpenIntensitaet,
   parseGeschmacksMatrix,
+  parseBeschaffenheit,
   parseTerpenIntensitaet,
   verdichteGeschmacksMatrix,
 } from "@/lib/query/bewertung";
@@ -40,6 +42,12 @@ async function Inhalt() {
         katalog={katalog}
         treue={mittlereHerstellerTreue(hersteller, sorte.reviews.map((review) => parseGeschmacksMatrix(review.geschmacksMatrix)))}
         zeilen={Object.entries(intensitaet).map(([terpen, { mittel, anzahl }]) => ({ terpen, wert: mittel, anzahl }))}
+        beschaffenheit={mittleBeschaffenheit(
+          sorte.reviews.map((review) => ({
+            beschaffenheit: parseBeschaffenheit(review.beschaffenheit),
+            feuchte: review.feuchtigkeitProzent,
+          })),
+        )}
       >
         <Link href={`/produkte/${sorte.slug}`} className={buttonKlassen("secondary", "md")}>
           Zur Sorte

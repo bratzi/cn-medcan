@@ -177,6 +177,8 @@ export type ReviewEintrag = {
   geschmacksMatrix: unknown;
   /** Rohes JSON - mit `parseTerpenIntensitaet` lesen. */
   terpenIntensitaet: unknown;
+  /** Rohes JSON - mit `parseBeschaffenheit` lesen. */
+  beschaffenheit: unknown;
   notiz: string | null;
   instagramReelUrl: string | null;
   chargenNr: string | null;
@@ -576,6 +578,7 @@ export async function ladeStrainDetail(
           feuchtigkeitProzent: true,
           geschmacksMatrix: true,
           terpenIntensitaet: true,
+          beschaffenheit: true,
           notiz: true,
           instagramReelUrl: true,
           erstelltAm: true,
@@ -658,6 +661,7 @@ export async function ladeStrainDetail(
       feuchtigkeitProzent: zuZahl(review.feuchtigkeitProzent),
       geschmacksMatrix: review.geschmacksMatrix,
       terpenIntensitaet: review.terpenIntensitaet,
+      beschaffenheit: review.beschaffenheit,
       notiz: review.notiz,
       instagramReelUrl: review.instagramReelUrl,
       chargenNr: review.charge?.chargenNr ?? null,
@@ -1035,7 +1039,7 @@ export type AromaVorzeige = {
   slug: string;
   terpene: TerpenEintrag[];
   /** Rohe Spalten der freigegebenen Bewertungen; verdichtet wird in der Sektion. */
-  reviews: { geschmacksMatrix: unknown; terpenIntensitaet: unknown }[];
+  reviews: { geschmacksMatrix: unknown; terpenIntensitaet: unknown; beschaffenheit: unknown; feuchtigkeitProzent: number | null }[];
 };
 
 /**
@@ -1062,7 +1066,7 @@ export async function ladeAromaVorzeige(): Promise<AromaVorzeige | null> {
       reviews: {
         where: { freigegeben: true },
         take: 50,
-        select: { geschmacksMatrix: true, terpenIntensitaet: true },
+        select: { geschmacksMatrix: true, terpenIntensitaet: true, beschaffenheit: true, feuchtigkeitProzent: true },
       },
     },
   });
@@ -1077,7 +1081,7 @@ export async function ladeAromaVorzeige(): Promise<AromaVorzeige | null> {
       konzentrationProzent: zuZahl(eintrag.konzentrationProzent),
       rang: eintrag.rang,
     })),
-    reviews: zeile.reviews,
+    reviews: zeile.reviews.map((review) => ({ ...review, feuchtigkeitProzent: zuZahl(review.feuchtigkeitProzent) })),
   };
 }
 

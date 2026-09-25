@@ -28,6 +28,7 @@ function eintrag(teil: Partial<EintragDaten> = {}): EintragDaten {
     erstelltAm: new Date("2026-09-12T12:00:00Z"),
     terpene: [],
     terpenIntensitaet: { Myrcen: 3, Limonen: 4 },
+    beschaffenheit: {},
     ...teil,
   };
 }
@@ -104,6 +105,7 @@ test("alsEintrag: Name und Slug vom Produkt, kaputte Matrix wird neutral", () =>
       feuchtigkeitProzent: null,
       geschmacksMatrix: "kaputt",
       terpenIntensitaet: null,
+      beschaffenheit: null,
       notiz: null,
       instagramReelUrl: null,
       chargenNr: null,

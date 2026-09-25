@@ -4,8 +4,10 @@ import { cache } from "react";
 
 import {
   parseGeschmacksMatrix,
+  parseBeschaffenheit,
   parseTerpenIntensitaet,
   type GeschmacksMatrix,
+  type Beschaffenheit,
   type TerpenIntensitaet,
 } from "@/lib/query/bewertung";
 import type { GeschmacksKategorie } from "@/db/enums";
@@ -41,6 +43,7 @@ export type RedaktionelleReview = {
   erstelltAm: Date;
   terpene: KartenTerpen[];
   terpenIntensitaet: TerpenIntensitaet;
+  beschaffenheit: Beschaffenheit;
 };
 
 /** Gezieltes `select`. Die Geschmacksmatrix braucht die Doppelseite der Startseite (Netzdiagramm). */
@@ -54,6 +57,7 @@ const AUSWAHL = {
   konsistenz: true,
   geschmacksMatrix: true,
   terpenIntensitaet: true,
+  beschaffenheit: true,
   feuchtigkeitProzent: true,
   notiz: true,
   instagramReelUrl: true,
@@ -82,6 +86,7 @@ type Satz = {
   konsistenz: number;
   geschmacksMatrix: string;
   terpenIntensitaet: string | null;
+  beschaffenheit: string | null;
   feuchtigkeitProzent: number | null;
   notiz: string | null;
   instagramReelUrl: string | null;
@@ -107,6 +112,7 @@ function zuAnsicht(satz: Satz): RedaktionelleReview {
     konsistenz: satz.konsistenz,
     geschmacksMatrix: parseGeschmacksMatrix(satz.geschmacksMatrix),
     terpenIntensitaet: parseTerpenIntensitaet(satz.terpenIntensitaet),
+    beschaffenheit: parseBeschaffenheit(satz.beschaffenheit),
     feuchtigkeitProzent: satz.feuchtigkeitProzent,
     notiz: satz.notiz,
     instagramReelUrl: satz.instagramReelUrl,

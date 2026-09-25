@@ -269,6 +269,32 @@ export const terpenIntensitaetSchema = z.record(z.string().min(1), z.number().in
 
 export type TerpenIntensitaet = z.infer<typeof terpenIntensitaetSchema>;
 
+/**
+ * Beschaffenheit der Blüte, je 0 bis 5 in halben Schritten, mehr ist besser.
+ * Die Restfeuchte steht getrennt in Prozent (feuchtigkeitProzent).
+ */
+export const BESCHAFFENHEIT_ACHSEN = [
+  { key: "chlorophyll", label: "Chlorophyll", links: "grasig", rechts: "sauber", hinweis: "Wie wenig Chlorophyll man schmeckt: grasig oder sauber ausgehärtet." },
+  { key: "budDichte", label: "Bud-Dichte", links: "weich", rechts: "fest", hinweis: "Wie fest die Blüte ist: weich und luftig oder dicht und hart." },
+  { key: "terpenDichte", label: "Terpendichte", links: "wenig", rechts: "viel", hinweis: "Wie dicht das Aroma sitzt: kaum Duft oder satt beim Öffnen." },
+  { key: "trichomFarbe", label: "Trichomfarbe", links: "klar", rechts: "bernstein", hinweis: "Reife der Trichome: klar, milchig, bernstein." },
+] as const;
+
+export type BeschaffenheitsKey = (typeof BESCHAFFENHEIT_ACHSEN)[number]["key"];
+
+export const beschaffenheitSchema = z.record(z.string().min(1), z.number().min(0).max(5).multipleOf(0.5));
+
+export type Beschaffenheit = Partial<Record<BeschaffenheitsKey, number>>;
+
+/** Liest die JSON-Spalte; nur bekannte Achsen, kaputt ergibt ein leeres Objekt. */
+export function parseBeschaffenheit(roh: unknown): Beschaffenheit {
+  if (roh === null || roh === undefined) return {};
+  const ergebnis = beschaffenheitSchema.safeParse(entpacke(roh));
+  if (!ergebnis.success) return {};
+  const bekannt = new Set<string>(BESCHAFFENHEIT_ACHSEN.map((achse) => achse.key));
+  return Object.fromEntries(Object.entries(ergebnis.data).filter(([key]) => bekannt.has(key))) as Beschaffenheit;
+}
+
 /** Liest die JSON-Spalte; leer, fehlend oder kaputt ergibt ein leeres Objekt. */
 export function parseTerpenIntensitaet(roh: unknown): TerpenIntensitaet {
   if (roh === null || roh === undefined) return {};

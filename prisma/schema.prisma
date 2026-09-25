@@ -260,6 +260,7 @@ model Review {
   /// 1 zu schwach, 3 Sweet Spot, 5 zu stark. Gelesen ueber
   /// parseTerpenIntensitaet() in lib/query/bewertung.ts.
   terpenIntensitaet String? @map("terpen_intensitaet")
+  beschaffenheit    String? @map("beschaffenheit")
 
   notiz String?
 

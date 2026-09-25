@@ -8,6 +8,7 @@ import { bewertungSpeichern } from "@/app/bewerten/aktionen";
 import { AromaKarte, type AromaSerie } from "@/components/review/AromaKarte";
 import { Button, Field, Input, Meldung } from "@/components/ui";
 import { useHydriert } from "@/components/ui/useHydriert";
+import { BeschaffenheitsRegler } from "@/components/review/BeschaffenheitsRegler";
 import type { KatalogEintrag } from "@/components/review/TerpenErgaenzen";
 import { ergaenztesTerpen, herstellerProfil, terpenStaerken, type KartenTerpen } from "@/lib/aromakarte";
 import { MAX_NOTIZ } from "@/lib/bewertung-eingabe";
@@ -174,14 +175,14 @@ export function BewertungsFormular({ strainId, handelsname, terpene, chargen, is
             <p className="text-caption text-text-muted">{achse.erlaeuterung}</p>
           </div>
         ))}
-        <Input
-          id="bewertung-feuchte"
-          label="Restfeuchte in Prozent"
-          hinweis="Zwischen 8 und 13 ist gut. Optional."
-          name="feuchtigkeit"
-          inputMode="decimal"
-          feldClassName="max-w-40"
-        />
+      </section>
+
+      <section className="flex flex-col gap-6">
+        <h2 className="font-buch text-h1 font-medium text-text">Beschaffenheit</h2>
+        <p className="max-w-[60ch] text-body text-text-muted text-pretty">
+          Wie die Blüte in der Hand ist. Optional, je Wert; was du nicht bewegst, bleibt unbewertet.
+        </p>
+        <BeschaffenheitsRegler />
       </section>
 
       <section className="grid grid-cols-1 gap-12 lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] lg:items-start">

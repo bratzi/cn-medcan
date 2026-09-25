@@ -1,7 +1,9 @@
 import {
   parseGeschmacksMatrix,
+  parseBeschaffenheit,
   parseTerpenIntensitaet,
   type GeschmacksMatrix,
+  type Beschaffenheit,
   type TerpenIntensitaet,
 } from "@/lib/query/bewertung";
 import type { KartenTerpen } from "@/lib/aromakarte";
@@ -27,6 +29,7 @@ export type EintragDaten = {
   terpene: KartenTerpen[];
   /** Sweet Spot je Terpen (1-5, 3 = Ziel), leer ohne Angabe. */
   terpenIntensitaet: TerpenIntensitaet;
+  beschaffenheit: Beschaffenheit;
 };
 
 /** Sprungziel des vollstaendigen Eintrags auf der Produktseite. */
@@ -63,5 +66,6 @@ export function alsEintrag(
     erstelltAm: review.erstelltAm,
     terpene: produkt.terpene ?? [],
     terpenIntensitaet: parseTerpenIntensitaet(review.terpenIntensitaet),
+    beschaffenheit: parseBeschaffenheit(review.beschaffenheit),
   };
 }

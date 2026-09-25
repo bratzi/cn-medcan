@@ -5,7 +5,13 @@
  */
 import { z } from "zod";
 
-import { BEWERTUNGS_ACHSEN, GESCHMACKS_ACHSEN, type GeschmacksMatrix } from "@/lib/query/bewertung";
+import {
+  BESCHAFFENHEIT_ACHSEN,
+  BEWERTUNGS_ACHSEN,
+  GESCHMACKS_ACHSEN,
+  type Beschaffenheit,
+  type GeschmacksMatrix,
+} from "@/lib/query/bewertung";
 
 export const MAX_NOTIZ = 1500;
 
@@ -16,6 +22,7 @@ export type BewertungEingabe = {
   feuchtigkeitProzent: number | null;
   geschmacksMatrix: GeschmacksMatrix;
   terpenIntensitaet: Record<string, number>;
+  beschaffenheit: Beschaffenheit;
   notiz: string | null;
   instagramReelUrl: string | null;
 };
@@ -81,6 +88,15 @@ export function bewertungPruefen(formular: Lesbar, terpenNamen: readonly string[
     terpenIntensitaet[name] = wert.data;
   }
 
+  const beschaffenheit: Beschaffenheit = {};
+  for (const { key, label } of BESCHAFFENHEIT_ACHSEN) {
+    const roh = formular.get(`beschaffenheit-${key}`);
+    if (roh === null || roh === undefined || roh === "") continue;
+    const wert = achse.safeParse(roh);
+    if (!wert.success) return { ok: false, fehler: `${label}: Wert von 0 bis 5 in halben Schritten.` };
+    beschaffenheit[key] = wert.data;
+  }
+
   const notiz = text(formular.get("notiz")) || null;
   if (notiz && notiz.length > MAX_NOTIZ) return { ok: false, fehler: `Die Notiz darf höchstens ${MAX_NOTIZ} Zeichen haben.` };
 
@@ -91,6 +107,6 @@ export function bewertungPruefen(formular: Lesbar, terpenNamen: readonly string[
 
   return {
     ok: true,
-    wert: { strainId, chargenNr, noten, feuchtigkeitProzent, geschmacksMatrix, terpenIntensitaet, notiz, instagramReelUrl },
+    wert: { strainId, chargenNr, noten, feuchtigkeitProzent, geschmacksMatrix, terpenIntensitaet, beschaffenheit, notiz, instagramReelUrl },
   };
 }
