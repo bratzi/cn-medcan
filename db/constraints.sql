@@ -320,3 +320,33 @@ begin
   select case when (select umfrage_id from umfrage_optionen where id = NEW.option_id) <> NEW.umfrage_id
     then raise(abort, 'stimmen: Option gehoert zu einer anderen Umfrage') end;
 end;
+
+-- ---------------------------------------------------------------------------
+--  sorten_vorschlaege / benachrichtigungen (Spec Bluete vorschlagen)
+-- ---------------------------------------------------------------------------
+drop trigger if exists sorten_vorschlaege_insert_chk;
+create trigger sorten_vorschlaege_insert_chk
+before insert on sorten_vorschlaege
+for each row
+begin
+  select case when NEW.status not in ('OFFEN','FREIGEGEBEN','ABGELEHNT') then raise(abort, 'sorten_vorschlaege.status: unbekannter Wert') end;
+  select case when NEW.kultivar_typ is not null and NEW.kultivar_typ not in ('INDICA','SATIVA','HYBRID','RUDERALIS') then raise(abort, 'sorten_vorschlaege.kultivar_typ: unbekannter Wert') end;
+  select case when length(NEW.schluessel) = 0 then raise(abort, 'sorten_vorschlaege.schluessel: leer') end;
+end;
+
+drop trigger if exists sorten_vorschlaege_update_chk;
+create trigger sorten_vorschlaege_update_chk
+before update on sorten_vorschlaege
+for each row
+begin
+  select case when NEW.status not in ('OFFEN','FREIGEGEBEN','ABGELEHNT') then raise(abort, 'sorten_vorschlaege.status: unbekannter Wert') end;
+  select case when NEW.kultivar_typ is not null and NEW.kultivar_typ not in ('INDICA','SATIVA','HYBRID','RUDERALIS') then raise(abort, 'sorten_vorschlaege.kultivar_typ: unbekannter Wert') end;
+end;
+
+drop trigger if exists benachrichtigungen_insert_chk;
+create trigger benachrichtigungen_insert_chk
+before insert on benachrichtigungen
+for each row
+begin
+  select case when NEW.art not in ('VORSCHLAG_FREIGEGEBEN','VORSCHLAG_ABGELEHNT') then raise(abort, 'benachrichtigungen.art: unbekannter Wert') end;
+end;

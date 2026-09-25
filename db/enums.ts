@@ -111,3 +111,15 @@ export const istGeschmacksKategorie = istWert(GESCHMACKS_KATEGORIEN);
 export const istMitgliedRolle = istWert(MITGLIED_ROLLEN);
 export const istUmfragePhase = istWert(UMFRAGE_PHASEN);
 export const istOptionHerkunft = istWert(OPTION_HERKUNFT);
+
+/**
+ * Stand eines Bluetenvorschlags (Spec Bluete vorschlagen 3.1). OFFEN wartet auf
+ * den Betreiber; FREIGEGEBEN traegt die strainId der Bluete im Katalog.
+ */
+export const VORSCHLAG_STATUS = ["OFFEN", "FREIGEGEBEN", "ABGELEHNT"] as const;
+export type VorschlagStatus = (typeof VORSCHLAG_STATUS)[number];
+export const istVorschlagStatus = istWert(VORSCHLAG_STATUS);
+
+/** Arten von Benachrichtigungen im Mitgliederbereich. Erweiterbar (Umfragen, Mail). */
+export const BENACHRICHTIGUNG_ARTEN = ["VORSCHLAG_FREIGEGEBEN", "VORSCHLAG_ABGELEHNT"] as const;
+export type BenachrichtigungArt = (typeof BENACHRICHTIGUNG_ARTEN)[number];

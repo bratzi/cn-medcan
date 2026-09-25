@@ -117,6 +117,7 @@ model Strain {
 
   umfrageVorschlaege UmfrageVorschlag[]
   umfrageOptionen    UmfrageOption[]
+  sortenVorschlaege  SortenVorschlag[]
 
   erstelltAm     DateTime @default(now()) @map("erstellt_am")
   aktualisiertAm DateTime @updatedAt @map("aktualisiert_am")
@@ -394,6 +395,9 @@ model Mitglied {
   stimmen     Stimme[]
   reviews     Review[]
 
+  sortenVorschlaege  SortenVorschlag[]
+  benachrichtigungen Benachrichtigung[]
+
   @@index([freigegeben])
   @@map("mitglied")
 }
@@ -535,4 +539,67 @@ model Stimme {
   @@unique([umfrageId, mitgliedId])
   @@index([optionId])
   @@map("stimmen")
+}
+
+// ---------------------------------------------------------------------------
+//  Bluete vorschlagen (Spec 2026-09-25)
+// ---------------------------------------------------------------------------
+
+/// Ein Mitglied schlaegt eine Bluete vor, die im Katalog fehlt. Die Freigabe
+/// durch den Betreiber legt daraus einen Strain an. Nicht zu verwechseln mit
+/// UmfrageVorschlag (dort wird eine vorhandene Bluete fuer eine Runde genannt).
+model SortenVorschlag {
+  id         String   @id @default(uuid())
+  mitgliedId String   @map("mitglied_id")
+  mitglied   Mitglied @relation(fields: [mitgliedId], references: [id], onDelete: Cascade)
+
+  handelsname  String
+  /// Slug des Handelsnamens nach der Regel aus scripts/stamm/sql-erzeugen.py.
+  /// Buendelt gleiche Vorschlaege verschiedener Mitglieder.
+  schluessel   String
+  hersteller   String?
+  kultivarName String? @map("kultivar_name")
+  kultivarTyp  String? @map("kultivar_typ")
+  thcProzent   Float?  @map("thc_prozent")
+  cbdProzent   Float?  @map("cbd_prozent")
+  /// JSON-Liste von bis zu 3 Terpennamen in Rangfolge.
+  terpene      String?
+  quelle       String
+  notiz        String?
+
+  /// Werte nach VORSCHLAG_STATUS in db/enums.ts, geprueft in db/constraints.sql.
+  status      String  @default("OFFEN")
+  strainId    String? @map("strain_id")
+  strain      Strain? @relation(fields: [strainId], references: [id], onDelete: SetNull)
+  begruendung String?
+
+  erstelltAm    DateTime  @default(now()) @map("erstellt_am")
+  entschiedenAm DateTime? @map("entschieden_am")
+
+  /// Ein Mitglied schlaegt dieselbe Bluete nur einmal vor - von der Datenbank erzwungen.
+  @@unique([mitgliedId, schluessel])
+  @@index([status, schluessel])
+  @@index([mitgliedId])
+  @@index([strainId])
+  @@map("sorten_vorschlaege")
+}
+
+/// Nachricht an ein Mitglied im Mitgliederbereich. Spaeter liest ein
+/// Mailversand genau diese Saetze (lib/benachrichtigung.ts).
+model Benachrichtigung {
+  id         String   @id @default(uuid())
+  mitgliedId String   @map("mitglied_id")
+  mitglied   Mitglied @relation(fields: [mitgliedId], references: [id], onDelete: Cascade)
+
+  /// Werte nach BENACHRICHTIGUNG_ARTEN in db/enums.ts.
+  art       String
+  text      String
+  /// Immer ein interner Pfad, vom Server gesetzt.
+  link      String?
+  gelesenAm DateTime? @map("gelesen_am")
+
+  erstelltAm DateTime @default(now()) @map("erstellt_am")
+
+  @@index([mitgliedId, gelesenAm])
+  @@map("benachrichtigungen")
 }
