@@ -54,7 +54,7 @@ export const dynamic = "force-dynamic";
 export async function generateMetadata({ params }: PageProps<"/produkte/[slug]">): Promise<Metadata> {
   const { slug } = await params;
   const strain = await ladeStrainDetail(slug, false);
-  if (!strain) return { title: "Produkt nicht gefunden" };
+  if (!strain) return { title: "Blüte nicht gefunden" };
   return {
     title: strain.handelsname,
     description: `Meine Bewertung, Cannabinoid- und Terpenprofil, Chargen und gemeldete Apothekenbestände zu ${strain.handelsname}.`,
@@ -110,7 +110,7 @@ function produktFakten(strain: StrainDetail): Fakt[] {
  */
 function Chargentabelle({ chargen }: { chargen: StrainDetail["chargen"] }) {
   if (chargen.length === 0) {
-    return <p className="text-body text-text-muted">Für dieses Produkt liegen keine Chargendaten vor.</p>;
+    return <p className="text-body text-text-muted">Für diese Blüte liegen keine Chargendaten vor.</p>;
   }
   return (
     <Table caption="Analysewerte je Charge" captionVersteckt>
@@ -336,7 +336,7 @@ export default async function ProduktDetailPage({ params }: PageProps<"/produkte
     <div className={cn(seitenRahmen(), "pt-16 pb-24 sm:pt-24")}>
       <p className="mb-8">
         <Link href="/produkte" className={einzelLinkKlassen()}>
-          Alle Produkte
+          Alle Blüten
         </Link>
       </p>
       {/* Bewusst ohne Suspense-Grenze: notFound() antwortet so mit 404, der Inhalt ist ohne JavaScript lesbar und #eintrag-… existiert beim Sprung. */}

@@ -316,7 +316,7 @@ export function FilterLeiste({ facetten, filter, gesamt }: Props) {
             onChange={(event) => setzeSofort({ nurVerfuegbar: event.target.checked })}
             className={CHECKBOX}
           />
-          <span>Nur verfügbare Produkte</span>
+          <span>Nur verfügbare Blüten</span>
         </label>
       </fieldset>
 

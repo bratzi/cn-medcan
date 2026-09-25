@@ -6,7 +6,7 @@
 export const HAUPTNAVIGATION = [
   { href: "/reviews", text: "Bewertungen" },
   { href: "/umfragen", text: "Abstimmung" },
-  { href: "/produkte", text: "Produkte" },
+  { href: "/produkte", text: "Blüten" },
   { href: "/apotheken", text: "Apotheken" },
 ] as const;
 

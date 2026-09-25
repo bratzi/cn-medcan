@@ -98,8 +98,8 @@ export function AktiveFilter({ filter, apothekenNamen }: Props) {
   if (filter.nurVerfuegbar) {
     chips.push({
       schluessel: "nurVerfuegbar",
-      text: "Nur verfügbare Produkte",
-      beschreibung: "Nur verfügbare Produkte",
+      text: "Nur verfügbare Blüten",
+      beschreibung: "Nur verfügbare Blüten",
       ziel: ohne({ nurVerfuegbar: false }),
     });
   }

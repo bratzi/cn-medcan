@@ -77,7 +77,7 @@ async function ApothekenListe() {
                   </dd>
                 </div>
                 <div className="flex flex-wrap gap-2">
-                  <dt className="text-text-muted">Gelistete Produkte</dt>
+                  <dt className="text-text-muted">Gelistete Blüten</dt>
                   <dd className="numeric text-text">
                     {ZAHL_FORMAT.format(apotheke.anzahlProdukte)}
                   </dd>

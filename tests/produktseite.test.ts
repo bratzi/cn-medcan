@@ -6,7 +6,7 @@ import { join } from "node:path";
 const QUELLE = readFileSync(join(process.cwd(), "app/produkte/[slug]/page.tsx"), "utf8");
 
 test("Produktseite: Rückweg als 44-px-Einzellink", () => {
-  assert.match(QUELLE, /className=\{einzelLinkKlassen\(\)\}>\s*Alle Produkte/);
+  assert.match(QUELLE, /className=\{einzelLinkKlassen\(\)\}>\s*Alle Blüten/);
 });
 
 test("Produktseite: keine Hilfszeile, die auf nicht gezeigte Ränge verweist", () => {

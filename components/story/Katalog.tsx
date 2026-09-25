@@ -39,7 +39,7 @@ async function Reihe() {
     return (
       // Kasten wie die Leerzustaende der Nachbar-Sektionen, bis Welle 2 den Katalog umbaut.
       <EmptyState
-        titel="Keine Produkte im Katalog"
+        titel="Keine Blüten im Katalog"
         beschreibung="Derzeit sind keine Handelsnamen hinterlegt."
         className="border border-border bg-surface-raised p-8 sm:p-12"
       />

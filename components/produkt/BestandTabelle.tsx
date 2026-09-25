@@ -43,7 +43,7 @@ export function BestandTabelle({ bestaende, fachkreis }: BestandTabelleProps) {
   if (bestaende.length === 0) {
     return (
       <p className="max-w-[68ch] text-body text-text-muted">
-        Für dieses Produkt liegt derzeit keine Bestandsmeldung einer Apotheke
+        Für diese Blüte liegt derzeit keine Bestandsmeldung einer Apotheke
         vor.
       </p>
     );
@@ -59,7 +59,7 @@ export function BestandTabelle({ bestaende, fachkreis }: BestandTabelleProps) {
         </p>
       ) : null}
 
-      <Table caption="Apotheken mit gemeldetem Bestand zu diesem Produkt">
+      <Table caption="Apotheken mit gemeldetem Bestand zu dieser Blüte">
         <TableHead>
           <TableRow>
             <TableHeaderCell>Apotheke</TableHeaderCell>

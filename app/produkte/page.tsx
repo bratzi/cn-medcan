@@ -12,9 +12,9 @@ import { istFachkreis } from "@/lib/query/fachkreis";
 import { ladeFilterFacetten, ladeStrainListe } from "@/lib/query/strains";
 
 export const metadata: Metadata = {
-  title: "Produkte — Medizinalcannabis-Katalog",
+  title: "Blüten — Medizinalcannabis-Katalog",
   description:
-    "Alle gelisteten Medizinalcannabis-Produkte mit Kultivar-Typ, Darreichungsform, THC-Spanne, dominantem Geschmack und Apothekenverfügbarkeit filtern.",
+    "Alle gelisteten Medizinalcannabis-Blüten mit Kultivar-Typ, Darreichungsform, THC-Spanne, dominantem Geschmack und Apothekenverfügbarkeit filtern.",
 };
 
 /**
@@ -38,9 +38,9 @@ export default async function ProduktePage({ searchParams }: Props) {
   return (
     <main className="mx-auto w-full max-w-7xl px-4 py-10 sm:px-6 lg:py-16">
       <header className="flex flex-col gap-2">
-        <h1 className="text-h1 text-text">Produkte</h1>
+        <h1 className="text-h1 text-text">Blüten</h1>
         <p className="max-w-[68ch] text-body text-text-muted">
-          Alle hier gelisteten Produkte sind verschreibungspflichtig und nur mit
+          Alle hier gelisteten Blüten sind verschreibungspflichtig und nur mit
           ärztlicher Verordnung über eine Apotheke beziehbar.
         </p>
       </header>
@@ -49,7 +49,7 @@ export default async function ProduktePage({ searchParams }: Props) {
         key={serialisiereFilter(filter).toString()}
         fallback={
           <div className="mt-10">
-            <Spinner text="Produkte werden geladen" />
+            <Spinner text="Blüten werden geladen" />
           </div>
         }
       >
@@ -81,15 +81,15 @@ async function Ergebnisbereich({ filter }: { filter: StrainFilter }) {
         <p className="text-small text-text-muted">
           <span className="numeric">{liste.eintraege.length}</span> von{" "}
           <span className="numeric">{liste.gesamt}</span>{" "}
-          {liste.gesamt === 1 ? "Produkt" : "Produkten"}
+          {liste.gesamt === 1 ? "Blüte" : "Blüten"}
         </p>
 
         <AktiveFilter filter={filter} apothekenNamen={apothekenNamen} />
 
         {liste.eintraege.length === 0 ? (
           <EmptyState
-            titel="Keine Produkte gefunden"
-            beschreibung="Zu dieser Filterkombination ist kein Produkt gelistet. Weniger Kriterien führen meist zu Treffern."
+            titel="Keine Blüten gefunden"
+            beschreibung="Zu dieser Filterkombination ist keine Blüte gelistet. Weniger Kriterien führen meist zu Treffern."
             aktion={
               <Link href="/produkte" className={buttonKlassen("secondary")}>
                 Alle Filter zurücksetzen

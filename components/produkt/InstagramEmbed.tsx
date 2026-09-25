@@ -71,7 +71,7 @@ function Platzhalter({ className }: { className?: string }) {
     >
       <p className="text-small font-medium text-text">Kein Video hinterlegt</p>
       <p className="mt-2 text-caption text-text">
-        Die Reel-Einbettung ist fuer dieses Produkt noch nicht konfiguriert.
+        Die Reel-Einbettung ist fuer diese Blüte noch nicht konfiguriert.
       </p>
     </div>
   );
@@ -89,7 +89,7 @@ export function InstagramEmbed({ url, bezeichnung, className }: InstagramEmbedPr
       title={
         bezeichnung
           ? `Instagram-Reel zu ${bezeichnung}`
-          : "Instagram-Reel zum Produkt"
+          : "Instagram-Reel zur Blüte"
       }
       loading="lazy"
       referrerPolicy="no-referrer"

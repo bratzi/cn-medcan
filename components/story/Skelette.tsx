@@ -60,7 +60,7 @@ export function StimmzettelSkelett() {
 export function KatalogSkelett() {
   return (
     <div role="status" data-skelett="" className="flex gap-4 overflow-hidden">
-      <SkelettAnsage text="Produkte werden geladen" />
+      <SkelettAnsage text="Blüten werden geladen" />
       {[0, 1, 2].map((stelle) => (
         <span key={stelle} aria-hidden="true" className={`${SKELETT_FLAECHE} h-96 w-72 shrink-0`} />
       ))}

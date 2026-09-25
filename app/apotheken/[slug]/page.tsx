@@ -173,7 +173,7 @@ function Sortiment({
   if (apotheke.sortiment.length === 0) {
     return (
       <EmptyState
-        titel="Keine gelisteten Produkte"
+        titel="Keine gelisteten Blüten"
         beschreibung="Diese Apotheke hat derzeit keine Bestände gemeldet."
       />
     );
@@ -194,7 +194,7 @@ function Sortiment({
       >
         <TableHead>
           <TableRow>
-            <TableHeaderCell>Produkt</TableHeaderCell>
+            <TableHeaderCell>Blüte</TableHeaderCell>
             <TableHeaderCell numerisch>Packungsgröße</TableHeaderCell>
             {fachkreis ? (
               <TableHeaderCell numerisch>Preis pro Gramm</TableHeaderCell>
@@ -264,7 +264,7 @@ async function ApothekeInhalt({ slug }: { slug: string }) {
       </div>
 
       <section className="mt-10 sm:mt-16">
-        <h2 className="text-h2 text-text">Gelistete Produkte</h2>
+        <h2 className="text-h2 text-text">Gelistete Blüten</h2>
         <div className="mt-8">
           <Sortiment apotheke={apotheke} fachkreis={fachkreis} />
         </div>
