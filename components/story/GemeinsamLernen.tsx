@@ -26,7 +26,8 @@ export function GemeinsamLernen() {
       <div aria-hidden="true" className="video-einbettung pointer-events-none absolute inset-0 -z-20 overflow-hidden">
         <Loop id="pflanze-loop" buehne className="h-full opacity-50" />
       </div>
-      <Schlagwort satz="wir stimmen ab" />
+      {/* Unten zwischen dieser und der nächsten Sektion (Nutzer 2026-09-25). */}
+      <Schlagwort satz="wir stimmen ab" oben="bottom-0 translate-y-1/2" />
 
       <div className="mx-auto grid w-full max-w-360 grid-cols-1 items-end gap-16 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
         <ol aria-hidden="true" className="flex flex-col gap-2">

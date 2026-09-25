@@ -1037,6 +1037,8 @@ export async function ladeStrainAuswahl(): Promise<StrainAuswahlEintrag[]> {
 export type AromaVorzeige = {
   handelsname: string;
   slug: string;
+  /** Referenzbild (Medien-Id-Pfad) für das Symbolbild in der Karte. */
+  herstellerBildPfad: string | null;
   terpene: TerpenEintrag[];
   /** Rohe Spalten der freigegebenen Bewertungen; verdichtet wird in der Sektion. */
   reviews: {
@@ -1064,6 +1066,7 @@ export async function ladeAromaVorzeige(): Promise<AromaVorzeige | null> {
     select: {
       handelsname: true,
       slug: true,
+      herstellerBildPfad: true,
       terpene: {
         orderBy: { rang: "asc" },
         select: {
@@ -1092,6 +1095,7 @@ export async function ladeAromaVorzeige(): Promise<AromaVorzeige | null> {
   return {
     handelsname: zeile.handelsname,
     slug: zeile.slug,
+    herstellerBildPfad: zeile.herstellerBildPfad,
     terpene: zeile.terpene.map((eintrag) => ({
       name: eintrag.terpen.name,
       aromaProfil: eintrag.terpen.aromaProfil,

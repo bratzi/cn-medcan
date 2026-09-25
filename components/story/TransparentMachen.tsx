@@ -135,7 +135,7 @@ export function TransparentMachen() {
       <div className="mx-auto w-full max-w-360">
         <div data-story="manifest">
           <h2 id="transparent-titel" data-manifest-zeile="" className="font-buch text-erzaehlung text-text text-balance">
-            Hinter jedem Handelsnamen steckt ein <em className="farbverlauf font-hand text-erzaehlung not-italic">Terpenprofil.</em> Wir
+            Hinter jedem Handelsnamen steckt ein <em className="farbverlauf font-hand text-erzaehlung not-italic leading-[0.8]" style={{ fontSize: "calc(var(--text-kapitel) * 1.35)" }}>Terpenprofil.</em> Wir
             schreiben auf, was drin ist.
           </h2>
           <Paar punkt={PUNKTE[0]} erster>
@@ -143,7 +143,7 @@ export function TransparentMachen() {
             sie schmeckt.
           </Paar>
           <Paar punkt={PUNKTE[1]}>
-            Jedes Terpen bekommt seine <em className="farbverlauf font-hand text-erzaehlung not-italic">eigene Note.</em> Daneben
+            Jedes Terpen bekommt seine <em className="farbverlauf font-hand text-erzaehlung not-italic leading-[0.8]" style={{ fontSize: "calc(var(--text-kapitel) * 1.35)" }}>eigene Note.</em> Daneben
             steht, was der Hersteller angibt, und wie weit die Community davon abweicht.
           </Paar>
           <Paar punkt={PUNKTE[2]}>

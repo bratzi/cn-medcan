@@ -39,6 +39,7 @@ const PROZENT = new Intl.NumberFormat("de-DE", {
  */
 export function AromaErkundung({
   titel,
+  bild,
   terpene,
   serien,
   zeilen,
@@ -49,6 +50,8 @@ export function AromaErkundung({
   children,
 }: {
   titel: string;
+  /** Symbolbild der Blüte, als Server-Teil hereingereicht. */
+  bild?: React.ReactNode;
   terpene: readonly KartenTerpen[];
   serien: readonly AromaSerie[];
   /** Community-Mittel je Terpen; Terpene ohne Bewertung starten im Sweet Spot. */
@@ -136,7 +139,16 @@ export function AromaErkundung({
           <dl className="flex flex-wrap items-end justify-center gap-x-24 gap-y-8">
             <div className="flex flex-col items-center gap-2">
               <dt className="text-small uppercase tracking-wide text-text-muted">Community-Fazit</dt>
-              <dd className="farbverlauf font-hand text-umschlag leading-none">{PROZENT.format(fazit)}</dd>
+              <dd className="relative isolate flex justify-center">
+                {/* Die Essenz der Seite (Nutzer 2026-09-25): dieselben driftenden Konturen
+                    wie die Wortmarke im Hero, dazu ein ruhiges Pulsieren. */}
+                {["marke-kontur-1", "marke-kontur-2", "marke-kontur-3", "marke-kontur-4"].map((klasse) => (
+                  <span key={klasse} aria-hidden="true" className={`marke-kontur ${klasse} font-hand text-umschlag leading-none`}>
+                    <span>{PROZENT.format(fazit)}</span>
+                  </span>
+                ))}
+                <span className="fazit-puls farbverlauf font-hand text-umschlag leading-none">{PROZENT.format(fazit)}</span>
+              </dd>
               <dd className="text-caption text-text-muted">
                 aus {anzahlBewertungen} {anzahlBewertungen === 1 ? "Bewertung" : "Bewertungen"}
               </dd>
@@ -192,6 +204,7 @@ export function AromaErkundung({
         <div className="w-full min-w-0">
           <AromaKarte
             titel={titel}
+            bild={bild}
             terpene={kartenTerpene}
             serien={alleSerien}
             staerken={staerken}
@@ -262,13 +275,20 @@ function Schritt({
   children: React.ReactNode;
 }) {
   return (
-    <section aria-label={`Schritt ${nummer}: ${titel}`} className="flex w-full flex-col gap-8">
-      <h3 className="flex items-end gap-6 border-t border-border pt-8 font-buch text-h2 font-medium text-text">
-        <span aria-hidden="true" className="farbverlauf font-hand text-umschlag leading-[0.8]">
+    <section aria-label={`Schritt ${nummer}: ${titel}`} className="relative isolate flex w-full flex-col gap-8">
+      {/* Ziffer über die ganze Höhe des Schritts im Hintergrund, blass wie die
+          Sektions-Schlagworte (Nutzer 2026-09-25); SVG, damit sie mit der Höhe skaliert. */}
+      <svg
+        aria-hidden="true"
+        viewBox="0 0 60 100"
+        preserveAspectRatio="xMinYMid meet"
+        className="pointer-events-none absolute inset-y-0 left-0 -z-10 h-full w-auto select-none overflow-visible text-kopierstift opacity-15"
+      >
+        <text x="0" y="88" style={{ fontSize: 118 }} className="font-hand text-kulisse" fill="currentColor">
           {nummer}
-        </span>
-        <span className="pb-4">{titel}</span>
-      </h3>
+        </text>
+      </svg>
+      <h3 className="border-t border-border pt-8 font-buch text-h2 font-medium text-text">{titel}</h3>
       {children}
     </section>
   );

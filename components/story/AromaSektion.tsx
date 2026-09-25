@@ -5,8 +5,10 @@ import { mittleBeschaffenheit } from "@/components/review/BeschaffenheitsLeiste"
 import { mittleNoten } from "@/components/review/GesamteindruckLeiste";
 import { AromaErkundung } from "@/components/review/AromaErkundung";
 import { type AromaSerie } from "@/components/review/AromaKarte";
+import { Bild } from "@/components/medien/Bild";
 import { Schlagwort } from "@/components/story/Schlagwort";
 import { buttonKlassen } from "@/components/ui";
+import { blueteBild } from "@/lib/medien";
 import { herstellerProfil, mittlereHerstellerTreue } from "@/lib/aromakarte";
 import {
   mittleTerpenIntensitaet,
@@ -26,6 +28,13 @@ async function Inhalt() {
   ]);
   if (!sorte) return null;
 
+  const bildId = blueteBild(sorte.herstellerBildPfad);
+  const bild = bildId ? (
+    <figure className="flex w-40 flex-col items-start gap-1 sm:w-48">
+      <Bild id={bildId} dekorativ sizes="192px" className="aspect-square w-full object-contain" />
+      <figcaption className="text-caption text-text-muted">Symbolbild</figcaption>
+    </figure>
+  ) : null;
   const hersteller = herstellerProfil(sorte.terpene);
   const community = verdichteGeschmacksMatrix(sorte.reviews);
   const serien: AromaSerie[] = [
@@ -38,6 +47,7 @@ async function Inhalt() {
     <div className="mt-16">
       <AromaErkundung
         titel={sorte.handelsname}
+        bild={bild}
         terpene={sorte.terpene}
         serien={serien}
         katalog={katalog}
@@ -72,7 +82,7 @@ export function AromaSektion() {
       className="relative isolate overflow-x-clip px-4 py-24 sm:px-8 sm:py-32"
     >
       {/* Am Ende der Graphensektion, nicht am Anfang (Nutzer 2026-09-25). */}
-      <Schlagwort satz="stimmt das?" ton="gruen" oben="bottom-0" />
+      <Schlagwort satz="stimmt das?" ton="gruen" oben="bottom-0 translate-y-1/2" />
       <div className="mx-auto w-full max-w-360">
         <h2 id="aroma-titel" className="max-w-4xl font-buch text-kapitel text-text text-balance">
           Was der Hersteller verspricht, <em className="farbverlauf hand-betont">prüfen wir nach.</em>

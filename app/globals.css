@@ -865,6 +865,20 @@ html.joint-cursor :is(input:not([type="range"]):not([type="radio"]):not([type="c
   }
 }
 
+/* Community-Fazit (AromaErkundung): pulsiert ruhig, nur transform. */
+@media (prefers-reduced-motion: no-preference) {
+  .fazit-puls {
+    display: inline-block;
+    animation: fazit-puls 3.2s ease-in-out infinite;
+  }
+}
+
+@keyframes fazit-puls {
+  50% {
+    transform: scale(1.05);
+  }
+}
+
 @keyframes kontur-drift {
   to {
     transform: translate(calc(var(--versatz-x) * -1), calc(var(--versatz-y) * -1));
