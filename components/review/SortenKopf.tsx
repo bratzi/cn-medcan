@@ -52,7 +52,7 @@ export function SortenKopf(props: SortenKopfProps) {
           <p className="text-small uppercase tracking-gesperrt text-text-muted">Das bewerten wir</p>
           {/* Logoschrift im Farbverlauf wie die Schlagworte (Nutzer 2026-09-25). */}
           <h3
-            className="farbverlauf font-hand text-balance wrap-break-word leading-[0.9]"
+            className="farbverlauf font-hand text-erzaehlung text-balance wrap-break-word leading-[0.9]"
             style={{ fontSize: "calc(var(--text-kapitel) * 1.35)" }}
           >
             {props.handelsname}
