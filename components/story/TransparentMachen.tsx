@@ -1,6 +1,7 @@
 import { LoopSchalter } from "@/components/medien/LoopSchalter";
 import type { ReactNode } from "react";
 
+import { GlasMaske } from "@/components/medien/GlasMaske";
 import { Loop } from "@/components/medien/Loop";
 import { UeberlaufWort, ueberlaufPlatz } from "@/components/story/UeberlaufWort";
 
@@ -13,28 +14,31 @@ import { UeberlaufWort, ueberlaufPlatz } from "@/components/story/UeberlaufWort"
  */
 const PUNKTE = [
   {
-    titel: "Gesamteindruck",
+    titel: "Overall",
     video: "aussehen-loop",
     text: "Aussehen, Geruch, Geschmack und Konsistenz, jeweils von 1 bis 5. Der erste Blick auf die Blüte.",
     seite: "rechts",
     form: "rounded-[62%_38%_55%_45%/48%_60%_40%_52%] rotate-3",
     verzoegerung: "0s",
+    glas: "lila",
   },
   {
-    titel: "Terpene",
+    titel: "Terpz",
     video: "geruch-loop",
     text: "Jedes Terpen einzeln, neben der Angabe des Herstellers. Die Abweichung steht daneben.",
     seite: "links",
     form: "rounded-[45%_55%_40%_60%/58%_42%_62%_38%] -rotate-2",
     verzoegerung: "-5s",
+    glas: "gruen",
   },
   {
-    titel: "Beschaffenheit",
+    titel: "Qualität",
     video: "feuchte-loop",
     text: "Chlorophyll, Bud-Dichte, Terpendichte, Trichome und Restfeuchte. Zwischen 8 und 13 Prozent Feuchte ist gut.",
     seite: "rechts",
     form: "rounded-[55%_45%_62%_38%/42%_56%_44%_58%] rotate-1",
     verzoegerung: "-9s",
+    glas: "lila",
   },
 ] as const;
 
@@ -78,6 +82,13 @@ function Punkt({ punkt }: { punkt: (typeof PUNKTE)[number] }) {
         >
           <Loop id={punkt.video} className="bild-zoom h-full" />
         </div>
+        {/* Glas über einem Teil des Videos, im Wechsel Violett und Grün, schwingt mit
+            und folgt dem Zeiger (Nutzer 2026-09-26). */}
+        <GlasMaske
+          tiefe="2"
+          ton={punkt.glas}
+          className={`-bottom-4 h-2/5 w-3/5 ${punkt.seite === "links" ? "-right-6" : "-left-6"}`}
+        />
       </div>
       {/* Pause fuer die Videos (WCAG 2.2.2); sichtbar erst, wenn loops.ts sie startet. */}
       <LoopSchalter />
@@ -160,18 +171,18 @@ export function TransparentMachen() {
             style={ueberlaufPlatz}
           >
             <span data-manifest-zeile="">Wir schreiben auf, was drin ist. Hinter jedem Handelsnamen steckt ein</span>{" "}
-            <UeberlaufWort wort="Terpenprofil." />
+            <UeberlaufWort wort="Terpenprofil." absatz />
           </h2>
           <Paar punkt={PUNKTE[0]} erster>
-            Der <Buzz>Gesamteindruck.</Buzz> Nicht, was auf der Dose steht, sondern wie sie aussieht, wie sie riecht, wie
+            Erst das <Buzz>Overall.</Buzz> Nicht, was auf der Dose steht, sondern wie sie aussieht, wie sie riecht, wie
             sie schmeckt.
           </Paar>
           <Paar punkt={PUNKTE[1]}>
-            Jedes Terpen bekommt seine <Buzz>eigene Note.</Buzz> Daneben
+            Dann die <Buzz>Terpz:</Buzz> Jedes Terpen bekommt seine eigene Note. Daneben
             steht, was der Hersteller angibt, und wie weit die Community davon abweicht.
           </Paar>
           <Paar punkt={PUNKTE[2]}>
-            Zum Schluss die <Buzz>Beschaffenheit:</Buzz> Dichte, Trichome, Feuchte. Dann stimmen wir ab, was als Nächstes
+            Zum Schluss die <Buzz>Qualität:</Buzz> Dichte, Trichome, Feuchte. Dann stimmen wir ab, was als Nächstes
             drankommt, und alle wissen danach ein bisschen mehr.
           </Paar>
         </div>

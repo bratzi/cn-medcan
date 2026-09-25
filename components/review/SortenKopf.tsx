@@ -1,4 +1,5 @@
 import { Bild } from "@/components/medien/Bild";
+import { GlasMaske } from "@/components/medien/GlasMaske";
 import { Badge } from "@/components/ui";
 import type { KultivarTyp } from "@/db/enums";
 import { formatiereProzentSpanne } from "@/lib/format";
@@ -125,7 +126,11 @@ export function KartenBild({ bildPfad }: { bildPfad: string | null }) {
   if (!bildId) return null;
   return (
     <figure className="flex flex-col items-start gap-1">
-      <Bild id={bildId} dekorativ sizes="192px" className="aspect-square w-full object-contain" />
+      {/* Glas über einem Teil der Blüte wie bei den Story-Videos (Nutzer 2026-09-26). */}
+      <div className="relative w-full">
+        <Bild id={bildId} dekorativ sizes="320px" className="h-auto w-full object-contain" />
+        <GlasMaske ton="lila" className="-right-3 -bottom-3 h-1/2 w-1/2" />
+      </div>
       <figcaption className="text-caption text-text-muted">Symbolbild</figcaption>
     </figure>
   );

@@ -3,6 +3,7 @@ import Link from "next/link";
 import { InstagramEmbed, baueEmbedUrl } from "@/components/produkt/InstagramEmbed";
 import { AromaKarte, type AromaSerie } from "@/components/review/AromaKarte";
 import { BeschaffenheitsLeiste } from "@/components/review/BeschaffenheitsLeiste";
+import { KartenBild } from "@/components/review/SortenKopf";
 import { SweetSpot } from "@/components/review/SweetSpot";
 import { herstellerProfil } from "@/lib/aromakarte";
 import { eintragAnker, eintragHref, type EintragDaten } from "@/components/review/eintrag";
@@ -113,6 +114,13 @@ export function Doppelseite({ eintrag, umfang, ueberschrift: Ueberschrift, story
           {voll ? <>Bewertung vom {datum}</> : eintrag.handelsname}
         </Ueberschrift>
 
+        {/* Blütenbild zwischen Titel und Noten, wie in der Blütenübersicht (Nutzer 2026-09-26). */}
+        {eintrag.bildPfad ? (
+          <div className="w-48 sm:w-64">
+            <KartenBild bildPfad={eintrag.bildPfad} />
+          </div>
+        ) : null}
+
         <dl className="grid grid-cols-2 gap-6">
           {achsen.map((achse) => (
             // gap-1 = 4px: Bezeichnung und Wert sind ein Paar.
@@ -143,7 +151,12 @@ export function Doppelseite({ eintrag, umfang, ueberschrift: Ueberschrift, story
       </div>
 
       <div className="flex min-w-0 flex-col gap-8 p-6 sm:p-12">
-        <AromaKarte titel="Aroma-Karte" terpene={eintrag.terpene} serien={aromaSerien(eintrag)} />
+        <AromaKarte
+          titel={eintrag.handelsname}
+          bild={eintrag.bildPfad ? <KartenBild bildPfad={eintrag.bildPfad} /> : undefined}
+          terpene={eintrag.terpene}
+          serien={aromaSerien(eintrag)}
+        />
         {voll ? (
           <SweetSpot
             titel="Terpen-Intensität"

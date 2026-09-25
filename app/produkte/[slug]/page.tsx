@@ -153,7 +153,7 @@ async function ProduktInhalt({ slug }: { slug: string }) {
   const { eigene, community, meineNote, communityMittel } = teileBewertungen(strain.reviews);
   const neuesteEigene = eigene[0];
   const geschmack = verdichteGeschmacksMatrix(strain.reviews);
-  const produkt = { handelsname: strain.handelsname, slug: strain.slug, terpene: strain.terpene };
+  const produkt = { handelsname: strain.handelsname, slug: strain.slug, terpene: strain.terpene, bildPfad: strain.herstellerBildPfad };
   const hersteller = herstellerProfil(strain.terpene);
   const intensitaet = mittleTerpenIntensitaet(strain.reviews.map((review) => parseTerpenIntensitaet(review.terpenIntensitaet)));
   const aromaSerien: AromaSerie[] = [

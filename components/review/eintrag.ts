@@ -30,6 +30,8 @@ export type EintragDaten = {
   /** Sweet Spot je Terpen (1-5, 3 = Ziel), leer ohne Angabe. */
   terpenIntensitaet: TerpenIntensitaet;
   beschaffenheit: Beschaffenheit;
+  /** Herstellerbild der Sorte (Symbolbild), wie in der Blütenübersicht. */
+  bildPfad?: string | null;
 };
 
 /** Sprungziel des vollstaendigen Eintrags auf der Produktseite. */
@@ -47,7 +49,7 @@ export function eintragHref(slug: string, id: string): string {
  */
 export function alsEintrag(
   review: ReviewEintrag,
-  produkt: { handelsname: string; slug: string; terpene?: KartenTerpen[] },
+  produkt: { handelsname: string; slug: string; terpene?: KartenTerpen[]; bildPfad?: string | null },
 ): EintragDaten {
   return {
     id: review.id,
@@ -67,5 +69,6 @@ export function alsEintrag(
     terpene: produkt.terpene ?? [],
     terpenIntensitaet: parseTerpenIntensitaet(review.terpenIntensitaet),
     beschaffenheit: parseBeschaffenheit(review.beschaffenheit),
+    bildPfad: produkt.bildPfad ?? null,
   };
 }

@@ -73,8 +73,8 @@ export function AromaSektion() {
           Was der Hersteller verspricht, <UeberlaufWort wort="prüfen wir nach." />
         </h2>
         <p className="mt-6 max-w-[60ch] text-body text-text-muted text-pretty">
-          Erst der Gesamteindruck, dann die Terpene: Grün ist das Profil, das die Herstellerangaben erwarten lassen,
-          Lila ist, was wir beim Probieren gefunden haben. Zum Schluss die Beschaffenheit. Zieh an den Reglern, und alles
+          Erst das Overall, dann die Terpz: Grün ist das Profil, das die Herstellerangaben erwarten lassen,
+          Lila ist, was wir beim Probieren gefunden haben. Zum Schluss die Qualität. Zieh an den Reglern, und alles
           zeigt deinen Eindruck.
         </p>
         <Suspense fallback={<div className="mt-16 aspect-4/3 w-full max-w-4xl bg-surface-sunken" data-skelett="" />}>

@@ -44,6 +44,7 @@ export type RedaktionelleReview = {
   terpene: KartenTerpen[];
   terpenIntensitaet: TerpenIntensitaet;
   beschaffenheit: Beschaffenheit;
+  bildPfad: string | null;
 };
 
 /** Gezieltes `select`. Die Geschmacksmatrix braucht die Doppelseite der Startseite (Netzdiagramm). */
@@ -66,6 +67,7 @@ const AUSWAHL = {
     select: {
       handelsname: true,
       slug: true,
+      herstellerBildPfad: true,
       // Aroma-Karte (Spec Redesign 14): die Terpene der Sorte, für Bögen und Herstellerprofil.
       terpene: {
         orderBy: { rang: "asc" },
@@ -94,6 +96,7 @@ type Satz = {
   strain: {
     handelsname: string;
     slug: string;
+    herstellerBildPfad: string | null;
     terpene: { rang: number; konzentrationProzent: number | null; terpen: { name: string; geschmack: string } }[];
   };
   charge: { chargenNr: string } | null;
@@ -113,6 +116,7 @@ function zuAnsicht(satz: Satz): RedaktionelleReview {
     geschmacksMatrix: parseGeschmacksMatrix(satz.geschmacksMatrix),
     terpenIntensitaet: parseTerpenIntensitaet(satz.terpenIntensitaet),
     beschaffenheit: parseBeschaffenheit(satz.beschaffenheit),
+    bildPfad: satz.strain.herstellerBildPfad,
     feuchtigkeitProzent: satz.feuchtigkeitProzent,
     notiz: satz.notiz,
     instagramReelUrl: satz.instagramReelUrl,

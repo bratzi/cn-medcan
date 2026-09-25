@@ -110,12 +110,12 @@ export function JointCursor() {
     <div ref={joint} aria-hidden="true" className="joint-zeiger">
       {/* Diagonal von der Spitze (1,1) zum Filter (29,29); die Spitze ist der Klickpunkt. */}
       <svg viewBox="0 0 32 32" width="30" height="30">
-        {/* Papier: Kegel, an der Spitze breiter, zum Filter schmaler. */}
-        <path className="joint-papier" d="M6.8 2.2 L29.4 26.6 L26.6 29.4 L2.2 6.8 Z" />
+        {/* Papier: Kegel, an der Spitze breiter, zum Filter deutlich schmaler (Nutzer 2026-09-26). */}
+        <path className="joint-papier" d="M6.8 2.2 L29 27 L27 29 L2.2 6.8 Z" />
         {/* Gedrehte Spitze. */}
         <path className="joint-papier" d="M6.8 2.2 L1 1 L2.2 6.8 Z" />
         {/* Filter (Crutch). */}
-        <path className="joint-filter" d="M24.6 21.4 L29.4 26.6 L26.6 29.4 L21.4 24.6 Z" />
+        <path className="joint-filter" d="M24.3 21.7 L29 27 L27 29 L21.7 24.3 Z" />
         {/* Naht und Filterlinie. */}
         <path className="joint-linie" d="M5 5 L22.5 22.5" />
         <path className="joint-linie" d="M22.4 23.6 L23.6 22.4" />
