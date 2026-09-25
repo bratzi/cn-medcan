@@ -75,6 +75,22 @@ export function netzPunkt(index: number, wert: number, radius = RADIUS, mitte: P
   return { x: runde(mitte.x + Math.cos(winkel) * radius * anteil), y: runde(mitte.y + Math.sin(winkel) * radius * anteil) };
 }
 
+/**
+ * Farbe der Bögen je Geschmacksachse (Nutzer 2026-09-25): Anteil Violett in
+ * Prozent für color-mix zwischen Kopierstift (violett) und Akzent (grün).
+ * Liegt die lila Serie (eigener Eindruck bzw. Community) über dem Hersteller,
+ * wird es violetter; übertreibt der Hersteller, grüner. Stärke |Differenz| / MAX,
+ * um die Hälfte verstärkt und gedeckelt. Ohne Werte oder bei Gleichstand null
+ * (dann bleibt die gewohnte Farbe).
+ */
+export function abweichungsAnteil(lila: number | undefined, hersteller: number | undefined): number | null {
+  if (lila === undefined || hersteller === undefined) return null;
+  const differenz = lila - hersteller;
+  if (Math.abs(differenz) < 0.05) return null;
+  const staerke = Math.min(1, (Math.abs(differenz) / MAX) * 1.5);
+  return Math.round(50 + Math.sign(differenz) * staerke * 50);
+}
+
 export function mische(a: Punkt, b: Punkt, t: number): Punkt {
   return { x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t };
 }

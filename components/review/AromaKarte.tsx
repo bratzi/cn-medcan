@@ -3,6 +3,7 @@
 import { useEffect, useId, useRef, useState } from "react";
 
 import {
+  abweichungsAnteil,
   achsenImKarte,
   balkenLaenge,
   achsenIndex,
@@ -265,7 +266,16 @@ export function AromaKarte({
               const kraft = staerke[terpen.name] ?? 0;
               // Ein Terpen bei 0 bleibt grau, auch auf aktiver Achse.
               const farbig = achseFarbig(achse) && kraft > 0;
-              const farbe = FARBE[achse % 2 === 0 ? "gruen" : "lila"];
+              // Stufenlos Violett bis Grün nach Abweichung lila Serie gegen Hersteller.
+              const achsenKey = GESCHMACKS_ACHSEN[achse].key;
+              const anteil = abweichungsAnteil(
+                serien.findLast((serie) => serie.ton === "lila")?.matrix[achsenKey],
+                serien.find((serie) => serie.ton === "gruen")?.matrix[achsenKey],
+              );
+              const farbe =
+                anteil === null
+                  ? FARBE[achse % 2 === 0 ? "gruen" : "lila"]
+                  : `color-mix(in oklab, var(--color-kopierstift) ${anteil}%, var(--color-accent))`;
               return (
                 <path
                   key={terpen.name}

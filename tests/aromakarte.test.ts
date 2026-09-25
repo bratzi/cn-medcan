@@ -2,6 +2,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 
 import {
+  abweichungsAnteil,
   achsenImKarte,
   balkenLaenge,
   bogen,
@@ -82,4 +83,15 @@ test("Terpen-Intensität: kaputt oder leer wird {}, Werte außerhalb 1-5 fallen 
     Myrcen: { mittel: 3.5, anzahl: 2 },
     Limonen: { mittel: 2, anzahl: 1 },
   });
+});
+
+test("Abweichungsfarbe: lila hoeher wird violetter, Hersteller hoeher gruener, ohne Werte oder gleich null", () => {
+  assert.equal(abweichungsAnteil(undefined, 3), null);
+  assert.equal(abweichungsAnteil(3, undefined), null);
+  assert.equal(abweichungsAnteil(2.5, 2.5), null);
+  // Anteil Violett in Prozent, 50 = Mitte; Stärke |Differenz| / 5, um die Hälfte verstärkt, gedeckelt.
+  assert.equal(abweichungsAnteil(4, 2), 80);
+  assert.equal(abweichungsAnteil(2, 4), 20);
+  assert.equal(abweichungsAnteil(5, 0), 100);
+  assert.equal(abweichungsAnteil(0, 5), 0);
 });

@@ -263,8 +263,8 @@ export function AromaErkundung({
             ) : null}
           </dl>
           <p className="max-w-[60ch] text-caption text-text-muted text-pretty">
-            Das Fazit aus den drei Stufen: Gesamteindruck, wie nah die Terpene an der Herstellerangabe liegen, und
-            Beschaffenheit, jede Stufe zu gleichen Teilen. 100 % heißt: alles top und genau wie angegeben.
+            Das Fazit aus den drei Stufen: Overall, wie nah die Terpz an der Herstellerangabe liegen, und Qualität,
+            jede Stufe zu gleichen Teilen. 100 % heißt: alles top und genau wie angegeben.
           </p>
         </div>
       ) : null}
