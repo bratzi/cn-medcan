@@ -81,7 +81,8 @@ function Punkt({ punkt }: { punkt: (typeof PUNKTE)[number] }) {
       {/* Pause fuer die Videos (WCAG 2.2.2); sichtbar erst, wenn loops.ts sie startet. */}
       <LoopSchalter />
       <div className="flex flex-col gap-2">
-        <h3 className="font-buch text-h3 font-medium text-text">{punkt.titel}</h3>
+        {/* Logoschrift im Farbverlauf wie die Schlagworte (Nutzer 2026-09-25). */}
+        <h3 className="farbverlauf font-hand text-notiz leading-none">{punkt.titel}</h3>
         <p className="text-small text-text-muted text-pretty">{punkt.text}</p>
       </div>
     </aside>
