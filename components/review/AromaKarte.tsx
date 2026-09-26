@@ -3,10 +3,8 @@
 import { useEffect, useId, useRef, useState } from "react";
 
 import {
-  abweichungsAnteil,
   achsenImKarte,
   balkenLaenge,
-  achsenIndex,
   alsPolygon,
   bogen,
   BREITE,
@@ -42,8 +40,6 @@ type Props = {
   hervorheben?: number | null;
   /** Stärke je Terpen (0 bis 1) für das Leuchten der Pfade; sonst aus den Herstellerangaben. */
   staerken?: Readonly<Record<string, number>>;
-  /** Namen der Terpene, die der Hersteller nicht angibt: Pfad gestrichelt, solange ihre Stärke 0 ist. */
-  ergaenzt?: readonly string[];
   /**
    * Macht die Balken links zu Reglern: man zieht den eigenen Wert je
    * Geschmacksrichtung direkt in der Karte (0 bis 5). `vergleich` zeigt einen
@@ -62,6 +58,29 @@ const DAUER_MS = 900;
 const WERT = new Intl.NumberFormat("de-DE", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
 const FARBE = { gruen: "var(--color-accent)", lila: "var(--color-kopierstift)" } as const;
 const GRAU = "var(--color-border-strong)";
+
+/**
+ * Farbe der Bögen je Geschmacksrichtung (Nutzer 2026-09-26): Zitrus gelb,
+ * Süß pink, Kräutrig moosgrün, Minzig minzgrün, Holzig braun, Würzig zimt,
+ * Erdig erdbraun, Diesel grau; Fruchtig und Blumig als bunter Verlauf
+ * (Verweis auf die Verläufe in <defs>, null = Verlauf).
+ */
+const LINIEN_FARBE: Record<string, string | null> = {
+  ZITRUS: "#f2d129",
+  FRUCHTIG: null,
+  SUESS: "#ff5fa8",
+  BLUMIG: null,
+  KRAEUTRIG: "#7d9a3c",
+  MINZIG: "#5fe0b8",
+  HOLZIG: "#9b6a3f",
+  WUERZIG: "#c98a3e",
+  ERDIG: "#7a5536",
+  DIESEL: "#9aa1a8",
+};
+const VERLAUF: Record<string, readonly string[]> = {
+  FRUCHTIG: ["#ff4d4d", "#ff9f1c", "#ffd23f", "#b5179e"],
+  BLUMIG: ["#c77dff", "#ff70a6", "#ffd670", "#8ecae6"],
+};
 const RINGE = [1, 2, 3, 4, 5] as const;
 const SKALA = [0, 1, 2, 3, 4, 5] as const;
 const GLEIT_MS = 420;
@@ -117,7 +136,6 @@ export function AromaKarte({
   ohneTitel = false,
   hervorheben = null,
   staerken,
-  ergaenzt = [],
   regler,
   lernen,
 }: Props) {
@@ -272,6 +290,22 @@ export function AromaKarte({
               <stop offset="60%" stopColor="var(--color-accent-subtle)" />
               <stop offset="100%" stopColor="var(--color-accent)" />
             </linearGradient>
+            {/* Bunte Verläufe für Fruchtig und Blumig, entlang der Bögen von der Achse zu den Terpenen. */}
+            {Object.entries(VERLAUF).map(([geschmack, farben]) => (
+              <linearGradient
+                key={geschmack}
+                id={`${spurId}-${geschmack}`}
+                gradientUnits="userSpaceOnUse"
+                x1={karte[0]?.x ?? 0}
+                x2={terpenKnoten[0]?.x ?? aktBreite}
+                y1={0}
+                y2={0}
+              >
+                {farben.map((farbe, i) => (
+                  <stop key={farbe} offset={`${(i / (farben.length - 1)) * 100}%`} stopColor={farbe} />
+                ))}
+              </linearGradient>
+            ))}
           </defs>
           {/* Netz-Raster, blendet mit dem Morph ein. */}
           <g opacity={t * 0.18}>
@@ -294,18 +328,15 @@ export function AromaKarte({
             {terpene.flatMap((terpen, index) =>
               terpenBoegen(terpen).map(({ achse, anteil: notenAnteil }) => {
                 const kraft = staerke[terpen.name] ?? 0;
-                // Ein Terpen bei 0 bleibt grau, auch auf aktiver Achse.
-                const farbig = achseFarbig(achse) && kraft > 0;
-                // Stufenlos Violett bis Grün nach Abweichung lila Serie gegen Hersteller.
-                const achsenKey = GESCHMACKS_ACHSEN[achse].key;
-                const anteil = abweichungsAnteil(
-                  serien.findLast((serie) => serie.ton === "lila")?.matrix[achsenKey],
-                  serien.find((serie) => serie.ton === "gruen")?.matrix[achsenKey],
-                );
-                const farbe =
-                  anteil === null
-                    ? FARBE[achse % 2 === 0 ? "gruen" : "lila"]
-                    : `color-mix(in oklab, var(--color-kopierstift) ${anteil}%, var(--color-accent))`;
+                // Vorhanden: das Terpen trägt (Stärke > 0) und die Richtung ist aktiv; sonst gestrichelt grau.
+                const vorhanden = achseFarbig(achse) && kraft > 0;
+                const geschmack = GESCHMACKS_ACHSEN[achse].enumWert;
+                const grundfarbe = LINIEN_FARBE[geschmack];
+                const farbe = grundfarbe ?? `url(#${spurId}-${geschmack})`;
+                const leuchtfarbe = grundfarbe ?? VERLAUF[geschmack]?.[1] ?? "white";
+                // Ausprägung 0 bis 1: Stärke des Terpens mal Anteil der Note. Schwach = ausgegraut
+                // (entsättigt, blass), stark = satt und mit Glow (Nutzer 2026-09-26).
+                const auspraegung = kraft * (0.4 + 0.6 * notenAnteil);
                 // Nebennoten zeichnen feiner als die Hauptnote (Anteil 0 bis 1).
                 const gewicht = 0.35 + 0.65 * notenAnteil;
                 return (
@@ -313,14 +344,17 @@ export function AromaKarte({
                     key={`${terpen.name}-${achse}`}
                     d={bogen(knoten[achse], terpenKnoten[index])}
                     fill="none"
-                    stroke={farbig ? farbe : GRAU}
+                    stroke={vorhanden ? farbe : GRAU}
                     strokeLinecap="round"
-                    // Nicht angegebene Terpene gestrichelt, bis man sie hochzieht (Nutzer 2026-09-26).
-                    strokeDasharray={ergaenzt.includes(terpen.name) && kraft <= 0 ? "6 8" : undefined}
-                    opacity={farbig ? (0.45 + 0.55 * kraft) * (0.55 + 0.45 * notenAnteil) : 0.3}
+                    strokeDasharray={vorhanden ? undefined : "6 8"}
+                    opacity={vorhanden ? 0.35 + 0.65 * auspraegung : 0.3}
                     style={{
-                      strokeWidth: farbig ? (1 + 3.5 * kraft) * gewicht : 0.8,
-                      filter: farbig && kraft * notenAnteil > 0.1 ? `drop-shadow(0 0 ${1 + 5 * kraft * gewicht}px ${farbe})` : "none",
+                      strokeWidth: vorhanden ? (1 + 3.5 * kraft) * gewicht : 0.8,
+                      filter: vorhanden
+                        ? `saturate(${(0.1 + 0.9 * auspraegung).toFixed(2)})${
+                            auspraegung > 0.45 ? ` drop-shadow(0 0 ${(2 + 8 * auspraegung).toFixed(1)}px ${leuchtfarbe})` : ""
+                          }`
+                        : "none",
                     }}
                     className="transition-[opacity,stroke-width,filter,stroke] duration-normal"
                   />

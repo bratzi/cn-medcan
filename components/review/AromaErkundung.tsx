@@ -216,7 +216,6 @@ export function AromaErkundung({
             terpene={kartenTerpene}
             serien={alleSerien}
             staerken={staerken}
-            ergaenzt={ergaenzt.map((terpen) => terpen.name)}
             regler={{
               werte,
               vergleich: hersteller ?? community,
