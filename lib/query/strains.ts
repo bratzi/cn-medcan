@@ -696,6 +696,8 @@ const ALLE_GESCHMAECKER: GeschmacksKategorie[] = [
   "BLUMIG",
   "HOLZIG",
   "KRAEUTRIG",
+  "FRUCHTIG",
+  "MINZIG",
 ];
 
 /**

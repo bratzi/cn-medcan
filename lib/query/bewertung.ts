@@ -34,19 +34,24 @@ export const BEWERTUNGS_ACHSEN = [
 export type BewertungsAchse = (typeof BEWERTUNGS_ACHSEN)[number]["key"];
 
 /**
- * Die acht Geschmacksachsen. Bewusst identisch zum Enum
+ * Die zehn Geschmacksachsen (seit 2026-09-26 mit Fruchtig und Minzig), in der
+ * Reihenfolge eines Aromarads: benachbarte Noten liegen nebeneinander, damit
+ * sich die Bögen der Karte wenig kreuzen. Diesel steht am Ende, weil es aus
+ * Schwefelverbindungen kommt, nicht aus Terpenen. Bewusst identisch zum Enum
  * `GeschmacksKategorie`, damit Filter, Terpen-Map und Bewertungsmatrix
  * dieselben Kategorien teilen.
  */
 export const GESCHMACKS_ACHSEN = [
-  { key: "diesel", label: "Diesel", enumWert: "DIESEL" },
   { key: "zitrus", label: "Zitrus", enumWert: "ZITRUS" },
-  { key: "erdig", label: "Erdig", enumWert: "ERDIG" },
+  { key: "fruchtig", label: "Fruchtig", enumWert: "FRUCHTIG" },
   { key: "suess", label: "Süß", enumWert: "SUESS" },
-  { key: "wuerzig", label: "Würzig", enumWert: "WUERZIG" },
   { key: "blumig", label: "Blumig", enumWert: "BLUMIG" },
-  { key: "holzig", label: "Holzig", enumWert: "HOLZIG" },
   { key: "kraeutrig", label: "Kräutrig", enumWert: "KRAEUTRIG" },
+  { key: "minzig", label: "Minzig", enumWert: "MINZIG" },
+  { key: "holzig", label: "Holzig", enumWert: "HOLZIG" },
+  { key: "wuerzig", label: "Würzig", enumWert: "WUERZIG" },
+  { key: "erdig", label: "Erdig", enumWert: "ERDIG" },
+  { key: "diesel", label: "Diesel", enumWert: "DIESEL" },
 ] as const satisfies readonly {
   key: string;
   label: string;
@@ -72,6 +77,9 @@ export const geschmacksMatrixSchema = z.object({
   blumig: achsenWert,
   holzig: achsenWert,
   kraeutrig: achsenWert,
+  // Seit 2026-09-26; ältere Bewertungen haben sie nicht und lesen sich mit 0.
+  fruchtig: achsenWert.default(0),
+  minzig: achsenWert.default(0),
 });
 
 export type GeschmacksMatrix = z.infer<typeof geschmacksMatrixSchema>;
@@ -87,6 +95,8 @@ export function leereGeschmacksMatrix(): GeschmacksMatrix {
     blumig: 0,
     holzig: 0,
     kraeutrig: 0,
+    fruchtig: 0,
+    minzig: 0,
   };
 }
 

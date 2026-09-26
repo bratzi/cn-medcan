@@ -64,11 +64,11 @@ test("Handschrift: Inspiration mit Rückfall, nur 400, keine synthetischen Schni
 
 const ohneTags = (html: string) => html.replace(/<[^>]+>/g, "");
 
-test("Wortmarke im Kopf: Handschrift in Kopierstift, echter Text", () => {
+test("Wortmarke im Kopf: Handschrift mit Verlauf und Glanz, echter Text", () => {
   const html = renderToStaticMarkup(createElement(Wortmarke, { groesse: "kopf" }));
   assert.match(html, /\bfont-hand\b/);
   assert.match(html, /\btext-marke\b/);
-  assert.match(html, /\btext-kopierstift\b/);
+  assert.match(html, /\bglanz-wort\b/);
   assert.equal(ohneTags(html), "Book of Terpz");
   assert.doesNotMatch(html, /font-buch|aria-hidden|uppercase|text-accent|gb/);
 });

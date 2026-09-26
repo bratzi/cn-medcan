@@ -61,7 +61,7 @@ create trigger terpene_insert_chk
 before insert on terpene
 for each row
 begin
-  select case when NEW.geschmack not in ('DIESEL','ZITRUS','ERDIG','SUESS','WUERZIG','BLUMIG','HOLZIG','KRAEUTRIG') then raise(abort, 'terpene.geschmack: unbekannter Wert') end;
+  select case when NEW.geschmack not in ('DIESEL','ZITRUS','ERDIG','SUESS','WUERZIG','BLUMIG','HOLZIG','KRAEUTRIG','FRUCHTIG','MINZIG') then raise(abort, 'terpene.geschmack: unbekannter Wert') end;
 end;
 
 drop trigger if exists terpene_update_chk;
@@ -69,7 +69,7 @@ create trigger terpene_update_chk
 before update on terpene
 for each row
 begin
-  select case when NEW.geschmack not in ('DIESEL','ZITRUS','ERDIG','SUESS','WUERZIG','BLUMIG','HOLZIG','KRAEUTRIG') then raise(abort, 'terpene.geschmack: unbekannter Wert') end;
+  select case when NEW.geschmack not in ('DIESEL','ZITRUS','ERDIG','SUESS','WUERZIG','BLUMIG','HOLZIG','KRAEUTRIG','FRUCHTIG','MINZIG') then raise(abort, 'terpene.geschmack: unbekannter Wert') end;
 end;
 
 -- ---------------------------------------------------------------------------

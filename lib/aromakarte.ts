@@ -1,11 +1,12 @@
 /**
- * Geometrie und Daten der Aroma-Karte (Spec Redesign 14): links die acht
+ * Geometrie und Daten der Aroma-Karte (Spec Redesign 14): links die zehn
  * Geschmacksachsen, rechts die Terpene, dazwischen Bögen wie auf einem
  * Terpen-Poster; per Schalter morphen die Knoten ins Netzdiagramm. Reine
  * Funktionen, damit Darstellung und Verdichtung testbar bleiben.
  */
 import { GESCHMACKS_ACHSEN, leereGeschmacksMatrix, type GeschmacksMatrix } from "@/lib/query/bewertung";
 import type { GeschmacksKategorie } from "@/db/enums";
+import { aromaAnteile } from "@/lib/terpen-aromen";
 
 export type Punkt = { x: number; y: number };
 export type KartenTerpen = { name: string; geschmack: GeschmacksKategorie; konzentrationProzent: number | null; rang: number };
@@ -128,10 +129,12 @@ export function herstellerProfil(terpene: readonly KartenTerpen[]): GeschmacksMa
   if (terpene.length === 0) return null;
   const matrix = leereGeschmacksMatrix();
   for (const terpen of terpene) {
-    const achse = ACHSE_ZU_KATEGORIE.get(terpen.geschmack);
-    if (!achse) continue;
     const gewicht = terpen.konzentrationProzent ?? Math.max(1, 4 - terpen.rang);
-    matrix[achse] += gewicht;
+    // Ein Terpen zahlt anteilig auf alle seine Noten ein (lib/terpen-aromen.ts).
+    for (const { geschmack, anteil } of aromaAnteile(terpen)) {
+      const achse = ACHSE_ZU_KATEGORIE.get(geschmack);
+      if (achse) matrix[achse] += gewicht * anteil;
+    }
   }
   const hoechster = Math.max(...Object.values(matrix));
   if (hoechster <= 0) return null;
@@ -141,7 +144,35 @@ export function herstellerProfil(terpene: readonly KartenTerpen[]): GeschmacksMa
   return matrix;
 }
 
-/** Index der Geschmacksachse, zu der ein Terpen gehört (für die Bögen). */
+/**
+ * Die Bögen eines Terpens: je Note die Achse und ihr Anteil (lib/terpen-aromen.ts).
+ * Achsen, die es nicht gibt, fallen weg.
+ */
+export function terpenBoegen(terpen: KartenTerpen): { achse: number; anteil: number }[] {
+  return aromaAnteile(terpen).flatMap(({ geschmack, anteil }) => {
+    const achse = achsenIndex(geschmack);
+    return achse < 0 ? [] : [{ achse, anteil }];
+  });
+}
+
+/**
+ * Reihenfolge der Terpene in der rechten Spalte (Nutzer 2026-09-26: Linien
+ * schöner ordnen): jedes Terpen steht auf der Höhe des gewichteten Mittels
+ * seiner Achsen (Baryzentrum), so laufen die Bögen möglichst parallel und
+ * kreuzen sich selten. Gleichstand: Hauptnote, dann Name.
+ */
+export function ordneTerpene<T extends KartenTerpen>(terpene: readonly T[]): T[] {
+  const lage = (terpen: T) => {
+    const boegen = terpenBoegen(terpen);
+    const summe = boegen.reduce((a, b) => a + b.anteil, 0);
+    return summe > 0 ? boegen.reduce((a, b) => a + b.achse * b.anteil, 0) / summe : GESCHMACKS_ACHSEN.length;
+  };
+  return [...terpene].sort(
+    (a, b) => lage(a) - lage(b) || achsenIndex(a.geschmack) - achsenIndex(b.geschmack) || a.name.localeCompare(b.name, "de"),
+  );
+}
+
+/** Index der Geschmacksachse, zu der ein Terpen gehört (Hauptnote). */
 export function achsenIndex(kategorie: GeschmacksKategorie): number {
   return GESCHMACKS_ACHSEN.findIndex((achse) => achse.enumWert === kategorie);
 }
@@ -166,16 +197,20 @@ export function eindruckProfil(
   const roh = leereGeschmacksMatrix();
   const basis = leereGeschmacksMatrix();
   for (const terpen of terpene) {
-    const achse = ACHSE_ZU_KATEGORIE.get(terpen.geschmack);
-    if (!achse) continue;
     const gewicht = terpen.konzentrationProzent ?? Math.max(1, 4 - terpen.rang);
-    basis[achse] += gewicht;
-    roh[achse] += gewicht * ((stufen[terpen.name] ?? 3) / 3);
+    for (const { geschmack, anteil } of aromaAnteile(terpen)) {
+      const achse = ACHSE_ZU_KATEGORIE.get(geschmack);
+      if (!achse) continue;
+      basis[achse] += gewicht * anteil;
+      roh[achse] += gewicht * anteil * ((stufen[terpen.name] ?? 3) / 3);
+    }
   }
   // Nicht angegebene Terpene: Gewicht 1, wie ein Terpen auf hinterem Rang.
   for (const terpen of ergaenzt) {
-    const achse = ACHSE_ZU_KATEGORIE.get(terpen.geschmack);
-    if (achse) roh[achse] += (stufen[terpen.name] ?? 3) / 3;
+    for (const { geschmack, anteil } of aromaAnteile(terpen)) {
+      const achse = ACHSE_ZU_KATEGORIE.get(geschmack);
+      if (achse) roh[achse] += anteil * ((stufen[terpen.name] ?? 3) / 3);
+    }
   }
   const hoechster = Math.max(1, ...Object.values(basis));
   if (hoechster <= 0) return null;

@@ -71,4 +71,6 @@ export const geschmacksKategorieLabel: Record<GeschmacksKategorie, string> = {
   BLUMIG: "Blumig",
   HOLZIG: "Holzig",
   KRAEUTRIG: "Kräutrig",
+  FRUCHTIG: "Fruchtig",
+  MINZIG: "Minzig",
 };

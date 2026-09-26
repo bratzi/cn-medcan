@@ -15,8 +15,10 @@ import {
   mische,
   mitteVon,
   netzPunkt,
+  ordneTerpene,
   RADIUS,
   sanft,
+  terpenBoegen,
   terpeneImKarte,
   terpenStaerken,
   type KartenTerpen,
@@ -24,6 +26,7 @@ import {
 } from "@/lib/aromakarte";
 import { cn } from "@/lib/cn";
 import { GESCHMACKS_ACHSEN, type GeschmacksMatrix } from "@/lib/query/bewertung";
+import { THIOLE } from "@/lib/terpen-aromen";
 
 export type AromaSerie = { name: string; ton: "gruen" | "lila"; matrix: GeschmacksMatrix };
 
@@ -37,7 +40,7 @@ type Props = {
   hervorheben?: number | null;
   /** Stärke je Terpen (0 bis 1) für das Leuchten der Pfade; sonst aus den Herstellerangaben. */
   staerken?: Readonly<Record<string, number>>;
-  /** Namen der Terpene, die der Hersteller nicht angibt: Pfad gestrichelt. */
+  /** Namen der Terpene, die der Hersteller nicht angibt: Pfad gestrichelt, solange ihre Stärke 0 ist. */
   ergaenzt?: readonly string[];
   /**
    * Macht die Balken links zu Reglern: man zieht den eigenen Wert je
@@ -106,7 +109,7 @@ function balkenEnde(knoten: Punkt, wert: number, versatz: number, laenge = 110):
  * Tabelle für Screenreader, das SVG ist aria-hidden.
  */
 export function AromaKarte({
-  terpene,
+  terpene: ungeordnet,
   serien: roheSerien,
   titel = "Aroma-Karte",
   ohneTitel = false,
@@ -116,6 +119,8 @@ export function AromaKarte({
   regler,
   lernen,
 }: Props) {
+  // Rechts nach dem Mittel ihrer Achsen geordnet, damit sich die Bögen wenig kreuzen.
+  const terpene = ordneTerpene(ungeordnet);
   const svgRef = useRef<SVGSVGElement>(null);
   const spurId = `spur-${useId().replace(/:/g, "")}`;
   // Beim Ziehen folgen die Balken dem Griff sofort, sonst gleiten sie.
@@ -184,7 +189,12 @@ export function AromaKarte({
   const karte = achsenImKarte(aktBreite);
   const balken = balkenLaenge(aktBreite);
   const knoten = karte.map((punkt, index) => mische(punkt, netzPunkt(index, MAX, RADIUS + 34, mitte), t));
-  const terpenKnoten = terpeneImKarte(terpene.length, aktBreite);
+  const dieselIndex = achsenIndex("DIESEL");
+  const spalte = terpeneImKarte(terpene.length + (dieselIndex >= 0 ? 1 : 0), aktBreite);
+  const terpenKnoten = spalte.slice(0, terpene.length);
+  // Diesel/Gas kommt aus Schwefelverbindungen, nicht aus Terpenen (lib/terpen-aromen.ts).
+  const thiolKnoten = dieselIndex >= 0 ? spalte[spalte.length - 1] : null;
+  const dieselWert = dieselIndex >= 0 ? Math.max(0, ...serien.map((serie) => serie.matrix.diesel)) : 0;
   const kartenSichtbar = 1 - t;
 
   const serienPunkte = serien.map((serie, s) =>
@@ -270,40 +280,56 @@ export function AromaKarte({
 
           {/* Bögen Achse zu Terpen, nur in der Karte. */}
           <g opacity={kartenSichtbar}>
-            {terpene.map((terpen, index) => {
-              const achse = achsenIndex(terpen.geschmack);
-              if (achse < 0) return null;
-              const kraft = staerke[terpen.name] ?? 0;
-              // Ein Terpen bei 0 bleibt grau, auch auf aktiver Achse.
-              const farbig = achseFarbig(achse) && kraft > 0;
-              // Stufenlos Violett bis Grün nach Abweichung lila Serie gegen Hersteller.
-              const achsenKey = GESCHMACKS_ACHSEN[achse].key;
-              const anteil = abweichungsAnteil(
-                serien.findLast((serie) => serie.ton === "lila")?.matrix[achsenKey],
-                serien.find((serie) => serie.ton === "gruen")?.matrix[achsenKey],
-              );
-              const farbe =
-                anteil === null
-                  ? FARBE[achse % 2 === 0 ? "gruen" : "lila"]
-                  : `color-mix(in oklab, var(--color-kopierstift) ${anteil}%, var(--color-accent))`;
-              return (
-                <path
-                  key={terpen.name}
-                  d={bogen(knoten[achse], terpenKnoten[index])}
-                  fill="none"
-                  stroke={farbig ? farbe : GRAU}
-                  strokeLinecap="round"
-                  strokeDasharray={ergaenzt.includes(terpen.name) ? "6 8" : undefined}
-                  opacity={farbig ? 0.45 + 0.55 * kraft : 0.35}
-                  style={{
-                    // Filigraner (Nutzer 2026-09-26): dünnere Striche, schwächerer Schein.
-                    strokeWidth: farbig ? 1 + 3.5 * kraft : 1,
-                    filter: farbig && kraft > 0.15 ? `drop-shadow(0 0 ${1 + 5 * kraft}px ${farbe})` : "none",
-                  }}
-                  className="transition-[opacity,stroke-width,filter,stroke] duration-normal"
-                />
-              );
-            })}
+            {terpene.flatMap((terpen, index) =>
+              terpenBoegen(terpen).map(({ achse, anteil: notenAnteil }) => {
+                const kraft = staerke[terpen.name] ?? 0;
+                // Ein Terpen bei 0 bleibt grau, auch auf aktiver Achse.
+                const farbig = achseFarbig(achse) && kraft > 0;
+                // Stufenlos Violett bis Grün nach Abweichung lila Serie gegen Hersteller.
+                const achsenKey = GESCHMACKS_ACHSEN[achse].key;
+                const anteil = abweichungsAnteil(
+                  serien.findLast((serie) => serie.ton === "lila")?.matrix[achsenKey],
+                  serien.find((serie) => serie.ton === "gruen")?.matrix[achsenKey],
+                );
+                const farbe =
+                  anteil === null
+                    ? FARBE[achse % 2 === 0 ? "gruen" : "lila"]
+                    : `color-mix(in oklab, var(--color-kopierstift) ${anteil}%, var(--color-accent))`;
+                // Nebennoten zeichnen feiner als die Hauptnote (Anteil 0 bis 1).
+                const gewicht = 0.35 + 0.65 * notenAnteil;
+                return (
+                  <path
+                    key={`${terpen.name}-${achse}`}
+                    d={bogen(knoten[achse], terpenKnoten[index])}
+                    fill="none"
+                    stroke={farbig ? farbe : GRAU}
+                    strokeLinecap="round"
+                    // Nicht angegebene Terpene gestrichelt, bis man sie hochzieht (Nutzer 2026-09-26).
+                    strokeDasharray={ergaenzt.includes(terpen.name) && kraft <= 0 ? "6 8" : undefined}
+                    opacity={farbig ? (0.45 + 0.55 * kraft) * (0.55 + 0.45 * notenAnteil) : 0.3}
+                    style={{
+                      strokeWidth: farbig ? (1 + 3.5 * kraft) * gewicht : 0.8,
+                      filter: farbig && kraft * notenAnteil > 0.1 ? `drop-shadow(0 0 ${1 + 5 * kraft * gewicht}px ${farbe})` : "none",
+                    }}
+                    className="transition-[opacity,stroke-width,filter,stroke] duration-normal"
+                  />
+                );
+              }),
+            )}
+            {thiolKnoten ? (
+              <path
+                d={bogen(knoten[dieselIndex], thiolKnoten)}
+                fill="none"
+                stroke={dieselWert > 0.05 ? "var(--color-text-muted)" : GRAU}
+                strokeLinecap="round"
+                strokeDasharray="2 6"
+                opacity={dieselWert > 0.05 ? 0.8 : 0.35}
+                style={{ strokeWidth: dieselWert > 0.05 ? 1.5 : 0.8 }}
+              />
+            ) : null}
+            {thiolKnoten ? (
+              <circle cx={thiolKnoten.x} cy={thiolKnoten.y} r={5} fill="none" stroke={GRAU} strokeWidth={1.5} />
+            ) : null}
             {terpenKnoten.map((punkt, index) => (
               <circle
                 key={terpene[index].name}
@@ -352,6 +378,32 @@ export function AromaKarte({
               ))}
             </g>
           ))}
+
+          {/* Delta je Achse (Nutzer 2026-09-26): das Stück, um das der längere Balken
+              übersteht, glüht und pulsiert in dessen Farbe (globals.css, .delta-puls). */}
+          {serien.length >= 2 && kartenSichtbar > 0.5
+            ? GESCHMACKS_ACHSEN.map((achse, index) => {
+                const werte = serien.map((serie) => serie.matrix[achse.key]);
+                const lang = werte[0] >= werte[1] ? 0 : 1;
+                const kurz = 1 - lang;
+                if (Math.abs(werte[0] - werte[1]) < 0.1) return null;
+                const von = serienPunkte[kurz][index];
+                const bis = serienPunkte[lang][index];
+                return (
+                  <line
+                    key={`delta-${achse.key}`}
+                    x1={von.x}
+                    y1={bis.y}
+                    x2={bis.x}
+                    y2={bis.y}
+                    stroke={FARBE[serien[lang].ton]}
+                    strokeLinecap="round"
+                    className="delta-puls"
+                    style={{ opacity: kartenSichtbar, "--delta-farbe": FARBE[serien[lang].ton] } as React.CSSProperties}
+                  />
+                );
+              })
+            : null}
 
           {/* Regler: je Achse eine Spur im Sweet-Spot-Stil, Griff am eigenen Wert. */}
           {regler && kartenSichtbar > 0.5
@@ -513,6 +565,15 @@ export function AromaKarte({
             {terpene[index].name}
           </span>
         ))}
+        {thiolKnoten ? (
+          <span
+            aria-hidden="true"
+            className="absolute -translate-y-1/2 pl-4 text-small whitespace-nowrap text-text-muted italic"
+            style={{ left: `${(thiolKnoten.x / aktBreite) * 100}%`, top: `${(thiolKnoten.y / HOEHE) * 100}%`, opacity: kartenSichtbar }}
+          >
+            {THIOLE} <span className="not-italic">(Schwefel, kein Terpen)</span>
+          </span>
+        ) : null}
       </div>
 
       <p aria-live="polite" className="numeric min-h-6 text-small text-text">
@@ -577,7 +638,20 @@ export function AromaKarte({
 
 /** Lerneffekt: welche Terpene eine Geschmacksrichtung tragen. */
 function TerpenLernen({ achse, lernen }: { achse: number; lernen: NonNullable<Props["lernen"]> }) {
-  const namen = lernen.filter((terpen) => achsenIndex(terpen.geschmack) === achse).map((terpen) => terpen.name);
+  if (GESCHMACKS_ACHSEN[achse].enumWert === "DIESEL") {
+    return (
+      <p className="-mt-4 text-small text-text-muted text-pretty">
+        <span className="font-medium text-text">Diesel</span> kommt nicht aus Terpenen, sondern aus Schwefelverbindungen
+        (Thiolen), die schon in Spuren stark riechen.
+      </p>
+    );
+  }
+  // Alle Terpene, die spürbar auf diese Richtung einzahlen (Anteil ab 20 %).
+  const namen = lernen
+    .filter((terpen) =>
+      terpenBoegen({ ...terpen, konzentrationProzent: null, rang: 99 }).some((b) => b.achse === achse && b.anteil >= 0.2),
+    )
+    .map((terpen) => terpen.name);
   if (namen.length === 0) return null;
   return (
     <p className="-mt-4 text-small text-text-muted text-pretty">

@@ -8,7 +8,7 @@ import { Doppelseite, type DoppelseiteProps } from "@/components/review/Doppelse
 import { alsEintrag, eintragHref, type EintragDaten } from "@/components/review/eintrag";
 import { leereGeschmacksMatrix } from "@/lib/query/bewertung";
 
-const MATRIX = { diesel: 1, zitrus: 0, erdig: 5, suess: 1, wuerzig: 4, blumig: 0, holzig: 2, kraeutrig: 2 };
+const MATRIX = { diesel: 1, zitrus: 0, erdig: 5, suess: 1, wuerzig: 4, blumig: 0, holzig: 2, kraeutrig: 2, fruchtig: 0, minzig: 0 };
 
 function eintrag(teil: Partial<EintragDaten> = {}): EintragDaten {
   return {

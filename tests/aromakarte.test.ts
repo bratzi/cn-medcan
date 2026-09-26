@@ -4,6 +4,9 @@ import assert from "node:assert/strict";
 import {
   abweichungsAnteil,
   achsenImKarte,
+  achsenIndex,
+  ordneTerpene,
+  terpenBoegen,
   balkenLaenge,
   bogen,
   herstellerProfil,
@@ -23,9 +26,33 @@ test("Herstellerprofil: dominantes Terpen setzt seine Achse auf 5, ohne Terpene 
     { name: "Myrcen", geschmack: "ERDIG", konzentrationProzent: null, rang: 2 },
   ]);
   assert.ok(profil);
+  // Anteilig nach lib/terpen-aromen.ts: Limonen (Gewicht 3) 75 % Zitrus, 15 % Fruchtig, 10 % Süß;
+  // Myrcen (Gewicht 2) 50 % Erdig, 30 % Fruchtig, 20 % Kräutrig. Höchste Achse Zitrus 2,25 = 5.
   assert.equal(profil.zitrus, 5);
-  assert.equal(profil.erdig, 3.3);
-  assert.equal(profil.suess, 0);
+  assert.equal(profil.erdig, 2.2);
+  assert.equal(profil.fruchtig, 2.3);
+  assert.equal(profil.suess, 0.7);
+  assert.equal(profil.blumig, 0);
+  assert.equal(profil.diesel, 0);
+});
+
+test("Terpenbögen: mehrere Noten je Terpen, unbekannte Terpene nur mit Hauptnote, Diesel nie aus Terpenen", () => {
+  const myrcen = terpenBoegen({ name: "Myrcen", geschmack: "ERDIG", konzentrationProzent: null, rang: 1 });
+  assert.equal(myrcen.length, 3);
+  assert.equal(Math.round(myrcen.reduce((a, b) => a + b.anteil, 0) * 100), 100);
+  assert.deepEqual(terpenBoegen({ name: "Unbekannt", geschmack: "HOLZIG", konzentrationProzent: null, rang: 1 }), [
+    { achse: achsenIndex("HOLZIG"), anteil: 1 },
+  ]);
+  for (const name of ["Myrcen", "Limonen", "beta-Caryophyllen", "Linalool", "alpha-Pinen", "Terpinolen", "Humulen", "Ocimen", "Farnesen", "Nerolidol"]) {
+    const boegen = terpenBoegen({ name, geschmack: "ERDIG", konzentrationProzent: null, rang: 1 });
+    assert.ok(boegen.every((b) => b.achse !== achsenIndex("DIESEL")), name);
+  }
+});
+
+test("Ordnung der Terpene folgt dem Mittel ihrer Achsen (wenig Kreuzungen)", () => {
+  const t = (name: string) => ({ name, geschmack: "ERDIG" as const, konzentrationProzent: null, rang: 1 });
+  const namen = ordneTerpene([t("beta-Caryophyllen"), t("Limonen"), t("alpha-Pinen"), t("Linalool")]).map((x) => x.name);
+  assert.deepEqual(namen, ["Limonen", "Linalool", "alpha-Pinen", "beta-Caryophyllen"]);
 });
 
 test("Konzentration schlägt Rang", () => {
@@ -37,8 +64,8 @@ test("Konzentration schlägt Rang", () => {
   assert.equal(profil?.zitrus, 1.3);
 });
 
-test("Geometrie: acht Achsen links, Netz beginnt oben, Morph interpoliert", () => {
-  assert.equal(achsenImKarte().length, 8);
+test("Geometrie: zehn Achsen links, Netz beginnt oben, Morph interpoliert", () => {
+  assert.equal(achsenImKarte().length, 10);
   assert.deepEqual(netzPunkt(0, 5), { x: MITTE.x, y: MITTE.y - RADIUS });
   assert.deepEqual(netzPunkt(0, 0), MITTE);
   assert.deepEqual(mische({ x: 0, y: 0 }, { x: 10, y: 20 }, 0.5), { x: 5, y: 10 });

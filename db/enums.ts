@@ -47,6 +47,8 @@ export const GESCHMACKS_KATEGORIEN = [
   "BLUMIG",
   "HOLZIG",
   "KRAEUTRIG",
+  "FRUCHTIG",
+  "MINZIG",
 ] as const;
 export type GeschmacksKategorie = (typeof GESCHMACKS_KATEGORIEN)[number];
 
