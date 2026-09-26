@@ -3,7 +3,7 @@
 > Übergabemedium zwischen Sessions. Wird nach jedem Arbeitsblock aktualisiert und committet.
 > Wer hier weiterarbeitet, liest diese Datei zuerst und braucht den Chatverlauf nicht.
 
-**Letzte Aktualisierung:** 2026-09-26 (Session 21)
+**Letzte Aktualisierung:** 2026-09-26 (Session 21, Save for Clear)
 **Repo:** https://github.com/bratzi/cn-medcan (public)
 **Branch:** `main` (Makeover „Grünes Buch“ Teilprojekt 1 ist seit 2026-09-24 auf `main`)
 
@@ -50,8 +50,21 @@ Texte aus Komponenten auslagern, Umschalter im Kopf neben dem Grow-Zelt, HWG-Tex
   ergänzte Terpene durchgezogen sobald > 0, Delta der Balken glüht/pulsiert (`.delta-puls`). Migration 0007 remote
   angewendet (vorher db/constraints.sql per `d1 execute --file`, weil `migrations apply` Trigger-Blöcke nicht kann).
 - Bewertungsmaske: Sweet Spot wieder da (SweetSpot-Spuren im Terpz-Schritt, ganze Stufen). Katalog: Bild verlinkt.
-- Offen: Live-Sichtprüfung der Karte (10 Achsen, Thiole, Delta-Puls), Glas hinter Video, Zelt; Speichern in
-  /bewerten/apples-bananas testen (Sweet Spot + neue Achsen); Task 8 Rest (Testblüte freigeben).
+- Karte zusätzlich: Begleitstoffe **Ester** (Fruchtig 0.8, Süß 0.2) und **Thiole** (Diesel) als eigene Knoten
+  (`BEGLEITSTOFFE` in lib/terpen-aromen.ts), gemeinsam mit den Terpenen nach Achsenmittel geordnet; eigene
+  Umriss-Icons je Geschmack/Terpen/Begleitstoff (components/review/AromaIcon.tsx, keine Icon-Bibliothek);
+  Bögen je Geschmack eigenfarbig (`LINIEN_FARBE`, Fruchtig/Blumig bunter Verlauf), schwach = entsättigt,
+  stark = satt + Glow, nicht vorhanden = gestrichelt grau. Violett/Grün-Abweichungsfarbe der Bögen entfällt.
+- Nutzerentscheid: Fruchtig/Minzig zählen in der Herstellertreue mit (alte Bewertungen dort 0, Nähe sinkt vorerst).
+- Startseite: mehr Luft um Aroma-Sektion, vor „Einer allein weiß wenig“, zwischen Neuestem Eintrag und Abstimmung;
+  **Apotheken-Sektion von der Startseite entfernt**. Fuß: Schlusszeile startet gefüllt und invertiert bis `end: "max"`,
+  Bildnachweise in der rechten Spalte, Wortmarke im Fuß (translate 0.08em), „Zurück zum Anfang“ klein (text-small).
+- **Offen / nächste Schritte (Reihenfolge):**
+  1. Live-Sichtprüfung (Chrome-Tab muss vorn sein, sonst schlagen Screenshots fehl): Aroma-Karte (Icons, Farben,
+     Ester/Thiole, Delta-Puls), Glas hinter Video, Zelt, Hero-Abstände, Kopfzeile 80 %, Fuß (Marke, Invertierung).
+  2. /bewerten/apples-bananas: Speichern testen (Sweet Spot + Fruchtig/Minzig).
+  3. Großer Task: englische Übersetzung mit Umschalter (siehe oben).
+  4. Task 8 Rest (Testblüte freigeben, braucht Login).
 
 ### (Vorher) NÄCHSTE SESSION BEGINNT HIER (Stand 2026-09-25, Session 20, Save for Clear)
 
