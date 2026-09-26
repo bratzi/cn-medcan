@@ -55,7 +55,7 @@ export function ThemaSchalter() {
         <rect x="4" y="3.5" width="16" height="17.5" rx="1.5" fill="none" />
         <path d="M7 21V10.5c0-2 2.2-3.5 5-3.5s5 1.5 5 3.5V21" fill="none" strokeLinejoin="round" />
         <path d="M12 7v14" strokeDasharray="1 1.4" />
-        <path d="M12 12.5v2" strokeLinecap="round" strokeWidth="2" />
+        <path d="M12 12.5v2" strokeLinecap="round" strokeWidth="1.4" />
         <path d="M4 22.5h16" strokeLinecap="round" />
       </svg>
     </button>

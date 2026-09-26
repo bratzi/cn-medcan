@@ -1067,7 +1067,9 @@ html.joint-cursor :is(input:not([type="range"]):not([type="radio"]):not([type="c
   width: 1.5rem;
   height: 1.5rem;
   stroke: currentColor;
-  stroke-width: 1.5;
+  /* Filigraner (Nutzer 2026-09-26): dünnere, etwas zurückgenommene Linien. */
+  stroke-width: 1;
+  stroke-opacity: 0.8;
   transition-property: opacity, scale, filter;
   transition-duration: 300ms;
   transition-timing-function: cubic-bezier(0.2, 0, 0, 1);
