@@ -73,15 +73,15 @@ export function Auftakt() {
         <p
           data-story="oberzeile"
           data-story-einstieg=""
-          className="max-w-[28ch] text-center font-sans text-[clamp(1.75rem,1rem+2.4vw,3.25rem)] leading-tight font-light uppercase tracking-gesperrt text-balance text-text/90"
+          className="mt-6 max-w-[28ch] text-center font-sans sm:mt-12 text-[clamp(1.75rem,1rem+2.4vw,3.25rem)] leading-tight font-light uppercase tracking-gesperrt text-balance text-text/90"
         >
           Cannabis, offen gelegt.
         </p>
-        {/* Zentriert und breit unter der Oberzeile, kleiner Abstand (Nutzer 2026-09-25). */}
+        {/* Zentriert und breit unter der Oberzeile; seit 2026-09-26 mit mehr Luft zur Wortmarke und zur Oberzeile (Nutzer). */}
         <p
           data-story="intro"
           data-story-einstieg=""
-          className="-mt-2 w-full text-center font-sans text-small uppercase leading-relaxed tracking-gesperrt text-text text-balance"
+          className="mt-2 w-full text-center font-sans text-small uppercase sm:mt-4 leading-relaxed tracking-gesperrt text-text text-balance"
         >
           {/* Ab md genau zwei Zeilen, je Satz eine, ohne Umbruch und damit breiter als die übrigen Texte (Nutzer 2026-09-25). */}
           <span className="md:block md:whitespace-nowrap">Wir testen Sorten nach festem Schema.</span>{" "}
