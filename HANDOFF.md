@@ -28,7 +28,54 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 
 ## ⇢ Hier geht es weiter
 
-### ⇢ NÄCHSTE SESSION BEGINNT HIER (Stand 2026-09-26, Session 21)
+### ⇢ SESSION 22 (2026-09-26, läuft) — neu geordnete Taskliste, ersetzt alle älteren Listen darunter
+
+Nutzer: parallel mit Agents arbeiten, Credits für Tempo und Qualität; alte Tasks neu einordnen, Veraltetes streichen,
+ganz am Ende ein Abschluss-Review über alles. Nutzerentscheide heute: **i18n per Cookie, gleiche URLs, nur Oberfläche**
+(Inhalte bleiben in ihrer Sprache); **Startseiten-Reihenfolge bleibt** (nur Feinschliff, Bugs, neue Bewegungsmomente);
+eingeplant: **Caching gegen 1102, Impressum + Datenschutz, /produkte → /blueten**; Joint-Cursor bleibt.
+
+**Erledigt und gepusht (Session 22):** Hero-Video weniger Zoom (`cae6f3e`: 1.02/1.05 statt 1.08/1.15; Datei ist
+1280×720, auf breiten Schirmen hochskaliert); aktive Bögen der Aroma-Karte glühen/pulsieren im Takt von `.delta-puls`
+in ihrer Geschmacksfarbe, Lichtpunkt läuft Geschmack → Terpen (`a3a8431`, `.bogen-puls`/`.bogen-fluss`); **Logo im
+Kopf** (`962ccc8`, components/marke/Logo.tsx: „Book of“ 0,45 em oben, „Terpz“ text-marke, vier Konturen, Verlauf,
+Glanz; Brand-Doku §2 angepasst); 24 geprüfte Skills installiert (`3192b53`). Live noch NICHT gesehen.
+
+**Welle 1 (läuft parallel in Agents, Dateien getrennt):**
+1. Startseite Bewegung/Perf: Hidden-Tab-Bug im Einstieg, Dauer-Animationen außerhalb des Bildes pausieren
+   (`data-ruhend`), will-change, Stimmbalken füllen sich ein + Zähler, Kopf hell über dem Hero, „Umschlag wird
+   Seite“ (Pin, abschaltbar), totes `schleife.ts` raus.
+2. Aroma/Review-Details: Fokusring der Regler, Karte/Netz als Radiogroup, Filter nicht je Frame, tabular-nums,
+   Leitplanke 4 (Handelsname in Buchschrift) im SortenKopf, Buchfalz, Skelette, ProduktCard.
+3. Review-Kleinpunkte „Blüte vorschlagen“ (Session-18-Liste, u. a. D1-Bind-Grenze bei updateMany).
+4. Impressum + Datenschutz (Platzhalter in lib/rechtliches.ts füllt der Nutzer; vom Gate ausgenommen).
+5. i18n-Spec `docs/superpowers/specs/2026-09-26-englisch-umschalter-design.md` → Nutzer prüft.
+6. Caching-v2-Spec + Plan (Daten statt HTML cachen, Messung zuerst) → Nutzer prüft.
+
+**Welle 2 (danach, Dateien überlappen mit Welle 1):**
+7. Integration, Sammelpush, **Live-Sichtprüfung** (Chrome vorn!): Logo, Bögen, Hero-Zoom, alles aus Welle 1, dazu der
+   Session-21-Rückstand (Glas hinter Video, Zelt, Kopfzeile 80 %, Fuß-Invertierung), `backdrop-filter` im Kopf,
+   hell/dunkel, 390 px, reduzierte Bewegung.
+8. /bewerten/apples-bananas speichern (Sweet Spot, Fruchtig/Minzig); Task 8 Rest (Testblüte freigeben) → Nutzer
+   fragen, ob Testblüte gelöscht wird. Braucht Login.
+9. Aufräumen: `three` + bewegung/blaetter.ts, components/story/Apotheken.tsx (ungenutzt).
+10. Kern-Kleinpunkte: `vorschlagBisAm` im Admin setzbar machen; Hydrations-Sperre (`useHydriert`) für Anmelde-,
+    Registrier- und Profilformular.
+11. /produkte → /blueten mit Weiterleitungen (vor i18n, damit die Übersetzung auf den finalen Pfaden arbeitet).
+
+**Welle 3 (nach Freigabe der Specs):** 12. Caching v2 ab Schritt 0 (Messung). 13. i18n in Wellen.
+
+**Ganz am Ende:** 14. Abschluss-Review über alles (Code-Review der Session, Live-Stichprobe, npm audit einmal,
+HANDOFF stimmig).
+
+**Geparkt (braucht Nutzer oder später):** Herstellertreue-Rangliste; Mailversand (Absenderdomain); Instagram-Handle;
+Einwilligung fürs Instagram-iframe (nach Datenschutz-Bericht klären); Symbolbilder vor öffentlichem Start;
+JSON-Import (Datei fehlt); Mail bei Vorschlägen.
+**Gestrichen (veraltet):** 3D-Blätter, Apotheken/Preise-Ausbau, Achsenknoten-Bug der alten Karte, AromaSpielwiese,
+„andere Buttons folgen der Maus“ (nie beantwortet), Audit-Vorschläge gegen Nutzerentscheide (weniger Puls/Glanz,
+weniger Handschrift, kleineres Blütenbild, anderer Hero-Text, Reihenfolge, Joint-Cursor raus).
+
+### (Vorher) NÄCHSTE SESSION BEGINNT HIER (Stand 2026-09-26, Session 21)
 
 **Nächster großer Task (Nutzerauftrag): englische Übersetzung mit Umschalter Deutsch/Englisch.**
 Mit superpowers:brainstorming beginnen (Routing /en vs. Cookie, Next-16-i18n-Doku in node_modules/next/dist/docs lesen,
