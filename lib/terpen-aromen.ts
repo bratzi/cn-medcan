@@ -15,8 +15,9 @@ import type { GeschmacksKategorie } from "@/db/enums";
  *
  * Diesel und Gas stammen nicht aus Terpenen, sondern aus Schwefelverbindungen
  * (Thiole, v. a. 3-Methyl-2-buten-1-thiol; Oswald u. a., ACS Omega 2021).
- * Kein Terpen zahlt deshalb auf Diesel ein; die Karte verbindet die Achse mit
- * einem eigenen Knoten (THIOLE).
+ * Kein Terpen zahlt deshalb auf Diesel ein. Ebenso tragen Ester (etwa
+ * Hexylacetat, Ethylester) viel vom Fruchtigen bei. Beide stehen als
+ * Begleitstoffe (BEGLEITSTOFFE) mit eigenem Knoten in der Karte.
  */
 export type AromaAnteil = { geschmack: GeschmacksKategorie; anteil: number };
 
@@ -76,8 +77,20 @@ const TABELLE: Record<string, readonly AromaAnteil[]> = {
   ],
 };
 
-/** Knoten für Diesel/Gas: Schwefelverbindungen, kein Terpen. */
-export const THIOLE = "Thiole";
+/** Aromastoffe, die keine Terpene sind, aber Noten der Karte prägen (Nutzer 2026-09-26). */
+export type Begleitstoff = { name: string; hinweis: string; noten: readonly AromaAnteil[] };
+
+export const BEGLEITSTOFFE: readonly Begleitstoff[] = [
+  {
+    name: "Ester",
+    hinweis: "fruchtig, kein Terpen",
+    noten: [
+      { geschmack: "FRUCHTIG", anteil: 0.8 },
+      { geschmack: "SUESS", anteil: 0.2 },
+    ],
+  },
+  { name: "Thiole", hinweis: "Schwefel, kein Terpen", noten: [{ geschmack: "DIESEL", anteil: 1 }] },
+];
 
 /**
  * Anteile je Geschmacksachse für ein Terpen: aus der Tabelle, sonst die

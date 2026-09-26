@@ -162,14 +162,24 @@ export function terpenBoegen(terpen: KartenTerpen): { achse: number; anteil: num
  * kreuzen sich selten. Gleichstand: Hauptnote, dann Name.
  */
 export function ordneTerpene<T extends KartenTerpen>(terpene: readonly T[]): T[] {
-  const lage = (terpen: T) => {
-    const boegen = terpenBoegen(terpen);
-    const summe = boegen.reduce((a, b) => a + b.anteil, 0);
-    return summe > 0 ? boegen.reduce((a, b) => a + b.achse * b.anteil, 0) / summe : GESCHMACKS_ACHSEN.length;
-  };
+  const lage = (terpen: T) => achsenLage(terpenBoegen(terpen));
   return [...terpene].sort(
     (a, b) => lage(a) - lage(b) || achsenIndex(a.geschmack) - achsenIndex(b.geschmack) || a.name.localeCompare(b.name, "de"),
   );
+}
+
+/** Gewichtetes Mittel der Achsen einer Bogengruppe; ohne Bögen ganz unten. */
+export function achsenLage(boegen: readonly { achse: number; anteil: number }[]): number {
+  const summe = boegen.reduce((a, b) => a + b.anteil, 0);
+  return summe > 0 ? boegen.reduce((a, b) => a + b.achse * b.anteil, 0) / summe : GESCHMACKS_ACHSEN.length;
+}
+
+/** Bögen eines Begleitstoffs (Ester, Thiole) wie bei einem Terpen. */
+export function begleitBoegen(noten: readonly { geschmack: GeschmacksKategorie; anteil: number }[]): { achse: number; anteil: number }[] {
+  return noten.flatMap(({ geschmack, anteil }) => {
+    const achse = achsenIndex(geschmack);
+    return achse < 0 ? [] : [{ achse, anteil }];
+  });
 }
 
 /** Index der Geschmacksachse, zu der ein Terpen gehört (Hauptnote). */
