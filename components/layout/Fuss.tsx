@@ -41,7 +41,8 @@ export function Fuss() {
       <div className="mx-auto grid w-full max-w-360 grid-cols-1 gap-12 px-4 pt-16 pb-24 sm:px-8 md:grid-cols-[1fr_1.4fr_1fr] md:items-start">
         <div className="flex flex-col items-start gap-6">
           <Unterzeile className="text-text-muted" />
-          <a href="#inhalt" className="farbverlauf font-hand text-notiz whitespace-nowrap transition-opacity duration-fast hover:opacity-80">
+          {/* Zurückhaltend in der normalen Schrift und klein (Nutzer 2026-09-26). */}
+          <a href="#inhalt" className="inline-flex min-h-11 items-center text-small whitespace-nowrap text-text-muted transition-colors duration-fast hover:text-text">
             Zurück zum Anfang ↑
           </a>
         </div>
@@ -62,30 +63,31 @@ export function Fuss() {
           </ol>
         </nav>
 
-        <p className="max-w-[40ch] border-l-2 border-border-strong pl-4 text-caption text-text-muted text-pretty">
-          Alle gelisteten Arzneimittel sind verschreibungspflichtig. Die Angaben dienen der
-          Information und ersetzen keine medizinische oder pharmazeutische Beratung. Eine Abgabe
-          von Arzneimitteln erfolgt über diese Seite nicht.
-        </p>
-      </div>
-
-      <div className="mx-auto w-full max-w-360 border-t border-border px-4 py-6 sm:px-8">
-        <details>
-          <summary className="inline-flex min-h-11 cursor-pointer items-center text-caption text-text-muted">
-            Bildnachweise
-          </summary>
-          <ul className="mt-2 flex flex-col gap-2 pb-2 text-caption text-text-muted">
-            {MEDIEN.map((m) => (
-              <li key={m.id}>
-                {`${ART_LABEL[m.art]}: `}
-                <a href={m.quelle} rel="noopener noreferrer" className="text-accent underline underline-offset-2">
-                  {m.urheber}
-                </a>
-                {" auf Pexels"}
-              </li>
-            ))}
-          </ul>
-        </details>
+        <div className="flex flex-col items-start gap-6">
+          <p className="max-w-[40ch] border-l-2 border-border-strong pl-4 text-caption text-text-muted text-pretty">
+            Alle gelisteten Arzneimittel sind verschreibungspflichtig. Die Angaben dienen der
+            Information und ersetzen keine medizinische oder pharmazeutische Beratung. Eine Abgabe
+            von Arzneimitteln erfolgt über diese Seite nicht.
+          </p>
+          {/* Bildnachweise nach oben in die Spalte (Nutzer 2026-09-26): keine eigene Zeile
+              mehr unter dem Fuß, damit die Wortmarke dahinter im Fuß liegt. */}
+          <details>
+            <summary className="inline-flex min-h-11 cursor-pointer items-center text-caption text-text-muted">
+              Bildnachweise
+            </summary>
+            <ul className="mt-2 flex flex-col gap-2 pb-2 text-caption text-text-muted">
+              {MEDIEN.map((m) => (
+                <li key={m.id}>
+                  {`${ART_LABEL[m.art]}: `}
+                  <a href={m.quelle} rel="noopener noreferrer" className="text-accent underline underline-offset-2">
+                    {m.urheber}
+                  </a>
+                  {" auf Pexels"}
+                </li>
+              ))}
+            </ul>
+          </details>
+        </div>
       </div>
 
       {/* Die Wortmarke liegt IM Fuß hinter dem Inhalt (Spec Redesign 10), nicht

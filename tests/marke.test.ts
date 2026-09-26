@@ -121,7 +121,7 @@ test("Fuß: die Wortmarke liegt im Fuß hinter dem Inhalt, kein Tag, kein zweite
   );
   assert.equal(fuss.match(/<Wortmarke /g)?.length, 1);
   assert.doesNotMatch(fuss, /fuss-tag|font-wand|>\s*gb\s*</);
-  assert.match(css, /\.fuss-marke\s*\{[^}]*translate:\s*0 0\.45em/);
+  assert.match(css, /\.fuss-marke\s*\{[^}]*translate:\s*0 0\.08em/);
   assert.doesNotMatch(css, /\.fuss-tag/);
   assert.match(lies("components/story/bewegung/schluss.ts"), /data-story="fuss-marke"/);
 });

@@ -34,7 +34,7 @@ export function WissenBuendeln() {
       aria-labelledby="wissen-titel"
       data-story="wissen"
       data-story-vorhang=""
-      className="relative isolate overflow-x-clip px-4 py-24 sm:px-8 sm:py-32"
+      className="relative isolate overflow-x-clip px-4 pt-32 pb-24 sm:px-8 sm:pt-48 sm:pb-32"
     >
       <div className="mx-auto grid w-full max-w-360 grid-cols-1 gap-12 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)] lg:gap-16">
         <h2 id="wissen-titel" className="max-w-4xl font-buch text-kapitel text-text text-balance">

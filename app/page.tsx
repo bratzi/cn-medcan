@@ -1,6 +1,5 @@
 import { Abstimmung } from "@/components/story/Abstimmung";
 import { AromaSektion } from "@/components/story/AromaSektion";
-import { Apotheken } from "@/components/story/Apotheken";
 import { Auftakt } from "@/components/story/Auftakt";
 import { FeldbuchRaster } from "@/components/story/FeldbuchRaster";
 import { GemeinsamLernen } from "@/components/story/GemeinsamLernen";
@@ -12,7 +11,8 @@ import { WissenBuendeln } from "@/components/story/WissenBuendeln";
 
 /**
  * Die Startseite als Scroll-Story (Spec 5.1). Sektion 9 ist der Fuß im
- * Layout. Jede Datensektion hat ihre eigene Suspense-Grenze; Bewegung kommt
+ * Layout. Apotheken seit 2026-09-26 nicht mehr auf der Startseite (Nutzer:
+ * noch fehl am Platz, nur in Aussicht). Jede Datensektion hat ihre eigene Suspense-Grenze; Bewegung kommt
  * allein aus der StoryBuehne am Ende.
  *
  * force-dynamic: die Seite ist nutzerbezogen (eigene Stimme, Preise nur mit
@@ -32,7 +32,6 @@ export default function StartPage() {
       <NeuesterEintrag />
       <Abstimmung />
       <Katalog />
-      <Apotheken />
       <StoryBuehne />
     </div>
   );

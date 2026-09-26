@@ -376,8 +376,9 @@
   /* Die Wortmarke läuft unten angeschnitten aus dem Fuß (Spec TP3 8.9).
      em bezieht sich auf text-umschlag am selben Element. */
   .fuss-marke {
-    /* Unterlängen laufen unten aus dem Fuß; blass wie die Buzz-Sätze. */
-    translate: 0 0.45em;
+    /* Ganz im Fuß hinter dem Inhalt (Nutzer 2026-09-26), nur die Unterlängen
+       laufen knapp aus; blass wie die Buzz-Sätze. */
+    translate: 0 0.08em;
     opacity: 0.15;
   }
 

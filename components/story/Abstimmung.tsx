@@ -55,7 +55,7 @@ export function Abstimmung() {
       aria-labelledby="abstimmung-titel"
       data-story="abstimmung"
       data-story-vorhang=""
-      className="relative isolate overflow-x-clip px-4 py-24 sm:px-8 sm:py-32"
+      className="relative isolate overflow-x-clip px-4 pt-32 pb-24 sm:px-8 sm:pt-48 sm:pb-32"
     >
       <div className="mx-auto grid w-full max-w-360 grid-cols-1 gap-12 lg:grid-cols-[2fr_3fr] lg:items-start">
         <div className="flex flex-col items-start gap-6">

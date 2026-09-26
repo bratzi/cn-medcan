@@ -59,7 +59,7 @@ export function AromaSektion() {
     <section
       aria-labelledby="aroma-titel"
       data-story="aroma"
-      className="relative isolate overflow-x-clip px-4 py-24 sm:px-8 sm:py-32"
+      className="relative isolate overflow-x-clip px-4 py-32 sm:px-8 sm:py-48"
     >
       {/* Am Ende der Graphensektion, nicht am Anfang (Nutzer 2026-09-25). */}
       <Schlagwort satz="stimmt das?" ton="gruen" oben="bottom-0 translate-y-1/2" />

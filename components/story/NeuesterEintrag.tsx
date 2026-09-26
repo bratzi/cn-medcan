@@ -46,7 +46,7 @@ export function NeuesterEintrag() {
     <section
       aria-labelledby="eintrag-titel"
       data-story="eintrag"
-      className="relative isolate overflow-x-clip bg-linear-to-b from-transparent via-surface-sunken to-transparent px-4 py-24 sm:px-8 sm:py-32"
+      className="relative isolate overflow-x-clip bg-linear-to-b from-transparent via-surface-sunken to-transparent px-4 pt-24 pb-32 sm:px-8 sm:pt-32 sm:pb-48"
     >
       {/* Unter dem Eintrag, nicht darüber (Nutzer 2026-09-25). */}
       <Schlagwort satz="was drin ist" ton="gruen" oben="bottom-0 translate-y-1/2" />
