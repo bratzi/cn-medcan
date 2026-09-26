@@ -27,6 +27,7 @@ import {
 } from "@/lib/aromakarte";
 import { cn } from "@/lib/cn";
 import { GESCHMACKS_ACHSEN, type GeschmacksMatrix } from "@/lib/query/bewertung";
+import { GeschmackIcon, TerpenIcon } from "@/components/review/AromaIcon";
 import { BEGLEITSTOFFE } from "@/lib/terpen-aromen";
 
 export type AromaSerie = { name: string; ton: "gruen" | "lila"; matrix: GeschmacksMatrix };
@@ -556,7 +557,7 @@ export function AromaKarte({
             onMouseEnter={() => setAktiv(index)}
             onFocus={() => setAktiv(index)}
             className={cn(
-              "absolute -translate-y-1/2 text-small font-medium uppercase tracking-wide whitespace-nowrap",
+              "absolute inline-flex -translate-y-1/2 items-center gap-1.5 text-small font-medium uppercase tracking-wide whitespace-nowrap",
               t < 0.5 ? "-translate-x-full pr-4" : "-translate-x-1/2",
               aktiv === index ? "text-text" : "text-text-muted",
             )}
@@ -565,6 +566,7 @@ export function AromaKarte({
               top: `${(punkt.y / HOEHE) * 100}%`,
             }}
           >
+            <GeschmackIcon geschmack={GESCHMACKS_ACHSEN[index].enumWert} />
             {GESCHMACKS_ACHSEN[index].label}
           </button>
         ))}
@@ -573,12 +575,13 @@ export function AromaKarte({
             key={terpene[index].name}
             aria-hidden="true"
             className={cn(
-              "absolute -translate-y-1/2 pl-4 font-buch font-medium whitespace-nowrap transition-colors duration-normal",
+              "absolute inline-flex -translate-y-1/2 items-center gap-1.5 pl-4 font-buch font-medium whitespace-nowrap transition-colors duration-normal",
               terpene.length > 6 ? "text-small" : "text-h3",
               (staerke[terpene[index].name] ?? 0) > 0 ? "text-text" : "text-text-muted",
             )}
             style={{ left: `${(punkt.x / aktBreite) * 100}%`, top: `${(punkt.y / HOEHE) * 100}%`, opacity: kartenSichtbar }}
           >
+            <TerpenIcon name={terpene[index].name} />
             {terpene[index].name}
           </span>
         ))}
@@ -586,9 +589,10 @@ export function AromaKarte({
           <span
             key={begleiter[index].name}
             aria-hidden="true"
-            className="absolute -translate-y-1/2 pl-4 text-small whitespace-nowrap text-text-muted italic"
+            className="absolute inline-flex -translate-y-1/2 items-center gap-1.5 pl-4 text-small whitespace-nowrap text-text-muted italic"
             style={{ left: `${(punkt.x / aktBreite) * 100}%`, top: `${(punkt.y / HOEHE) * 100}%`, opacity: kartenSichtbar }}
           >
+            <TerpenIcon name={begleiter[index].name} />
             {begleiter[index].name} <span className="not-italic">({begleiter[index].hinweis})</span>
           </span>
         ))}
