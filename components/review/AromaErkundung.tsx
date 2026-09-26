@@ -48,6 +48,7 @@ export function AromaErkundung({
   beschaffenheit,
   gesamteindruck,
   eingabe = false,
+  zwischenruf,
   children,
 }: {
   titel: string;
@@ -71,6 +72,8 @@ export function AromaErkundung({
    * umschließende Formular (Feldnamen wie lib/bewertung-eingabe.ts).
    */
   eingabe?: boolean;
+  /** Hintergrundsatz (Schlagwort) mittig zwischen Qualität und Fazit, nur auf der Startseite. */
+  zwischenruf?: React.ReactNode;
   children?: React.ReactNode;
 }) {
   const [eigen, setEigen] = useState<GeschmacksMatrix | null>(null);
@@ -257,6 +260,10 @@ export function AromaErkundung({
         </Schritt>
       ) : null}
 
+      {/* Nullhoch, die negativen Ränder heben die zusätzliche Lücke auf: der Satz sitzt
+          genau in der Mitte zwischen Qualität und Fazit (Nutzer 2026-09-26). */}
+      {zwischenruf ? <div className="relative -my-8 h-0 md:-my-12">{zwischenruf}</div> : null}
+
       {/* Community-Fazit nach allen drei Schritten (Nutzer 2026-09-25, zuvor darüber): das Fazit
           aus Gesamteindruck, Terpenen und Beschaffenheit, in der Handschrift des Logos,
           weil es die Stimme der Community ist (Ausnahme zu Regel 3, ui-design-engine). */}
@@ -265,7 +272,9 @@ export function AromaErkundung({
           <dl className="flex flex-wrap items-end justify-center gap-x-24 gap-y-8">
             <div className="flex flex-col items-center gap-2">
               <dt className="text-small uppercase tracking-wide text-text-muted">Community-Fazit</dt>
-              <dd className="relative isolate flex justify-center">
+              {/* tabular-nums auf dem dd: gilt für die Zahl und ihre Konturen gleich,
+                  damit die Konturen deckungsgleich bleiben. */}
+              <dd className="relative isolate flex justify-center tabular-nums">
                 {/* Die Essenz der Seite (Nutzer 2026-09-25): dieselben driftenden Konturen
                     wie die Wortmarke im Hero, dazu ein ruhiges Pulsieren. */}
                 {["marke-kontur-1", "marke-kontur-2", "marke-kontur-3", "marke-kontur-4"].map((klasse) => (
@@ -282,7 +291,7 @@ export function AromaErkundung({
             {eigenesFazit !== null ? (
               <div className="flex flex-col items-center gap-2" aria-live="polite">
                 <dt className="text-small uppercase tracking-wide text-text-muted">Dein Fazit</dt>
-                <dd className="farbverlauf font-hand text-notiz leading-none">{PROZENT.format(eigenesFazit)}</dd>
+                <dd className="farbverlauf font-hand text-notiz leading-none tabular-nums">{PROZENT.format(eigenesFazit)}</dd>
                 <dd className="text-caption text-text-muted">aus deinen Reglern</dd>
               </div>
             ) : null}
