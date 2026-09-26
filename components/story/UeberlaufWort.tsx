@@ -25,8 +25,8 @@ export function UeberlaufWort({ wort, absatz = false }: { wort: string; absatz?:
       <em
         className={
           absatz
-            ? "pointer-events-none relative mx-auto -mt-[0.1em] block w-max translate-x-[0.35em] -rotate-3 text-left not-italic whitespace-nowrap"
-            : "pointer-events-none absolute bottom-0 left-0 -z-10 block w-max origin-bottom-left translate-x-[0.08em] translate-y-[0.22em] -rotate-3 text-left not-italic whitespace-nowrap"
+            ? "pointer-events-none relative -z-10 mx-auto -mt-[0.28em] block w-max translate-x-[0.35em] -rotate-3 text-left not-italic whitespace-nowrap"
+            : "pointer-events-none absolute bottom-0 left-0 -z-10 block w-max origin-bottom-left translate-x-[0.08em] translate-y-[0.34em] -rotate-3 text-left not-italic whitespace-nowrap"
         }
         style={{ fontSize: "var(--ueberlauf-grad)" }}
       >

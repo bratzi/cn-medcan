@@ -64,7 +64,7 @@ const RINGE = [
 function Punkt({ punkt }: { punkt: (typeof PUNKTE)[number] }) {
   return (
     <aside className="flex w-64 shrink-0 flex-col items-center gap-6 text-center md:w-md lg:w-lg">
-      <div data-punkt="" className="relative aspect-square w-full">
+      <div data-punkt="" className="relative isolate aspect-square w-full">
         {RINGE.map((ring, index) => (
           <span
             key={index}
@@ -77,13 +77,13 @@ function Punkt({ punkt }: { punkt: (typeof PUNKTE)[number] }) {
         ))}
         <div
           data-punkt-tiefe="1"
-          className={`blob-morph relative h-full w-full overflow-hidden ${punkt.form}`}
+          className={`blob-morph relative z-[1] h-full w-full overflow-hidden ${punkt.form}`}
           style={{ animationDelay: punkt.verzoegerung }}
         >
           <Loop id={punkt.video} className="bild-zoom h-full" />
         </div>
-        {/* Glas über einem Teil des Videos, im Wechsel Violett und Grün, schwingt mit
-            und folgt dem Zeiger (Nutzer 2026-09-26). */}
+        {/* Glas hinter dem Video, zu rund zwei Dritteln verdeckt, im Wechsel Violett und Grün,
+            schwingt mit und folgt dem Zeiger (Nutzer 2026-09-26). */}
         <GlasMaske
           tiefe="2"
           ton={punkt.glas}
