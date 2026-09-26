@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 import { NavLink } from "@/components/layout/NavLink";
-import { Wortmarke } from "@/components/marke/Wortmarke";
+import { Logo } from "@/components/marke/Logo";
 import { KontoZaehler } from "@/components/layout/KontoZaehler";
 import { KopfZustand } from "@/components/layout/KopfZustand";
 import { ThemaSchalter } from "@/components/layout/ThemaSchalter";
@@ -41,8 +41,10 @@ export function Kopf() {
           (Nutzer 2026-09-25); bis der Rand breit genug ist, rückt der Kopf dafür ein. */}
       <ThemaSchalter />
       <div className="mx-auto grid w-full max-w-360 grid-cols-[1fr_auto_auto] items-center gap-x-4 gap-y-2 py-2 pr-4 pl-16 sm:pr-8 sm:pl-20 min-[1640px]:pl-8 lg:grid-cols-[auto_1fr_auto_auto]">
-        <Link href="/" className="inline-flex min-h-11 items-center justify-self-start px-2">
-          <Wortmarke groesse="kopf" />
+        {/* Logo statt einzeiliger Wortmarke (Nutzer 2026-09-26): "Book of" klein oben,
+            "Terpz" im Fokus, Konturen, Verlauf und Glanz wie im Auftakt. */}
+        <Link href="/" className="inline-flex min-h-11 items-center justify-self-start px-2 py-1">
+          <Logo className="text-marke" />
         </Link>
 
         <nav

@@ -6,6 +6,7 @@ import { join } from "node:path";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 
+import { Logo } from "@/components/marke/Logo";
 import { Unterzeile, Wortmarke } from "@/components/marke/Wortmarke";
 
 const lies = (datei: string) => readFileSync(join(process.cwd(), datei), "utf8");
@@ -64,13 +65,22 @@ test("Handschrift: Inspiration mit Rückfall, nur 400, keine synthetischen Schni
 
 const ohneTags = (html: string) => html.replace(/<[^>]+>/g, "");
 
-test("Wortmarke im Kopf: Handschrift mit Verlauf und Glanz, echter Text", () => {
-  const html = renderToStaticMarkup(createElement(Wortmarke, { groesse: "kopf" }));
+test("Logo im Kopf: Book of klein oben, Terpz im Fokus, Konturen, Verlauf und Glanz", () => {
+  const html = renderToStaticMarkup(createElement(Logo, { className: "text-marke" }));
   assert.match(html, /\bfont-hand\b/);
   assert.match(html, /\btext-marke\b/);
-  assert.match(html, /\bglanz-wort\b/);
-  assert.equal(ohneTags(html), "Book of Terpz");
-  assert.doesNotMatch(html, /font-buch|aria-hidden|uppercase|text-accent|gb/);
+  // Zugänglicher Name genau einmal, alles Sichtbare ist Bild.
+  assert.match(html, /<span class="sr-only">Book of Terpz<\/span>/);
+  const sichtbar = html.replace(/<span class="sr-only">[^<]*<\/span>/, "");
+  assert.equal(sichtbar.match(/aria-hidden="true"/g)?.length, 5);
+  // Vier Konturen wie im Auftakt, Glanz auf beiden Zeilen des Schriftzugs.
+  for (const n of [1, 2, 3, 4]) assert.match(html, new RegExp(`marke-kontur marke-kontur-${n}`));
+  assert.equal(html.match(/\bglanz-wort\b/g)?.length, 2);
+  // "Book of" kleiner als "Terpz", und zwar oben.
+  assert.ok(html.indexOf("Book of", html.indexOf("glanz-wort") - 200) < html.lastIndexOf("Terpz"));
+  assert.match(html, /text-\[0\.45em\]/);
+  assert.doesNotMatch(html, /font-buch|uppercase|text-accent/);
+  assert.match(lies("components/layout/Kopf.tsx"), /<Logo className="text-marke" \/>/);
 });
 
 test("Wortmarke als Umschlag: zwei Zeilen, ein zugänglicher Name", () => {
@@ -151,7 +161,10 @@ test("keine Reste von Wand und Graffiti in app, components, lib (Spec TP3 15.2)"
 
 test("Handschrift nur in den Handschrift-Graden: nie unter 32 px (Spec TP3 15.3)", () => {
   const GRAD = /text-(marke|umschlag|notiz|vermerk|plakat|kulisse|manifest|erzaehlung)\b/;
-  const treffer = QUELLEN.filter((pfad) => /\.tsx?$/.test(pfad) && !pfad.endsWith(join("marke", "Wortmarke.tsx")))
+  // Wortmarke und Logo bekommen ihren Grad vom Aufrufer; "Book of" im Logo ist als Teil
+  // des Zeichens bewusst kleiner (Nutzer 2026-09-26).
+  const eigenerGrad = [join("marke", "Wortmarke.tsx"), join("marke", "Logo.tsx")];
+  const treffer = QUELLEN.filter((pfad) => /\.tsx?$/.test(pfad) && !eigenerGrad.some((datei) => pfad.endsWith(datei)))
     .flatMap((pfad) =>
       readFileSync(pfad, "utf8")
         .split("\n")

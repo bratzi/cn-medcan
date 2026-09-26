@@ -24,8 +24,12 @@ wird. Daher kommen die Farbe der Handschrift und der eine WebGL-Effekt (Abschnit
 ## 2. Name und Logo
 
 - **Wortmarke** „Book of Terpz“ in Inspiration (400), immer in `kopierstift`. Der Name ist echter Text,
-  kein Bild. Im Kopf in `text-marke` (40 px, eine Zeile), im Auftakt als `h1` in `text-umschlag`
-  (zweizeilig), im Fuß in `text-umschlag` einzeilig und unten angeschnitten.
+  kein Bild. Im Auftakt als `h1` in `text-plakat`, im Fuß einzeilig und unten angeschnitten.
+- **Logo** (Nutzer 2026-09-26, `components/marke/Logo.tsx`): die Hero-Wortmarke als Satz aus zwei
+  Zeilen, „Book of“ klein (0,45 em, als Teil des Zeichens die einzige Handschrift unter 32 px) obenauf, „Terpz“ in `text-marke` im Fokus. Wie die Auftakt-h1:
+  Verlauf Grün–Violett, feine Kopierstift-Kontur, Glanz; dahinter die vier driftenden Umrisse
+  (`.marke-kontur-N`). Steht im Kopf aller Seiten. Diese Nutzerentscheidung geht dem Verbot von
+  Verläufen unten vor (gilt für Wortmarke im Auftakt und Logo).
 - **Unterzeile** „Charge für Charge“ in Geist 500, `text-caption`, Versalien per CSS, Laufweite 0,3 em,
   in `text`. Gespeichert in natürlicher Schreibung. Schwung über Ordnung.
 - **Signet** „gB“ in Inspiration, `violett-500` auf `neutral-100`, quadratisch, aus den Glyphen der Schrift

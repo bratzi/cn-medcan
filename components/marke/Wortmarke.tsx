@@ -1,7 +1,7 @@
 import { cn } from "@/lib/cn";
 
 type Props = {
-  groesse: "kopf" | "umschlag" | "plakat";
+  groesse: "umschlag" | "plakat";
   /** Nur umschlag: "Book of Terpz" in einer Zeile (Fuß) statt in zwei (Auftakt). */
   einzeilig?: boolean;
   className?: string;
@@ -12,7 +12,7 @@ type Props = {
  * immer in Kopierstift-Violett. Der Name ist echter Text, kein Bild; wo er
  * nur Bild ist (Fuß), setzt der Aufrufer aria-hidden.
  *
- * kopf:     eine Zeile in text-marke (40 px), im Kopf aller Seiten.
+ * Im Kopf steht seit 2026-09-26 das Logo (components/marke/Logo.tsx).
  * umschlag: text-umschlag, zweizeilig im Auftakt (dort als h1), einzeilig
  *           im Fuß. Das Leerzeichen zwischen den Zeilen hält den
  *           zugänglichen Namen "Book of Terpz" zusammen. An
@@ -21,11 +21,6 @@ type Props = {
  *           (Spec Redesign 7); schreibt sich wie der Umschlag.
  */
 export function Wortmarke({ groesse, einzeilig = false, className }: Props) {
-  if (groesse === "kopf") {
-    // Verlauf Grün–Violett und Glanz wie die Hero-Wortmarke, ohne deren Konturen (Nutzer 2026-09-26).
-    return <span className={cn("glanz-wort font-hand text-marke", className)}>Book of Terpz</span>;
-  }
-
   const signatur = groesse === "plakat";
   const zeile = einzeilig || signatur ? "inline-block" : "block";
   return (
