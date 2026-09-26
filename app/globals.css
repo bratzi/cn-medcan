@@ -1237,3 +1237,49 @@ html.joint-cursor :is(input:not([type="range"]):not([type="radio"]):not([type="c
     filter: drop-shadow(0 0 9px var(--delta-farbe));
   }
 }
+
+/* Aktive Bögen der Aroma-Karte (Nutzer 2026-09-26): eine Leuchtschicht über dem
+   Bogen glüht und pulsiert im Takt von .delta-puls in der Farbe des Geschmacks,
+   ein Lichtpunkt läuft vom Geschmack zum Terpen (pathLength 100, Strich 6 von 200,
+   danach eine Pause außerhalb des Pfads). Ohne Bewegung: beides aus, der Bogen
+   selbst bleibt farbig stehen. */
+.bogen-puls,
+.bogen-fluss {
+  visibility: hidden;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .bogen-puls {
+    visibility: visible;
+    animation: bogen-puls 1.8s ease-in-out infinite;
+  }
+
+  .bogen-fluss {
+    visibility: visible;
+    filter: drop-shadow(0 0 4px var(--bogen-farbe));
+    animation: bogen-fluss 3s linear infinite;
+  }
+}
+
+@keyframes bogen-puls {
+  0%,
+  100% {
+    opacity: 0.08;
+    stroke-width: var(--bogen-breite);
+    filter: drop-shadow(0 0 1px var(--bogen-farbe));
+  }
+  50% {
+    opacity: 0.85;
+    stroke-width: calc(var(--bogen-breite) * 1.8);
+    filter: drop-shadow(0 0 calc(var(--bogen-glow) * 1px) var(--bogen-farbe));
+  }
+}
+
+@keyframes bogen-fluss {
+  from {
+    stroke-dashoffset: 6;
+  }
+  to {
+    stroke-dashoffset: -160;
+  }
+}

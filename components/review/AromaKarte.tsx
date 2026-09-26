@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useId, useRef, useState } from "react";
+import { Fragment, useEffect, useId, useRef, useState } from "react";
 
 import {
   achsenImKarte,
@@ -339,25 +339,68 @@ export function AromaKarte({
                 const auspraegung = kraft * (0.4 + 0.6 * notenAnteil);
                 // Nebennoten zeichnen feiner als die Hauptnote (Anteil 0 bis 1).
                 const gewicht = 0.35 + 0.65 * notenAnteil;
+                const breite = (1 + 3.5 * kraft) * gewicht;
+                const pfad = bogen(knoten[achse], terpenKnoten[index]);
+                // Versatz je Bogen, damit die Lichtpunkte nicht im Gleichschritt laufen.
+                const versatz = `${-((index * 0.37 + achse * 0.13) % 3).toFixed(2)}s`;
                 return (
-                  <path
-                    key={`${terpen.name}-${achse}`}
-                    d={bogen(knoten[achse], terpenKnoten[index])}
-                    fill="none"
-                    stroke={vorhanden ? farbe : GRAU}
-                    strokeLinecap="round"
-                    strokeDasharray={vorhanden ? undefined : "6 8"}
-                    opacity={vorhanden ? 0.35 + 0.65 * auspraegung : 0.3}
-                    style={{
-                      strokeWidth: vorhanden ? (1 + 3.5 * kraft) * gewicht : 0.8,
-                      filter: vorhanden
-                        ? `saturate(${(0.1 + 0.9 * auspraegung).toFixed(2)})${
-                            auspraegung > 0.45 ? ` drop-shadow(0 0 ${(2 + 8 * auspraegung).toFixed(1)}px ${leuchtfarbe})` : ""
-                          }`
-                        : "none",
-                    }}
-                    className="transition-[opacity,stroke-width,filter,stroke] duration-normal"
-                  />
+                  <Fragment key={`${terpen.name}-${achse}`}>
+                    <path
+                      d={pfad}
+                      fill="none"
+                      stroke={vorhanden ? farbe : GRAU}
+                      strokeLinecap="round"
+                      strokeDasharray={vorhanden ? undefined : "6 8"}
+                      opacity={vorhanden ? 0.35 + 0.65 * auspraegung : 0.22}
+                      style={{
+                        strokeWidth: vorhanden ? breite : 0.8,
+                        filter: vorhanden
+                          ? `saturate(${(0.1 + 0.9 * auspraegung).toFixed(2)})${
+                              auspraegung > 0.45 ? ` drop-shadow(0 0 ${(2 + 8 * auspraegung).toFixed(1)}px ${leuchtfarbe})` : ""
+                            }`
+                          : "none",
+                      }}
+                      className="transition-[opacity,stroke-width,filter,stroke] duration-normal"
+                    />
+                    {/* Aktive Bögen glühen und pulsieren im Takt der Delta-Balken links, in
+                        ihrer eigenen Farbe; ein Lichtpunkt läuft vom Geschmack zum Terpen
+                        (Nutzer 2026-09-26, globals.css .bogen-puls/.bogen-fluss). */}
+                    {vorhanden ? (
+                      <>
+                        <path
+                          d={pfad}
+                          fill="none"
+                          stroke={farbe}
+                          strokeLinecap="round"
+                          className="bogen-puls"
+                          style={
+                            {
+                              "--bogen-farbe": leuchtfarbe,
+                              "--bogen-breite": `${breite.toFixed(2)}px`,
+                              "--bogen-glow": (4 + 10 * auspraegung).toFixed(1),
+                            } as React.CSSProperties
+                          }
+                        />
+                        <path
+                          d={pfad}
+                          pathLength={100}
+                          fill="none"
+                          stroke={farbe}
+                          strokeLinecap="round"
+                          strokeDasharray="6 194"
+                          className="bogen-fluss"
+                          style={
+                            {
+                              "--bogen-farbe": leuchtfarbe,
+                              strokeWidth: Math.max(2, breite * 1.5),
+                              opacity: 0.5 + 0.5 * auspraegung,
+                              animationDelay: versatz,
+                            } as React.CSSProperties
+                          }
+                        />
+                      </>
+                    ) : null}
+                  </Fragment>
                 );
               }),
             )}
