@@ -22,7 +22,8 @@ type Props = {
  */
 export function Wortmarke({ groesse, einzeilig = false, className }: Props) {
   if (groesse === "kopf") {
-    return <span className={cn("font-hand text-marke text-kopierstift", className)}>Book of Terpz</span>;
+    // Verlauf Grün–Violett und Glanz wie die Hero-Wortmarke, ohne deren Konturen (Nutzer 2026-09-26).
+    return <span className={cn("glanz-wort font-hand text-marke", className)}>Book of Terpz</span>;
   }
 
   const signatur = groesse === "plakat";
