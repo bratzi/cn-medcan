@@ -20,9 +20,10 @@ export const auftakt: Choreografie = ({ gsap }) => {
     // fromTo statt from: der Zielwert käme sonst aus dem CSS-Einstieg (opacity 0),
     // und die Zeile bliebe unsichtbar, weil die Bühne den Notfall abschaltet.
     // Ziel 0.75 = opacity-75 am Video (Auftakt.tsx); danach übernimmt wieder die Klasse.
+    // Nur noch ein Hauch Nähe (Nutzer 2026-09-26: Video wirkte zu stark eingezoomt, vorher 1.08).
     .fromTo(
       '[data-story="auftakt-film"] video',
-      { opacity: 0, scale: 1.08 },
+      { opacity: 0, scale: 1.02 },
       { opacity: 0.75, scale: 1, duration: 3, ease: "power2.out", clearProps: "opacity,scale" },
       0,
     )
@@ -50,6 +51,7 @@ export const auftaktFilm: Choreografie = ({ gsap }) => {
   const buehne = document.querySelector<HTMLElement>('[data-story="auftakt"]');
   if (!film || !buehne) return;
   const scrub = { trigger: buehne, start: "top top", end: "bottom top", scrub: true };
-  gsap.fromTo(film, { scale: 1 }, { scale: 1.15, ease: "none", scrollTrigger: scrub });
+  // 1.05 statt 1.15 (Nutzer 2026-09-26: zu stark eingezoomt).
+  gsap.fromTo(film, { scale: 1 }, { scale: 1.05, ease: "none", scrollTrigger: scrub });
   gsap.fromTo('[data-story="titel"]', { yPercent: 0 }, { yPercent: -30, ease: "none", scrollTrigger: { ...scrub } });
 };
