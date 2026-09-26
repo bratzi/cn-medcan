@@ -3,7 +3,7 @@
 > Übergabemedium zwischen Sessions. Wird nach jedem Arbeitsblock aktualisiert und committet.
 > Wer hier weiterarbeitet, liest diese Datei zuerst und braucht den Chatverlauf nicht.
 
-**Letzte Aktualisierung:** 2026-09-25 (Session 20, Save for Clear)
+**Letzte Aktualisierung:** 2026-09-26 (Session 21)
 **Repo:** https://github.com/bratzi/cn-medcan (public)
 **Branch:** `main` (Makeover „Grünes Buch“ Teilprojekt 1 ist seit 2026-09-24 auf `main`)
 
@@ -28,7 +28,32 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 
 ## ⇢ Hier geht es weiter
 
-### ⇢ NÄCHSTE SESSION BEGINNT HIER (Stand 2026-09-25, Session 20, Save for Clear)
+### ⇢ NÄCHSTE SESSION BEGINNT HIER (Stand 2026-09-26, Session 21)
+
+**Nächster großer Task (Nutzerauftrag): englische Übersetzung mit Umschalter Deutsch/Englisch.**
+Mit superpowers:brainstorming beginnen (Routing /en vs. Cookie, Next-16-i18n-Doku in node_modules/next/dist/docs lesen,
+Texte aus Komponenten auslagern, Umschalter im Kopf neben dem Grow-Zelt, HWG-Texte beachten).
+
+**Session 21 (alles gepusht, Tests 194/194):**
+- Hero: Wortmarke einen Tick dicker (Kontur 0.012em), mehr Abstand Marke/Oberzeile/Intro; Kopfzeile-Band 80 % Breite.
+- Kopf-Wortmarke: `glanz-wort` (Verlauf Grün–Violett + Glanz wie Hero, ohne Konturen). Zelt-Icon Strich 1, Opazität 0.8.
+- `UeberlaufWort`: „prüfen wir nach.“ schließt am Satzende an (tiefer versetzt), „Terpenprofil.“ als eigene Zeile (`absatz`),
+  leicht hinter dem Satz; beide mit `glanz-wort`.
+- Storytelling: Begriffe Overall/Terpz/Qualität; Overall-Satz „wie es aussieht … und wie es sich anfühlt“.
+  `GlasMaske` (components/medien) als Scheibe in Video-Größe/Blob-Form HINTER dem Video, versetzt (~2/3 verdeckt),
+  Violett/Grün im Wechsel. Nicht am Blütenbild (Nutzer). Terpen- und Trichom-Form wurden verworfen.
+- Neuester Eintrag (Doppelseite): Blütenbild über die volle linke Kartenbreite zwischen Titel und Noten (`bildPfad`
+  in EintragDaten/RedaktionelleReview). Terpz-Schritt: kein Name/Bild über der Karte (`ohneTitel`).
+- Aroma-Karte: volle Breite (viewBox = Messbreite, Balken ab 14 px), feinere Bögen; **10 Achsen** (neu FRUCHTIG, MINZIG,
+  Aromarad-Reihenfolge, alte Matrizen lesen neue Achsen als 0), **mehrere Bögen je Terpen** nach `lib/terpen-aromen.ts`,
+  Terpene nach Achsenmittel geordnet (`ordneTerpene`), Diesel an Knoten „Thiole“ (Schwefel, kein Terpen),
+  ergänzte Terpene durchgezogen sobald > 0, Delta der Balken glüht/pulsiert (`.delta-puls`). Migration 0007 remote
+  angewendet (vorher db/constraints.sql per `d1 execute --file`, weil `migrations apply` Trigger-Blöcke nicht kann).
+- Bewertungsmaske: Sweet Spot wieder da (SweetSpot-Spuren im Terpz-Schritt, ganze Stufen). Katalog: Bild verlinkt.
+- Offen: Live-Sichtprüfung der Karte (10 Achsen, Thiole, Delta-Puls), Glas hinter Video, Zelt; Speichern in
+  /bewerten/apples-bananas testen (Sweet Spot + neue Achsen); Task 8 Rest (Testblüte freigeben).
+
+### (Vorher) NÄCHSTE SESSION BEGINNT HIER (Stand 2026-09-25, Session 20, Save for Clear)
 
 Alles gepusht und deployt (Tests 192/192). Nutzerregel neu: **Apotheken und Preise nur „in Aussicht“, nicht
 einplanen** (Memory apotheken-preise-zurueckgestellt) — Block B Schritt 7 entfällt damit bis auf Weiteres.
