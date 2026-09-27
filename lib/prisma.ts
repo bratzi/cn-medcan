@@ -22,6 +22,8 @@ type GlobalerCache = {
 
 const globalerCache = globalThis as unknown as GlobalerCache;
 
+let neubauten = 0; // Modulebene, nur Diagnose (Plan Caching v2, Schritt 1)
+
 /**
  * Prisma-Client fuer das D1-Binding.
  *
@@ -46,6 +48,7 @@ export async function getPrisma(): Promise<PrismaClient> {
     return globalerCache.prismaClient;
   }
 
+  console.log(JSON.stringify({ diag: "prisma-neu", nr: ++neubauten, bindingWechsel: Boolean(globalerCache.prismaBinding) }));
   const client = new PrismaClient({ adapter: new PrismaD1(binding) });
   globalerCache.prismaClient = client;
   globalerCache.prismaBinding = binding;

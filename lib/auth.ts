@@ -82,6 +82,8 @@ function erzeugen(prisma: PrismaClient, secret: string, baseURL: string | undefi
   });
 }
 
+let neubauten = 0; // Modulebene, nur Diagnose (Plan Caching v2, Schritt 1)
+
 export async function getAuth(): Promise<AuthInstanz> {
   const prisma = await getPrisma();
 
@@ -104,6 +106,7 @@ export async function getAuth(): Promise<AuthInstanz> {
   // OAuth-Rueckleitungen auf den falschen Host.
   const baseURL = process.env.BETTER_AUTH_URL ?? env.BETTER_AUTH_URL;
 
+  console.log(JSON.stringify({ diag: "auth-neu", nr: ++neubauten }));
   const instanz = erzeugen(prisma, secret, baseURL);
   globalerCache.authInstanz = instanz;
   globalerCache.authPrisma = prisma;
