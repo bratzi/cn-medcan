@@ -54,11 +54,15 @@ export const aktuellesMitglied = cache(async (): Promise<AngemeldetesMitglied | 
   if (!sitz) return null;
 
   const prisma = await getPrisma();
-  const satz = await prisma.mitglied.upsert({
-    where: { userId: sitz.user.id },
-    create: { userId: sitz.user.id, anzeigename: sitz.user.name },
-    update: {},
-  });
+  // Erst lesen: der Satz existiert fast immer. Nur wenn er fehlt, nachlegen -
+  // kein Schreibzugriff je Render. Eindeutigkeit sichert der Unique-Index auf userId.
+  const satz =
+    (await prisma.mitglied.findUnique({ where: { userId: sitz.user.id } })) ??
+    (await prisma.mitglied.upsert({
+      where: { userId: sitz.user.id },
+      create: { userId: sitz.user.id, anzeigename: sitz.user.name },
+      update: {},
+    }));
 
   return {
     userId: sitz.user.id,
