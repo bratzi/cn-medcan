@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect } from "react";
+import { useEffect, useSyncExternalStore } from "react";
 
 import { Seitenkopf, seitenRahmen } from "@/components/layout/Seitenkopf";
 import { Button } from "@/components/ui/Button";
@@ -16,7 +16,8 @@ import { cn } from "@/lib/cn";
  *
  * Zweisprachig in der Datei selbst (Plan Englisch, Task 6): eine Fehlergrenze
  * hat keinen Server-Elternteil, der ihr Texte geben koennte. Die Sprache steht
- * in <html lang>, das das Root-Layout setzt.
+ * in <html lang>, das das Root-Layout setzt; gelesen per useSyncExternalStore,
+ * damit Server und erstes Hydrieren gleich rendern.
  */
 const TEXTE = {
   de: {
@@ -32,6 +33,11 @@ const TEXTE = {
     start: "To the home page",
   },
 } as const;
+
+const nieAendern = () => () => {};
+const seitenSprache = () => document.documentElement.lang;
+const spracheAufDemServer = () => "de";
+
 export default function Fehler({
   error,
   retry,
@@ -43,7 +49,8 @@ export default function Fehler({
     console.error(error);
   }, [error]);
 
-  const texte = typeof document !== "undefined" && document.documentElement.lang === "en" ? TEXTE.en : TEXTE.de;
+  const lang = useSyncExternalStore(nieAendern, seitenSprache, spracheAufDemServer);
+  const texte = lang.startsWith("en") ? TEXTE.en : TEXTE.de;
 
   return (
     <>

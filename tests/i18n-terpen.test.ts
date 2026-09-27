@@ -11,3 +11,9 @@ test("terpenAnzeige: -en wird im Englischen -ene, -ol bleibt, Deutsch unveraende
   assert.equal(terpenAnzeige("Ester", "en"), "Esters");
   assert.equal(terpenAnzeige("Thiole", "en"), "Thiols");
 });
+
+test("terpenAnzeige: englische Schreibung weicht bei Guajol und Eukalyptol ab", () => {
+  assert.equal(terpenAnzeige("Guajol", "en"), "Guaiol");
+  assert.equal(terpenAnzeige("Eukalyptol", "en"), "Eucalyptol");
+  assert.equal(terpenAnzeige("Guajol", "de"), "Guajol");
+});

@@ -43,7 +43,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
 
   return (
     <html
-      lang={sprache}
+      lang={sprache === "en" ? "en-GB" : "de"}
       data-theme={THEMA_STANDARD}
       suppressHydrationWarning
       className={`${newsreader.variable} ${inspiration.variable} h-full antialiased`}

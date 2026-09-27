@@ -14,7 +14,7 @@ type Props = {
  * Formular statt onClick: geht ohne JS und vor dem Hydrieren.
  * Schmal (unter sm) steht nur die andere Sprache da, damit Logo und Konto Platz
  * behalten; die gewaehlte Sprache zeigt dort <html lang> und die Seite selbst.
- * Verborgen, bis alle Wellen uebersetzt sind (lib/i18n/schalter.ts).
+ * Sichtbar, solange I18N_OEFFENTLICH gilt (lib/i18n/schalter.ts).
  */
 export function SprachSchalter({ aktuell, gruppe }: Props) {
   if (!I18N_OEFFENTLICH) return null;
