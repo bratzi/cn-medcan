@@ -48,9 +48,15 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
   Chrome (Gate-Cookie bleibt im Browser); Chrome-Timer im Hintergrund-Tab werden gedrosselt (AbortController greift nicht).
 - Offen aus A2: Blütenseite mit Testbewertung ansehen, Testblüte in /admin/vorschlaege freigeben, Nutzer fragen, ob
   Testblüte und Testbewertung gelöscht werden (Bewertung per D1 entfernbar, Admin-Löschen gibt es nur für Community).
-- **A4 Englisch:** Plan geschrieben `docs/superpowers/plans/2026-09-27-englisch.md` (11 Tasks, 7 Abweichungen von der Spec
-  zur Nutzerbestätigung oben im Plan). Wartet auf Nutzer-Review und Wahl der Ausführung (Subagents oder inline).
-- Danach laut Gesamtliste: A5 Abschluss-Review, A6 Mobile.
+- **A4 Englisch läuft inline** (Nutzer: inline). Plan `docs/superpowers/plans/2026-09-27-englisch.md`, Ledger mit allen
+  Rulings in `.superpowers/sdd/2026-09-27-englisch/progress.md` (git-ignoriert; nach Clear dort weiter, erledigte Tasks
+  stehen als `Task N: complete`). Erledigt: Tasks 1–5 (Gerüst), 6 Welle 1 Rahmen, 7 Welle 2 Katalog + ganzer Aroma-Baum,
+  8 Welle 3 Reviews/Bewerten (`f0bacd3`, `ba8b8af`, Live-Prüfung von 8 steht aus). Test-Einstieg: `/api/sprache?wahl=en`
+  bzw. `=de`. **Offen:** Task 9 Welle 4 (Umfragen, Startseite `components/story/*`, Apotheken), 10 Welle 5 (Mitglied,
+  Vorschlagen, Benachrichtigungen + Migration 0008), 11 Freischalten (`I18N_OEFFENTLICH = true`), dann Abschluss-Review.
+  **Live-Hinweis:** Im Browser-MCP ist der Tab verborgen (`visibilityState: hidden`): React setzt nachgestreamte
+  Suspense-Inhalte dann nicht ein (kein requestAnimationFrame), Seiten wirken hängend. Kein Seitenfehler; Inhalt
+  steht versteckt in `div[hidden][id^="S:"]` und lässt sich dort prüfen. A2: Testbewertung erscheint auf der Blütenseite.
 
 ### ⇢ SESSION 22 (2026-09-26, läuft) — neu geordnete Taskliste, ersetzt alle älteren Listen darunter
 
