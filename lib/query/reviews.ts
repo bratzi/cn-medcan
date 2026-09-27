@@ -12,7 +12,6 @@ import {
 } from "@/lib/query/bewertung";
 import type { GeschmacksKategorie } from "@/db/enums";
 import type { KartenTerpen } from "@/lib/aromakarte";
-import { MEMO_TTL_MS, merke } from "@/lib/memo";
 import { getPrisma } from "@/lib/prisma";
 
 /**
@@ -140,11 +139,7 @@ function zuAnsicht(satz: Satz): RedaktionelleReview {
  * Startseite fragt sie zweimal (Kopfzeile und Doppelseite), die Datenbank
  * sieht pro Request eine Abfrage.
  */
-export const neuesteRedaktionelleReview = cache(
-  (): Promise<RedaktionelleReview | null> => merke("reviews:neueste", MEMO_TTL_MS, neuesteRedaktionelleReviewRoh)
-);
-
-async function neuesteRedaktionelleReviewRoh(): Promise<RedaktionelleReview | null> {
+export const neuesteRedaktionelleReview = cache(async (): Promise<RedaktionelleReview | null> => {
   const prisma = await getPrisma();
   const satz = await prisma.review.findFirst({
     where: { istRedaktionell: true, freigegeben: true },
@@ -152,7 +147,7 @@ async function neuesteRedaktionelleReviewRoh(): Promise<RedaktionelleReview | nu
     select: AUSWAHL,
   });
   return satz ? zuAnsicht(satz as Satz) : null;
-}
+});
 
 /** Die letzten Bewertungen des Betreibers - fuer /reviews (Schritt 6). */
 export async function redaktionelleReviews(limit = 20): Promise<RedaktionelleReview[]> {

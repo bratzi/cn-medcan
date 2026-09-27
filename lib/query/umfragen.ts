@@ -1,6 +1,5 @@
 import "server-only";
 
-import { MEMO_TTL_MS, merke } from "@/lib/memo";
 import { getPrisma } from "@/lib/prisma";
 import { istOptionHerkunft, istUmfragePhase, type OptionHerkunft, type UmfragePhase } from "@/db/enums";
 import { zuCommunityZahlen, type CommunityZahlen } from "@/lib/query/community";
@@ -58,12 +57,7 @@ export type UmfrageAnsicht = {
  * "Laufend" heisst `aktiv = 'AKTIV'`. Dass es davon hoechstens eine gibt,
  * sichert der Unique-Index auf der Spalte - nicht diese Funktion.
  */
-export function aktiveUmfrage(): Promise<UmfrageAnsicht | null> {
-  // Zaehlstaende duerfen bis zur TTL nachlaufen; die eigene Stimme liest eigeneStimme() frisch.
-  return merke("umfragen:aktiv", MEMO_TTL_MS, aktiveUmfrageRoh);
-}
-
-async function aktiveUmfrageRoh(): Promise<UmfrageAnsicht | null> {
+export async function aktiveUmfrage(): Promise<UmfrageAnsicht | null> {
   const prisma = await getPrisma();
   const satz = await prisma.umfrage.findUnique({
     where: { aktiv: "AKTIV" },
@@ -273,11 +267,7 @@ export async function umfragenUebersicht(limit = MAX_UMFRAGEN): Promise<UmfrageU
  * ein Sub-Request. Tabellennamen wie in den @@map-Angaben des Schemas.
  * Bewusst ohne Namen und Freitexte (Spec 2, §10 HWG).
  */
-export function communityZahlen(): Promise<CommunityZahlen> {
-  return merke("umfragen:zahlen", MEMO_TTL_MS, communityZahlenRoh);
-}
-
-async function communityZahlenRoh(): Promise<CommunityZahlen> {
+export async function communityZahlen(): Promise<CommunityZahlen> {
   const prisma = await getPrisma();
   const zeilen = await prisma.$queryRaw<{ stimmen: unknown; vorschlaege: unknown; runden: unknown }[]>`
     SELECT

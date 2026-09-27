@@ -5,7 +5,6 @@ import { revalidatePath } from "next/cache";
 import { bewertungPruefen } from "@/lib/bewertung-eingabe";
 import { getPrisma } from "@/lib/prisma";
 import { freigabeErforderlich } from "@/lib/session";
-import { vergiss } from "@/lib/memo";
 
 export type BewertungErgebnis = { ok: true; sofortSichtbar: boolean; slug: string } | { ok: false; fehler: string };
 
@@ -73,7 +72,6 @@ export async function bewertungSpeichern(formData: FormData): Promise<BewertungE
     },
   });
 
-  vergiss(""); // gemerkte Daten dieses Isolats (lib/memo.ts)
   revalidatePath(`/blueten/${strain.slug}`);
   revalidatePath("/");
   revalidatePath("/admin");

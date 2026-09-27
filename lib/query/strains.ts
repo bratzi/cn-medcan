@@ -11,10 +11,9 @@ import {
   type KultivarTyp,
   type RezeptStatus,
 } from "@/db/enums";
-import { MEMO_TTL_MS, merke } from "@/lib/memo";
 import { getPrisma } from "@/lib/prisma";
 
-import { leererFilter, TREFFER_PRO_SEITE, type StrainFilter } from "./filter";
+import { TREFFER_PRO_SEITE, type StrainFilter } from "./filter";
 
 /**
  * Wie viele Bestandszeilen je Produkt fuer die Liste geladen werden.
@@ -492,7 +491,7 @@ export async function ladeStrainTitel(slug: string): Promise<string | null> {
 }
 
 /** Ein Produkt mit vollem Profil. `null`, wenn unbekannt oder inaktiv. */
-async function ladeStrainDetailRoh(
+export async function ladeStrainDetail(
   slug: string,
   fachkreis: boolean
 ): Promise<StrainDetail | null> {
@@ -1077,7 +1076,7 @@ export type AromaVorzeige = {
  * Terpenangaben, mit den meisten Bewertungen. Keine Preise, keine Bestände,
  * also unabhängig vom Fachkreis-Gate.
  */
-async function ladeAromaVorzeigeRoh(): Promise<AromaVorzeige | null> {
+export async function ladeAromaVorzeige(): Promise<AromaVorzeige | null> {
   const prisma = await getPrisma();
   const zeile = await prisma.strain.findFirst({
     where: { aktiv: true, terpene: { some: {} }, reviews: { some: { freigegeben: true } } },
@@ -1145,31 +1144,8 @@ async function ladeAromaVorzeigeRoh(): Promise<AromaVorzeige | null> {
 /** Alle bekannten Terpene mit Geschmacksachse: zum Ergänzen, was der Hersteller nicht angibt. */
 export type KatalogTerpen = { name: string; geschmack: GeschmacksKategorie };
 
-async function ladeTerpenKatalogRoh(): Promise<KatalogTerpen[]> {
+export async function ladeTerpenKatalog(): Promise<KatalogTerpen[]> {
   const prisma = await getPrisma();
   const zeilen = await prisma.terpen.findMany({ orderBy: { name: "asc" }, select: { name: true, geschmack: true }, take: 200 });
   return zeilen.map((zeile) => ({ name: zeile.name, geschmack: alsGeschmacksKategorie(zeile.geschmack) }));
-}
-
-// Gemerkte Fassungen (Plan Caching v2, Schritt 6). Rolle nur im Schluessel, nie als Wert.
-const SLUG_MUSTER = /^[a-z0-9-]{1,80}$/;
-
-/** Ein Produkt mit vollem Profil. `null`, wenn unbekannt oder inaktiv. Pro Isolat gemerkt. */
-export function ladeStrainDetail(slug: string, fachkreis: boolean): Promise<StrainDetail | null> {
-  // Unsinnige Slugs nicht merken, sonst waechst der Schluesselraum mit jedem Aufruf.
-  if (!SLUG_MUSTER.test(slug)) return ladeStrainDetailRoh(slug, fachkreis);
-  return merke(`katalog:detail:${slug}:fk=${fachkreis ? 1 : 0}`, MEMO_TTL_MS, () => ladeStrainDetailRoh(slug, fachkreis));
-}
-
-export function ladeAromaVorzeige(): Promise<AromaVorzeige | null> {
-  return merke("katalog:aroma-vorzeige", MEMO_TTL_MS, ladeAromaVorzeigeRoh);
-}
-
-export function ladeTerpenKatalog(): Promise<KatalogTerpen[]> {
-  return merke("terpene:katalog", MEMO_TTL_MS, ladeTerpenKatalogRoh);
-}
-
-/** Die ungefilterte erste Katalogseite (Startseite, /blueten ohne Filter). */
-export function ladeStrainListeStart(fachkreis: boolean): Promise<StrainListe> {
-  return merke(`katalog:start:fk=${fachkreis ? 1 : 0}`, MEMO_TTL_MS, () => ladeStrainListe(leererFilter(), fachkreis));
 }

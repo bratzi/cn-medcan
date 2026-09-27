@@ -16,7 +16,6 @@ import {
   terpeneNachtragen,
 } from "@/lib/vorschlag-eingabe";
 import type { BenachrichtigungArt, VorschlagStatus } from "@/db/enums";
-import { vergiss } from "@/lib/memo";
 
 export type AdminVorschlagErgebnis = { ok: true } | { ok: false; fehler: string };
 
@@ -90,7 +89,6 @@ async function herstellerSichern(name: string): Promise<string | null> {
 }
 
 function neuLaden(slug?: string) {
-  vergiss(""); // gemerkte Daten dieses Isolats (lib/memo.ts)
   revalidatePath("/admin");
   revalidatePath("/admin/vorschlaege");
   revalidatePath("/mitglied");
