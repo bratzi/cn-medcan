@@ -170,6 +170,17 @@ export function AromaKarte({
   const [ansicht, setAnsicht] = useState<"karte" | "netz">("karte");
   const [t, setT] = useState(0);
   const [ueberfahren, setAktiv] = useState<number | null>(null);
+  // Überfahrenes Terpen oder überfahrener Begleitstoff rechts (Nutzer 2026-09-26:
+  // Hervorheben in beide Richtungen). Schließt die überfahrene Achse aus und umgekehrt.
+  const [terpenAktiv, setTerpenAktiv] = useState<string | null>(null);
+  const achseUeberfahren = (index: number) => {
+    setAktiv(index);
+    setTerpenAktiv(null);
+  };
+  const terpenUeberfahren = (name: string) => {
+    setTerpenAktiv(name);
+    setAktiv(null);
+  };
   // Achse, deren Regler per Tastatur fokussiert ist (nur :focus-visible): zeichnet
   // einen Fokusring am Griff, getrennt vom Hervorheben beim Überfahren.
   const [tastatur, setTastatur] = useState<number | null>(null);
@@ -225,6 +236,27 @@ export function AromaKarte({
   /** Farbig ist nur, was gerade aktiv ist: die hervorgehobene Achse, sonst jede Achse mit Wert. */
   const achseFarbig = (index: number) =>
     aktiv === null ? serien.some((serie) => serie.matrix[GESCHMACKS_ACHSEN[index].key] > 0.05) : aktiv === index;
+  // Welche Richtungen ein Terpen oder Begleitstoff spürbar trägt (Anteil ab 20 %, stärkste zuerst):
+  // verbindet beim Überfahren beide Seiten der Karte.
+  const traeger = new Map<string, { achse: number; anteil: number }[]>([
+    ...terpene.map(
+      (terpen) =>
+        [terpen.name, terpenBoegen(terpen).filter((b) => b.anteil >= 0.2).sort((a, b) => b.anteil - a.anteil)] as const,
+    ),
+    ...BEGLEITSTOFFE.map(
+      (stoff) =>
+        [stoff.name, begleitBoegen(stoff.noten).filter((b) => b.anteil >= 0.2).sort((a, b) => b.anteil - a.anteil)] as const,
+    ),
+  ]);
+  /** Achse gehört zum überfahrenen Terpen. */
+  const achseVerbunden = (index: number) =>
+    terpenAktiv !== null && (traeger.get(terpenAktiv) ?? []).some((b) => b.achse === index);
+  /** Achse ist betont: selbst überfahren oder vom überfahrenen Terpen getragen. */
+  const achseBetont = (index: number) => aktiv === index || achseVerbunden(index);
+  /** Terpen ist betont: selbst überfahren oder trägt die überfahrene Achse. */
+  const terpenBetont = (name: string) =>
+    terpenAktiv === name || (aktiv !== null && (traeger.get(name) ?? []).some((b) => b.achse === aktiv));
+  const etwasUeberfahren = aktiv !== null || terpenAktiv !== null;
 
   // Vor der ersten Messung wie früher im Maßstab 640 (dann per max-w-3xl
   // dargestellt); danach die gemessene viewBox-Breite. Das Netz (RADIUS)
@@ -334,7 +366,10 @@ export function AromaKarte({
       <div
         ref={messRef}
         className={cn("relative w-full", breite === null && "mx-auto max-w-3xl")}
-        onMouseLeave={() => setAktiv(null)}
+        onMouseLeave={() => {
+          setAktiv(null);
+          setTerpenAktiv(null);
+        }}
       >
         <svg ref={svgRef} viewBox={`0 0 ${aktBreite} ${HOEHE}`} aria-hidden="true" className="block w-full text-text">
           <defs>
@@ -381,9 +416,13 @@ export function AromaKarte({
           <g opacity={kartenSichtbar}>
             {terpene.flatMap((terpen, index) =>
               terpenBoegen(terpen).map(({ achse, anteil: notenAnteil }) => {
-                const kraft = staerke[terpen.name] ?? 0;
+                // Überfahrenes Terpen: seine Bögen leuchten auch, wenn es nicht angegeben ist
+                // (Lerneffekt, Mindeststärke 0,6); alle anderen Bögen treten zurück.
+                const imFokus = terpenAktiv === terpen.name;
+                const gedimmt = terpenAktiv !== null && !imFokus;
+                const kraft = imFokus ? Math.max(staerke[terpen.name] ?? 0, 0.6) : (staerke[terpen.name] ?? 0);
                 // Vorhanden: das Terpen trägt (Stärke > 0) und die Richtung ist aktiv; sonst gestrichelt grau.
-                const vorhanden = achseFarbig(achse) && kraft > 0;
+                const vorhanden = imFokus || (achseFarbig(achse) && kraft > 0);
                 const geschmack = GESCHMACKS_ACHSEN[achse].enumWert;
                 const grundfarbe = LINIEN_FARBE[geschmack];
                 const farbe = grundfarbe ?? `url(#${spurId}-${geschmack})`;
@@ -405,7 +444,7 @@ export function AromaKarte({
                       stroke={vorhanden ? farbe : GRAU}
                       strokeLinecap="round"
                       strokeDasharray={vorhanden ? undefined : "6 8"}
-                      opacity={vorhanden ? 0.35 + 0.65 * auspraegung : 0.22}
+                      opacity={(vorhanden ? 0.35 + 0.65 * auspraegung : 0.22) * (gedimmt ? 0.2 : 1)}
                       style={{
                         strokeWidth: vorhanden ? breite : 0.8,
                         filter:
@@ -427,7 +466,7 @@ export function AromaKarte({
                         ihrer eigenen Farbe; ein Lichtpunkt läuft vom Geschmack zum Terpen
                         (Nutzer 2026-09-26, globals.css .bogen-puls/.bogen-fluss). Im Netz
                         (t = 1) sind sie unsichtbar und laufen dann nicht endlos weiter. */}
-                    {vorhanden && t < 1 ? (
+                    {vorhanden && !gedimmt && t < 1 ? (
                       <>
                         <path
                           d={pfad}
@@ -469,31 +508,42 @@ export function AromaKarte({
             {/* Begleitstoffe gepunktet in neutraler Farbe: sie sind keine Terpene. */}
             {begleiter.flatMap((stoff, index) =>
               stoff.boegen.map(({ achse, anteil }) => {
-                const spuerbar = achsenWert(achse) > 0.05;
+                const imFokus = terpenAktiv === stoff.name;
+                const spuerbar = imFokus || achsenWert(achse) > 0.05;
                 return (
                   <path
                     key={`${stoff.name}-${achse}`}
                     d={bogen(knoten[achse], begleitKnoten[index])}
                     fill="none"
-                    stroke={spuerbar ? "var(--color-text-muted)" : GRAU}
+                    stroke={imFokus ? "var(--color-text)" : spuerbar ? "var(--color-text-muted)" : GRAU}
                     strokeLinecap="round"
                     strokeDasharray="2 6"
-                    opacity={spuerbar ? 0.5 + 0.4 * anteil : 0.3}
-                    style={{ strokeWidth: spuerbar ? 0.8 + 1.2 * anteil : 0.8 }}
+                    opacity={(spuerbar ? 0.5 + 0.4 * anteil : 0.3) * (terpenAktiv !== null && !imFokus ? 0.2 : 1)}
+                    style={{ strokeWidth: imFokus ? 1.5 + 2 * anteil : spuerbar ? 0.8 + 1.2 * anteil : 0.8 }}
+                    className="transition-[opacity,stroke-width,stroke] duration-normal"
                   />
                 );
               }),
             )}
             {begleitKnoten.map((punkt, index) => (
-              <circle key={begleiter[index].name} cx={punkt.x} cy={punkt.y} r={5} fill="none" stroke={GRAU} strokeWidth={1.5} />
+              <circle
+                key={begleiter[index].name}
+                cx={punkt.x}
+                cy={punkt.y}
+                r={terpenBetont(begleiter[index].name) ? 7 : 5}
+                fill="none"
+                stroke={terpenBetont(begleiter[index].name) ? "currentColor" : GRAU}
+                strokeWidth={1.5}
+              />
             ))}
+            {/* Knoten wachsen wie die Punkte der Geschmacksachsen, wenn ihr Terpen betont ist. */}
             {terpenKnoten.map((punkt, index) => (
               <circle
                 key={terpene[index].name}
                 cx={punkt.x}
                 cy={punkt.y}
-                r={6}
-                fill={(staerke[terpene[index].name] ?? 0) > 0 ? "currentColor" : GRAU}
+                r={terpenBetont(terpene[index].name) ? 8 : 6}
+                fill={(staerke[terpene[index].name] ?? 0) > 0 || terpenBetont(terpene[index].name) ? "currentColor" : GRAU}
               />
             ))}
           </g>
@@ -518,7 +568,7 @@ export function AromaKarte({
                   x2={punkt.x}
                   y2={punkt.y}
                   stroke={achseFarbig(index) ? FARBE[serie.ton] : GRAU}
-                  strokeWidth={aktiv === index ? 6 : 4}
+                  strokeWidth={achseBetont(index) ? 6 : 4}
                   strokeLinecap="round"
                   opacity={(serie.matrix[GESCHMACKS_ACHSEN[index].key] > 0.05 ? kartenSichtbar : 0) * (achseFarbig(index) ? 1 : 0.6)}
                 />
@@ -528,7 +578,7 @@ export function AromaKarte({
                   key={`p-${GESCHMACKS_ACHSEN[index].key}`}
                   cx={punkt.x}
                   cy={punkt.y}
-                  r={aktiv === index ? 6 : 4}
+                  r={achseBetont(index) ? 6 : 4}
                   fill={achseFarbig(index) || t > 0.5 ? FARBE[serie.ton] : GRAU}
                   opacity={serie.matrix[GESCHMACKS_ACHSEN[index].key] > 0.05 ? 1 : t}
                 />
@@ -697,7 +747,7 @@ export function AromaKarte({
               key={GESCHMACKS_ACHSEN[index].key}
               cx={punkt.x}
               cy={punkt.y}
-              r={aktiv === index ? 8 : 6}
+              r={achseBetont(index) ? 8 : 6}
               fill="currentColor"
             />
           ))}
@@ -710,12 +760,12 @@ export function AromaKarte({
             type="button"
             tabIndex={-1}
             aria-hidden="true"
-            onMouseEnter={() => setAktiv(index)}
-            onFocus={() => setAktiv(index)}
+            onMouseEnter={() => achseUeberfahren(index)}
+            onFocus={() => achseUeberfahren(index)}
             className={cn(
               "absolute inline-flex -translate-y-1/2 items-center gap-1.5 text-small font-medium uppercase tracking-wide whitespace-nowrap",
               t < 0.5 ? "-translate-x-full pr-4" : "-translate-x-1/2",
-              aktiv === index ? "text-text" : "text-text-muted",
+              achseBetont(index) ? "text-text" : "text-text-muted",
             )}
             style={{
               left: `${((t < 0.5 ? punkt.x - 150 * kartenSichtbar : punkt.x) / aktBreite) * 100}%`,
@@ -726,43 +776,74 @@ export function AromaKarte({
             {GESCHMACKS_ACHSEN[index].label}
           </button>
         ))}
-        {terpenKnoten.map((punkt, index) => (
-          <span
-            key={terpene[index].name}
-            aria-hidden="true"
-            className={cn(
-              "absolute inline-flex -translate-y-1/2 items-center gap-1.5 pl-4 font-buch font-medium whitespace-nowrap transition-colors duration-normal",
-              terpene.length > 6 ? "text-small" : "text-h3",
-              (staerke[terpene[index].name] ?? 0) > 0 ? "text-text" : "text-text-muted",
-            )}
-            style={{ left: `${(punkt.x / aktBreite) * 100}%`, top: `${(punkt.y / HOEHE) * 100}%`, opacity: kartenSichtbar }}
-          >
-            <TerpenIcon name={terpene[index].name} />
-            {terpene[index].name}
-          </span>
-        ))}
+        {/* Terpene rechts sind wie die Geschmäcker links Ziele fürs Hervorheben (Nutzer
+            2026-09-26): ihre Bögen leuchten, die getragenen Richtungen links werden betont. */}
+        {terpenKnoten.map((punkt, index) => {
+          const name = terpene[index].name;
+          return (
+            <button
+              key={name}
+              type="button"
+              tabIndex={-1}
+              aria-hidden="true"
+              onMouseEnter={() => terpenUeberfahren(name)}
+              onFocus={() => terpenUeberfahren(name)}
+              className={cn(
+                "absolute inline-flex -translate-y-1/2 items-center gap-1.5 pl-4 font-buch font-medium whitespace-nowrap transition-colors duration-normal",
+                terpene.length > 6 ? "text-small" : "text-h3",
+                (etwasUeberfahren ? terpenBetont(name) : (staerke[name] ?? 0) > 0) ? "text-text" : "text-text-muted",
+              )}
+              style={{ left: `${(punkt.x / aktBreite) * 100}%`, top: `${(punkt.y / HOEHE) * 100}%`, opacity: kartenSichtbar }}
+            >
+              <TerpenIcon name={name} />
+              {name}
+            </button>
+          );
+        })}
         {begleitKnoten.map((punkt, index) => (
-          <span
+          <button
             key={begleiter[index].name}
+            type="button"
+            tabIndex={-1}
             aria-hidden="true"
-            className="absolute inline-flex -translate-y-1/2 items-center gap-1.5 pl-4 text-small whitespace-nowrap text-text-muted italic"
+            onMouseEnter={() => terpenUeberfahren(begleiter[index].name)}
+            onFocus={() => terpenUeberfahren(begleiter[index].name)}
+            className={cn(
+              "absolute inline-flex -translate-y-1/2 items-center gap-1.5 pl-4 text-small whitespace-nowrap italic transition-colors duration-normal",
+              terpenBetont(begleiter[index].name) ? "text-text" : "text-text-muted",
+            )}
             style={{ left: `${(punkt.x / aktBreite) * 100}%`, top: `${(punkt.y / HOEHE) * 100}%`, opacity: kartenSichtbar }}
           >
             <TerpenIcon name={begleiter[index].name} />
             {begleiter[index].name} <span className="not-italic">({begleiter[index].hinweis})</span>
-          </span>
+          </button>
         ))}
       </div>
 
-      <p aria-live="polite" className="numeric min-h-6 text-small text-text">
-        {aktiveAchse
-          ? `${aktiveAchse.label}: ` +
-            serien.map((serie) => `${serie.name} ${WERT.format(serie.matrix[aktiveAchse.key])}`).join(" · ")
-          : regler
-            ? "Zieh die lila Punkte links: Wie stark hast du jede Geschmacksrichtung geschmeckt?"
-            : "Über eine Geschmacksrichtung fahren, um die Werte zu vergleichen."}
-      </p>
-      {aktiveAchse && lernen ? <TerpenLernen achse={aktiv!} lernen={lernen} /> : null}
+      {/* Infotext unter der Karte (Nutzer 2026-09-26): zentriert, größer, kursiv in der
+          Buchschrift, jeder Geschmack und jedes Terpen mit seinem Icon daneben. */}
+      <div aria-live="polite" className="flex min-h-16 flex-col items-center gap-2 text-center">
+        {aktiveAchse ? (
+          <p className="font-buch text-body text-text italic text-balance">
+            <Mit icon={<GeschmackIcon geschmack={aktiveAchse.enumWert} className={ICON_IM_TEXT} />}>
+              <span className="font-medium not-italic">{aktiveAchse.label}</span>
+            </Mit>
+            {": "}
+            <span className="numeric not-italic">
+              {serien.map((serie) => `${serie.name} ${WERT.format(serie.matrix[aktiveAchse.key])}`).join(" · ")}
+            </span>
+          </p>
+        ) : terpenAktiv !== null ? (
+          <TerpenTraegt name={terpenAktiv} richtungen={traeger.get(terpenAktiv) ?? []} />
+        ) : (
+          <p className="font-buch text-body text-text-muted italic text-balance">
+            {regler
+              ? "Zieh die lila Punkte links: Wie stark hast du jede Geschmacksrichtung geschmeckt?"
+              : "Fahr über eine Geschmacksrichtung oder ein Terpen, um die Verbindungen zu sehen."}
+          </p>
+        )}
+        {aktiveAchse && lernen ? <TerpenLernen achse={aktiv!} lernen={lernen} /> : null}
+      </div>
 
       {regler ? (
         <fieldset className="sr-only">
@@ -820,6 +901,59 @@ export function AromaKarte({
   );
 }
 
+/** Icons im Infotext: etwas größer als in der Beschriftung, auf der Schriftlinie. */
+const ICON_IM_TEXT = "mr-1 size-5! align-[-0.2em]";
+
+/** Icon und Name bleiben zusammen in einer Zeile. */
+function Mit({ icon, children }: { icon: React.ReactNode; children: React.ReactNode }) {
+  return (
+    <span className="whitespace-nowrap">
+      {icon}
+      {children}
+    </span>
+  );
+}
+
+/** "A", "A und B", "A, B und C". */
+function Aufzaehlung({ teile }: { teile: readonly React.ReactNode[] }) {
+  return teile.map((teil, index) => (
+    <Fragment key={index}>
+      {index > 0 ? (index === teile.length - 1 ? " und " : ", ") : null}
+      {teil}
+    </Fragment>
+  ));
+}
+
+/** Gegenrichtung zum Lerneffekt: welche Geschmacksrichtungen ein Terpen oder Begleitstoff trägt. */
+function TerpenTraegt({ name, richtungen }: { name: string; richtungen: readonly { achse: number }[] }) {
+  const begleitstoff = BEGLEITSTOFFE.some((stoff) => stoff.name === name);
+  return (
+    <p className="font-buch text-body text-text italic text-balance">
+      <Mit icon={<TerpenIcon name={name} className={ICON_IM_TEXT} />}>
+        <span className="font-medium not-italic">{name}</span>
+      </Mit>
+      {richtungen.length === 0 ? (
+        " trägt keine der zehn Richtungen spürbar."
+      ) : (
+        <>
+          {begleitstoff ? " ist kein Terpen und bringt vor allem " : " trägt vor allem "}
+          <Aufzaehlung
+            teile={richtungen.map(({ achse }) => (
+              <Mit
+                key={achse}
+                icon={<GeschmackIcon geschmack={GESCHMACKS_ACHSEN[achse].enumWert} className={ICON_IM_TEXT} />}
+              >
+                <span className="font-medium not-italic">{GESCHMACKS_ACHSEN[achse].label}</span>
+              </Mit>
+            ))}
+          />
+          .
+        </>
+      )}
+    </p>
+  );
+}
+
 /** Lerneffekt: welche Terpene eine Geschmacksrichtung tragen. */
 function TerpenLernen({ achse, lernen }: { achse: number; lernen: NonNullable<Props["lernen"]> }) {
   // Alle Terpene, die spürbar auf diese Richtung einzahlen (Anteil ab 20 %).
@@ -832,25 +966,26 @@ function TerpenLernen({ achse, lernen }: { achse: number; lernen: NonNullable<Pr
     begleitBoegen(stoff.noten).some((b) => b.achse === achse && b.anteil >= 0.2),
   ).map((stoff) => stoff.name);
   if (namen.length === 0 && stoffe.length === 0) return null;
+  const alsIcon = (name: string, farbe: string) => (
+    <Mit key={name} icon={<TerpenIcon name={name} className={ICON_IM_TEXT} />}>
+      <span className={cn("font-medium not-italic", farbe)}>{name}</span>
+    </Mit>
+  );
   return (
-    <p className="-mt-4 text-small text-text-muted text-pretty">
-      <span className="font-medium text-text">{GESCHMACKS_ACHSEN[achse].label}</span>
+    <p className="font-buch text-body text-text-muted italic text-balance">
+      <Mit icon={<GeschmackIcon geschmack={GESCHMACKS_ACHSEN[achse].enumWert} className={ICON_IM_TEXT} />}>
+        <span className="font-medium text-text not-italic">{GESCHMACKS_ACHSEN[achse].label}</span>
+      </Mit>
       {namen.length > 0 ? (
         <>
           {" steckt vor allem in "}
-          {namen.map((name, index) => (
-            <span key={name}>
-              {index > 0 ? (index === namen.length - 1 ? " und " : ", ") : null}
-              <span className="font-medium text-accent">{name}</span>
-            </span>
-          ))}
-          .
+          <Aufzaehlung teile={namen.map((name) => alsIcon(name, "text-accent"))} />.
         </>
       ) : null}
       {stoffe.length > 0 ? (
         <>
           {namen.length > 0 ? " Dazu kommen " : " kommt vor allem aus "}
-          <span className="font-medium text-text">{stoffe.join(" und ")}</span>, die keine Terpene sind.
+          <Aufzaehlung teile={stoffe.map((name) => alsIcon(name, "text-text"))} />, die keine Terpene sind.
         </>
       ) : null}
     </p>
