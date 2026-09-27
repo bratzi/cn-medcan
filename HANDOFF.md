@@ -35,13 +35,20 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
   kann gelöscht werden“, als Betreiber = redaktionell, sofort sichtbar). Blütenseite und /admin/vorschlaege danach 1102 →
   Testblüte freigeben + Anzeige prüfen steht noch aus. **Befund:** die Regler der Karte reagieren nicht auf Pfeiltasten
   (nur Ziehen) → in Task 6 (Mobile/Barrierefreiheit) prüfen.
-- **A3 Caching v2 läuft.** Schritt 0 gemessen (Tabelle im Plan): /zugang warm 8–19 ms, / 42–89 ms; Cloudflare lässt
-  eine Weile durch, dann hart 10 ms (exceededCpu) → Grundlast von Next ist das Hauptproblem (0.5 greift).
-  Commits: Schritt 1 Diagnose `ef12bf1`, 3 Cookie-Vorfilter `bd319ca`, 4 lesen statt upsert `416b05a`, 5 schlanker Titel
-  (`944d906`), 6 `lib/memo.ts` + Anwendung (TTL 300 s, Schreibaktionen leeren mit `vergiss("")`, Stimmen nicht).
-  Abweichung vom Plan: 1–6 in einem Push (13-min-Build-Regel), gemeinsam gemessen.
-  **Nächstes:** Messlauf nach Build (fetch aus Chrome + `wrangler tail`), Diagnosezeilen auswerten (Schritt 2 nötig?),
-  dann Schritt 7 (/zugang ohne searchParams), Diagnose revert, Befund an Nutzer (Grundlast > 10 ms).
+- **A3 Caching v2 — Schritte 0–5 und 7 erledigt, 6 zurückgenommen, 2 entfällt.** Messtabelle und Befund im Plan
+  `docs/superpowers/plans/2026-09-26-caching-v2.md`. Live seit Build 13:38 UTC: 3 Cookie-Vorfilter `bd319ca`,
+  4 lesen statt upsert `416b05a`, 5 schlanker Titel `944d906`, 7 /zugang statisch `50cc6dc`. `lib/memo.ts` + Tests
+  liegen ungenutzt (`2f526a6`); Anwendung per Revert `5b3b764` raus, Diagnose per Revert `71cb733` raus.
+  **Kernbefund:** Grundlast von Next liegt je Seite bei 20–90 ms CPU (Limit Free 10 ms); Cloudflare lässt das eine
+  Weile durch, dann 1102 — beim Streaming als „hängende“ Seite, weil der Abbruch nach den Kopfzeilen kommt.
+  Datencaching löst das nicht. **Nutzerentscheid nötig:** (a) Workers Paid 5 $/Monat (widerspricht „nie
+  kostenpflichtig“), (b) Schritt 8a statisches Vorrendern + `staticAssetsIncrementalCache` allein (hilft nur Seiten
+  ohne Sitzung; Startseite liest die Sitzung in Abstimmung → müsste auf Client-Abfrage umgebaut werden),
+  (c) so lassen. Messmethode: `wrangler tail --format json` in den Scratchpad + fetch-Schleife aus dem angemeldeten
+  Chrome (Gate-Cookie bleibt im Browser); Chrome-Timer im Hintergrund-Tab werden gedrosselt (AbortController greift nicht).
+- Offen aus A2: Blütenseite mit Testbewertung ansehen, Testblüte in /admin/vorschlaege freigeben, Nutzer fragen, ob
+  Testblüte und Testbewertung gelöscht werden (Bewertung per D1 entfernbar, Admin-Löschen gibt es nur für Community).
+- Danach laut Gesamtliste: A4 Englisch (writing-plans), A5 Abschluss-Review, A6 Mobile.
 
 ### ⇢ SESSION 22 (2026-09-26, läuft) — neu geordnete Taskliste, ersetzt alle älteren Listen darunter
 
