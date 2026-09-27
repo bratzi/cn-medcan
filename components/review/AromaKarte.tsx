@@ -828,26 +828,56 @@ export function AromaKarte({
         ))}
       </div>
 
-      {/* Infotext unter der Karte (Nutzer 2026-09-26, 2026-09-27): Buchschrift, kursiv; die Icons
-          stehen abgesetzt in einer eigenen Spalte links, zu jedem Terpen ein beschreibender Satz. */}
-      <div aria-live="polite" className="flex min-h-16 flex-col items-center gap-3">
+      {/* Infotext unter der Karte (Nutzer 2026-09-26, 2026-09-27): zentriert wie eine Legende im Buch.
+          Die Höhe ist fest reserviert, damit die Sektion beim Überfahren nicht springt; der Inhalt
+          blendet beim Wechsel nur über (Deckkraft). */}
+      <div aria-live="polite" className="grid min-h-64 justify-items-center sm:min-h-48">
         {aktiveAchse ? (
-          <div className="flex w-full max-w-xl flex-col gap-3">
-            <Zeile icon={<GeschmackIcon geschmack={aktiveAchse.enumWert} className={ICON_SPALTE} />}>
-              <span className="font-medium not-italic">{aktiveAchse.label}</span>
-              {": "}
-              <span className="numeric not-italic">
-                {serien.map((serie) => `${serie.name} ${WERT.format(serie.matrix[aktiveAchse.key])}`).join(" · ")}
-              </span>
-            </Zeile>
-            {lernen ? <TerpenLernen achse={aktiv!} lernen={lernen} /> : null}
-          </div>
+          <InfoTafel
+            key={`achse-${aktiveAchse.key}`}
+            art="Geschmacksrichtung"
+            icon={<GeschmackIcon geschmack={aktiveAchse.enumWert} className={ICON_TITEL} />}
+            titel={aktiveAchse.label}
+            bezugTitel={lernen ? "Steckt vor allem in" : undefined}
+            bezug={lernen ? tragendeStoffe(aktiv!, lernen).map((name) => (
+              <Pille key={name} icon={<TerpenIcon name={name} className={ICON_PILLE} />}>
+                {name}
+              </Pille>
+            )) : []}
+          >
+            <span className="inline-flex flex-wrap items-center justify-center gap-x-4 gap-y-2">
+              {serien.map((serie) => (
+                <span key={serie.name} className="inline-flex items-center gap-2">
+                  <span aria-hidden="true" className="size-2 rounded-full" style={{ backgroundColor: FARBE[serie.ton] }} />
+                  <span className="text-text-muted">{serie.name}</span>
+                  <span className="numeric text-text">{WERT.format(serie.matrix[aktiveAchse.key])}</span>
+                </span>
+              ))}
+            </span>
+          </InfoTafel>
         ) : terpenAktiv !== null ? (
-          <div className="flex w-full max-w-xl flex-col gap-3">
-            <TerpenTraegt name={terpenAktiv} richtungen={traeger.get(terpenAktiv) ?? []} />
-          </div>
+          <InfoTafel
+            key={`terpen-${terpenAktiv}`}
+            art={BEGLEITSTOFFE.some((stoff) => stoff.name === terpenAktiv) ? "Begleitstoff" : "Terpen"}
+            icon={<TerpenIcon name={terpenAktiv} className={ICON_TITEL} />}
+            titel={terpenAktiv}
+            bezugTitel="Trägt vor allem"
+            bezug={(traeger.get(terpenAktiv) ?? []).map(({ achse }) => (
+              <Pille
+                key={achse}
+                icon={<GeschmackIcon geschmack={GESCHMACKS_ACHSEN[achse].enumWert} className={ICON_PILLE} />}
+              >
+                {GESCHMACKS_ACHSEN[achse].label}
+              </Pille>
+            ))}
+          >
+            {aromaSatz(terpenAktiv)}
+          </InfoTafel>
         ) : (
-          <p className="text-center font-buch text-body text-text-muted italic text-balance">
+          <p
+            key="hinweis"
+            className="max-w-md pt-8 text-center font-buch text-body text-text-muted italic text-balance transition-opacity duration-normal ease-out starting:opacity-0"
+          >
             {regler
               ? "Zieh die lila Punkte links: Wie stark hast du jede Geschmacksrichtung geschmeckt?"
               : "Fahr über eine Geschmacksrichtung oder ein Terpen, um die Verbindungen zu sehen."}
@@ -911,62 +941,64 @@ export function AromaKarte({
   );
 }
 
-/** Icons im Infotext: in der eigenen Spalte links, mittig zur ersten Textzeile. */
-const ICON_SPALTE = "mt-0.5 size-5! shrink-0";
+/** Icon vor dem Namen im Infotext: abgesetzt, in Größe der Zeile. */
+const ICON_TITEL = "size-6! shrink-0 text-text-muted";
+/** Icon in einer Pille: klein, gedämpft, damit der Name führt. */
+const ICON_PILLE = "size-4! shrink-0 text-text-muted";
 
-/** Eine Zeile des Infotexts: Icon abgesetzt links, Text rechts daneben. Ohne Icon bleibt die Spalte leer. */
-function Zeile({ icon, gedaempft, children }: { icon?: React.ReactNode; gedaempft?: boolean; children: React.ReactNode }) {
+/**
+ * Legende unter der Karte: kleine Versalzeile, Name mit abgesetztem Icon, ein Satz, darunter die
+ * Verbindungen als Pillen. Drei Grade (caption, h3, body), zentriert.
+ */
+function InfoTafel({
+  art,
+  icon,
+  titel,
+  bezugTitel,
+  bezug,
+  children,
+}: {
+  art: string;
+  icon: React.ReactNode;
+  titel: string;
+  bezugTitel?: string;
+  bezug: readonly React.ReactNode[];
+  children: React.ReactNode;
+}) {
   return (
-    <div className="grid grid-cols-[1.25rem_1fr] items-start gap-x-3 text-left">
-      <span aria-hidden="true" className="flex">
-        {icon}
-      </span>
-      <p className={cn("font-buch text-body italic text-pretty", gedaempft ? "text-text-muted" : "text-text")}>
-        {children}
+    <div className="flex w-full max-w-xl flex-col items-center gap-2 text-center transition-opacity duration-normal ease-out starting:opacity-0">
+      <p className="text-caption tracking-wide text-text-muted uppercase">{art}</p>
+      <p className="inline-flex items-center gap-2 font-buch text-h3 text-text">
+        <span aria-hidden="true" className="flex">
+          {icon}
+        </span>
+        {titel}
       </p>
+      {children ? <p className="max-w-md font-buch text-body text-text-muted italic text-pretty">{children}</p> : null}
+      {bezug.length > 0 ? (
+        <div className="mt-2 flex flex-col items-center gap-2">
+          {bezugTitel ? <p className="text-caption tracking-wide text-text-muted uppercase">{bezugTitel}</p> : null}
+          <ul className="flex flex-wrap justify-center gap-2">{bezug}</ul>
+        </div>
+      ) : null}
     </div>
   );
 }
 
-/** Name und Satz eines Terpens oder Begleitstoffs als Zeile. */
-function TerpenZeile({ name, farbe }: { name: string; farbe: string }) {
-  const satz = aromaSatz(name);
+/** Eine Verbindung als ruhige Pille: Icon abgesetzt links, Name rechts. */
+function Pille({ icon, children }: { icon: React.ReactNode; children: React.ReactNode }) {
   return (
-    <Zeile icon={<TerpenIcon name={name} className={ICON_SPALTE} />} gedaempft>
-      <span className={cn("font-medium not-italic", farbe)}>{name}</span>
-      {satz ? `: ${satz}` : null}
-    </Zeile>
+    <li className="inline-flex h-8 items-center gap-2 rounded-full border border-border px-4 text-caption text-text">
+      <span aria-hidden="true" className="flex">
+        {icon}
+      </span>
+      {children}
+    </li>
   );
 }
 
-/** Gegenrichtung zum Lerneffekt: was ein Terpen oder Begleitstoff ist und welche Richtungen es trägt. */
-function TerpenTraegt({ name, richtungen }: { name: string; richtungen: readonly { achse: number }[] }) {
-  const satz = aromaSatz(name);
-  return (
-    <>
-      <Zeile icon={<TerpenIcon name={name} className={ICON_SPALTE} />}>
-        <span className="font-medium not-italic">{name}</span>
-        {satz ? `: ${satz}` : null}
-      </Zeile>
-      {richtungen.length === 0 ? (
-        <Zeile gedaempft>Trägt keine der zehn Richtungen spürbar.</Zeile>
-      ) : (
-        <>
-          <Zeile gedaempft>Trägt vor allem:</Zeile>
-          {richtungen.map(({ achse }) => (
-            <Zeile key={achse} icon={<GeschmackIcon geschmack={GESCHMACKS_ACHSEN[achse].enumWert} className={ICON_SPALTE} />}>
-              <span className="font-medium not-italic">{GESCHMACKS_ACHSEN[achse].label}</span>
-            </Zeile>
-          ))}
-        </>
-      )}
-    </>
-  );
-}
-
-/** Lerneffekt: welche Terpene eine Geschmacksrichtung tragen, je Terpen mit seinem Satz. */
-function TerpenLernen({ achse, lernen }: { achse: number; lernen: NonNullable<Props["lernen"]> }) {
-  // Alle Terpene, die spürbar auf diese Richtung einzahlen (Anteil ab 20 %).
+/** Lerneffekt: Terpene und Begleitstoffe, die spürbar auf diese Richtung einzahlen (Anteil ab 20 %). */
+function tragendeStoffe(achse: number, lernen: NonNullable<Props["lernen"]>): string[] {
   const namen = lernen
     .filter((terpen) =>
       terpenBoegen({ ...terpen, konzentrationProzent: null, rang: 99 }).some((b) => b.achse === achse && b.anteil >= 0.2),
@@ -975,16 +1007,5 @@ function TerpenLernen({ achse, lernen }: { achse: number; lernen: NonNullable<Pr
   const stoffe = BEGLEITSTOFFE.filter((stoff) =>
     begleitBoegen(stoff.noten).some((b) => b.achse === achse && b.anteil >= 0.2),
   ).map((stoff) => stoff.name);
-  if (namen.length === 0 && stoffe.length === 0) return null;
-  return (
-    <>
-      <Zeile gedaempft>Steckt vor allem in:</Zeile>
-      {namen.map((name) => (
-        <TerpenZeile key={name} name={name} farbe="text-accent" />
-      ))}
-      {stoffe.map((name) => (
-        <TerpenZeile key={name} name={name} farbe="text-text" />
-      ))}
-    </>
-  );
+  return [...namen, ...stoffe];
 }
