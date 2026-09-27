@@ -71,6 +71,15 @@ export function RundeAnlegenFormular() {
         feldClassName="w-64"
       />
 
+      <Input
+        id="umfrage-vorschlag-bis"
+        label="Vorschläge bis"
+        name="vorschlagBisAm"
+        type="date"
+        hinweis="Freiwillig. Gilt bis zum Ende dieses Tages und wird auf dem Stimmzettel angezeigt."
+        feldClassName="w-64"
+      />
+
       {fehler ? <Meldung art="fehler">{fehler}</Meldung> : null}
 
       <div>

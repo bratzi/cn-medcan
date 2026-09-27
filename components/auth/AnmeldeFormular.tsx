@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 
 import { signIn } from "@/lib/auth-client";
 import { zaehlerZuruecksetzen } from "@/components/layout/konto-zaehler-speicher";
-import { Button, Input } from "@/components/ui";
+import { Button, Input, useHydriert } from "@/components/ui";
 import { fehlertext } from "./fehlertexte";
 
 type Props = {
@@ -15,6 +15,7 @@ type Props = {
 
 export function AnmeldeFormular({ weiter }: Props) {
   const router = useRouter();
+  const hydriert = useHydriert();
   const [laeuft, setLaeuft] = useState(false);
   const [fehler, setFehler] = useState<string | null>(null);
 
@@ -71,7 +72,7 @@ export function AnmeldeFormular({ weiter }: Props) {
         </p>
       ) : null}
 
-      <Button type="submit" disabled={laeuft}>
+      <Button type="submit" disabled={!hydriert || laeuft}>
         {laeuft ? "Wird geprüft …" : "Anmelden"}
       </Button>
     </form>

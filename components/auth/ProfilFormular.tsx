@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { profilSpeichern } from "@/app/mitglied/aktionen";
-import { Button, Input } from "@/components/ui";
+import { Button, Input, useHydriert } from "@/components/ui";
 
 type Props = {
   anzeigename: string;
@@ -13,6 +13,7 @@ type Props = {
 
 export function ProfilFormular({ anzeigename, instagramHandle }: Props) {
   const router = useRouter();
+  const hydriert = useHydriert();
   const [laeuft, setLaeuft] = useState(false);
   const [fehler, setFehler] = useState<string | null>(null);
   const [gespeichert, setGespeichert] = useState(false);
@@ -77,7 +78,7 @@ export function ProfilFormular({ anzeigename, instagramHandle }: Props) {
       ) : null}
 
       <div>
-        <Button type="submit" disabled={laeuft}>
+        <Button type="submit" disabled={!hydriert || laeuft}>
           {laeuft ? "Wird gespeichert …" : "Speichern"}
         </Button>
       </div>

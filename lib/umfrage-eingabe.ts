@@ -138,6 +138,52 @@ export function umfrageEingabePruefen(
   };
 }
 
+/** Versatz von Europe/Berlin gegen UTC in Minuten zum Zeitpunkt `zeit`. */
+function berlinVersatzMinuten(zeit: Date): number {
+  const teil = new Intl.DateTimeFormat("en-US", {
+    timeZone: "Europe/Berlin",
+    timeZoneName: "longOffset",
+  })
+    .formatToParts(zeit)
+    .find((t) => t.type === "timeZoneName")?.value;
+  const treffer = /GMT([+-])(\d{2}):(\d{2})/.exec(teil ?? "");
+  if (!treffer) return 0;
+  const minuten = Number(treffer[2]) * 60 + Number(treffer[3]);
+  return treffer[1] === "-" ? -minuten : minuten;
+}
+
+/**
+ * Frist fuer Vorschlaege einer neuen Runde, aus `<input type="date">`.
+ *
+ * Freiwillig: leer wird zu null. Ein Tag gilt bis zu seinem Ende in Berlin
+ * (23:59:59.999 Ortszeit), sonst liefe die Frist je nach Sommer- oder
+ * Winterzeit schon am Abend davor ab. Ein vergangener Tag ist ein
+ * Tippfehler, keine Frist. Ein geplantes Abstimmungsende gibt es im Schema
+ * nicht (`endetAm` setzt erst das Beenden), daher kein Vergleich damit.
+ */
+export function vorschlagFristPruefen(
+  roh: string,
+  jetzt: Date = new Date(),
+): UmfragePruefErgebnis<Date | null> {
+  const text = roh.trim();
+  if (text.length === 0) return { ok: true, wert: null };
+
+  const teile = /^(\d{4})-(\d{2})-(\d{2})$/.exec(text);
+  const tagesEndeUtc = teile
+    ? new Date(Date.UTC(Number(teile[1]), Number(teile[2]) - 1, Number(teile[3]), 23, 59, 59, 999))
+    : null;
+  // Rundreise faengt "2026-02-30" ab, das Date.UTC stillschweigend verschiebt.
+  if (!tagesEndeUtc || tagesEndeUtc.toISOString().slice(0, 10) !== text) {
+    return { ok: false, fehler: "Vorschläge bis: bitte ein gültiges Datum angeben." };
+  }
+
+  const frist = new Date(tagesEndeUtc.getTime() - berlinVersatzMinuten(tagesEndeUtc) * 60_000);
+  if (frist.getTime() < jetzt.getTime()) {
+    return { ok: false, fehler: "Vorschläge bis: das Datum liegt in der Vergangenheit." };
+  }
+  return { ok: true, wert: frist };
+}
+
 /**
  * Wer gewinnt.
  *

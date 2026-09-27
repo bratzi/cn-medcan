@@ -9,6 +9,7 @@ import {
   gewinnerErmitteln,
   phasenwechselPruefen,
   umfrageEingabePruefen,
+  vorschlagFristPruefen,
   type OptionFuerAuswertung,
 } from "@/lib/umfrage-eingabe";
 
@@ -40,6 +41,9 @@ export async function umfrageAnlegen(formData: FormData): Promise<AdminUmfrageEr
   );
   if (!geprueft.ok) return geprueft;
 
+  const frist = vorschlagFristPruefen(String(formData.get("vorschlagBisAm") ?? ""));
+  if (!frist.ok) return frist;
+
   const prisma = await getPrisma();
   try {
     await prisma.umfrage.create({
@@ -47,6 +51,7 @@ export async function umfrageAnlegen(formData: FormData): Promise<AdminUmfrageEr
         titel: geprueft.wert.titel,
         beschreibung: geprueft.wert.beschreibung,
         communityPlaetze: geprueft.wert.communityPlaetze,
+        vorschlagBisAm: frist.wert,
         phase: "VORSCHLAG",
         aktiv: "AKTIV",
       },
