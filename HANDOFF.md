@@ -41,6 +41,20 @@ in ihrer Geschmacksfarbe, Lichtpunkt läuft Geschmack → Terpen (`a3a8431`, `.b
 Kopf** (`962ccc8`, components/marke/Logo.tsx: „Book of“ 0,45 em oben, „Terpz“ text-marke, vier Konturen, Verlauf,
 Glanz; Brand-Doku §2 angepasst); 24 geprüfte Skills installiert (`3192b53`). Live noch NICHT gesehen.
 
+**⇢ STAND ZUM CLEAR (2026-09-27): WELLE 1 UND 2 (Code) FERTIG, alles gepusht, Tests 250/250, Baum sauber.**
+Welle 2: Instagram-Zwei-Klick `97e62d1`, Vorschlagsfrist + Hydrations-Sperre `45f8c9f`, three/Apotheken raus
+`60a959d`, **/produkte → /blueten** mit 308-Weiterleitungen `f3c098d` (lib/alte-adressen.ts). Kein Agent läuft.
+**Nächste Session, der Reihe nach:**
+1. Live-Sichtprüfung (Chrome vorn, Nutzer angemeldet): Logo im Kopf, Aroma-Bögen (Puls, Lichtpunkt, Hover in beide
+   Richtungen, Infotext mit Icons), „stimmt das?“ zwischen Qualität und Fazit, Pin „Umschlag wird Seite“ (≥768 px,
+   Sprung? Schatten?), Kopf hell/dunkel über Hero, Stimmbalken/Zähler, Hintergrund-Tab-Einstieg, Impressum/Datenschutz
+   ohne Passwort, Instagram-Klick, /produkte leitet um; dazu Session-21-Rückstand (Glas, Zelt, Kopfzeile 80 %, Fuß).
+2. /bewerten/apples-bananas speichern; Testblüte in /admin/vorschlaege freigeben, danach fragen ob löschen.
+3. Nutzer: Freigabe beider Specs (i18n: Accept-Language?, en-GB?, Umschalter erst ab Welle 2?; Caching: 300 s oder
+   60 s) → writing-plans für i18n, Caching ab Schritt 0 (Messung); Nutzer-Entscheid inaktive Blüte bei Freigabe
+   reaktivieren?; Platzhalter in lib/rechtliches.ts füllt der Nutzer.
+4. Welle 3 (Caching, i18n), dann Abschluss-Review.
+
 **Stand 2026-09-27, später: WELLE 1 FERTIG, alles gepusht, Tests 231/231.** W1-A `0d278c2` (Pin „Umschlag wird Seite“
 abschaltbar über `UMSCHLAG_WIRD_SEITE` in bewegung/auftakt.ts, `data-ruhend` in bewegung/ruhe.ts), W1-C `43e3105`
 (Entscheid offen: Freigabe einer inaktiven Blüte mit gleicher Id schaltet sie wieder aktiv), W1-D `42e35fd` (Nutzer
