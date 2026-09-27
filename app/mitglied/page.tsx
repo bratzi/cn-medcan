@@ -10,30 +10,26 @@ import { benachrichtigungenLaden } from "@/lib/query/benachrichtigungen";
 import { eigeneVorschlaege } from "@/lib/query/vorschlaege";
 import { holeWoerterbuch } from "@/lib/i18n";
 import { aktuellesMitglied } from "@/lib/session";
-import type { MitgliedRolle, VorschlagStatus } from "@/db/enums";
+import type { VorschlagStatus } from "@/db/enums";
+import { benachrichtigungSatz } from "@/lib/benachrichtigung";
+import { formatiereDatum } from "@/lib/format";
+import { holeSprache } from "@/lib/i18n";
+import { t } from "@/lib/i18n/text";
 
-export const metadata: Metadata = {
-  title: "Mein Konto",
-  robots: { index: false, follow: false },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return { title: (await holeWoerterbuch()).kopf.navigation.konto, robots: { index: false, follow: false } };
+}
 
-const ROLLEN_LABEL: Record<MitgliedRolle, string> = {
-  MITGLIED: "Mitglied",
-  FACHKREIS: "Fachkreis",
-  ADMIN: "Betreiber",
-};
-
-const DATUM_KURZ = new Intl.DateTimeFormat("de-DE", { dateStyle: "medium" });
-
-const STATUS_BADGE: Record<VorschlagStatus, { text: string; variante: "warning" | "success" | "danger" }> = {
-  OFFEN: { text: "Wird geprüft", variante: "warning" },
-  FREIGEGEBEN: { text: "Im Katalog", variante: "success" },
-  ABGELEHNT: { text: "Abgelehnt", variante: "danger" },
+const STATUS_VARIANTE: Record<VorschlagStatus, "warning" | "success" | "danger"> = {
+  OFFEN: "warning",
+  FREIGEGEBEN: "success",
+  ABGELEHNT: "danger",
 };
 
 export default async function MitgliedPage() {
   const mitglied = await aktuellesMitglied();
-  const w = await holeWoerterbuch();
+  const [w, sprache] = await Promise.all([holeWoerterbuch(), holeSprache()]);
+  const texte = w.mitglied;
   if (!mitglied) redirect("/anmelden?weiter=%2Fmitglied");
 
   const [nachrichten, vorschlaege] = await Promise.all([
@@ -46,7 +42,7 @@ export default async function MitgliedPage() {
     <div className="mx-auto w-full max-w-180 px-4 py-16 sm:px-8">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <h1 className="text-h1 text-text">Mein Konto</h1>
+          <h1 className="text-h1 text-text">{w.kopf.navigation.konto}</h1>
           <p className="mt-2 text-body text-text-muted">{mitglied.email}</p>
         </div>
         <AbmeldeButton texte={w.auth.formular} />
@@ -56,7 +52,7 @@ export default async function MitgliedPage() {
         <Card>
           <CardHeader>
             <h2 id="status-titel" className="text-h3 text-text">
-              Status
+              {texte.status}
             </h2>
           </CardHeader>
           <CardBody className="flex flex-col gap-4">
@@ -64,19 +60,19 @@ export default async function MitgliedPage() {
               {/* Zustand nie nur ueber Farbe: das Badge traegt Klartext und
                   einen Formmarker, daneben steht ein erklaerender Satz. */}
               {mitglied.freigegeben ? (
-                <Badge variante="success">Freigegeben</Badge>
+                <Badge variante="success">{texte.freigegeben}</Badge>
               ) : (
-                <Badge variante="warning">Freigabe steht aus</Badge>
+                <Badge variante="warning">{texte.freigabeAus}</Badge>
               )}
               <Badge variante="neutral" zeichen={false}>
-                Rolle: {ROLLEN_LABEL[mitglied.rolle]}
+                {t(texte.rolle, { rolle: texte.rollen[mitglied.rolle] })}
               </Badge>
             </div>
 
             <p className="max-w-[68ch] text-body text-text-muted">
               {mitglied.freigegeben
-                ? "Das Konto ist freigegeben. Damit besteht Stimmrecht in Umfragen."
-                : "Der Betreiber gibt Konten von Hand frei. Bis dahin sind Vorschläge und Abstimmungen gesperrt; der Katalog bleibt lesbar."}
+                ? texte.freigegebenText
+                : texte.nichtFreigegebenText}
             </p>
           </CardBody>
         </Card>
@@ -86,26 +82,26 @@ export default async function MitgliedPage() {
         <Card>
           <CardHeader>
             <h2 id="nachrichten-titel" className="text-h3 text-text">
-              Benachrichtigungen
+              {texte.benachrichtigungen}
             </h2>
           </CardHeader>
           <CardBody>
             {nachrichten.length === 0 ? (
-              <p className="text-body text-text-muted">Noch nichts Neues.</p>
+              <p className="text-body text-text-muted">{texte.nichtsNeues}</p>
             ) : (
               <ul className="flex flex-col gap-4">
                 {nachrichten.map((n) => (
                   <li key={n.id} className="flex flex-col gap-2">
                     <span className="flex flex-wrap items-center gap-2 text-small text-text-muted">
-                      <span className="numeric">{DATUM_KURZ.format(n.erstelltAm)}</span>
-                      {!n.gelesen ? <Badge variante="accent">Neu</Badge> : null}
+                      <span className="numeric">{formatiereDatum(n.erstelltAm, sprache)}</span>
+                      {!n.gelesen ? <Badge variante="accent">{texte.neu}</Badge> : null}
                     </span>
                     {n.link ? (
                       <Link href={n.link} className={textLinkKlassen()}>
-                        {n.text}
+                        {benachrichtigungSatz(w.benachrichtigung, n)}
                       </Link>
                     ) : (
-                      <span className="text-body text-text">{n.text}</span>
+                      <span className="text-body text-text">{benachrichtigungSatz(w.benachrichtigung, n)}</span>
                     )}
                   </li>
                 ))}
@@ -120,12 +116,12 @@ export default async function MitgliedPage() {
         <Card>
           <CardHeader>
             <h2 id="vorschlaege-titel" className="text-h3 text-text">
-              Meine Vorschläge
+              {texte.meineVorschlaege}
             </h2>
           </CardHeader>
           <CardBody className="flex flex-col items-start gap-6">
             {vorschlaege.length === 0 ? (
-              <p className="text-body text-text-muted">Du hast noch keine Blüte vorgeschlagen.</p>
+              <p className="text-body text-text-muted">{texte.keineVorschlaege}</p>
             ) : (
               <ul className="flex w-full flex-col gap-4">
                 {vorschlaege.map((v) => (
@@ -138,17 +134,17 @@ export default async function MitgliedPage() {
                       ) : (
                         <span className="text-body text-text wrap-break-word">{v.handelsname}</span>
                       )}
-                      <Badge variante={STATUS_BADGE[v.status].variante}>{STATUS_BADGE[v.status].text}</Badge>
+                      <Badge variante={STATUS_VARIANTE[v.status]}>{texte.vorschlagStatus[v.status]}</Badge>
                     </span>
                     {v.status === "ABGELEHNT" && v.begruendung ? (
-                      <span className="text-small text-text-muted">Grund: {v.begruendung}</span>
+                      <span className="text-small text-text-muted">{t(texte.grund, { text: v.begruendung })}</span>
                     ) : null}
                   </li>
                 ))}
               </ul>
             )}
             <Link href="/vorschlagen" className={buttonKlassen("secondary")}>
-              Blüte vorschlagen
+              {texte.vorschlagen}
             </Link>
           </CardBody>
         </Card>
@@ -162,15 +158,15 @@ export default async function MitgliedPage() {
           <Card>
             <CardHeader>
               <h2 id="verwaltung-titel" className="text-h3 text-text">
-                Verwaltung
+                {texte.verwaltung}
               </h2>
             </CardHeader>
             <CardBody className="flex flex-col items-start gap-4">
               <p className="max-w-[68ch] text-body text-text-muted">
-                Mitglieder freigeben und Rollen vergeben.
+                {texte.verwaltungText}
               </p>
               <Link href="/admin" className={buttonKlassen("secondary")}>
-                Zur Verwaltung
+                {texte.zurVerwaltung}
               </Link>
             </CardBody>
           </Card>
@@ -181,13 +177,14 @@ export default async function MitgliedPage() {
         <Card>
           <CardHeader>
             <h2 id="profil-titel" className="text-h3 text-text">
-              Angaben
+              {texte.angaben}
             </h2>
           </CardHeader>
           <CardBody>
             <ProfilFormular
               anzeigename={mitglied.anzeigename}
               instagramHandle={mitglied.instagramHandle}
+              texte={texte.profil}
             />
           </CardBody>
         </Card>

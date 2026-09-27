@@ -7,6 +7,8 @@ import { getPrisma } from "@/lib/prisma";
 import { istEindeutigkeitsfehler } from "@/lib/prisma-fehler";
 import { blueteVorhanden, terpenNamen } from "@/lib/query/vorschlaege";
 import { MAX_OFFENE_VORSCHLAEGE, blueteVorschlagPruefen } from "@/lib/vorschlag-eingabe";
+import { holeWoerterbuch } from "@/lib/i18n";
+import { meldungText } from "@/lib/i18n/text";
 
 export type VorschlagErgebnis =
   | { ok: true }
@@ -25,9 +27,10 @@ export type VorschlagErgebnis =
  */
 export async function blueteVorschlagen(formData: FormData): Promise<VorschlagErgebnis> {
   const mitglied = await mitgliedErforderlich();
+  const wb = await holeWoerterbuch();
 
   const geprueft = blueteVorschlagPruefen(formData, await terpenNamen());
-  if (!geprueft.ok) return geprueft;
+  if (!geprueft.ok) return { ok: false, fehler: meldungText(wb, geprueft.fehler) };
   const w = geprueft.wert;
 
   // Eine inaktive Bluete steht nicht im Katalog: kein Link ins Leere, der
@@ -36,7 +39,7 @@ export async function blueteVorschlagen(formData: FormData): Promise<VorschlagEr
   if (vorhanden?.aktiv) {
     return {
       ok: false,
-      fehler: "Diese Blüte steht schon im Katalog.",
+      fehler: wb.meldung["vorschlag.schonImKatalog"],
       vorhanden: { slug: vorhanden.slug, handelsname: vorhanden.handelsname },
     };
   }
@@ -50,7 +53,7 @@ export async function blueteVorschlagen(formData: FormData): Promise<VorschlagEr
   if (offen >= MAX_OFFENE_VORSCHLAEGE) {
     return {
       ok: false,
-      fehler: `Du hast schon ${MAX_OFFENE_VORSCHLAEGE} offene Vorschläge. Sobald wir sie geprüft haben, geht es weiter.`,
+      fehler: meldungText(wb, { schluessel: "vorschlag.zuVieleOffen", parameter: { max: MAX_OFFENE_VORSCHLAEGE } }),
     };
   }
 
@@ -74,7 +77,7 @@ export async function blueteVorschlagen(formData: FormData): Promise<VorschlagEr
     if (istEindeutigkeitsfehler(fehler)) {
       return {
         ok: false,
-        fehler: "Diese Blüte hast du schon vorgeschlagen. Den Stand siehst du unter Mein Konto.",
+        fehler: wb.meldung["vorschlag.schonVorgeschlagen"],
         schonVorgeschlagen: true,
       };
     }

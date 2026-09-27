@@ -594,6 +594,8 @@ model Benachrichtigung {
   /// Werte nach BENACHRICHTIGUNG_ARTEN in db/enums.ts.
   art       String
   text      String
+  /// JSON mit handelsname und optional begruendung; null bei alten Zeilen (Spec Englisch 5.4).
+  parameter String?
   /// Immer ein interner Pfad, vom Server gesetzt.
   link      String?
   gelesenAm DateTime? @map("gelesen_am")

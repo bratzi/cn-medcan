@@ -14,7 +14,7 @@ test("Texte ohne Gedankenstrich, Handelsname unveraendert", () => {
 });
 
 test("nachrichtenFuer: eine Nachricht je Mitglied", () => {
-  const liste = nachrichtenFuer(["a", "b", "a"], { art: "VORSCHLAG_FREIGEGEBEN", text: "t", link: "/blueten/x" });
+  const liste = nachrichtenFuer(["a", "b", "a"], { art: "VORSCHLAG_FREIGEGEBEN", text: "t", parameter: null, link: "/blueten/x" });
   assert.deepEqual(liste.map((n) => n.mitgliedId), ["a", "b"]);
   assert.equal(liste[0].link, "/blueten/x");
 });

@@ -8,7 +8,15 @@ export async function ungeleseneAnzahl(mitgliedId: string): Promise<number> {
   return prisma.benachrichtigung.count({ where: { mitgliedId, gelesenAm: null } });
 }
 
-export type Eintrag = { id: string; text: string; link: string | null; gelesen: boolean; erstelltAm: Date };
+export type Eintrag = {
+  id: string;
+  art: string;
+  text: string;
+  parameter: string | null;
+  link: string | null;
+  gelesen: boolean;
+  erstelltAm: Date;
+};
 
 /** Neueste zuerst; nur die eigenen (mitgliedId aus der Sitzung). */
 export async function benachrichtigungenLaden(mitgliedId: string): Promise<Eintrag[]> {
@@ -17,11 +25,13 @@ export async function benachrichtigungenLaden(mitgliedId: string): Promise<Eintr
     where: { mitgliedId },
     orderBy: { erstelltAm: "desc" },
     take: MAX_BENACHRICHTIGUNGEN,
-    select: { id: true, text: true, link: true, gelesenAm: true, erstelltAm: true },
+    select: { id: true, art: true, text: true, parameter: true, link: true, gelesenAm: true, erstelltAm: true },
   });
   return zeilen.map((z) => ({
     id: z.id,
+    art: z.art,
     text: z.text,
+    parameter: z.parameter,
     link: z.link,
     gelesen: z.gelesenAm !== null,
     erstelltAm: z.erstelltAm,

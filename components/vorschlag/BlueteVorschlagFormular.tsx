@@ -10,24 +10,25 @@ import { useHydriert } from "@/components/ui/useHydriert";
 import type { SelectOption } from "@/components/ui";
 import { KULTIVAR_TYPEN } from "@/db/enums";
 import { MAX_VORSCHLAG_NOTIZ, MAX_VORSCHLAG_TERPENE } from "@/lib/vorschlag-eingabe";
+import { t } from "@/lib/i18n/text";
+import type { Woerterbuch } from "@/lib/i18n/typen";
 
-const TYP_LABEL: Record<(typeof KULTIVAR_TYPEN)[number], string> = {
-  INDICA: "Indica",
-  SATIVA: "Sativa",
-  HYBRID: "Hybrid",
-  RUDERALIS: "Ruderalis",
+const RANG = ["eins", "zwei", "drei"] as const;
+
+type Props = {
+  terpene: readonly string[];
+  nameVorbelegt: string;
+  texte: Woerterbuch["vorschlag"];
+  typen: Woerterbuch["label"]["kultivarTyp"];
 };
-const TYPEN: SelectOption[] = KULTIVAR_TYPEN.map((t) => ({ wert: t, label: TYP_LABEL[t] }));
-const RANG = ["Dominantes Terpen", "Zweites Terpen", "Drittes Terpen"];
-
-type Props = { terpene: readonly string[]; nameVorbelegt: string };
 
 /**
  * Eine fehlende Bluete vorschlagen. Die Pruefung liegt in
  * lib/vorschlag-eingabe.ts und laeuft in der Server Action; maxLength ist
  * Bedienkomfort, keine Absicherung.
  */
-export function BlueteVorschlagFormular({ terpene, nameVorbelegt }: Props) {
+export function BlueteVorschlagFormular({ terpene, nameVorbelegt, texte, typen }: Props) {
+  const TYPEN: SelectOption[] = KULTIVAR_TYPEN.map((typ) => ({ wert: typ, label: typen[typ] }));
   const router = useRouter();
   const hydriert = useHydriert();
   const [laeuft, setLaeuft] = useState(false);
@@ -47,7 +48,7 @@ export function BlueteVorschlagFormular({ terpene, nameVorbelegt }: Props) {
         router.refresh();
       }
     } catch {
-      setAntwort({ ok: false, fehler: "Das hat nicht geklappt. Vielleicht ist die Sitzung abgelaufen, melde dich neu an." });
+      setAntwort({ ok: false, fehler: texte.fehlerAllgemein });
     } finally {
       setLaeuft(false);
     }
@@ -58,46 +59,46 @@ export function BlueteVorschlagFormular({ terpene, nameVorbelegt }: Props) {
       <Input
         id="vorschlag-name"
         name="handelsname"
-        label="Handelsname"
+        label={texte.handelsname}
         pflicht
         required
         maxLength={120}
         defaultValue={nameVorbelegt}
-        hinweis="So, wie er auf der Packung oder beim Hersteller steht."
+        hinweis={texte.handelsnameHinweis}
       />
       <Input
         id="vorschlag-quelle"
         name="quelle"
-        label="Quelle"
+        label={texte.quelle}
         pflicht
         required
         maxLength={300}
-        hinweis="Link zum Hersteller oder kurz, woher du es weißt, z. B. Packung."
+        hinweis={texte.quelleHinweis}
       />
-      <Input id="vorschlag-hersteller" name="hersteller" label="Hersteller" maxLength={120} hinweis="Freiwillig." />
+      <Input id="vorschlag-hersteller" name="hersteller" label={texte.hersteller} maxLength={120} hinweis={texte.freiwillig} />
       <Input
         id="vorschlag-kultivar"
         name="kultivarName"
-        label="Kultivar"
+        label={texte.kultivar}
         maxLength={120}
-        hinweis="Freiwillig. Die Genetik hinter dem Handelsnamen, falls bekannt."
+        hinweis={texte.kultivarHinweis}
       />
-      <Select id="vorschlag-typ" name="kultivarTyp" label="Typ" optionen={TYPEN} platzhalter="Weiß ich nicht" />
+      <Select id="vorschlag-typ" name="kultivarTyp" label={texte.typ} optionen={TYPEN} platzhalter={texte.weissNicht} />
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-        <Input id="vorschlag-thc" name="thc" label="THC in %" inputMode="decimal" hinweis="Freiwillig." />
-        <Input id="vorschlag-cbd" name="cbd" label="CBD in %" inputMode="decimal" hinweis="Freiwillig." />
+        <Input id="vorschlag-thc" name="thc" label={texte.thc} inputMode="decimal" hinweis={texte.freiwillig} />
+        <Input id="vorschlag-cbd" name="cbd" label={texte.cbd} inputMode="decimal" hinweis={texte.freiwillig} />
       </div>
-      {RANG.slice(0, MAX_VORSCHLAG_TERPENE).map((label, i) => (
+      {RANG.slice(0, MAX_VORSCHLAG_TERPENE).map((rang, i) => (
         <Select
-          key={label}
+          key={rang}
           id={`vorschlag-terpen${i + 1}`}
           name={`terpen${i + 1}`}
-          label={label}
+          label={texte.rang[rang]}
           optionen={optionen}
-          platzhalter="Keine Angabe"
+          platzhalter={texte.keineAngabe}
         />
       ))}
-      <Field id="vorschlag-notiz" label="Notiz für uns" hinweis="Freiwillig.">
+      <Field id="vorschlag-notiz" label={texte.notiz} hinweis={texte.freiwillig}>
         {(attribute) => (
           <textarea
             {...attribute}
@@ -116,7 +117,7 @@ export function BlueteVorschlagFormular({ terpene, nameVorbelegt }: Props) {
             <>
               {" "}
               <Link href={`/blueten/${antwort.vorhanden.slug}`} className={textLinkKlassen()}>
-                Zu {antwort.vorhanden.handelsname}
+                {t(texte.zuBluete, { name: antwort.vorhanden.handelsname })}
               </Link>
             </>
           ) : null}
@@ -124,19 +125,19 @@ export function BlueteVorschlagFormular({ terpene, nameVorbelegt }: Props) {
             <>
               {" "}
               <Link href="/mitglied" className={textLinkKlassen()}>
-                Zu Mein Konto
+                {texte.zuKonto}
               </Link>
             </>
           ) : null}
         </Meldung>
       ) : null}
       {antwort?.ok ? (
-        <Meldung art="erfolg">Danke! Wir prüfen deinen Vorschlag und melden uns unter Mein Konto.</Meldung>
+        <Meldung art="erfolg">{texte.danke}</Meldung>
       ) : null}
 
       <div>
         <Button type="submit" disabled={laeuft || !hydriert}>
-          {laeuft ? "Wird gesendet …" : "Blüte vorschlagen"}
+          {laeuft ? texte.sendet : texte.absenden}
         </Button>
       </div>
     </form>

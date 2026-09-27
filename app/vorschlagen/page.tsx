@@ -5,11 +5,11 @@ import { BlueteVorschlagFormular } from "@/components/vorschlag/BlueteVorschlagF
 import { terpenNamen } from "@/lib/query/vorschlaege";
 import { aktuellesMitglied } from "@/lib/session";
 import { vorschlagPfad } from "@/lib/vorschlag-eingabe";
+import { holeWoerterbuch } from "@/lib/i18n";
 
-export const metadata: Metadata = {
-  title: "Blüte vorschlagen",
-  robots: { index: false, follow: false },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return { title: (await holeWoerterbuch()).vorschlag.titel, robots: { index: false, follow: false } };
+}
 
 type Props = { searchParams: Promise<Record<string, string | string[] | undefined>> };
 
@@ -19,18 +19,22 @@ export default async function VorschlagenPage({ searchParams }: Props) {
   const nameVorbelegt = (typeof roh === "string" ? roh : "").slice(0, 120);
 
   // Der Suchbegriff aus dem Katalog soll die Anmeldung ueberleben.
-  const mitglied = await aktuellesMitglied();
+  const [mitglied, w] = await Promise.all([aktuellesMitglied(), holeWoerterbuch()]);
   if (!mitglied) redirect(`/anmelden?weiter=${encodeURIComponent(vorschlagPfad(nameVorbelegt))}`);
 
   return (
     <div className="mx-auto w-full max-w-180 px-4 py-16 sm:px-8">
-      <h1 className="text-h1 text-text text-balance">Blüte vorschlagen</h1>
+      <h1 className="text-h1 text-text text-balance">{w.vorschlag.titel}</h1>
       <p className="mt-2 max-w-[68ch] text-body text-text-muted text-pretty">
-        Dir fehlt eine Blüte im Katalog? Trag ein, was du weißt. Wir prüfen die Angaben und nehmen sie
-        auf. Unter Mein Konto siehst du, wie es um deinen Vorschlag steht.
+        {w.vorschlag.satz}
       </p>
       <div className="mt-8">
-        <BlueteVorschlagFormular terpene={await terpenNamen()} nameVorbelegt={nameVorbelegt} />
+        <BlueteVorschlagFormular
+          terpene={await terpenNamen()}
+          nameVorbelegt={nameVorbelegt}
+          texte={w.vorschlag}
+          typen={w.label.kultivarTyp}
+        />
       </div>
     </div>
   );

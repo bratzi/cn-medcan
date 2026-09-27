@@ -6,6 +6,8 @@ import { mitgliedErforderlich } from "@/lib/session";
 import { gelesenIdsPruefen } from "@/lib/benachrichtigung";
 import { getPrisma } from "@/lib/prisma";
 import { profilEingabePruefen } from "@/lib/mitglied-eingabe";
+import { holeWoerterbuch } from "@/lib/i18n";
+import { meldungText } from "@/lib/i18n/text";
 
 export type ProfilErgebnis = { ok: true } | { ok: false; fehler: string };
 
@@ -27,7 +29,7 @@ export async function profilSpeichern(formData: FormData): Promise<ProfilErgebni
     String(formData.get("anzeigename") ?? ""),
     String(formData.get("instagramHandle") ?? ""),
   );
-  if (!geprueft.ok) return geprueft;
+  if (!geprueft.ok) return { ok: false, fehler: meldungText(await holeWoerterbuch(), geprueft.fehler) };
 
   const prisma = await getPrisma();
   await prisma.mitglied.update({

@@ -5,7 +5,7 @@ import { revalidatePath } from "next/cache";
 import { adminErforderlich } from "@/lib/session";
 import { getPrisma } from "@/lib/prisma";
 import { istEindeutigkeitsfehler } from "@/lib/prisma-fehler";
-import { benachrichtigen, nachrichtenFuer, textAbgelehnt, textFreigegeben } from "@/lib/benachrichtigung";
+import { benachrichtigen, nachrichtenFuer, vorlageAbgelehnt, vorlageFreigegeben, type Nachricht } from "@/lib/benachrichtigung";
 import { inHaeppchen } from "@/lib/haeppchen";
 import { blueteVorhanden, terpenNamen } from "@/lib/query/vorschlaege";
 import { strainIdAusSlug, unternehmensIdAusSchluessel, unternehmensSchluessel } from "@/lib/stamm-id";
@@ -15,7 +15,7 @@ import {
   herstellerRolleNachFreigabe,
   terpeneNachtragen,
 } from "@/lib/vorschlag-eingabe";
-import type { BenachrichtigungArt, VorschlagStatus } from "@/db/enums";
+import type { VorschlagStatus } from "@/db/enums";
 
 export type AdminVorschlagErgebnis = { ok: true } | { ok: false; fehler: string };
 
@@ -42,7 +42,7 @@ async function offeneLaden(schluessel: string) {
 async function abschliessen(
   offene: { id: string; mitgliedId: string }[],
   status: Exclude<VorschlagStatus, "OFFEN">,
-  nachricht: { art: BenachrichtigungArt; text: string; link: string | null },
+  nachricht: Omit<Nachricht, "mitgliedId">,
   felder: { strainId?: string; begruendung?: string | null },
 ) {
   await benachrichtigen(nachrichtenFuer(offene.map((v) => v.mitgliedId), nachricht));
@@ -192,7 +192,7 @@ export async function blueteFreigeben(formData: FormData): Promise<AdminVorschla
   await abschliessen(
     offene,
     "FREIGEGEBEN",
-    { art: "VORSCHLAG_FREIGEGEBEN", text: textFreigegeben(name), link: `/blueten/${slug}` },
+    { ...vorlageFreigegeben(name), link: `/blueten/${slug}` },
     { strainId: vorhanden?.id ?? strainId },
   );
   neuLaden(slug);
@@ -212,7 +212,7 @@ export async function blueteAblehnen(formData: FormData): Promise<AdminVorschlag
   await abschliessen(
     offene,
     "ABGELEHNT",
-    { art: "VORSCHLAG_ABGELEHNT", text: textAbgelehnt(offene[0].handelsname, begruendung), link: "/mitglied" },
+    { ...vorlageAbgelehnt(offene[0].handelsname, begruendung), link: "/mitglied" },
     { begruendung },
   );
   neuLaden();
@@ -240,7 +240,7 @@ export async function blueteZuordnen(formData: FormData): Promise<AdminVorschlag
   await abschliessen(
     offene,
     "FREIGEGEBEN",
-    { art: "VORSCHLAG_FREIGEGEBEN", text: textFreigegeben(strain.handelsname), link: `/blueten/${strain.slug}` },
+    { ...vorlageFreigegeben(strain.handelsname), link: `/blueten/${strain.slug}` },
     { strainId: strain.id },
   );
   neuLaden(strain.slug);

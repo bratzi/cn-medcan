@@ -19,9 +19,11 @@ export type ProfilEingabe = {
   instagramHandle: string | null;
 };
 
+import type { Meldung } from "@/lib/i18n/typen";
+
 export type PruefErgebnis =
   | { ok: true; wert: ProfilEingabe }
-  | { ok: false; fehler: string };
+  | { ok: false; fehler: Meldung };
 
 export function profilEingabePruefen(
   anzeigenameRoh: string,
@@ -29,12 +31,12 @@ export function profilEingabePruefen(
 ): PruefErgebnis {
   const anzeigename = anzeigenameRoh.trim();
   if (anzeigename.length === 0) {
-    return { ok: false, fehler: "Bitte einen Anzeigenamen angeben." };
+    return { ok: false, fehler: { schluessel: "mitglied.nameFehlt" } };
   }
   if (anzeigename.length > ANZEIGENAME_MAXLAENGE) {
     return {
       ok: false,
-      fehler: `Der Anzeigename darf höchstens ${ANZEIGENAME_MAXLAENGE} Zeichen haben.`,
+      fehler: { schluessel: "mitglied.nameLang", parameter: { max: ANZEIGENAME_MAXLAENGE } },
     };
   }
 
@@ -44,9 +46,7 @@ export function profilEingabePruefen(
   if (handle.length > INSTAGRAM_MAXLAENGE || (handle.length > 0 && !INSTAGRAM_MUSTER.test(handle))) {
     return {
       ok: false,
-      fehler:
-        "Instagram-Name: nur Buchstaben, Ziffern, Punkt und Unterstrich, " +
-        `höchstens ${INSTAGRAM_MAXLAENGE} Zeichen.`,
+      fehler: { schluessel: "mitglied.instagram", parameter: { max: INSTAGRAM_MAXLAENGE } },
     };
   }
 

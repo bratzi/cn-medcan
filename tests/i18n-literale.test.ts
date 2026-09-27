@@ -79,6 +79,15 @@ const UMGESTELLT: string[] = [
   // Welle 4c: Apotheken (zurueckgestellt, aber uebersetzt)
   "app/apotheken/page.tsx",
   "app/apotheken/[slug]/page.tsx",
+  // Welle 5: Mitgliederbereich, Vorschlagen
+  "app/mitglied/page.tsx",
+  "app/mitglied/aktionen.ts",
+  "components/auth/ProfilFormular.tsx",
+  "lib/mitglied-eingabe.ts",
+  "app/vorschlagen/page.tsx",
+  "app/vorschlagen/aktionen.ts",
+  "components/vorschlag/BlueteVorschlagFormular.tsx",
+  "lib/query/benachrichtigungen.ts",
 ];
 
 const ERLAUBT: string[] = ["Book of Terpz", "Deutsch"];

@@ -12,6 +12,7 @@ import {
   type KultivarTyp,
 } from "@/db/enums";
 import { slugAusName } from "@/lib/stamm-id";
+import type { Meldung } from "@/lib/i18n/typen";
 
 export const MAX_OFFENE_VORSCHLAEGE = 5;
 export const MAX_VORSCHLAG_NOTIZ = 500;
@@ -21,6 +22,18 @@ const MAX_NAME = 120;
 const MAX_QUELLE = 300;
 
 export type Pruef<T> = { ok: true; wert: T } | { ok: false; fehler: string };
+
+/** Mitglieder-Pruefung: meldet Schluessel (Woerterbuch), die Admin-Freigabe bleibt deutsch. */
+export type PruefMeldung<T> = { ok: true; wert: T } | { ok: false; fehler: Meldung };
+
+type NamensFehler = "vorschlag.nameFehlt" | "vorschlag.nameLang" | "vorschlag.nameOhneZeichen";
+
+/** Dieselben Namensfehler auf Deutsch fuer die Admin-Freigabe (sie spricht nur Deutsch). */
+const NAMENS_FEHLER_DE: Record<NamensFehler, (max: number) => string> = {
+  "vorschlag.nameFehlt": () => "Der Handelsname fehlt.",
+  "vorschlag.nameLang": (max) => `Der Handelsname ist länger als ${max} Zeichen.`,
+  "vorschlag.nameOhneZeichen": () => "Der Handelsname braucht Buchstaben oder Ziffern.",
+};
 
 type Lesbar = { get(name: string): unknown };
 
@@ -70,40 +83,43 @@ export type BlueteVorschlag = {
   notiz: string | null;
 };
 
-function nameUndSchluessel(formular: Lesbar, feld: string): Pruef<{ name: string; slug: string }> {
+function nameUndSchluessel(
+  formular: Lesbar,
+  feld: string,
+): { ok: true; wert: { name: string; slug: string } } | { ok: false; fehler: { schluessel: NamensFehler; parameter?: { max: number } } } {
   const name = text(formular.get(feld));
-  if (!name) return { ok: false, fehler: "Der Handelsname fehlt." };
-  if (name.length > MAX_NAME) return { ok: false, fehler: `Der Handelsname ist länger als ${MAX_NAME} Zeichen.` };
+  if (!name) return { ok: false, fehler: { schluessel: "vorschlag.nameFehlt" } };
+  if (name.length > MAX_NAME) return { ok: false, fehler: { schluessel: "vorschlag.nameLang", parameter: { max: MAX_NAME } } };
   const slug = slugAusName(name);
-  if (!slug) return { ok: false, fehler: "Der Handelsname braucht Buchstaben oder Ziffern." };
+  if (!slug) return { ok: false, fehler: { schluessel: "vorschlag.nameOhneZeichen" } };
   return { ok: true, wert: { name, slug } };
 }
 
 export function blueteVorschlagPruefen(
   formular: Lesbar,
   terpenNamen: readonly string[],
-): Pruef<BlueteVorschlag> {
+): PruefMeldung<BlueteVorschlag> {
   const name = nameUndSchluessel(formular, "handelsname");
   if (!name.ok) return name;
 
   const quelle = text(formular.get("quelle"));
-  if (!quelle) return { ok: false, fehler: "Bitte gib an, woher du die Angaben hast." };
-  if (quelle.length > MAX_QUELLE) return { ok: false, fehler: `Die Quelle ist länger als ${MAX_QUELLE} Zeichen.` };
+  if (!quelle) return { ok: false, fehler: { schluessel: "vorschlag.quelleFehlt" } };
+  if (quelle.length > MAX_QUELLE) return { ok: false, fehler: { schluessel: "vorschlag.quelleLang", parameter: { max: MAX_QUELLE } } };
 
   const typRoh = text(formular.get("kultivarTyp"));
-  if (typRoh && !istKultivarTyp(typRoh)) return { ok: false, fehler: "Unbekannter Kultivartyp." };
+  if (typRoh && !istKultivarTyp(typRoh)) return { ok: false, fehler: { schluessel: "vorschlag.typUnbekannt" } };
 
   const thc = zahl(formular.get("thc"), 40);
-  if (thc === "fehler") return { ok: false, fehler: "THC bitte als Zahl zwischen 0 und 40 %." };
+  if (thc === "fehler") return { ok: false, fehler: { schluessel: "vorschlag.thc" } };
   const cbd = zahl(formular.get("cbd"), 30);
-  if (cbd === "fehler") return { ok: false, fehler: "CBD bitte als Zahl zwischen 0 und 30 %." };
+  if (cbd === "fehler") return { ok: false, fehler: { schluessel: "vorschlag.cbd" } };
 
   const terpene = terpeneAusFormular(formular, MAX_VORSCHLAG_TERPENE, terpenNamen);
-  if (terpene === "fehler") return { ok: false, fehler: "Bitte nur Terpene aus der Liste wählen." };
+  if (terpene === "fehler") return { ok: false, fehler: { schluessel: "vorschlag.terpene" } };
 
   const notiz = optional(formular.get("notiz"));
   if (notiz && notiz.length > MAX_VORSCHLAG_NOTIZ) {
-    return { ok: false, fehler: `Die Notiz ist länger als ${MAX_VORSCHLAG_NOTIZ} Zeichen.` };
+    return { ok: false, fehler: { schluessel: "vorschlag.notizLang", parameter: { max: MAX_VORSCHLAG_NOTIZ } } };
   }
 
   return {
@@ -157,7 +173,7 @@ export function blueteFreigabePruefen(
   if (!vorschlagSchluessel) return { ok: false, fehler: "Kein Vorschlag angegeben." };
 
   const name = nameUndSchluessel(formular, "handelsname");
-  if (!name.ok) return name;
+  if (!name.ok) return { ok: false, fehler: NAMENS_FEHLER_DE[name.fehler.schluessel](MAX_NAME) };
 
   const typ = text(formular.get("kultivarTyp"));
   if (!istKultivarTyp(typ)) return { ok: false, fehler: "Bitte den Kultivartyp wählen." };

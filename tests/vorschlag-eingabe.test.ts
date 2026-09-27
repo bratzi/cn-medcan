@@ -41,7 +41,7 @@ test("Vorschlag: fehlender Name, fehlende Quelle, leerer Slug", () => {
   assert.equal(blueteVorschlagPruefen(formular({ quelle: "x" }), TERPENE).ok, false);
   assert.equal(blueteVorschlagPruefen(formular({ handelsname: "A" }), TERPENE).ok, false);
   const leer = blueteVorschlagPruefen(formular({ handelsname: "&&&", quelle: "x" }), TERPENE);
-  assert.deepEqual(leer, { ok: false, fehler: "Der Handelsname braucht Buchstaben oder Ziffern." });
+  assert.deepEqual(leer, { ok: false, fehler: { schluessel: "vorschlag.nameOhneZeichen" } });
 });
 
 test("Vorschlag: Zahlen mit Komma, Grenzen, Kultivartyp", () => {
@@ -99,6 +99,9 @@ test("Freigabe: Pflichtfelder, Spannen, Slug aus dem korrigierten Namen", () => 
     TERPENE,
   );
   assert.deepEqual(verdreht, { ok: false, fehler: "THC: der kleinste Wert ist größer als der größte." });
+  // Die Admin-Freigabe spricht weiter Deutsch, auch bei den gemeinsamen Namensfehlern.
+  const ohneName = blueteFreigabePruefen(formular({ vorschlagSchluessel: "a", handelsname: "&&&" }), TERPENE);
+  assert.deepEqual(ohneName, { ok: false, fehler: "Der Handelsname braucht Buchstaben oder Ziffern." });
 });
 
 function vorschlag(teil: Partial<OffenerVorschlag>): OffenerVorschlag {

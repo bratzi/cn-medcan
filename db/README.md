@@ -85,6 +85,8 @@ Prisma aus dem Schema, und Prisma kennt diese Bedingungen nicht.
 Folge: **`db/constraints.sql` nach jeder Migration erneut ausfuehren.** Prisma
 baut Tabellen beim Aendern als create/copy/drop/rename um, und SQLite verwirft
 dabei alle Trigger der alten Tabelle. Das Skript ist idempotent.
+Ausnahme: eine reine `ALTER TABLE ... ADD COLUMN` (z. B. 0008) baut nichts um, die
+Trigger bleiben; das Skript schadet aber auch dann nicht.
 
 Die Werte in `constraints.sql` und `enums.ts` muessen uebereinstimmen. Wer dort
 einen Wert ergaenzt, ergaenzt ihn hier mit — sonst weist die Datenbank ihn ab.
