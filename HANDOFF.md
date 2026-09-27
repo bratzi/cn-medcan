@@ -41,6 +41,16 @@ in ihrer Geschmacksfarbe, Lichtpunkt läuft Geschmack → Terpen (`a3a8431`, `.b
 Kopf** (`962ccc8`, components/marke/Logo.tsx: „Book of“ 0,45 em oben, „Terpz“ text-marke, vier Konturen, Verlauf,
 Glanz; Brand-Doku §2 angepasst); 24 geprüfte Skills installiert (`3192b53`). Live noch NICHT gesehen.
 
+**⇢ SESSION 23 (2026-09-27, läuft): Live-Sichtprüfung begonnen.** Gut: Logo im Kopf, Hero (Kopf hell lesbar),
+Storytelling mit Glas, Overall/Qualität, „stimmt das?“ zwischen Qualität und Fazit, Doppelseite, Abstimmung, Katalog;
+Aroma-Hover in beide Richtungen; /produkte → 308 /blueten; Impressum/Datenschutz ohne Login 200. Leerer Streifen über
+dem Kopf in Screenshots ist Aufnahme-Artefakt (Kopf per JS bei top 0). Instagram-Zwei-Klick live nicht prüfbar (kein
+Reel hinterlegt). **Gefixt:** `55188a1` Achsennamen der Aroma-Karte standen im Balken und wurden durchgestrichen → jetzt
+über dem Balken, links mindestens 124 vom Rand (ragten in der Doppelseite hinaus), Ester/Thiole-Hinweis zweizeilig (ragte
+rechts hinaus). `58cec5c` Nutzerwunsch: Infotext mit Iconspalte links (Zeile/TerpenZeile), ein Satz je Terpen
+(`aromaSatz` in lib/terpen-aromen.ts, nur Duft/Vorkommen wegen HWG). **Noch live ansehen:** beide Commits, 390 px,
+danach Punkt 2 (apples-bananas speichern).
+
 **⇢ STAND ZUM CLEAR (2026-09-27): WELLE 1 UND 2 (Code) FERTIG, alles gepusht, Tests 250/250, Baum sauber.**
 Welle 2: Instagram-Zwei-Klick `97e62d1`, Vorschlagsfrist + Hydrations-Sperre `45f8c9f`, three/Apotheken raus
 `60a959d`, **/produkte → /blueten** mit 308-Weiterleitungen `f3c098d` (lib/alte-adressen.ts). Kein Agent läuft.
