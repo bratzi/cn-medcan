@@ -73,10 +73,10 @@ export const HOSTING_GRUNDLAGE = platzhalter(
 /** Stand der Datenschutzerklärung. */
 export const DATENSCHUTZ_STAND = platzhalter("Datum der Veröffentlichung");
 
-/** Links auf die beiden Seiten, gemeinsam für Fuß und Zugangsseite. */
+/** Links auf die beiden Seiten, gemeinsam für Fuß und Zugangsseite. Texte unter fuss[schluessel]. */
 export const RECHTLICHE_LINKS = [
-  { href: "/impressum", text: "Impressum" },
-  { href: "/datenschutz", text: "Datenschutz" },
+  { href: "/impressum", schluessel: "impressum" },
+  { href: "/datenschutz", schluessel: "datenschutz" },
 ] as const;
 
 /** Alle Angaben, die noch fehlen (für Tests und einen späteren Hinweis im Admin). */

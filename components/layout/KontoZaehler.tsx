@@ -4,6 +4,9 @@ import { useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 
 import { ZAEHLER_NEU, ZAEHLER_SPEICHER } from "@/components/layout/konto-zaehler-speicher";
+import type { Sprache } from "@/lib/i18n/sprache-kern";
+import { mehrzahl } from "@/lib/i18n/text";
+import type { Mehrzahl } from "@/lib/i18n/typen";
 
 const GUELTIG_MS = 60_000;
 
@@ -14,7 +17,7 @@ const GUELTIG_MS = 60_000;
  * nicht jede Seite eine Anfrage kostet. An- und Abmelden leeren den Speicher
  * und loesen ZAEHLER_NEU aus; /mitglied loest "benachrichtigungen-gelesen" aus.
  */
-export function KontoZaehler() {
+export function KontoZaehler({ texte, sprache }: { texte: Mehrzahl; sprache: Sprache }) {
   const pfad = usePathname();
   const [anzahl, setAnzahl] = useState(0);
   const [neuLaden, setNeuLaden] = useState(0);
@@ -89,7 +92,7 @@ export function KontoZaehler() {
     <span className="numeric ml-2 inline-grid min-w-6 place-items-center rounded-full bg-accent px-2 text-caption text-accent-fg">
       <span aria-hidden="true">{anzahl}</span>
       <span className="sr-only">
-        {anzahl === 1 ? "1 ungelesene Benachrichtigung" : `${anzahl} ungelesene Benachrichtigungen`}
+        {mehrzahl(sprache, texte, anzahl)}
       </span>
     </span>
   );

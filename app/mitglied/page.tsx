@@ -8,6 +8,7 @@ import { GelesenMarkieren } from "@/components/mitglied/GelesenMarkieren";
 import { Badge, buttonKlassen, Card, CardBody, CardHeader, textLinkKlassen } from "@/components/ui";
 import { benachrichtigungenLaden } from "@/lib/query/benachrichtigungen";
 import { eigeneVorschlaege } from "@/lib/query/vorschlaege";
+import { holeWoerterbuch } from "@/lib/i18n";
 import { aktuellesMitglied } from "@/lib/session";
 import type { MitgliedRolle, VorschlagStatus } from "@/db/enums";
 
@@ -32,6 +33,7 @@ const STATUS_BADGE: Record<VorschlagStatus, { text: string; variante: "warning" 
 
 export default async function MitgliedPage() {
   const mitglied = await aktuellesMitglied();
+  const w = await holeWoerterbuch();
   if (!mitglied) redirect("/anmelden?weiter=%2Fmitglied");
 
   const [nachrichten, vorschlaege] = await Promise.all([
@@ -47,7 +49,7 @@ export default async function MitgliedPage() {
           <h1 className="text-h1 text-text">Mein Konto</h1>
           <p className="mt-2 text-body text-text-muted">{mitglied.email}</p>
         </div>
-        <AbmeldeButton />
+        <AbmeldeButton texte={w.auth.formular} />
       </div>
 
       <section aria-labelledby="status-titel" className="mt-8">

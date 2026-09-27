@@ -65,7 +65,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
           {children}
         </main>
 
-        <Fuss />
+        <Fuss w={w} />
         <JointCursor />
       </body>
     </html>

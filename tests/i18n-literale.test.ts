@@ -7,7 +7,25 @@ import { readFileSync } from "node:fs";
  * (Spec Englisch 8). Jede Welle traegt ihre Dateien in UMGESTELLT ein.
  * Kommentare zaehlen nicht; Eigennamen stehen in ERLAUBT.
  */
-const UMGESTELLT: string[] = ["app/layout.tsx", "components/layout/SprachSchalter.tsx"];
+const UMGESTELLT: string[] = [
+  "app/layout.tsx",
+  "components/layout/SprachSchalter.tsx",
+  // Welle 1: Rahmen
+  "lib/navigation.ts",
+  "components/layout/Kopf.tsx",
+  "components/layout/Fuss.tsx",
+  "components/layout/KontoZaehler.tsx",
+  "components/layout/ThemaSchalter.tsx",
+  "app/not-found.tsx",
+  "app/anmelden/page.tsx",
+  "app/registrieren/page.tsx",
+  "components/auth/AnmeldeFormular.tsx",
+  "components/auth/RegistrierFormular.tsx",
+  "components/auth/AbmeldeButton.tsx",
+  "components/auth/fehlertexte.ts",
+  "app/zugang/page.tsx",
+  "components/zugang/ZugangFelder.tsx",
+];
 
 const ERLAUBT: string[] = ["Book of Terpz", "Deutsch"];
 

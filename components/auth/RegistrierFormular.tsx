@@ -7,17 +7,21 @@ import { signUp } from "@/lib/auth-client";
 import { zaehlerZuruecksetzen } from "@/components/layout/konto-zaehler-speicher";
 import { profilSpeichern } from "@/app/mitglied/aktionen";
 import { Button, Input, useHydriert } from "@/components/ui";
+import type { Woerterbuch } from "@/lib/i18n/typen";
+import { t } from "@/lib/i18n/text";
 import { fehlertext } from "./fehlertexte";
 
 type Props = {
   /** Schon geprueftes, relatives Ziel - siehe lib/weiterleitung.ts. */
   weiter: string;
+  texte: Woerterbuch["auth"]["formular"];
+  fehlertexte: Woerterbuch["auth"]["fehler"];
 };
 
 /** Muss zu minPasswordLength in lib/auth.ts passen. */
 const PASSWORT_MINDESTLAENGE = 10;
 
-export function RegistrierFormular({ weiter }: Props) {
+export function RegistrierFormular({ weiter, texte, fehlertexte }: Props) {
   const router = useRouter();
   const hydriert = useHydriert();
   const [laeuft, setLaeuft] = useState(false);
@@ -32,7 +36,7 @@ export function RegistrierFormular({ weiter }: Props) {
     const wiederholung = String(daten.get("wiederholung") ?? "");
 
     if (passwort !== wiederholung) {
-      setFehler("Die beiden Passwörter stimmen nicht überein.");
+      setFehler(texte.passwoerterUngleich);
       return;
     }
 
@@ -46,7 +50,7 @@ export function RegistrierFormular({ weiter }: Props) {
     });
 
     if (error) {
-      setFehler(fehlertext(error.code, "Die Registrierung ist fehlgeschlagen."));
+      setFehler(fehlertext(fehlertexte, error.code, texte.registrierungFehlgeschlagen));
       setLaeuft(false);
       return;
     }
@@ -72,19 +76,19 @@ export function RegistrierFormular({ weiter }: Props) {
     <form onSubmit={absenden} className="flex flex-col gap-6">
       <Input
         id="registrieren-anzeigename"
-        label="Anzeigename"
+        label={texte.anzeigename}
         name="anzeigename"
         type="text"
         required
         maxLength={60}
         autoComplete="nickname"
         autoFocus
-        hinweis="Unter diesem Namen erscheinen deine Vorschläge und Bewertungen."
+        hinweis={texte.anzeigenameHinweis}
       />
 
       <Input
         id="registrieren-email"
-        label="E-Mail-Adresse"
+        label={texte.email}
         name="email"
         type="email"
         required
@@ -93,28 +97,28 @@ export function RegistrierFormular({ weiter }: Props) {
 
       <Input
         id="registrieren-instagram"
-        label="Instagram-Name"
+        label={texte.instagram}
         name="instagramHandle"
         type="text"
         maxLength={30}
         autoComplete="off"
-        hinweis="Freiwillig, hilft aber bei der Freigabe: darüber ist die Zuordnung zum Account nachvollziehbar."
+        hinweis={texte.instagramHinweis}
       />
 
       <Input
         id="registrieren-passwort"
-        label="Passwort"
+        label={texte.passwort}
         name="passwort"
         type="password"
         required
         minLength={PASSWORT_MINDESTLAENGE}
         autoComplete="new-password"
-        hinweis={`Mindestens ${PASSWORT_MINDESTLAENGE} Zeichen.`}
+        hinweis={t(texte.passwortHinweis, { anzahl: PASSWORT_MINDESTLAENGE })}
       />
 
       <Input
         id="registrieren-wiederholung"
-        label="Passwort wiederholen"
+        label={texte.wiederholen}
         name="wiederholung"
         type="password"
         required
@@ -125,13 +129,13 @@ export function RegistrierFormular({ weiter }: Props) {
       {fehler ? (
         // Fehler nicht nur farblich: Klartext mit vorangestelltem Wortmarker.
         <p role="alert" className="text-small text-danger">
-          <span className="font-medium">Fehler: </span>
+          <span className="font-medium">{texte.fehler} </span>
           {fehler}
         </p>
       ) : null}
 
       <Button type="submit" disabled={!hydriert || laeuft}>
-        {laeuft ? "Konto wird angelegt …" : "Konto anlegen"}
+        {laeuft ? texte.wirdAngelegt : texte.anlegen}
       </Button>
     </form>
   );

@@ -2,6 +2,7 @@
 
 import { useLayoutEffect } from "react";
 
+import type { Woerterbuch } from "@/lib/i18n/typen";
 import { THEMA_SCHLUESSEL, anderesThema } from "@/lib/thema";
 
 /**
@@ -11,7 +12,7 @@ import { THEMA_SCHLUESSEL, anderesThema } from "@/lib/thema";
  * vor dem Hydrieren. Beim Umschalten sind Übergänge für einen Frame aus, damit
  * die Seite springt statt zu verschmieren (better-ui).
  */
-export function ThemaSchalter() {
+export function ThemaSchalter({ texte }: { texte: Woerterbuch["kopf"]["thema"] }) {
   // Nur Entwicklung: Strict Mode setzt <html> beim zweiten Einhängen zurück
   // (Next-Doku). In Produktion hat das Kopf-Skript es schon gesetzt.
   useLayoutEffect(() => {
@@ -36,8 +37,8 @@ export function ThemaSchalter() {
 
   return (
     <button type="button" onClick={wechsle} className="thema-lampe">
-      <span className="sr-only thema-ziel-dunkel">Licht aus, dunkel darstellen</span>
-      <span className="sr-only thema-ziel-hell">Licht an, hell darstellen</span>
+      <span className="sr-only thema-ziel-dunkel">{texte.dunkel}</span>
+      <span className="sr-only thema-ziel-hell">{texte.hell}</span>
       {/* Grow-Zelt offen (hell, Nutzer 2026-09-25): Tür hochgerollt, Licht fällt
           aus der Öffnung, drinnen eine Pflanze. Zelt in Textfarbe, Licht warm. */}
       <svg aria-hidden="true" viewBox="0 0 24 24" className="thema-lampe-an">

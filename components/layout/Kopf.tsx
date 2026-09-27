@@ -52,7 +52,7 @@ export function Kopf({ sprache, w }: Props) {
     <header data-kopf="" className="kopf fixed inset-x-0 top-0 z-40">
       {/* Hell/Dunkel fest in der linken oberen Fensterecke, außerhalb des Inhalts
           (Nutzer 2026-09-25); bis der Rand breit genug ist, rückt der Kopf dafür ein. */}
-      <ThemaSchalter />
+      <ThemaSchalter texte={w.kopf.thema} />
       <SprachSchalter aktuell={sprache} gruppe={w.sprache.gruppe} />
       <div className={`mx-auto grid w-full max-w-360 grid-cols-[1fr_auto_auto] items-center gap-x-4 gap-y-2 py-2 pr-4 sm:pr-8 min-[1640px]:pl-8 lg:grid-cols-[auto_1fr_auto_auto] ${EINRUECKUNG}`}>
         {/* Logo statt einzeiliger Wortmarke (Nutzer 2026-09-26): "Book of" klein oben,
@@ -62,14 +62,14 @@ export function Kopf({ sprache, w }: Props) {
         </Link>
 
         <nav
-          aria-label="Hauptnavigation"
+          aria-label={w.kopf.hauptnavigation}
           className="col-span-3 row-start-2 -mx-4 min-w-0 sm:-mx-8 lg:col-span-1 lg:col-start-2 lg:row-start-1 lg:mx-0 lg:justify-self-end"
         >
           <ul className="-my-2 flex snap-x scroll-px-4 gap-2 overflow-x-auto px-4 py-2 sm:scroll-px-8 sm:px-8 lg:-mx-2 lg:px-2">
             {HAUPTNAVIGATION.map((eintrag) => (
               <li key={eintrag.href} className="shrink-0 snap-start">
                 <NavLink href={eintrag.href} className={NAV_LINK} aktivKlasse="">
-                  <span className={AKTIV_WORT}>{eintrag.text}</span>
+                  <span className={AKTIV_WORT}>{w.kopf.navigation[eintrag.schluessel]}</span>
                 </NavLink>
               </li>
             ))}
@@ -81,8 +81,8 @@ export function Kopf({ sprache, w }: Props) {
           className="konto-pille col-start-3 row-start-1 inline-flex h-11 items-center rounded-full px-5 font-sans text-[0.75rem] font-medium uppercase tracking-gesperrt text-text lg:col-start-4"
           aktivKlasse={AKTIV}
         >
-          {KONTO_LINK.text}
-          <KontoZaehler />
+          {w.kopf.navigation[KONTO_LINK.schluessel]}
+          <KontoZaehler texte={w.kopf.ungelesen} sprache={sprache} />
         </NavLink>
       </div>
       <KopfZustand />

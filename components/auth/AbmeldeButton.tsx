@@ -6,8 +6,9 @@ import { useRouter } from "next/navigation";
 import { signOut } from "@/lib/auth-client";
 import { zaehlerZuruecksetzen } from "@/components/layout/konto-zaehler-speicher";
 import { Button } from "@/components/ui";
+import type { Woerterbuch } from "@/lib/i18n/typen";
 
-export function AbmeldeButton() {
+export function AbmeldeButton({ texte }: { texte: Woerterbuch["auth"]["formular"] }) {
   const router = useRouter();
   const [laeuft, setLaeuft] = useState(false);
 
@@ -23,7 +24,7 @@ export function AbmeldeButton() {
 
   return (
     <Button variante="secondary" groesse="sm" onClick={abmelden} disabled={laeuft}>
-      {laeuft ? "Wird abgemeldet …" : "Abmelden"}
+      {laeuft ? texte.wirdAbgemeldet : texte.abmelden}
     </Button>
   );
 }

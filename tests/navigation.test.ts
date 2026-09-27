@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 
 import { HAUPTNAVIGATION, KONTO_LINK, istAktiv } from "@/lib/navigation";
 import { de } from "@/lib/i18n/de";
+import { en } from "@/lib/i18n/en";
 
 test("Kern zuerst: Bewertungen, Abstimmung, Blüten; Apotheken nur in Aussicht", () => {
   assert.deepEqual(
@@ -10,10 +11,12 @@ test("Kern zuerst: Bewertungen, Abstimmung, Blüten; Apotheken nur in Aussicht",
     ["/reviews", "/umfragen", "/blueten"],
   );
   assert.deepEqual(
-    HAUPTNAVIGATION.map((eintrag) => eintrag.text),
+    HAUPTNAVIGATION.map((eintrag) => de.kopf.navigation[eintrag.schluessel]),
     ["Bewertungen", "Abstimmung", "Blüten"],
   );
-  assert.deepEqual(KONTO_LINK, { href: "/mitglied", text: "Mein Konto" });
+  assert.deepEqual(KONTO_LINK, { href: "/mitglied", schluessel: "konto" });
+  assert.equal(de.kopf.navigation.konto, "Mein Konto");
+  assert.equal(en.kopf.navigation.bewertungen, "Reviews");
 });
 
 test("istAktiv: die Seite selbst und ihre Unterseiten", () => {

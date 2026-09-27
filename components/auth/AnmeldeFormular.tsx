@@ -6,14 +6,17 @@ import { useRouter } from "next/navigation";
 import { signIn } from "@/lib/auth-client";
 import { zaehlerZuruecksetzen } from "@/components/layout/konto-zaehler-speicher";
 import { Button, Input, useHydriert } from "@/components/ui";
+import type { Woerterbuch } from "@/lib/i18n/typen";
 import { fehlertext } from "./fehlertexte";
 
 type Props = {
   /** Schon geprueftes, relatives Ziel - siehe lib/weiterleitung.ts. */
   weiter: string;
+  texte: Woerterbuch["auth"]["formular"];
+  fehlertexte: Woerterbuch["auth"]["fehler"];
 };
 
-export function AnmeldeFormular({ weiter }: Props) {
+export function AnmeldeFormular({ weiter, texte, fehlertexte }: Props) {
   const router = useRouter();
   const hydriert = useHydriert();
   const [laeuft, setLaeuft] = useState(false);
@@ -31,7 +34,7 @@ export function AnmeldeFormular({ weiter }: Props) {
     });
 
     if (error) {
-      setFehler(fehlertext(error.code, "Die Anmeldung ist fehlgeschlagen."));
+      setFehler(fehlertext(fehlertexte, error.code, texte.anmeldungFehlgeschlagen));
       setLaeuft(false);
       return;
     }
@@ -47,7 +50,7 @@ export function AnmeldeFormular({ weiter }: Props) {
     <form onSubmit={absenden} className="flex flex-col gap-6" noValidate={false}>
       <Input
         id="anmelden-email"
-        label="E-Mail-Adresse"
+        label={texte.email}
         name="email"
         type="email"
         required
@@ -57,7 +60,7 @@ export function AnmeldeFormular({ weiter }: Props) {
 
       <Input
         id="anmelden-passwort"
-        label="Passwort"
+        label={texte.passwort}
         name="passwort"
         type="password"
         required
@@ -67,13 +70,13 @@ export function AnmeldeFormular({ weiter }: Props) {
       {fehler ? (
         // Fehler nicht nur farblich: Klartext mit vorangestelltem Wortmarker.
         <p role="alert" className="text-small text-danger">
-          <span className="font-medium">Fehler: </span>
+          <span className="font-medium">{texte.fehler} </span>
           {fehler}
         </p>
       ) : null}
 
       <Button type="submit" disabled={!hydriert || laeuft}>
-        {laeuft ? "Wird geprüft …" : "Anmelden"}
+        {laeuft ? texte.wirdGeprueft : texte.anmelden}
       </Button>
     </form>
   );

@@ -4,13 +4,14 @@
  * weil es kein Inhalt ist.
  */
 export const HAUPTNAVIGATION = [
-  { href: "/reviews", text: "Bewertungen" },
-  { href: "/umfragen", text: "Abstimmung" },
-  { href: "/blueten", text: "Blüten" },
+  { href: "/reviews", schluessel: "bewertungen" },
+  { href: "/umfragen", schluessel: "abstimmung" },
+  { href: "/blueten", schluessel: "blueten" },
   // Apotheken seit 2026-09-25 nur in Aussicht (Nutzer), deshalb nicht in der Navigation.
 ] as const;
 
-export const KONTO_LINK = { href: "/mitglied", text: "Mein Konto" } as const;
+/** Texte im Woerterbuch unter kopf.navigation[schluessel]. */
+export const KONTO_LINK = { href: "/mitglied", schluessel: "konto" } as const;
 
 /** Aktiv sind die Seite selbst und ihre Unterseiten, nicht ein blosser Namensanfang. */
 export function istAktiv(pfad: string, href: string): boolean {

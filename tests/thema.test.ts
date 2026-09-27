@@ -8,6 +8,7 @@ import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 
 import { THEMA_SCHLUESSEL, THEMA_SKRIPT, anderesThema } from "@/lib/thema";
+import { de } from "@/lib/i18n/de";
 
 const lies = (datei: string) => readFileSync(join(process.cwd(), datei), "utf8");
 
@@ -50,7 +51,7 @@ test("Layout: startet hell, Skript im head, DOM gewinnt beim Hydrieren", () => {
 
 test("Schalter: eine Lampe, der zugängliche Name nennt das Ziel, per CSS ohne Aufblitzen", async () => {
   const { ThemaSchalter } = await import("@/components/layout/ThemaSchalter");
-  const html = renderToStaticMarkup(createElement(ThemaSchalter));
+  const html = renderToStaticMarkup(createElement(ThemaSchalter, { texte: de.kopf.thema }));
   assert.match(html, /^<button type="button"/);
   assert.match(html, /class="sr-only thema-ziel-dunkel">Licht aus, dunkel darstellen</);
   assert.match(html, /class="sr-only thema-ziel-hell">Licht an, hell darstellen</);
@@ -60,5 +61,5 @@ test("Schalter: eine Lampe, der zugängliche Name nennt das Ziel, per CSS ohne A
 
 test("Schalter sitzt im Kopf oben links, nicht mehr fest im Layout (Nutzer 2026-09-25)", () => {
   assert.doesNotMatch(lies("app/layout.tsx"), /ThemaSchalter/);
-  assert.match(lies("components/layout/Kopf.tsx"), /<ThemaSchalter \/>/);
+  assert.match(lies("components/layout/Kopf.tsx"), /<ThemaSchalter texte=\{w\.kopf\.thema\} \/>/);
 });

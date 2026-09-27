@@ -2,6 +2,8 @@
 
 import { useSyncExternalStore } from "react";
 
+import type { Woerterbuch } from "@/lib/i18n/typen";
+
 /**
  * Formularfelder von /zugang. Liest `weiter` und `fehler` im Browser aus der
  * Adresse, damit die Seite selbst ohne searchParams statisch bleibt (Plan
@@ -12,7 +14,7 @@ const nieAendern = () => () => {};
 const suche = () => window.location.search;
 const sucheAufDemServer = () => "";
 
-export function ZugangFelder() {
+export function ZugangFelder({ texte }: { texte: Woerterbuch["zugang"] }) {
   const parameter = new URLSearchParams(useSyncExternalStore(nieAendern, suche, sucheAufDemServer));
   const weiter = parameter.get("weiter") ?? "/";
   const fehler = parameter.has("fehler");
@@ -23,7 +25,7 @@ export function ZugangFelder() {
 
       <div className="flex flex-col gap-2">
         <label htmlFor="passwort" className="text-small font-medium text-text">
-          Passwort
+          {texte.passwort}
         </label>
         <input
           id="passwort"
@@ -40,7 +42,7 @@ export function ZugangFelder() {
 
       {fehler ? (
         <p id="zugang-fehler" role="alert" className="text-small text-danger">
-          Passwort falsch. Bitte erneut versuchen.
+          {texte.falsch}
         </p>
       ) : null}
     </>
