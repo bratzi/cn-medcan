@@ -3,7 +3,7 @@
 > Übergabemedium zwischen Sessions. Wird nach jedem Arbeitsblock aktualisiert und committet.
 > Wer hier weiterarbeitet, liest diese Datei zuerst und braucht den Chatverlauf nicht.
 
-**Letzte Aktualisierung:** 2026-09-27 (Session 24, Zwischenstand)
+**Letzte Aktualisierung:** 2026-09-27 (Session 24, Englisch fertig)
 **Repo:** https://github.com/bratzi/cn-medcan (public)
 **Branch:** `main` (Makeover „Grünes Buch“ Teilprojekt 1 ist seit 2026-09-24 auf `main`)
 
@@ -48,15 +48,26 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
   Chrome (Gate-Cookie bleibt im Browser); Chrome-Timer im Hintergrund-Tab werden gedrosselt (AbortController greift nicht).
 - Offen aus A2: Blütenseite mit Testbewertung ansehen, Testblüte in /admin/vorschlaege freigeben, Nutzer fragen, ob
   Testblüte und Testbewertung gelöscht werden (Bewertung per D1 entfernbar, Admin-Löschen gibt es nur für Community).
-- **A4 Englisch läuft inline** (Nutzer: inline). Plan `docs/superpowers/plans/2026-09-27-englisch.md`, Ledger mit allen
-  Rulings in `.superpowers/sdd/2026-09-27-englisch/progress.md` (git-ignoriert; nach Clear dort weiter, erledigte Tasks
-  stehen als `Task N: complete`). Erledigt: Tasks 1–5 (Gerüst), 6 Welle 1 Rahmen, 7 Welle 2 Katalog + ganzer Aroma-Baum,
-  8 Welle 3 Reviews/Bewerten (`f0bacd3`, `ba8b8af`, Live-Prüfung von 8 steht aus). Test-Einstieg: `/api/sprache?wahl=en`
-  bzw. `=de`. **Offen:** Task 9 Welle 4 (Umfragen, Startseite `components/story/*`, Apotheken), 10 Welle 5 (Mitglied,
-  Vorschlagen, Benachrichtigungen + Migration 0008), 11 Freischalten (`I18N_OEFFENTLICH = true`), dann Abschluss-Review.
-  **Live-Hinweis:** Im Browser-MCP ist der Tab verborgen (`visibilityState: hidden`): React setzt nachgestreamte
-  Suspense-Inhalte dann nicht ein (kein requestAnimationFrame), Seiten wirken hängend. Kein Seitenfehler; Inhalt
-  steht versteckt in `div[hidden][id^="S:"]` und lässt sich dort prüfen. A2: Testbewertung erscheint auf der Blütenseite.
+- **A4 Englisch ERLEDIGT und öffentlich** (`4c2ae11` Schalter sichtbar, `26c8b4f` letzte Fixes; Tests 288/288).
+  Plan `docs/superpowers/plans/2026-09-27-englisch.md`. Alle 5 Wellen live geprüft (Kopf, Fuß, Katalog, Blütenseite,
+  Aroma-Karte, Reviews, Bewerten, Abstimmung, Startseite inkl. Suspense-Teile, Mitglied, Vorschlagen). Migration 0008
+  (`benachrichtigungen.parameter`) remote angewendet. Umschalter DE/EN neben dem Zelt (schmal nur ein Knopf), Cookie
+  `sprache`, Browsersprache aktiv. Server Action setzt das Cookie (per POST live geprüft). A2: Testbewertung sichtbar.
+  **Offen / Nutzer prüfen:** Klick auf EN in einem sichtbaren Tab (im verborgenen MCP-Tab kam der React-Klick nicht an);
+  390 px: Logo + Konto + Schalter; englische Markenzeilen (Intro nowrap ab md, Überlaufwörter „terpene profile.“,
+  „we check.“). **Aufgeschobene Minor-Punkte (Abschluss-Review):** `app/error.tsx` liest `lang` im Render (auf
+  useSyncExternalStore umstellen); `server-only` in `lib/i18n/de.ts`/`en.ts` erwägen; `/api/sprache` (GET mit
+  Seiteneffekt) entfernen oder POST; `<html lang>` en → en-GB; `terpenAnzeige` Ausnahmen (Guajol, Eukalyptol);
+  veraltete Kommentare in SprachSchalter.tsx und ZugangFelder.tsx.
+  **Wichtige Rulings:** /admin, Impressum/Datenschutz, Wortmarke inkl. „Terpen für Terpen“, tote Dateien (Netzdiagramm,
+  TerpenErgaenzen, BestandTabelle) und Alt-Texte in lib/medien.ts (Bilder alle dekorativ) bleiben deutsch;
+  Bewertungsschema bleibt deutsch in lib/query/bewertung.ts, Wörterbuch `schema` spiegelt es (Test i18n-schema);
+  Prüffunktionen melden Schlüssel, Server Actions übersetzen; Admin-Prüfungen bleiben deutsch; Terpennamen per Regel
+  (-en → -ene), `aromaProfil`-Stichworte im Englischen ausgeblendet. Kein `sed -i` mehr auf CRLF-Dateien (hat zwei
+  Dateien auf LF gestellt, zurückgesetzt). **Live-Hinweis:** Im MCP-Tab (`visibilityState: hidden`) setzt React
+  Suspense-Inhalte nicht ein; Inhalt steht versteckt in `div[hidden][id^="S:"]` und lässt sich dort prüfen.
+- **Nächste Schritte laut Gesamtliste:** Rest A2 (Testblüte in /admin/vorschlaege freigeben, Nutzer fragen ob
+  Testblüte und Testbewertung gelöscht werden), A5 Abschluss-Review über alles, A6 Mobile-Optimierung.
 
 ### ⇢ SESSION 22 (2026-09-26, läuft) — neu geordnete Taskliste, ersetzt alle älteren Listen darunter
 
