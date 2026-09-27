@@ -15,7 +15,8 @@ import {
   netzPunkt,
   achsenLage,
   begleitBoegen,
-  RADIUS,
+  MIN_BREITE,
+  radiusVon,
   sanft,
   terpenBoegen,
   terpeneImKarte,
@@ -199,7 +200,7 @@ export function AromaKarte({
     const beobachter = new ResizeObserver((eintraege) => {
       const gemessen = eintraege[0]?.contentRect.width;
       if (!gemessen) return;
-      setBreite(Math.max(BREITE, Math.round(gemessen)));
+      setBreite(Math.max(MIN_BREITE, Math.round(gemessen)));
     });
     beobachter.observe(element);
     return () => beobachter.disconnect();
@@ -263,9 +264,11 @@ export function AromaKarte({
   // bleibt bei jeder Breite gleich groß, nur sein Mittelpunkt wandert mit.
   const aktBreite = breite ?? BREITE;
   const mitte = mitteVon(aktBreite);
+  const radius = radiusVon(aktBreite);
+  const schmal = aktBreite < BREITE;
   const karte = achsenImKarte(aktBreite);
   const balken = balkenLaenge(aktBreite);
-  const knoten = karte.map((punkt, index) => mische(punkt, netzPunkt(index, MAX, RADIUS + 34, mitte), t));
+  const knoten = karte.map((punkt, index) => mische(punkt, netzPunkt(index, MAX, radius + 34, mitte), t));
   // Rechte Spalte: Terpene und Begleitstoffe (Ester, Thiole; keine Terpene) gemeinsam nach
   // dem Mittel ihrer Achsen geordnet, damit sich die Bögen wenig kreuzen (Nutzer 2026-09-26).
   const begleiter = BEGLEITSTOFFE.map((stoff) => ({ ...stoff, boegen: begleitBoegen(stoff.noten) })).filter(
@@ -288,7 +291,7 @@ export function AromaKarte({
     GESCHMACKS_ACHSEN.map((achse, index) =>
       mische(
         balkenEnde(karte[index], serie.matrix[achse.key], s * 6 - 3, balken),
-        netzPunkt(index, serie.matrix[achse.key], RADIUS, mitte),
+        netzPunkt(index, serie.matrix[achse.key], radius, mitte),
         t,
       ),
     ),
@@ -307,7 +310,7 @@ export function AromaKarte({
     regler && tastatur !== null
       ? mische(
           balkenEnde(karte[tastatur], regler.werte[GESCHMACKS_ACHSEN[tastatur].key], 0, balken),
-          netzPunkt(tastatur, regler.werte[GESCHMACKS_ACHSEN[tastatur].key], RADIUS, mitte),
+          netzPunkt(tastatur, regler.werte[GESCHMACKS_ACHSEN[tastatur].key], radius, mitte),
           t,
         )
       : null;
@@ -401,13 +404,13 @@ export function AromaKarte({
             {RINGE.map((ring) => (
               <polygon
                 key={ring}
-                points={alsPolygon(GESCHMACKS_ACHSEN.map((_, index) => netzPunkt(index, ring, RADIUS, mitte)))}
+                points={alsPolygon(GESCHMACKS_ACHSEN.map((_, index) => netzPunkt(index, ring, radius, mitte)))}
                 fill="none"
                 stroke="currentColor"
               />
             ))}
             {GESCHMACKS_ACHSEN.map((achse, index) => {
-              const ende = netzPunkt(index, MAX, RADIUS, mitte);
+              const ende = netzPunkt(index, MAX, radius, mitte);
               return <line key={achse.key} x1={mitte.x} y1={mitte.y} x2={ende.x} y2={ende.y} stroke="currentColor" />;
             })}
           </g>
@@ -724,7 +727,9 @@ export function AromaKarte({
               );
             })}
           </g>
-          {aktiv !== null && kartenSichtbar > 0.5
+          {/* Werte am Punkt nur im Netz; in der Karte stehen sie in der Legende darunter, am
+              Balkenende stießen sie an den Achsennamen der nächsten Zeile. */}
+          {aktiv !== null && kartenSichtbar < 0.5
             ? serien.map((serie, s) => {
                 const ende = serienPunkte[s][aktiv];
                 return (
@@ -794,10 +799,17 @@ export function AromaKarte({
               onFocus={() => terpenUeberfahren(name)}
               className={cn(
                 "absolute inline-flex -translate-y-1/2 items-center gap-1.5 pl-4 font-buch font-medium whitespace-nowrap transition-colors duration-normal",
-                terpene.length > 6 ? "text-small" : "text-h3",
+                terpene.length > 6 || schmal ? "text-small" : "text-h3",
                 (etwasUeberfahren ? terpenBetont(name) : (staerke[name] ?? 0) > 0) ? "text-text" : "text-text-muted",
               )}
-              style={{ left: `${(punkt.x / aktBreite) * 100}%`, top: `${(punkt.y / HOEHE) * 100}%`, opacity: kartenSichtbar }}
+              style={{
+                left: `${(punkt.x / aktBreite) * 100}%`,
+                top: `${(punkt.y / HOEHE) * 100}%`,
+                opacity: kartenSichtbar,
+                // Schmal: lange Namen (beta-Caryophyllen) brechen am Bindestrich um statt hinauszuragen.
+                maxWidth: schmal ? `${aktBreite - punkt.x}px` : undefined,
+                whiteSpace: schmal ? "normal" : undefined,
+              }}
             >
               <TerpenIcon name={name} />
               {name}
@@ -823,7 +835,8 @@ export function AromaKarte({
               <TerpenIcon name={begleiter[index].name} />
               {begleiter[index].name}
             </span>
-            <span className="text-caption font-normal">{begleiter[index].hinweis}</span>
+            {/* Unter 480 entfällt der Hinweis; die Legende sagt beim Antippen, dass es kein Terpen ist. */}
+            {aktBreite >= 480 ? <span className="text-caption font-normal">{begleiter[index].hinweis}</span> : null}
           </button>
         ))}
       </div>
@@ -831,7 +844,7 @@ export function AromaKarte({
       {/* Infotext unter der Karte (Nutzer 2026-09-26, 2026-09-27): zentriert wie eine Legende im Buch.
           Die Höhe ist fest reserviert, damit die Sektion beim Überfahren nicht springt; der Inhalt
           blendet beim Wechsel nur über (Deckkraft). */}
-      <div aria-live="polite" className="grid min-h-64 justify-items-center sm:min-h-48">
+      <div aria-live="polite" className="grid min-h-80 justify-items-center sm:min-h-56">
         {aktiveAchse ? (
           <InfoTafel
             key={`achse-${aktiveAchse.key}`}

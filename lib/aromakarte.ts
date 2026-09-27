@@ -31,17 +31,30 @@ const BESCHRIFTUNG = 14;
  * Bögen behalten. Die Balken füllen den Raum zwischen Beschriftung und Achse.
  */
 export function achsenX(breite: number = BREITE): number {
+  // Unter BREITE (Handy, seit 2026-09-27) wird die Karte nicht mehr verkleinert, sondern
+  // schmal gesetzt: die Achse steht bei 42 % der Breite.
+  if (breite < BREITE) return runde(breite * 0.42);
   return runde(LINKS + Math.max(0, breite - BREITE) * 0.5);
 }
+
+/** Kleinste Breite, in der die Karte gesetzt wird; darunter wird sie verkleinert. */
+export const MIN_BREITE = 320;
 
 export function balkenLaenge(breite: number = BREITE): number {
   return runde(achsenX(breite) - 16 - BESCHRIFTUNG);
 }
 /** Platz rechts der Terpenknoten für die Namen (HTML, feste Größe). */
 const RECHTS_ABSTAND = 150;
+/** Auf schmalen Karten weniger Platz rechts; lange Namen brechen dort um. */
+const RECHTS_ABSTAND_SCHMAL = 124;
 const OBEN = 48;
 const UNTEN = HOEHE - 48;
 export const RADIUS = 180;
+
+/** Netzradius: RADIUS, auf schmalen Karten so klein, dass die Achsennamen am Rand Platz haben. */
+export function radiusVon(breite: number = BREITE): number {
+  return Math.min(RADIUS, runde(breite / 2 - 80));
+}
 
 const runde = (zahl: number) => Math.round(zahl * 10) / 10 + 0;
 
@@ -70,7 +83,7 @@ export function achsenImKarte(breite: number = BREITE): Punkt[] {
 
 /** Knoten der Terpene (rechte Spalte). */
 export function terpeneImKarte(anzahl: number, breite: number = BREITE): Punkt[] {
-  const x = runde(breite - RECHTS_ABSTAND);
+  const x = runde(breite - (breite < BREITE ? RECHTS_ABSTAND_SCHMAL : RECHTS_ABSTAND));
   return Array.from({ length: anzahl }, (_, index) => ({ x, y: spalte(anzahl, index) }));
 }
 

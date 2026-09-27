@@ -17,6 +17,7 @@ import {
   terpeneImKarte,
   MITTE,
   RADIUS,
+  radiusVon,
 } from "@/lib/aromakarte";
 
 test("Herstellerprofil: dominantes Terpen setzt seine Achse auf 5, ohne Terpene null", () => {
@@ -175,4 +176,14 @@ test("Regler: Tastaturfokus zeichnet einen eigenen Ring im Fokus-Token, nur bei 
   assert.match(quelle, /setTastatur\(e\.currentTarget\.matches\(":focus-visible"\) \? index : null\)/);
   assert.match(quelle, /r=\{16\}\s+fill="none"\s+stroke="var\(--color-focus-ring\)"\s+strokeWidth=\{2\}/);
   assert.match(quelle, /vectorEffect="non-scaling-stroke"/);
+});
+
+test("Schmale Karte (Handy): Achse bei 42 %, Terpene 124 vor dem Rand, Netz kleiner; ab 640 unverändert", () => {
+  assert.equal(achsenImKarte(358)[0].x, 150.4);
+  assert.equal(balkenLaenge(358), 120.4);
+  assert.equal(terpeneImKarte(3, 358)[0].x, 234);
+  assert.equal(radiusVon(358), 99);
+  assert.equal(radiusVon(640), RADIUS);
+  assert.equal(radiusVon(1200), RADIUS);
+  assert.equal(achsenImKarte(640)[0].x, 260);
 });
