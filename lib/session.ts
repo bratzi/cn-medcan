@@ -5,6 +5,7 @@ import { headers } from "next/headers";
 
 import { getAuth } from "@/lib/auth";
 import { getPrisma } from "@/lib/prisma";
+import { hatSitzungsCookie } from "@/lib/sitzungs-cookie";
 import { istMitgliedRolle, type MitgliedRolle } from "@/db/enums";
 
 /**
@@ -36,6 +37,8 @@ const sitzung = cache(async () => {
   // Secret braucht. Andersherum rendert `next build` Seiten wie /admin vorab
   // und bricht ohne BETTER_AUTH_SECRET ab - Workers Builds hat keine Secrets.
   const anfrageHeader = await headers();
+  // Ohne Cookie keine Sitzung: Anonyme sparen sich den Aufbau von Better Auth.
+  if (!hatSitzungsCookie(anfrageHeader)) return null;
   const auth = await getAuth();
   return auth.api.getSession({ headers: anfrageHeader });
 });
