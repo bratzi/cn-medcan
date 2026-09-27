@@ -154,10 +154,13 @@ test("freigabeVorbelegen: erster Vorschlag zuerst, Luecken aus den weiteren, Ein
   });
 });
 
-test("freigabeKonflikt: fremde Id ist Konflikt, gleiche Id oder nichts nicht", () => {
-  assert.equal(freigabeKonflikt("id-a", null), null);
-  assert.equal(freigabeKonflikt("id-a", { id: "id-a", slug: "x" }), null);
-  assert.deepEqual(freigabeKonflikt("id-a", { id: "id-b", slug: "apples-bananas" }), { slug: "apples-bananas" });
+test("freigabeKonflikt: fremde Id ist Konflikt, gleiche Id mit gleichem Namen oder nichts nicht", () => {
+  assert.equal(freigabeKonflikt("id-a", "X", null), null);
+  assert.equal(freigabeKonflikt("id-a", "X", { id: "id-a", slug: "x", handelsname: "X" }), null);
+  assert.deepEqual(freigabeKonflikt("id-a", "A&B", { id: "id-b", slug: "apples-bananas", handelsname: "A&B" }), {
+    slug: "apples-bananas",
+    handelsname: "A&B",
+  });
 });
 
 test("quelleAlsLink: nur http(s)", () => {

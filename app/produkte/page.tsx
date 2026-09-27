@@ -116,12 +116,15 @@ async function Ergebnisbereich({ filter }: { filter: StrainFilter }) {
           </ul>
         )}
 
-        <p className="text-small text-text-muted">
-          Blüte fehlt?{" "}
-          <Link href={vorschlagLink(filter.q)} className={textLinkKlassen()}>
-            Schlag sie vor
-          </Link>
-        </p>
+        {/* Im leeren Ergebnis steht der Einstieg schon im Leerzustand. */}
+        {liste.eintraege.length > 0 ? (
+          <p className="text-small text-text-muted">
+            Blüte fehlt?{" "}
+            <Link href={vorschlagLink(filter.q)} className={textLinkKlassen()}>
+              Schlag sie vor
+            </Link>
+          </p>
+        ) : null}
 
         {liste.seitenAnzahl > 1 ? (
           <nav

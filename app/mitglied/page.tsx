@@ -38,7 +38,7 @@ export default async function MitgliedPage() {
     benachrichtigungenLaden(mitglied.mitgliedId),
     eigeneVorschlaege(mitglied.mitgliedId),
   ]);
-  const ungelesen = nachrichten.filter((n) => !n.gelesen).length;
+  const ungelesen = nachrichten.filter((n) => !n.gelesen).map((n) => n.id);
 
   return (
     <div className="mx-auto w-full max-w-180 px-4 py-16 sm:px-8">
@@ -123,7 +123,7 @@ export default async function MitgliedPage() {
                 ))}
               </ul>
             )}
-            <GelesenMarkieren ungelesen={ungelesen} />
+            <GelesenMarkieren ids={ungelesen} />
           </CardBody>
         </Card>
       </section>

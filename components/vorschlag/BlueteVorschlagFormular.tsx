@@ -120,6 +120,14 @@ export function BlueteVorschlagFormular({ terpene, nameVorbelegt }: Props) {
               </Link>
             </>
           ) : null}
+          {antwort.schonVorgeschlagen ? (
+            <>
+              {" "}
+              <Link href="/mitglied" className={textLinkKlassen()}>
+                Zu Mein Konto
+              </Link>
+            </>
+          ) : null}
         </Meldung>
       ) : null}
       {antwort?.ok ? (

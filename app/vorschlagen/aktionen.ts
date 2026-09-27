@@ -10,7 +10,13 @@ import { MAX_OFFENE_VORSCHLAEGE, blueteVorschlagPruefen } from "@/lib/vorschlag-
 
 export type VorschlagErgebnis =
   | { ok: true }
-  | { ok: false; fehler: string; vorhanden?: { slug: string; handelsname: string } };
+  | {
+      ok: false;
+      fehler: string;
+      vorhanden?: { slug: string; handelsname: string };
+      /** Eigener offener oder entschiedener Vorschlag mit demselben Schluessel: Link auf Mein Konto. */
+      schonVorgeschlagen?: true;
+    };
 
 /**
  * Eine fehlende Bluete vorschlagen. Jedes angemeldete Mitglied darf das,
@@ -24,8 +30,10 @@ export async function blueteVorschlagen(formData: FormData): Promise<VorschlagEr
   if (!geprueft.ok) return geprueft;
   const w = geprueft.wert;
 
+  // Eine inaktive Bluete steht nicht im Katalog: kein Link ins Leere, der
+  // Vorschlag geht durch, und die Freigabe schaltet sie wieder an.
   const vorhanden = await blueteVorhanden(w.schluessel, w.handelsname);
-  if (vorhanden) {
+  if (vorhanden?.aktiv) {
     return {
       ok: false,
       fehler: "Diese Blüte steht schon im Katalog.",
@@ -64,7 +72,11 @@ export async function blueteVorschlagen(formData: FormData): Promise<VorschlagEr
     });
   } catch (fehler) {
     if (istEindeutigkeitsfehler(fehler)) {
-      return { ok: false, fehler: "Diese Blüte hast du schon vorgeschlagen. Den Stand siehst du unter Mein Konto." };
+      return {
+        ok: false,
+        fehler: "Diese Blüte hast du schon vorgeschlagen. Den Stand siehst du unter Mein Konto.",
+        schonVorgeschlagen: true,
+      };
     }
     throw fehler;
   }

@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 
 import { mitgliedErforderlich } from "@/lib/session";
+import { gelesenIdsPruefen } from "@/lib/benachrichtigung";
 import { getPrisma } from "@/lib/prisma";
 import { profilEingabePruefen } from "@/lib/mitglied-eingabe";
 
@@ -38,12 +39,18 @@ export async function profilSpeichern(formData: FormData): Promise<ProfilErgebni
   return { ok: true };
 }
 
-/** Alle Benachrichtigungen des angemeldeten Mitglieds als gelesen markieren. */
-export async function benachrichtigungenGelesen(): Promise<void> {
+/**
+ * Die angezeigten Benachrichtigungen als gelesen markieren. Nur diese: aeltere
+ * jenseits der Liste bleiben ungelesen, sonst verschwaende ihr "Neu", ohne dass
+ * sie je zu sehen waren. Hoechstens 20 Ids, also weit unter der D1-Grenze.
+ */
+export async function benachrichtigungenGelesen(roh: unknown): Promise<void> {
   const mitglied = await mitgliedErforderlich();
+  const ids = gelesenIdsPruefen(roh);
+  if (ids.length === 0) return;
   const prisma = await getPrisma();
   await prisma.benachrichtigung.updateMany({
-    where: { mitgliedId: mitglied.mitgliedId, gelesenAm: null },
+    where: { id: { in: ids }, mitgliedId: mitglied.mitgliedId, gelesenAm: null },
     data: { gelesenAm: new Date() },
   });
 }

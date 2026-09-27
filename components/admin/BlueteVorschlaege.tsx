@@ -1,17 +1,19 @@
 import { BlueteFreigabe } from "@/components/admin/BlueteFreigabe";
 import { Badge, Card, CardBody, CardHeader, EmptyState, textLinkKlassen } from "@/components/ui";
 import { ladeStrainAuswahl } from "@/lib/query/strains";
-import { offeneVorschlaegeFuerAdmin, terpenNamen } from "@/lib/query/vorschlaege";
+import { herstellerNamen, offeneVorschlaegeFuerAdmin, terpenNamen } from "@/lib/query/vorschlaege";
 import { freigabeVorbelegen, quelleAlsLink, vorschlaegeBuendeln } from "@/lib/vorschlag-eingabe";
 
 const DATUM = new Intl.DateTimeFormat("de-DE", { dateStyle: "medium" });
+const HERSTELLER_LISTE = "freigabe-hersteller-liste";
 
 /** Offene Bluetenvorschlaege, gleiche gebuendelt, aelteste zuerst (Spec 4.2). */
 export async function BlueteVorschlaege() {
-  const [offene, terpene, strains] = await Promise.all([
+  const [offene, terpene, strains, hersteller] = await Promise.all([
     offeneVorschlaegeFuerAdmin(),
     terpenNamen(),
     ladeStrainAuswahl(),
+    herstellerNamen(),
   ]);
   const gruppen = vorschlaegeBuendeln(offene);
   const katalog = strains.map((s) => ({ wert: s.id, label: s.handelsname }));
@@ -25,6 +27,12 @@ export async function BlueteVorschlaege() {
           </h2>
         </CardHeader>
         <CardBody className="flex flex-col gap-8">
+          {/* Eine Liste fuer alle Formulare: bestehende Hersteller waehlen oder neuen Namen tippen (Spec 4.2). */}
+          <datalist id={HERSTELLER_LISTE}>
+            {hersteller.map((name) => (
+              <option key={name} value={name} />
+            ))}
+          </datalist>
           {gruppen.length === 0 ? (
             <EmptyState titel="Keine offenen Vorschläge" beschreibung="Neue Vorschläge der Mitglieder erscheinen hier." />
           ) : (
@@ -60,6 +68,7 @@ export async function BlueteVorschlaege() {
                   vorbelegung={freigabeVorbelegen(gruppe)}
                   terpene={terpene}
                   katalog={katalog}
+                  herstellerListe={HERSTELLER_LISTE}
                 />
               </article>
             ))

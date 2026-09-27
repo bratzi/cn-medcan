@@ -15,13 +15,29 @@ export async function terpenNamen(): Promise<string[]> {
   return zeilen.map((z) => z.name);
 }
 
-/** Steht die Bluete schon im Katalog (gleicher Slug oder Handelsname)? */
+/**
+ * Steht die Bluete schon in der Datenbank (gleicher Slug oder Handelsname)?
+ * Auch inaktive: sie belegen Slug und Namen. `aktiv` sagt, ob sie im Katalog
+ * zu sehen ist (nur dann taugt ein Link auf ihre Seite).
+ */
 export async function blueteVorhanden(slug: string, handelsname: string) {
   const prisma = await getPrisma();
   return prisma.strain.findFirst({
     where: { OR: [{ slug }, { handelsname }] },
-    select: { id: true, slug: true, handelsname: true },
+    select: { id: true, slug: true, handelsname: true, aktiv: true },
   });
+}
+
+/** Namen der Hersteller als Vorschlagsliste fuer das Freigabeformular. */
+export async function herstellerNamen(): Promise<string[]> {
+  const prisma = await getPrisma();
+  const zeilen = await prisma.unternehmen.findMany({
+    where: { rolle: { in: ["HERSTELLER", "BEIDES"] } },
+    select: { name: true },
+    orderBy: { name: "asc" },
+    take: 200,
+  });
+  return zeilen.map((z) => z.name);
 }
 
 export async function offeneVorschlaegeFuerAdmin(): Promise<OffenerVorschlag[]> {

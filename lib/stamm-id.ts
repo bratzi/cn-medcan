@@ -29,7 +29,9 @@ export function slugAusName(name: string): string {
 export function unternehmensSchluessel(name: string): string | null {
   const klein = name.trim().toLowerCase();
   if (!klein || klein.startsWith("unbekannt") || klein.startsWith("nicht genannt")) return null;
-  return klein.replace(/\s+(gmbh|pharma|pharmaceuticals|international)\b/g, "").trim() || null;
+  // Pythons \b kennt Umlaute als Wortzeichen, das \b von JavaScript nicht:
+  // "pharmaö" darf hier so wenig gekuerzt werden wie im Importskript.
+  return klein.replace(/\s+(gmbh|pharma|pharmaceuticals|international)(?![\p{L}\p{N}_])/gu, "").trim() || null;
 }
 
 function hexZuBytes(hex: string): Uint8Array {

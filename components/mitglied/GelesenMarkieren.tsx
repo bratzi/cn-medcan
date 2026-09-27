@@ -3,16 +3,23 @@
 import { useEffect } from "react";
 
 import { benachrichtigungenGelesen } from "@/app/mitglied/aktionen";
+import { zaehlerZuruecksetzen } from "@/components/layout/konto-zaehler-speicher";
 
-/** Markiert nach dem Anzeigen einmal alles als gelesen und setzt den Zaehler im Kopf auf 0. */
-export function GelesenMarkieren({ ungelesen }: { ungelesen: number }) {
+/**
+ * Markiert nach dem Anzeigen einmal die angezeigten ungelesenen als gelesen.
+ * Der Zaehler im Kopf fragt danach neu statt auf 0 zu springen: aeltere
+ * Ungelesene jenseits der Liste zaehlen weiter.
+ */
+export function GelesenMarkieren({ ids }: { ids: readonly string[] }) {
+  // Als Text, damit ein neues Array mit gleichem Inhalt keinen zweiten Aufruf ausloest.
+  const schluessel = ids.join(",");
   useEffect(() => {
-    if (ungelesen === 0) return;
-    void benachrichtigungenGelesen()
-      .then(() => window.dispatchEvent(new Event("benachrichtigungen-gelesen")))
+    if (!schluessel) return;
+    void benachrichtigungenGelesen(schluessel.split(","))
+      .then(zaehlerZuruecksetzen)
       .catch(() => {
         // Verbindungsfehler: der Zaehler bleibt stehen, naechster Versuch beim naechsten Besuch.
       });
-  }, [ungelesen]);
+  }, [schluessel]);
   return null;
 }

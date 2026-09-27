@@ -263,15 +263,34 @@ export function freigabeVorbelegen(gruppe: VorschlagGruppe): FreigabeVorbelegung
 }
 
 /**
- * Steht unter diesem Namen schon eine andere Bluete? Gleiche Id ist kein
- * Konflikt (Doppelklick oder Import dazwischen): dann wird sie genommen.
+ * Steht unter diesem Namen schon eine andere Bluete? Gleiche Id mit gleichem
+ * Namen ist kein Konflikt (Doppelklick oder Import dazwischen): dann wird sie
+ * genommen. Gleiche Id mit anderem Namen schon: die vorhandene Bluete bleibt
+ * unveraendert, eine Namenskorrektur im Formular ginge sonst still verloren.
+ * Der Betreiber ordnet die Vorschlaege dann ausdruecklich zu.
  */
 export function freigabeKonflikt(
   sollId: string,
-  vorhanden: { id: string; slug: string } | null,
-): { slug: string } | null {
-  if (!vorhanden || vorhanden.id === sollId) return null;
-  return { slug: vorhanden.slug };
+  handelsname: string,
+  vorhanden: { id: string; slug: string; handelsname: string } | null,
+): { slug: string; handelsname: string } | null {
+  if (!vorhanden) return null;
+  if (vorhanden.id === sollId && vorhanden.handelsname === handelsname) return null;
+  return { slug: vorhanden.slug, handelsname: vorhanden.handelsname };
+}
+
+/**
+ * Rolle eines gefundenen Unternehmens, das jetzt auch Hersteller ist. Wie
+ * firma() im Importskript: war es nur Importeur, wird es BEIDES. null heisst
+ * "bleibt, wie es ist".
+ */
+export function herstellerRolleNachFreigabe(rolle: string): "BEIDES" | null {
+  return rolle === "IMPORTEUR" ? "BEIDES" : null;
+}
+
+/** Pfad zu /vorschlagen, mit dem Namen als Vorbelegung (Katalogsuche, Anmeldung). */
+export function vorschlagPfad(name: string | undefined): string {
+  return name ? `/vorschlagen?name=${encodeURIComponent(name)}` : "/vorschlagen";
 }
 
 /** Nur http(s) wird verlinkt; alles andere bleibt Text. */

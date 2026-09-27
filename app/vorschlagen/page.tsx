@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { BlueteVorschlagFormular } from "@/components/vorschlag/BlueteVorschlagFormular";
 import { terpenNamen } from "@/lib/query/vorschlaege";
 import { aktuellesMitglied } from "@/lib/session";
+import { vorschlagPfad } from "@/lib/vorschlag-eingabe";
 
 export const metadata: Metadata = {
   title: "Blüte vorschlagen",
@@ -14,11 +15,12 @@ type Props = { searchParams: Promise<Record<string, string | string[] | undefine
 
 /** Fehlt eine Bluete im Katalog, traegt ein angemeldetes Mitglied sie hier ein (Spec 4.1). */
 export default async function VorschlagenPage({ searchParams }: Props) {
-  const mitglied = await aktuellesMitglied();
-  if (!mitglied) redirect("/anmelden?weiter=%2Fvorschlagen");
-
   const roh = (await searchParams).name;
   const nameVorbelegt = (typeof roh === "string" ? roh : "").slice(0, 120);
+
+  // Der Suchbegriff aus dem Katalog soll die Anmeldung ueberleben.
+  const mitglied = await aktuellesMitglied();
+  if (!mitglied) redirect(`/anmelden?weiter=${encodeURIComponent(vorschlagPfad(nameVorbelegt))}`);
 
   return (
     <div className="mx-auto w-full max-w-180 px-4 py-16 sm:px-8">

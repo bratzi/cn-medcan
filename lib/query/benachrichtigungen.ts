@@ -1,8 +1,7 @@
 import "server-only";
 
+import { MAX_BENACHRICHTIGUNGEN } from "@/lib/benachrichtigung";
 import { getPrisma } from "@/lib/prisma";
-
-const MAX_LISTE = 20;
 
 export async function ungeleseneAnzahl(mitgliedId: string): Promise<number> {
   const prisma = await getPrisma();
@@ -17,7 +16,7 @@ export async function benachrichtigungenLaden(mitgliedId: string): Promise<Eintr
   const zeilen = await prisma.benachrichtigung.findMany({
     where: { mitgliedId },
     orderBy: { erstelltAm: "desc" },
-    take: MAX_LISTE,
+    take: MAX_BENACHRICHTIGUNGEN,
     select: { id: true, text: true, link: true, gelesenAm: true, erstelltAm: true },
   });
   return zeilen.map((z) => ({

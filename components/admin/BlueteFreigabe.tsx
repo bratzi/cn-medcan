@@ -15,6 +15,8 @@ type Props = {
   vorbelegung: FreigabeVorbelegung;
   terpene: readonly string[];
   katalog: readonly SelectOption[];
+  /** Id einer datalist mit den bestehenden Herstellern. */
+  herstellerListe: string;
 };
 
 type AdminErgebnis = { ok: true } | { ok: false; fehler: string };
@@ -23,7 +25,7 @@ const TYPEN: SelectOption[] = KULTIVAR_TYPEN.map((t) => ({ wert: t, label: t }))
 const BESTRAHLUNG: SelectOption[] = BESTRAHLUNGEN.map((b) => ({ wert: b, label: b }));
 
 /** Drei Wege fuer eine Gruppe: freigeben (Bluete anlegen), zuordnen, ablehnen. */
-export function BlueteFreigabe({ schluessel, vorbelegung: v, terpene, katalog }: Props) {
+export function BlueteFreigabe({ schluessel, vorbelegung: v, terpene, katalog, herstellerListe }: Props) {
   const freigabe = useAktion();
   const zuordnung = useAktion();
   const ablehnung = useAktion();
@@ -58,7 +60,15 @@ export function BlueteFreigabe({ schluessel, vorbelegung: v, terpene, katalog }:
           <Input id={id("thcmax")} name="thcMax" label="THC bis %" required inputMode="decimal" defaultValue={v.thcMax} />
           <Input id={id("cbdmin")} name="cbdMin" label="CBD von %" required inputMode="decimal" defaultValue={v.cbdMin} />
           <Input id={id("cbdmax")} name="cbdMax" label="CBD bis %" required inputMode="decimal" defaultValue={v.cbdMax} />
-          <Input id={id("hersteller")} name="hersteller" label="Hersteller" defaultValue={v.hersteller} />
+          <Input
+            id={id("hersteller")}
+            name="hersteller"
+            label="Hersteller"
+            list={herstellerListe}
+            autoComplete="off"
+            hinweis="Aus der Liste wählen oder neu eintragen."
+            defaultValue={v.hersteller}
+          />
           <Input id={id("land")} name="anbauland" label="Anbauland" />
           <Select id={id("bestrahlung")} name="bestrahlung" label="Bestrahlung" optionen={BESTRAHLUNG} defaultValue="UNBEKANNT" />
         </div>

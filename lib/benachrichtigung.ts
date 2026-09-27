@@ -13,6 +13,20 @@ export type Nachricht = {
   link: string | null;
 };
 
+/** So viele zeigt /mitglied; mehr darf "gelesen" nicht markieren. */
+export const MAX_BENACHRICHTIGUNGEN = 20;
+
+/**
+ * Ids aus dem Browser fuer "gelesen": nur Texte, ohne Doppelte, hoechstens
+ * so viele, wie die Seite zeigt. Ob sie dem Mitglied gehoeren, entscheidet
+ * die Abfrage (mitgliedId aus der Sitzung).
+ */
+export function gelesenIdsPruefen(roh: unknown): string[] {
+  if (!Array.isArray(roh)) return [];
+  const ids = roh.filter((id): id is string => typeof id === "string" && id.length > 0);
+  return [...new Set(ids)].slice(0, MAX_BENACHRICHTIGUNGEN);
+}
+
 export function textFreigegeben(handelsname: string): string {
   return `Deine vorgeschlagene Blüte ${handelsname} steht jetzt im Katalog.`;
 }
