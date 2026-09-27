@@ -6,6 +6,7 @@ import { useEffect, useRef, useState, type Ref } from "react";
 import { buttonKlassen } from "@/components/ui/Button";
 import { textLinkKlassen } from "@/components/ui/textlink";
 import { cn } from "@/lib/cn";
+import type { Woerterbuch } from "@/lib/i18n/typen";
 
 /**
  * Zwei-Klick-Loesung fuer das Instagram-Reel (§ 25 Abs. 1 TDDDG, Art. 6
@@ -45,7 +46,7 @@ export function ReelRahmen({
   );
 }
 
-export function ReelNachKlick({ embedUrl, titel, className }: ReelNachKlickProps) {
+export function ReelNachKlick({ embedUrl, titel, className, texte }: ReelNachKlickProps & { texte: Woerterbuch["reel"] }) {
   const [geladen, setGeladen] = useState(false);
   const rahmen = useRef<HTMLIFrameElement>(null);
 
@@ -66,12 +67,12 @@ export function ReelNachKlick({ embedUrl, titel, className }: ReelNachKlickProps
         onClick={() => setGeladen(true)}
         className={buttonKlassen("secondary", "md", "self-start")}
       >
-        Reel von Instagram laden
+        {texte.laden}
       </button>
       <p className="text-caption text-pretty text-text">
-        Beim Laden gehen deine IP-Adresse und Browserdaten an Meta.{" "}
+        {texte.datenschutz}{" "}
         <Link href="/datenschutz#ds-instagram" className={textLinkKlassen()}>
-          Mehr dazu im Datenschutz
+          {texte.mehr}
         </Link>
       </p>
     </div>

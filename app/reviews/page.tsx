@@ -16,10 +16,10 @@ import { holeSprache, holeWoerterbuch } from "@/lib/i18n";
  */
 export const dynamic = "force-dynamic";
 
-export const metadata: Metadata = {
-  title: "Bewertungen",
-  description: "Meine Bewertungen nach festem Schema, jeweils an eine konkrete Charge gebunden.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const w = await holeWoerterbuch();
+  return { title: w.reviews.titel, description: w.reviews.metaBeschreibung };
+}
 
 /** Das Buch selbst (Spec TP2 4.1): der neueste Eintrag gross, alle im Inhaltsverzeichnis. */
 async function ReviewsInhalt() {
@@ -28,11 +28,11 @@ async function ReviewsInhalt() {
   if (reviews.length === 0) {
     return (
       <EmptyState
-        titel="Das erste Kapitel wird gerade geschrieben."
-        beschreibung="Welche Sorte ich zuerst teste, entscheidet die Abstimmung."
+        titel={w.reviews.leerTitel}
+        beschreibung={w.reviews.leerText}
         aktion={
           <Link href="/umfragen" className={buttonKlassen("secondary")}>
-            Zur Abstimmung
+            {w.reviews.zurAbstimmung}
           </Link>
         }
       />
@@ -43,7 +43,7 @@ async function ReviewsInhalt() {
     <div className="flex flex-col gap-16 sm:gap-24">
       <section aria-labelledby="neueste-titel" className="flex flex-col gap-8">
         <h2 id="neueste-titel" className={ABSCHNITT_TITEL}>
-          Der neueste Eintrag
+          {w.reviews.neuester}
         </h2>
         <Doppelseite eintrag={reviews[0]} umfang="auszug" ueberschrift="h3" w={w} sprache={sprache} />
       </section>
@@ -51,7 +51,7 @@ async function ReviewsInhalt() {
       {reviews.length > 1 ? (
         <section aria-labelledby="alle-titel" className="flex flex-col gap-8">
           <h2 id="alle-titel" className={ABSCHNITT_TITEL}>
-            Alle Einträge
+            {w.reviews.alle}
           </h2>
           <Inhaltsverzeichnis eintraege={reviews} w={w} sprache={sprache} />
         </section>
@@ -60,12 +60,13 @@ async function ReviewsInhalt() {
   );
 }
 
-export default function ReviewsPage() {
+export default async function ReviewsPage() {
+  const w = await holeWoerterbuch();
   return (
     <>
       <Seitenkopf
-        titel="Bewertungen"
-        satz="Jede Sorte teste ich nach demselben Schema und schreibe dazu, welche Charge es war."
+        titel={w.reviews.titel}
+        satz={w.reviews.satz}
       />
       <div className={cn(seitenRahmen(), "pt-12 pb-24 sm:pt-16")}>
         {/* Bewusst ohne Suspense-Grenze: der Inhalt steht im ersten HTML, damit er ohne JavaScript lesbar ist und Sprungziele (#eintrag-…) existieren. */}

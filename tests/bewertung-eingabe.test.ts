@@ -43,3 +43,26 @@ test("Beschaffenheit: nur bewegte Regler, 0 bis 5 in halben Schritten", () => {
   assert.equal(bewertungPruefen(formular({ "beschaffenheit-terpenDichte": "5.5" }), []).ok, false);
   assert.equal(bewertungPruefen(formular({ "beschaffenheit-trichomFarbe": "2.3" }), []).ok, false);
 });
+
+test("jede Ablehnung nennt einen Meldungsschluessel, den das Woerterbuch kennt", async () => {
+  const { de } = await import("@/lib/i18n/de");
+  const { en } = await import("@/lib/i18n/en");
+  const faelle = [
+    formular({ strainId: "" }),
+    formular({ chargenNr: "<b>" }),
+    formular({ "note-wirkung": "" }),
+    formular({ feuchtigkeit: "45" }),
+    formular({ "geschmack-zitrus": "3.3" }),
+    formular({ "terpen-Myrcen": "6" }),
+    formular({ "beschaffenheit-budDichte": "9" }),
+    formular({ notiz: "x".repeat(5000) }),
+    formular({ instagramReelUrl: "https://example.com/x" }),
+  ];
+  for (const f of faelle) {
+    const e = bewertungPruefen(f, ["Myrcen"]);
+    assert.equal(e.ok, false);
+    if (e.ok) continue;
+    assert.ok(e.fehler.schluessel in de.meldung, e.fehler.schluessel);
+    assert.ok(e.fehler.schluessel in en.meldung, e.fehler.schluessel);
+  }
+});

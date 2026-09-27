@@ -12,8 +12,11 @@ import { ladeStrainDetail, ladeTerpenKatalog } from "@/lib/query/strains";
 import { aktuellesMitglied } from "@/lib/session";
 import { holeSprache, holeWoerterbuch } from "@/lib/i18n";
 import { aromaTexte } from "@/lib/i18n/typen";
+import { t } from "@/lib/i18n/text";
 
-export const metadata: Metadata = { title: "Bewerten" };
+export async function generateMetadata(): Promise<Metadata> {
+  return { title: (await holeWoerterbuch()).bewerten.metaTitel };
+}
 export const dynamic = "force-dynamic";
 
 /**
@@ -36,21 +39,21 @@ export default async function BewertenPage({ params }: PageProps<"/bewerten/[slu
   return (
     <>
       <Seitenkopf
-        titel={`${strain.handelsname} bewerten`}
-        satz="Nach festem Schema, an eine Charge gebunden. Damit wir vergleichen können."
+        titel={t(w.bewerten.titel, { name: strain.handelsname })}
+        satz={w.bewerten.satz}
         zurueck={zurueck}
       />
       <div className={cn(seitenRahmen(), "pt-12 pb-24 sm:pt-16")}>
         {!mitglied ? (
           <div className="flex flex-col items-start gap-6">
-            <p className="text-body text-text">Zum Bewerten bitte anmelden.</p>
+            <p className="text-body text-text">{w.bewerten.anmeldenHinweis}</p>
             <Link href={`/anmelden?weiter=/bewerten/${strain.slug}`} className={buttonKlassen("primary", "md")}>
-              Anmelden
+              {w.bewerten.anmelden}
             </Link>
           </div>
         ) : !mitglied.freigegeben ? (
           <p className="max-w-[60ch] text-body text-text">
-            Sobald dein Konto freigeschaltet ist, kannst du hier bewerten.
+            {w.bewerten.nichtFreigegeben}
           </p>
         ) : (
           <BewertungsFormular
@@ -61,6 +64,7 @@ export default async function BewertenPage({ params }: PageProps<"/bewerten/[slu
             istBetreiber={mitglied.rolle === "ADMIN"}
             katalog={katalog}
             aromaTexte={aromaTexte(w, sprache)}
+            texte={w.bewerten}
             kopf={
               <SortenKopf
                 handelsname={strain.handelsname}

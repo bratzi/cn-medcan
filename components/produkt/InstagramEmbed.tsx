@@ -1,5 +1,7 @@
 import { ReelNachKlick } from "@/components/produkt/ReelNachKlick";
 import { cn } from "@/lib/cn";
+import { t } from "@/lib/i18n/text";
+import type { Woerterbuch } from "@/lib/i18n/typen";
 
 /**
  * Instagram-Reel-Einbettung ohne Drittanbieter-Skript.
@@ -24,6 +26,7 @@ export type InstagramEmbedProps = {
   /** Ueberschrift des `title`-Attributs, z. B. der Handelsname. */
   bezeichnung?: string;
   className?: string;
+  texte: Woerterbuch["reel"];
 };
 
 /** Erlaubte Hosts - nur Instagram selbst, keine Redirect-Dienste. */
@@ -64,7 +67,7 @@ export function baueEmbedUrl(rohUrl: string | null | undefined): string | null {
   return `https://www.instagram.com/${pfadArt}/${code}/embed`;
 }
 
-function Platzhalter({ className }: { className?: string }) {
+function Platzhalter({ className, texte }: { className?: string; texte: Woerterbuch["reel"] }) {
   return (
     <div
       className={cn(
@@ -72,24 +75,25 @@ function Platzhalter({ className }: { className?: string }) {
         className,
       )}
     >
-      <p className="text-small font-medium text-text">Kein Video hinterlegt</p>
+      <p className="text-small font-medium text-text">{texte.keinVideo}</p>
       <p className="mt-2 text-caption text-text">
-        Die Reel-Einbettung ist fuer diese Blüte noch nicht konfiguriert.
+        {texte.nichtKonfiguriert}
       </p>
     </div>
   );
 }
 
-export function InstagramEmbed({ url, bezeichnung, className }: InstagramEmbedProps) {
+export function InstagramEmbed({ url, bezeichnung, className, texte }: InstagramEmbedProps) {
   const quelle = url ?? process.env.NEXT_PUBLIC_INSTAGRAM_REEL_URL ?? null;
   const embedUrl = baueEmbedUrl(quelle);
 
-  if (!embedUrl) return <Platzhalter className={className} />;
+  if (!embedUrl) return <Platzhalter className={className} texte={texte} />;
 
   return (
     <ReelNachKlick
       embedUrl={embedUrl}
-      titel={bezeichnung ? `Instagram-Reel zu ${bezeichnung}` : "Instagram-Reel zur Blüte"}
+      titel={bezeichnung ? t(texte.titelZu, { name: bezeichnung }) : texte.titel}
+      texte={texte}
       className={className}
     />
   );

@@ -5,6 +5,12 @@ import { revalidatePath } from "next/cache";
 import { bewertungPruefen } from "@/lib/bewertung-eingabe";
 import { getPrisma } from "@/lib/prisma";
 import { freigabeErforderlich } from "@/lib/session";
+import { holeSprache, holeWoerterbuch, type Sprache, type Woerterbuch } from "@/lib/i18n";
+import { terpenAnzeige } from "@/lib/i18n/terpen";
+import { meldungText } from "@/lib/i18n/text";
+import type { Meldung } from "@/lib/i18n/typen";
+import type { BeschaffenheitsKey } from "@/lib/query/bewertung";
+import type { GeschmacksKategorie } from "@/db/enums";
 
 export type BewertungErgebnis = { ok: true; sofortSichtbar: boolean; slug: string } | { ok: false; fehler: string };
 
@@ -17,12 +23,32 @@ export type BewertungErgebnis = { ok: true; sofortSichtbar: boolean; slug: strin
  * sichtbar; nur er darf ein Reel verknüpfen. Terpene werden nur für die
  * Terpene der Sorte angenommen, alles andere im Formular wird ignoriert.
  */
+/**
+ * Meldung in der Sprache der Anfrage. Die Pruefung nennt nur Schluessel und
+ * Feld; der sichtbare Feldname kommt hier aus dem Woerterbuch.
+ */
+function text(w: Woerterbuch, sprache: Sprache, meldung: Meldung): string {
+  const p = meldung.parameter ?? {};
+  const label =
+    typeof p.feld === "string"
+      ? w.schema.noten[p.feld as keyof Woerterbuch["schema"]["noten"]]?.label
+      : typeof p.geschmack === "string"
+        ? w.label.geschmack[p.geschmack as GeschmacksKategorie]
+        : typeof p.beschaffenheit === "string"
+          ? w.schema.beschaffenheit[p.beschaffenheit as BeschaffenheitsKey]?.label
+          : typeof p.terpen === "string"
+            ? terpenAnzeige(p.terpen, sprache)
+            : undefined;
+  return meldungText(w, { ...meldung, parameter: label === undefined ? p : { ...p, label } });
+}
+
 export async function bewertungSpeichern(formData: FormData): Promise<BewertungErgebnis> {
+  const [w, sprache] = await Promise.all([holeWoerterbuch(), holeSprache()]);
   let mitglied;
   try {
     mitglied = await freigabeErforderlich();
   } catch {
-    return { ok: false, fehler: "Bewerten können nur freigeschaltete Mitglieder." };
+    return { ok: false, fehler: text(w, sprache, { schluessel: "bewertung.nurFreigeschaltet" }) };
   }
   const istBetreiber = mitglied.rolle === "ADMIN";
 
@@ -31,7 +57,7 @@ export async function bewertungSpeichern(formData: FormData): Promise<BewertungE
     where: { id: String(formData.get("strainId") ?? "") },
     select: { id: true, slug: true, aktiv: true },
   });
-  if (!strain || !strain.aktiv) return { ok: false, fehler: "Diese Sorte gibt es nicht (mehr)." };
+  if (!strain || !strain.aktiv) return { ok: false, fehler: text(w, sprache, { schluessel: "bewertung.sorteWeg" }) };
 
   // Alle bekannten Terpene: auch solche, die der Hersteller nicht angibt, die man aber schmeckt.
   const bekannte = await prisma.terpen.findMany({ select: { name: true } });
@@ -39,9 +65,9 @@ export async function bewertungSpeichern(formData: FormData): Promise<BewertungE
     formData,
     bekannte.map((terpen) => terpen.name),
   );
-  if (!geprueft.ok) return geprueft;
+  if (!geprueft.ok) return { ok: false, fehler: text(w, sprache, geprueft.fehler) };
   const e = geprueft.wert;
-  if (e.instagramReelUrl && !istBetreiber) return { ok: false, fehler: "Ein Reel verknüpft nur der Betreiber." };
+  if (e.instagramReelUrl && !istBetreiber) return { ok: false, fehler: text(w, sprache, { schluessel: "bewertung.reelNurBetreiber" }) };
 
   // Charge: vorhandene nehmen, sonst anlegen. Ohne Nummer bleibt die Bewertung ohne Charge.
   let chargeId: string | null = null;

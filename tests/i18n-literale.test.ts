@@ -46,6 +46,14 @@ const UMGESTELLT: string[] = [
   "components/review/Inhaltsverzeichnis.tsx",
   "components/review/Doppelseite.tsx",
   "components/review/erkundung-daten.ts",
+  // Welle 3: Reviews und Bewerten
+  "app/reviews/page.tsx",
+  "app/bewerten/[slug]/page.tsx",
+  "app/bewerten/aktionen.ts",
+  "lib/bewertung-eingabe.ts",
+  "components/review/BewertungsFormular.tsx",
+  "components/produkt/InstagramEmbed.tsx",
+  "components/produkt/ReelNachKlick.tsx",
 ];
 
 const ERLAUBT: string[] = ["Book of Terpz", "Deutsch"];
@@ -73,6 +81,8 @@ test("umgestellte Dateien enthalten keine deutschen Oberflaechentexte", () => {
     for (const text of texte(ohneKommentare(readFileSync(pfad, "utf8")))) {
       if (ERLAUBT.some((e) => text === e)) continue;
       if (text.startsWith("@/") || text.startsWith("./") || text === "use client" || text === "use server") continue;
+      // Ids und Schluessel in kebab-case (z. B. "alle-titel") sind kein Oberflaechentext.
+      if (/^[a-z0-9]+(-[a-z0-9]+)+$/.test(text)) continue;
       if (DEUTSCH.test(text)) funde.push(`${pfad}: ${text}`);
     }
   }

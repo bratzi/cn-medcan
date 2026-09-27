@@ -15,7 +15,8 @@ import { Button, Field, Input, Meldung } from "@/components/ui";
 import { useHydriert } from "@/components/ui/useHydriert";
 import type { KartenTerpen, Treue } from "@/lib/aromakarte";
 import { MAX_NOTIZ } from "@/lib/bewertung-eingabe";
-import type { AromaTexte } from "@/lib/i18n/typen";
+import type { AromaTexte, Woerterbuch } from "@/lib/i18n/typen";
+import { t } from "@/lib/i18n/text";
 
 type Props = {
   strainId: string;
@@ -35,6 +36,7 @@ type Props = {
   beschaffenheit: BeschaffenheitsWerte;
   /** Texte der Aroma-Bausteine (lib/i18n/typen.ts, aromaTexte). */
   aromaTexte: AromaTexte;
+  texte: Woerterbuch["bewerten"];
 };
 
 /**
@@ -53,6 +55,7 @@ export function BewertungsFormular({
   katalog = [],
   kopf,
   aromaTexte,
+  texte,
   ...daten
 }: Props) {
   const router = useRouter();
@@ -81,11 +84,11 @@ export function BewertungsFormular({
       <div className="flex flex-col items-start gap-6">
         <Meldung art="erfolg">
           {erfolg.sofortSichtbar
-            ? "Gespeichert und veröffentlicht."
-            : "Danke! Deine Bewertung ist eingegangen und erscheint nach der Freigabe."}
+            ? texte.gespeichert
+            : texte.eingegangen}
         </Meldung>
         <Link href={`/blueten/${erfolg.slug}`} className="text-small text-accent underline underline-offset-4">
-          {`Zurück zu ${handelsname}`}
+          {t(texte.zurueck, { name: handelsname })}
         </Link>
       </div>
     );
@@ -98,11 +101,11 @@ export function BewertungsFormular({
       <AromaErkundung titel={handelsname} bild={kopf} terpene={terpene} katalog={katalog} eingabe texte={aromaTexte} {...daten} />
 
       <section className="flex flex-col gap-6 border-t border-border pt-8">
-        <h2 className="font-buch text-h2 font-medium text-text">Charge und Notiz</h2>
+        <h2 className="font-buch text-h2 font-medium text-text">{texte.chargeNotiz}</h2>
         <Input
           id="bewertung-charge"
-          label="Chargennummer"
-          hinweis="Steht auf der Dose. Leer lassen, wenn unbekannt."
+          label={texte.charge}
+          hinweis={texte.chargeHinweis}
           name="chargenNr"
           list="bewertung-chargen"
           maxLength={40}
@@ -113,7 +116,7 @@ export function BewertungsFormular({
             <option key={nummer} value={nummer} />
           ))}
         </datalist>
-        <Field id="bewertung-notiz" label="Was ist dir aufgefallen?" hinweis={`Höchstens ${MAX_NOTIZ} Zeichen. Optional.`}>
+        <Field id="bewertung-notiz" label={texte.notiz} hinweis={t(texte.notizHinweis, { anzahl: MAX_NOTIZ })}>
           {(attribute) => (
             <textarea
               {...attribute}
@@ -125,14 +128,14 @@ export function BewertungsFormular({
           )}
         </Field>
         {istBetreiber ? (
-          <Input id="bewertung-reel" label="Instagram-Reel" hinweis="Optional." name="instagramReelUrl" type="url" inputMode="url" />
+          <Input id="bewertung-reel" label={texte.reel} hinweis={texte.optional} name="instagramReelUrl" type="url" inputMode="url" />
         ) : null}
       </section>
 
       {fehler ? <Meldung art="fehler">{fehler}</Meldung> : null}
       <div>
         <Button type="submit" disabled={!hydriert || laeuft}>
-          {laeuft ? "Wird gespeichert" : istBetreiber ? "Veröffentlichen" : "Bewertung einreichen"}
+          {laeuft ? texte.speichert : istBetreiber ? texte.veroeffentlichen : texte.einreichen}
         </Button>
       </div>
     </form>

@@ -6,6 +6,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 
 import { InstagramEmbed, baueEmbedUrl } from "@/components/produkt/InstagramEmbed";
 import { ReelRahmen } from "@/components/produkt/ReelNachKlick";
+import { de } from "@/lib/i18n/de";
 
 const GUELTIG = "https://www.instagram.com/reel/ABCdef12345/";
 
@@ -18,7 +19,7 @@ test("baueEmbedUrl baut die Embed-URL neu und lehnt Fremdes ab", () => {
 });
 
 test("vor dem Klick lädt nichts von Instagram", () => {
-  const html = renderToStaticMarkup(createElement(InstagramEmbed, { url: GUELTIG, bezeichnung: "Nebelharz 22" }));
+  const html = renderToStaticMarkup(createElement(InstagramEmbed, { url: GUELTIG, bezeichnung: "Nebelharz 22", texte: de.reel }));
   assert.doesNotMatch(html, /<iframe|instagram\.com/);
   assert.match(html, /<button type="button"[^>]*>Reel von Instagram laden<\/button>/);
   assert.match(html, /Meta/);
@@ -38,7 +39,7 @@ test("nach dem Klick: iframe mit geprüfter URL und ohne Referrer", () => {
 });
 
 test("ohne gültige URL bleibt der bisherige Platzhalter ohne Lade-Button", () => {
-  const html = renderToStaticMarkup(createElement(InstagramEmbed, { url: "https://example.com/reel/x" }));
+  const html = renderToStaticMarkup(createElement(InstagramEmbed, { url: "https://example.com/reel/x", texte: de.reel }));
   assert.match(html, /Kein Video hinterlegt/);
   assert.doesNotMatch(html, /<iframe|Reel von Instagram laden/);
 });

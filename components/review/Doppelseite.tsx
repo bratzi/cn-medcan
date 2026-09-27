@@ -192,7 +192,7 @@ export function Doppelseite({ eintrag, umfang, ueberschrift: Ueberschrift, story
             {eintrag.notiz}
           </p>
         ) : null}
-        {reel ? <InstagramEmbed url={reel} bezeichnung={eintrag.handelsname} /> : null}
+        {reel ? <InstagramEmbed url={reel} bezeichnung={eintrag.handelsname} texte={w.reel} /> : null}
         {voll ? null : (
           <p className="mt-auto">
             <Link href={eintragHref(eintrag.slug, eintrag.id)} className={buttonKlassen("secondary", "md")}>
