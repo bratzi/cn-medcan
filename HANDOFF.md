@@ -41,6 +41,15 @@ in ihrer Geschmacksfarbe, Lichtpunkt läuft Geschmack → Terpen (`a3a8431`, `.b
 Kopf** (`962ccc8`, components/marke/Logo.tsx: „Book of“ 0,45 em oben, „Terpz“ text-marke, vier Konturen, Verlauf,
 Glanz; Brand-Doku §2 angepasst); 24 geprüfte Skills installiert (`3192b53`). Live noch NICHT gesehen.
 
+**Stand 2026-09-27, später: WELLE 1 FERTIG, alles gepusht, Tests 231/231.** W1-A `0d278c2` (Pin „Umschlag wird Seite“
+abschaltbar über `UMSCHLAG_WIRD_SEITE` in bewegung/auftakt.ts, `data-ruhend` in bewegung/ruhe.ts), W1-C `43e3105`
+(Entscheid offen: Freigabe einer inaktiven Blüte mit gleicher Id schaltet sie wieder aktiv), W1-D `42e35fd` (Nutzer
+füllt Platzhalter in lib/rechtliches.ts; **Lücke: Instagram-iframe lädt ohne Einwilligung** → Zwei-Klick in Welle 2),
+W1-E Spec `14ee8dc` (3 offene Fragen: Accept-Language ja?, en-GB?, Umschalter erst ab Welle 2?), W1-F `0f7b888`
+(Fragen: Datenalter 300 s oder 60 s; keine eigene Domain). **Beide Specs warten auf Nutzerfreigabe.**
+Welle 2 läuft: Aufräumen (9), Kern-Kleinpunkte (10), Instagram-Zwei-Klick; danach /blueten (11); Browserpunkte (7, 8)
+brauchen Chrome vorn.
+
 **Stand 2026-09-27:** Welle 1 brach am Sitzungslimit ab. W1-B (Aroma-Details) ist fertig (`2c55c83`), dazu
 „stimmt das?“ eins höher (`e6c647a`) und Hover in beide Richtungen plus Infotext mit Icons (`4d428c4`). W1-A, C, D, E, F
 wurden **neu gestartet**. Aufträge in `docs/superpowers/plans/2026-09-26-session22-wellen.md`. **Ist der Baum nach einem
