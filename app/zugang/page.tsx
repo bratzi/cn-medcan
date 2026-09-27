@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { textLinkKlassen } from "@/components/ui/textlink";
+import { ZugangFelder } from "@/components/zugang/ZugangFelder";
 import { RECHTLICHE_LINKS } from "@/lib/rechtliches";
 
 export const metadata: Metadata = {
@@ -9,13 +10,7 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-type Props = {
-  searchParams: Promise<{ weiter?: string; fehler?: string }>;
-};
-
-export default async function ZugangPage({ searchParams }: Props) {
-  const { weiter = "/", fehler } = await searchParams;
-
+export default function ZugangPage() {
   return (
     <main className="flex min-h-dvh items-center justify-center bg-surface-sunken p-4">
       <div className="w-full max-w-100 rounded-lg border border-border bg-surface p-8 shadow-md">
@@ -25,30 +20,7 @@ export default async function ZugangPage({ searchParams }: Props) {
         </p>
 
         <form action="/api/zugang" method="post" className="mt-8 flex flex-col gap-4">
-          <input type="hidden" name="weiter" value={weiter} />
-
-          <div className="flex flex-col gap-2">
-            <label htmlFor="passwort" className="text-small font-medium text-text">
-              Passwort
-            </label>
-            <input
-              id="passwort"
-              name="passwort"
-              type="password"
-              required
-              autoComplete="current-password"
-              autoFocus
-              aria-describedby={fehler ? "zugang-fehler" : undefined}
-              aria-invalid={fehler ? true : undefined}
-              className="h-11 rounded-md border border-border-strong bg-surface px-4 text-body text-text outline-none transition-colors duration-150 focus-visible:border-accent focus-visible:ring-2 focus-visible:ring-focus-ring"
-            />
-          </div>
-
-          {fehler ? (
-            <p id="zugang-fehler" role="alert" className="text-small text-danger">
-              Passwort falsch. Bitte erneut versuchen.
-            </p>
-          ) : null}
+          <ZugangFelder />
 
           <button
             type="submit"
