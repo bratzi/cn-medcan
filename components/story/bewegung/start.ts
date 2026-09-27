@@ -1,9 +1,6 @@
 import { abstimmung } from "./abstimmung";
 import { auftakt, auftaktFilm, umschlagWirdSeite } from "./auftakt";
 import { eintrag } from "./eintrag";
-import { starteBlaetter } from "./blaetter";
-
-const BLAETTER_AN = false;
 import { beobachteLoops } from "./loops";
 import { beobachtePunkte } from "./punkte";
 import { randnotizen } from "./randnotizen";
@@ -11,7 +8,7 @@ import { beobachteRuhe } from "./ruhe";
 import { schluss } from "./schluss";
 import { transparent } from "./transparent";
 import { vorhang } from "./vorhang";
-import { AB_TABLET, type Choreografie, type Werkzeug } from "./typen";
+import { type Choreografie, type Werkzeug } from "./typen";
 
 /**
  * Scroll-Ablaeufe der Sektionen 2 bis 9. Sie starten erst, wenn kein
@@ -114,25 +111,12 @@ export async function starteBuehne(): Promise<() => void> {
   // CSS-Endlosschleifen (Blob-Morph, Glanz, Puls) ruhen in Sektionen ausserhalb des Bildes.
   const ruheStopp = beobachteRuhe();
 
-  // 3D-Blätter vorerst aus (Nutzer 2026-09-25: passt nicht rein, Code bleibt für später).
-  // Wieder an: BLAETTER_AN auf true. Nur ab Tablet: auf kleinen Geräten kostet WebGL zu viel Akku.
-  let blaetterStopp: (() => void) | null = null;
-  if (BLAETTER_AN && window.matchMedia(AB_TABLET).matches) {
-    void starteBlaetter(() => lenis.velocity)
-      .then((stopp) => {
-        if (beendet) stopp();
-        else blaetterStopp = stopp;
-      })
-      .catch(() => undefined);
-  }
-
   return () => {
     beendet = true;
     stoppeWarten();
     loops.stoppen();
     punkteStopp();
     ruheStopp();
-    blaetterStopp?.();
     window.removeEventListener("load", neuMessen);
     for (const aufraeumen of aufraeumer.splice(0)) aufraeumen();
     mm.revert();
