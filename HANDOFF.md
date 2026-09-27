@@ -58,14 +58,46 @@ brechen um, Begleitstoff-Hinweis unter 480 aus). **Handy-Ansicht davon live NOCH
 **Nutzerentscheide 2026-09-27:** i18n: Accept-Language-Erkennung ja, en-GB, Umschalter erst sichtbar wenn alle
 Wellen übersetzt sind. Caching: TTL 300 s. Beide Specs damit freigegeben (Status in den Specs vermerkt).
 
-**Nächste Session, der Reihe nach:**
-1. Handy-Ansicht der Aroma-Karte live prüfen (Chrome vorn; Fenster geht nur bis 494 px, daher auch Doppelseite
-   ~623 px ansehen, die jetzt ebenfalls schmal gesetzt wird).
-2. /bewerten/apples-bananas speichern (Sweet Spot, Fruchtig/Minzig); Testblüte in /admin/vorschlaege freigeben,
-   dann fragen ob löschen; Nutzer-Entscheid „inaktive Blüte bei Freigabe reaktivieren?“ offen.
-3. Welle 3: Caching v2 nach `docs/superpowers/plans/2026-09-26-caching-v2.md` ab Schritt 0 (Messung), TTL 300 s.
-4. writing-plans für i18n (Spec 2026-09-26-englisch-umschalter-design.md), dann in Wellen umsetzen.
-5. Abschluss-Review über alles. Platzhalter in lib/rechtliches.ts füllt der Nutzer.
+### ⇢ GESAMTLISTE, neu sortiert (Session 23, 2026-09-27) — ersetzt ALLE Task-Listen darunter
+
+Alle alten Listen (Session 12 bis 22, „Was noch offen ist“, „2. Danach“) wurden durchgesehen. Was dort nicht
+hier steht, ist erledigt oder gestrichen.
+
+**A. Sinnvoll, der Reihe nach:**
+1. Kleiner Textfehler: `app/mitglied/page.tsx:76` und `app/admin/page.tsx:414` versprechen Freigegebenen
+   „Sicht auf die Preisangaben“; Preise sind zurückgestellt und hängen noch am Gate-Passwort → Satzteil streichen.
+2. /bewerten/apples-bananas einmal speichern (Sweet Spot, Fruchtig/Minzig) als Live-Test der Kernschleife;
+   Testblüte in /admin/vorschlaege freigeben, dann Nutzer fragen, ob sie gelöscht wird. Braucht Login im Chrome.
+3. Welle 3a: **Caching v2** nach `docs/superpowers/plans/2026-09-26-caching-v2.md`, ab Schritt 0 (Messung),
+   TTL 300 s. Behebt die Fehler 1102, hat Vorrang vor Komfort.
+4. Welle 3b: **Englisch** — erst superpowers:writing-plans aus der freigegebenen Spec, dann in Wellen; Schalter
+   erst mit der letzten Welle sichtbar (Nutzerentscheid).
+5. Abschluss-Review über alles (Code-Review der Sessions 22/23, Live-Stichprobe, `npm audit` einmal, HANDOFF stimmig).
+6. **LETZTER TASK (Nutzerauftrag 2026-09-27): Mobile-Version optisch und technisch optimieren**, mit den besten
+   Skills: `better-interface` (Gesamturteil), `better-layout`, `better-typography`, `better-accessibility`,
+   `fitts-law` (Touch-Ziele ≥ 44 px), `critique-composition`/`critique-information-density` auf Screenshots,
+   `cloudflare:web-perf` (Core Web Vitals mobil), `emil-design-eng` für Feinschliff, `ui-design-engine` als
+   Regelwerk. Umfang: Startseite, /blueten, Blütenseite, /bewerten, /umfragen, /mitglied, Kopf (Navigation scrollt
+   waagerecht, „BLÜTEN“ angeschnitten → prüfen, ob alle drei ohne Wischen passen), Aroma-Karte schmal (seit
+   `c8bd530`, live noch nicht gesehen), Legende min-h-80, Hero-Video auf dem Handy (Datenmenge), Lenis/GSAP-Last.
+   Chrome geht nur bis 494 px: für 390 px die Seite in einem iframe mit width 390 messen oder Emulation per JS.
+
+**B. Unwichtig / nur auf Zuruf (geparkt):**
+- Entscheid „inaktive Blüte bei Freigabe reaktivieren?“ (Verhalten heute: ja, `43e3105`) — nur ändern, wenn Nutzer es will.
+- Platzhalter in `lib/rechtliches.ts` (füllt der Nutzer; vor öffentlichem Start Pflicht).
+- Instagram-Handle, Symbolbilder ersetzen, Herstellertreue-Rangliste, `/mitglied` eigene Vorschläge/Stimmen
+  ausbauen, Mail bei Vorschlägen.
+- Mailversand (Block C): braucht eigene Absenderdomain, keine vorhanden → ruht.
+- Apotheken/Preise, `FACHKREIS_PASSWORD` ausbauen, Preise an Mitgliedsfreigabe binden: zurückgestellt (Memory),
+  nur als Aussicht.
+- JSON-Import (Datei fehlt), `.dev.vars` für lokale Vorschau (lokal wird nicht gebaut).
+
+**C. Obsolet / gestrichen:** 3D-Blätter, AromaSpielwiese, Achsenknoten-Bug der alten Karte, „andere Buttons folgen
+der Maus“, Audit-Vorschläge gegen Nutzerentscheide (weniger Puls/Glanz/Handschrift, Reihenfolge, Joint-Cursor raus),
+Hydrations-Sperre der drei Formulare und `vorschlagBisAm` (erledigt `45f8c9f`), /produkte → /blueten (erledigt),
+Instagram-Zwei-Klick (erledigt), Review-Oberfläche fehlt (erledigt: /bewerten), D1/Deploy/Workers Builds
+einrichten (erledigt), Wasm- und .env-Befunde (erledigt), Session-21-Rückstand der Sichtprüfung (heute geprüft).
+
 **Build-Regel:** nach einem Code-Push ~13 min nicht erneut pushen (bricht den Build ab); nur HANDOFF.md ist ausgenommen.
 
 **⇢ STAND ZUM CLEAR (2026-09-27): WELLE 1 UND 2 (Code) FERTIG, alles gepusht, Tests 250/250, Baum sauber.**
