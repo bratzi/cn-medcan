@@ -76,6 +76,9 @@ const UMGESTELLT: string[] = [
   "components/story/Skelette.tsx",
   "components/medien/LoopSchalter.tsx",
   "lib/query/community.ts",
+  // Welle 4c: Apotheken (zurueckgestellt, aber uebersetzt)
+  "app/apotheken/page.tsx",
+  "app/apotheken/[slug]/page.tsx",
 ];
 
 const ERLAUBT: string[] = ["Book of Terpz", "Deutsch"];

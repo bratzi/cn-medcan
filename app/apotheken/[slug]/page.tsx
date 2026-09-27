@@ -24,10 +24,8 @@ import {
   formatierePreisProGramm,
   formatiereRelativ,
 } from "@/lib/format";
-import { de } from "@/lib/i18n/de";
-// Deutsch bis Welle 4 (Plan Englisch): Apotheken sind zurueckgestellt.
-const bestandStatusLabel: Record<BestandStatus, string> = de.label.bestandStatus;
-const rezeptStatusLabel = de.label.rezeptStatus;
+import { holeSprache, holeWoerterbuch, type Sprache, type Woerterbuch } from "@/lib/i18n";
+import { t } from "@/lib/i18n/text";
 import { istFachkreis } from "@/lib/query/fachkreis";
 import { ladeApothekeDetail, type ApothekeDetail } from "@/lib/query/strains";
 
@@ -45,8 +43,8 @@ const STATUS_VARIANTE: Record<BestandStatus, BadgeVariante> = {
   AUSGELISTET: "neutral",
 };
 
-function statusLabel(status: string): string {
-  return bestandStatusLabel[status as BestandStatus] ?? status;
+function statusLabel(w: Woerterbuch, status: string): string {
+  return w.label.bestandStatus[status as BestandStatus] ?? status;
 }
 
 function statusVariante(status: string): BadgeVariante {
@@ -57,24 +55,26 @@ export async function generateMetadata({
   params,
 }: PageProps<"/apotheken/[slug]">): Promise<Metadata> {
   const { slug } = await params;
-  const apotheke = await ladeApothekeDetail(slug, false);
+  const [apotheke, w] = await Promise.all([ladeApothekeDetail(slug, false), holeWoerterbuch()]);
 
   if (!apotheke) {
-    return { title: "Apotheke nicht gefunden" };
+    return { title: w.apotheke.nichtGefunden };
   }
 
   return {
     title: apotheke.name,
-    description: `Standort, Lieferzeit, Rezeptarten und gemeldetes Sortiment der ${apotheke.name}.`,
+    description: t(w.apotheke.detailBeschreibung, { name: apotheke.name }),
   };
 }
 
-function Stammdaten({ apotheke }: { apotheke: ApothekeDetail }) {
+function Stammdaten({ apotheke, w, sprache }: { apotheke: ApothekeDetail; w: Woerterbuch; sprache: Sprache }) {
+  const x = w.apotheke;
+  const ka = w.bluete.fakten.keineAngabe;
   const zeilen: { begriff: string; wert: ReactNode }[] = [
-    { begriff: "Name", wert: apotheke.name },
-    { begriff: "Anschrift", wert: apotheke.strasse ?? "k. A." },
+    { begriff: x.name, wert: apotheke.name },
+    { begriff: x.anschrift, wert: apotheke.strasse ?? ka },
     {
-      begriff: "PLZ und Ort",
+      begriff: x.plzOrt,
       wert: (
         <>
           <span className="numeric">{apotheke.plz}</span> {apotheke.ort}
@@ -82,7 +82,7 @@ function Stammdaten({ apotheke }: { apotheke: ApothekeDetail }) {
       ),
     },
     {
-      begriff: "Telefon",
+      begriff: x.telefon,
       wert: apotheke.telefon ? (
         <a
           href={`tel:${apotheke.telefon.replace(/\s+/g, "")}`}
@@ -91,11 +91,11 @@ function Stammdaten({ apotheke }: { apotheke: ApothekeDetail }) {
           {apotheke.telefon}
         </a>
       ) : (
-        "k. A."
+        ka
       ),
     },
     {
-      begriff: "E-Mail",
+      begriff: x.email,
       wert: apotheke.email ? (
         <a
           href={`mailto:${apotheke.email}`}
@@ -104,11 +104,11 @@ function Stammdaten({ apotheke }: { apotheke: ApothekeDetail }) {
           {apotheke.email}
         </a>
       ) : (
-        "k. A."
+        ka
       ),
     },
     {
-      begriff: "Website",
+      begriff: x.website,
       wert: apotheke.website ? (
         <a
           href={apotheke.website}
@@ -119,27 +119,28 @@ function Stammdaten({ apotheke }: { apotheke: ApothekeDetail }) {
           {apotheke.website}
         </a>
       ) : (
-        "k. A."
+        ka
       ),
     },
     {
-      begriff: "Lieferzeit",
+      begriff: x.lieferzeit,
       wert: formatiereLieferzeit(
         apotheke.lieferzeitTageMin,
         apotheke.lieferzeitTageMax,
+        sprache,
       ),
     },
-    { begriff: "Rezeptstatus", wert: rezeptStatusLabel[apotheke.rezeptStatus] },
+    { begriff: x.rezeptstatus, wert: w.label.rezeptStatus[apotheke.rezeptStatus] },
     {
-      begriff: "E-Rezept-Token per Upload",
-      wert: apotheke.eRezeptTokenUpload ? "Wird angenommen" : "Wird nicht angenommen",
+      begriff: x.token,
+      wert: apotheke.eRezeptTokenUpload ? x.angenommen : x.nichtAngenommen,
     },
     {
-      begriff: "Betriebserlaubnisnummer",
+      begriff: x.betriebserlaubnis,
       wert: apotheke.betriebserlaubnisNr ? (
         <span className="numeric">{apotheke.betriebserlaubnisNr}</span>
       ) : (
-        "k. A."
+        ka
       ),
     },
   ];
@@ -147,7 +148,7 @@ function Stammdaten({ apotheke }: { apotheke: ApothekeDetail }) {
   return (
     <Card>
       <CardBody>
-        <h2 className="text-h3 text-text">Stammdaten</h2>
+        <h2 className="text-h3 text-text">{x.stammdaten}</h2>
         <dl className="mt-4 flex flex-col gap-4">
           {zeilen.map((zeile) => (
             <div
@@ -169,15 +170,20 @@ function Stammdaten({ apotheke }: { apotheke: ApothekeDetail }) {
 function Sortiment({
   apotheke,
   fachkreis,
+  w,
+  sprache,
 }: {
   apotheke: ApothekeDetail;
   fachkreis: boolean;
+  w: Woerterbuch;
+  sprache: Sprache;
 }) {
+  const x = w.apotheke;
   if (apotheke.sortiment.length === 0) {
     return (
       <EmptyState
-        titel="Keine gelisteten Blüten"
-        beschreibung="Diese Apotheke hat derzeit keine Bestände gemeldet."
+        titel={x.keineBestaende}
+        beschreibung={x.keineBestaendeText}
       />
     );
   }
@@ -186,24 +192,23 @@ function Sortiment({
     <>
       {fachkreis ? null : (
         <p className="mb-4 max-w-[68ch] rounded-md border border-border bg-surface-raised px-4 py-4 text-small text-text-muted">
-          Preise verschreibungspflichtiger Arzneimittel werden nach § 10 HWG nur
-          Fachkreisen angezeigt.
+          {x.preisHinweis}
         </p>
       )}
 
       <Table
-        caption={`Gemeldete Bestände der ${apotheke.name}`}
+        caption={t(x.bestaende, { name: apotheke.name })}
         captionVersteckt
       >
         <TableHead>
           <TableRow>
-            <TableHeaderCell>Blüte</TableHeaderCell>
-            <TableHeaderCell numerisch>Packungsgröße</TableHeaderCell>
+            <TableHeaderCell>{x.spalten.bluete}</TableHeaderCell>
+            <TableHeaderCell numerisch>{x.spalten.packung}</TableHeaderCell>
             {fachkreis ? (
-              <TableHeaderCell numerisch>Preis pro Gramm</TableHeaderCell>
+              <TableHeaderCell numerisch>{x.spalten.preis}</TableHeaderCell>
             ) : null}
-            <TableHeaderCell>Status</TableHeaderCell>
-            <TableHeaderCell>Stand</TableHeaderCell>
+            <TableHeaderCell>{x.spalten.status}</TableHeaderCell>
+            <TableHeaderCell>{x.spalten.stand}</TableHeaderCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -218,20 +223,20 @@ function Sortiment({
                   {zeile.strain.handelsname}
                 </Link>
               </TableCell>
-              <TableCell numerisch>{formatiereGramm(zeile.packungGramm)}</TableCell>
+              <TableCell numerisch>{formatiereGramm(zeile.packungGramm, sprache)}</TableCell>
               {fachkreis ? (
                 <TableCell numerisch>
-                  {formatierePreisProGramm(zeile.preisProGrammCent)}
+                  {formatierePreisProGramm(zeile.preisProGrammCent, sprache)}
                 </TableCell>
               ) : null}
               <TableCell>
                 <Badge variante={statusVariante(zeile.status)}>
-                  {statusLabel(zeile.status)}
+                  {statusLabel(w, zeile.status)}
                 </Badge>
               </TableCell>
               <TableCell>
                 <span className="text-small text-text-muted">
-                  {formatiereRelativ(zeile.standAm)}
+                  {formatiereRelativ(zeile.standAm, undefined, sprache)}
                 </span>
               </TableCell>
             </TableRow>
@@ -242,7 +247,7 @@ function Sortiment({
   );
 }
 
-async function ApothekeInhalt({ slug }: { slug: string }) {
+async function ApothekeInhalt({ slug, w, sprache }: { slug: string; w: Woerterbuch; sprache: Sprache }) {
   const fachkreis = await istFachkreis();
   const apotheke = await ladeApothekeDetail(slug, fachkreis);
 
@@ -255,7 +260,7 @@ async function ApothekeInhalt({ slug }: { slug: string }) {
       <h1 className="text-h1 text-text">{apotheke.name}</h1>
       <div className="mt-4 flex flex-wrap items-center gap-2">
         <Badge variante={apotheke.versandapotheke ? "accent" : "neutral"}>
-          {apotheke.versandapotheke ? "Versandapotheke" : "Vor Ort"}
+          {apotheke.versandapotheke ? w.apotheke.versand : w.apotheke.vorOrt}
         </Badge>
         <span className="text-small text-text-muted">
           <span className="numeric">{apotheke.plz}</span> {apotheke.ort}
@@ -263,13 +268,13 @@ async function ApothekeInhalt({ slug }: { slug: string }) {
       </div>
 
       <div className="mt-8">
-        <Stammdaten apotheke={apotheke} />
+        <Stammdaten apotheke={apotheke} w={w} sprache={sprache} />
       </div>
 
       <section className="mt-10 sm:mt-16">
-        <h2 className="text-h2 text-text">Gelistete Blüten</h2>
+        <h2 className="text-h2 text-text">{w.apotheke.gelistet}</h2>
         <div className="mt-8">
-          <Sortiment apotheke={apotheke} fachkreis={fachkreis} />
+          <Sortiment apotheke={apotheke} fachkreis={fachkreis} w={w} sprache={sprache} />
         </div>
       </section>
     </>
@@ -280,6 +285,7 @@ export default async function ApothekeDetailPage({
   params,
 }: PageProps<"/apotheken/[slug]">) {
   const { slug } = await params;
+  const [w, sprache] = await Promise.all([holeWoerterbuch(), holeSprache()]);
 
   return (
     <div className="mx-auto w-full max-w-360 px-4 py-10 sm:px-8 sm:py-16">
@@ -288,12 +294,12 @@ export default async function ApothekeDetailPage({
           href="/apotheken"
           className="rounded-sm text-accent underline underline-offset-2 hover:opacity-70"
         >
-          Zurück zur Apothekenübersicht
+          {w.apotheke.zurueck}
         </Link>
       </p>
 
-      <Suspense fallback={<Spinner text="Apotheke wird geladen" />}>
-        <ApothekeInhalt slug={slug} />
+      <Suspense fallback={<Spinner text={w.apotheke.laedtEine} />}>
+        <ApothekeInhalt slug={slug} w={w} sprache={sprache} />
       </Suspense>
     </div>
   );

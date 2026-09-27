@@ -3,10 +3,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { Badge, Card, CardBody, EmptyState, Spinner } from "@/components/ui";
-import { formatiereLieferzeit } from "@/lib/format";
-import { de } from "@/lib/i18n/de";
-// Deutsch bis Welle 4 (Plan Englisch): Apotheken sind zurueckgestellt.
-const rezeptStatusLabel = de.label.rezeptStatus;
+import { formatiereLieferzeit, formatiereZahl } from "@/lib/format";
+import { holeSprache, holeWoerterbuch, type Sprache, type Woerterbuch } from "@/lib/i18n";
 import { ladeApothekenListe } from "@/lib/query/strains";
 
 /**
@@ -16,22 +14,20 @@ import { ladeApothekenListe } from "@/lib/query/strains";
  */
 export const dynamic = "force-dynamic";
 
-export const metadata: Metadata = {
-  title: "Apotheken",
-  description:
-    "Versandapotheken mit gemeldeten Beständen an verschreibungspflichtigen Cannabisarzneimitteln.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const w = await holeWoerterbuch();
+  return { title: w.apotheke.titel, description: w.apotheke.metaBeschreibung };
+}
 
-const ZAHL_FORMAT = new Intl.NumberFormat("de-DE");
-
-async function ApothekenListe() {
+async function ApothekenListe({ w, sprache }: { w: Woerterbuch; sprache: Sprache }) {
+  const texte = w.apotheke;
   const apotheken = await ladeApothekenListe();
 
   if (apotheken.length === 0) {
     return (
       <EmptyState
-        titel="Keine Apotheken hinterlegt"
-        beschreibung="Derzeit sind keine Apotheken im Katalog erfasst."
+        titel={texte.leerTitel}
+        beschreibung={texte.leerText}
       />
     );
   }
@@ -52,36 +48,37 @@ async function ApothekenListe() {
                   </Link>
                 </h2>
                 <Badge variante={apotheke.versandapotheke ? "accent" : "neutral"}>
-                  {apotheke.versandapotheke ? "Versandapotheke" : "Vor Ort"}
+                  {apotheke.versandapotheke ? texte.versand : texte.vorOrt}
                 </Badge>
               </div>
 
               <dl className="flex flex-col gap-2 text-small">
                 <div className="flex flex-wrap gap-2">
-                  <dt className="text-text-muted">Ort</dt>
+                  <dt className="text-text-muted">{texte.ort}</dt>
                   <dd className="text-text">
                     <span className="numeric">{apotheke.plz}</span> {apotheke.ort}
                   </dd>
                 </div>
                 <div className="flex flex-wrap gap-2">
-                  <dt className="text-text-muted">Lieferzeit</dt>
+                  <dt className="text-text-muted">{texte.lieferzeit}</dt>
                   <dd className="text-text">
                     {formatiereLieferzeit(
                       apotheke.lieferzeitTageMin,
                       apotheke.lieferzeitTageMax,
+                      sprache,
                     )}
                   </dd>
                 </div>
                 <div className="flex flex-wrap gap-2">
-                  <dt className="text-text-muted">Rezept</dt>
+                  <dt className="text-text-muted">{texte.rezept}</dt>
                   <dd className="text-text">
-                    {rezeptStatusLabel[apotheke.rezeptStatus]}
+                    {w.label.rezeptStatus[apotheke.rezeptStatus]}
                   </dd>
                 </div>
                 <div className="flex flex-wrap gap-2">
-                  <dt className="text-text-muted">Gelistete Blüten</dt>
+                  <dt className="text-text-muted">{texte.gelistet}</dt>
                   <dd className="numeric text-text">
-                    {ZAHL_FORMAT.format(apotheke.anzahlProdukte)}
+                    {formatiereZahl(apotheke.anzahlProdukte, 0, sprache)}
                   </dd>
                 </div>
               </dl>
@@ -93,19 +90,18 @@ async function ApothekenListe() {
   );
 }
 
-export default function ApothekenPage() {
+export default async function ApothekenPage() {
+  const [w, sprache] = await Promise.all([holeWoerterbuch(), holeSprache()]);
   return (
     <div className="mx-auto w-full max-w-360 px-4 py-10 sm:px-8 sm:py-16">
-      <h1 className="text-h1 text-text">Apotheken</h1>
+      <h1 className="text-h1 text-text">{w.apotheke.titel}</h1>
       <p className="mt-4 max-w-[68ch] text-body text-text-muted">
-        Apotheken, die Bestände an verschreibungspflichtigen Cannabisarzneimitteln
-        melden. Die Angaben zu Lieferzeit und Rezeptart stammen von der jeweiligen
-        Apotheke.
+        {w.apotheke.satz}
       </p>
 
       <div className="mt-8">
-        <Suspense fallback={<Spinner text="Apotheken werden geladen" />}>
-          <ApothekenListe />
+        <Suspense fallback={<Spinner text={w.apotheke.laedt} />}>
+          <ApothekenListe w={w} sprache={sprache} />
         </Suspense>
       </div>
     </div>
