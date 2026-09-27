@@ -2,6 +2,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 
 import { HAUPTNAVIGATION, KONTO_LINK, istAktiv } from "@/lib/navigation";
+import { de } from "@/lib/i18n/de";
 
 test("Kern zuerst: Bewertungen, Abstimmung, Blüten; Apotheken nur in Aussicht", () => {
   assert.deepEqual(
@@ -30,7 +31,7 @@ test("Kopf: einzeilig erst ab lg, wo der Platz reicht; Leiste mit Luft für den 
   const { createElement } = await import("react");
   const { renderToStaticMarkup } = await import("react-dom/server");
   const { Kopf } = await import("@/components/layout/Kopf");
-  const html = renderToStaticMarkup(createElement(Kopf));
+  const html = renderToStaticMarkup(createElement(Kopf, { sprache: "de", w: de }));
   assert.match(html, /lg:grid-cols-\[auto_1fr_auto_auto]/);
   assert.doesNotMatch(html, /md:grid-cols-\[auto_1fr_auto_auto]/);
   const leiste = html.match(/<ul class="([^"]*)"/)?.[1] ?? "";
@@ -43,7 +44,7 @@ test("Kopf: Aktiv-Markierung am Wort, keine Kapitelnummern mehr", async () => {
   const { createElement } = await import("react");
   const { renderToStaticMarkup } = await import("react-dom/server");
   const { Kopf } = await import("@/components/layout/Kopf");
-  const html = renderToStaticMarkup(createElement(Kopf));
+  const html = renderToStaticMarkup(createElement(Kopf, { sprache: "de", w: de }));
   // Stiftstrich (globals.css .kapitel-wort::after) sitzt am Wort; Nummern entfallen (Nutzer 2026-09-25).
   assert.match(html, /<span class="kapitel-wort">/);
   assert.doesNotMatch(html, /kapitel-nummer/);

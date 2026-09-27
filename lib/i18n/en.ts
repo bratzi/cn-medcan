@@ -9,8 +9,6 @@ export const en: Woerterbuch = {
   },
   sprache: {
     gruppe: "Language",
-    de: "Deutsch",
-    en: "English",
   },
   meldung: {
     "allgemein.unbekannt": "That did not work. Please try again.",

@@ -3,6 +3,7 @@ import { Inspiration, Newsreader } from "next/font/google";
 import { JointCursor } from "@/components/layout/JointCursor";
 import { Fuss } from "@/components/layout/Fuss";
 import { Kopf } from "@/components/layout/Kopf";
+import { holeSprache, holeWoerterbuch } from "@/lib/i18n";
 import { THEMA_SKRIPT, THEMA_STANDARD } from "@/lib/thema";
 import "./globals.css";
 
@@ -28,20 +29,21 @@ const inspiration = Inspiration({
   adjustFontFallback: true,
 });
 
-export const metadata: Metadata = {
-  title: {
-    default: "Book of Terpz",
-    template: "%s · Book of Terpz",
-  },
-  description:
-    "Bewertungen verschreibungspflichtiger Cannabisarzneimittel nach festem Schema, jeweils an eine Charge gebunden. Die Community stimmt ab, welche Sorte als Nächstes bewertet wird.",
-  robots: { index: false, follow: false },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const w = await holeWoerterbuch();
+  return {
+    title: { default: "Book of Terpz", template: "%s · Book of Terpz" },
+    description: w.rahmen.beschreibung,
+    robots: { index: false, follow: false },
+  };
+}
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default async function RootLayout({ children }: LayoutProps<"/">) {
+  const [sprache, w] = await Promise.all([holeSprache(), holeWoerterbuch()]);
+
   return (
     <html
-      lang="de"
+      lang={sprache}
       data-theme={THEMA_STANDARD}
       suppressHydrationWarning
       className={`${newsreader.variable} ${inspiration.variable} h-full antialiased`}
@@ -54,10 +56,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           href="#inhalt"
           className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:inline-flex focus:h-11 focus:items-center focus:rounded-full focus:bg-accent focus:px-4 focus:text-small focus:font-medium focus:text-accent-fg"
         >
-          Direkt zum Inhalt
+          {w.rahmen.direktZumInhalt}
         </a>
 
-        <Kopf />
+        <Kopf sprache={sprache} w={w} />
 
         <main id="inhalt" className="flex-1 pt-(--kopf-h,4rem)">
           {children}

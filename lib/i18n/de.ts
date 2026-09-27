@@ -13,8 +13,6 @@ export const de = {
   },
   sprache: {
     gruppe: "Sprache",
-    de: "Deutsch",
-    en: "English",
   },
   meldung: {
     "allgemein.unbekannt": "Das hat nicht geklappt. Bitte erneut versuchen.",

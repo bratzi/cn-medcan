@@ -1047,6 +1047,29 @@ html.joint-cursor :is(input:not([type="range"]):not([type="radio"]):not([type="c
   transition-timing-function: cubic-bezier(0.2, 0, 0, 1);
 }
 
+/* Sprachschalter DE/EN (components/layout/SprachSchalter.tsx) rechts neben dem Zelt,
+   gleiche Hoehe, gleiche Flaeche; erst sichtbar, wenn lib/i18n/schalter.ts es erlaubt. */
+.sprach-schalter {
+  position: fixed;
+  top: 0.5rem;
+  left: 3.75rem;
+  z-index: 50;
+  display: flex;
+  height: 2.75rem;
+  border-radius: 9999px;
+  color: var(--color-text);
+  background: color-mix(in oklab, var(--color-surface-raised) 92%, transparent);
+  box-shadow:
+    0 0 0 1px color-mix(in oklab, var(--color-text) 8%, transparent),
+    0 2px 4px color-mix(in oklab, black 10%, transparent),
+    0 8px 20px color-mix(in oklab, black 12%, transparent);
+}
+
+.sprach-schalter button:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 3px;
+}
+
 .thema-lampe:hover {
   box-shadow:
     0 0 0 1px color-mix(in oklab, var(--color-kopierstift) 35%, transparent),

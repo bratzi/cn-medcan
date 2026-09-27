@@ -7,6 +7,9 @@ export const SPRACHEN = ["de", "en"] as const;
 export type Sprache = (typeof SPRACHEN)[number];
 export const SPRACH_COOKIE = "sprache";
 
+/** Jede Sprache heisst in ihr selbst so (Umschalter, lang je Knopf). */
+export const SPRACH_NAMEN: Record<Sprache, string> = { de: "Deutsch", en: "English" };
+
 export function istSprache(wert: unknown): wert is Sprache {
   return wert === "de" || wert === "en";
 }

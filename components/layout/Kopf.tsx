@@ -4,7 +4,11 @@ import { NavLink } from "@/components/layout/NavLink";
 import { Logo } from "@/components/marke/Logo";
 import { KontoZaehler } from "@/components/layout/KontoZaehler";
 import { KopfZustand } from "@/components/layout/KopfZustand";
+import { SprachSchalter } from "@/components/layout/SprachSchalter";
 import { ThemaSchalter } from "@/components/layout/ThemaSchalter";
+import { I18N_OEFFENTLICH } from "@/lib/i18n/schalter";
+import type { Sprache } from "@/lib/i18n/sprache-kern";
+import type { Woerterbuch } from "@/lib/i18n/typen";
 import { HAUPTNAVIGATION, KONTO_LINK } from "@/lib/navigation";
 
 /**
@@ -34,13 +38,23 @@ const AKTIV = "underline decoration-text decoration-2 underline-offset-8";
 /** Das Wort trägt den Stiftstrich; die Nummer ist Dekoration (aria-hidden). */
 const AKTIV_WORT = "kapitel-wort";
 
-export function Kopf() {
+// Platz fuer Zelt (und Sprachschalter, sobald sichtbar) in der Fensterecke.
+const EINRUECKUNG = I18N_OEFFENTLICH ? "pl-40 sm:pl-44" : "pl-16 sm:pl-20";
+
+type Props = {
+  sprache: Sprache;
+  /** Vom Root-Layout gelesen; der Kopf selbst liest keine Anfrage. */
+  w: Woerterbuch;
+};
+
+export function Kopf({ sprache, w }: Props) {
   return (
     <header data-kopf="" className="kopf fixed inset-x-0 top-0 z-40">
       {/* Hell/Dunkel fest in der linken oberen Fensterecke, außerhalb des Inhalts
           (Nutzer 2026-09-25); bis der Rand breit genug ist, rückt der Kopf dafür ein. */}
       <ThemaSchalter />
-      <div className="mx-auto grid w-full max-w-360 grid-cols-[1fr_auto_auto] items-center gap-x-4 gap-y-2 py-2 pr-4 pl-16 sm:pr-8 sm:pl-20 min-[1640px]:pl-8 lg:grid-cols-[auto_1fr_auto_auto]">
+      <SprachSchalter aktuell={sprache} gruppe={w.sprache.gruppe} />
+      <div className={`mx-auto grid w-full max-w-360 grid-cols-[1fr_auto_auto] items-center gap-x-4 gap-y-2 py-2 pr-4 sm:pr-8 min-[1640px]:pl-8 lg:grid-cols-[auto_1fr_auto_auto] ${EINRUECKUNG}`}>
         {/* Logo statt einzeiliger Wortmarke (Nutzer 2026-09-26): "Book of" klein oben,
             "Terpz" im Fokus, Konturen, Verlauf und Glanz wie im Auftakt. */}
         <Link href="/" className="inline-flex min-h-11 items-center justify-self-start px-2 py-1">
