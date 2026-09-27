@@ -3,7 +3,7 @@
 > Übergabemedium zwischen Sessions. Wird nach jedem Arbeitsblock aktualisiert und committet.
 > Wer hier weiterarbeitet, liest diese Datei zuerst und braucht den Chatverlauf nicht.
 
-**Letzte Aktualisierung:** 2026-09-27 (Session 23, Save for Clear)
+**Letzte Aktualisierung:** 2026-09-27 (Session 24, Zwischenstand)
 **Repo:** https://github.com/bratzi/cn-medcan (public)
 **Branch:** `main` (Makeover „Grünes Buch“ Teilprojekt 1 ist seit 2026-09-24 auf `main`)
 
@@ -27,6 +27,21 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 ---
 
 ## ⇢ Hier geht es weiter
+
+### ⇢ SESSION 24 (2026-09-27, läuft)
+
+- **A1 erledigt** `80b23d8`: /mitglied und /admin versprechen keine Preisangaben mehr (HWG-Preishinweis in /mitglied mit entfernt).
+- **A2 halb:** Testbewertung auf /bewerten/apples-bananas gespeichert (Fruchtig 3, Minzig 0,5, Notiz „Testbewertung …
+  kann gelöscht werden“, als Betreiber = redaktionell, sofort sichtbar). Blütenseite und /admin/vorschlaege danach 1102 →
+  Testblüte freigeben + Anzeige prüfen steht noch aus. **Befund:** die Regler der Karte reagieren nicht auf Pfeiltasten
+  (nur Ziehen) → in Task 6 (Mobile/Barrierefreiheit) prüfen.
+- **A3 Caching v2 läuft.** Schritt 0 gemessen (Tabelle im Plan): /zugang warm 8–19 ms, / 42–89 ms; Cloudflare lässt
+  eine Weile durch, dann hart 10 ms (exceededCpu) → Grundlast von Next ist das Hauptproblem (0.5 greift).
+  Commits: Schritt 1 Diagnose `ef12bf1`, 3 Cookie-Vorfilter `bd319ca`, 4 lesen statt upsert `416b05a`, 5 schlanker Titel
+  (`944d906`), 6 `lib/memo.ts` + Anwendung (TTL 300 s, Schreibaktionen leeren mit `vergiss("")`, Stimmen nicht).
+  Abweichung vom Plan: 1–6 in einem Push (13-min-Build-Regel), gemeinsam gemessen.
+  **Nächstes:** Messlauf nach Build (fetch aus Chrome + `wrangler tail`), Diagnosezeilen auswerten (Schritt 2 nötig?),
+  dann Schritt 7 (/zugang ohne searchParams), Diagnose revert, Befund an Nutzer (Grundlast > 10 ms).
 
 ### ⇢ SESSION 22 (2026-09-26, läuft) — neu geordnete Taskliste, ersetzt alle älteren Listen darunter
 
