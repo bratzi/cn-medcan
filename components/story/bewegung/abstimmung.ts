@@ -1,7 +1,10 @@
 import { SCHREIBEN_AB, SCHREIBEN_BIS } from "./schreiben";
 import type { Choreografie } from "./typen";
 
-const ZAHL = new Intl.NumberFormat("de-DE");
+import { zahlFormat } from "./zahlformat";
+
+/** In der Sprache der Seite; beim Aufruf gelesen, nicht beim Laden des Moduls. */
+const ZAHL = { format: (wert: number) => zahlFormat(document.documentElement.lang, 0).format(wert) };
 
 /**
  * Sektion 6 (Spec TP3 8.6): "Wähl mit." und die Vermerke auf dem

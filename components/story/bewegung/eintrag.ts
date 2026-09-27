@@ -1,6 +1,9 @@
 import type { Choreografie } from "./typen";
 
-const NOTE = new Intl.NumberFormat("de-DE", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+import { zahlFormat } from "./zahlformat";
+
+/** In der Sprache der Seite; beim Aufruf gelesen, nicht beim Laden des Moduls. */
+const NOTE = { format: (wert: number) => zahlFormat(document.documentElement.lang, 1).format(wert) };
 
 /**
  * Sektion 5: die Doppelseite schlaegt auf (clip-path von der Mitte), die

@@ -104,7 +104,7 @@ function ohneKommentare(quelle: string): string {
 
 function texte(quelle: string): string[] {
   const aus: string[] = [];
-  for (const m of quelle.matchAll(/"((?:[^"\\n]|\.)*)"|'((?:[^'\\n]|\.)*)'|`([^`]*)`/g)) aus.push(m[1] ?? m[2] ?? m[3] ?? "");
+  for (const m of quelle.matchAll(/"((?:[^"\\\n]|\\.)*)"|'((?:[^'\\\n]|\\.)*)'|`([^`]*)`/g)) aus.push(m[1] ?? m[2] ?? m[3] ?? "");
   for (const m of quelle.matchAll(/>([^<>{}]+)</g)) aus.push(m[1]);
   return aus.map((s) => s.trim()).filter(Boolean);
 }
@@ -124,4 +124,11 @@ test("umgestellte Dateien enthalten keine deutschen Oberflaechentexte", () => {
     }
   }
   assert.deepEqual(funde, []);
+});
+
+test("Selbsttest: der Waechter findet deutsche Strings in Anfuehrungszeichen, auch mit n", () => {
+  const funde = texte(ohneKommentare('const a = "Bitte wählen"; const b = t("Kein Treffer"); const c = \'Menü öffnen\';'));
+  assert.ok(funde.includes("Bitte wählen"), JSON.stringify(funde));
+  assert.ok(funde.includes("Kein Treffer"), JSON.stringify(funde));
+  assert.ok(funde.includes("Menü öffnen"), JSON.stringify(funde));
 });
