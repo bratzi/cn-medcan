@@ -10,6 +10,8 @@
   Reviews, Begründungen, Vorschlagsnotizen), bleibt in der Sprache, in der es geschrieben wurde.
 - **Deutsch ist Standard.**
 - Der Umschalter sitzt neben dem Grow-Zelt-Themaschalter (`components/layout/ThemaSchalter.tsx`).
+- **Freigabe 2026-09-27 (Session 23):** Accept-Language-Erkennung ja; `en-GB`; der Umschalter wird
+  erst sichtbar, wenn alle Wellen übersetzt sind.
 
 Alle anderen Entscheidungen hier habe ich getroffen; sie sind mit **Entscheidung Claude** markiert,
 mit Grund, und können beim Lesen korrigiert werden. Pfade sind schon als `/blueten` geschrieben

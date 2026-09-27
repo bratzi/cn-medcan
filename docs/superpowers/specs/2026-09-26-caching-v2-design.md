@@ -1,6 +1,6 @@
 # Caching v2 gegen Fehler 1102 — Design
 
-**Stand:** 2026-09-26 (Session 22, Welle 1, Block W1-F) · **Status:** Entwurf, wartet auf Nutzerfreigabe
+**Stand:** 2026-09-26 (Session 22, Welle 1, Block W1-F) · **Status:** freigegeben 2026-09-27 (Session 23), TTL 300 s
 **Vorgänger:** `docs/superpowers/specs/2026-09-25-caching-design.md` (Cache Components, KV + D1-Tags) — gescheitert
 bzw. zurückgenommen, siehe „Was schiefging“.
 **Plan:** `docs/superpowers/plans/2026-09-26-caching-v2.md`

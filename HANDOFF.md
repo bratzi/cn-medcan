@@ -3,7 +3,7 @@
 > Übergabemedium zwischen Sessions. Wird nach jedem Arbeitsblock aktualisiert und committet.
 > Wer hier weiterarbeitet, liest diese Datei zuerst und braucht den Chatverlauf nicht.
 
-**Letzte Aktualisierung:** 2026-09-26 (Session 21, Save for Clear)
+**Letzte Aktualisierung:** 2026-09-27 (Session 23, Save for Clear)
 **Repo:** https://github.com/bratzi/cn-medcan (public)
 **Branch:** `main` (Makeover „Grünes Buch“ Teilprojekt 1 ist seit 2026-09-24 auf `main`)
 
@@ -41,15 +41,32 @@ in ihrer Geschmacksfarbe, Lichtpunkt läuft Geschmack → Terpen (`a3a8431`, `.b
 Kopf** (`962ccc8`, components/marke/Logo.tsx: „Book of“ 0,45 em oben, „Terpz“ text-marke, vier Konturen, Verlauf,
 Glanz; Brand-Doku §2 angepasst); 24 geprüfte Skills installiert (`3192b53`). Live noch NICHT gesehen.
 
-**⇢ SESSION 23 (2026-09-27, läuft): Live-Sichtprüfung begonnen.** Gut: Logo im Kopf, Hero (Kopf hell lesbar),
-Storytelling mit Glas, Overall/Qualität, „stimmt das?“ zwischen Qualität und Fazit, Doppelseite, Abstimmung, Katalog;
-Aroma-Hover in beide Richtungen; /produkte → 308 /blueten; Impressum/Datenschutz ohne Login 200. Leerer Streifen über
-dem Kopf in Screenshots ist Aufnahme-Artefakt (Kopf per JS bei top 0). Instagram-Zwei-Klick live nicht prüfbar (kein
-Reel hinterlegt). **Gefixt:** `55188a1` Achsennamen der Aroma-Karte standen im Balken und wurden durchgestrichen → jetzt
-über dem Balken, links mindestens 124 vom Rand (ragten in der Doppelseite hinaus), Ester/Thiole-Hinweis zweizeilig (ragte
-rechts hinaus). `58cec5c` Nutzerwunsch: Infotext mit Iconspalte links (Zeile/TerpenZeile), ein Satz je Terpen
-(`aromaSatz` in lib/terpen-aromen.ts, nur Duft/Vorkommen wegen HWG). **Noch live ansehen:** beide Commits, 390 px,
-danach Punkt 2 (apples-bananas speichern).
+**⇢ STAND ZUM CLEAR NACH SESSION 23 (2026-09-27): alles gepusht, live (Build c8bd530 success), Tests 251/251.**
+
+Session 23 erledigt: Live-Sichtprüfung weitgehend durch (Logo, Hero, Kopf hell, Storytelling, Overall/Qualität,
+„stimmt das?“, Doppelseite, Abstimmung, Katalog, Fuß, Aroma-Hover beide Richtungen, /produkte → 308 /blueten,
+Impressum/Datenschutz ohne Login 200). Leerer Streifen über dem Kopf in Screenshots = Aufnahme-Artefakt (Lenis).
+Instagram-Zwei-Klick live nicht prüfbar (kein Reel hinterlegt). Kopfnavigation scrollt auf dem Handy waagerecht
+(„BLÜTEN“ angeschnitten, bewusst so gelassen; Nutzer ggf. fragen).
+Aroma-Karte: `55188a1` Achsennamen über dem Balken (waren durchgestrichen), links min. 124; `58cec5c`/`0a25a13`
+Infotext = zentrierte Legende `InfoTafel` mit fester Höhe (min-h-80, sm:min-h-56), Versalzeile, Name mit abgesetztem
+Icon, ein Satz je Terpen (`aromaSatz` in lib/terpen-aromen.ts, nur Duft/Vorkommen wegen HWG), Verbindungen als
+`Pille`, Überblendung per `starting:opacity-0`; `c8bd530` Werte am Balken nur noch im Netz, **Karte unter 640 px
+schmal gesetzt statt verkleinert** (achsenX 42 %, RECHTS_ABSTAND_SCHMAL 124, `radiusVon`, MIN_BREITE 320, Terpennamen
+brechen um, Begleitstoff-Hinweis unter 480 aus). **Handy-Ansicht davon live NOCH NICHT gesehen.**
+
+**Nutzerentscheide 2026-09-27:** i18n: Accept-Language-Erkennung ja, en-GB, Umschalter erst sichtbar wenn alle
+Wellen übersetzt sind. Caching: TTL 300 s. Beide Specs damit freigegeben (Status in den Specs vermerkt).
+
+**Nächste Session, der Reihe nach:**
+1. Handy-Ansicht der Aroma-Karte live prüfen (Chrome vorn; Fenster geht nur bis 494 px, daher auch Doppelseite
+   ~623 px ansehen, die jetzt ebenfalls schmal gesetzt wird).
+2. /bewerten/apples-bananas speichern (Sweet Spot, Fruchtig/Minzig); Testblüte in /admin/vorschlaege freigeben,
+   dann fragen ob löschen; Nutzer-Entscheid „inaktive Blüte bei Freigabe reaktivieren?“ offen.
+3. Welle 3: Caching v2 nach `docs/superpowers/plans/2026-09-26-caching-v2.md` ab Schritt 0 (Messung), TTL 300 s.
+4. writing-plans für i18n (Spec 2026-09-26-englisch-umschalter-design.md), dann in Wellen umsetzen.
+5. Abschluss-Review über alles. Platzhalter in lib/rechtliches.ts füllt der Nutzer.
+**Build-Regel:** nach einem Code-Push ~13 min nicht erneut pushen (bricht den Build ab); nur HANDOFF.md ist ausgenommen.
 
 **⇢ STAND ZUM CLEAR (2026-09-27): WELLE 1 UND 2 (Code) FERTIG, alles gepusht, Tests 250/250, Baum sauber.**
 Welle 2: Instagram-Zwei-Klick `97e62d1`, Vorschlagsfrist + Hydrations-Sperre `45f8c9f`, three/Apotheken raus
