@@ -73,23 +73,9 @@ export default async function MitgliedPage() {
 
             <p className="max-w-[68ch] text-body text-text-muted">
               {mitglied.freigegeben
-                ? "Das Konto ist freigegeben. Damit bestehen Stimmrecht in Umfragen und Sicht auf die Preisangaben."
+                ? "Das Konto ist freigegeben. Damit besteht Stimmrecht in Umfragen."
                 : "Der Betreiber gibt Konten von Hand frei. Bis dahin sind Vorschläge und Abstimmungen gesperrt; der Katalog bleibt lesbar."}
             </p>
-
-            {mitglied.freigegeben ? (
-              // §10 HWG adressiert Fachkreise, also Angehoerige der
-              // Heilberufe. Ein freigegebenes Mitglied ist das nicht - die
-              // Preisanzeige ist eine Entscheidung des Betreibers und braucht
-              // deshalb diesen Hinweis. Die Rolle FACHKREIS bleibt im
-              // Datenmodell, damit die strengere Variante ohne
-              // Schemaaenderung nachziehbar ist.
-              <p className="max-w-[68ch] text-caption text-text-muted">
-                Hinweis: Preisangaben richten sich nach § 10 Heilmittelwerbegesetz an
-                Angehörige der Heilberufe. Sie dienen hier der Orientierung und sind
-                keine Aufforderung zum Erwerb.
-              </p>
-            ) : null}
           </CardBody>
         </Card>
       </section>

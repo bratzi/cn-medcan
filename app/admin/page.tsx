@@ -411,7 +411,7 @@ export default async function AdminPage() {
       <h1 className="text-h1 text-text">Verwaltung</h1>
       <p className="mt-2 max-w-[68ch] text-body text-text-muted">
         Umfragen steuern, Ergebnisse verknüpfen, Mitglieder freigeben. Erst mit der
-        Freigabe bestehen Stimmrecht in Umfragen und Sicht auf die Preisangaben.
+        Freigabe besteht Stimmrecht in Umfragen.
       </p>
 
       <div className="mt-8 flex flex-col gap-8">
