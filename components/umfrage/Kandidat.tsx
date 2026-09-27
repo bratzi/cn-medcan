@@ -3,8 +3,10 @@ import Link from "next/link";
 import { Badge } from "@/components/ui";
 import { namenLinkKlassen } from "@/components/ui/textlink";
 import type { UmfrageOptionAnsicht } from "@/lib/query/umfragen";
-
-const ZAHL_FORMATTER = new Intl.NumberFormat("de-DE");
+import { formatiereZahl } from "@/lib/format";
+import type { Sprache } from "@/lib/i18n/sprache-kern";
+import type { Woerterbuch } from "@/lib/i18n/typen";
+import { mehrzahl } from "@/lib/i18n/text";
 
 /** Handschrift am Stimmzettel: die Mindestgröße 32 px (Spec TP3 4 und 8.6). */
 const VERMERK = "font-hand text-vermerk text-kopierstift";
@@ -14,6 +16,8 @@ export type KandidatProps = {
   gesamt: number;
   gewaehlt: boolean;
   zeigeStimmen: boolean;
+  texte: Woerterbuch["umfrage"]["kandidat"];
+  sprache: Sprache;
 };
 
 export function stimmenAnteil(option: UmfrageOptionAnsicht, gesamt: number): number {
@@ -21,8 +25,8 @@ export function stimmenAnteil(option: UmfrageOptionAnsicht, gesamt: number): num
   return Math.min(Math.max(option.stimmen / gesamt, 0), 1) * 100;
 }
 
-function stimmenText(stimmen: number): string {
-  return `${ZAHL_FORMATTER.format(stimmen)} ${stimmen === 1 ? "Stimme" : "Stimmen"}`;
+function stimmenText(stimmen: number, texte: KandidatProps["texte"], sprache: Sprache): string {
+  return `${formatiereZahl(stimmen, 0, sprache)} ${mehrzahl(sprache, texte.stimmen, stimmen)}`;
 }
 
 /**
@@ -35,7 +39,7 @@ function stimmenText(stimmen: number): string {
  * dort `null` ("steht nicht zur Wahl"), nicht `0` ("niemand wollte sie").
  * Eigene Datei, damit er ohne die Server Action des Stimmformulars rendert.
  */
-export function Kandidat({ option, gesamt, gewaehlt, zeigeStimmen }: KandidatProps) {
+export function Kandidat({ option, gesamt, gewaehlt, zeigeStimmen, texte, sprache }: KandidatProps) {
   return (
     <li className="border-t border-border py-4 first:border-t-0 first:pt-0">
       <div className="flex flex-wrap items-baseline justify-between gap-2">
@@ -57,21 +61,21 @@ export function Kandidat({ option, gesamt, gewaehlt, zeigeStimmen }: KandidatPro
         <span className="flex items-center gap-2">
           {option.herkunft === "COMMUNITY" ? (
             <span data-story="vermerk" className={VERMERK}>
-              von euch
+              {texte.vonEuch}
             </span>
           ) : null}
-          {option.istGewinner ? <Badge variante="success">Gewinner</Badge> : null}
-          {gewaehlt ? <Badge variante="accent">Deine Stimme</Badge> : null}
+          {option.istGewinner ? <Badge variante="success">{texte.gewinner}</Badge> : null}
+          {gewaehlt ? <Badge variante="accent">{texte.deineStimme}</Badge> : null}
           {zeigeStimmen && option.stimmen !== null ? (
             <span className="numeric text-small text-text">
               {/* Die Zahl zählt auf der Startseite hoch (bewegung/abstimmung.ts): sichtbar
                   aria-hidden, vorgelesen wird der Endwert. */}
-              <span className="sr-only">{stimmenText(option.stimmen)}</span>
+              <span className="sr-only">{stimmenText(option.stimmen, texte, sprache)}</span>
               <span aria-hidden="true">
                 <span data-stimmzahl="" data-ziel={option.stimmen}>
-                  {ZAHL_FORMATTER.format(option.stimmen)}
+                  {formatiereZahl(option.stimmen, 0, sprache)}
                 </span>
-                {option.stimmen === 1 ? " Stimme" : " Stimmen"}
+                {` ${mehrzahl(sprache, texte.stimmen, option.stimmen)}`}
               </span>
             </span>
           ) : null}

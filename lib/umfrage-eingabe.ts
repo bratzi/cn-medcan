@@ -7,12 +7,16 @@
  */
 
 import { istUmfragePhase, type UmfragePhase } from "@/db/enums";
+import type { Meldung } from "@/lib/i18n/typen";
 
 export const BEGRUENDUNG_MAXLAENGE = 500;
 export const TITEL_MAXLAENGE = 120;
 export const BESCHREIBUNG_MAXLAENGE = 1000;
 
 export type UmfragePruefErgebnis<T> = { ok: true; wert: T } | { ok: false; fehler: string };
+
+/** Oeffentliche Pruefungen (Vorschlag, Stimme) melden Schluessel; die Admin-Pruefungen bleiben deutsch. */
+export type MeldungsErgebnis<T> = { ok: true; wert: T } | { ok: false; fehler: Meldung };
 
 function idPruefen(roh: string): string | null {
   const id = roh.trim();
@@ -30,18 +34,18 @@ export function vorschlagEingabePruefen(
   umfrageIdRoh: string,
   strainIdRoh: string,
   begruendungRoh: string,
-): UmfragePruefErgebnis<{ umfrageId: string; strainId: string; begruendung: string | null }> {
+): MeldungsErgebnis<{ umfrageId: string; strainId: string; begruendung: string | null }> {
   const umfrageId = idPruefen(umfrageIdRoh);
-  if (!umfrageId) return { ok: false, fehler: "Keine Umfrage angegeben." };
+  if (!umfrageId) return { ok: false, fehler: { schluessel: "umfrage.keineUmfrage" } };
 
   const strainId = idPruefen(strainIdRoh);
-  if (!strainId) return { ok: false, fehler: "Bitte eine Sorte auswählen." };
+  if (!strainId) return { ok: false, fehler: { schluessel: "umfrage.sorteWaehlen" } };
 
   const begruendung = begruendungRoh.trim();
   if (begruendung.length > BEGRUENDUNG_MAXLAENGE) {
     return {
       ok: false,
-      fehler: `Die Begründung darf höchstens ${BEGRUENDUNG_MAXLAENGE} Zeichen haben.`,
+      fehler: { schluessel: "umfrage.begruendungLang", parameter: { max: BEGRUENDUNG_MAXLAENGE } },
     };
   }
 
@@ -55,12 +59,12 @@ export function vorschlagEingabePruefen(
 export function stimmeEingabePruefen(
   umfrageIdRoh: string,
   optionIdRoh: string,
-): UmfragePruefErgebnis<{ umfrageId: string; optionId: string }> {
+): MeldungsErgebnis<{ umfrageId: string; optionId: string }> {
   const umfrageId = idPruefen(umfrageIdRoh);
-  if (!umfrageId) return { ok: false, fehler: "Keine Umfrage angegeben." };
+  if (!umfrageId) return { ok: false, fehler: { schluessel: "umfrage.keineUmfrage" } };
 
   const optionId = idPruefen(optionIdRoh);
-  if (!optionId) return { ok: false, fehler: "Bitte einen Kandidaten auswählen." };
+  if (!optionId) return { ok: false, fehler: { schluessel: "umfrage.kandidatWaehlen" } };
 
   return { ok: true, wert: { umfrageId, optionId } };
 }

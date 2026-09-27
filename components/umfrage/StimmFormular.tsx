@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { stimmeAbgeben } from "@/app/umfragen/aktionen";
 import { Button } from "@/components/ui";
 import { useHydriert } from "@/components/ui/useHydriert";
+import type { Woerterbuch } from "@/lib/i18n/typen";
 
 export type StimmOption = {
   id: string;
@@ -15,6 +16,7 @@ export type StimmOption = {
 type Props = {
   umfrageId: string;
   optionen: readonly StimmOption[];
+  texte: Woerterbuch["umfrage"]["stimmFormular"];
 };
 
 /**
@@ -25,7 +27,7 @@ type Props = {
  * steht nur die Rueckmeldung.
  */
 
-export function StimmFormular({ umfrageId, optionen }: Props) {
+export function StimmFormular({ umfrageId, optionen, texte }: Props) {
   const router = useRouter();
   const hydriert = useHydriert();
   const [laeuft, setLaeuft] = useState(false);
@@ -55,7 +57,7 @@ export function StimmFormular({ umfrageId, optionen }: Props) {
       {/* Während die Stimme unterwegs ist, tritt die Auswahl zurück (globals.css, .stimm-auswahl). */}
       <fieldset className="stimm-auswahl border-0 p-0" data-wartet={laeuft ? "" : undefined}>
         <legend className="text-small font-medium text-text">
-          Was sollen wir als Nächstes bewerten?
+          {texte.frage}
         </legend>
 
         <ul className="mt-4 flex flex-col gap-2">
@@ -83,19 +85,19 @@ export function StimmFormular({ umfrageId, optionen }: Props) {
 
       {fehler ? (
         <p role="alert" className="mt-4 text-small text-danger">
-          <span className="font-medium">Fehler: </span>
+          <span className="font-medium">{texte.fehler} </span>
           {fehler}
         </p>
       ) : null}
 
       <div className="mt-6">
         <Button type="submit" disabled={laeuft || !hydriert}>
-          {laeuft ? "Stimme wird abgegeben …" : "Stimme abgeben"}
+          {laeuft ? texte.wirdAbgegeben : texte.abgeben}
         </Button>
       </div>
 
       <p className="mt-4 text-caption text-text-muted">
-        Eine Stimme je Runde. Sie lässt sich danach nicht ändern.
+        {texte.eineStimme}
       </p>
     </form>
   );

@@ -6,6 +6,7 @@ import { stimmZustand } from "@/components/umfrage/stimmzustand";
 import { aktiveUmfrage, eigeneStimme } from "@/lib/query/umfragen";
 import { aktuellesMitglied } from "@/lib/session";
 import { sicher } from "@/lib/sicher";
+import { holeSprache, holeWoerterbuch } from "@/lib/i18n";
 
 /**
  * Der Stimmzettel. Der Zustand entsteht hier und nur hier; die Karte zeigt
@@ -14,6 +15,7 @@ import { sicher } from "@/lib/sicher";
  * Mitglieder.
  */
 async function Stimmzettel() {
+  const [w, sprache] = await Promise.all([holeWoerterbuch(), holeSprache()]);
   const geladen = await sicher(
     async () => {
       const [umfrage, mitglied] = await Promise.all([aktiveUmfrage(), aktuellesMitglied()]);
@@ -41,7 +43,7 @@ async function Stimmzettel() {
     );
   }
 
-  return <UmfrageKarte umfrage={umfrage} zustand={stimmZustand(mitglied, optionId)} />;
+  return <UmfrageKarte umfrage={umfrage} zustand={stimmZustand(mitglied, optionId)} w={w} sprache={sprache} />;
 }
 
 /**

@@ -5,7 +5,7 @@ import { ABSCHNITT_TITEL, Seitenkopf, seitenRahmen } from "@/components/layout/S
 import { Badge, Blatt, EmptyState, buttonKlassen, namenLinkKlassen, textLinkKlassen } from "@/components/ui";
 import { UmfrageKarte } from "@/components/umfrage/UmfrageKarte";
 import { VorschlagFormular } from "@/components/umfrage/VorschlagFormular";
-import { PHASEN_LABEL } from "@/components/umfrage/phasen";
+import { phasenLabel } from "@/components/umfrage/phasen";
 import { stimmZustand } from "@/components/umfrage/stimmzustand";
 import { rundenZeitraum } from "@/components/umfrage/zeitraum";
 import { cn } from "@/lib/cn";
@@ -19,27 +19,29 @@ import {
   type UmfrageUebersicht,
 } from "@/lib/query/umfragen";
 import { aktuellesMitglied } from "@/lib/session";
+import { holeSprache, holeWoerterbuch, type Sprache, type Woerterbuch } from "@/lib/i18n";
+import { t } from "@/lib/i18n/text";
 
 /** Nutzerbezogen (eigene Stimme, Freischaltung) - siehe app/page.tsx. */
 export const dynamic = "force-dynamic";
 
-export const metadata: Metadata = {
-  title: "Abstimmung",
-  description: "Laufende und vergangene Runden: Wir schlagen Sorten vor und wählen, was wir als Nächstes testen.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const w = await holeWoerterbuch();
+  return { title: w.umfrage.titel, description: w.umfrage.metaBeschreibung };
+}
 
 /** Handschrift-Überschrift: kurz, Imperativ, in Kopierstift (Spec TP3 10). */
 const HAND_TITEL = "font-hand text-notiz text-kopierstift";
 
-function RundenZeile({ runde }: { runde: UmfrageUebersicht }) {
+function RundenZeile({ runde, w, sprache }: { runde: UmfrageUebersicht; w: Woerterbuch; sprache: Sprache }) {
   return (
     <li className="grid grid-cols-1 gap-2 py-6 md:grid-cols-[minmax(0,1fr)_auto] md:gap-8">
       <div className="flex min-w-0 flex-col gap-2">
         <p className="font-buch text-h2 font-medium text-text wrap-break-word">{runde.titel}</p>
-        <p className="numeric text-small text-text-muted">{rundenZeitraum(runde.startAm, runde.endetAm)}</p>
+        <p className="numeric text-small text-text-muted">{rundenZeitraum(runde.startAm, runde.endetAm, w.umfrage.zeitraum, sprache)}</p>
         {runde.gewinner.length > 0 ? (
           <p className="text-body text-text wrap-break-word">
-            {"Gewonnen: "}
+            {`${w.umfrage.gewonnen} `}
             {runde.gewinner.map((gewinner, index) => (
               <span key={gewinner.slug}>
                 {index > 0 ? ", " : null}
@@ -52,7 +54,7 @@ function RundenZeile({ runde }: { runde: UmfrageUebersicht }) {
         ) : null}
       </div>
       <div>
-        <Badge variante={runde.istAktiv ? "accent" : "neutral"}>{PHASEN_LABEL[runde.phase]}</Badge>
+        <Badge variante={runde.istAktiv ? "accent" : "neutral"}>{phasenLabel(w, runde.phase)}</Badge>
       </div>
     </li>
   );
@@ -64,7 +66,8 @@ function RundenZeile({ runde }: { runde: UmfrageUebersicht }) {
  * Startseite ueber stimmZustand(); ueber das Schreiben entscheidet die
  * Server Action erneut.
  */
-async function UmfragenInhalt() {
+async function UmfragenInhalt({ w, sprache }: { w: Woerterbuch; sprache: Sprache }) {
+  const texte = w.umfrage;
   const [umfrage, mitglied] = await Promise.all([aktiveUmfrage(), aktuellesMitglied()]);
   const optionId = umfrage && mitglied?.freigegeben ? await eigeneStimme(umfrage.id, mitglied.mitgliedId) : null;
   const zustand = stimmZustand(mitglied, optionId);
@@ -85,18 +88,18 @@ async function UmfragenInhalt() {
         {umfrage ? (
           <>
             <h2 id="runde-titel" className={cn(HAND_TITEL, "self-start")}>
-              {umfrage.phase === "VORSCHLAG" ? "Schlag vor." : "Stimm ab."}
+              {umfrage.phase === "VORSCHLAG" ? texte.schlagVor : texte.stimmAb}
             </h2>
-            <UmfrageKarte umfrage={umfrage} zustand={zustand} ort="umfragen" />
+            <UmfrageKarte umfrage={umfrage} zustand={zustand} ort="umfragen" w={w} sprache={sprache} />
           </>
         ) : (
           <>
             <h2 id="runde-titel" className="sr-only">
-              Laufende Runde
+              {texte.laufendeRunde}
             </h2>
             <EmptyState
-              titel="Gerade läuft keine Runde."
-              beschreibung="Die nächste steht hier, sobald sie eröffnet ist."
+              titel={texte.keineRunde}
+              beschreibung={texte.keineRundeText}
             />
           </>
         )}
@@ -105,16 +108,17 @@ async function UmfragenInhalt() {
       {umfrage ? (
         <section id="vorschlaege" aria-labelledby="vorschlaege-titel" className="flex scroll-mt-8 flex-col gap-8">
           <h2 id="vorschlaege-titel" className={cn(HAND_TITEL, "self-start")}>
-            Eure Vorschläge.
+            {texte.eureVorschlaege}
           </h2>
 
           {darfVorschlagen ? (
             <Blatt className="max-w-3xl">
-              <h3 className="text-h3 text-text">Dein Vorschlag</h3>
+              <h3 className="text-h3 text-text">{texte.deinVorschlag}</h3>
               <div className="mt-6">
                 <VorschlagFormular
                   umfrageId={umfrage.id}
                   strains={strains.map((strain) => ({ wert: strain.id, label: strain.handelsname }))}
+                  texte={texte.vorschlagFormular}
                 />
               </div>
             </Blatt>
@@ -123,20 +127,20 @@ async function UmfragenInhalt() {
           {umfrage.phase === "VORSCHLAG" && !mitglied ? (
             <div className="flex flex-wrap items-center gap-4">
               <p className="text-body text-text-muted">
-                Vorschlagen kannst du, sobald du angemeldet und freigeschaltet bist.
+                {texte.vorschlagenAnonym}
               </p>
               <Link href="/anmelden?weiter=%2Fumfragen" className={buttonKlassen("primary")}>
-                Anmelden
+                {texte.anmelden}
               </Link>
             </div>
           ) : null}
 
           {umfrage.phase === "VORSCHLAG" && mitglied && !mitglied.freigegeben ? (
-            <p className="text-body text-text-muted">Sobald dein Konto freigeschaltet ist, kannst du hier vorschlagen.</p>
+            <p className="text-body text-text-muted">{texte.vorschlagenFreigabe}</p>
           ) : null}
 
           {vorschlaege.length === 0 ? (
-            <p className="text-body text-text-muted">Noch kein Vorschlag in dieser Runde.</p>
+            <p className="text-body text-text-muted">{texte.keinVorschlag}</p>
           ) : (
             <ul className="flex flex-col divide-y divide-border">
               {vorschlaege.map((vorschlag) => (
@@ -149,13 +153,13 @@ async function UmfragenInhalt() {
                       {vorschlag.handelsname}
                     </Link>
                     {vorschlag.uebernommen ? (
-                      <Badge variante="success">Auf der Wahlliste</Badge>
+                      <Badge variante="success">{texte.aufWahlliste}</Badge>
                     ) : (
-                      <Badge variante="neutral">Offen</Badge>
+                      <Badge variante="neutral">{texte.offen}</Badge>
                     )}
                   </div>
                   <p className="text-small text-text-muted">
-                    {`Von ${vorschlag.vonAnzeigename}, ${formatiereDatum(vorschlag.erstelltAm)}`}
+                    {t(texte.von, { name: vorschlag.vonAnzeigename, datum: formatiereDatum(vorschlag.erstelltAm, sprache) })}
                   </p>
                   {vorschlag.begruendung ? (
                     <p className="max-w-[68ch] text-body text-text">{vorschlag.begruendung}</p>
@@ -169,14 +173,14 @@ async function UmfragenInhalt() {
 
       <section aria-labelledby="runden-titel" className="flex flex-col gap-8">
         <h2 id="runden-titel" className={ABSCHNITT_TITEL}>
-          Alle Runden
+          {texte.alleRunden}
         </h2>
         {runden.length === 0 ? (
-          <EmptyState titel="Noch keine Runden." beschreibung="Hier steht jede Runde, sobald die erste eröffnet ist." />
+          <EmptyState titel={texte.keineRunden} beschreibung={texte.keineRundenText} />
         ) : (
           <ol className="flex flex-col divide-y divide-border">
             {runden.map((runde) => (
-              <RundenZeile key={runde.id} runde={runde} />
+              <RundenZeile key={runde.id} runde={runde} w={w} sprache={sprache} />
             ))}
           </ol>
         )}
@@ -185,13 +189,14 @@ async function UmfragenInhalt() {
   );
 }
 
-export default function UmfragenPage() {
+export default async function UmfragenPage() {
+  const [w, sprache] = await Promise.all([holeWoerterbuch(), holeSprache()]);
   return (
     <>
-      <Seitenkopf titel="Abstimmung" satz="Wir schlagen Sorten vor und wählen. Was gewinnt, testen wir als Nächstes." />
+      <Seitenkopf titel={w.umfrage.titel} satz={w.umfrage.satz} />
       <div className={cn(seitenRahmen(), "pt-12 pb-24 sm:pt-16")}>
         {/* Bewusst ohne Suspense-Grenze: der Inhalt steht im ersten HTML, damit er ohne JavaScript lesbar ist und Sprungziele (#eintrag-…) existieren. */}
-        <UmfragenInhalt />
+        <UmfragenInhalt w={w} sprache={sprache} />
       </div>
     </>
   );

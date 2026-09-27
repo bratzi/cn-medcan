@@ -54,6 +54,15 @@ const UMGESTELLT: string[] = [
   "components/review/BewertungsFormular.tsx",
   "components/produkt/InstagramEmbed.tsx",
   "components/produkt/ReelNachKlick.tsx",
+  // Welle 4a: Umfragen
+  "app/umfragen/page.tsx",
+  "app/umfragen/aktionen.ts",
+  "components/umfrage/UmfrageKarte.tsx",
+  "components/umfrage/Kandidat.tsx",
+  "components/umfrage/StimmFormular.tsx",
+  "components/umfrage/VorschlagFormular.tsx",
+  "components/umfrage/phasen.ts",
+  "components/umfrage/zeitraum.ts",
 ];
 
 const ERLAUBT: string[] = ["Book of Terpz", "Deutsch"];

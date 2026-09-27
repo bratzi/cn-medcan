@@ -8,6 +8,7 @@ import { vorschlagEinreichen } from "@/app/umfragen/aktionen";
 import { Button, Field, Select, textLinkKlassen } from "@/components/ui";
 import { useHydriert } from "@/components/ui/useHydriert";
 import type { SelectOption } from "@/components/ui";
+import type { Woerterbuch } from "@/lib/i18n/typen";
 
 type Props = {
   umfrageId: string;
@@ -25,7 +26,7 @@ const MAX_BEGRUENDUNG = 500;
  * keine Absicherung.
  */
 
-export function VorschlagFormular({ umfrageId, strains }: Props) {
+export function VorschlagFormular({ umfrageId, strains, texte }: Props & { texte: Woerterbuch["umfrage"]["vorschlagFormular"] }) {
   const router = useRouter();
   const hydriert = useHydriert();
   const [laeuft, setLaeuft] = useState(false);
@@ -59,23 +60,23 @@ export function VorschlagFormular({ umfrageId, strains }: Props) {
 
       <Select
         id="vorschlag-strain"
-        label="Sorte"
+        label={texte.sorte}
         name="strainId"
         required
         optionen={strains}
-        platzhalter="Bitte auswählen"
+        platzhalter={texte.bitteWaehlen}
       />
       <p className="-mt-4 text-small text-text-muted">
-        Nur Blüten aus dem Katalog. Fehlt eine?{" "}
+        {texte.nurKatalog}{" "}
         <Link href="/vorschlagen" className={textLinkKlassen()}>
-          Schlag sie vor
+          {texte.schlagSieVor}
         </Link>
       </p>
 
       <Field
         id="vorschlag-begruendung"
-        label="Begründung"
-        hinweis="Freiwillig. Warum lohnt sich diese Sorte für die nächste Bewertung?"
+        label={texte.begruendung}
+        hinweis={texte.begruendungHinweis}
       >
         {(attribute) => (
           <textarea
@@ -90,21 +91,21 @@ export function VorschlagFormular({ umfrageId, strains }: Props) {
 
       {fehler ? (
         <p role="alert" className="text-small text-danger">
-          <span className="font-medium">Fehler: </span>
+          <span className="font-medium">{texte.fehler} </span>
           {fehler}
         </p>
       ) : null}
 
       {gespeichert && !fehler ? (
         <p role="status" className="text-small text-success">
-          <span className="font-medium">Vorschlag eingereicht. </span>
-          Vorschläge werden geprüft, bevor sie auf die Wahlliste kommen.
+          <span className="font-medium">{texte.eingereicht} </span>
+          {texte.geprueft}
         </p>
       ) : null}
 
       <div>
         <Button type="submit" disabled={laeuft || !hydriert}>
-          {laeuft ? "Wird eingereicht …" : "Vorschlag einreichen"}
+          {laeuft ? texte.wirdEingereicht : texte.einreichen}
         </Button>
       </div>
     </form>

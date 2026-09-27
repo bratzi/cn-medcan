@@ -15,7 +15,7 @@ test("Stimmbalken in Tinte, nicht in Blattgrün", () => {
 
 test("Begriffe: freigeschaltet statt Freigabe, Ich statt Betreiber", () => {
   assert.doesNotMatch(QUELLE, /Freigabe ausstehend|freigegebene Mitglieder|des Betreibers|Vom Betreiber/);
-  assert.match(QUELLE, /Noch nicht freigeschaltet/);
+  assert.match(readFileSync(join(process.cwd(), "lib/i18n/de.ts"), "utf8"), /nichtFreigeschaltet: "Noch nicht freigeschaltet"/);
 });
 
 test("nur noch der Stimmzettel, keine Karten-Variante", () => {
@@ -42,7 +42,7 @@ const lies = (datei: string) => readFileSync(join(process.cwd(), datei), "utf8")
 test("Phasennamen aus einer Quelle für Stimmzettel und Chronik", () => {
   assert.doesNotMatch(lies("app/umfragen/page.tsx"), /const PHASEN_LABEL/);
   assert.doesNotMatch(QUELLE, /const PHASEN_LABEL/);
-  assert.match(lies("components/umfrage/phasen.ts"), /export const PHASEN_LABEL/);
+  assert.match(lies("components/umfrage/phasen.ts"), /export function phasenLabel/);
 });
 
 test("Startseite spricht von freigeschalteten Mitgliedern", () => {
@@ -58,7 +58,7 @@ test("Formulare der Abstimmung: Hover über Fläche, Fokus über die globale Reg
 
 test("Lange Namen im gesetzten Platz und bei den Gewinnern brechen um", () => {
   assert.match(QUELLE, /namenLinkKlassen\("min-w-0 /);
-  assert.match(lies("app/umfragen/page.tsx"), /<p className="text-body text-text wrap-break-word">\s*\{"Gewonnen: "\}/);
+  assert.match(lies("app/umfragen/page.tsx"), /<p className="text-body text-text wrap-break-word">\s*\{`\$\{w\.umfrage\.gewonnen\} `\}/);
 });
 
 test("Stimmzettel auf derselben Ebene wie Doppelseite und Blatt", () => {

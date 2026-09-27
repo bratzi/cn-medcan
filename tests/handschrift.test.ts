@@ -94,7 +94,15 @@ function option(teil: Partial<UmfrageOptionAnsicht> = {}): UmfrageOptionAnsicht 
 }
 
 function kandidat(teil: Partial<KandidatProps> = {}): string {
-  const props: KandidatProps = { option: option(), gesamt: 5, gewaehlt: false, zeigeStimmen: true, ...teil };
+  const props: KandidatProps = {
+    option: option(),
+    gesamt: 5,
+    gewaehlt: false,
+    zeigeStimmen: true,
+    texte: de.umfrage.kandidat,
+    sprache: "de",
+    ...teil,
+  };
   return renderToStaticMarkup(createElement("ul", null, createElement(Kandidat, props)));
 }
 

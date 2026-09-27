@@ -6,6 +6,8 @@ import { freigabeErforderlich } from "@/lib/session";
 import { getPrisma } from "@/lib/prisma";
 import { istEindeutigkeitsfehler } from "@/lib/prisma-fehler";
 import { stimmeEingabePruefen, vorschlagEingabePruefen } from "@/lib/umfrage-eingabe";
+import { holeWoerterbuch } from "@/lib/i18n";
+import { meldungText } from "@/lib/i18n/text";
 
 export type UmfrageErgebnis = { ok: true } | { ok: false; fehler: string };
 
@@ -24,13 +26,14 @@ export type UmfrageErgebnis = { ok: true } | { ok: false; fehler: string };
 /** Einen Strain fuer die laufende Runde vorschlagen. */
 export async function vorschlagEinreichen(formData: FormData): Promise<UmfrageErgebnis> {
   const mitglied = await freigabeErforderlich();
+  const w = await holeWoerterbuch();
 
   const geprueft = vorschlagEingabePruefen(
     String(formData.get("umfrageId") ?? ""),
     String(formData.get("strainId") ?? ""),
     String(formData.get("begruendung") ?? ""),
   );
-  if (!geprueft.ok) return geprueft;
+  if (!geprueft.ok) return { ok: false, fehler: meldungText(w, geprueft.fehler) };
 
   const prisma = await getPrisma();
 
@@ -42,9 +45,9 @@ export async function vorschlagEinreichen(formData: FormData): Promise<UmfrageEr
     where: { id: geprueft.wert.umfrageId },
     select: { phase: true },
   });
-  if (!umfrage) return { ok: false, fehler: "Diese Umfrage gibt es nicht." };
+  if (!umfrage) return { ok: false, fehler: w.meldung["umfrage.gibtEsNicht"] };
   if (umfrage.phase !== "VORSCHLAG") {
-    return { ok: false, fehler: "Diese Runde nimmt keine Vorschläge mehr an." };
+    return { ok: false, fehler: w.meldung["umfrage.keineVorschlaege"] };
   }
 
   try {
@@ -59,7 +62,7 @@ export async function vorschlagEinreichen(formData: FormData): Promise<UmfrageEr
   } catch (fehler) {
     // Unique (umfrageId, mitgliedId, strainId): derselbe Vorschlag zweimal.
     if (istEindeutigkeitsfehler(fehler)) {
-      return { ok: false, fehler: "Diese Sorte hast du in dieser Runde schon vorgeschlagen." };
+      return { ok: false, fehler: w.meldung["umfrage.schonVorgeschlagen"] };
     }
     throw fehler;
   }
@@ -80,12 +83,13 @@ export async function vorschlagEinreichen(formData: FormData): Promise<UmfrageEr
  */
 export async function stimmeAbgeben(formData: FormData): Promise<UmfrageErgebnis> {
   const mitglied = await freigabeErforderlich();
+  const w = await holeWoerterbuch();
 
   const geprueft = stimmeEingabePruefen(
     String(formData.get("umfrageId") ?? ""),
     String(formData.get("optionId") ?? ""),
   );
-  if (!geprueft.ok) return geprueft;
+  if (!geprueft.ok) return { ok: false, fehler: meldungText(w, geprueft.fehler) };
 
   const { umfrageId, optionId } = geprueft.wert;
   const prisma = await getPrisma();
@@ -96,15 +100,15 @@ export async function stimmeAbgeben(formData: FormData): Promise<UmfrageErgebnis
   });
 
   if (!option || option.umfrageId !== umfrageId) {
-    return { ok: false, fehler: "Diesen Kandidaten gibt es in dieser Runde nicht." };
+    return { ok: false, fehler: w.meldung["umfrage.kandidatFehlt"] };
   }
   if (option.umfrage.phase !== "ABSTIMMUNG") {
-    return { ok: false, fehler: "In dieser Runde wird gerade nicht abgestimmt." };
+    return { ok: false, fehler: w.meldung["umfrage.keineAbstimmung"] };
   }
   if (option.herkunft !== "COMMUNITY") {
     return {
       ok: false,
-      fehler: "Dieser Platz ist gesetzt und steht nicht zur Abstimmung.",
+      fehler: w.meldung["umfrage.gesetzt"],
     };
   }
 
@@ -114,7 +118,7 @@ export async function stimmeAbgeben(formData: FormData): Promise<UmfrageErgebnis
     });
   } catch (fehler) {
     if (istEindeutigkeitsfehler(fehler)) {
-      return { ok: false, fehler: "Du hast in dieser Runde bereits abgestimmt." };
+      return { ok: false, fehler: w.meldung["umfrage.schonAbgestimmt"] };
     }
     throw fehler;
   }
