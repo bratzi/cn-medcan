@@ -48,7 +48,9 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
   Chrome (Gate-Cookie bleibt im Browser); Chrome-Timer im Hintergrund-Tab werden gedrosselt (AbortController greift nicht).
 - Offen aus A2: Blütenseite mit Testbewertung ansehen, Testblüte in /admin/vorschlaege freigeben, Nutzer fragen, ob
   Testblüte und Testbewertung gelöscht werden (Bewertung per D1 entfernbar, Admin-Löschen gibt es nur für Community).
-- Danach laut Gesamtliste: A4 Englisch (writing-plans), A5 Abschluss-Review, A6 Mobile.
+- **A4 Englisch:** Plan geschrieben `docs/superpowers/plans/2026-09-27-englisch.md` (11 Tasks, 7 Abweichungen von der Spec
+  zur Nutzerbestätigung oben im Plan). Wartet auf Nutzer-Review und Wahl der Ausführung (Subagents oder inline).
+- Danach laut Gesamtliste: A5 Abschluss-Review, A6 Mobile.
 
 ### ⇢ SESSION 22 (2026-09-26, läuft) — neu geordnete Taskliste, ersetzt alle älteren Listen darunter
 
