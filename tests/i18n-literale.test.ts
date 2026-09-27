@@ -1,0 +1,41 @@
+import { test } from "node:test";
+import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
+
+/**
+ * Waechter gegen deutsche Oberflaechentexte in bereits umgestellten Dateien
+ * (Spec Englisch 8). Jede Welle traegt ihre Dateien in UMGESTELLT ein.
+ * Kommentare zaehlen nicht; Eigennamen stehen in ERLAUBT.
+ */
+const UMGESTELLT: string[] = ["app/layout.tsx", "components/layout/SprachSchalter.tsx"];
+
+const ERLAUBT: string[] = ["Book of Terpz", "Deutsch"];
+
+const DEUTSCH =
+  /[äöüÄÖÜß]|\b(und|oder|nicht|mit|für|bitte|Bitte|keine?|noch|eine?|wird|werden|ist|sind|zur|zum|dein|deine|wir|uns|Sie|jetzt|hier|alle|wählen)\b/;
+
+function ohneKommentare(quelle: string): string {
+  return quelle
+    .replace(/\{\s*\/\*[\s\S]*?\*\/\s*\}/g, "")
+    .replace(/\/\*[\s\S]*?\*\//g, "")
+    .replace(/(^|[\s;])\/\/.*$/gm, "$1");
+}
+
+function texte(quelle: string): string[] {
+  const aus: string[] = [];
+  for (const m of quelle.matchAll(/"((?:[^"\\n]|\.)*)"|'((?:[^'\\n]|\.)*)'|`([^`]*)`/g)) aus.push(m[1] ?? m[2] ?? m[3] ?? "");
+  for (const m of quelle.matchAll(/>([^<>{}]+)</g)) aus.push(m[1]);
+  return aus.map((s) => s.trim()).filter(Boolean);
+}
+
+test("umgestellte Dateien enthalten keine deutschen Oberflaechentexte", () => {
+  const funde: string[] = [];
+  for (const pfad of UMGESTELLT) {
+    for (const text of texte(ohneKommentare(readFileSync(pfad, "utf8")))) {
+      if (ERLAUBT.some((e) => text === e)) continue;
+      if (text.startsWith("@/") || text.startsWith("./") || text === "use client" || text === "use server") continue;
+      if (DEUTSCH.test(text)) funde.push(`${pfad}: ${text}`);
+    }
+  }
+  assert.deepEqual(funde, []);
+});
