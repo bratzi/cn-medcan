@@ -41,6 +41,12 @@ in ihrer Geschmacksfarbe, Lichtpunkt läuft Geschmack → Terpen (`a3a8431`, `.b
 Kopf** (`962ccc8`, components/marke/Logo.tsx: „Book of“ 0,45 em oben, „Terpz“ text-marke, vier Konturen, Verlauf,
 Glanz; Brand-Doku §2 angepasst); 24 geprüfte Skills installiert (`3192b53`). Live noch NICHT gesehen.
 
+**Stand 2026-09-27:** Welle 1 brach am Sitzungslimit ab. W1-B (Aroma-Details) ist fertig (`2c55c83`), dazu
+„stimmt das?“ eins höher (`e6c647a`) und Hover in beide Richtungen plus Infotext mit Icons (`4d428c4`). W1-A, C, D, E, F
+wurden **neu gestartet**. Aufträge in `docs/superpowers/plans/2026-09-26-session22-wellen.md`. **Ist der Baum nach einem
+Clear schmutzig:** die Diffs gehören zu diesen Agents; je Block gegen den Plan prüfen, `npm test`, dann dateigenau
+committen oder den Block neu starten. Sortenkopf-Name bleibt in Logoschrift (Nutzerausnahme zu Leitplanke 4).
+
 **Welle 1 (läuft parallel in Agents, Dateien getrennt):**
 1. Startseite Bewegung/Perf: Hidden-Tab-Bug im Einstieg, Dauer-Animationen außerhalb des Bildes pausieren
    (`data-ruhend`), will-change, Stimmbalken füllen sich ein + Zähler, Kopf hell über dem Hero, „Umschlag wird
