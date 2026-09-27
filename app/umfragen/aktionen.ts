@@ -6,6 +6,7 @@ import { freigabeErforderlich } from "@/lib/session";
 import { getPrisma } from "@/lib/prisma";
 import { istEindeutigkeitsfehler } from "@/lib/prisma-fehler";
 import { stimmeEingabePruefen, vorschlagEingabePruefen } from "@/lib/umfrage-eingabe";
+import { vergiss } from "@/lib/memo";
 
 export type UmfrageErgebnis = { ok: true } | { ok: false; fehler: string };
 
@@ -64,6 +65,7 @@ export async function vorschlagEinreichen(formData: FormData): Promise<UmfrageEr
     throw fehler;
   }
 
+  vergiss(""); // gemerkte Daten dieses Isolats (lib/memo.ts)
   revalidatePath("/umfragen");
   return { ok: true };
 }

@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { adminErforderlich } from "@/lib/session";
 import { getPrisma } from "@/lib/prisma";
 import { freigabeEingabePruefen, reviewIdPruefen, rolleEingabePruefen } from "@/lib/admin-eingabe";
+import { vergiss } from "@/lib/memo";
 
 export type AdminErgebnis = { ok: true } | { ok: false; fehler: string };
 
@@ -40,6 +41,7 @@ export async function freigabeSetzen(formData: FormData): Promise<AdminErgebnis>
     },
   });
 
+  vergiss(""); // gemerkte Daten dieses Isolats (lib/memo.ts)
   revalidatePath("/admin");
   return { ok: true };
 }
@@ -61,6 +63,7 @@ export async function rolleSetzen(formData: FormData): Promise<AdminErgebnis> {
     data: { rolle: geprueft.wert.rolle },
   });
 
+  vergiss(""); // gemerkte Daten dieses Isolats (lib/memo.ts)
   revalidatePath("/admin");
   return { ok: true };
 }
@@ -76,6 +79,7 @@ async function reviewSlug(reviewId: string): Promise<string | null> {
 }
 
 function bewertungPfadeNeuLaden(slug: string) {
+  vergiss(""); // gemerkte Daten dieses Isolats (lib/memo.ts)
   revalidatePath("/admin");
   revalidatePath("/");
   revalidatePath(`/blueten/${slug}`);

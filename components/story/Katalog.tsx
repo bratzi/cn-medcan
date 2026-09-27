@@ -4,9 +4,8 @@ import { Suspense } from "react";
 import { ProduktCard } from "@/components/produkt/ProduktCard";
 import { KatalogSkelett } from "@/components/story/Skelette";
 import { EmptyState, buttonKlassen } from "@/components/ui";
-import { leererFilter } from "@/lib/query/filter";
 import { istFachkreis } from "@/lib/query/fachkreis";
-import { ladeStrainListe } from "@/lib/query/strains";
+import { ladeStrainListeStart } from "@/lib/query/strains";
 import { sicher } from "@/lib/sicher";
 
 const ANZAHL = 6;
@@ -21,7 +20,7 @@ const EINSTIEGE = [
 /** Sechs Produkte als wischbare Reihe. Preise nur mit Freigabe (bestehende Logik). */
 async function Reihe() {
   const liste = await sicher(
-    async () => ladeStrainListe(leererFilter(), await istFachkreis()),
+    async () => ladeStrainListeStart(await istFachkreis()),
     null,
     "Katalog-Reihe",
   );

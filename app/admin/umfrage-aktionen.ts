@@ -12,6 +12,7 @@ import {
   vorschlagFristPruefen,
   type OptionFuerAuswertung,
 } from "@/lib/umfrage-eingabe";
+import { vergiss } from "@/lib/memo";
 
 export type AdminUmfrageErgebnis = { ok: true } | { ok: false; fehler: string };
 
@@ -66,6 +67,7 @@ export async function umfrageAnlegen(formData: FormData): Promise<AdminUmfrageEr
     throw fehler;
   }
 
+  vergiss(""); // gemerkte Daten dieses Isolats (lib/memo.ts)
   revalidatePath("/admin");
   revalidatePath("/umfragen");
   return { ok: true };
@@ -128,6 +130,7 @@ export async function gesetztenPlatzVergeben(
     throw fehler;
   }
 
+  vergiss(""); // gemerkte Daten dieses Isolats (lib/memo.ts)
   revalidatePath("/admin");
   revalidatePath("/umfragen");
   return { ok: true };
@@ -186,6 +189,7 @@ export async function vorschlagUebernehmen(
     data: { uebernommen: true },
   });
 
+  vergiss(""); // gemerkte Daten dieses Isolats (lib/memo.ts)
   revalidatePath("/admin");
   revalidatePath("/umfragen");
   return { ok: true };
@@ -239,6 +243,7 @@ export async function phaseWeiterschalten(
       where: { id: umfrageId },
       data: { phase: "ABSTIMMUNG" },
     });
+    vergiss(""); // gemerkte Daten dieses Isolats (lib/memo.ts)
     revalidatePath("/admin");
     revalidatePath("/umfragen");
     revalidatePath("/");
@@ -276,6 +281,7 @@ export async function phaseWeiterschalten(
     data: { phase: "BEENDET", aktiv: null, endetAm: new Date() },
   });
 
+  vergiss(""); // gemerkte Daten dieses Isolats (lib/memo.ts)
   revalidatePath("/admin");
   revalidatePath("/umfragen");
   revalidatePath("/");
@@ -310,6 +316,7 @@ export async function ergebnisVerknuepfen(
       where: { id: optionId },
       data: { ergebnisReviewId: null },
     });
+    vergiss(""); // gemerkte Daten dieses Isolats (lib/memo.ts)
     revalidatePath("/admin");
     revalidatePath("/umfragen");
     return { ok: true };
@@ -331,6 +338,7 @@ export async function ergebnisVerknuepfen(
     data: { ergebnisReviewId: reviewIdRoh },
   });
 
+  vergiss(""); // gemerkte Daten dieses Isolats (lib/memo.ts)
   revalidatePath("/admin");
   revalidatePath("/umfragen");
   return { ok: true };
