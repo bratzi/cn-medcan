@@ -483,6 +483,13 @@ export async function ladeStrainListe(
 //  Detail
 // ---------------------------------------------------------------------------
 
+/** Nur der Handelsname fuer Metadaten - spart die schwere Detailabfrage (Plan Caching v2, Schritt 5). */
+export async function ladeStrainTitel(slug: string): Promise<string | null> {
+  const prisma = await getPrisma();
+  const zeile = await prisma.strain.findFirst({ where: { slug, aktiv: true }, select: { handelsname: true } });
+  return zeile?.handelsname ?? null;
+}
+
 /** Ein Produkt mit vollem Profil. `null`, wenn unbekannt oder inaktiv. */
 export async function ladeStrainDetail(
   slug: string,
@@ -1139,6 +1146,6 @@ export type KatalogTerpen = { name: string; geschmack: GeschmacksKategorie };
 
 export async function ladeTerpenKatalog(): Promise<KatalogTerpen[]> {
   const prisma = await getPrisma();
-  const zeilen = await prisma.terpen.findMany({ orderBy: { name: "asc" }, select: { name: true, geschmack: true } });
+  const zeilen = await prisma.terpen.findMany({ orderBy: { name: "asc" }, select: { name: true, geschmack: true }, take: 200 });
   return zeilen.map((zeile) => ({ name: zeile.name, geschmack: alsGeschmacksKategorie(zeile.geschmack) }));
 }

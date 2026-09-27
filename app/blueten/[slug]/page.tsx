@@ -40,7 +40,7 @@ import { parseGeschmacksMatrix, teileBewertungen, verdichteGeschmacksMatrix, mit
 import { mittleBeschaffenheit } from "@/components/review/BeschaffenheitsLeiste";
 import { mittleNoten } from "@/components/review/GesamteindruckLeiste";
 import { istFachkreis } from "@/lib/query/fachkreis";
-import { ladeStrainDetail, ladeTerpenKatalog, type StrainDetail, type UnternehmenEintrag } from "@/lib/query/strains";
+import { ladeStrainDetail, ladeStrainTitel, ladeTerpenKatalog, type StrainDetail, type UnternehmenEintrag } from "@/lib/query/strains";
 
 /**
  * Kein Prerender zur Buildzeit: es gibt derzeit keine zur Buildzeit
@@ -52,11 +52,11 @@ export const dynamic = "force-dynamic";
 
 export async function generateMetadata({ params }: PageProps<"/blueten/[slug]">): Promise<Metadata> {
   const { slug } = await params;
-  const strain = await ladeStrainDetail(slug, false);
-  if (!strain) return { title: "Blüte nicht gefunden" };
+  const handelsname = await ladeStrainTitel(slug);
+  if (!handelsname) return { title: "Blüte nicht gefunden" };
   return {
-    title: strain.handelsname,
-    description: `Meine Bewertung, Cannabinoid- und Terpenprofil, Chargen und gemeldete Apothekenbestände zu ${strain.handelsname}.`,
+    title: handelsname,
+    description: `Meine Bewertung, Cannabinoid- und Terpenprofil, Chargen und gemeldete Apothekenbestände zu ${handelsname}.`,
   };
 }
 
