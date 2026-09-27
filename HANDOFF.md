@@ -41,7 +41,7 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
   liegen ungenutzt (`2f526a6`); Anwendung per Revert `5b3b764` raus, Diagnose per Revert `71cb733` raus.
   **Kernbefund:** Grundlast von Next liegt je Seite bei 20–90 ms CPU (Limit Free 10 ms); Cloudflare lässt das eine
   Weile durch, dann 1102 — beim Streaming als „hängende“ Seite, weil der Abbruch nach den Kopfzeilen kommt.
-  Datencaching löst das nicht. **Nutzerentscheid nötig:** (a) Workers Paid 5 $/Monat (widerspricht „nie
+  Datencaching löst das nicht. **Nutzerentscheid 2026-09-27: (c) so lassen** (Seite steht hinter dem Passwort; vor öffentlichem Start neu bewerten). Optionen waren: (a) Workers Paid 5 $/Monat (widerspricht „nie
   kostenpflichtig“), (b) Schritt 8a statisches Vorrendern + `staticAssetsIncrementalCache` allein (hilft nur Seiten
   ohne Sitzung; Startseite liest die Sitzung in Abstimmung → müsste auf Client-Abfrage umgebaut werden),
   (c) so lassen. Messmethode: `wrangler tail --format json` in den Scratchpad + fetch-Schleife aus dem angemeldeten
