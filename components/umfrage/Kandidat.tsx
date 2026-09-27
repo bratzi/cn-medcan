@@ -21,6 +21,10 @@ export function stimmenAnteil(option: UmfrageOptionAnsicht, gesamt: number): num
   return Math.min(Math.max(option.stimmen / gesamt, 0), 1) * 100;
 }
 
+function stimmenText(stimmen: number): string {
+  return `${ZAHL_FORMATTER.format(stimmen)} ${stimmen === 1 ? "Stimme" : "Stimmen"}`;
+}
+
 /**
  * Ein Kandidat auf dem Stimmzettel. Der Handelsname ist gedruckt
  * (Newsreader, Leitplanke 4). Die Herkunft ist sichtbar unterschieden:
@@ -60,7 +64,15 @@ export function Kandidat({ option, gesamt, gewaehlt, zeigeStimmen }: KandidatPro
           {gewaehlt ? <Badge variante="accent">Deine Stimme</Badge> : null}
           {zeigeStimmen && option.stimmen !== null ? (
             <span className="numeric text-small text-text">
-              {`${ZAHL_FORMATTER.format(option.stimmen)} ${option.stimmen === 1 ? "Stimme" : "Stimmen"}`}
+              {/* Die Zahl zählt auf der Startseite hoch (bewegung/abstimmung.ts): sichtbar
+                  aria-hidden, vorgelesen wird der Endwert. */}
+              <span className="sr-only">{stimmenText(option.stimmen)}</span>
+              <span aria-hidden="true">
+                <span data-stimmzahl="" data-ziel={option.stimmen}>
+                  {ZAHL_FORMATTER.format(option.stimmen)}
+                </span>
+                {option.stimmen === 1 ? " Stimme" : " Stimmen"}
+              </span>
             </span>
           ) : null}
         </span>
@@ -69,7 +81,12 @@ export function Kandidat({ option, gesamt, gewaehlt, zeigeStimmen }: KandidatPro
       {zeigeStimmen && option.stimmen !== null ? (
         <span aria-hidden="true" className="mt-2 flex h-2 w-full overflow-hidden bg-surface-sunken">
           {/* Datengrafik in Tinte, nicht in Blattgruen: Gruen ist Bedienung. */}
-          <span className="block h-full bg-text" style={{ width: `${stimmenAnteil(option, gesamt)}%` }} />
+          {/* Wächst auf der Startseite von links (data-stimmbalken, bewegung/abstimmung.ts). */}
+          <span
+            data-stimmbalken=""
+            className="block h-full origin-left bg-text"
+            style={{ width: `${stimmenAnteil(option, gesamt)}%` }}
+          />
         </span>
       ) : null}
     </li>

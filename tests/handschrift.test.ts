@@ -189,3 +189,10 @@ test("Skelette haben die Maße der echten Inhalte", () => {
   assert.equal(rand.match(/\bh-16 sm:h-20 lg:h-24\b/g)?.length, 3);
   assert.doesNotMatch(rand, /\bh-12\b/);
 });
+
+test("Stimmenzahl: Endwert vorgelesen, sichtbare Zahl hochzählbar und aria-hidden", () => {
+  const html = kandidat({ option: option({ stimmen: 1284 }) });
+  assert.match(html, /<span class="sr-only">1\.284 Stimmen<\/span>/);
+  assert.match(html, /<span aria-hidden="true"><span data-stimmzahl="" data-ziel="1284">1\.284<\/span> Stimmen<\/span>/);
+  assert.match(html, /<span data-stimmbalken="" class="block h-full origin-left bg-text"/);
+});

@@ -1283,3 +1283,43 @@ html.joint-cursor :is(input:not([type="range"]):not([type="radio"]):not([type="c
     stroke-dashoffset: -160;
   }
 }
+
+/* ==========================================================================
+   Session 22, W1-A: Ruhe, Umschlag, Stimmabgabe
+   ========================================================================== */
+
+/* Story-Sektionen außerhalb des Bildes ruhen (components/story/bewegung/ruhe.ts):
+   CSS-Endlosschleifen halten an und laufen 200 px vor dem Eintritt weiter. Das
+   Attribut setzt nur die StoryBuehne; ohne JavaScript läuft alles. */
+[data-ruhend],
+[data-ruhend] *,
+[data-ruhend] *::before,
+[data-ruhend] *::after {
+  animation-play-state: paused !important;
+}
+
+/* "Umschlag wird Seite" (bewegung/auftakt.ts): weicher Schatten nach oben, solange
+   die erste Buchseite über den gepinnten Auftakt gleitet. Farbton 165 wie --shadow-*. */
+[data-umschlag-seite] {
+  box-shadow: 0 -16px 48px -8px oklch(0.13 0.007 165 / 0.28);
+}
+
+/* Stimmabgabe (components/umfrage/StimmFormular.tsx): während die Stimme unterwegs
+   ist, tritt die Auswahl zurück. 150 ms, starkes ease-out (Session-22-Plan). */
+.stimm-auswahl {
+  transition:
+    opacity 150ms cubic-bezier(0.23, 1, 0.32, 1),
+    scale 150ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.stimm-auswahl[data-wartet] {
+  opacity: 0.6;
+  scale: 0.98;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* Reduziert: nur die Deckkraft, keine Größenänderung. */
+  .stimm-auswahl[data-wartet] {
+    scale: none;
+  }
+}

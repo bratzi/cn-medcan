@@ -21,8 +21,15 @@ export function KopfZustand() {
       const gescrollt = window.scrollY > 8;
       kopf.toggleAttribute("data-gescrollt", gescrollt);
       const buehne = document.querySelector<HTMLElement>(".buehne-dunkel[data-story='auftakt']");
-      const ueberBuehne = !!buehne && buehne.getBoundingClientRect().bottom > kopf.offsetHeight;
-      kopf.classList.toggle("buehne-dunkel", ueberBuehne && !gescrollt);
+      const kopfH = kopf.offsetHeight;
+      // Die erste Buchseite gleitet über den gepinnten Auftakt (bewegung/auftakt.ts):
+      // liegt sie schon unter dem Kopf, schwebt er über Papier, nicht über der Bühne.
+      const seite = document.querySelector<HTMLElement>("[data-umschlag-seite]");
+      const seiteDarueber = !!seite && seite.getBoundingClientRect().top <= kopfH;
+      const ueberBuehne = !!buehne && buehne.getBoundingClientRect().bottom > kopfH && !seiteDarueber;
+      // Auch gescrollt dunkel, solange die Bühne unter dem Kopf liegt: sonst stünde im
+      // Hell-Modus ein heller Papierstreifen über dem schwarzen Film.
+      kopf.classList.toggle("buehne-dunkel", ueberBuehne);
     };
     const planen = () => {
       if (!rahmen) rahmen = requestAnimationFrame(pruefen);

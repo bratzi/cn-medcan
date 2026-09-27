@@ -69,9 +69,16 @@ export function beobachtePunkte(): () => void {
         ebene.element.style.translate = `${ebene.x.toFixed(2)}px ${ebene.y.toFixed(2)}px`;
       }
       frame = bewegt ? requestAnimationFrame(schritt) : 0;
+      // Eigene Ebene nur, solange sich etwas bewegt (will-change kostet Speicher).
+      if (!frame) ebenenVorbereiten(false);
+    };
+    const ebenenVorbereiten = (aktiv: boolean) => {
+      for (const ebene of ebenen) ebene.element.style.willChange = aktiv ? "translate" : "";
     };
     const anstossen = () => {
-      if (!frame) frame = requestAnimationFrame(schritt);
+      if (frame) return;
+      ebenenVorbereiten(true);
+      frame = requestAnimationFrame(schritt);
     };
 
     const bewegen = (ereignis: PointerEvent) => {
@@ -105,7 +112,10 @@ export function beobachtePunkte(): () => void {
       punkt.removeEventListener("pointermove", bewegen);
       punkt.removeEventListener("pointerleave", verlassen);
       cancelAnimationFrame(frame);
-      for (const ebene of ebenen) ebene.element.style.translate = "";
+      for (const ebene of ebenen) {
+        ebene.element.style.translate = "";
+        ebene.element.style.willChange = "";
+      }
     });
   }
 

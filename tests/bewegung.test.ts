@@ -82,3 +82,67 @@ test("Randzahlen haben ein eigenes Attribut, data-zaehler bleibt der Doppelseite
   assert.doesNotMatch(ablauf, /data-zaehler/);
   assert.doesNotMatch(readFileSync(join("components", "story", "Randspalte.tsx"), "utf8"), /data-zaehler/);
 });
+
+const bewegung = (datei: string) => readFileSync(join("components", "story", "bewegung", datei), "utf8");
+
+test("Auftakt: der CSS-Notfall wird erst abgeschaltet, wenn die Timeline läuft", () => {
+  const auftakt = bewegung("auftakt.ts");
+  assert.doesNotMatch(auftakt, /\.set\(einstieg,\s*\{\s*animation:\s*"none",\s*opacity:\s*0/);
+  assert.match(auftakt, /onStart:\s*\(\)\s*=>\s*\{\s*gsap\.set\(einstieg,\s*\{\s*animation:\s*"none"\s*\}\)/);
+  assert.match(auftakt, /visibilityState === "visible"/);
+  // Zoomwerte bleiben (Nutzer 2026-09-26).
+  assert.match(auftakt, /scale:\s*1\.02/);
+  assert.match(auftakt, /scale:\s*1\.05/);
+});
+
+test("Umschlag wird Seite: abschaltbar, Pin ohne Platzhalter, nur ab Tablet", () => {
+  const auftakt = bewegung("auftakt.ts");
+  assert.match(auftakt, /export const UMSCHLAG_WIRD_SEITE = (true|false);/);
+  assert.match(auftakt, /mm\.add\(AB_TABLET/);
+  assert.match(auftakt, /pin:\s*true,\s*pinSpacing:\s*false/);
+  assert.match(bewegung("start.ts"), /\bumschlagWirdSeite\b/);
+  const seite = readFileSync(join("components", "story", "TransparentMachen.tsx"), "utf8");
+  assert.match(seite, /className="[^"]*\bfeldbuch-raster\b[^"]*\bz-10\b[^"]*\bbg-surface\b/);
+  assert.match(css, /\[data-umschlag-seite\]\s*\{\s*box-shadow:/);
+});
+
+test("Ruhende Sektionen: CSS-Animationen halten außerhalb des Bildes an, der Kopf nie", () => {
+  assert.match(bewegung("ruhe.ts"), /section\[data-story\]/);
+  assert.match(bewegung("ruhe.ts"), /rootMargin: "200px 0px"/);
+  assert.match(bewegung("start.ts"), /beobachteRuhe\(\)/);
+  assert.match(
+    css,
+    /\[data-ruhend\],\s*\[data-ruhend\] \*,\s*\[data-ruhend\] \*::before,\s*\[data-ruhend\] \*::after\s*\{\s*animation-play-state: paused !important;/,
+  );
+  assert.doesNotMatch(readFileSync(join("components", "layout", "Kopf.tsx"), "utf8"), /data-story=/);
+});
+
+test("will-change nur während der Bewegung (Vorhang, Zeigerpunkte)", () => {
+  assert.match(bewegung("vorhang.ts"), /onToggle:[\s\S]*?willChange = isActive \? "clip-path" : ""/);
+  const punkte = bewegung("punkte.ts");
+  assert.match(punkte, /willChange = aktiv \? "translate" : ""/);
+  assert.match(punkte, /if \(!frame\) ebenenVorbereiten\(false\)/);
+});
+
+test("Totes schleife.ts ist weg", () => {
+  assert.equal(existsSync(join("components", "story", "bewegung", "schleife.ts")), false);
+  assert.doesNotMatch(bewegung("start.ts"), /\bschleife\b|"\.\/schleife"/);
+});
+
+test("Stimmbalken wachsen von links, Stimmenzahlen zählen mit eigenem Attribut hoch", () => {
+  const kandidat = readFileSync(join("components", "umfrage", "Kandidat.tsx"), "utf8");
+  assert.match(kandidat, /data-stimmbalken=""\s*className="[^"]*\borigin-left\b/);
+  assert.match(kandidat, /data-stimmzahl="" data-ziel=\{option\.stimmen\}/);
+  const ablauf = bewegung("abstimmung.ts");
+  assert.match(ablauf, /\{ scaleX: 0, duration: 0\.9, ease: "power3\.out", stagger: 0\.08/);
+  assert.match(ablauf, /"\[data-stimmzahl\]"/);
+  assert.doesNotMatch(ablauf, /data-randzahl|data-zaehler/);
+});
+
+test("Stimmabgabe: Auswahl tritt während des Sendens zurück, reduziert ohne Skalierung", () => {
+  const formular = readFileSync(join("components", "umfrage", "StimmFormular.tsx"), "utf8");
+  assert.match(formular, /stimm-auswahl[\s\S]*?data-wartet=\{laeuft/);
+  assert.match(css, /\.stimm-auswahl\s*\{\s*transition:\s*opacity 150ms cubic-bezier\(0\.23, 1, 0\.32, 1\),\s*scale 150ms cubic-bezier\(0\.23, 1, 0\.32, 1\);/);
+  assert.match(css, /\.stimm-auswahl\[data-wartet\]\s*\{\s*opacity: 0\.6;\s*scale: 0\.98;/);
+  assert.match(css, /@media \(prefers-reduced-motion: reduce\) \{\s*\/\*[^*]*\*\/\s*\.stimm-auswahl\[data-wartet\]\s*\{\s*scale: none;/);
+});

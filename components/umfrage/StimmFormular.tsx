@@ -49,10 +49,11 @@ export function StimmFormular({ umfrageId, optionen }: Props) {
   }
 
   return (
-    <form onSubmit={absenden}>
+    <form onSubmit={absenden} aria-busy={laeuft}>
       <input type="hidden" name="umfrageId" value={umfrageId} />
 
-      <fieldset className="border-0 p-0">
+      {/* Während die Stimme unterwegs ist, tritt die Auswahl zurück (globals.css, .stimm-auswahl). */}
+      <fieldset className="stimm-auswahl border-0 p-0" data-wartet={laeuft ? "" : undefined}>
         <legend className="text-small font-medium text-text">
           Was sollen wir als Nächstes bewerten?
         </legend>

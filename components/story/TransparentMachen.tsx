@@ -155,12 +155,20 @@ function Buzz({ children }: { children: ReactNode }) {
  * die Abweichung zwischen Community und Herstellerangabe. Die Kopfzeile mit
  * dem Stand steht jetzt unten im Auftakt (Kopfzeile.tsx).
  */
+/*
+ * "Umschlag wird Seite" (bewegung/auftakt.ts): die Sektion ist die erste
+ * Buchseite und gleitet über den gepinnten Auftakt, deshalb eigene Ebene
+ * (`z-10`), deckendes Papier und das Feldbuch-Raster selbst (es deckt das
+ * feste Raster darunter ab und liegt mit ihm auf denselben Spalten). Den
+ * weichen Schatten nach oben trägt sie nur, solange der Pin besteht
+ * (`data-umschlag-seite`, globals.css).
+ */
 export function TransparentMachen() {
   return (
     <section
       aria-labelledby="transparent-titel"
       data-story="transparent"
-      className="relative isolate overflow-x-clip px-4 py-24 sm:px-8 sm:py-32"
+      className="feldbuch-raster relative isolate z-10 overflow-x-clip bg-surface px-4 py-24 sm:px-8 sm:py-32"
     >
       <div className="mx-auto w-full max-w-360">
         <div data-story="manifest">

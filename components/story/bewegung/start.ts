@@ -1,5 +1,5 @@
 import { abstimmung } from "./abstimmung";
-import { auftakt, auftaktFilm } from "./auftakt";
+import { auftakt, auftaktFilm, umschlagWirdSeite } from "./auftakt";
 import { eintrag } from "./eintrag";
 import { starteBlaetter } from "./blaetter";
 
@@ -7,7 +7,7 @@ const BLAETTER_AN = false;
 import { beobachteLoops } from "./loops";
 import { beobachtePunkte } from "./punkte";
 import { randnotizen } from "./randnotizen";
-import { schleife } from "./schleife";
+import { beobachteRuhe } from "./ruhe";
 import { schluss } from "./schluss";
 import { transparent } from "./transparent";
 import { vorhang } from "./vorhang";
@@ -19,13 +19,14 @@ import { AB_TABLET, type Choreografie, type Werkzeug } from "./typen";
  * aendert.
  *
  * Reihenfolge = Seitenreihenfolge: ScrollTrigger misst in Anlegereihenfolge.
- * Der Vorhang steht zuletzt; er deckt Sektion 3 und die Abstimmung auf.
+ * Der Pin des Auftakts steht vorn (Pins vor den Ablaeufen darunter), der
+ * Vorhang zuletzt; er deckt Sektion 3 und die Abstimmung auf.
  */
 const SCROLL_CHOREOGRAFIEN: readonly Choreografie[] = [
+  umschlagWirdSeite,
   auftaktFilm,
   transparent,
   randnotizen,
-  schleife,
   eintrag,
   abstimmung,
   schluss,
@@ -110,6 +111,8 @@ export async function starteBuehne(): Promise<() => void> {
   const loops = beobachteLoops();
   // Video-Blobs im Storytelling folgen dem Zeiger und bewegen sich sonst selbst (siehe punkte.ts).
   const punkteStopp = beobachtePunkte();
+  // CSS-Endlosschleifen (Blob-Morph, Glanz, Puls) ruhen in Sektionen ausserhalb des Bildes.
+  const ruheStopp = beobachteRuhe();
 
   // 3D-Blätter vorerst aus (Nutzer 2026-09-25: passt nicht rein, Code bleibt für später).
   // Wieder an: BLAETTER_AN auf true. Nur ab Tablet: auf kleinen Geräten kostet WebGL zu viel Akku.
@@ -128,6 +131,7 @@ export async function starteBuehne(): Promise<() => void> {
     stoppeWarten();
     loops.stoppen();
     punkteStopp();
+    ruheStopp();
     blaetterStopp?.();
     window.removeEventListener("load", neuMessen);
     for (const aufraeumen of aufraeumer.splice(0)) aufraeumen();
