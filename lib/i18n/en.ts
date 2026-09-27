@@ -290,6 +290,7 @@ export const en: Woerterbuch = {
       darreichungsform: "Dosage form",
       geschmack: "Dominant flavour",
       thc: "THC range",
+      bis: "to",
       hoechstpreis: "Maximum price per gram",
       aktuell: "Current: {preis}",
       keinPreis: "Prices are only visible to healthcare professionals, so there is no price filter.",

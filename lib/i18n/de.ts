@@ -294,6 +294,7 @@ export const de = {
       darreichungsform: "Darreichungsform",
       geschmack: "Dominanter Geschmack",
       thc: "THC-Spanne",
+      bis: "bis",
       hoechstpreis: "Höchstpreis pro Gramm",
       aktuell: "Aktuell: {preis}",
       keinPreis: "Preise sind nur für Fachkreise sichtbar. Ein Preisfilter steht deshalb nicht zur Verfügung.",

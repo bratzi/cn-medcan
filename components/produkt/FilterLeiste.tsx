@@ -265,6 +265,7 @@ export function FilterLeiste({ facetten, filter, gesamt, texte, titel, zurueckse
 
       <RangeSlider
         label={texte.thc}
+        bis={texte.bis}
         min={facetten.thcSpanne.min}
         max={facetten.thcSpanne.max}
         wert={[entwurf.thcMin, entwurf.thcMax]}

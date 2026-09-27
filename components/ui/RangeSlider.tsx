@@ -10,6 +10,8 @@ export type RangeSliderProps = {
   wert: [number, number];
   onChange: (wert: [number, number]) => void;
   label: string;
+  /** Verbindungswort zwischen den Werten, z. B. "bis" oder "to". */
+  bis: string;
   /** Formatiert den Wert fuer Anzeige und `aria-valuetext`. */
   formatiere?: (n: number) => string;
   className?: string;
@@ -28,6 +30,7 @@ export function RangeSlider({
   wert,
   onChange,
   label,
+  bis,
   formatiere,
   className,
 }: RangeSliderProps) {
@@ -60,7 +63,7 @@ export function RangeSlider({
 
       <p className="text-small text-text-muted">
         <span className="numeric">{zeige(aktuellMin)}</span>
-        {" bis "}
+        {` ${bis} `}
         <span className="numeric">{zeige(aktuellMax)}</span>
       </p>
 
