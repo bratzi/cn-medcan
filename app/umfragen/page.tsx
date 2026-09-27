@@ -43,7 +43,7 @@ function RundenZeile({ runde }: { runde: UmfrageUebersicht }) {
             {runde.gewinner.map((gewinner, index) => (
               <span key={gewinner.slug}>
                 {index > 0 ? ", " : null}
-                <Link href={`/produkte/${gewinner.slug}`} className={textLinkKlassen()}>
+                <Link href={`/blueten/${gewinner.slug}`} className={textLinkKlassen()}>
                   {gewinner.handelsname}
                 </Link>
               </span>
@@ -143,7 +143,7 @@ async function UmfragenInhalt() {
                 <li key={vorschlag.id} className="flex flex-col gap-2 py-6">
                   <div className="flex flex-wrap items-baseline justify-between gap-4">
                     <Link
-                      href={`/produkte/${vorschlag.slug}`}
+                      href={`/blueten/${vorschlag.slug}`}
                       className={namenLinkKlassen("min-w-0 font-buch text-h2 font-medium wrap-break-word")}
                     >
                       {vorschlag.handelsname}

@@ -3,7 +3,7 @@
  * kein Gedankenstrich als Trenner (Zahlenbereiche wie "22,0 – 28,0 %" sind
  * erlaubt), keine Umschrift, genau ein h1, keine doppelten Ids.
  * Aufruf gegen den laufenden Dev-Server:
- *   npx tsx scripts/seiten-pruefen.ts /reviews /umfragen /produkte/nebelharz-22
+ *   npx tsx scripts/seiten-pruefen.ts /reviews /umfragen /blueten/nebelharz-22
  * Das Gate-Cookie entsteht aus SITE_SESSION_SECRET in .env.local; der Wert
  * wird nie ausgegeben.
  */

@@ -39,7 +39,7 @@ test("Auszug: vier Noten ohne Wirkung, Link springt auf den Eintrag", () => {
   const html = zeige({ eintrag: eintrag(), umfang: "auszug", ueberschrift: "h3" });
   assert.equal(html.match(/<dt/g)?.length, 4);
   assert.doesNotMatch(html, /Wirkung/);
-  assert.match(html, /href="\/produkte\/nebelharz-22#eintrag-r1"/);
+  assert.match(html, /href="\/blueten\/nebelharz-22#eintrag-r1"/);
   assert.match(html, /line-clamp-3/);
   assert.match(html, />Nebelharz 22 \(fiktiv\)<\/h3>/);
 });
@@ -119,7 +119,7 @@ test("alsEintrag: Name und Slug vom Produkt, kaputte Matrix wird neutral", () =>
   assert.equal(e.handelsname, "Nebelharz 22 (fiktiv)");
   assert.equal(e.slug, "nebelharz-22");
   assert.deepEqual(e.geschmacksMatrix, leereGeschmacksMatrix());
-  assert.equal(eintragHref("nebelharz-22", "r1"), "/produkte/nebelharz-22#eintrag-r1");
+  assert.equal(eintragHref("nebelharz-22", "r1"), "/blueten/nebelharz-22#eintrag-r1");
 });
 
 test("Überschrift: auf Unterseiten kleiner als der Abschnittstitel, auf der Startseite wie bisher", () => {

@@ -40,7 +40,7 @@ export function eintragAnker(id: string): string {
 }
 
 export function eintragHref(slug: string, id: string): string {
-  return `/produkte/${slug}#${eintragAnker(id)}`;
+  return `/blueten/${slug}#${eintragAnker(id)}`;
 }
 
 /**

@@ -117,7 +117,7 @@ test("vorschlagPfad: Suchbegriff bleibt erhalten, auch ueber die Anmeldung", () 
 });
 
 test("Leeres Suchergebnis zeigt nur einen Vorschlags-Einstieg", () => {
-  const katalog = lies("app/produkte/page.tsx");
+  const katalog = lies("app/blueten/page.tsx");
   assert.match(katalog, /liste\.eintraege\.length > 0 \? \(\s*<p className="text-small text-text-muted">\s*Blüte fehlt\?/);
 });
 

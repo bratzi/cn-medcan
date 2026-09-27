@@ -92,8 +92,8 @@ function neuLaden(slug?: string) {
   revalidatePath("/admin");
   revalidatePath("/admin/vorschlaege");
   revalidatePath("/mitglied");
-  revalidatePath("/produkte");
-  if (slug) revalidatePath(`/produkte/${slug}`);
+  revalidatePath("/blueten");
+  if (slug) revalidatePath(`/blueten/${slug}`);
 }
 
 export async function blueteFreigeben(formData: FormData): Promise<AdminVorschlagErgebnis> {
@@ -192,7 +192,7 @@ export async function blueteFreigeben(formData: FormData): Promise<AdminVorschla
   await abschliessen(
     offene,
     "FREIGEGEBEN",
-    { art: "VORSCHLAG_FREIGEGEBEN", text: textFreigegeben(name), link: `/produkte/${slug}` },
+    { art: "VORSCHLAG_FREIGEGEBEN", text: textFreigegeben(name), link: `/blueten/${slug}` },
     { strainId: vorhanden?.id ?? strainId },
   );
   neuLaden(slug);
@@ -240,7 +240,7 @@ export async function blueteZuordnen(formData: FormData): Promise<AdminVorschlag
   await abschliessen(
     offene,
     "FREIGEGEBEN",
-    { art: "VORSCHLAG_FREIGEGEBEN", text: textFreigegeben(strain.handelsname), link: `/produkte/${strain.slug}` },
+    { art: "VORSCHLAG_FREIGEGEBEN", text: textFreigegeben(strain.handelsname), link: `/blueten/${strain.slug}` },
     { strainId: strain.id },
   );
   neuLaden(strain.slug);

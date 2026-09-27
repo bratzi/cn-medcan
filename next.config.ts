@@ -1,6 +1,12 @@
 import type { NextConfig } from "next";
 
+import { ALTE_KATALOG_WEITERLEITUNGEN } from "./lib/alte-adressen";
+
 const nextConfig: NextConfig = {
+  // /produkte -> /blueten (308, Query bleibt), siehe lib/alte-adressen.ts.
+  async redirects() {
+    return [...ALTE_KATALOG_WEITERLEITUNGEN];
+  },
   // Der Prisma-Client (runtime = "cloudflare") importiert seinen Query-Compiler
   // als `.wasm?module`. Turbopacks Lader dafuer loest den Pfad dynamisch auf,
   // und die Build-Spur erfasst deshalb rund 30.000 Dateien - darunter jede

@@ -70,7 +70,7 @@ export function ErgebnisListe({ runden, reviewsJeStrain }: Props) {
                     >
                       <div className="flex flex-wrap items-center gap-2">
                         <Link
-                          href={`/produkte/${platz.slug}`}
+                          href={`/blueten/${platz.slug}`}
                           className="text-body font-medium text-text underline underline-offset-2"
                           title={platz.handelsname}
                         >

@@ -80,7 +80,7 @@ export function BewertungsFormular({
             ? "Gespeichert und veröffentlicht."
             : "Danke! Deine Bewertung ist eingegangen und erscheint nach der Freigabe."}
         </Meldung>
-        <Link href={`/produkte/${erfolg.slug}`} className="text-small text-accent underline underline-offset-4">
+        <Link href={`/blueten/${erfolg.slug}`} className="text-small text-accent underline underline-offset-4">
           {`Zurück zu ${handelsname}`}
         </Link>
       </div>

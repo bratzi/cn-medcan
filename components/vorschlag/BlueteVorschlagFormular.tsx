@@ -115,7 +115,7 @@ export function BlueteVorschlagFormular({ terpene, nameVorbelegt }: Props) {
           {antwort.vorhanden ? (
             <>
               {" "}
-              <Link href={`/produkte/${antwort.vorhanden.slug}`} className={textLinkKlassen()}>
+              <Link href={`/blueten/${antwort.vorhanden.slug}`} className={textLinkKlassen()}>
                 Zu {antwort.vorhanden.handelsname}
               </Link>
             </>

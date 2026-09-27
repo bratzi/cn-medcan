@@ -50,7 +50,7 @@ import { ladeStrainDetail, ladeTerpenKatalog, type StrainDetail, type Unternehme
  */
 export const dynamic = "force-dynamic";
 
-export async function generateMetadata({ params }: PageProps<"/produkte/[slug]">): Promise<Metadata> {
+export async function generateMetadata({ params }: PageProps<"/blueten/[slug]">): Promise<Metadata> {
   const { slug } = await params;
   const strain = await ladeStrainDetail(slug, false);
   if (!strain) return { title: "Blüte nicht gefunden" };
@@ -314,12 +314,12 @@ async function ProduktInhalt({ slug }: { slug: string }) {
   );
 }
 
-export default async function ProduktDetailPage({ params }: PageProps<"/produkte/[slug]">) {
+export default async function ProduktDetailPage({ params }: PageProps<"/blueten/[slug]">) {
   const { slug } = await params;
   return (
     <div className={cn(seitenRahmen(), "pt-16 pb-24 sm:pt-24")}>
       <p className="mb-8">
-        <Link href="/produkte" className={einzelLinkKlassen()}>
+        <Link href="/blueten" className={einzelLinkKlassen()}>
           Alle Blüten
         </Link>
       </p>

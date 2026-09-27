@@ -94,7 +94,7 @@ export function Auftakt() {
       <div className="flex flex-1 items-center justify-center px-4 py-8">
         <div data-punkt="" className="p-6">
           <Link
-            href="/produkte"
+            href="/blueten"
             data-punkt-tiefe="1"
             className="konto-pille inline-flex h-14 items-center rounded-full px-10 font-sans text-small font-medium uppercase tracking-gesperrt text-text"
           >

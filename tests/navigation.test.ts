@@ -6,7 +6,7 @@ import { HAUPTNAVIGATION, KONTO_LINK, istAktiv } from "@/lib/navigation";
 test("Kern zuerst: Bewertungen, Abstimmung, Blüten; Apotheken nur in Aussicht", () => {
   assert.deepEqual(
     HAUPTNAVIGATION.map((eintrag) => eintrag.href),
-    ["/reviews", "/umfragen", "/produkte"],
+    ["/reviews", "/umfragen", "/blueten"],
   );
   assert.deepEqual(
     HAUPTNAVIGATION.map((eintrag) => eintrag.text),
@@ -16,12 +16,12 @@ test("Kern zuerst: Bewertungen, Abstimmung, Blüten; Apotheken nur in Aussicht",
 });
 
 test("istAktiv: die Seite selbst und ihre Unterseiten", () => {
-  assert.equal(istAktiv("/produkte", "/produkte"), true);
-  assert.equal(istAktiv("/produkte/nebelharz-22", "/produkte"), true);
+  assert.equal(istAktiv("/blueten", "/blueten"), true);
+  assert.equal(istAktiv("/blueten/nebelharz-22", "/blueten"), true);
 });
 
 test("istAktiv: kein Treffer über einen bloßen Namensanfang oder die Startseite", () => {
-  assert.equal(istAktiv("/produkte-archiv", "/produkte"), false);
+  assert.equal(istAktiv("/blueten-archiv", "/blueten"), false);
   assert.equal(istAktiv("/", "/reviews"), false);
   assert.equal(istAktiv("/reviews", "/umfragen"), false);
 });

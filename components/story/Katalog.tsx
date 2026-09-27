@@ -12,10 +12,10 @@ import { sicher } from "@/lib/sicher";
 const ANZAHL = 6;
 
 const EINSTIEGE = [
-  { href: "/produkte?typ=INDICA", text: "Indica" },
-  { href: "/produkte?typ=SATIVA", text: "Sativa" },
-  { href: "/produkte?geschmack=ZITRUS", text: "Zitrus" },
-  { href: "/produkte?nurVerfuegbar=1", text: "Nur verfügbare" },
+  { href: "/blueten?typ=INDICA", text: "Indica" },
+  { href: "/blueten?typ=SATIVA", text: "Sativa" },
+  { href: "/blueten?geschmack=ZITRUS", text: "Zitrus" },
+  { href: "/blueten?nurVerfuegbar=1", text: "Nur verfügbare" },
 ] as const;
 
 /** Sechs Produkte als wischbare Reihe. Preise nur mit Freigabe (bestehende Logik). */
@@ -75,7 +75,7 @@ export function Katalog() {
               Cannabinoidgehalt, Terpenprofil und gemeldeter Verfügbarkeit.
             </p>
           </div>
-          <Link href="/produkte" className={buttonKlassen("secondary", "md")}>
+          <Link href="/blueten" className={buttonKlassen("secondary", "md")}>
             Gesamten Katalog ansehen
           </Link>
         </div>

@@ -56,7 +56,7 @@ export function VorschlagListe({ vorschlaege, phase }: Props) {
                   <div className="flex flex-wrap items-start justify-between gap-4">
                     <div>
                       <Link
-                        href={`/produkte/${vorschlag.slug}`}
+                        href={`/blueten/${vorschlag.slug}`}
                         className="text-body font-medium text-text underline underline-offset-2"
                         title={vorschlag.handelsname}
                       >

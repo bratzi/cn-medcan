@@ -16,9 +16,9 @@ test("Seitenkopf: genau ein h1 in Newsreader 200, Satz darunter, keine Oberzeile
 
 test("Seitenkopf: Rückweg als Textlink über dem Titel", () => {
   const html = renderToStaticMarkup(
-    createElement(Seitenkopf, { titel: "X", zurueck: { href: "/produkte", text: "Alle Produkte" } }),
+    createElement(Seitenkopf, { titel: "X", zurueck: { href: "/blueten", text: "Alle Produkte" } }),
   );
-  assert.match(html, /href="\/produkte"/);
+  assert.match(html, /href="\/blueten"/);
   assert.ok(html.indexOf("Alle Produkte") < html.indexOf("<h1"));
 });
 
@@ -33,7 +33,7 @@ test("Abschnittstitel in Newsreader 500", () => {
 
 test("Seitenkopf: Rückweg ist 44 px hoch", () => {
   const html = renderToStaticMarkup(
-    createElement(Seitenkopf, { titel: "X", zurueck: { href: "/produkte", text: "Alle Produkte" } }),
+    createElement(Seitenkopf, { titel: "X", zurueck: { href: "/blueten", text: "Alle Produkte" } }),
   );
   assert.match(html, /<a[^>]*class="[^"]*min-h-11[^"]*"[^>]*>Alle Produkte</);
 });

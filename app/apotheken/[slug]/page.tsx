@@ -208,7 +208,7 @@ function Sortiment({
             <TableRow key={zeile.id}>
               <TableCell>
                 <Link
-                  href={`/produkte/${zeile.strain.slug}`}
+                  href={`/blueten/${zeile.strain.slug}`}
                   title={zeile.strain.handelsname}
                   className="rounded-sm text-accent underline underline-offset-2 transition-opacity duration-150 ease-standard hover:opacity-70 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring"
                 >

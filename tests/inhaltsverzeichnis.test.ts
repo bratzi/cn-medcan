@@ -37,7 +37,7 @@ test("je Eintrag eine Zeile mit Sprunglink, Note und Datum", () => {
     }),
   );
   assert.equal(html.match(/<li/g)?.length, 2);
-  assert.match(html, /href="\/produkte\/a#eintrag-a"/);
+  assert.match(html, /href="\/blueten\/a#eintrag-a"/);
   assert.match(html, />4,2</);
   assert.match(html, /12\.09\.2026/);
   assert.match(html, /Charge <span class="numeric">CH-1<\/span>/);

@@ -109,7 +109,7 @@ export function RundeSteuerung({ umfrage, strains }: Props) {
                   <TableRow key={option.id}>
                     <TableCell>
                       <Link
-                        href={`/produkte/${option.slug}`}
+                        href={`/blueten/${option.slug}`}
                         className="font-medium text-text underline underline-offset-2"
                         title={option.handelsname}
                       >

@@ -49,7 +49,7 @@ export function GemeinsamLernen() {
           <p className="max-w-[56ch] text-body text-text-muted text-pretty">
             Bewerten kannst du jede Blüte jederzeit, auch ohne Abstimmung und ohne Runde.
           </p>
-          <Link href="/produkte" className={buttonKlassen("secondary", "md")}>
+          <Link href="/blueten" className={buttonKlassen("secondary", "md")}>
             Zu den Blüten
           </Link>
           {/* Pause fuer das Video (WCAG 2.2.2). Sichtbar erst, wenn die StoryBuehne

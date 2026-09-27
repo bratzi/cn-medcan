@@ -97,7 +97,7 @@ async function Ergebnisbereich({ filter }: { filter: StrainFilter }) {
             beschreibung="Zu dieser Filterkombination ist keine Blüte gelistet. Weniger Kriterien führen meist zu Treffern. Fehlt dir eine Blüte, schlag sie vor."
             aktion={
               <div className="flex flex-wrap gap-4">
-                <Link href="/produkte" className={buttonKlassen("secondary")}>
+                <Link href="/blueten" className={buttonKlassen("secondary")}>
                   Alle Filter zurücksetzen
                 </Link>
                 <Link href={vorschlagLink(filter.q)} className={buttonKlassen("secondary")}>
@@ -133,7 +133,7 @@ async function Ergebnisbereich({ filter }: { filter: StrainFilter }) {
           >
             {liste.seite > 1 ? (
               <Link
-                href={`/produkte?${serialisiereFilter({ ...filter, seite: liste.seite - 1 }).toString()}`}
+                href={`/blueten?${serialisiereFilter({ ...filter, seite: liste.seite - 1 }).toString()}`}
                 className={buttonKlassen("secondary")}
                 rel="prev"
               >
@@ -150,7 +150,7 @@ async function Ergebnisbereich({ filter }: { filter: StrainFilter }) {
 
             {liste.seite < liste.seitenAnzahl ? (
               <Link
-                href={`/produkte?${serialisiereFilter({ ...filter, seite: liste.seite + 1 }).toString()}`}
+                href={`/blueten?${serialisiereFilter({ ...filter, seite: liste.seite + 1 }).toString()}`}
                 className={buttonKlassen("secondary")}
                 rel="next"
               >

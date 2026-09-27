@@ -123,7 +123,7 @@ export function AktiveFilter({ filter, apothekenNamen }: Props) {
         {chips.map((chip) => (
           <li key={chip.schluessel}>
             <Link
-              href={`/produkte?${serialisiereFilter(chip.ziel).toString()}`}
+              href={`/blueten?${serialisiereFilter(chip.ziel).toString()}`}
               aria-label={`Filter ${chip.beschreibung} entfernen`}
               className="inline-flex min-h-11 items-center gap-2 rounded-sm border border-border-strong bg-surface-raised px-4 text-small text-text transition-opacity duration-150 ease-standard hover:opacity-80 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring"
             >

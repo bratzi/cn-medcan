@@ -72,7 +72,7 @@ export async function bewertungSpeichern(formData: FormData): Promise<BewertungE
     },
   });
 
-  revalidatePath(`/produkte/${strain.slug}`);
+  revalidatePath(`/blueten/${strain.slug}`);
   revalidatePath("/");
   revalidatePath("/admin");
   return { ok: true, sofortSichtbar: istBetreiber, slug: strain.slug };

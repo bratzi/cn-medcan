@@ -144,7 +144,7 @@ export default async function MitgliedPage() {
                   <li key={v.id} className="flex flex-col gap-2">
                     <span className="flex flex-wrap items-center gap-2">
                       {v.strainSlug ? (
-                        <Link href={`/produkte/${v.strainSlug}`} className={textLinkKlassen()}>
+                        <Link href={`/blueten/${v.strainSlug}`} className={textLinkKlassen()}>
                           {v.handelsname}
                         </Link>
                       ) : (

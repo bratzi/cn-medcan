@@ -46,7 +46,7 @@ export function Kandidat({ option, gesamt, gewaehlt, zeigeStimmen }: KandidatPro
             </span>
           ) : null}
           <Link
-            href={`/produkte/${option.slug}`}
+            href={`/blueten/${option.slug}`}
             className={namenLinkKlassen("min-w-0 font-buch text-h3 font-medium wrap-break-word")}
             title={option.handelsname}
           >

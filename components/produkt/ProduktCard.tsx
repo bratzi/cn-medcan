@@ -30,7 +30,7 @@ export function ProduktCard({ strain, className }: Props) {
         <figure className="relative flex h-56 items-center justify-center overflow-hidden px-8 pt-8 pb-6">
           {/* Bild führt auch zur Sorte (Nutzer 2026-09-26); für Tastatur und Screenreader
               reicht der Link am Namen, daher hier ohne Tabstopp. */}
-          <Link prefetch={false} href={`/produkte/${strain.slug}`} tabIndex={-1} aria-hidden="true" className="flex h-full w-full items-center justify-center">
+          <Link prefetch={false} href={`/blueten/${strain.slug}`} tabIndex={-1} aria-hidden="true" className="flex h-full w-full items-center justify-center">
             <Bild
               id={bild}
               dekorativ
@@ -47,7 +47,7 @@ export function ProduktCard({ strain, className }: Props) {
             <h3 className="text-h3 text-text">
               <Link
                 prefetch={false}
-                href={`/produkte/${strain.slug}`}
+                href={`/blueten/${strain.slug}`}
                 className="hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring"
               >
                 {strain.handelsname}

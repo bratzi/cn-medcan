@@ -28,7 +28,7 @@ export default async function BewertenPage({ params }: PageProps<"/bewerten/[slu
   ]);
   if (!strain) notFound();
 
-  const zurueck = { href: `/produkte/${strain.slug}`, text: strain.handelsname };
+  const zurueck = { href: `/blueten/${strain.slug}`, text: strain.handelsname };
 
   return (
     <>

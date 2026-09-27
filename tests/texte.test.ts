@@ -20,7 +20,7 @@ const DATEIEN = [
   "app/error.tsx",
   "app/reviews/page.tsx",
   "app/umfragen/page.tsx",
-  "app/produkte/[slug]/page.tsx",
+  "app/blueten/[slug]/page.tsx",
   "components/produkt/Titelblatt.tsx",
   "components/produkt/CannabinoidBar.tsx",
   "components/produkt/TerpenChips.tsx",

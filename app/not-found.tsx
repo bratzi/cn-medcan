@@ -16,7 +16,7 @@ export default function NotFound() {
         <Link href="/" className={buttonKlassen("primary", "md")}>
           Zur Startseite
         </Link>
-        <Link href="/produkte" className={buttonKlassen("secondary", "md")}>
+        <Link href="/blueten" className={buttonKlassen("secondary", "md")}>
           Zum Blütenkatalog
         </Link>
       </div>

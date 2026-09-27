@@ -78,7 +78,7 @@ async function reviewSlug(reviewId: string): Promise<string | null> {
 function bewertungPfadeNeuLaden(slug: string) {
   revalidatePath("/admin");
   revalidatePath("/");
-  revalidatePath(`/produkte/${slug}`);
+  revalidatePath(`/blueten/${slug}`);
 }
 
 /** Community-Bewertung freigeben - danach ist sie oeffentlich sichtbar. */
