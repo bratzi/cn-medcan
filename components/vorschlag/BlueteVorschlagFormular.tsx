@@ -10,6 +10,8 @@ import { useHydriert } from "@/components/ui/useHydriert";
 import type { SelectOption } from "@/components/ui";
 import { KULTIVAR_TYPEN } from "@/db/enums";
 import { MAX_VORSCHLAG_NOTIZ, MAX_VORSCHLAG_TERPENE } from "@/lib/vorschlag-eingabe";
+import type { Sprache } from "@/lib/i18n/sprache-kern";
+import { terpenAnzeige } from "@/lib/i18n/terpen";
 import { t } from "@/lib/i18n/text";
 import type { Woerterbuch } from "@/lib/i18n/typen";
 
@@ -20,6 +22,7 @@ type Props = {
   nameVorbelegt: string;
   texte: Woerterbuch["vorschlag"];
   typen: Woerterbuch["label"]["kultivarTyp"];
+  sprache: Sprache;
 };
 
 /**
@@ -27,13 +30,13 @@ type Props = {
  * lib/vorschlag-eingabe.ts und laeuft in der Server Action; maxLength ist
  * Bedienkomfort, keine Absicherung.
  */
-export function BlueteVorschlagFormular({ terpene, nameVorbelegt, texte, typen }: Props) {
+export function BlueteVorschlagFormular({ terpene, nameVorbelegt, texte, typen, sprache }: Props) {
   const TYPEN: SelectOption[] = KULTIVAR_TYPEN.map((typ) => ({ wert: typ, label: typen[typ] }));
   const router = useRouter();
   const hydriert = useHydriert();
   const [laeuft, setLaeuft] = useState(false);
   const [antwort, setAntwort] = useState<VorschlagErgebnis | null>(null);
-  const optionen: SelectOption[] = terpene.map((t) => ({ wert: t, label: t }));
+  const optionen: SelectOption[] = terpene.map((name) => ({ wert: name, label: terpenAnzeige(name, sprache) }));
 
   async function absenden(ereignis: React.FormEvent<HTMLFormElement>) {
     ereignis.preventDefault();
@@ -60,7 +63,7 @@ export function BlueteVorschlagFormular({ terpene, nameVorbelegt, texte, typen }
         id="vorschlag-name"
         name="handelsname"
         label={texte.handelsname}
-        pflicht
+        pflicht={texte.pflicht}
         required
         maxLength={120}
         defaultValue={nameVorbelegt}
@@ -70,7 +73,7 @@ export function BlueteVorschlagFormular({ terpene, nameVorbelegt, texte, typen }
         id="vorschlag-quelle"
         name="quelle"
         label={texte.quelle}
-        pflicht
+        pflicht={texte.pflicht}
         required
         maxLength={300}
         hinweis={texte.quelleHinweis}

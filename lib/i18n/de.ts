@@ -678,6 +678,7 @@ export const de = {
   vorschlag: {
     titel: "Blüte vorschlagen",
     satz: "Dir fehlt eine Blüte im Katalog? Trag ein, was du weißt. Wir prüfen die Angaben und nehmen sie auf. Unter Mein Konto siehst du, wie es um deinen Vorschlag steht.",
+    pflicht: "Pflichtangabe",
     handelsname: "Handelsname",
     handelsnameHinweis: "So, wie er auf der Packung oder beim Hersteller steht.",
     quelle: "Quelle",

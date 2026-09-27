@@ -674,6 +674,7 @@ export const en: Woerterbuch = {
   vorschlag: {
     titel: "Suggest a flower",
     satz: "Is a flower missing from the catalogue? Enter what you know. We check the details and add it. Under My account you can see how your suggestion is doing.",
+    pflicht: "required",
     handelsname: "Trade name",
     handelsnameHinweis: "As it appears on the pack or with the producer.",
     quelle: "Source",

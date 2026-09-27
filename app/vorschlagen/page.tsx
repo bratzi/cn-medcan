@@ -5,7 +5,7 @@ import { BlueteVorschlagFormular } from "@/components/vorschlag/BlueteVorschlagF
 import { terpenNamen } from "@/lib/query/vorschlaege";
 import { aktuellesMitglied } from "@/lib/session";
 import { vorschlagPfad } from "@/lib/vorschlag-eingabe";
-import { holeWoerterbuch } from "@/lib/i18n";
+import { holeSprache, holeWoerterbuch } from "@/lib/i18n";
 
 export async function generateMetadata(): Promise<Metadata> {
   return { title: (await holeWoerterbuch()).vorschlag.titel, robots: { index: false, follow: false } };
@@ -19,7 +19,7 @@ export default async function VorschlagenPage({ searchParams }: Props) {
   const nameVorbelegt = (typeof roh === "string" ? roh : "").slice(0, 120);
 
   // Der Suchbegriff aus dem Katalog soll die Anmeldung ueberleben.
-  const [mitglied, w] = await Promise.all([aktuellesMitglied(), holeWoerterbuch()]);
+  const [mitglied, w, sprache] = await Promise.all([aktuellesMitglied(), holeWoerterbuch(), holeSprache()]);
   if (!mitglied) redirect(`/anmelden?weiter=${encodeURIComponent(vorschlagPfad(nameVorbelegt))}`);
 
   return (
@@ -34,6 +34,7 @@ export default async function VorschlagenPage({ searchParams }: Props) {
           nameVorbelegt={nameVorbelegt}
           texte={w.vorschlag}
           typen={w.label.kultivarTyp}
+          sprache={sprache}
         />
       </div>
     </div>

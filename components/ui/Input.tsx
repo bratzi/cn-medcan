@@ -12,7 +12,7 @@ export type InputProps = Omit<InputHTMLAttributes<HTMLInputElement>, "id"> & {
    * gekoppelt: in diesen Formularen ist fast jedes Feld Pflicht, der Marker
    * an jedem Label waere Rauschen. Freiwillige Felder sagen es im `hinweis`.
    */
-  pflicht?: boolean;
+  pflicht?: boolean | string;
   /** Klassen fuer den umgebenden Field-Block. */
   feldClassName?: string;
 };

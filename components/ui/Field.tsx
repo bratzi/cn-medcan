@@ -16,7 +16,8 @@ export type FieldProps = {
   children: ReactNode | ((attribute: FeldAttribute) => ReactNode);
   hinweis?: string;
   fehler?: string;
-  pflicht?: boolean;
+  /** true: deutscher Zusatz (Admin); Text: dieser Zusatz in der Sprache der Seite. */
+  pflicht?: boolean | string;
   /**
    * Label nur fuer Screenreader. Fuer Felder in einer Tabellenzelle, wo die
    * Spaltenueberschrift die Beschriftung schon traegt und ein zweites,
@@ -56,7 +57,7 @@ export function Field({
       >
         {label}
         {pflicht ? (
-          <span className="text-text-muted"> (Pflichtangabe)</span>
+          <span className="text-text-muted">{` (${pflicht === true ? "Pflichtangabe" : pflicht})`}</span>
         ) : null}
       </label>
 
