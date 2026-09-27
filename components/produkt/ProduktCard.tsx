@@ -48,7 +48,7 @@ export function ProduktCard({ strain, className }: Props) {
               <Link
                 prefetch={false}
                 href={`/produkte/${strain.slug}`}
-                className="rounded-sm hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring"
+                className="hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring"
               >
                 {strain.handelsname}
               </Link>
@@ -76,7 +76,7 @@ export function ProduktCard({ strain, className }: Props) {
         {strain.terpene.length > 0 ? <TerpenChips terpene={strain.terpene} /> : null}
       </CardBody>
 
-      <CardFooter className="flex items-baseline justify-between gap-4">
+      <CardFooter className="flex items-baseline gap-4">
         <span className="text-small text-text-muted">
           {strain.herstellerName ?? "Hersteller unbekannt"}
         </span>

@@ -72,11 +72,14 @@ export function Doppelseite({ eintrag, umfang, ueberschrift: Ueberschrift, story
   const reel = voll && baueEmbedUrl(eintrag.instagramReelUrl) ? eintrag.instagramReelUrl : null;
 
   return (
+    // Buchfalz ab lg: ein leiser Schatten je 2rem links und rechts der Mitte, genau
+    // am Spalt der zwei gleich breiten Seiten. Die Seiten haben mindestens 3rem
+    // Innenabstand, der Falz reicht also nie unter Bild oder Text.
     <article
       id={anker}
       aria-labelledby={titelId}
       data-story={story ? "doppelseite" : undefined}
-      className="grid scroll-mt-8 grid-cols-1 border border-border-strong bg-surface-raised shadow-md lg:grid-cols-2"
+      className="grid scroll-mt-8 grid-cols-1 border border-border-strong bg-surface-raised shadow-md lg:grid-cols-2 lg:bg-[linear-gradient(90deg,transparent_calc(50%_-_2rem),color-mix(in_oklab,var(--color-text)_7%,transparent)_50%,transparent_calc(50%_+_2rem))]"
     >
       <div className="flex min-w-0 flex-col gap-8 p-6 sm:p-12 lg:border-r lg:border-border">
         <p className="text-small text-text-muted">

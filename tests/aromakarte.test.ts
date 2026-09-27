@@ -122,3 +122,57 @@ test("Abweichungsfarbe: lila hoeher wird violetter, Hersteller hoeher gruener, o
   assert.equal(abweichungsAnteil(5, 0), 100);
   assert.equal(abweichungsAnteil(0, 5), 0);
 });
+
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
+import { createElement } from "react";
+import { renderToStaticMarkup } from "react-dom/server";
+
+import { AromaKarte, naechsteAnsicht } from "@/components/review/AromaKarte";
+import { leereGeschmacksMatrix } from "@/lib/query/bewertung";
+
+const LIMONEN = { name: "Limonen", geschmack: "ZITRUS" as const, konzentrationProzent: null, rang: 1 };
+const karte = () =>
+  renderToStaticMarkup(
+    createElement(AromaKarte, {
+      terpene: [LIMONEN],
+      serien: [{ name: "Laut Hersteller", ton: "gruen", matrix: { ...leereGeschmacksMatrix(), zitrus: 5 } }],
+    }),
+  );
+
+test("Ansichts-Schalter ist eine Radiogroup mit einem Tabstopp und Druck-Rückmeldung", () => {
+  const html = karte();
+  assert.match(html, /role="radiogroup" aria-label="Ansicht"/);
+  assert.doesNotMatch(html, /aria-pressed/);
+  assert.match(html, /role="radio" aria-checked="true" tabindex="0"[^>]*>Karte</);
+  assert.match(html, /role="radio" aria-checked="false" tabindex="-1"[^>]*>Netz</);
+  // Druck nur ohne reduzierte Bewegung (Tailwind v4: scale ist eine eigene Eigenschaft).
+  assert.match(html, /motion-safe:active:scale-\[0\.97\]/);
+  assert.match(html, /transition-\[color,background-color,scale\]/);
+});
+
+test("Pfeiltasten im Ansichts-Schalter laufen um, Pos1/Ende springen an den Rand", () => {
+  assert.equal(naechsteAnsicht("ArrowRight", 0), 1);
+  assert.equal(naechsteAnsicht("ArrowDown", 1), 0);
+  assert.equal(naechsteAnsicht("ArrowLeft", 0), 1);
+  assert.equal(naechsteAnsicht("ArrowUp", 1), 0);
+  assert.equal(naechsteAnsicht("Home", 1), 0);
+  assert.equal(naechsteAnsicht("End", 0), 1);
+  assert.equal(naechsteAnsicht("Enter", 0), null);
+  assert.equal(naechsteAnsicht("Tab", 1), null);
+});
+
+test("Im Stand der Karte tragen aktive Bögen Filter, Puls und Lichtpunkt wie zuvor", () => {
+  const html = karte();
+  assert.match(html, /filter:saturate\(/);
+  assert.match(html, /transition-\[opacity,stroke-width,filter,stroke\]/);
+  assert.match(html, /class="bogen-puls"/);
+  assert.match(html, /class="bogen-fluss"/);
+});
+
+test("Regler: Tastaturfokus zeichnet einen eigenen Ring im Fokus-Token, nur bei :focus-visible", () => {
+  const quelle = readFileSync(join(process.cwd(), "components/review/AromaKarte.tsx"), "utf8");
+  assert.match(quelle, /setTastatur\(e\.currentTarget\.matches\(":focus-visible"\) \? index : null\)/);
+  assert.match(quelle, /r=\{16\}\s+fill="none"\s+stroke="var\(--color-focus-ring\)"\s+strokeWidth=\{2\}/);
+  assert.match(quelle, /vectorEffect="non-scaling-stroke"/);
+});

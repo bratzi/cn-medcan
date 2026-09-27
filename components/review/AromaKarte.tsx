@@ -84,6 +84,29 @@ const VERLAUF: Record<string, readonly string[]> = {
 const RINGE = [1, 2, 3, 4, 5] as const;
 const SKALA = [0, 1, 2, 3, 4, 5] as const;
 const GLEIT_MS = 420;
+const ANSICHTEN = ["karte", "netz"] as const;
+
+/**
+ * Pfeiltasten im Ansichts-Schalter (APG Radiogroup): rechts/unten zur nächsten,
+ * links/oben zur vorigen Ansicht, jeweils umlaufend; Pos1/Ende springen an den
+ * Rand. Andere Tasten: null, der Browser behält sie.
+ */
+export function naechsteAnsicht(taste: string, index: number, anzahl = ANSICHTEN.length): number | null {
+  switch (taste) {
+    case "ArrowRight":
+    case "ArrowDown":
+      return (index + 1) % anzahl;
+    case "ArrowLeft":
+    case "ArrowUp":
+      return (index - 1 + anzahl) % anzahl;
+    case "Home":
+      return 0;
+    case "End":
+      return anzahl - 1;
+    default:
+      return null;
+  }
+}
 
 /**
  * Gleitet Zahlenwerte weich zum Ziel, damit Balken und Flächen sichtbar
@@ -147,6 +170,9 @@ export function AromaKarte({
   const [ansicht, setAnsicht] = useState<"karte" | "netz">("karte");
   const [t, setT] = useState(0);
   const [ueberfahren, setAktiv] = useState<number | null>(null);
+  // Achse, deren Regler per Tastatur fokussiert ist (nur :focus-visible): zeichnet
+  // einen Fokusring am Griff, getrennt vom Hervorheben beim Überfahren.
+  const [tastatur, setTastatur] = useState<number | null>(null);
   const aktiv = hervorheben ?? ueberfahren;
   const tRef = useRef(0);
   // Misst die tatsächliche Breite der Karte: null vor der ersten Messung
@@ -237,6 +263,22 @@ export function AromaKarte({
   );
 
   const aktiveAchse = aktiv === null ? null : GESCHMACKS_ACHSEN[aktiv];
+  // Sättigung und Glow der Bögen nur im Stand der Karte: während des Morphs ändert
+  // jeder Bogen in jedem Frame seine Form, ein drop-shadow auf 30 bis 50 Pfaden
+  // müsste dann jedes Mal neu gerastert werden. Unterwegs zählen nur Deckkraft und
+  // Strichbreite; am Ziel blendet der Filter über die Transition ein (Endzustand
+  // wie zuvor). Im Netz sind die Bögen unsichtbar. Das Gleiten der Werte ändert
+  // die Bögen nicht (ihre Form hängt nur an t), dort bleibt der Filter stehen.
+  const bogenFilter = t === 0;
+  // Fokusring der Tastatur: am Griff in der Karte, am Wert im Netz, folgt dem Morph.
+  const fokusPunkt =
+    regler && tastatur !== null
+      ? mische(
+          balkenEnde(karte[tastatur], regler.werte[GESCHMACKS_ACHSEN[tastatur].key], 0, balken),
+          netzPunkt(tastatur, regler.werte[GESCHMACKS_ACHSEN[tastatur].key], RADIUS, mitte),
+          t,
+        )
+      : null;
 
   return (
     <figure aria-label={titel} className="flex flex-col gap-6">
@@ -247,15 +289,27 @@ export function AromaKarte({
       )}
       <div className="flex flex-col items-end gap-6">
       <div className="flex flex-wrap items-center justify-end gap-4">
-        <div role="group" aria-label="Ansicht" className="inline-flex rounded-full border border-border-strong p-1">
-          {(["karte", "netz"] as const).map((wahl) => (
+        {/* Ansichts-Schalter als Radiogroup (APG): ein Tabstopp, Pfeiltasten wählen.
+            Druck-Rückmeldung per scale 0.97, nur ohne reduzierte Bewegung. */}
+        <div role="radiogroup" aria-label="Ansicht" className="inline-flex rounded-full border border-border-strong p-1">
+          {ANSICHTEN.map((wahl, index) => (
             <button
               key={wahl}
               type="button"
-              aria-pressed={ansicht === wahl}
+              role="radio"
+              aria-checked={ansicht === wahl}
+              tabIndex={ansicht === wahl ? 0 : -1}
               onClick={() => setAnsicht(wahl)}
+              onKeyDown={(e) => {
+                const ziel = naechsteAnsicht(e.key, index);
+                if (ziel === null) return;
+                e.preventDefault();
+                setAnsicht(ANSICHTEN[ziel]);
+                e.currentTarget.parentElement?.querySelectorAll<HTMLButtonElement>('[role="radio"]')[ziel]?.focus();
+              }}
               className={cn(
-                "inline-flex h-9 items-center rounded-full px-4 text-small font-medium transition-colors duration-fast ease-standard",
+                "inline-flex h-9 items-center rounded-full px-4 text-small font-medium",
+                "transition-[color,background-color,scale] duration-[var(--duration-fast),var(--duration-fast),120ms] ease-[cubic-bezier(0.23,1,0.32,1)] motion-safe:active:scale-[0.97]",
                 ansicht === wahl ? "bg-accent text-accent-fg" : "text-text hover:text-accent-hover",
               )}
             >
@@ -354,18 +408,26 @@ export function AromaKarte({
                       opacity={vorhanden ? 0.35 + 0.65 * auspraegung : 0.22}
                       style={{
                         strokeWidth: vorhanden ? breite : 0.8,
-                        filter: vorhanden
-                          ? `saturate(${(0.1 + 0.9 * auspraegung).toFixed(2)})${
-                              auspraegung > 0.45 ? ` drop-shadow(0 0 ${(2 + 8 * auspraegung).toFixed(1)}px ${leuchtfarbe})` : ""
-                            }`
-                          : "none",
+                        filter:
+                          vorhanden && bogenFilter
+                            ? `saturate(${(0.1 + 0.9 * auspraegung).toFixed(2)})${
+                                auspraegung > 0.45 ? ` drop-shadow(0 0 ${(2 + 8 * auspraegung).toFixed(1)}px ${leuchtfarbe})` : ""
+                              }`
+                            : "none",
                       }}
-                      className="transition-[opacity,stroke-width,filter,stroke] duration-normal"
+                      // Unterwegs ohne filter in der Transition: der Filter fällt sofort
+                      // weg, statt 250 ms lang auf wandernden Pfaden überzublenden.
+                      className={
+                        bogenFilter
+                          ? "transition-[opacity,stroke-width,filter,stroke] duration-normal"
+                          : "transition-[opacity,stroke-width,stroke] duration-normal"
+                      }
                     />
                     {/* Aktive Bögen glühen und pulsieren im Takt der Delta-Balken links, in
                         ihrer eigenen Farbe; ein Lichtpunkt läuft vom Geschmack zum Terpen
-                        (Nutzer 2026-09-26, globals.css .bogen-puls/.bogen-fluss). */}
-                    {vorhanden ? (
+                        (Nutzer 2026-09-26, globals.css .bogen-puls/.bogen-fluss). Im Netz
+                        (t = 1) sind sie unsichtbar und laufen dann nicht endlos weiter. */}
+                    {vorhanden && t < 1 ? (
                       <>
                         <path
                           d={pfad}
@@ -571,6 +633,23 @@ export function AromaKarte({
               })
             : null}
 
+          {/* Tastaturfokus (nur :focus-visible der Regler unter der Karte): ein eigener
+              Ring im Fokus-Token um den Griff, 2 px bei jeder Breite der Karte,
+              im Kontrastmodus in der Systemfarbe. Überfahren zeigt ihn nicht. */}
+          {fokusPunkt ? (
+            <circle
+              cx={fokusPunkt.x}
+              cy={fokusPunkt.y}
+              r={16}
+              fill="none"
+              stroke="var(--color-focus-ring)"
+              strokeWidth={2}
+              vectorEffect="non-scaling-stroke"
+              pointerEvents="none"
+              className="forced-colors:stroke-[color:Highlight]"
+            />
+          ) : null}
+
           {/* Skala über den Balken: Länge = Wert 0 bis 5. */}
           <g opacity={kartenSichtbar * 0.7}>
             {SKALA.map((stufe) => {
@@ -697,8 +776,14 @@ export function AromaKarte({
                 max={MAX}
                 step={0.1}
                 value={regler.werte[achse.key]}
-                onFocus={() => setAktiv(index)}
-                onBlur={() => setAktiv(null)}
+                onFocus={(e) => {
+                  setAktiv(index);
+                  setTastatur(e.currentTarget.matches(":focus-visible") ? index : null);
+                }}
+                onBlur={() => {
+                  setAktiv(null);
+                  setTastatur(null);
+                }}
                 onChange={(e) => regler.aendern(achse.key, Number(e.target.value))}
               />
             </label>

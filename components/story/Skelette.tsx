@@ -14,8 +14,10 @@ export function RandspaltenSkelett() {
   return (
     <div role="status" data-skelett="" className="flex flex-col gap-8">
       <SkelettAnsage text="Zahlen werden geladen" />
+      {/* Höhe wie eine echte Randnotiz: Zahl in text-display neben dem Wort in
+          text-notiz (clamp 2 bis 4.5rem), damit beim Laden nichts springt. */}
       {["w-48", "w-56", "w-40"].map((breite) => (
-        <span key={breite} aria-hidden="true" className={`${SKELETT_FLAECHE} h-12 ${breite}`} />
+        <span key={breite} aria-hidden="true" className={`${SKELETT_FLAECHE} h-16 sm:h-20 lg:h-24 ${breite}`} />
       ))}
     </div>
   );
@@ -62,7 +64,8 @@ export function KatalogSkelett() {
     <div role="status" data-skelett="" className="flex gap-4 overflow-hidden">
       <SkelettAnsage text="Blüten werden geladen" />
       {[0, 1, 2].map((stelle) => (
-        <span key={stelle} aria-hidden="true" className={`${SKELETT_FLAECHE} h-96 w-72 shrink-0`} />
+        // Breite wie die Karten der Reihe (components/story/Katalog.tsx).
+        <span key={stelle} aria-hidden="true" className={`${SKELETT_FLAECHE} h-96 w-72 shrink-0 sm:w-88`} />
       ))}
     </div>
   );

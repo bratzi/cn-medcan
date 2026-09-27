@@ -49,8 +49,10 @@ export function SortenKopf(props: SortenKopfProps) {
 
       <div className="flex min-w-0 flex-col gap-8">
         <div className="flex flex-col gap-4">
-          <p className="text-small uppercase tracking-gesperrt text-text-muted">Das bewerten wir</p>
-          {/* Logoschrift im Farbverlauf wie die Schlagworte (Nutzer 2026-09-25). */}
+          <p className="text-small uppercase tracking-wide text-text-muted">Das bewerten wir</p>
+          {/* Logoschrift im Farbverlauf wie die Schlagworte (Nutzer 2026-09-25). Bewusste
+              Nutzerausnahme zu Leitplanke 4 (Handelsnamen gedruckt); am 2026-09-26 bestätigt
+              beibehalten, nicht "korrigieren". */}
           <h3
             className="farbverlauf font-hand text-erzaehlung text-balance wrap-break-word leading-[0.9]"
             style={{ fontSize: "calc(var(--text-kapitel) * 1.35)" }}
@@ -83,7 +85,7 @@ export function SortenKopf(props: SortenKopfProps) {
 
         {props.terpene.length > 0 ? (
           <div className="flex flex-col gap-4">
-            <p className="text-small uppercase tracking-gesperrt text-text-muted">Terpene laut Hersteller</p>
+            <p className="text-small uppercase tracking-wide text-text-muted">Terpene laut Hersteller</p>
             <ul className="flex flex-col gap-4">
               {props.terpene.map((terpen) => {
                 const anteil =

@@ -126,3 +126,13 @@ test("Überschrift: auf Unterseiten kleiner als der Abschnittstitel, auf der Sta
   const startseite = zeige({ eintrag: eintrag(), umfang: "auszug", ueberschrift: "h3", story: true });
   assert.match(startseite, /<h3 id="eintrag-r1-titel" class="[^"]*\btext-kapitel\b/);
 });
+
+test("Buchfalz ab lg: leiser Verlauf genau an der Mitte, 2rem je Seite", () => {
+  const html = zeige({ eintrag: eintrag(), umfang: "auszug", ueberschrift: "h3" });
+  assert.match(
+    html,
+    /<article [^>]*class="[^"]*\blg:grid-cols-2 lg:bg-\[linear-gradient\(90deg,transparent_calc\(50%_-_2rem\),color-mix\(in_oklab,var\(--color-text\)_7%,transparent\)_50%,transparent_calc\(50%_\+_2rem\)\)\]/,
+  );
+  // Die Seiten haben ab sm 3rem Innenabstand: der Falz (2rem) reicht nicht unter Bild oder Text.
+  assert.equal(html.match(/flex min-w-0 flex-col gap-8 p-6 sm:p-12/g)?.length, 2);
+});

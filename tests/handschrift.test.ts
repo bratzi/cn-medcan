@@ -139,3 +139,53 @@ test("/umfragen: Community-Überschriften von Hand, ohne Nebel und ohne Drehung"
   assert.equal(quelle.match(/className=\{cn\(HAND_TITEL, "self-start"\)\}/g)?.length, 2);
   assert.doesNotMatch(quelle, /Textur|font-wand|WAND_TITEL|rotate/);
 });
+
+import { AromaErkundung } from "@/components/review/AromaErkundung";
+import { SortenKopf } from "@/components/review/SortenKopf";
+import { KatalogSkelett, RandspaltenSkelett } from "@/components/story/Skelette";
+
+test("Sortenkopf: Handelsname in Logoschrift (Nutzerausnahme zu Leitplanke 4), Versalien-Zeilen tracking-wide", () => {
+  const html = renderToStaticMarkup(
+    createElement(SortenKopf, {
+      handelsname: "Nebelharz 22 (fiktiv)",
+      bildPfad: null,
+      kultivarName: null,
+      kultivarTyp: "INDICA",
+      genetik: null,
+      herstellerName: null,
+      thcMin: 20,
+      thcMax: 24,
+      cbdMin: 0,
+      cbdMax: 1,
+      terpene: [{ name: "Myrcen", konzentrationProzent: 0.8, rang: 1 }],
+    }),
+  );
+  assert.match(html, /<h3 class="farbverlauf font-hand text-erzaehlung [^"]*"[^>]*>Nebelharz 22 \(fiktiv\)<\/h3>/);
+  // Kleine Versalien-Zeilen laufen wie die übrigen der Aroma-Erkundung in tracking-wide.
+  assert.equal(html.match(/uppercase tracking-wide/g)?.length, 2);
+  assert.doesNotMatch(html, /tracking-gesperrt/);
+});
+
+test("Fazit-Zahlen in Handschrift stehen tabellarisch", () => {
+  const html = renderToStaticMarkup(
+    createElement(AromaErkundung, {
+      titel: "Nebelharz 22 (fiktiv)",
+      terpene: [],
+      serien: [],
+      zeilen: [],
+      treue: { wert: 0.8, anzahl: 3 },
+    }),
+  );
+  assert.match(html, /<dd class="relative isolate flex justify-center tabular-nums">/);
+  assert.match(html, /fazit-puls farbverlauf font-hand text-umschlag/);
+});
+
+test("Skelette haben die Maße der echten Inhalte", () => {
+  const katalog = renderToStaticMarkup(createElement(KatalogSkelett));
+  // Wie die Karten der Reihe in components/story/Katalog.tsx.
+  assert.match(lies("components/story/Katalog.tsx"), /w-72 shrink-0 snap-start sm:w-88/);
+  assert.equal(katalog.match(/\bw-72 shrink-0 sm:w-88\b/g)?.length, 3);
+  const rand = renderToStaticMarkup(createElement(RandspaltenSkelett));
+  assert.equal(rand.match(/\bh-16 sm:h-20 lg:h-24\b/g)?.length, 3);
+  assert.doesNotMatch(rand, /\bh-12\b/);
+});
