@@ -1,6 +1,6 @@
+import { formatiereZahl } from "@/lib/format";
+import type { Sprache } from "@/lib/i18n/sprache-kern";
 import type { Randnotiz } from "@/lib/query/community";
-
-const ZAHL = new Intl.NumberFormat("de-DE");
 
 /**
  * Die Randspalte der Sektion 3 (Spec TP3 8.3): die Zahl gedruckt in Newsreader
@@ -10,7 +10,7 @@ const ZAHL = new Intl.NumberFormat("de-DE");
  * `min-w-0` und `flex-wrap`: große Zahlen schieben das Wort in die nächste
  * Zeile, statt bei 320 px überzulaufen.
  */
-export function Randspalte({ notizen }: { notizen: readonly Randnotiz[] }) {
+export function Randspalte({ notizen, sprache }: { notizen: readonly Randnotiz[]; sprache: Sprache }) {
   return (
     <ul data-story="randspalte" className="flex flex-col gap-8">
       {notizen.map((notiz) => {
@@ -23,7 +23,7 @@ export function Randspalte({ notizen }: { notizen: readonly Randnotiz[] }) {
             </li>
           );
         }
-        const zahl = ZAHL.format(notiz.zahl);
+        const zahl = formatiereZahl(notiz.zahl, 0, sprache);
         return (
           <li key={notiz.wort} className="flex min-w-0 flex-wrap items-baseline gap-x-4 gap-y-2">
             <span className="sr-only">{`${zahl} ${notiz.wort}`}</span>

@@ -21,7 +21,9 @@ export function beobachteLoops(): { stoppen: () => void } {
   };
   const beschriften = () => {
     for (const knopf of schalter) {
-      knopf.setAttribute("aria-label", angehalten ? "Video abspielen" : "Video anhalten");
+      // Beschriftung in der Sprache der Seite (LoopSchalter setzt beide als data-Attribute).
+      const label = angehalten ? knopf.dataset.labelAbspielen : knopf.dataset.labelAnhalten;
+      if (label) knopf.setAttribute("aria-label", label);
       knopf.toggleAttribute("data-angehalten", angehalten);
     }
   };

@@ -1,3 +1,6 @@
+import type { Sprache } from "@/lib/i18n/sprache-kern";
+import { mehrzahl } from "@/lib/i18n/text";
+import type { Woerterbuch } from "@/lib/i18n/typen";
 /**
  * Community-Zahlen für die Randspalte der Startseite (Spec 5.3, Spec TP3
  * 8.3), ohne Datenbankzugriff und ohne "server-only": die reine Zuordnung
@@ -20,7 +23,8 @@ type Zeile = Partial<Record<keyof CommunityZahlen, unknown>>;
 export type Randnotiz = { zahl: number | null; wort: string };
 
 /** Die Leitsätze der Randspalte, wenn es noch nichts zu zählen gibt (Spec 5.2). */
-export const LEITSAETZE = ["Schlag vor.", "Stimm ab.", "Lies mit."] as const;
+/** Schluessel der Leitsaetze im Woerterbuch (start.wissen.leitsaetze), in dieser Reihenfolge. */
+export const LEITSAETZE = ["schlagVor", "stimmAb", "liesMit"] as const;
 
 /** D1 liefert COUNT je nach Adapter als number, bigint oder string. */
 function alsZahl(wert: unknown): number {
@@ -48,11 +52,11 @@ export function hatCommunityZahlen(zahlen: CommunityZahlen): boolean {
  * (Spec TP3 12). Die Leitsätze, wenn alles 0 ist oder die Abfrage
  * fehlschlug.
  */
-export function randnotizen(zahlen: CommunityZahlen | null): Randnotiz[] {
-  if (!zahlen || !hatCommunityZahlen(zahlen)) return LEITSAETZE.map((wort) => ({ zahl: null, wort }));
+export function randnotizen(zahlen: CommunityZahlen | null, texte: Woerterbuch["start"]["wissen"], sprache: Sprache): Randnotiz[] {
+  if (!zahlen || !hatCommunityZahlen(zahlen)) return LEITSAETZE.map((schluessel) => ({ zahl: null, wort: texte.leitsaetze[schluessel] }));
   return [
-    { zahl: zahlen.stimmen, wort: zahlen.stimmen === 1 ? "Stimme" : "Stimmen" },
-    { zahl: zahlen.vorschlaege, wort: zahlen.vorschlaege === 1 ? "Vorschlag" : "Vorschläge" },
-    { zahl: zahlen.runden, wort: zahlen.runden === 1 ? "Runde" : "Runden" },
+    { zahl: zahlen.stimmen, wort: mehrzahl(sprache, texte.stimmen, zahlen.stimmen) },
+    { zahl: zahlen.vorschlaege, wort: mehrzahl(sprache, texte.vorschlaege, zahlen.vorschlaege) },
+    { zahl: zahlen.runden, wort: mehrzahl(sprache, texte.runden, zahlen.runden) },
   ];
 }

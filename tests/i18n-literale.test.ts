@@ -63,6 +63,19 @@ const UMGESTELLT: string[] = [
   "components/umfrage/VorschlagFormular.tsx",
   "components/umfrage/phasen.ts",
   "components/umfrage/zeitraum.ts",
+  // Welle 4b: Startseite
+  "components/story/Auftakt.tsx",
+  "components/story/TransparentMachen.tsx",
+  "components/story/AromaSektion.tsx",
+  "components/story/GemeinsamLernen.tsx",
+  "components/story/WissenBuendeln.tsx",
+  "components/story/Randspalte.tsx",
+  "components/story/NeuesterEintrag.tsx",
+  "components/story/Abstimmung.tsx",
+  "components/story/Katalog.tsx",
+  "components/story/Skelette.tsx",
+  "components/medien/LoopSchalter.tsx",
+  "lib/query/community.ts",
 ];
 
 const ERLAUBT: string[] = ["Book of Terpz", "Deutsch"];
@@ -87,7 +100,10 @@ function texte(quelle: string): string[] {
 test("umgestellte Dateien enthalten keine deutschen Oberflaechentexte", () => {
   const funde: string[] = [];
   for (const pfad of UMGESTELLT) {
-    for (const text of texte(ohneKommentare(readFileSync(pfad, "utf8")))) {
+    for (const roh of texte(ohneKommentare(readFileSync(pfad, "utf8")))) {
+      // JSX-Ausdruecke ({texte.wir}) sind kein Text; nur was ausserhalb steht, zaehlt.
+      const text = roh.replace(/\{[^{}]*\}/g, "").trim();
+      if (!text) continue;
       if (ERLAUBT.some((e) => text === e)) continue;
       if (text.startsWith("@/") || text.startsWith("./") || text === "use client" || text === "use server") continue;
       // Ids und Schluessel in kebab-case (z. B. "alle-titel") sind kein Oberflaechentext.

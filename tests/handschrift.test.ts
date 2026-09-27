@@ -15,7 +15,7 @@ import type { UmfrageOptionAnsicht } from "@/lib/query/umfragen";
 const lies = (datei: string) => readFileSync(join(process.cwd(), datei), "utf8");
 
 function randspalte(...notizen: Randnotiz[]): string {
-  return renderToStaticMarkup(createElement(Randspalte, { notizen }));
+  return renderToStaticMarkup(createElement(Randspalte, { notizen, sprache: "de" }));
 }
 
 test("Randnotiz mit Zahl: Zahl gedruckt, Wort von Hand, vorgelesen als ein Satz", () => {
@@ -49,15 +49,15 @@ test("Große Zahlen brechen um statt überzulaufen", () => {
 test("Wissen bündeln: Randspalte ab lg, kein Schwenk, keine Wand", () => {
   const quelle = lies("components/story/WissenBuendeln.tsx");
   assert.match(quelle, /lg:grid-cols-\[minmax\(0,2fr\)_minmax\(0,1fr\)\]/);
-  assert.match(quelle, /<Suspense fallback=\{<RandspaltenSkelett \/>\}>/);
+  assert.match(quelle, /<Suspense fallback=\{<RandspaltenSkelett ansage=\{w\.start\.skelett\.zahlen\} \/>\}>/);
   assert.doesNotMatch(quelle, /bg-surface-sunken|Textur|wand|font-wand/);
 });
 
 test("Schleife: jede Station gedruckt, das Verb als Schlagwort von Hand (Nutzer 2026-09-25)", () => {
   const quelle = lies("components/story/GemeinsamLernen.tsx");
-  for (const verb of ["schlagen vor.", "stimmen ab.", "testen.", "bewerten."]) {
-    assert.ok(quelle.includes(`verb: "${verb}"`), `Station fehlt: ${verb}`);
-  }
+  const stationen = Object.values(de.start.lernen.stationen);
+  assert.deepEqual(stationen, ["schlagen vor.", "stimmen ab.", "testen.", "bewerten."]);
+  assert.match(quelle, /\{texte\.stationen\[station\]\}/);
   assert.match(quelle, /className="font-buch text-erzaehlung/);
   assert.match(quelle, /className="farbverlauf font-hand text-erzaehlung/);
   assert.doesNotMatch(quelle, /font-wand|wand:|Sedgwick/);
@@ -65,13 +65,13 @@ test("Schleife: jede Station gedruckt, das Verb als Schlagwort von Hand (Nutzer 
 
 test("Abstimmung: „Wähl mit.“ von Hand, ohne Wasserzeichen und Drip", () => {
   const quelle = lies("components/story/Abstimmung.tsx");
-  assert.match(quelle, /<p data-story="waehl-mit" className="farbverlauf font-hand text-notiz">\s*Wähl mit\.\s*<\/p>/);
+  assert.match(quelle, /<p data-story="waehl-mit" className="farbverlauf font-hand text-notiz">\s*\{texte\.waehlMit\}\s*<\/p>/);
   assert.doesNotMatch(quelle, /wasserzeichen|Textur|font-wand|rotate/);
   assert.match(lies("components/story/bewegung/abstimmung.ts"), /SCHREIBEN_AB/);
 });
 
 test("Skelett des Stimmzettels hat die Form des Stimmzettels", () => {
-  const html = renderToStaticMarkup(createElement(StimmzettelSkelett));
+  const html = renderToStaticMarkup(createElement(StimmzettelSkelett, { ansage: "Abstimmung wird geladen" }));
   assert.match(html, /role="status"/);
   assert.match(html, /data-skelett=""/);
   assert.match(html, /border border-border-strong bg-surface-raised shadow-md/);
@@ -194,11 +194,11 @@ test("Fazit-Zahlen in Handschrift stehen tabellarisch", () => {
 });
 
 test("Skelette haben die Maße der echten Inhalte", () => {
-  const katalog = renderToStaticMarkup(createElement(KatalogSkelett));
+  const katalog = renderToStaticMarkup(createElement(KatalogSkelett, { ansage: "Blüten werden geladen" }));
   // Wie die Karten der Reihe in components/story/Katalog.tsx.
   assert.match(lies("components/story/Katalog.tsx"), /w-72 shrink-0 snap-start sm:w-88/);
   assert.equal(katalog.match(/\bw-72 shrink-0 sm:w-88\b/g)?.length, 3);
-  const rand = renderToStaticMarkup(createElement(RandspaltenSkelett));
+  const rand = renderToStaticMarkup(createElement(RandspaltenSkelett, { ansage: "Zahlen werden geladen" }));
   assert.equal(rand.match(/\bh-16 sm:h-20 lg:h-24\b/g)?.length, 3);
   assert.doesNotMatch(rand, /\bh-12\b/);
 });

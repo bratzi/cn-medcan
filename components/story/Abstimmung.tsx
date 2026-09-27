@@ -29,7 +29,7 @@ async function Stimmzettel() {
   if (!geladen) {
     return (
       <p className="max-w-[48ch] border border-border-strong bg-surface-raised p-8 text-body text-text">
-        Die Abstimmung lässt sich gerade nicht laden. Lade die Seite in ein paar Minuten neu, der Rest funktioniert weiter.
+        {w.start.abstimmung.fehler}
       </p>
     );
   }
@@ -38,7 +38,7 @@ async function Stimmzettel() {
   if (!umfrage) {
     return (
       <p className="max-w-[48ch] border border-border-strong bg-surface-raised p-8 text-body text-text">
-        Gerade läuft keine Runde. Die nächste steht hier, sobald sie eröffnet ist.
+        {w.start.abstimmung.keineRunde}
       </p>
     );
   }
@@ -50,7 +50,9 @@ async function Stimmzettel() {
  * Sektion 6 (Spec TP3 8.6): der Stimmzettel im Buch, "Wähl mit." von Hand.
  * Ziel des Buttons "Wähl mit".
  */
-export function Abstimmung() {
+export async function Abstimmung() {
+  const w = await holeWoerterbuch();
+  const texte = w.start.abstimmung;
   return (
     <section
       id="abstimmung"
@@ -62,18 +64,17 @@ export function Abstimmung() {
       <div className="mx-auto grid w-full max-w-360 grid-cols-1 gap-12 lg:grid-cols-[2fr_3fr] lg:items-start">
         <div className="flex flex-col items-start gap-6">
           <h2 id="abstimmung-titel" className="font-buch text-kapitel text-text text-balance">
-            Was testen wir als Nächstes?
+            {texte.titel}
           </h2>
           <p data-story="waehl-mit" className="farbverlauf font-hand text-notiz">
-            Wähl mit.
+            {texte.waehlMit}
           </p>
           <p className="max-w-[48ch] text-body text-text-muted text-pretty">
-            Freigeschaltete Mitglieder stimmen ab, eine Stimme pro Runde. Was gewinnt, kommt als
-            Nächstes auf den Tisch.
+            {texte.satz}
           </p>
         </div>
 
-        <Suspense fallback={<StimmzettelSkelett />}>
+        <Suspense fallback={<StimmzettelSkelett ansage={w.start.skelett.abstimmung} />}>
           <Stimmzettel />
         </Suspense>
       </div>

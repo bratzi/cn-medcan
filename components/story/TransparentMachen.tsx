@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 import { GlasMaske } from "@/components/medien/GlasMaske";
 import { Loop } from "@/components/medien/Loop";
 import { UeberlaufWort, ueberlaufPlatz } from "@/components/story/UeberlaufWort";
+import { holeWoerterbuch } from "@/lib/i18n";
 
 /**
  * Die drei Prüfpunkte zwischen den Absätzen (Spec Redesign 9 und 13), seit
@@ -14,27 +15,24 @@ import { UeberlaufWort, ueberlaufPlatz } from "@/components/story/UeberlaufWort"
  */
 const PUNKTE = [
   {
-    titel: "Overall",
+    schluessel: "overall",
     video: "aussehen-loop",
-    text: "Aussehen, Geruch, Geschmack und Konsistenz, jeweils von 1 bis 5. Der erste Blick auf die Blüte.",
     seite: "rechts",
     form: "rounded-[62%_38%_55%_45%/48%_60%_40%_52%] rotate-3",
     verzoegerung: "0s",
     glas: "lila",
   },
   {
-    titel: "Terpz",
+    schluessel: "terpz",
     video: "geruch-loop",
-    text: "Jedes Terpen einzeln, neben der Angabe des Herstellers. Die Abweichung steht daneben.",
     seite: "links",
     form: "rounded-[45%_55%_40%_60%/58%_42%_62%_38%] -rotate-2",
     verzoegerung: "-5s",
     glas: "gruen",
   },
   {
-    titel: "Qualität",
+    schluessel: "qualitaet",
     video: "feuchte-loop",
-    text: "Chlorophyll, Bud-Dichte, Terpendichte, Trichome und Restfeuchte. Zwischen 8 und 13 Prozent Feuchte ist gut.",
     seite: "rechts",
     form: "rounded-[55%_45%_62%_38%/42%_56%_44%_58%] rotate-1",
     verzoegerung: "-9s",
@@ -61,7 +59,7 @@ const RINGE = [
  * Zeiger in drei Tiefen (bewegung/punkte.ts, data-punkt-tiefe).
  * Reduzierte Bewegung: alles steht, das Standbild bleibt (globals.css).
  */
-function Punkt({ punkt }: { punkt: (typeof PUNKTE)[number] }) {
+function Punkt({ punkt, text }: { punkt: (typeof PUNKTE)[number]; text: { titel: string; text: string } }) {
   return (
     <aside className="flex w-64 shrink-0 flex-col items-center gap-6 text-center md:w-md lg:w-lg">
       <div data-punkt="" className="relative isolate aspect-square w-full">
@@ -95,8 +93,8 @@ function Punkt({ punkt }: { punkt: (typeof PUNKTE)[number] }) {
       <LoopSchalter />
       <div className="flex flex-col gap-2">
         {/* Logoschrift im Farbverlauf wie die Schlagworte (Nutzer 2026-09-25). */}
-        <h3 className="farbverlauf font-hand text-notiz leading-none">{punkt.titel}</h3>
-        <p className="text-small text-text-muted text-pretty">{punkt.text}</p>
+        <h3 className="farbverlauf font-hand text-notiz leading-none">{text.titel}</h3>
+        <p className="text-small text-text-muted text-pretty">{text.text}</p>
       </div>
     </aside>
   );
@@ -111,9 +109,11 @@ function Punkt({ punkt }: { punkt: (typeof PUNKTE)[number] }) {
 function Paar({
   punkt,
   erster = false,
+  text,
   children,
 }: {
   punkt: (typeof PUNKTE)[number];
+  text: { titel: string; text: string };
   erster?: boolean;
   children: ReactNode;
 }) {
@@ -129,7 +129,7 @@ function Paar({
       >
         {children}
       </p>
-      <Punkt punkt={punkt} />
+      <Punkt punkt={punkt} text={text} />
     </div>
   );
 }
@@ -163,7 +163,8 @@ function Buzz({ children }: { children: ReactNode }) {
  * weichen Schatten nach oben trägt sie nur, solange der Pin besteht
  * (`data-umschlag-seite`, globals.css).
  */
-export function TransparentMachen() {
+export async function TransparentMachen() {
+  const texte = (await holeWoerterbuch()).start.transparent;
   return (
     <section
       aria-labelledby="transparent-titel"
@@ -179,20 +180,17 @@ export function TransparentMachen() {
             className="relative isolate mx-auto max-w-4xl text-center font-buch text-erzaehlung text-text text-balance"
             style={ueberlaufPlatz}
           >
-            <span data-manifest-zeile="">Wir schreiben auf, was drin ist. Hinter jedem Handelsnamen steckt ein</span>{" "}
-            <UeberlaufWort wort="Terpenprofil." absatz />
+            <span data-manifest-zeile="">{texte.satz}</span>{" "}
+            <UeberlaufWort wort={texte.ueberlauf} absatz />
           </h2>
-          <Paar punkt={PUNKTE[0]} erster>
-            Erst das <Buzz>Overall.</Buzz> Nicht, was auf der Dose steht, sondern wie es aussieht, wie es riecht, wie
-            es schmeckt und wie es sich anfühlt.
+          <Paar punkt={PUNKTE[0]} text={texte.punkte[PUNKTE[0].schluessel]} erster>
+            {texte.absatz1.vor} <Buzz>{texte.absatz1.buzz}</Buzz> {texte.absatz1.nach}
           </Paar>
-          <Paar punkt={PUNKTE[1]}>
-            Dann die <Buzz>Terpz:</Buzz> Jedes Terpen bekommt seine eigene Note. Daneben
-            steht, was der Hersteller angibt, und wie weit die Community davon abweicht.
+          <Paar punkt={PUNKTE[1]} text={texte.punkte[PUNKTE[1].schluessel]}>
+            {texte.absatz2.vor} <Buzz>{texte.absatz2.buzz}</Buzz> {texte.absatz2.nach}
           </Paar>
-          <Paar punkt={PUNKTE[2]}>
-            Zum Schluss die <Buzz>Qualität:</Buzz> Dichte, Trichome, Feuchte. Dann stimmen wir ab, was als Nächstes
-            drankommt, und alle wissen danach ein bisschen mehr.
+          <Paar punkt={PUNKTE[2]} text={texte.punkte[PUNKTE[2].schluessel]}>
+            {texte.absatz3.vor} <Buzz>{texte.absatz3.buzz}</Buzz> {texte.absatz3.nach}
           </Paar>
         </div>
       </div>

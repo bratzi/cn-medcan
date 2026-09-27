@@ -5,6 +5,7 @@ import { preload } from "react-dom";
 import { Loop } from "@/components/medien/Loop";
 import { Kopfzeile } from "@/components/story/Kopfzeile";
 import { Unterzeile, Wortmarke } from "@/components/marke/Wortmarke";
+import { holeWoerterbuch } from "@/lib/i18n";
 
 /**
  * Konturen hinter der Wortmarke (Nutzer 2026-09-25, statt der 3D-Bahnen): die
@@ -32,7 +33,8 @@ const KONTUREN = [
  * Oberzeile und Satz. Der Button "Bewerte jetzt mit" trägt die Markierung bewusst
  * nicht: er ist ab dem ersten Frame bedienbar.
  */
-export function Auftakt() {
+export async function Auftakt() {
+  const texte = (await holeWoerterbuch()).start.auftakt;
   // Standbild ist das größte Bild der ersten Ansicht: vor allem anderen anfordern.
   preload("/medien/auftakt-loop-standbild.webp", { as: "image", fetchPriority: "high" });
 
@@ -75,7 +77,7 @@ export function Auftakt() {
           data-story-einstieg=""
           className="mt-6 max-w-[28ch] text-center font-sans sm:mt-12 text-[clamp(1.75rem,1rem+2.4vw,3.25rem)] leading-tight font-light uppercase tracking-gesperrt text-balance text-text/90"
         >
-          Cannabis, offen gelegt.
+          {texte.oberzeile}
         </p>
         {/* Zentriert und breit unter der Oberzeile; seit 2026-09-26 mit mehr Luft zur Wortmarke und zur Oberzeile (Nutzer). */}
         <p
@@ -84,8 +86,8 @@ export function Auftakt() {
           className="mt-2 w-full text-center font-sans text-small uppercase sm:mt-4 leading-relaxed tracking-gesperrt text-text text-balance"
         >
           {/* Ab md genau zwei Zeilen, je Satz eine, ohne Umbruch und damit breiter als die übrigen Texte (Nutzer 2026-09-25). */}
-          <span className="md:block md:whitespace-nowrap">Wir testen Sorten nach festem Schema.</span>{" "}
-          <span className="md:block md:whitespace-nowrap">Kollektiven Geschmack kultivieren · Terpene schmecken &amp; verstehen · neue Maßstäbe definieren.</span>
+          <span className="md:block md:whitespace-nowrap">{texte.intro1}</span>{" "}
+          <span className="md:block md:whitespace-nowrap">{texte.intro2}</span>
         </p>
       </div>
 
@@ -98,7 +100,7 @@ export function Auftakt() {
             data-punkt-tiefe="1"
             className="konto-pille inline-flex h-14 items-center rounded-full px-10 font-sans text-small font-medium uppercase tracking-gesperrt text-text"
           >
-            Bewerte jetzt mit
+            {texte.mitmachen}
           </Link>
         </div>
       </div>

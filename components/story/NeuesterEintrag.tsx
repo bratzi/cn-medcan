@@ -20,7 +20,7 @@ async function EintragInhalt() {
     console.error("neuesteRedaktionelleReview fehlgeschlagen", fehler);
     return (
       <p className="border border-border bg-surface-raised p-8 text-body text-text">
-        Der neueste Eintrag lässt sich gerade nicht laden. Lade die Seite in ein paar Minuten neu, der Rest funktioniert weiter.
+        {w.start.eintrag.fehler}
       </p>
     );
   }
@@ -28,12 +28,12 @@ async function EintragInhalt() {
   if (!review) {
     return (
       <div className="flex flex-col items-start gap-6 border border-border bg-surface-raised p-8 sm:p-12">
-        <p className="font-buch text-kapitel text-text">Das erste Kapitel wird gerade geschrieben.</p>
+        <p className="font-buch text-kapitel text-text">{w.start.eintrag.leerTitel}</p>
         <p className="max-w-[48ch] text-body text-text-muted">
-          Welche Sorte wir zuerst testen, entscheidet die Abstimmung.
+          {w.start.eintrag.leerText}
         </p>
         <Link href="#abstimmung" className={buttonKlassen("secondary", "md")}>
-          Zur Abstimmung
+          {w.start.eintrag.zurAbstimmung}
         </Link>
       </div>
     );
@@ -43,7 +43,9 @@ async function EintragInhalt() {
 }
 
 /** Sektion 5 (Spec 5.1): der Höhepunkt der Story. */
-export function NeuesterEintrag() {
+export async function NeuesterEintrag() {
+  const w = await holeWoerterbuch();
+  const texte = w.start.eintrag;
   return (
     <section
       aria-labelledby="eintrag-titel"
@@ -51,12 +53,12 @@ export function NeuesterEintrag() {
       className="relative isolate overflow-x-clip bg-linear-to-b from-transparent via-surface-sunken to-transparent px-4 pt-24 pb-32 sm:px-8 sm:pt-32 sm:pb-48"
     >
       {/* Unter dem Eintrag, nicht darüber (Nutzer 2026-09-25). */}
-      <Schlagwort satz="was drin ist" ton="gruen" oben="bottom-0 translate-y-1/2" />
+      <Schlagwort satz={texte.schlagwort} ton="gruen" oben="bottom-0 translate-y-1/2" />
       <div className="mx-auto flex w-full max-w-360 flex-col gap-12">
         <h2 id="eintrag-titel" className="font-buch text-kapitel text-text">
-          Der <em className="farbverlauf hand-betont">neueste</em> Eintrag
+          {texte.vor} <em className="farbverlauf hand-betont">{texte.betont}</em> {texte.nach}
         </h2>
-        <Suspense fallback={<DoppelseitenSkelett />}>
+        <Suspense fallback={<DoppelseitenSkelett ansage={w.start.skelett.eintrag} />}>
           <EintragInhalt />
         </Suspense>
       </div>

@@ -5,6 +5,7 @@ import { Randspalte } from "@/components/story/Randspalte";
 import { RandspaltenSkelett } from "@/components/story/Skelette";
 import { randnotizen, type CommunityZahlen } from "@/lib/query/community";
 import { communityZahlen } from "@/lib/query/umfragen";
+import { holeSprache, holeWoerterbuch } from "@/lib/i18n";
 
 /**
  * Die Notizen der Randspalte: echte Zähler oder, wenn es nichts zu zählen
@@ -13,6 +14,7 @@ import { communityZahlen } from "@/lib/query/umfragen";
  * trotzdem durch.
  */
 async function RandspaltenInhalt() {
+  const [w, sprache] = await Promise.all([holeWoerterbuch(), holeSprache()]);
   let zahlen: CommunityZahlen | null = null;
   try {
     zahlen = await communityZahlen();
@@ -20,7 +22,7 @@ async function RandspaltenInhalt() {
     unstable_rethrow(fehler);
     console.error("communityZahlen fehlgeschlagen", fehler);
   }
-  return <Randspalte notizen={randnotizen(zahlen)} />;
+  return <Randspalte notizen={randnotizen(zahlen, w.start.wissen, sprache)} sprache={sprache} />;
 }
 
 /**
@@ -28,7 +30,9 @@ async function RandspaltenInhalt() {
  * gedruckte Satz, ab lg rechts die Randnotizen der Community; darunter
  * stehen sie direkt unter dem Satz. Grund ist das Papier, kein Schwenk.
  */
-export function WissenBuendeln() {
+export async function WissenBuendeln() {
+  const w = await holeWoerterbuch();
+  const texte = w.start.wissen;
   return (
     <section
       aria-labelledby="wissen-titel"
@@ -38,10 +42,10 @@ export function WissenBuendeln() {
     >
       <div className="mx-auto grid w-full max-w-360 grid-cols-1 gap-12 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)] lg:gap-16">
         <h2 id="wissen-titel" className="max-w-4xl font-buch text-kapitel text-text text-balance">
-          Einer allein weiß wenig. Hier sammelt sich, was <em className="farbverlauf hand-betont">viele</em> erfahren.
+          {texte.vor} <em className="farbverlauf hand-betont">{texte.betont}</em> {texte.nach}
         </h2>
         <div className="lg:border-s lg:border-border lg:ps-8">
-          <Suspense fallback={<RandspaltenSkelett />}>
+          <Suspense fallback={<RandspaltenSkelett ansage={w.start.skelett.zahlen} />}>
             <RandspaltenInhalt />
           </Suspense>
         </div>

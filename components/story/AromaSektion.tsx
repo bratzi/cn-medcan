@@ -48,10 +48,10 @@ async function Inhalt() {
         {...erkundungsDaten(sorte.terpene, sorte.reviews, w.aroma.serien)}
         texte={aromaTexte(w, sprache)}
         // Zwischen Qualität und Fazit, eins höher als zuvor am Sektionsende (Nutzer 2026-09-26).
-        zwischenruf={<Schlagwort satz="stimmt das?" ton="gruen" oben="top-0 -translate-y-1/2" />}
+        zwischenruf={<Schlagwort satz={w.start.aroma.zwischenruf} ton="gruen" oben="top-0 -translate-y-1/2" />}
       >
         <Link href={`/blueten/${sorte.slug}`} className={buttonKlassen("secondary", "md")}>
-          Zur Sorte
+          {w.start.aroma.zurSorte}
         </Link>
       </AromaErkundung>
     </div>
@@ -63,7 +63,8 @@ async function Inhalt() {
  * als Referenz auf der Startseite. Hält, was der Hersteller angibt, dem
  * Urteil der Community gegenüber, dazu der Sweet Spot je Terpen.
  */
-export function AromaSektion() {
+export async function AromaSektion() {
+  const texte = (await holeWoerterbuch()).start.aroma;
   return (
     <section
       aria-labelledby="aroma-titel"
@@ -76,12 +77,10 @@ export function AromaSektion() {
           className="relative isolate max-w-4xl font-buch text-kapitel text-text text-balance"
           style={ueberlaufPlatz}
         >
-          Was der Hersteller verspricht, <UeberlaufWort wort="prüfen wir nach." />
+          {texte.titel} <UeberlaufWort wort={texte.ueberlauf} />
         </h2>
         <p className="mt-6 max-w-[60ch] text-body text-text-muted text-pretty">
-          Erst das Overall, dann die Terpz: Grün ist das Profil, das die Herstellerangaben erwarten lassen,
-          Lila ist, was wir beim Probieren gefunden haben. Zum Schluss die Qualität. Zieh an den Reglern, und alles
-          zeigt deinen Eindruck.
+          {texte.text}
         </p>
         <Suspense fallback={<div className="mt-16 aspect-4/3 w-full max-w-4xl bg-surface-sunken" data-skelett="" />}>
           <Inhalt />
