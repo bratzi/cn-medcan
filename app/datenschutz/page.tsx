@@ -27,10 +27,12 @@ import {
  *   (Session.ipAddress, userAgent), gefüllt von better-auth.
  * - Browser-Speicher: lib/thema.ts (localStorage) und
  *   components/layout/konto-zaehler-speicher.ts (sessionStorage).
- * - Instagram: components/produkt/InstagramEmbed.tsx, iframe mit
- *   loading="lazy" und referrerPolicy="no-referrer", OHNE Einwilligung und
- *   ohne Klick zum Laden; nur in Doppelseite.tsx, nur wenn der Betreiber
- *   ein Reel verknüpft hat (app/bewerten/aktionen.ts).
+ * - Instagram: components/produkt/InstagramEmbed.tsx +
+ *   ReelNachKlick.tsx, Zwei-Klick-Lösung: bis zum Klick auf „Reel von
+ *   Instagram laden“ keine Anfrage an instagram.com, danach iframe mit
+ *   referrerPolicy="no-referrer"; die Wahl wird nicht gespeichert; nur in
+ *   Doppelseite.tsx, nur wenn der Betreiber ein Reel verknüpft hat
+ *   (app/bewerten/aktionen.ts).
  * - Schriften: next/font/google in app/layout.tsx (beim Build eingebettet,
  *   keine Anfrage an Google im Browser). Medien aus public/medien.
  * - Keine Analyse- oder Werbedienste im Code und in package.json.
@@ -229,11 +231,22 @@ export default function DatenschutzPage() {
 
           <Abschnitt id="ds-instagram" titel="Instagram-Videos">
             <p className="text-pretty">
-              Zu manchen unserer eigenen Bewertungen zeigen wir ein Video von Instagram. Es wird
-              direkt von Instagram geladen, sobald du den Bereich der Bewertung erreichst. Dabei
-              erhält Meta Platforms Ireland Limited deine IP-Adresse und Angaben zu deinem Browser
-              und kann eigene Cookies lesen oder setzen, vor allem wenn du bei Instagram angemeldet
-              bist. Unsere Seitenadresse geben wir dabei nicht mit.
+              Zu manchen unserer eigenen Bewertungen gibt es ein Video von Instagram. Wir binden es
+              erst ein, wenn du auf „Reel von Instagram laden“ klickst. Bis dahin lädt dein Browser
+              nichts von Instagram, und Meta erfährt nichts von deinem Besuch.
+            </p>
+            <p className="text-pretty">
+              Nach dem Klick lädt dein Browser das Video direkt von Instagram. Dabei erhält Meta
+              Platforms Ireland Limited deine IP-Adresse und Angaben zu deinem Browser und kann
+              eigene Cookies lesen oder setzen, vor allem wenn du bei Instagram angemeldet bist.
+              Unsere Seitenadresse geben wir dabei nicht mit. Deine Wahl speichern wir nicht; beim
+              nächsten Besuch fragen wir wieder.
+            </p>
+            <p className="text-pretty">
+              Rechtsgrundlage ist deine Einwilligung durch den Klick (Art. 6 Abs. 1 lit. a DSGVO,
+              § 25 Abs. 1 TDDDG). Du kannst sie jederzeit widerrufen, indem du die Seite neu lädst;
+              dann ist das Video wieder ausgeblendet. Was Meta bereits erhalten hat, bleibt davon
+              unberührt.
             </p>
             <p className="text-pretty">
               Was Meta mit diesen Daten macht, steht in der{" "}

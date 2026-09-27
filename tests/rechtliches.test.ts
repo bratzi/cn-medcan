@@ -58,3 +58,11 @@ test("Datenschutzerklärung nennt alle Cookies und Speicher, die der Code setzt"
     assert.ok(name && text.includes(`"${name}"`), `${name} fehlt in der Datenschutzerklärung`);
   }
 });
+
+test("Datenschutz beschreibt Instagram als Zwei-Klick-Lösung mit Einwilligung", () => {
+  const text = lesen("app/datenschutz/page.tsx");
+  assert.match(text, /Reel von Instagram laden/);
+  assert.match(text, /Art\. 6 Abs\. 1 lit\. a DSGVO/);
+  assert.match(text, /§ 25 Abs\. 1 TDDDG/);
+  assert.doesNotMatch(text, /sobald du den Bereich/);
+});

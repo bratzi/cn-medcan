@@ -76,10 +76,13 @@ test("Story-Ziele nur, wenn die Startseite sie verlangt", () => {
 
 test("Reel nur im vollen Eintrag und nur mit gültiger eigener URL", () => {
   const gueltig = "https://www.instagram.com/reel/ABCdef12345/";
-  assert.match(zeige({ eintrag: eintrag({ instagramReelUrl: gueltig }), umfang: "voll", ueberschrift: "h3" }), /<iframe/);
-  assert.doesNotMatch(zeige({ eintrag: eintrag({ instagramReelUrl: gueltig }), umfang: "auszug", ueberschrift: "h3" }), /<iframe/);
+  // Zwei-Klick-Lösung: im vollen Eintrag erst der Lade-Button, noch kein iframe.
+  const voll = zeige({ eintrag: eintrag({ instagramReelUrl: gueltig }), umfang: "voll", ueberschrift: "h3" });
+  assert.match(voll, /Reel von Instagram laden/);
+  assert.doesNotMatch(voll, /<iframe/);
+  assert.doesNotMatch(zeige({ eintrag: eintrag({ instagramReelUrl: gueltig }), umfang: "auszug", ueberschrift: "h3" }), /<iframe|Reel von Instagram laden/);
   const fremd = zeige({ eintrag: eintrag({ instagramReelUrl: "https://example.com/reel/x" }), umfang: "voll", ueberschrift: "h3" });
-  assert.doesNotMatch(fremd, /<iframe|Kein Video hinterlegt/);
+  assert.doesNotMatch(fremd, /<iframe|Kein Video hinterlegt|Reel von Instagram laden/);
 });
 
 test("Lange Handelsnamen brechen um statt überzulaufen", () => {

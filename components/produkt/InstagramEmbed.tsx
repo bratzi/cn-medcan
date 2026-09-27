@@ -1,3 +1,4 @@
+import { ReelNachKlick } from "@/components/produkt/ReelNachKlick";
 import { cn } from "@/lib/cn";
 
 /**
@@ -13,6 +14,8 @@ import { cn } from "@/lib/cn";
  *
  * Stattdessen ein einfacher `<iframe>` auf die offizielle `/embed`-URL. Die
  * URL wird nicht durchgereicht, sondern aus dem validierten Pfad neu gebaut.
+ * Auch der iframe laedt erst nach einem Klick (Zwei-Klick-Loesung in
+ * `ReelNachKlick.tsx`): vorher geht keine Anfrage an instagram.com.
  */
 
 export type InstagramEmbedProps = {
@@ -84,20 +87,10 @@ export function InstagramEmbed({ url, bezeichnung, className }: InstagramEmbedPr
   if (!embedUrl) return <Platzhalter className={className} />;
 
   return (
-    <iframe
-      src={embedUrl}
-      title={
-        bezeichnung
-          ? `Instagram-Reel zu ${bezeichnung}`
-          : "Instagram-Reel zur Blüte"
-      }
-      loading="lazy"
-      referrerPolicy="no-referrer"
-      allow="encrypted-media"
-      className={cn(
-        "aspect-[9/16] w-full rounded-md border border-border bg-surface-raised",
-        className,
-      )}
+    <ReelNachKlick
+      embedUrl={embedUrl}
+      titel={bezeichnung ? `Instagram-Reel zu ${bezeichnung}` : "Instagram-Reel zur Blüte"}
+      className={className}
     />
   );
 }
