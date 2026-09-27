@@ -4,7 +4,9 @@ import Link from "next/link";
 
 import { Badge, Card, CardBody, EmptyState, Spinner } from "@/components/ui";
 import { formatiereLieferzeit } from "@/lib/format";
-import { rezeptStatusLabel } from "@/lib/labels";
+import { de } from "@/lib/i18n/de";
+// Deutsch bis Welle 4 (Plan Englisch): Apotheken sind zurueckgestellt.
+const rezeptStatusLabel = de.label.rezeptStatus;
 import { ladeApothekenListe } from "@/lib/query/strains";
 
 /**

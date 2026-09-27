@@ -15,6 +15,7 @@ import { Button, Field, Input, Meldung } from "@/components/ui";
 import { useHydriert } from "@/components/ui/useHydriert";
 import type { KartenTerpen, Treue } from "@/lib/aromakarte";
 import { MAX_NOTIZ } from "@/lib/bewertung-eingabe";
+import type { AromaTexte } from "@/lib/i18n/typen";
 
 type Props = {
   strainId: string;
@@ -32,6 +33,8 @@ type Props = {
   zeilen: readonly SweetSpotZeile[];
   gesamteindruck: Gesamteindruck;
   beschaffenheit: BeschaffenheitsWerte;
+  /** Texte der Aroma-Bausteine (lib/i18n/typen.ts, aromaTexte). */
+  aromaTexte: AromaTexte;
 };
 
 /**
@@ -49,6 +52,7 @@ export function BewertungsFormular({
   istBetreiber,
   katalog = [],
   kopf,
+  aromaTexte,
   ...daten
 }: Props) {
   const router = useRouter();
@@ -91,7 +95,7 @@ export function BewertungsFormular({
     <form onSubmit={absenden} className="flex flex-col gap-16 md:gap-24">
       <input type="hidden" name="strainId" value={strainId} />
 
-      <AromaErkundung titel={handelsname} bild={kopf} terpene={terpene} katalog={katalog} eingabe {...daten} />
+      <AromaErkundung titel={handelsname} bild={kopf} terpene={terpene} katalog={katalog} eingabe texte={aromaTexte} {...daten} />
 
       <section className="flex flex-col gap-6 border-t border-border pt-8">
         <h2 className="font-buch text-h2 font-medium text-text">Charge und Notiz</h2>

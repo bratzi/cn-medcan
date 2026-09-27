@@ -10,12 +10,13 @@ import { parseStrainFilter, serialisiereFilter } from "@/lib/query/filter";
 import type { StrainFilter } from "@/lib/query/filter";
 import { istFachkreis } from "@/lib/query/fachkreis";
 import { ladeFilterFacetten, ladeStrainListe } from "@/lib/query/strains";
+import { holeSprache, holeWoerterbuch, type Sprache, type Woerterbuch } from "@/lib/i18n";
+import { mehrzahl, t } from "@/lib/i18n/text";
 
-export const metadata: Metadata = {
-  title: "Blüten — Medizinalcannabis-Katalog",
-  description:
-    "Alle gelisteten Medizinalcannabis-Blüten mit Kultivar-Typ, Darreichungsform, THC-Spanne, dominantem Geschmack und Apothekenverfügbarkeit filtern.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const w = await holeWoerterbuch();
+  return { title: w.katalog.metaTitel, description: w.katalog.metaBeschreibung };
+}
 
 /**
  * Dynamisches Rendern: die Liste haengt an Suchparametern und am
@@ -34,14 +35,14 @@ type Props = {
 
 export default async function ProduktePage({ searchParams }: Props) {
   const filter = parseStrainFilter(await searchParams);
+  const [w, sprache] = await Promise.all([holeWoerterbuch(), holeSprache()]);
 
   return (
     <main className="mx-auto w-full max-w-7xl px-4 py-10 sm:px-6 lg:py-16">
       <header className="flex flex-col gap-2">
-        <h1 className="text-h1 text-text">Blüten</h1>
+        <h1 className="text-h1 text-text">{w.katalog.titel}</h1>
         <p className="max-w-[68ch] text-body text-text-muted">
-          Alle hier gelisteten Blüten sind verschreibungspflichtig und nur mit
-          ärztlicher Verordnung über eine Apotheke beziehbar.
+          {w.katalog.einleitung}
         </p>
       </header>
 
@@ -49,11 +50,11 @@ export default async function ProduktePage({ searchParams }: Props) {
         key={serialisiereFilter(filter).toString()}
         fallback={
           <div className="mt-10">
-            <Spinner text="Blüten werden geladen" />
+            <Spinner text={w.katalog.laedt} />
           </div>
         }
       >
-        <Ergebnisbereich filter={filter} />
+        <Ergebnisbereich filter={filter} w={w} sprache={sprache} />
       </Suspense>
     </main>
   );
@@ -64,7 +65,8 @@ function vorschlagLink(suche: string | undefined): string {
   return suche ? `/vorschlagen?name=${encodeURIComponent(suche)}` : "/vorschlagen";
 }
 
-async function Ergebnisbereich({ filter }: { filter: StrainFilter }) {
+async function Ergebnisbereich({ filter, w, sprache }: { filter: StrainFilter; w: Woerterbuch; sprache: Sprache }) {
+  const texte = w.katalog;
   const fachkreis = await istFachkreis();
   // Zwei parallele Abfragen: Liste und Facetten blockieren sich nicht.
   const [liste, facetten] = await Promise.all([
@@ -78,30 +80,37 @@ async function Ergebnisbereich({ filter }: { filter: StrainFilter }) {
 
   return (
     <div className="mt-10 flex flex-col gap-10 lg:flex-row lg:gap-16">
-      <aside className="w-full shrink-0 lg:w-72" aria-label="Filter">
-        <FilterLeiste facetten={facetten} filter={filter} gesamt={liste.gesamt} />
+      <aside className="w-full shrink-0 lg:w-72" aria-label={texte.filter}>
+        <FilterLeiste
+          facetten={facetten}
+          filter={filter}
+          gesamt={liste.gesamt}
+          texte={texte.leiste}
+          titel={texte.filter}
+          zuruecksetzen={texte.zuruecksetzen}
+          labels={{ kultivarTyp: w.label.kultivarTyp, darreichungsform: w.label.darreichungsform, geschmack: w.label.geschmack }}
+          sprache={sprache}
+        />
       </aside>
 
       <div className="flex min-w-0 flex-1 flex-col gap-6">
-        <p className="text-small text-text-muted">
-          <span className="numeric">{liste.eintraege.length}</span> von{" "}
-          <span className="numeric">{liste.gesamt}</span>{" "}
-          {liste.gesamt === 1 ? "Blüte" : "Blüten"}
+        <p className="text-small text-text-muted numeric">
+          {mehrzahl(sprache, texte.anzahl, liste.gesamt, { sichtbar: liste.eintraege.length })}
         </p>
 
-        <AktiveFilter filter={filter} apothekenNamen={apothekenNamen} />
+        <AktiveFilter filter={filter} apothekenNamen={apothekenNamen} w={w} sprache={sprache} />
 
         {liste.eintraege.length === 0 ? (
           <EmptyState
-            titel="Keine Blüten gefunden"
-            beschreibung="Zu dieser Filterkombination ist keine Blüte gelistet. Weniger Kriterien führen meist zu Treffern. Fehlt dir eine Blüte, schlag sie vor."
+            titel={texte.leerTitel}
+            beschreibung={texte.leerText}
             aktion={
               <div className="flex flex-wrap gap-4">
                 <Link href="/blueten" className={buttonKlassen("secondary")}>
-                  Alle Filter zurücksetzen
+                  {texte.zuruecksetzen}
                 </Link>
                 <Link href={vorschlagLink(filter.q)} className={buttonKlassen("secondary")}>
-                  Blüte vorschlagen
+                  {texte.vorschlagen}
                 </Link>
               </div>
             }
@@ -110,7 +119,7 @@ async function Ergebnisbereich({ filter }: { filter: StrainFilter }) {
           <ul className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
             {liste.eintraege.map((strain) => (
               <li key={strain.id} className="flex">
-                <ProduktCard strain={strain} className="w-full" />
+                <ProduktCard strain={strain} w={w} sprache={sprache} className="w-full" />
               </li>
             ))}
           </ul>
@@ -119,16 +128,16 @@ async function Ergebnisbereich({ filter }: { filter: StrainFilter }) {
         {/* Im leeren Ergebnis steht der Einstieg schon im Leerzustand. */}
         {liste.eintraege.length > 0 ? (
           <p className="text-small text-text-muted">
-            Blüte fehlt?{" "}
+            {texte.fehlt}{" "}
             <Link href={vorschlagLink(filter.q)} className={textLinkKlassen()}>
-              Schlag sie vor
+              {texte.schlagVor}
             </Link>
           </p>
         ) : null}
 
         {liste.seitenAnzahl > 1 ? (
           <nav
-            aria-label="Seitennavigation"
+            aria-label={texte.seitennavigation}
             className="flex flex-wrap items-center justify-between gap-4 border-t border-border pt-6"
           >
             {liste.seite > 1 ? (
@@ -137,15 +146,14 @@ async function Ergebnisbereich({ filter }: { filter: StrainFilter }) {
                 className={buttonKlassen("secondary")}
                 rel="prev"
               >
-                Vorige Seite
+                {texte.vorige}
               </Link>
             ) : (
               <span />
             )}
 
-            <p className="text-small text-text-muted">
-              Seite <span className="numeric">{liste.seite}</span> von{" "}
-              <span className="numeric">{liste.seitenAnzahl}</span>
+            <p className="numeric text-small text-text-muted">
+              {t(texte.seiteVon, { seite: liste.seite, seiten: liste.seitenAnzahl })}
             </p>
 
             {liste.seite < liste.seitenAnzahl ? (
@@ -154,7 +162,7 @@ async function Ergebnisbereich({ filter }: { filter: StrainFilter }) {
                 className={buttonKlassen("secondary")}
                 rel="next"
               >
-                Nächste Seite
+                {texte.naechste}
               </Link>
             ) : (
               <span />

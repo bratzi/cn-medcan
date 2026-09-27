@@ -23,11 +23,11 @@ import {
 } from "@/lib/aromakarte";
 import { BEWERTUNGS_ACHSEN, GESCHMACKS_ACHSEN, leereGeschmacksMatrix, type GeschmacksMatrix } from "@/lib/query/bewertung";
 import { communityFazit } from "@/lib/fazit";
+import { formatiereAnteil } from "@/lib/format";
+import { mehrzahl } from "@/lib/i18n/text";
+import type { AromaTexte } from "@/lib/i18n/typen";
 
-const PROZENT = new Intl.NumberFormat("de-DE", {
-  style: "percent",
-  maximumFractionDigits: 0,
-});
+const prozent = (anteil: number, sprache: AromaTexte["sprache"]) => formatiereAnteil(anteil, 0, sprache);
 
 /**
  * Aroma-Erkundung in drei Schritten: Gesamteindruck, Terpene, Beschaffenheit,
@@ -50,6 +50,7 @@ export function AromaErkundung({
   eingabe = false,
   zwischenruf,
   children,
+  texte,
 }: {
   titel: string;
   /** Sortenkopf (Symbolbild groß, Herstellerangaben) über der Karte, als Server-Teil hereingereicht. */
@@ -72,6 +73,7 @@ export function AromaErkundung({
    * umschließende Formular (Feldnamen wie lib/bewertung-eingabe.ts).
    */
   eingabe?: boolean;
+  texte: AromaTexte;
   /** Hintergrundsatz (Schlagwort) mittig zwischen Qualität und Fazit, nur auf der Startseite. */
   zwischenruf?: React.ReactNode;
   children?: React.ReactNode;
@@ -127,7 +129,7 @@ export function AromaErkundung({
   const alleSerien: AromaSerie[] = eigen
     ? [
         ...serien.filter((serie) => serie.ton === "gruen"),
-        { name: "Dein Eindruck", ton: "lila", matrix: eigen },
+        { name: texte.aroma.serien.eigen, ton: "lila", matrix: eigen },
       ]
     : [...serien];
 
@@ -178,11 +180,12 @@ export function AromaErkundung({
       {bild}
 
       {gesamteindruck ? (
-        <Schritt nummer="1" titel="Overall">
+        <Schritt nummer="1" titel={texte.aroma.erkundung.overall}>
           <GesamteindruckLeiste
             {...gesamteindruck}
             className="w-full"
             mitWirkung={eingabe}
+            texte={texte}
             ohneTitel
             bedienung={{
               eigen: eigeneNoten,
@@ -192,25 +195,25 @@ export function AromaErkundung({
         </Schritt>
       ) : null}
 
-      <Schritt nummer="2" titel="Terpz">
+      <Schritt nummer="2" titel={texte.aroma.erkundung.terpz}>
         {treue || eigeneTreue !== null ? (
           <p className="text-small text-text-muted">
             {treue ? (
               <>
-                Nähe zur Herstellerangabe: <span className="numeric text-text">{PROZENT.format(treue.wert)}</span>
+                {texte.aroma.erkundung.naehe}{" "}
+                <span className="numeric text-text">{prozent(treue.wert, texte.sprache)}</span>
               </>
             ) : null}
             {eigeneTreue !== null ? (
               <>
-                {treue ? " · " : ""}Dein Eindruck:{" "}
-                <span className="numeric text-kopierstift">{PROZENT.format(eigeneTreue)}</span>
+                {treue ? " · " : ""}{texte.aroma.erkundung.deinEindruck}{" "}
+                <span className="numeric text-kopierstift">{prozent(eigeneTreue, texte.sprache)}</span>
               </>
             ) : null}
           </p>
         ) : null}
         <p className="max-w-[60ch] text-small text-text-muted text-pretty">
-          Zieh die lila Punkte links in der Karte: Wie stark schmeckst du jede Richtung? Dazu leuchten die
-          Terpene auf, die sie tragen.{eingabe ? "" : " Hier wird nichts gespeichert."}
+          {texte.aroma.erkundung.anleitung}{eingabe ? "" : ` ${texte.aroma.erkundung.nichtsGespeichert}`}
         </p>
         <div className="w-full min-w-0">
           <AromaKarte
@@ -226,12 +229,14 @@ export function AromaErkundung({
                 setEigen((alt) => ({ ...(alt ?? start), [key]: wert })),
             }}
             lernen={katalog}
+            texte={texte}
           />
         </div>
         {eingabe ? (
           <SweetSpot
-            titel="Terpen-Intensität"
+            titel={texte.aroma.erkundung.intensitaet}
             quer
+            texte={texte}
             zeilen={sweetSpotZeilen}
             bedienung={{
               eigen: eigeneIntensitaet,
@@ -243,11 +248,12 @@ export function AromaErkundung({
       </Schritt>
 
       {beschaffenheit ? (
-        <Schritt nummer="3" titel="Qualität">
+        <Schritt nummer="3" titel={texte.aroma.erkundung.qualitaet}>
           <BeschaffenheitsLeiste
             {...beschaffenheit}
             className="w-full"
             ohneTitel
+            texte={texte}
             bedienung={{
               eigen: eigeneBeschaffenheit,
               aendern: (schluessel, wert) =>
@@ -271,7 +277,7 @@ export function AromaErkundung({
         <div className="flex flex-col items-center gap-4 text-center">
           <dl className="flex flex-wrap items-end justify-center gap-x-24 gap-y-8">
             <div className="flex flex-col items-center gap-2">
-              <dt className="text-small uppercase tracking-wide text-text-muted">Community-Fazit</dt>
+              <dt className="text-small uppercase tracking-wide text-text-muted">{texte.aroma.erkundung.communityFazit}</dt>
               {/* tabular-nums auf dem dd: gilt für die Zahl und ihre Konturen gleich,
                   damit die Konturen deckungsgleich bleiben. */}
               <dd className="relative isolate flex justify-center tabular-nums">
@@ -279,26 +285,25 @@ export function AromaErkundung({
                     wie die Wortmarke im Hero, dazu ein ruhiges Pulsieren. */}
                 {["marke-kontur-1", "marke-kontur-2", "marke-kontur-3", "marke-kontur-4"].map((klasse) => (
                   <span key={klasse} aria-hidden="true" className={`marke-kontur ${klasse} font-hand text-umschlag leading-none`}>
-                    <span>{PROZENT.format(fazit)}</span>
+                    <span>{prozent(fazit, texte.sprache)}</span>
                   </span>
                 ))}
-                <span className="fazit-puls farbverlauf font-hand text-umschlag leading-none">{PROZENT.format(fazit)}</span>
+                <span className="fazit-puls farbverlauf font-hand text-umschlag leading-none">{prozent(fazit, texte.sprache)}</span>
               </dd>
               <dd className="text-caption text-text-muted">
-                aus {anzahlBewertungen} {anzahlBewertungen === 1 ? "Bewertung" : "Bewertungen"}
+                {mehrzahl(texte.sprache, texte.aroma.ausBewertungen, anzahlBewertungen)}
               </dd>
             </div>
             {eigenesFazit !== null ? (
               <div className="flex flex-col items-center gap-2" aria-live="polite">
-                <dt className="text-small uppercase tracking-wide text-text-muted">Dein Fazit</dt>
-                <dd className="farbverlauf font-hand text-notiz leading-none tabular-nums">{PROZENT.format(eigenesFazit)}</dd>
-                <dd className="text-caption text-text-muted">aus deinen Reglern</dd>
+                <dt className="text-small uppercase tracking-wide text-text-muted">{texte.aroma.erkundung.deinFazit}</dt>
+                <dd className="farbverlauf font-hand text-notiz leading-none tabular-nums">{prozent(eigenesFazit, texte.sprache)}</dd>
+                <dd className="text-caption text-text-muted">{texte.aroma.erkundung.ausReglern}</dd>
               </div>
             ) : null}
           </dl>
           <p className="max-w-[60ch] text-caption text-text-muted text-pretty">
-            Das Fazit aus den drei Stufen: Overall, wie nah die Terpz an der Herstellerangabe liegen, und Qualität,
-            jede Stufe zu gleichen Teilen. 100 % heißt: alles top und genau wie angegeben.
+            {texte.aroma.erkundung.fazitErklaerung}
           </p>
         </div>
       ) : null}
@@ -317,7 +322,7 @@ export function AromaErkundung({
               }}
               className="min-h-11 text-small text-accent underline underline-offset-4 hover:text-accent-hover"
             >
-              Zurücksetzen
+              {texte.aroma.erkundung.zuruecksetzen}
             </button>
           ) : null}
         </div>

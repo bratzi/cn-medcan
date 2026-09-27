@@ -142,6 +142,8 @@ test("/umfragen: Community-Überschriften von Hand, ohne Nebel und ohne Drehung"
 
 import { AromaErkundung } from "@/components/review/AromaErkundung";
 import { SortenKopf } from "@/components/review/SortenKopf";
+import { de } from "@/lib/i18n/de";
+import { aromaTexte } from "@/lib/i18n/typen";
 import { KatalogSkelett, RandspaltenSkelett } from "@/components/story/Skelette";
 
 test("Sortenkopf: Handelsname in Logoschrift (Nutzerausnahme zu Leitplanke 4), Versalien-Zeilen tracking-wide", () => {
@@ -158,6 +160,8 @@ test("Sortenkopf: Handelsname in Logoschrift (Nutzerausnahme zu Leitplanke 4), V
       cbdMin: 0,
       cbdMax: 1,
       terpene: [{ name: "Myrcen", konzentrationProzent: 0.8, rang: 1 }],
+      w: de,
+      sprache: "de",
     }),
   );
   assert.match(html, /<h3 class="farbverlauf font-hand text-erzaehlung [^"]*"[^>]*>Nebelharz 22 \(fiktiv\)<\/h3>/);
@@ -174,6 +178,7 @@ test("Fazit-Zahlen in Handschrift stehen tabellarisch", () => {
       serien: [],
       zeilen: [],
       treue: { wert: 0.8, anzahl: 3 },
+      texte: aromaTexte(de, "de"),
     }),
   );
   assert.match(html, /<dd class="relative isolate flex justify-center tabular-nums">/);

@@ -24,7 +24,10 @@ import {
   formatierePreisProGramm,
   formatiereRelativ,
 } from "@/lib/format";
-import { bestandStatusLabel, rezeptStatusLabel } from "@/lib/labels";
+import { de } from "@/lib/i18n/de";
+// Deutsch bis Welle 4 (Plan Englisch): Apotheken sind zurueckgestellt.
+const bestandStatusLabel: Record<BestandStatus, string> = de.label.bestandStatus;
+const rezeptStatusLabel = de.label.rezeptStatus;
 import { istFachkreis } from "@/lib/query/fachkreis";
 import { ladeApothekeDetail, type ApothekeDetail } from "@/lib/query/strains";
 

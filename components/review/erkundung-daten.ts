@@ -27,12 +27,17 @@ type Bewertung = {
  * einmal für Startseite, Blütenseite und Bewertungsmaske (Nutzer 2026-09-25:
  * die Maske sieht exakt aus wie die Startseite).
  */
-export function erkundungsDaten(terpene: readonly KartenTerpen[], reviews: readonly Bewertung[]) {
+export function erkundungsDaten(
+  terpene: readonly KartenTerpen[],
+  reviews: readonly Bewertung[],
+  /** Legendennamen der Serien in der Sprache der Seite (w.aroma.serien). */
+  namen: { hersteller: string; community: string },
+) {
   const hersteller = herstellerProfil(terpene);
   const community = verdichteGeschmacksMatrix(reviews);
   const serien: AromaSerie[] = [
-    ...(hersteller ? [{ name: "Laut Hersteller", ton: "gruen" as const, matrix: hersteller }] : []),
-    ...(community.anzahlBewertungen > 0 ? [{ name: "Laut Community", ton: "lila" as const, matrix: community.matrix }] : []),
+    ...(hersteller ? [{ name: namen.hersteller, ton: "gruen" as const, matrix: hersteller }] : []),
+    ...(community.anzahlBewertungen > 0 ? [{ name: namen.community, ton: "lila" as const, matrix: community.matrix }] : []),
   ];
   const intensitaet = mittleTerpenIntensitaet(reviews.map((review) => parseTerpenIntensitaet(review.terpenIntensitaet)));
   return {

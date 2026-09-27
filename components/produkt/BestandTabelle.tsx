@@ -16,11 +16,11 @@ import {
   formatierePreisProGramm,
   formatiereRelativ,
 } from "@/lib/format";
-import {
-  bestandStatusErlaeuterung,
-  bestandStatusLabel,
-  rezeptStatusLabel,
-} from "@/lib/labels";
+import { de } from "@/lib/i18n/de";
+// Deutsch bis Welle 4 (Plan Englisch): Apotheken sind zurueckgestellt.
+const bestandStatusErlaeuterung = de.label.bestandStatusErlaeuterung;
+const bestandStatusLabel = de.label.bestandStatus;
+const rezeptStatusLabel = de.label.rezeptStatus;
 import { istBestandStatus, type BestandStatus } from "@/db/enums";
 import type { BestandEintrag } from "@/lib/query/strains";
 import { textLinkKlassen } from "@/components/ui/textlink";

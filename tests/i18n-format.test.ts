@@ -36,3 +36,18 @@ test("Lieferzeit und Preis", () => {
   assert.equal(formatierePreisProGramm(null, "en"), "Price on request");
   assert.equal(formatierePreisProGramm(1250, "en"), "€12.50/g");
 });
+
+test("formatiereZahl und formatiereAnteil je Sprache", async () => {
+  const { formatiereAnteil, formatiereZahl } = await import("@/lib/format");
+  assert.equal(formatiereZahl(4.25, 1), "4,3");
+  assert.equal(formatiereZahl(4.25, 1, "en"), "4.3");
+  assert.equal(formatiereAnteil(0.43), "43 %");
+  assert.equal(formatiereAnteil(0.43, 0, "en"), "43%");
+});
+
+test("formatiereWert: hoechstens eine Stelle", async () => {
+  const { formatiereWert } = await import("@/lib/format");
+  assert.equal(formatiereWert(4), "4");
+  assert.equal(formatiereWert(3.54), "3,5");
+  assert.equal(formatiereWert(3.54, "en"), "3.5");
+});

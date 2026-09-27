@@ -7,6 +7,7 @@ import { Inhaltsverzeichnis } from "@/components/review/Inhaltsverzeichnis";
 import { EmptyState, buttonKlassen } from "@/components/ui";
 import { cn } from "@/lib/cn";
 import { redaktionelleReviews } from "@/lib/query/reviews";
+import { holeSprache, holeWoerterbuch } from "@/lib/i18n";
 
 /**
  * Kein Prerender zur Buildzeit: es gibt derzeit keine erreichbare Datenbank.
@@ -22,7 +23,7 @@ export const metadata: Metadata = {
 
 /** Das Buch selbst (Spec TP2 4.1): der neueste Eintrag gross, alle im Inhaltsverzeichnis. */
 async function ReviewsInhalt() {
-  const reviews = await redaktionelleReviews();
+  const [reviews, w, sprache] = await Promise.all([redaktionelleReviews(), holeWoerterbuch(), holeSprache()]);
 
   if (reviews.length === 0) {
     return (
@@ -44,7 +45,7 @@ async function ReviewsInhalt() {
         <h2 id="neueste-titel" className={ABSCHNITT_TITEL}>
           Der neueste Eintrag
         </h2>
-        <Doppelseite eintrag={reviews[0]} umfang="auszug" ueberschrift="h3" />
+        <Doppelseite eintrag={reviews[0]} umfang="auszug" ueberschrift="h3" w={w} sprache={sprache} />
       </section>
 
       {reviews.length > 1 ? (
@@ -52,7 +53,7 @@ async function ReviewsInhalt() {
           <h2 id="alle-titel" className={ABSCHNITT_TITEL}>
             Alle Einträge
           </h2>
-          <Inhaltsverzeichnis eintraege={reviews} />
+          <Inhaltsverzeichnis eintraege={reviews} w={w} sprache={sprache} />
         </section>
       ) : null}
     </div>

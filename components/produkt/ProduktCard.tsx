@@ -5,12 +5,15 @@ import { Badge, Card, CardBody, CardFooter } from "@/components/ui";
 import { CannabinoidBar } from "@/components/produkt/CannabinoidBar";
 import { TerpenChips } from "@/components/produkt/TerpenChips";
 import { cn } from "@/lib/cn";
-import { darreichungsformLabel, kultivarTypLabel } from "@/lib/labels";
+import type { Sprache } from "@/lib/i18n/sprache-kern";
+import type { Woerterbuch } from "@/lib/i18n/typen";
 import { blueteBild } from "@/lib/medien";
 import type { StrainListenEintrag } from "@/lib/query/strains";
 
 type Props = {
   strain: StrainListenEintrag;
+  w: Woerterbuch;
+  sprache: Sprache;
   className?: string;
 };
 
@@ -18,7 +21,7 @@ type Props = {
  * Produktkarte der Uebersicht. Server Component - keine Interaktivitaet
  * ausser dem umschliessenden Link.
  */
-export function ProduktCard({ strain, className }: Props) {
+export function ProduktCard({ strain, w, sprache, className }: Props) {
   // Apotheken und Preise seit 2026-09-25 nur in Aussicht (Nutzer): keine Badges, kein Preis.
   const bild = blueteBild(strain.herstellerBildPfad);
 
@@ -38,7 +41,7 @@ export function ProduktCard({ strain, className }: Props) {
               className="h-full! min-h-0 w-full object-contain"
             />
           </Link>
-          <figcaption className="absolute right-4 bottom-2 text-caption text-text-muted">Symbolbild</figcaption>
+          <figcaption className="absolute right-4 bottom-2 text-caption text-text-muted">{w.katalog.karte.symbolbild}</figcaption>
         </figure>
       ) : null}
       <CardBody className="flex flex-1 flex-col gap-4">
@@ -61,8 +64,8 @@ export function ProduktCard({ strain, className }: Props) {
         </div>
 
         <div className="flex flex-wrap gap-2">
-          <Badge variante="neutral">{kultivarTypLabel[strain.kultivarTyp]}</Badge>
-          <Badge variante="neutral">{darreichungsformLabel[strain.darreichungsform]}</Badge>
+          <Badge variante="neutral">{w.label.kultivarTyp[strain.kultivarTyp]}</Badge>
+          <Badge variante="neutral">{w.label.darreichungsform[strain.darreichungsform]}</Badge>
           {strain.anbauland ? <Badge variante="neutral">{strain.anbauland}</Badge> : null}
         </div>
 
@@ -71,14 +74,16 @@ export function ProduktCard({ strain, className }: Props) {
           thcMax={strain.thcMaxProzent}
           cbdMin={strain.cbdMinProzent}
           cbdMax={strain.cbdMaxProzent}
+          w={w}
+          sprache={sprache}
         />
 
-        {strain.terpene.length > 0 ? <TerpenChips terpene={strain.terpene} /> : null}
+        {strain.terpene.length > 0 ? <TerpenChips terpene={strain.terpene} w={w} sprache={sprache} /> : null}
       </CardBody>
 
       <CardFooter className="flex items-baseline gap-4">
         <span className="text-small text-text-muted">
-          {strain.herstellerName ?? "Hersteller unbekannt"}
+          {strain.herstellerName ?? w.katalog.karte.herstellerUnbekannt}
         </span>
       </CardFooter>
     </Card>

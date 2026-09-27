@@ -130,6 +130,8 @@ import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 
 import { AromaKarte, naechsteAnsicht } from "@/components/review/AromaKarte";
+import { de } from "@/lib/i18n/de";
+import { aromaTexte } from "@/lib/i18n/typen";
 import { leereGeschmacksMatrix } from "@/lib/query/bewertung";
 
 const LIMONEN = { name: "Limonen", geschmack: "ZITRUS" as const, konzentrationProzent: null, rang: 1 };
@@ -138,6 +140,7 @@ const karte = () =>
     createElement(AromaKarte, {
       terpene: [LIMONEN],
       serien: [{ name: "Laut Hersteller", ton: "gruen", matrix: { ...leereGeschmacksMatrix(), zitrus: 5 } }],
+      texte: aromaTexte(de, "de"),
     }),
   );
 

@@ -1,7 +1,9 @@
 import Link from "next/link";
 
 import { formatierePreisProGramm, formatiereProzent } from "@/lib/format";
-import { darreichungsformLabel, geschmacksKategorieLabel, kultivarTypLabel } from "@/lib/labels";
+import type { Sprache } from "@/lib/i18n/sprache-kern";
+import type { Woerterbuch } from "@/lib/i18n/typen";
+import { t } from "@/lib/i18n/text";
 import { istFilterLeer, leererFilter, serialisiereFilter } from "@/lib/query/filter";
 import type { StrainFilter } from "@/lib/query/filter";
 
@@ -9,6 +11,8 @@ type Props = {
   filter: StrainFilter;
   /** Nur zur Anzeige der Apothekennamen — Slug allein waere nicht lesbar. */
   apothekenNamen?: ReadonlyMap<string, string>;
+  w: Woerterbuch;
+  sprache: Sprache;
 };
 
 type Chip = {
@@ -27,8 +31,9 @@ const STANDARD = leererFilter();
  * Aktive Filter als entfernbare Chips. Server Component: jeder Chip ist ein
  * normaler Link auf die Query ohne diesen Wert — funktioniert ohne JavaScript.
  */
-export function AktiveFilter({ filter, apothekenNamen }: Props) {
+export function AktiveFilter({ filter, apothekenNamen, w, sprache }: Props) {
   if (istFilterLeer(filter)) return null;
+  const texte = w.katalog.aktiv;
 
   const chips: Chip[] = [];
   // Ein entfernter Wert fuehrt immer auf Seite 1 zurueck, sonst zeigt die
@@ -42,8 +47,8 @@ export function AktiveFilter({ filter, apothekenNamen }: Props) {
   if (filter.q) {
     chips.push({
       schluessel: "q",
-      text: `Suche: ${filter.q}`,
-      beschreibung: `Suche ${filter.q}`,
+      text: t(texte.suche, { wert: filter.q }),
+      beschreibung: t(texte.sucheBeschreibung, { wert: filter.q }),
       ziel: ohne({ q: undefined }),
     });
   }
@@ -51,8 +56,8 @@ export function AktiveFilter({ filter, apothekenNamen }: Props) {
   for (const typ of filter.typ) {
     chips.push({
       schluessel: `typ-${typ}`,
-      text: kultivarTypLabel[typ],
-      beschreibung: kultivarTypLabel[typ],
+      text: w.label.kultivarTyp[typ],
+      beschreibung: w.label.kultivarTyp[typ],
       ziel: ohne({ typ: filter.typ.filter((wert) => wert !== typ) }),
     });
   }
@@ -60,8 +65,8 @@ export function AktiveFilter({ filter, apothekenNamen }: Props) {
   for (const form of filter.form) {
     chips.push({
       schluessel: `form-${form}`,
-      text: darreichungsformLabel[form],
-      beschreibung: darreichungsformLabel[form],
+      text: w.label.darreichungsform[form],
+      beschreibung: w.label.darreichungsform[form],
       ziel: ohne({ form: filter.form.filter((wert) => wert !== form) }),
     });
   }
@@ -69,14 +74,14 @@ export function AktiveFilter({ filter, apothekenNamen }: Props) {
   for (const geschmack of filter.geschmack) {
     chips.push({
       schluessel: `geschmack-${geschmack}`,
-      text: `Geschmack: ${geschmacksKategorieLabel[geschmack]}`,
-      beschreibung: `Geschmack ${geschmacksKategorieLabel[geschmack]}`,
+      text: t(texte.geschmack, { wert: w.label.geschmack[geschmack] }),
+      beschreibung: t(texte.geschmackBeschreibung, { wert: w.label.geschmack[geschmack] }),
       ziel: ohne({ geschmack: filter.geschmack.filter((wert) => wert !== geschmack) }),
     });
   }
 
   if (filter.thcMin !== STANDARD.thcMin || filter.thcMax !== STANDARD.thcMax) {
-    const text = `THC ${formatiereProzent(filter.thcMin)} bis ${formatiereProzent(filter.thcMax)}`;
+    const text = t(texte.thc, { von: formatiereProzent(filter.thcMin, 1, sprache), bis: formatiereProzent(filter.thcMax, 1, sprache) });
     chips.push({
       schluessel: "thc",
       text,
@@ -86,11 +91,11 @@ export function AktiveFilter({ filter, apothekenNamen }: Props) {
   }
 
   if (filter.preisMax !== undefined) {
-    const text = `bis ${formatierePreisProGramm(filter.preisMax)}`;
+    const text = t(texte.bisPreis, { preis: formatierePreisProGramm(filter.preisMax, sprache) });
     chips.push({
       schluessel: "preisMax",
       text,
-      beschreibung: `Höchstpreis ${text}`,
+      beschreibung: t(texte.hoechstpreis, { text }),
       ziel: ohne({ preisMax: undefined }),
     });
   }
@@ -98,8 +103,8 @@ export function AktiveFilter({ filter, apothekenNamen }: Props) {
   if (filter.nurVerfuegbar) {
     chips.push({
       schluessel: "nurVerfuegbar",
-      text: "Nur verfügbare Blüten",
-      beschreibung: "Nur verfügbare Blüten",
+      text: w.katalog.leiste.nurVerfuegbar,
+      beschreibung: w.katalog.leiste.nurVerfuegbar,
       ziel: ohne({ nurVerfuegbar: false }),
     });
   }
@@ -108,8 +113,8 @@ export function AktiveFilter({ filter, apothekenNamen }: Props) {
     const name = apothekenNamen?.get(slug) ?? slug;
     chips.push({
       schluessel: `apotheke-${slug}`,
-      text: `Apotheke: ${name}`,
-      beschreibung: `Apotheke ${name}`,
+      text: t(texte.apotheke, { wert: name }),
+      beschreibung: t(texte.apothekeBeschreibung, { wert: name }),
       ziel: ohne({ apotheke: filter.apotheke.filter((wert) => wert !== slug) }),
     });
   }
@@ -118,13 +123,13 @@ export function AktiveFilter({ filter, apothekenNamen }: Props) {
 
   return (
     <div className="flex flex-col gap-2">
-      <h2 className="text-caption tracking-wide text-text-muted">Aktive Filter</h2>
+      <h2 className="text-caption tracking-wide text-text-muted">{texte.titel}</h2>
       <ul className="flex flex-wrap gap-2">
         {chips.map((chip) => (
           <li key={chip.schluessel}>
             <Link
               href={`/blueten?${serialisiereFilter(chip.ziel).toString()}`}
-              aria-label={`Filter ${chip.beschreibung} entfernen`}
+              aria-label={t(texte.entfernen, { wert: chip.beschreibung })}
               className="inline-flex min-h-11 items-center gap-2 rounded-sm border border-border-strong bg-surface-raised px-4 text-small text-text transition-opacity duration-150 ease-standard hover:opacity-80 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring"
             >
               <span>{chip.text}</span>

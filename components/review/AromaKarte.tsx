@@ -27,7 +27,11 @@ import {
 import { cn } from "@/lib/cn";
 import { GESCHMACKS_ACHSEN, type GeschmacksMatrix } from "@/lib/query/bewertung";
 import { GeschmackIcon, TerpenIcon } from "@/components/review/AromaIcon";
-import { aromaSatz, BEGLEITSTOFFE } from "@/lib/terpen-aromen";
+import { BEGLEITSTOFFE } from "@/lib/terpen-aromen";
+import { formatiereZahl } from "@/lib/format";
+import { terpenAnzeige } from "@/lib/i18n/terpen";
+import { t as text } from "@/lib/i18n/text";
+import type { AromaTexte } from "@/lib/i18n/typen";
 
 export type AromaSerie = { name: string; ton: "gruen" | "lila"; matrix: GeschmacksMatrix };
 
@@ -53,10 +57,10 @@ type Props = {
   };
   /** Alle bekannten Terpene: zeigt zur aktiven Geschmacksrichtung, welche Terpene sie tragen. */
   lernen?: readonly { name: string; geschmack: KartenTerpen["geschmack"] }[];
+  texte: AromaTexte;
 };
 
 const DAUER_MS = 900;
-const WERT = new Intl.NumberFormat("de-DE", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
 const FARBE = { gruen: "var(--color-accent)", lila: "var(--color-kopierstift)" } as const;
 const GRAU = "var(--color-border-strong)";
 
@@ -156,13 +160,20 @@ function balkenEnde(knoten: Punkt, wert: number, versatz: number, laenge = 110):
 export function AromaKarte({
   terpene: ungeordnet,
   serien: roheSerien,
-  titel = "Aroma-Karte",
+  titel: titelRoh,
   ohneTitel = false,
   hervorheben = null,
   staerken,
   regler,
   lernen,
+  texte,
 }: Props) {
+  const titel = titelRoh ?? texte.aroma.karte.titel;
+  const sprache = texte.sprache;
+  const kt = texte.aroma.karte;
+  const WERT = { format: (wert: number) => formatiereZahl(wert, 1, sprache) };
+  const achsenName = (index: number) => texte.geschmack[GESCHMACKS_ACHSEN[index].enumWert];
+  const satz = (name: string) => (texte.aroma.satz as Record<string, string>)[name.trim().toLowerCase()] ?? null;
   const terpene = ungeordnet;
   const svgRef = useRef<SVGSVGElement>(null);
   const spurId = `spur-${useId().replace(/:/g, "")}`;
@@ -326,7 +337,7 @@ export function AromaKarte({
       <div className="flex flex-wrap items-center justify-end gap-4">
         {/* Ansichts-Schalter als Radiogroup (APG): ein Tabstopp, Pfeiltasten wählen.
             Druck-Rückmeldung per scale 0.97, nur ohne reduzierte Bewegung. */}
-        <div role="radiogroup" aria-label="Ansicht" className="inline-flex rounded-full border border-border-strong p-1">
+        <div role="radiogroup" aria-label={kt.ansicht} className="inline-flex rounded-full border border-border-strong p-1">
           {ANSICHTEN.map((wahl, index) => (
             <button
               key={wahl}
@@ -348,7 +359,7 @@ export function AromaKarte({
                 ansicht === wahl ? "bg-accent text-accent-fg" : "text-text hover:text-accent-hover",
               )}
             >
-              {wahl === "karte" ? "Karte" : "Netz"}
+              {wahl === "karte" ? kt.karte : kt.netz}
             </button>
           ))}
         </div>
@@ -782,7 +793,7 @@ export function AromaKarte({
             }}
           >
             <GeschmackIcon geschmack={GESCHMACKS_ACHSEN[index].enumWert} />
-            {GESCHMACKS_ACHSEN[index].label}
+            {achsenName(index)}
           </button>
         ))}
         {/* Terpene rechts sind wie die Geschmäcker links Ziele fürs Hervorheben (Nutzer
@@ -812,7 +823,7 @@ export function AromaKarte({
               }}
             >
               <TerpenIcon name={name} />
-              {name}
+              {terpenAnzeige(name, sprache)}
             </button>
           );
         })}
@@ -833,10 +844,10 @@ export function AromaKarte({
             {/* Hinweis in eigener Zeile, sonst ragt er über schmale Karten (Doppelseite) hinaus. */}
             <span className="inline-flex items-center gap-1.5 text-small italic">
               <TerpenIcon name={begleiter[index].name} />
-              {begleiter[index].name}
+              {terpenAnzeige(begleiter[index].name, sprache)}
             </span>
             {/* Unter 480 entfällt der Hinweis; die Legende sagt beim Antippen, dass es kein Terpen ist. */}
-            {aktBreite >= 480 ? <span className="text-caption font-normal">{begleiter[index].hinweis}</span> : null}
+            {aktBreite >= 480 ? <span className="text-caption font-normal">{(texte.aroma.begleitHinweis as Record<string, string>)[begleiter[index].name] ?? begleiter[index].hinweis}</span> : null}
           </button>
         ))}
       </div>
@@ -848,13 +859,13 @@ export function AromaKarte({
         {aktiveAchse ? (
           <InfoTafel
             key={`achse-${aktiveAchse.key}`}
-            art="Geschmacksrichtung"
+            art={kt.geschmacksrichtung}
             icon={<GeschmackIcon geschmack={aktiveAchse.enumWert} className={ICON_TITEL} />}
-            titel={aktiveAchse.label}
-            bezugTitel={lernen ? "Steckt vor allem in" : undefined}
+            titel={texte.geschmack[aktiveAchse.enumWert]}
+            bezugTitel={lernen ? kt.stecktIn : undefined}
             bezug={lernen ? tragendeStoffe(aktiv!, lernen).map((name) => (
               <Pille key={name} icon={<TerpenIcon name={name} className={ICON_PILLE} />}>
-                {name}
+                {terpenAnzeige(name, sprache)}
               </Pille>
             )) : []}
           >
@@ -871,20 +882,20 @@ export function AromaKarte({
         ) : terpenAktiv !== null ? (
           <InfoTafel
             key={`terpen-${terpenAktiv}`}
-            art={BEGLEITSTOFFE.some((stoff) => stoff.name === terpenAktiv) ? "Begleitstoff" : "Terpen"}
+            art={BEGLEITSTOFFE.some((stoff) => stoff.name === terpenAktiv) ? kt.begleitstoff : kt.terpen}
             icon={<TerpenIcon name={terpenAktiv} className={ICON_TITEL} />}
-            titel={terpenAktiv}
-            bezugTitel="Trägt vor allem"
+            titel={terpenAnzeige(terpenAktiv, sprache)}
+            bezugTitel={kt.traegt}
             bezug={(traeger.get(terpenAktiv) ?? []).map(({ achse }) => (
               <Pille
                 key={achse}
                 icon={<GeschmackIcon geschmack={GESCHMACKS_ACHSEN[achse].enumWert} className={ICON_PILLE} />}
               >
-                {GESCHMACKS_ACHSEN[achse].label}
+                {achsenName(achse)}
               </Pille>
             ))}
           >
-            {aromaSatz(terpenAktiv)}
+            {satz(terpenAktiv)}
           </InfoTafel>
         ) : (
           <p
@@ -892,18 +903,18 @@ export function AromaKarte({
             className="max-w-md pt-8 text-center font-buch text-body text-text-muted italic text-balance transition-opacity duration-normal ease-out starting:opacity-0"
           >
             {regler
-              ? "Zieh die lila Punkte links: Wie stark hast du jede Geschmacksrichtung geschmeckt?"
-              : "Fahr über eine Geschmacksrichtung oder ein Terpen, um die Verbindungen zu sehen."}
+              ? kt.hinweisRegler
+              : kt.hinweisErkunden}
           </p>
         )}
       </div>
 
       {regler ? (
         <fieldset className="sr-only">
-          <legend>Dein Eindruck je Geschmacksrichtung, 0 bis 5</legend>
+          <legend>{kt.reglerLegende}</legend>
           {GESCHMACKS_ACHSEN.map((achse, index) => (
             <label key={achse.key}>
-              {achse.label}
+              {texte.geschmack[achse.enumWert]}
               <input
                 type="range"
                 min={0}
@@ -927,10 +938,10 @@ export function AromaKarte({
 
       <div className="sr-only">
       <table>
-        <caption>{`${titel}, Skala 0 bis 5`}</caption>
+        <caption>{text(kt.tabelle, { titel })}</caption>
         <thead>
           <tr>
-            <th scope="col">Geschmack</th>
+            <th scope="col">{kt.geschmack}</th>
             {serien.map((serie) => (
               <th key={serie.name} scope="col">
                 {serie.name}
@@ -941,7 +952,7 @@ export function AromaKarte({
         <tbody>
           {GESCHMACKS_ACHSEN.map((achse) => (
             <tr key={achse.key}>
-              <th scope="row">{achse.label}</th>
+              <th scope="row">{texte.geschmack[achse.enumWert]}</th>
               {serien.map((serie) => (
                 <td key={serie.name}>{WERT.format(serie.matrix[achse.key])}</td>
               ))}

@@ -29,6 +29,8 @@ type Woerter = {
 
 type Formate = Woerter & {
   zahl: readonly Intl.NumberFormat[];
+  /** Hoechstens eine Nachkommastelle, ohne Nullen aufzufuellen (4 statt 4,0). */
+  kurz: Intl.NumberFormat;
   euro: Intl.NumberFormat;
   gramm: Intl.NumberFormat;
   datum: Intl.DateTimeFormat;
@@ -44,6 +46,7 @@ function baue(locale: string, woerter: Woerter): Formate {
           maximumFractionDigits: stellen,
         }),
     ),
+    kurz: new Intl.NumberFormat(locale, { maximumFractionDigits: 1 }),
     euro: new Intl.NumberFormat(locale, { style: "currency", currency: "EUR" }),
     gramm: new Intl.NumberFormat(locale, {
       style: "unit",
@@ -214,4 +217,20 @@ export function formatiereLieferzeit(
   }
 
   return `${ganz.format(minZahl)}${SCHMALES_LEERZEICHEN}${GEDANKENSTRICH}${SCHMALES_LEERZEICHEN}${ganz.format(maxZahl)} ${f.werktage}`;
+}
+
+/** Zahl ohne Einheit mit fester Stellenzahl, z. B. Noten `4,3` bzw. `4.3`. */
+export function formatiereZahl(wert: number, stellen = 1, sprache: Sprache = "de"): string {
+  return formatter(formate(sprache), stellen).format(wert);
+}
+
+/** Wert mit hoechstens einer Nachkommastelle, z. B. Reglerwerte `4` oder `3,5`. */
+export function formatiereWert(wert: number, sprache: Sprache = "de"): string {
+  return formate(sprache).kurz.format(wert);
+}
+
+/** Anteil 0 bis 1 als Prozent, z. B. `43 %` bzw. `43%`. */
+export function formatiereAnteil(anteil: number, stellen = 0, sprache: Sprache = "de"): string {
+  const f = formate(sprache);
+  return `${formatter(f, stellen).format(anteil * 100)}${f.prozentAbstand}%`;
 }

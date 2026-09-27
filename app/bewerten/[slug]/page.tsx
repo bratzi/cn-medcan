@@ -10,6 +10,8 @@ import { buttonKlassen } from "@/components/ui";
 import { cn } from "@/lib/cn";
 import { ladeStrainDetail, ladeTerpenKatalog } from "@/lib/query/strains";
 import { aktuellesMitglied } from "@/lib/session";
+import { holeSprache, holeWoerterbuch } from "@/lib/i18n";
+import { aromaTexte } from "@/lib/i18n/typen";
 
 export const metadata: Metadata = { title: "Bewerten" };
 export const dynamic = "force-dynamic";
@@ -21,6 +23,7 @@ export const dynamic = "force-dynamic";
  */
 export default async function BewertenPage({ params }: PageProps<"/bewerten/[slug]">) {
   const { slug } = await params;
+  const [w, sprache] = await Promise.all([holeWoerterbuch(), holeSprache()]);
   const [strain, mitglied, katalog] = await Promise.all([
     ladeStrainDetail(slug, false),
     aktuellesMitglied(),
@@ -57,6 +60,7 @@ export default async function BewertenPage({ params }: PageProps<"/bewerten/[slu
             chargen={strain.chargen.map((charge) => charge.chargenNr)}
             istBetreiber={mitglied.rolle === "ADMIN"}
             katalog={katalog}
+            aromaTexte={aromaTexte(w, sprache)}
             kopf={
               <SortenKopf
                 handelsname={strain.handelsname}
@@ -70,9 +74,11 @@ export default async function BewertenPage({ params }: PageProps<"/bewerten/[slu
                 cbdMin={strain.cbdMinProzent}
                 cbdMax={strain.cbdMaxProzent}
                 terpene={strain.terpene}
+                w={w}
+                sprache={sprache}
               />
             }
-            {...erkundungsDaten(strain.terpene, strain.reviews)}
+            {...erkundungsDaten(strain.terpene, strain.reviews, w.aroma.serien)}
           />
         )}
       </div>

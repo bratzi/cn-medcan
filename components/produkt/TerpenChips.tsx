@@ -1,6 +1,8 @@
 import { cn } from "@/lib/cn";
 import { formatiereProzent, type Dezimalwert } from "@/lib/format";
-import { geschmacksKategorieLabel } from "@/lib/labels";
+import type { Sprache } from "@/lib/i18n/sprache-kern";
+import type { Woerterbuch } from "@/lib/i18n/typen";
+import { terpenAnzeige } from "@/lib/i18n/terpen";
 import type { GeschmacksKategorie } from "@/db/enums";
 
 export type TerpenEintrag = {
@@ -13,6 +15,8 @@ export type TerpenEintrag = {
 
 export type TerpenChipsProps = {
   terpene: readonly TerpenEintrag[];
+  w: Woerterbuch;
+  sprache: Sprache;
   className?: string;
 };
 
@@ -20,11 +24,11 @@ export type TerpenChipsProps = {
  * Terpenprofil als Chips. Das dominante Terpen (Rang 1) ist durch Gewicht,
  * staerkeren Rahmen und den Zusatz "dominant" markiert, nicht durch Farbe.
  */
-export function TerpenChips({ terpene, className }: TerpenChipsProps) {
+export function TerpenChips({ terpene, w, sprache, className }: TerpenChipsProps) {
   if (terpene.length === 0) {
     return (
       <p className={cn("text-small text-text-muted", className)}>
-        Kein Terpenprofil hinterlegt.
+        {w.katalog.karte.keinTerpenprofil}
       </p>
     );
   }
@@ -34,7 +38,7 @@ export function TerpenChips({ terpene, className }: TerpenChipsProps) {
       {terpene.map((terpen) => {
         const dominant = terpen.rang === 1;
         const geschmack = terpen.geschmack
-          ? geschmacksKategorieLabel[terpen.geschmack]
+          ? w.label.geschmack[terpen.geschmack]
           : undefined;
 
         return (
@@ -47,7 +51,7 @@ export function TerpenChips({ terpene, className }: TerpenChipsProps) {
             )}
           >
             {/* Handelsnamen und Terpennamen stehen unveraendert. */}
-            <span title={terpen.name}>{terpen.name}</span>
+            <span title={terpen.name}>{terpenAnzeige(terpen.name, sprache)}</span>
 
             {geschmack ? (
               <span className="text-caption text-text-muted">{geschmack}</span>
@@ -56,12 +60,12 @@ export function TerpenChips({ terpene, className }: TerpenChipsProps) {
             {terpen.konzentrationProzent !== null &&
             terpen.konzentrationProzent !== undefined ? (
               <span className="numeric text-caption text-text-muted">
-                {formatiereProzent(terpen.konzentrationProzent, 2)}
+                {formatiereProzent(terpen.konzentrationProzent, 2, sprache)}
               </span>
             ) : null}
 
             {dominant ? (
-              <span className="text-caption tracking-wide text-text-muted">dominant</span>
+              <span className="text-caption tracking-wide text-text-muted">{w.katalog.karte.dominant}</span>
             ) : null}
           </li>
         );

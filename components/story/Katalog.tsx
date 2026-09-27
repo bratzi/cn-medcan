@@ -8,6 +8,7 @@ import { leererFilter } from "@/lib/query/filter";
 import { istFachkreis } from "@/lib/query/fachkreis";
 import { ladeStrainListe } from "@/lib/query/strains";
 import { sicher } from "@/lib/sicher";
+import { holeSprache, holeWoerterbuch } from "@/lib/i18n";
 
 const ANZAHL = 6;
 
@@ -20,6 +21,7 @@ const EINSTIEGE = [
 
 /** Sechs Produkte als wischbare Reihe. Preise nur mit Freigabe (bestehende Logik). */
 async function Reihe() {
+  const [w, sprache] = await Promise.all([holeWoerterbuch(), holeSprache()]);
   const liste = await sicher(
     async () => ladeStrainListe(leererFilter(), await istFachkreis()),
     null,
@@ -53,7 +55,7 @@ async function Reihe() {
     >
       {eintraege.map((strain) => (
         <li key={strain.id} className="flex w-72 shrink-0 snap-start sm:w-88">
-          <ProduktCard strain={strain} className="w-full" />
+          <ProduktCard strain={strain} w={w} sprache={sprache} className="w-full" />
         </li>
       ))}
     </ul>

@@ -14,3 +14,18 @@ export type Woerterbuch = Breit<typeof de>;
 
 export type MeldungSchluessel = keyof Woerterbuch["meldung"];
 export type Meldung = { schluessel: MeldungSchluessel; parameter?: Record<string, string | number> };
+
+/**
+ * Alles, was die Aroma-Bausteine im Browser brauchen (Karte, Erkundung,
+ * Sweet Spot, Leisten): nur diese Ausschnitte, nicht das ganze Woerterbuch.
+ */
+export type AromaTexte = {
+  aroma: Woerterbuch["aroma"];
+  schema: Woerterbuch["schema"];
+  geschmack: Woerterbuch["label"]["geschmack"];
+  sprache: import("./sprache-kern").Sprache;
+};
+
+export function aromaTexte(w: Woerterbuch, sprache: import("./sprache-kern").Sprache): AromaTexte {
+  return { aroma: w.aroma, schema: w.schema, geschmack: w.label.geschmack, sprache };
+}

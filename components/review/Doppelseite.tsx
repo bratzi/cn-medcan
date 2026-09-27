@@ -9,14 +9,16 @@ import { herstellerProfil } from "@/lib/aromakarte";
 import { eintragAnker, eintragHref, type EintragDaten } from "@/components/review/eintrag";
 import { Badge, buttonKlassen, type BadgeVariante } from "@/components/ui";
 import { cn } from "@/lib/cn";
-import { formatiereDatum, formatiereProzent } from "@/lib/format";
+import { formatiereDatum, formatiereProzent, formatiereZahl } from "@/lib/format";
+import type { Sprache } from "@/lib/i18n/sprache-kern";
+import type { Woerterbuch } from "@/lib/i18n/typen";
+import { t } from "@/lib/i18n/text";
+import { aromaTexte } from "@/lib/i18n/typen";
 import {
   BEWERTUNGS_ACHSEN,
   bewerteFeuchtigkeit,
   type FeuchtigkeitsEinordnung,
 } from "@/lib/query/bewertung";
-
-const NOTE = new Intl.NumberFormat("de-DE", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
 
 /**
  * "Wirkung" nur im vollstaendigen Eintrag (Spec TP1 Abschnitt 2): gross
@@ -24,12 +26,20 @@ const NOTE = new Intl.NumberFormat("de-DE", { minimumFractionDigits: 1, maximumF
  */
 const AUSZUG_ACHSEN = BEWERTUNGS_ACHSEN.filter((achse) => achse.key !== "wirkung");
 
-const FEUCHTIGKEIT: Record<FeuchtigkeitsEinordnung, { variante: BadgeVariante; label: string }> = {
-  optimal: { variante: "success", label: "Restfeuchte optimal" },
-  zu_trocken: { variante: "warning", label: "Zu trocken" },
-  zu_feucht: { variante: "danger", label: "Zu feucht" },
-  unbekannt: { variante: "neutral", label: "Restfeuchte unbekannt" },
+const FEUCHTIGKEIT: Record<FeuchtigkeitsEinordnung, BadgeVariante> = {
+  optimal: "success",
+  zu_trocken: "warning",
+  zu_feucht: "danger",
+  unbekannt: "neutral",
 };
+
+/** Hinweistext je Einordnung im Woerterbuch (schema.feuchte). */
+const FEUCHTE_HINWEIS = {
+  optimal: "optimal",
+  zu_trocken: "zuTrocken",
+  zu_feucht: "zuFeucht",
+  unbekannt: "unbekannt",
+} as const satisfies Record<FeuchtigkeitsEinordnung, string>;
 
 export type DoppelseiteProps = {
   eintrag: EintragDaten;
@@ -38,6 +48,8 @@ export type DoppelseiteProps = {
   ueberschrift: "h2" | "h3";
   /** Nur die Startseite: Ziele fuer die StoryBuehne (aufschlagen, hochzaehlen). */
   story?: boolean;
+  w: Woerterbuch;
+  sprache: Sprache;
 };
 
 /**
@@ -47,27 +59,28 @@ export type DoppelseiteProps = {
  * auf einer Seite stehen koennen und "Ganzen Eintrag lesen" darauf springt.
  */
 /** Zwei Serien: was die Herstellerangaben erwarten lassen und was diese Bewertung gefunden hat. */
-function aromaSerien(eintrag: EintragDaten): AromaSerie[] {
+function aromaSerien(eintrag: EintragDaten, w: Woerterbuch): AromaSerie[] {
   const hersteller = herstellerProfil(eintrag.terpene);
   const serien: AromaSerie[] = [];
-  if (hersteller) serien.push({ name: "Laut Hersteller", ton: "gruen", matrix: hersteller });
-  serien.push({ name: "Diese Bewertung", ton: "lila", matrix: eintrag.geschmacksMatrix });
+  if (hersteller) serien.push({ name: w.aroma.serien.hersteller, ton: "gruen", matrix: hersteller });
+  serien.push({ name: w.review.dieseBewertung, ton: "lila", matrix: eintrag.geschmacksMatrix });
   return serien;
 }
 
-export function Doppelseite({ eintrag, umfang, ueberschrift: Ueberschrift, story = false }: DoppelseiteProps) {
+export function Doppelseite({ eintrag, umfang, ueberschrift: Ueberschrift, story = false, w, sprache }: DoppelseiteProps) {
+  const texte = aromaTexte(w, sprache);
   const voll = umfang === "voll";
   const achsen = voll ? BEWERTUNGS_ACHSEN : AUSZUG_ACHSEN;
   const anker = eintragAnker(eintrag.id);
   const titelId = `${anker}-titel`;
   const datum = (
-    <time dateTime={eintrag.erstelltAm.toISOString()}>{formatiereDatum(eintrag.erstelltAm)}</time>
+    <time dateTime={eintrag.erstelltAm.toISOString()}>{formatiereDatum(eintrag.erstelltAm, sprache)}</time>
   );
   const feuchtigkeit = bewerteFeuchtigkeit(eintrag.feuchtigkeitProzent);
   const feuchtigkeitsText =
     eintrag.feuchtigkeitProzent === null
-      ? FEUCHTIGKEIT[feuchtigkeit.einordnung].label
-      : `${FEUCHTIGKEIT[feuchtigkeit.einordnung].label} · ${formatiereProzent(eintrag.feuchtigkeitProzent)}`;
+      ? w.review.feuchte[feuchtigkeit.einordnung]
+      : `${w.review.feuchte[feuchtigkeit.einordnung]} · ${formatiereProzent(eintrag.feuchtigkeitProzent, 1, sprache)}`;
   // Kein Ersatz aus der Umgebung: nur eine gueltige eigene URL ergibt ein Reel.
   const reel = voll && baueEmbedUrl(eintrag.instagramReelUrl) ? eintrag.instagramReelUrl : null;
 
@@ -86,19 +99,18 @@ export function Doppelseite({ eintrag, umfang, ueberschrift: Ueberschrift, story
           {voll ? (
             eintrag.chargenNr ? (
               <>
-                {"Charge "}
-                <span className="numeric">{eintrag.chargenNr}</span>
+                <span className="numeric">{t(w.bluete.charge, { charge: eintrag.chargenNr })}</span>
               </>
             ) : (
-              "Charge nicht angegeben"
+              w.review.chargeFehlt
             )
           ) : (
             <>
               {datum}
               {eintrag.chargenNr ? (
                 <>
-                  {" · Charge "}
-                  <span className="numeric">{eintrag.chargenNr}</span>
+                  {" · "}
+                  <span className="numeric">{t(w.bluete.charge, { charge: eintrag.chargenNr })}</span>
                 </>
               ) : null}
             </>
@@ -114,29 +126,37 @@ export function Doppelseite({ eintrag, umfang, ueberschrift: Ueberschrift, story
             story ? "text-kapitel" : "text-h2 font-medium",
           )}
         >
-          {voll ? <>Bewertung vom {datum}</> : eintrag.handelsname}
+          {voll ? (
+            <>
+              {w.review.bewertungVom.split("{datum}")[0]}
+              {datum}
+              {w.review.bewertungVom.split("{datum}")[1]}
+            </>
+          ) : (
+            eintrag.handelsname
+          )}
         </Ueberschrift>
 
         {/* Blütenbild zwischen Titel und Noten über die volle Breite der Karte,
             dasselbe wie in der Blütenübersicht (Nutzer 2026-09-26). */}
-        {eintrag.bildPfad ? <KartenBild bildPfad={eintrag.bildPfad} /> : null}
+        {eintrag.bildPfad ? <KartenBild bildPfad={eintrag.bildPfad} symbolbild={w.aroma.sortenKopf.symbolbild} /> : null}
 
         <dl className="grid grid-cols-2 gap-6">
           {achsen.map((achse) => (
             // gap-1 = 4px: Bezeichnung und Wert sind ein Paar.
             <div key={achse.key} className="flex flex-col gap-1">
-              <dt className="text-small text-text-muted">{achse.label}</dt>
+              <dt className="text-small text-text-muted">{w.schema.noten[achse.key].label}</dt>
               <dd className="numeric text-h1 text-text">
                 <span
                   aria-hidden="true"
                   {...(story ? { "data-zaehler": "", "data-ziel": eintrag[achse.key] } : {})}
                 >
-                  {NOTE.format(eintrag[achse.key])}
+                  {formatiereZahl(eintrag[achse.key], 1, sprache)}
                 </span>
                 <span aria-hidden="true" className="text-h3 text-text-muted">
                   {" / 5"}
                 </span>
-                <span className="sr-only">{`${NOTE.format(eintrag[achse.key])} von 5`}</span>
+                <span className="sr-only">{`${formatiereZahl(eintrag[achse.key], 1, sprache)} ${w.bluete.vonFuenf}`}</span>
               </dd>
             </div>
           ))}
@@ -144,22 +164,23 @@ export function Doppelseite({ eintrag, umfang, ueberschrift: Ueberschrift, story
 
         {voll ? (
           <div className="flex flex-col items-start gap-2">
-            <Badge variante={FEUCHTIGKEIT[feuchtigkeit.einordnung].variante}>{feuchtigkeitsText}</Badge>
-            <p className="max-w-[56ch] text-small text-text-muted">{feuchtigkeit.hinweis}</p>
+            <Badge variante={FEUCHTIGKEIT[feuchtigkeit.einordnung]}>{feuchtigkeitsText}</Badge>
+            <p className="max-w-[56ch] text-small text-text-muted">{w.schema.feuchte[FEUCHTE_HINWEIS[feuchtigkeit.einordnung]]}</p>
           </div>
         ) : null}
       </div>
 
       <div className="flex min-w-0 flex-col gap-8 p-6 sm:p-12">
-        <AromaKarte titel="Aroma-Karte" terpene={eintrag.terpene} serien={aromaSerien(eintrag)} />
+        <AromaKarte terpene={eintrag.terpene} serien={aromaSerien(eintrag, w)} texte={texte} />
         {voll ? (
           <SweetSpot
-            titel="Terpen-Intensität"
+            titel={w.aroma.erkundung.intensitaet}
+            texte={texte}
             zeilen={Object.entries(eintrag.terpenIntensitaet).map(([terpen, wert]) => ({ terpen, wert }))}
           />
         ) : null}
         {voll ? (
-          <BeschaffenheitsLeiste werte={eintrag.beschaffenheit} feuchte={null} />
+          <BeschaffenheitsLeiste werte={eintrag.beschaffenheit} feuchte={null} texte={texte} />
         ) : null}
         {eintrag.notiz ? (
           <p
@@ -175,7 +196,7 @@ export function Doppelseite({ eintrag, umfang, ueberschrift: Ueberschrift, story
         {voll ? null : (
           <p className="mt-auto">
             <Link href={eintragHref(eintrag.slug, eintrag.id)} className={buttonKlassen("secondary", "md")}>
-              Ganzen Eintrag lesen
+              {w.review.ganzerEintrag}
             </Link>
           </p>
         )}

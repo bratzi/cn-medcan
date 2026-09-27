@@ -25,6 +25,27 @@ const UMGESTELLT: string[] = [
   "components/auth/fehlertexte.ts",
   "app/zugang/page.tsx",
   "components/zugang/ZugangFelder.tsx",
+  // Welle 2: Katalog und Aroma-Baum
+  "app/blueten/page.tsx",
+  "app/blueten/[slug]/page.tsx",
+  "components/produkt/FilterLeiste.tsx",
+  "components/produkt/AktiveFilter.tsx",
+  "components/produkt/ProduktCard.tsx",
+  "components/produkt/Titelblatt.tsx",
+  "components/produkt/TerpenChips.tsx",
+  "components/produkt/CannabinoidBar.tsx",
+  "lib/labels.ts",
+  "components/review/AromaErkundung.tsx",
+  "components/review/AromaKarte.tsx",
+  "components/review/SortenKopf.tsx",
+  "components/review/SweetSpot.tsx",
+  "components/review/GesamteindruckLeiste.tsx",
+  "components/review/BeschaffenheitsLeiste.tsx",
+  "components/review/Aufklaerung.tsx",
+  "components/review/CommunityStimmen.tsx",
+  "components/review/Inhaltsverzeichnis.tsx",
+  "components/review/Doppelseite.tsx",
+  "components/review/erkundung-daten.ts",
 ];
 
 const ERLAUBT: string[] = ["Book of Terpz", "Deutsch"];

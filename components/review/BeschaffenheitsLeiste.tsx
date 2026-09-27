@@ -1,7 +1,10 @@
 import { cn } from "@/lib/cn";
 import { BESCHAFFENHEIT_ACHSEN, type Beschaffenheit } from "@/lib/query/bewertung";
+import { formatiereWert } from "@/lib/format";
+import type { AromaTexte } from "@/lib/i18n/typen";
+import { mehrzahl, t } from "@/lib/i18n/text";
 
-const WERT = new Intl.NumberFormat("de-DE", { maximumFractionDigits: 1 });
+
 
 /** Restfeuchte: Skala 0 bis 20 %, gut ist 8 bis 13 %. */
 const FEUCHTE_MAX = 20;
@@ -143,17 +146,20 @@ export function BeschaffenheitsLeiste({
   werte,
   feuchte,
   anzahl,
-  titel = "Beschaffenheit",
+  titel,
   className,
   bedienung,
   ohneTitel = false,
+  texte,
 }: BeschaffenheitsWerte & {
   titel?: string;
   className?: string;
   bedienung?: BeschaffenheitsBedienung;
   /** In der Erkundung trägt der Schritt die Überschrift; hier dann nur die Anzahl. */
   ohneTitel?: boolean;
+  texte: AromaTexte;
 }) {
+  const aus = mehrzahl(texte.sprache, texte.aroma.ausBewertungen, anzahl ?? 0);
   const achsen = BESCHAFFENHEIT_ACHSEN.filter((achse) => werte[achse.key] !== undefined || bedienung);
   const zeigeFeuchte = feuchte !== null || bedienung;
   if (achsen.length === 0 && !zeigeFeuchte) return null;
@@ -164,15 +170,15 @@ export function BeschaffenheitsLeiste({
       {ohneTitel ? (
         anzahl ? (
           <p className="text-caption text-text-muted">
-            aus {anzahl} {anzahl === 1 ? "Bewertung" : "Bewertungen"}
+            {aus}
           </p>
         ) : null
       ) : (
         <h3 className="font-buch text-h3 font-medium text-text">
-          {titel}
+          {titel ?? texte.aroma.beschaffenheit.titel}
           {anzahl ? (
             <span className="ml-2 text-caption font-normal text-text-muted">
-              aus {anzahl} {anzahl === 1 ? "Bewertung" : "Bewertungen"}
+              {aus}
             </span>
           ) : null}
         </h3>
@@ -181,11 +187,11 @@ export function BeschaffenheitsLeiste({
         {zeigeFeuchte ? (
           <div className="flex flex-col gap-1.5">
             <div className="flex items-baseline justify-between gap-4">
-              <dt className="text-small font-medium text-text">Restfeuchte</dt>
-              <dd className="numeric text-small text-text-muted">{WERT.format(feuchteWert)} %</dd>
+              <dt className="text-small font-medium text-text">{texte.aroma.beschaffenheit.restfeuchte}</dt>
+              <dd className="numeric text-small text-text-muted">{formatiereWert(feuchteWert, texte.sprache)} %</dd>
             </div>
             <Spur
-              label="Restfeuchte in Prozent"
+              label={texte.aroma.beschaffenheit.restfeuchteProzent}
               wert={feuchteWert}
               max={FEUCHTE_MAX}
               schritt={0.1}
@@ -194,9 +200,9 @@ export function BeschaffenheitsLeiste({
               aendern={bedienung ? (wert) => bedienung.aendern("feuchte", wert) : undefined}
             />
             <div aria-hidden="true" className="flex justify-between text-caption text-text-muted">
-              <span>trocken</span>
-              <span>8 bis 13 % gut</span>
-              <span>feucht</span>
+              <span>{texte.aroma.beschaffenheit.trocken}</span>
+              <span>{texte.aroma.beschaffenheit.gut}</span>
+              <span>{texte.aroma.beschaffenheit.feucht}</span>
             </div>
           </div>
         ) : null}
@@ -206,11 +212,11 @@ export function BeschaffenheitsLeiste({
           return (
             <div key={achse.key} className="flex flex-col gap-1.5">
               <div className="flex items-baseline justify-between gap-4">
-                <dt className="text-small font-medium text-text">{achse.label}</dt>
-                <dd className="numeric text-small text-text-muted">{WERT.format(wert)} von 5</dd>
+                <dt className="text-small font-medium text-text">{texte.schema.beschaffenheit[achse.key].label}</dt>
+                <dd className="numeric text-small text-text-muted">{t(texte.aroma.vonFuenf, { wert: formatiereWert(wert, texte.sprache) })}</dd>
               </div>
               <Spur
-                label={`${achse.label}, 0 bis 5`}
+                label={t(texte.aroma.skala, { label: texte.schema.beschaffenheit[achse.key].label, von: 0, bis: 5 })}
                 wert={wert}
                 max={5}
                 schritt={0.1}
@@ -218,8 +224,8 @@ export function BeschaffenheitsLeiste({
                 aendern={bedienung ? (neu) => bedienung.aendern(achse.key, neu) : undefined}
               />
               <div aria-hidden="true" className="flex justify-between text-caption text-text-muted">
-                <span>{achse.links}</span>
-                <span>{achse.rechts}</span>
+                <span>{texte.schema.beschaffenheit[achse.key].links}</span>
+                <span>{texte.schema.beschaffenheit[achse.key].rechts}</span>
               </div>
             </div>
           );

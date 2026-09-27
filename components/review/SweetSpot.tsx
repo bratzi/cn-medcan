@@ -1,6 +1,10 @@
 "use client";
 
 import { cn } from "@/lib/cn";
+import { formatiereWert } from "@/lib/format";
+import { terpenAnzeige } from "@/lib/i18n/terpen";
+import { t } from "@/lib/i18n/text";
+import type { AromaTexte } from "@/lib/i18n/typen";
 import { INTENSITAETS_STUFEN } from "@/lib/query/bewertung";
 
 export type SweetSpotZeile = {
@@ -13,12 +17,10 @@ export type SweetSpotZeile = {
   ergaenzt?: boolean;
 };
 
-const WERT = new Intl.NumberFormat("de-DE", { maximumFractionDigits: 1 });
-
-function einordnung(wert: number): string {
-  if (wert < 0.5) return "nicht geschmeckt";
+function einordnung(wert: number, texte: AromaTexte): string {
+  if (wert < 0.5) return texte.schema.nichtGeschmeckt;
   const naechste = INTENSITAETS_STUFEN.reduce((a, b) => (Math.abs(b.wert - wert) < Math.abs(a.wert - wert) ? b : a));
-  return naechste.label;
+  return texte.schema.intensitaet[naechste.wert];
 }
 
 /** Skala 0 bis 5, wie die Aroma-Karte; 0 heißt nicht geschmeckt. */
@@ -61,19 +63,26 @@ export function SweetSpot({
   titel,
   bedienung,
   quer = false,
+  texte,
 }: {
   zeilen: readonly SweetSpotZeile[];
   titel?: string;
   bedienung?: Bedienung;
   /** Spuren als Karten nebeneinander, horizontal scrollbar (wie der Katalog). */
   quer?: boolean;
+  texte: AromaTexte;
 }) {
+  const sprache = texte.sprache;
+  const sw = texte.aroma.sweetSpot;
+  const [vorMarke, nachMarke] = sw.ueberschrift.split("{marke}");
   if (zeilen.length === 0) return null;
   return (
     <section className="flex flex-col gap-4">
       <h3 className={cn("font-buch font-medium text-text text-balance", quer ? "text-h3" : "text-h2")}>
         {titel ? `${titel}: ` : null}
-        <em className="farbverlauf hand-betont">Sweet Spot</em> gesucht
+        {vorMarke}
+        <em className="farbverlauf hand-betont">{sw.marke}</em>
+        {nachMarke}
       </h3>
       <ul
         className={
@@ -97,12 +106,12 @@ export function SweetSpot({
             >
               <div className={cn("flex gap-4", quer ? "flex-col gap-0" : "items-baseline justify-between")}>
                 <span className={cn("font-buch font-medium text-text", quer ? "text-body" : "text-h3")}>
-                  {zeile.terpen}
-                  {zeile.ergaenzt ? <span className="ml-2 text-caption font-normal text-text-muted">nicht angegeben</span> : null}
+                  {terpenAnzeige(zeile.terpen, sprache)}
+                  {zeile.ergaenzt ? <span className="ml-2 text-caption font-normal text-text-muted">{sw.nichtAngegeben}</span> : null}
                 </span>
                 <span className="numeric text-small text-text-muted">
-                  {`${einordnung(gezeigt)} · ${WERT.format(gezeigt)} von 5`}
-                  {bedienung && zeile.anzahl ? ` · Community ${WERT.format(zeile.wert)}` : ""}
+                  {`${einordnung(gezeigt, texte)} · ${t(texte.aroma.vonFuenf, { wert: formatiereWert(gezeigt, sprache) })}`}
+                  {bedienung && zeile.anzahl ? ` · ${t(sw.community, { wert: formatiereWert(zeile.wert, sprache) })}` : ""}
                   {!bedienung && zeile.anzahl ? ` · ${zeile.anzahl} Bewertungen` : ""}
                 </span>
               </div>
@@ -152,8 +161,8 @@ export function SweetSpot({
                     max={MAX}
                     step={0.1}
                     value={gezeigt}
-                    aria-label={`${zeile.terpen}: Intensität`}
-                    aria-valuetext={`${einordnung(gezeigt)}, ${WERT.format(gezeigt)} von 5`}
+                    aria-label={t(sw.intensitaetVon, { terpen: terpenAnzeige(zeile.terpen, sprache) })}
+                    aria-valuetext={`${einordnung(gezeigt, texte)}, ${t(texte.aroma.vonFuenf, { wert: formatiereWert(gezeigt, sprache) })}`}
                     onFocus={() => bedienung.aktivieren?.(zeile.terpen)}
                     onBlur={() => bedienung.aktivieren?.(null)}
                     onChange={(e) => bedienung.aendern(zeile.terpen, Number(e.target.value))}
@@ -162,13 +171,13 @@ export function SweetSpot({
                 ) : null}
               </div>
               <div aria-hidden="true" className="relative h-5 text-caption text-text-muted">
-                <span className="absolute left-0">{quer ? "schwach" : "zu schwach"}</span>
+                <span className="absolute left-0">{quer ? sw.schwach : texte.schema.intensitaet[1]}</span>
                 {quer ? null : (
                   <span className="absolute -translate-x-1/2" style={{ left: `${anteil(3)}%` }}>
-                    Sweet Spot
+                    {sw.marke}
                   </span>
                 )}
-                <span className="absolute right-0">{quer ? "stark" : "zu stark"}</span>
+                <span className="absolute right-0">{quer ? sw.stark : texte.schema.intensitaet[5]}</span>
               </div>
             </li>
           );

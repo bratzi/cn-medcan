@@ -2,17 +2,26 @@ import Link from "next/link";
 
 import { eintragHref, type EintragDaten } from "@/components/review/eintrag";
 import { namenLinkKlassen } from "@/components/ui/textlink";
-import { formatiereDatum } from "@/lib/format";
+import { formatiereDatum, formatiereZahl } from "@/lib/format";
+import type { Sprache } from "@/lib/i18n/sprache-kern";
+import type { Woerterbuch } from "@/lib/i18n/typen";
+import { t } from "@/lib/i18n/text";
 import { berechneGesamtnote } from "@/lib/query/bewertung";
-
-const NOTE = new Intl.NumberFormat("de-DE", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
 
 /**
  * Alle Eintraege wie hinten in einem Buch (Spec TP2 4.1): Name, Punktlinie,
  * Note. Die ganze Zeile ist Klickflaeche (after:inset-0), der Name ist der
  * eine Link. Er springt auf den vollstaendigen Eintrag der Produktseite.
  */
-export function Inhaltsverzeichnis({ eintraege }: { eintraege: readonly EintragDaten[] }) {
+export function Inhaltsverzeichnis({
+  eintraege,
+  w,
+  sprache,
+}: {
+  eintraege: readonly EintragDaten[];
+  w: Woerterbuch;
+  sprache: Sprache;
+}) {
   return (
     <ol className="flex flex-col">
       {eintraege.map((eintrag) => (
@@ -28,16 +37,16 @@ export function Inhaltsverzeichnis({ eintraege }: { eintraege: readonly EintragD
             </Link>
             <span aria-hidden="true" className="min-w-8 grow border-b border-dotted border-border-strong" />
             <span className="numeric shrink-0 text-h2 font-normal text-text">
-              {NOTE.format(berechneGesamtnote(eintrag))}
-              <span className="sr-only"> von 5</span>
+              {formatiereZahl(berechneGesamtnote(eintrag), 1, sprache)}
+              <span className="sr-only"> {w.bluete.vonFuenf}</span>
             </span>
           </div>
           <p className="mt-2 text-small text-text-muted">
-            <time dateTime={eintrag.erstelltAm.toISOString()}>{formatiereDatum(eintrag.erstelltAm)}</time>
+            <time dateTime={eintrag.erstelltAm.toISOString()}>{formatiereDatum(eintrag.erstelltAm, sprache)}</time>
             {eintrag.chargenNr ? (
               <>
-                {" · Charge "}
-                <span className="numeric">{eintrag.chargenNr}</span>
+                {" · "}
+                <span className="numeric">{t(w.bluete.charge, { charge: eintrag.chargenNr })}</span>
               </>
             ) : null}
           </p>

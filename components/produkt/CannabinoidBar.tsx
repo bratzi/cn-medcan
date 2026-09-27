@@ -1,5 +1,8 @@
 import { cn } from "@/lib/cn";
-import { formatiereProzent, formatiereProzentSpanne, type Dezimalwert } from "@/lib/format";
+import { formatiereProzent, formatiereProzentSpanne, formatiereZahl, type Dezimalwert } from "@/lib/format";
+import type { Sprache } from "@/lib/i18n/sprache-kern";
+import type { Woerterbuch } from "@/lib/i18n/typen";
+import { t } from "@/lib/i18n/text";
 
 /** Obergrenze der Skala: reale Blueten liegen unterhalb von 35 % THC. */
 const SKALA_MAX = 35;
@@ -9,6 +12,8 @@ export type CannabinoidBarProps = {
   thcMax?: Dezimalwert | null;
   cbdMin?: Dezimalwert | null;
   cbdMax?: Dezimalwert | null;
+  w: Woerterbuch;
+  sprache: Sprache;
   className?: string;
 };
 
@@ -22,20 +27,20 @@ function prozentAnteil(wert: number): number {
   return Math.min(Math.max((wert / SKALA_MAX) * 100, 0), 100);
 }
 
-/** de-DE-Zahl ohne Einheit, fuer das `aria-label`, das "Prozent" ausschreibt. */
-const VORLESE_FORMATTER = new Intl.NumberFormat("de-DE", {
-  minimumFractionDigits: 1,
-  maximumFractionDigits: 1,
-});
-
-/** Textbeschreibung fuer das `aria-label`: ohne Sonderzeichen, gut vorlesbar. */
-function beschreibe(name: string, min: number | null, max: number | null): string {
+/** Textbeschreibung fuer das `aria-label`: ohne Sonderzeichen, gut vorlesbar ("Prozent" ausgeschrieben). */
+function beschreibe(
+  texte: Woerterbuch["katalog"]["cannabinoide"],
+  sprache: Sprache,
+  name: string,
+  min: number | null,
+  max: number | null,
+): string {
   const von = min ?? max;
   const bis = max ?? min;
-  if (von === null || bis === null) return `${name} keine Angabe`;
-  if (bis < 1) return `${name} unter ${VORLESE_FORMATTER.format(1)} Prozent`;
-  if (von === bis) return `${name} ${VORLESE_FORMATTER.format(von)} Prozent`;
-  return `${name} ${VORLESE_FORMATTER.format(von)} bis ${VORLESE_FORMATTER.format(bis)} Prozent`;
+  if (von === null || bis === null) return t(texte.keineAngabe, { name });
+  if (bis < 1) return t(texte.unter, { name, wert: formatiereZahl(1, 1, sprache) });
+  if (von === bis) return t(texte.wert, { name, wert: formatiereZahl(von, 1, sprache) });
+  return t(texte.spanne, { name, von: formatiereZahl(von, 1, sprache), bis: formatiereZahl(bis, 1, sprache) });
 }
 
 type ZeileProps = {
@@ -43,9 +48,11 @@ type ZeileProps = {
   min: number | null;
   max: number | null;
   balkenKlasse: string;
+  sprache: Sprache;
+  keineAngabe: string;
 };
 
-function Zeile({ name, min, max, balkenKlasse }: ZeileProps) {
+function Zeile({ name, min, max, balkenKlasse, sprache, keineAngabe }: ZeileProps) {
   const von = min ?? max;
   const bis = max ?? min;
   const start = von === null ? 0 : prozentAnteil(von);
@@ -72,10 +79,10 @@ function Zeile({ name, min, max, balkenKlasse }: ZeileProps) {
       {/* Die Zahl steht immer daneben, der Balken ist nur Redundanz. */}
       <span className="numeric w-32 shrink-0 text-right text-small text-text">
         {von === null && bis === null
-          ? "k. A."
+          ? keineAngabe
           : bis !== null && bis < 1
-            ? `< ${formatiereProzent(1)}`
-            : formatiereProzentSpanne(von, bis)}
+            ? `< ${formatiereProzent(1, 1, sprache)}`
+            : formatiereProzentSpanne(von, bis, 1, sprache)}
       </span>
     </div>
   );
@@ -90,6 +97,8 @@ export function CannabinoidBar({
   thcMax,
   cbdMin,
   cbdMax,
+  w,
+  sprache,
   className,
 }: CannabinoidBarProps) {
   const thcVon = zuZahl(thcMin);
@@ -97,7 +106,8 @@ export function CannabinoidBar({
   const cbdVon = zuZahl(cbdMin);
   const cbdBis = zuZahl(cbdMax);
 
-  const label = `${beschreibe("THC", thcVon, thcBis)}, ${beschreibe("CBD", cbdVon, cbdBis)}`;
+  const texte = w.katalog.cannabinoide;
+  const label = `${beschreibe(texte, sprache, "THC", thcVon, thcBis)}, ${beschreibe(texte, sprache, "CBD", cbdVon, cbdBis)}`;
 
   return (
     <div
@@ -105,9 +115,9 @@ export function CannabinoidBar({
       aria-label={label}
       className={cn("flex flex-col gap-2", className)}
     >
-      <Zeile name="THC" min={thcVon} max={thcBis} balkenKlasse="bg-text" />
-      <Zeile name="CBD" min={cbdVon} max={cbdBis} balkenKlasse="bg-text-muted" />
-      <p className="text-caption text-text-muted">Skala 0 bis 35&nbsp;% des Gewichts</p>
+      <Zeile name="THC" min={thcVon} max={thcBis} balkenKlasse="bg-text" sprache={sprache} keineAngabe={w.bluete.fakten.keineAngabe} />
+      <Zeile name="CBD" min={cbdVon} max={cbdBis} balkenKlasse="bg-text-muted" sprache={sprache} keineAngabe={w.bluete.fakten.keineAngabe} />
+      <p className="text-caption text-text-muted">{texte.skala}</p>
     </div>
   );
 }

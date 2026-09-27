@@ -9,6 +9,7 @@ import { TerpenChips } from "@/components/produkt/TerpenChips";
 import { Titelblatt, type TitelblattProps } from "@/components/produkt/Titelblatt";
 import { CommunityStimmen } from "@/components/review/CommunityStimmen";
 import type { ReviewEintrag } from "@/lib/query/strains";
+import { de } from "@/lib/i18n/de";
 
 const BASIS: TitelblattProps = {
   handelsname: "Nebelharz 22 (fiktiv)",
@@ -21,6 +22,8 @@ const BASIS: TitelblattProps = {
   cbdMin: 0,
   cbdMax: 1,
   meineBewertung: null,
+  w: de,
+  sprache: "de",
 };
 const zeige = (props: TitelblattProps) => renderToStaticMarkup(createElement(Titelblatt, props));
 const TAG = new Date("2026-09-12T12:00:00Z");
@@ -78,10 +81,10 @@ function stimme(id: string, note: number, notiz: string | null): ReviewEintrag {
 }
 
 test("Community: Mittel in Einzahl und Mehrzahl als ganze Sätze", () => {
-  const eine = renderToStaticMarkup(createElement(CommunityStimmen, { bewertungen: [stimme("c1", 3, null)], mittel: 3 }));
+  const eine = renderToStaticMarkup(createElement(CommunityStimmen, { bewertungen: [stimme("c1", 3, null)], mittel: 3, w: de, sprache: "de" }));
   assert.match(eine, /Aus einer Bewertung: <span class="numeric">3,0<\/span> von 5/);
   const zwei = renderToStaticMarkup(
-    createElement(CommunityStimmen, { bewertungen: [stimme("c1", 3, "Gut."), stimme("c2", 4, null)], mittel: 3.5 }),
+    createElement(CommunityStimmen, { bewertungen: [stimme("c1", 3, "Gut."), stimme("c2", 4, null)], mittel: 3.5, w: de, sprache: "de" }),
   );
   assert.match(zwei, /Mittel aus 2 Bewertungen: <span class="numeric">3,5<\/span> von 5/);
   assert.equal(zwei.match(/<li/g)?.length, 2);
@@ -89,10 +92,10 @@ test("Community: Mittel in Einzahl und Mehrzahl als ganze Sätze", () => {
 });
 
 test("Datengrafik in Tinte, Terpen-Chips als Pillen ohne Grün", () => {
-  const balken = renderToStaticMarkup(createElement(CannabinoidBar, { thcMin: 20, thcMax: 24, cbdMin: 0, cbdMax: 1 }));
+  const balken = renderToStaticMarkup(createElement(CannabinoidBar, { thcMin: 20, thcMax: 24, cbdMin: 0, cbdMax: 1, w: de, sprache: "de" }));
   assert.doesNotMatch(balken, /bg-accent/);
   const chips = renderToStaticMarkup(
-    createElement(TerpenChips, { terpene: [{ name: "Myrcen", rang: 1 }, { name: "Limonen", rang: 2 }] }),
+    createElement(TerpenChips, { terpene: [{ name: "Myrcen", rang: 1 }, { name: "Limonen", rang: 2 }], w: de, sprache: "de" }),
   );
   assert.doesNotMatch(chips, /accent/);
   assert.match(chips, /rounded-full/);

@@ -4,10 +4,10 @@ import { Bild } from "@/components/medien/Bild";
 import { Badge } from "@/components/ui";
 import { einzelLinkKlassen } from "@/components/ui/textlink";
 import type { Darreichungsform, KultivarTyp } from "@/db/enums";
-import { formatiereDatum, formatiereProzentSpanne } from "@/lib/format";
-import { darreichungsformLabel, kultivarTypLabel } from "@/lib/labels";
-
-const NOTE = new Intl.NumberFormat("de-DE", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+import { formatiereDatum, formatiereProzentSpanne, formatiereZahl } from "@/lib/format";
+import type { Sprache } from "@/lib/i18n/sprache-kern";
+import type { Woerterbuch } from "@/lib/i18n/typen";
+import { t } from "@/lib/i18n/text";
 
 export type MeineBewertung = { note: number; erstelltAm: Date; chargenNr: string | null };
 
@@ -25,6 +25,8 @@ export type TitelblattProps = {
   meineBewertung: MeineBewertung | null;
   /** Referenzbild (Medien-Id) oder null; ein Symbolbild, nicht die echte Sorte. */
   bild?: string | null;
+  w: Woerterbuch;
+  sprache: Sprache;
 };
 
 /**
@@ -51,53 +53,56 @@ export function Titelblatt(props: TitelblattProps) {
           <p className="font-buch text-h3 font-medium italic text-text">{props.kultivarName}</p>
         ) : null}
         <div className="flex flex-wrap gap-2">
-          <Badge variante="neutral">{kultivarTypLabel[props.kultivarTyp]}</Badge>
-          <Badge variante="neutral">{darreichungsformLabel[props.darreichungsform]}</Badge>
+          <Badge variante="neutral">{props.w.label.kultivarTyp[props.kultivarTyp]}</Badge>
+          <Badge variante="neutral">{props.w.label.darreichungsform[props.darreichungsform]}</Badge>
         </div>
         <p className="numeric text-h3 font-normal text-text">
-          <span className="whitespace-nowrap">{`THC ${formatiereProzentSpanne(props.thcMin, props.thcMax)}`}</span>
+          <span className="whitespace-nowrap">{`THC ${formatiereProzentSpanne(props.thcMin, props.thcMax, 1, props.sprache)}`}</span>
           <span aria-hidden="true">{" · "}</span>
           <span className="sr-only">, </span>
-          <span className="whitespace-nowrap">{`CBD ${formatiereProzentSpanne(props.cbdMin, props.cbdMax)}`}</span>
+          <span className="whitespace-nowrap">{`CBD ${formatiereProzentSpanne(props.cbdMin, props.cbdMax, 1, props.sprache)}`}</span>
         </p>
       </div>
       {props.bild ? (
         <figure className="flex w-full max-w-xs flex-col items-end gap-2 justify-self-center lg:w-72">
           <Bild id={props.bild} dekorativ sizes="(min-width: 1024px) 288px, 80vw" className="h-auto w-full" />
-          <figcaption className="text-caption text-text-muted">Symbolbild</figcaption>
+          <figcaption className="text-caption text-text-muted">{props.w.bluete.titelblatt.symbolbild}</figcaption>
         </figure>
       ) : null}
-      <MeineNote bewertung={props.meineBewertung} />
+      <MeineNote bewertung={props.meineBewertung} w={props.w} sprache={props.sprache} />
     </section>
   );
 }
 
 /** "Meine Note" ist die Gesamtnote der neuesten eigenen Bewertung, kein Mittel mit der Community. */
-function MeineNote({ bewertung }: { bewertung: MeineBewertung | null }) {
+function MeineNote({ bewertung, w, sprache }: { bewertung: MeineBewertung | null; w: Woerterbuch; sprache: Sprache }) {
+  const texte = w.bluete.titelblatt;
   if (!bewertung) {
     return (
       <div className="flex flex-col gap-2 lg:items-end lg:text-right">
-        <p className="text-h3 font-normal text-text">Noch nicht von uns getestet.</p>
+        <p className="text-h3 font-normal text-text">{texte.nichtGetestet}</p>
         <Link href="/umfragen" className={einzelLinkKlassen()}>
-          Zur Abstimmung
+          {texte.zurAbstimmung}
         </Link>
       </div>
     );
   }
 
-  const datum = formatiereDatum(bewertung.erstelltAm);
+  const datum = formatiereDatum(bewertung.erstelltAm, sprache);
   return (
     <div className="flex flex-col gap-2 lg:items-end lg:text-right">
-      <p className="text-small text-text-muted">Unsere Note</p>
+      <p className="text-small text-text-muted">{texte.unsereNote}</p>
       <p className="numeric text-kapitel font-normal text-text">
-        {NOTE.format(bewertung.note)}
+        {formatiereZahl(bewertung.note, 1, sprache)}
         <span aria-hidden="true" className="text-h3 text-text-muted">
           {" / 5"}
         </span>
-        <span className="sr-only"> von 5</span>
+        <span className="sr-only"> {w.bluete.vonFuenf}</span>
       </p>
       <p className="text-small text-text-muted">
-        {bewertung.chargenNr ? `Bewertet am ${datum}, Charge ${bewertung.chargenNr}` : `Bewertet am ${datum}`}
+        {bewertung.chargenNr
+          ? t(texte.bewertetAmCharge, { datum, charge: bewertung.chargenNr })
+          : t(texte.bewertetAm, { datum })}
       </p>
     </div>
   );

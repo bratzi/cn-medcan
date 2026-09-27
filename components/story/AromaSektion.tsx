@@ -9,12 +9,16 @@ import { UeberlaufWort, ueberlaufPlatz } from "@/components/story/UeberlaufWort"
 import { buttonKlassen } from "@/components/ui";
 import { ladeAromaVorzeige, ladeTerpenKatalog } from "@/lib/query/strains";
 import { sicher } from "@/lib/sicher";
+import { holeSprache, holeWoerterbuch } from "@/lib/i18n";
+import { aromaTexte } from "@/lib/i18n/typen";
 
 /** Lädt die vorgeführte Sorte; ohne Daten entfällt die Sektion still (Spec 13.3). */
 async function Inhalt() {
-  const [sorte, katalog] = await Promise.all([
+  const [sorte, katalog, w, sprache] = await Promise.all([
     sicher(() => ladeAromaVorzeige(), null, "Aroma-Karte der Startseite"),
     sicher(() => ladeTerpenKatalog(), [], "Terpen-Katalog"),
+    holeWoerterbuch(),
+    holeSprache(),
   ]);
   if (!sorte) return null;
 
@@ -35,11 +39,14 @@ async function Inhalt() {
             cbdMin={sorte.cbdMinProzent}
             cbdMax={sorte.cbdMaxProzent}
             terpene={sorte.terpene}
+            w={w}
+            sprache={sprache}
           />
         }
         terpene={sorte.terpene}
         katalog={katalog}
-        {...erkundungsDaten(sorte.terpene, sorte.reviews)}
+        {...erkundungsDaten(sorte.terpene, sorte.reviews, w.aroma.serien)}
+        texte={aromaTexte(w, sprache)}
         // Zwischen Qualität und Fazit, eins höher als zuvor am Sektionsende (Nutzer 2026-09-26).
         zwischenruf={<Schlagwort satz="stimmt das?" ton="gruen" oben="top-0 -translate-y-1/2" />}
       >

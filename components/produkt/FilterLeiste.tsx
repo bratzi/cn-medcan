@@ -5,11 +5,9 @@ import { useCallback, useEffect, useId, useState, useTransition } from "react";
 
 import { Button, Field, RangeSlider, Select } from "@/components/ui";
 import { formatierePreisProGramm, formatiereProzent } from "@/lib/format";
-import {
-  darreichungsformLabel,
-  geschmacksKategorieLabel,
-  kultivarTypLabel,
-} from "@/lib/labels";
+import type { Sprache } from "@/lib/i18n/sprache-kern";
+import { mehrzahl, t } from "@/lib/i18n/text";
+import type { Woerterbuch } from "@/lib/i18n/typen";
 import {
   SORTIERUNGEN,
   istFilterLeer,
@@ -24,14 +22,12 @@ type Props = {
   filter: StrainFilter;
   /** Trefferzahl, wird per aria-live angekuendigt. */
   gesamt: number;
-};
-
-const SORTIERUNG_LABEL: Record<Sortierung, string> = {
-  relevanz: "Relevanz",
-  thc_absteigend: "THC absteigend",
-  thc_aufsteigend: "THC aufsteigend",
-  preis_aufsteigend: "Preis aufsteigend",
-  name: "Handelsname A–Z",
+  texte: Woerterbuch["katalog"]["leiste"];
+  /** Filter, Zuruecksetzen: gemeinsam mit der Seite. */
+  titel: string;
+  zuruecksetzen: string;
+  labels: Pick<Woerterbuch["label"], "kultivarTyp" | "darreichungsform" | "geschmack">;
+  sprache: Sprache;
 };
 
 /** Verzoegerung fuer Freitext und Slider in Millisekunden. */
@@ -91,7 +87,7 @@ function umschalten<T>(werte: readonly T[], wert: T, aktiv: boolean): T[] {
   return aktiv ? [...werte, wert] : werte.filter((eintrag) => eintrag !== wert);
 }
 
-export function FilterLeiste({ facetten, filter, gesamt }: Props) {
+export function FilterLeiste({ facetten, filter, gesamt, texte, titel, zuruecksetzen, labels, sprache }: Props) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -159,24 +155,24 @@ export function FilterLeiste({ facetten, filter, gesamt }: Props) {
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <h2 className="text-h3 text-text">Filter</h2>
+        <h2 className="text-h3 text-text">{titel}</h2>
         {!istFilterLeer(filter) ? (
           <Button
             variante="ghost"
             groesse="sm"
             onClick={() => schreibe({ ...leererFilter(), sortierung: filter.sortierung })}
           >
-            Alle Filter zurücksetzen
+            {zuruecksetzen}
           </Button>
         ) : null}
       </div>
 
       {/* Ein einziger Live-Bereich fuer Trefferzahl und Ladezustand. */}
       <p role="status" aria-live="polite" className="text-small text-text-muted">
-        {pending ? "Filter wird angewendet …" : `${gesamt} Treffer`}
+        {pending ? texte.wirdAngewendet : mehrzahl(sprache, texte.treffer, gesamt)}
       </p>
 
-      <Field id={`${basisId}-q`} label="Handelsname oder Genetik">
+      <Field id={`${basisId}-q`} label={texte.suche}>
         {(attribute) => (
           <input
             {...attribute}
@@ -193,7 +189,7 @@ export function FilterLeiste({ facetten, filter, gesamt }: Props) {
       </Field>
 
       <fieldset className="flex flex-col gap-1 border-0 p-0">
-        <legend className="text-small font-medium text-text">Kultivar-Typ</legend>
+        <legend className="text-small font-medium text-text">{texte.kultivarTyp}</legend>
         {facetten.typen.map((facette) => (
           <label key={facette.wert} className={CHECKBOX_ZEILE}>
             <input
@@ -208,7 +204,7 @@ export function FilterLeiste({ facetten, filter, gesamt }: Props) {
               className={CHECKBOX}
             />
             <span>
-              {kultivarTypLabel[facette.wert]}{" "}
+              {labels.kultivarTyp[facette.wert]}{" "}
               <span className="numeric text-text-muted">({facette.anzahl})</span>
             </span>
           </label>
@@ -216,7 +212,7 @@ export function FilterLeiste({ facetten, filter, gesamt }: Props) {
       </fieldset>
 
       <fieldset className="flex flex-col gap-1 border-0 p-0">
-        <legend className="text-small font-medium text-text">Darreichungsform</legend>
+        <legend className="text-small font-medium text-text">{texte.darreichungsform}</legend>
         {facetten.formen.map((facette) => (
           <label key={facette.wert} className={CHECKBOX_ZEILE}>
             <input
@@ -231,7 +227,7 @@ export function FilterLeiste({ facetten, filter, gesamt }: Props) {
               className={CHECKBOX}
             />
             <span>
-              {darreichungsformLabel[facette.wert]}{" "}
+              {labels.darreichungsform[facette.wert]}{" "}
               <span className="numeric text-text-muted">({facette.anzahl})</span>
             </span>
           </label>
@@ -239,7 +235,7 @@ export function FilterLeiste({ facetten, filter, gesamt }: Props) {
       </fieldset>
 
       <fieldset className="flex flex-col gap-1 border-0 p-0">
-        <legend className="text-small font-medium text-text">Dominanter Geschmack</legend>
+        <legend className="text-small font-medium text-text">{texte.geschmack}</legend>
         {/* Achsen ohne Treffer bleiben stehen und werden nur deaktiviert,
             damit die Leiste beim Filtern nicht die Hoehe wechselt. */}
         {facetten.geschmaecker.map((facette) => (
@@ -260,7 +256,7 @@ export function FilterLeiste({ facetten, filter, gesamt }: Props) {
               className={CHECKBOX}
             />
             <span>
-              {geschmacksKategorieLabel[facette.wert]}{" "}
+              {labels.geschmack[facette.wert]}{" "}
               <span className="numeric text-text-muted">({facette.anzahl})</span>
             </span>
           </label>
@@ -268,11 +264,11 @@ export function FilterLeiste({ facetten, filter, gesamt }: Props) {
       </fieldset>
 
       <RangeSlider
-        label="THC-Spanne"
+        label={texte.thc}
         min={facetten.thcSpanne.min}
         max={facetten.thcSpanne.max}
         wert={[entwurf.thcMin, entwurf.thcMax]}
-        formatiere={(n) => formatiereProzent(n)}
+        formatiere={(n) => formatiereProzent(n, 1, sprache)}
         onChange={([min, max]) =>
           setEntwurf((alt) => ({ ...alt, thcMin: min, thcMax: max }))
         }
@@ -281,8 +277,8 @@ export function FilterLeiste({ facetten, filter, gesamt }: Props) {
       {preisVerfuegbar ? (
         <Field
           id={`${basisId}-preis`}
-          label="Höchstpreis pro Gramm"
-          hinweis={`Aktuell: ${formatierePreisProGramm(aktuellerPreis)}`}
+          label={texte.hoechstpreis}
+          hinweis={t(texte.aktuell, { preis: formatierePreisProGramm(aktuellerPreis, sprache) })}
         >
           {(attribute) => (
             <input
@@ -292,7 +288,7 @@ export function FilterLeiste({ facetten, filter, gesamt }: Props) {
               max={preisMax}
               step={PREIS_SCHRITT}
               value={aktuellerPreis}
-              aria-valuetext={formatierePreisProGramm(aktuellerPreis)}
+              aria-valuetext={formatierePreisProGramm(aktuellerPreis, sprache)}
               onChange={(event) =>
                 setEntwurf((alt) => ({ ...alt, preisMax: Number(event.target.value) }))
               }
@@ -302,13 +298,12 @@ export function FilterLeiste({ facetten, filter, gesamt }: Props) {
         </Field>
       ) : (
         <p className="text-small text-text-muted">
-          Preise sind nur für Fachkreise sichtbar. Ein Preisfilter steht deshalb
-          nicht zur Verfügung.
+          {texte.keinPreis}
         </p>
       )}
 
       <fieldset className="flex flex-col gap-1 border-0 p-0">
-        <legend className="text-small font-medium text-text">Verfügbarkeit</legend>
+        <legend className="text-small font-medium text-text">{texte.verfuegbarkeit}</legend>
         <label className={CHECKBOX_ZEILE}>
           <input
             type="checkbox"
@@ -316,13 +311,13 @@ export function FilterLeiste({ facetten, filter, gesamt }: Props) {
             onChange={(event) => setzeSofort({ nurVerfuegbar: event.target.checked })}
             className={CHECKBOX}
           />
-          <span>Nur verfügbare Blüten</span>
+          <span>{texte.nurVerfuegbar}</span>
         </label>
       </fieldset>
 
       {facetten.apotheken.length > 0 ? (
         <fieldset className="flex flex-col gap-1 border-0 p-0">
-          <legend className="text-small font-medium text-text">Apotheke</legend>
+          <legend className="text-small font-medium text-text">{texte.apotheke}</legend>
           <div
             className={
               zeigeApothekenScroll
@@ -358,11 +353,11 @@ export function FilterLeiste({ facetten, filter, gesamt }: Props) {
 
       <Select
         id={`${basisId}-sortierung`}
-        label="Sortierung"
+        label={texte.sortierung}
         value={filter.sortierung}
         optionen={SORTIERUNGEN.map((wert) => ({
           wert,
-          label: SORTIERUNG_LABEL[wert],
+          label: texte.sortierungen[wert],
         }))}
         onChange={(event) =>
           setzeSofort({ sortierung: event.target.value as Sortierung })

@@ -7,6 +7,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { Doppelseite, type DoppelseiteProps } from "@/components/review/Doppelseite";
 import { alsEintrag, eintragHref, type EintragDaten } from "@/components/review/eintrag";
 import { leereGeschmacksMatrix } from "@/lib/query/bewertung";
+import { de } from "@/lib/i18n/de";
 
 const MATRIX = { diesel: 1, zitrus: 0, erdig: 5, suess: 1, wuerzig: 4, blumig: 0, holzig: 2, kraeutrig: 2, fruchtig: 0, minzig: 0 };
 
@@ -33,7 +34,8 @@ function eintrag(teil: Partial<EintragDaten> = {}): EintragDaten {
   };
 }
 
-const zeige = (props: DoppelseiteProps) => renderToStaticMarkup(createElement(Doppelseite, props));
+const zeige = (props: Omit<DoppelseiteProps, "w" | "sprache">) =>
+  renderToStaticMarkup(createElement(Doppelseite, { ...props, w: de, sprache: "de" }));
 
 test("Auszug: vier Noten ohne Wirkung, Link springt auf den Eintrag", () => {
   const html = zeige({ eintrag: eintrag(), umfang: "auszug", ueberschrift: "h3" });

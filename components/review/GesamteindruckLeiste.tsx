@@ -1,8 +1,11 @@
 import { Spur } from "@/components/review/BeschaffenheitsLeiste";
 import { cn } from "@/lib/cn";
 import { BEWERTUNGS_ACHSEN } from "@/lib/query/bewertung";
+import { formatiereWert } from "@/lib/format";
+import type { AromaTexte } from "@/lib/i18n/typen";
+import { mehrzahl, t } from "@/lib/i18n/text";
 
-const WERT = new Intl.NumberFormat("de-DE", { maximumFractionDigits: 1 });
+
 
 /**
  * Die allgemeinen Noten auf der Bewertungskarte, unabhängig von den Terpenen.
@@ -38,6 +41,7 @@ export function GesamteindruckLeiste({
   bedienung,
   mitWirkung = false,
   ohneTitel = false,
+  texte,
 }: Gesamteindruck & {
   className?: string;
   bedienung?: {
@@ -48,7 +52,9 @@ export function GesamteindruckLeiste({
   mitWirkung?: boolean;
   /** In der Erkundung trägt der Schritt die Überschrift; hier dann nur die Anzahl. */
   ohneTitel?: boolean;
+  texte: AromaTexte;
 }) {
+  const aus = mehrzahl(texte.sprache, texte.aroma.ausBewertungen, anzahl);
   const achsen = mitWirkung ? BEWERTUNGS_ACHSEN : EINDRUCK_ACHSEN;
   const mittelWerte: Partial<Record<NotenKey, number>> = werte;
   if (!bedienung && Object.keys(werte).length === 0) return null;
@@ -57,15 +63,15 @@ export function GesamteindruckLeiste({
       {ohneTitel ? (
         anzahl > 0 ? (
           <p className="text-caption text-text-muted">
-            aus {anzahl} {anzahl === 1 ? "Bewertung" : "Bewertungen"}
+            {aus}
           </p>
         ) : null
       ) : (
         <h3 className="font-buch text-h3 font-medium text-text">
-          Gesamteindruck
+          {texte.aroma.gesamteindruck}
           {anzahl > 0 ? (
             <span className="ml-2 text-caption font-normal text-text-muted">
-              aus {anzahl} {anzahl === 1 ? "Bewertung" : "Bewertungen"}
+              {aus}
             </span>
           ) : null}
         </h3>
@@ -78,11 +84,11 @@ export function GesamteindruckLeiste({
           return (
             <div key={achse.key} className="flex flex-col gap-1.5">
               <div className="flex items-baseline justify-between gap-4">
-                <dt className="text-small font-medium text-text">{achse.label}</dt>
-                <dd className="numeric text-small text-text-muted">{WERT.format(wert)} von 5</dd>
+                <dt className="text-small font-medium text-text">{texte.schema.noten[achse.key].label}</dt>
+                <dd className="numeric text-small text-text-muted">{t(texte.aroma.vonFuenf, { wert: formatiereWert(wert, texte.sprache) })}</dd>
               </div>
               <Spur
-                label={`${achse.label}, 1 bis 5`}
+                label={t(texte.aroma.skala, { label: texte.schema.noten[achse.key].label, von: 1, bis: 5 })}
                 wert={wert - 1}
                 max={4}
                 schritt={1}

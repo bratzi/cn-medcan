@@ -35,7 +35,9 @@ import {
   formatiereProzent,
   formatiereProzentSpanne,
 } from "@/lib/format";
-import { bestrahlungLabel, darreichungsformLabel, kultivarTypLabel } from "@/lib/labels";
+import { holeSprache, holeWoerterbuch, type Sprache, type Woerterbuch } from "@/lib/i18n";
+import { mehrzahl, t } from "@/lib/i18n/text";
+import { aromaTexte } from "@/lib/i18n/typen";
 import { parseGeschmacksMatrix, teileBewertungen, verdichteGeschmacksMatrix, mittleTerpenIntensitaet, parseBeschaffenheit, parseTerpenIntensitaet } from "@/lib/query/bewertung";
 import { mittleBeschaffenheit } from "@/components/review/BeschaffenheitsLeiste";
 import { mittleNoten } from "@/components/review/GesamteindruckLeiste";
@@ -52,11 +54,11 @@ export const dynamic = "force-dynamic";
 
 export async function generateMetadata({ params }: PageProps<"/blueten/[slug]">): Promise<Metadata> {
   const { slug } = await params;
-  const handelsname = await ladeStrainTitel(slug);
-  if (!handelsname) return { title: "Blüte nicht gefunden" };
+  const [handelsname, w] = await Promise.all([ladeStrainTitel(slug), holeWoerterbuch()]);
+  if (!handelsname) return { title: w.bluete.nichtGefunden };
   return {
     title: handelsname,
-    description: `Meine Bewertung, Cannabinoid- und Terpenprofil, Chargen und gemeldete Apothekenbestände zu ${handelsname}.`,
+    description: t(w.bluete.metaBeschreibung, { handelsname }),
   };
 }
 
@@ -78,26 +80,28 @@ function unternehmenWert(eintrag: UnternehmenEintrag): ReactNode {
   );
 }
 
-function produktFakten(strain: StrainDetail): Fakt[] {
+function produktFakten(strain: StrainDetail, w: Woerterbuch): Fakt[] {
+  const f = w.bluete.fakten;
+  const ka = f.keineAngabe;
   return [
-    { begriff: "Handelsname", wert: strain.handelsname },
-    { begriff: "Kultivar", wert: strain.kultivarName ?? "k. A." },
-    { begriff: "Kultivartyp", wert: kultivarTypLabel[strain.kultivarTyp] },
-    { begriff: "Darreichungsform", wert: darreichungsformLabel[strain.darreichungsform] },
-    { begriff: "Genetik", wert: strain.genetik ?? "k. A." },
-    { begriff: "PZN", wert: strain.pzn ? <span className="numeric">{strain.pzn}</span> : "k. A." },
+    { begriff: f.handelsname, wert: strain.handelsname },
+    { begriff: f.kultivar, wert: strain.kultivarName ?? ka },
+    { begriff: f.kultivartyp, wert: w.label.kultivarTyp[strain.kultivarTyp] },
+    { begriff: f.darreichungsform, wert: w.label.darreichungsform[strain.darreichungsform] },
+    { begriff: f.genetik, wert: strain.genetik ?? ka },
+    { begriff: f.pzn, wert: strain.pzn ? <span className="numeric">{strain.pzn}</span> : ka },
     {
-      begriff: "Bestrahlung",
-      wert: bestrahlungLabel[strain.bestrahlung as Bestrahlung] ?? strain.bestrahlung,
+      begriff: f.bestrahlung,
+      wert: w.label.bestrahlung[strain.bestrahlung as Bestrahlung] ?? strain.bestrahlung,
     },
-    { begriff: "Anbauland", wert: strain.anbauland ?? "k. A." },
-    { begriff: "Hersteller", wert: strain.hersteller ? unternehmenWert(strain.hersteller) : "k. A." },
-    { begriff: "Importeur", wert: strain.importeur ? unternehmenWert(strain.importeur) : "k. A." },
+    { begriff: f.anbauland, wert: strain.anbauland ?? ka },
+    { begriff: f.hersteller, wert: strain.hersteller ? unternehmenWert(strain.hersteller) : ka },
+    { begriff: f.importeur, wert: strain.importeur ? unternehmenWert(strain.importeur) : ka },
     {
-      begriff: "Verschreibungspflicht",
-      wert: strain.verschreibungspflichtig ? "Verschreibungspflichtig" : "Nicht verschreibungspflichtig",
+      begriff: f.verschreibungspflicht,
+      wert: strain.verschreibungspflichtig ? f.verschreibungspflichtig : f.nichtVerschreibungspflichtig,
     },
-    { begriff: "BfArM-Listung", wert: strain.bfarmGelistet ? "Gelistet" : "Nicht gelistet" },
+    { begriff: f.bfarm, wert: strain.bfarmGelistet ? f.gelistet : f.nichtGelistet },
   ];
 }
 
@@ -107,19 +111,20 @@ function produktFakten(strain: StrainDetail): Fakt[] {
  * desselben Handelsnamens koennen deutlich abweichen, und genau das ist die
  * Information.
  */
-function Chargentabelle({ chargen }: { chargen: StrainDetail["chargen"] }) {
+function Chargentabelle({ chargen, w, sprache }: { chargen: StrainDetail["chargen"]; w: Woerterbuch; sprache: Sprache }) {
+  const texte = w.bluete;
   if (chargen.length === 0) {
-    return <p className="text-body text-text-muted">Für diese Blüte liegen keine Chargendaten vor.</p>;
+    return <p className="text-body text-text-muted">{texte.keineChargen}</p>;
   }
   return (
-    <Table caption="Analysewerte je Charge" captionVersteckt>
+    <Table caption={texte.chargenTabelle} captionVersteckt>
       <TableHead>
         <TableRow>
-          <TableHeaderCell>Charge</TableHeaderCell>
-          <TableHeaderCell numerisch>THC gemessen</TableHeaderCell>
-          <TableHeaderCell numerisch>CBD gemessen</TableHeaderCell>
-          <TableHeaderCell>Analysedatum</TableHeaderCell>
-          <TableHeaderCell>Verfall</TableHeaderCell>
+          <TableHeaderCell>{texte.spalten.charge}</TableHeaderCell>
+          <TableHeaderCell numerisch>{texte.spalten.thc}</TableHeaderCell>
+          <TableHeaderCell numerisch>{texte.spalten.cbd}</TableHeaderCell>
+          <TableHeaderCell>{texte.spalten.analyse}</TableHeaderCell>
+          <TableHeaderCell>{texte.spalten.verfall}</TableHeaderCell>
         </TableRow>
       </TableHead>
       <TableBody>
@@ -128,10 +133,10 @@ function Chargentabelle({ chargen }: { chargen: StrainDetail["chargen"] }) {
             <TableCell>
               <span className="numeric">{charge.chargenNr}</span>
             </TableCell>
-            <TableCell numerisch>{formatiereProzent(charge.thcIst)}</TableCell>
-            <TableCell numerisch>{formatiereProzent(charge.cbdIst)}</TableCell>
-            <TableCell>{formatiereDatum(charge.analysedatum)}</TableCell>
-            <TableCell>{formatiereDatum(charge.verfallsdatum)}</TableCell>
+            <TableCell numerisch>{formatiereProzent(charge.thcIst, 1, sprache)}</TableCell>
+            <TableCell numerisch>{formatiereProzent(charge.cbdIst, 1, sprache)}</TableCell>
+            <TableCell>{formatiereDatum(charge.analysedatum, sprache)}</TableCell>
+            <TableCell>{formatiereDatum(charge.verfallsdatum, sprache)}</TableCell>
           </TableRow>
         ))}
       </TableBody>
@@ -144,8 +149,9 @@ function Chargentabelle({ chargen }: { chargen: StrainDetail["chargen"] }) {
  * Bewertungen, Geschmacksprofil, Community, dann die Produktdaten. Leere
  * Abschnitte entfallen, statt einen Leerzustand zu zeigen (Spec 13.3).
  */
-async function ProduktInhalt({ slug }: { slug: string }) {
+async function ProduktInhalt({ slug, w, sprache }: { slug: string; w: Woerterbuch; sprache: Sprache }) {
   const fachkreis = await istFachkreis();
+  const texte = w.bluete;
   const [strain, katalog] = await Promise.all([ladeStrainDetail(slug, fachkreis), ladeTerpenKatalog()]);
   if (!strain) notFound();
 
@@ -156,9 +162,9 @@ async function ProduktInhalt({ slug }: { slug: string }) {
   const hersteller = herstellerProfil(strain.terpene);
   const intensitaet = mittleTerpenIntensitaet(strain.reviews.map((review) => parseTerpenIntensitaet(review.terpenIntensitaet)));
   const aromaSerien: AromaSerie[] = [
-    ...(hersteller ? [{ name: "Laut Hersteller", ton: "gruen" as const, matrix: hersteller }] : []),
+    ...(hersteller ? [{ name: w.aroma.serien.hersteller, ton: "gruen" as const, matrix: hersteller }] : []),
     ...(geschmack.anzahlBewertungen >= 1
-      ? [{ name: "Laut Community", ton: "lila" as const, matrix: geschmack.matrix }]
+      ? [{ name: w.aroma.serien.community, ton: "lila" as const, matrix: geschmack.matrix }]
       : []),
   ];
 
@@ -175,6 +181,8 @@ async function ProduktInhalt({ slug }: { slug: string }) {
         cbdMin={strain.cbdMinProzent}
         cbdMax={strain.cbdMaxProzent}
         bild={blueteBild(strain.herstellerBildPfad)}
+        w={w}
+        sprache={sprache}
         meineBewertung={
           neuesteEigene && meineNote !== null
             ? { note: meineNote, erstelltAm: neuesteEigene.erstelltAm, chargenNr: neuesteEigene.chargenNr }
@@ -186,12 +194,12 @@ async function ProduktInhalt({ slug }: { slug: string }) {
           eine Sorte nur zeitweise nach vorn. */}
       <p className="mt-8 flex flex-wrap items-center gap-4">
         <Link href={`/bewerten/${strain.slug}`} className={buttonKlassen("primary", "md")}>
-          Diese Sorte bewerten
+          {texte.bewerten}
         </Link>
         <a href="#community-titel" className="text-small text-accent underline underline-offset-4 hover:text-accent-hover">
           {community.length > 0
-            ? `${community.length} ${community.length === 1 ? "Bewertung" : "Bewertungen"} der Community lesen`
-            : "Noch keine Community-Bewertung"}
+            ? mehrzahl(sprache, texte.communityLesen, community.length)
+            : texte.nochKeineCommunity}
         </a>
       </p>
 
@@ -202,10 +210,10 @@ async function ProduktInhalt({ slug }: { slug: string }) {
       {eigene.length > 0 ? (
         <section aria-labelledby="meine-titel" className={cn(ABSTAND, "flex flex-col gap-8")}>
           <h2 id="meine-titel" className={ABSCHNITT_TITEL}>
-            {eigene.length === 1 ? "Unsere Bewertung" : "Unsere Bewertungen"}
+            {mehrzahl(sprache, texte.unsereBewertung, eigene.length)}
           </h2>
           {eigene.map((review) => (
-            <Doppelseite key={review.id} eintrag={alsEintrag(review, produkt)} umfang="voll" ueberschrift="h3" />
+            <Doppelseite key={review.id} eintrag={alsEintrag(review, produkt)} umfang="voll" ueberschrift="h3" w={w} sprache={sprache} />
           ))}
         </section>
       ) : null}
@@ -213,12 +221,12 @@ async function ProduktInhalt({ slug }: { slug: string }) {
       {aromaSerien.length > 0 ? (
         <section aria-labelledby="geschmack-titel" className={cn(ABSTAND, "flex flex-col gap-4")}>
           <h2 id="geschmack-titel" className={ABSCHNITT_TITEL}>
-            Stimmt das Profil?
+            {texte.profilFrage}
           </h2>
           <p className="max-w-[68ch] text-body text-text-muted text-pretty">
             {geschmack.anzahlBewertungen >= 1
-              ? `Grün ist, was die Herstellerangaben erwarten lassen, Lila, was ${geschmack.anzahlBewertungen} Bewertungen gefunden haben.`
-              : "Grün ist, was die Herstellerangaben erwarten lassen. Mit den ersten Bewertungen kommt der Vergleich dazu."}
+              ? t(texte.profilMitCommunity, { anzahl: geschmack.anzahlBewertungen })
+              : texte.profilOhneCommunity}
           </p>
           <div className="mt-4">
             <AromaErkundung
@@ -226,6 +234,7 @@ async function ProduktInhalt({ slug }: { slug: string }) {
               terpene={strain.terpene}
               serien={aromaSerien}
               katalog={katalog}
+              texte={aromaTexte(w, sprache)}
               treue={mittlereHerstellerTreue(hersteller, strain.reviews.map((review) => parseGeschmacksMatrix(review.geschmacksMatrix)))}
               zeilen={Object.entries(intensitaet).map(([terpen, { mittel, anzahl }]) => ({ terpen, wert: mittel, anzahl }))}
               gesamteindruck={mittleNoten(strain.reviews)}
@@ -239,55 +248,59 @@ async function ProduktInhalt({ slug }: { slug: string }) {
           </div>
           <p className="mt-8">
             <Link href={`/bewerten/${strain.slug}`} className={buttonKlassen("primary", "md")}>
-              Selbst bewerten
+              {texte.selbstBewerten}
             </Link>
           </p>
-          <Aufklaerung />
+          <Aufklaerung texte={w.aroma.aufklaerung} />
         </section>
       ) : null}
 
       {community.length > 0 && communityMittel !== null ? (
         <div className={ABSTAND}>
-          <CommunityStimmen bewertungen={community} mittel={communityMittel} />
+          <CommunityStimmen bewertungen={community} mittel={communityMittel} w={w} sprache={sprache} />
         </div>
       ) : (
         <section aria-labelledby="community-titel" className={cn(ABSTAND, "flex flex-col items-start gap-4")}>
           <h2 id="community-titel" className={ABSCHNITT_TITEL}>
-            Stimmen der Community
+            {texte.communityTitel}
           </h2>
           <p className="max-w-[60ch] text-body text-text-muted text-pretty">
-            Zu {strain.handelsname} gibt es noch keine Bewertung aus der Community. Gib die erste ab: Aussehen, Geruch,
-            Geschmack, Konsistenz, Aroma und Beschaffenheit, gebunden an deine Charge.
+            {t(texte.communityLeer, { handelsname: strain.handelsname })}
           </p>
           <Link href={`/bewerten/${strain.slug}`} className={buttonKlassen("secondary", "md")}>
-            Erste Bewertung abgeben
+            {texte.ersteBewertung}
           </Link>
         </section>
       )}
 
       <section aria-labelledby="daten-titel" className={ABSTAND}>
         <h2 id="daten-titel" className={ABSCHNITT_TITEL}>
-          Angaben zur Blüte
+          {texte.angaben}
         </h2>
         <div className="mt-8 grid grid-cols-1 gap-12 lg:grid-cols-2">
-          <Faktenliste zeilen={produktFakten(strain)} />
+          <Faktenliste zeilen={produktFakten(strain, w)} />
           <div className="flex flex-col gap-12">
             <div>
-              <h3 className="text-h3 text-text">Wirkstoffspannen</h3>
+              <h3 className="text-h3 text-text">{texte.wirkstoffspannen}</h3>
               <CannabinoidBar
                 className="mt-4"
                 thcMin={strain.thcMinProzent}
                 thcMax={strain.thcMaxProzent}
                 cbdMin={strain.cbdMinProzent}
                 cbdMax={strain.cbdMaxProzent}
+                w={w}
+                sprache={sprache}
               />
               <p className="mt-4 text-caption text-text-muted">
-                {`Herstellerangabe: ${formatiereProzentSpanne(strain.thcMinProzent, strain.thcMaxProzent)} THC, ${formatiereProzentSpanne(strain.cbdMinProzent, strain.cbdMaxProzent)} CBD.`}
+                {t(texte.herstellerangabe, {
+                  thc: formatiereProzentSpanne(strain.thcMinProzent, strain.thcMaxProzent, 1, sprache),
+                  cbd: formatiereProzentSpanne(strain.cbdMinProzent, strain.cbdMaxProzent, 1, sprache),
+                })}
               </p>
             </div>
             <div>
-              <h3 className="text-h3 text-text">Terpenprofil</h3>
-              <TerpenChips className="mt-4" terpene={strain.terpene} />
+              <h3 className="text-h3 text-text">{texte.terpenprofil}</h3>
+              <TerpenChips className="mt-4" terpene={strain.terpene} w={w} sprache={sprache} />
             </div>
           </div>
         </div>
@@ -295,20 +308,19 @@ async function ProduktInhalt({ slug }: { slug: string }) {
 
       <section aria-labelledby="chargen-titel" className={ABSTAND}>
         <h2 id="chargen-titel" className={ABSCHNITT_TITEL}>
-          Chargen
+          {texte.chargen}
         </h2>
         <p className="mt-2 max-w-[68ch] text-small text-text-muted">
-          Gemessene Werte einzelner Chargen. Sie können innerhalb der zulässigen Toleranz von der deklarierten
-          Spanne abweichen.
+          {texte.chargenSatz}
         </p>
         <div className="mt-8">
-          <Chargentabelle chargen={strain.chargen} />
+          <Chargentabelle chargen={strain.chargen} w={w} sprache={sprache} />
         </div>
       </section>
 
       {/* Apotheken, Bestände und Preise seit 2026-09-25 nur in Aussicht (Nutzer). */}
       <p className={cn(ABSTAND, "text-caption text-text-muted")}>
-        {`Apotheken und Preise: in Aussicht. Stand der Angaben: ${formatiereDatum(strain.aktualisiertAm)}.`}
+        {t(texte.aussicht, { datum: formatiereDatum(strain.aktualisiertAm, sprache) })}
       </p>
     </>
   );
@@ -316,15 +328,16 @@ async function ProduktInhalt({ slug }: { slug: string }) {
 
 export default async function ProduktDetailPage({ params }: PageProps<"/blueten/[slug]">) {
   const { slug } = await params;
+  const [w, sprache] = await Promise.all([holeWoerterbuch(), holeSprache()]);
   return (
     <div className={cn(seitenRahmen(), "pt-16 pb-24 sm:pt-24")}>
       <p className="mb-8">
         <Link href="/blueten" className={einzelLinkKlassen()}>
-          Alle Blüten
+          {w.bluete.alleBlueten}
         </Link>
       </p>
       {/* Bewusst ohne Suspense-Grenze: notFound() antwortet so mit 404, der Inhalt ist ohne JavaScript lesbar und #eintrag-… existiert beim Sprung. */}
-      <ProduktInhalt slug={slug} />
+      <ProduktInhalt slug={slug} w={w} sprache={sprache} />
     </div>
   );
 }

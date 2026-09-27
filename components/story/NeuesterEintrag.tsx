@@ -4,12 +4,14 @@ import { Suspense } from "react";
 
 import { Doppelseite } from "@/components/review/Doppelseite";
 import { DoppelseitenSkelett } from "@/components/story/Skelette";
+import { holeSprache, holeWoerterbuch } from "@/lib/i18n";
 import { Schlagwort } from "@/components/story/Schlagwort";
 import { buttonKlassen } from "@/components/ui";
 import { neuesteRedaktionelleReview, type RedaktionelleReview } from "@/lib/query/reviews";
 
 /** Lädt den Eintrag; leer und Fehler haben eigene Sätze (Spec 5.2). */
 async function EintragInhalt() {
+  const [w, sprache] = await Promise.all([holeWoerterbuch(), holeSprache()]);
   let review: RedaktionelleReview | null;
   try {
     review = await neuesteRedaktionelleReview();
@@ -37,7 +39,7 @@ async function EintragInhalt() {
     );
   }
 
-  return <Doppelseite eintrag={review} umfang="auszug" ueberschrift="h3" story />;
+  return <Doppelseite eintrag={review} umfang="auszug" ueberschrift="h3" story w={w} sprache={sprache} />;
 }
 
 /** Sektion 5 (Spec 5.1): der Höhepunkt der Story. */
