@@ -3,7 +3,9 @@ import { COOKIE_NAME, tokenPruefen } from "@/lib/gate";
 
 /**
  * Sperrt die gesamte Seite hinter das Entwicklungs-Passwort.
- * Ausgenommen: die Login-Route selbst und statische Assets.
+ * Ausgenommen: die Login-Route selbst, Impressum und Datenschutzerklaerung
+ * (muessen ohne Huerde erreichbar sein, § 5 DDG, Art. 13 DSGVO) und
+ * statische Assets.
  *
  * Ohne gesetztes SITE_PASSWORD bleibt die Seite offen - so blockiert ein
  * fehlendes Secret nicht die lokale Entwicklung. In Produktion muss das
@@ -25,13 +27,15 @@ export async function proxy(request: NextRequest) {
 
 export const config = {
   matcher: [
-    // Alles ausser Login-Route, Next-Interna und Dateien mit Endung.
+    // Alles ausser Login-Route, Impressum, Datenschutz, Next-Interna und
+    // Dateien mit Endung. Das Muster muss ein Literal bleiben (Next liest es
+    // statisch), deshalb stehen die Pfade hier und nicht aus lib/rechtliches.ts.
     //
     // Der Punkt MUSS als "\\." geschrieben werden. Ein einfaches "\." ist in
     // einem JS-String nur ".", das Muster waere dann ".*." und wuerde auf
     // jeden nicht leeren Pfad passen - die Negation haette also ALLES ausser
     // "/" vom Gate ausgenommen. Genau dieser Fehler war hier schon drin, und
     // er faellt nicht auf: die Seite funktioniert, sie ist nur offen.
-    "/((?!zugang|api/zugang|_next/static|_next/image|favicon\\.ico|.*\\.).*)",
+    "/((?!zugang|api/zugang|impressum|datenschutz|_next/static|_next/image|favicon\\.ico|.*\\.).*)",
   ],
 };

@@ -1,4 +1,8 @@
 import type { Metadata } from "next";
+import Link from "next/link";
+
+import { textLinkKlassen } from "@/components/ui/textlink";
+import { RECHTLICHE_LINKS } from "@/lib/rechtliches";
 
 export const metadata: Metadata = {
   title: "Zugang - cn-medcan",
@@ -53,6 +57,19 @@ export default async function ZugangPage({ searchParams }: Props) {
             Weiter
           </button>
         </form>
+
+        {/* Impressum und Datenschutz sind vom Gate ausgenommen (proxy.ts). */}
+        <nav aria-label="Rechtliches" className="mt-8">
+          <ul className="flex flex-wrap gap-x-6">
+            {RECHTLICHE_LINKS.map((link) => (
+              <li key={link.href}>
+                <Link href={link.href} prefetch={false} className={textLinkKlassen("inline-flex min-h-11 items-center text-caption")}>
+                  {link.text}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </nav>
       </div>
     </main>
   );

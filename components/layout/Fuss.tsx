@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Unterzeile, Wortmarke } from "@/components/marke/Wortmarke";
 import { MEDIEN, type MedienArt } from "@/lib/medien";
 import { HAUPTNAVIGATION, KONTO_LINK } from "@/lib/navigation";
+import { RECHTLICHE_LINKS } from "@/lib/rechtliches";
 
 const LINKS = [...HAUPTNAVIGATION, KONTO_LINK];
 
@@ -87,6 +88,22 @@ export function Fuss() {
               ))}
             </ul>
           </details>
+          {/* Pflichtlinks: ohne Passwort erreichbar (proxy.ts), klein wie die Bildnachweise. */}
+          <nav aria-label="Rechtliches">
+            <ul className="flex flex-wrap gap-x-6">
+              {RECHTLICHE_LINKS.map((link) => (
+                <li key={link.href}>
+                  <Link
+                    href={link.href}
+                    prefetch={false}
+                    className="inline-flex min-h-11 items-center text-caption text-text-muted underline underline-offset-2 transition-colors duration-fast hover:text-text"
+                  >
+                    {link.text}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </nav>
         </div>
       </div>
 
