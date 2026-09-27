@@ -26,7 +26,7 @@ import {
 import { cn } from "@/lib/cn";
 import { GESCHMACKS_ACHSEN, type GeschmacksMatrix } from "@/lib/query/bewertung";
 import { GeschmackIcon, TerpenIcon } from "@/components/review/AromaIcon";
-import { BEGLEITSTOFFE } from "@/lib/terpen-aromen";
+import { aromaSatz, BEGLEITSTOFFE } from "@/lib/terpen-aromen";
 
 export type AromaSerie = { name: string; ton: "gruen" | "lila"; matrix: GeschmacksMatrix };
 
@@ -828,29 +828,31 @@ export function AromaKarte({
         ))}
       </div>
 
-      {/* Infotext unter der Karte (Nutzer 2026-09-26): zentriert, größer, kursiv in der
-          Buchschrift, jeder Geschmack und jedes Terpen mit seinem Icon daneben. */}
-      <div aria-live="polite" className="flex min-h-16 flex-col items-center gap-2 text-center">
+      {/* Infotext unter der Karte (Nutzer 2026-09-26, 2026-09-27): Buchschrift, kursiv; die Icons
+          stehen abgesetzt in einer eigenen Spalte links, zu jedem Terpen ein beschreibender Satz. */}
+      <div aria-live="polite" className="flex min-h-16 flex-col items-center gap-3">
         {aktiveAchse ? (
-          <p className="font-buch text-body text-text italic text-balance">
-            <Mit icon={<GeschmackIcon geschmack={aktiveAchse.enumWert} className={ICON_IM_TEXT} />}>
+          <div className="flex w-full max-w-xl flex-col gap-3">
+            <Zeile icon={<GeschmackIcon geschmack={aktiveAchse.enumWert} className={ICON_SPALTE} />}>
               <span className="font-medium not-italic">{aktiveAchse.label}</span>
-            </Mit>
-            {": "}
-            <span className="numeric not-italic">
-              {serien.map((serie) => `${serie.name} ${WERT.format(serie.matrix[aktiveAchse.key])}`).join(" · ")}
-            </span>
-          </p>
+              {": "}
+              <span className="numeric not-italic">
+                {serien.map((serie) => `${serie.name} ${WERT.format(serie.matrix[aktiveAchse.key])}`).join(" · ")}
+              </span>
+            </Zeile>
+            {lernen ? <TerpenLernen achse={aktiv!} lernen={lernen} /> : null}
+          </div>
         ) : terpenAktiv !== null ? (
-          <TerpenTraegt name={terpenAktiv} richtungen={traeger.get(terpenAktiv) ?? []} />
+          <div className="flex w-full max-w-xl flex-col gap-3">
+            <TerpenTraegt name={terpenAktiv} richtungen={traeger.get(terpenAktiv) ?? []} />
+          </div>
         ) : (
-          <p className="font-buch text-body text-text-muted italic text-balance">
+          <p className="text-center font-buch text-body text-text-muted italic text-balance">
             {regler
               ? "Zieh die lila Punkte links: Wie stark hast du jede Geschmacksrichtung geschmeckt?"
               : "Fahr über eine Geschmacksrichtung oder ein Terpen, um die Verbindungen zu sehen."}
           </p>
         )}
-        {aktiveAchse && lernen ? <TerpenLernen achse={aktiv!} lernen={lernen} /> : null}
       </div>
 
       {regler ? (
@@ -909,60 +911,60 @@ export function AromaKarte({
   );
 }
 
-/** Icons im Infotext: etwas größer als in der Beschriftung, auf der Schriftlinie. */
-const ICON_IM_TEXT = "mr-1 size-5! align-[-0.2em]";
+/** Icons im Infotext: in der eigenen Spalte links, mittig zur ersten Textzeile. */
+const ICON_SPALTE = "mt-0.5 size-5! shrink-0";
 
-/** Icon und Name bleiben zusammen in einer Zeile. */
-function Mit({ icon, children }: { icon: React.ReactNode; children: React.ReactNode }) {
+/** Eine Zeile des Infotexts: Icon abgesetzt links, Text rechts daneben. Ohne Icon bleibt die Spalte leer. */
+function Zeile({ icon, gedaempft, children }: { icon?: React.ReactNode; gedaempft?: boolean; children: React.ReactNode }) {
   return (
-    <span className="whitespace-nowrap">
-      {icon}
-      {children}
-    </span>
+    <div className="grid grid-cols-[1.25rem_1fr] items-start gap-x-3 text-left">
+      <span aria-hidden="true" className="flex">
+        {icon}
+      </span>
+      <p className={cn("font-buch text-body italic text-pretty", gedaempft ? "text-text-muted" : "text-text")}>
+        {children}
+      </p>
+    </div>
   );
 }
 
-/** "A", "A und B", "A, B und C". */
-function Aufzaehlung({ teile }: { teile: readonly React.ReactNode[] }) {
-  return teile.map((teil, index) => (
-    <Fragment key={index}>
-      {index > 0 ? (index === teile.length - 1 ? " und " : ", ") : null}
-      {teil}
-    </Fragment>
-  ));
+/** Name und Satz eines Terpens oder Begleitstoffs als Zeile. */
+function TerpenZeile({ name, farbe }: { name: string; farbe: string }) {
+  const satz = aromaSatz(name);
+  return (
+    <Zeile icon={<TerpenIcon name={name} className={ICON_SPALTE} />} gedaempft>
+      <span className={cn("font-medium not-italic", farbe)}>{name}</span>
+      {satz ? `: ${satz}` : null}
+    </Zeile>
+  );
 }
 
-/** Gegenrichtung zum Lerneffekt: welche Geschmacksrichtungen ein Terpen oder Begleitstoff trägt. */
+/** Gegenrichtung zum Lerneffekt: was ein Terpen oder Begleitstoff ist und welche Richtungen es trägt. */
 function TerpenTraegt({ name, richtungen }: { name: string; richtungen: readonly { achse: number }[] }) {
-  const begleitstoff = BEGLEITSTOFFE.some((stoff) => stoff.name === name);
+  const satz = aromaSatz(name);
   return (
-    <p className="font-buch text-body text-text italic text-balance">
-      <Mit icon={<TerpenIcon name={name} className={ICON_IM_TEXT} />}>
+    <>
+      <Zeile icon={<TerpenIcon name={name} className={ICON_SPALTE} />}>
         <span className="font-medium not-italic">{name}</span>
-      </Mit>
+        {satz ? `: ${satz}` : null}
+      </Zeile>
       {richtungen.length === 0 ? (
-        " trägt keine der zehn Richtungen spürbar."
+        <Zeile gedaempft>Trägt keine der zehn Richtungen spürbar.</Zeile>
       ) : (
         <>
-          {begleitstoff ? " ist kein Terpen und bringt vor allem " : " trägt vor allem "}
-          <Aufzaehlung
-            teile={richtungen.map(({ achse }) => (
-              <Mit
-                key={achse}
-                icon={<GeschmackIcon geschmack={GESCHMACKS_ACHSEN[achse].enumWert} className={ICON_IM_TEXT} />}
-              >
-                <span className="font-medium not-italic">{GESCHMACKS_ACHSEN[achse].label}</span>
-              </Mit>
-            ))}
-          />
-          .
+          <Zeile gedaempft>Trägt vor allem:</Zeile>
+          {richtungen.map(({ achse }) => (
+            <Zeile key={achse} icon={<GeschmackIcon geschmack={GESCHMACKS_ACHSEN[achse].enumWert} className={ICON_SPALTE} />}>
+              <span className="font-medium not-italic">{GESCHMACKS_ACHSEN[achse].label}</span>
+            </Zeile>
+          ))}
         </>
       )}
-    </p>
+    </>
   );
 }
 
-/** Lerneffekt: welche Terpene eine Geschmacksrichtung tragen. */
+/** Lerneffekt: welche Terpene eine Geschmacksrichtung tragen, je Terpen mit seinem Satz. */
 function TerpenLernen({ achse, lernen }: { achse: number; lernen: NonNullable<Props["lernen"]> }) {
   // Alle Terpene, die spürbar auf diese Richtung einzahlen (Anteil ab 20 %).
   const namen = lernen
@@ -974,28 +976,15 @@ function TerpenLernen({ achse, lernen }: { achse: number; lernen: NonNullable<Pr
     begleitBoegen(stoff.noten).some((b) => b.achse === achse && b.anteil >= 0.2),
   ).map((stoff) => stoff.name);
   if (namen.length === 0 && stoffe.length === 0) return null;
-  const alsIcon = (name: string, farbe: string) => (
-    <Mit key={name} icon={<TerpenIcon name={name} className={ICON_IM_TEXT} />}>
-      <span className={cn("font-medium not-italic", farbe)}>{name}</span>
-    </Mit>
-  );
   return (
-    <p className="font-buch text-body text-text-muted italic text-balance">
-      <Mit icon={<GeschmackIcon geschmack={GESCHMACKS_ACHSEN[achse].enumWert} className={ICON_IM_TEXT} />}>
-        <span className="font-medium text-text not-italic">{GESCHMACKS_ACHSEN[achse].label}</span>
-      </Mit>
-      {namen.length > 0 ? (
-        <>
-          {" steckt vor allem in "}
-          <Aufzaehlung teile={namen.map((name) => alsIcon(name, "text-accent"))} />.
-        </>
-      ) : null}
-      {stoffe.length > 0 ? (
-        <>
-          {namen.length > 0 ? " Dazu kommen " : " kommt vor allem aus "}
-          <Aufzaehlung teile={stoffe.map((name) => alsIcon(name, "text-text"))} />, die keine Terpene sind.
-        </>
-      ) : null}
-    </p>
+    <>
+      <Zeile gedaempft>Steckt vor allem in:</Zeile>
+      {namen.map((name) => (
+        <TerpenZeile key={name} name={name} farbe="text-accent" />
+      ))}
+      {stoffe.map((name) => (
+        <TerpenZeile key={name} name={name} farbe="text-text" />
+      ))}
+    </>
   );
 }

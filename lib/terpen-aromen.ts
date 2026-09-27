@@ -100,3 +100,27 @@ export const BEGLEITSTOFFE: readonly Begleitstoff[] = [
 export function aromaAnteile(terpen: { name: string; geschmack: GeschmacksKategorie }): readonly AromaAnteil[] {
   return TABELLE[terpen.name.trim().toLowerCase()] ?? [{ geschmack: terpen.geschmack, anteil: 1 }];
 }
+
+/**
+ * Ein Satz je Terpen und Begleitstoff für den Infotext der Aroma-Karte (Nutzer
+ * 2026-09-27). Nur Duft, Geschmack und Vorkommen, keine Wirkung (HWG).
+ */
+const SATZ: Record<string, string> = {
+  myrcen: "Das häufigste Terpen in Cannabis, erdig und moschusartig mit einem Hauch reifer Mango.",
+  limonen: "Steckt auch in Zitronen- und Orangenschalen und bringt die frische, spritzige Zitrusnote.",
+  "beta-caryophyllen": "Kennt man aus schwarzem Pfeffer und Nelken: pfeffrig-würzig mit holzigem Unterton.",
+  linalool: "Der Duft von Lavendel, blumig, weich und leicht süß.",
+  "alpha-pinen": "Riecht nach Kiefernwald und Harz, frisch und ein wenig kühl.",
+  terpinolen: "Vielschichtig und frisch: Kräuter, Blüten, ein Spritzer Zitrus und etwas Kiefer.",
+  humulen: "Das Terpen des Hopfens, trocken, erdig und holzig.",
+  ocimen: "Süß und krautig mit tropischem Einschlag, auch in Basilikum und Mango zu finden.",
+  farnesen: "Erinnert an die Schale grüner Äpfel, fruchtig mit einer grünen Note.",
+  nerolidol: "Holzig wie Rinde mit blumigem Einschlag, kommt auch in Neroliöl, Jasmin und Ingwer vor.",
+  ester: "Kein Terpen, sondern die Stoffe hinter vielen Fruchtaromen, etwa Birne oder Banane.",
+  thiole: "Kein Terpen, sondern Schwefelverbindungen, die schon in winzigen Mengen nach Gas und Diesel riechen.",
+};
+
+/** Der beschreibende Satz zu einem Terpen oder Begleitstoff, sonst null. */
+export function aromaSatz(name: string): string | null {
+  return SATZ[name.trim().toLowerCase()] ?? null;
+}
