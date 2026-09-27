@@ -1,7 +1,7 @@
 /**
- * Englisch ist erst oeffentlich, wenn alle fuenf Wellen uebersetzt sind
- * (Nutzerentscheid 2026-09-27). Bis dahin: kein Umschalter im Kopf, keine
- * Accept-Language-Erkennung; nur ein von Hand gesetztes Cookie (Test-Einstieg
- * /api/sprache?wahl=en) schaltet um. Task 11 setzt den Wert auf true.
+ * Englisch ist seit 2026-09-27 oeffentlich (alle fuenf Wellen uebersetzt,
+ * Nutzerentscheid): Umschalter im Kopf sichtbar, Accept-Language-Erkennung
+ * aktiv. Auf false gestellt, gilt wieder nur ein von Hand gesetztes Cookie
+ * (Test-Einstieg /api/sprache?wahl=en).
  */
-export const I18N_OEFFENTLICH = false;
+export const I18N_OEFFENTLICH = true;

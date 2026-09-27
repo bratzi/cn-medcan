@@ -39,7 +39,9 @@ const AKTIV = "underline decoration-text decoration-2 underline-offset-8";
 const AKTIV_WORT = "kapitel-wort";
 
 // Platz fuer Zelt (und Sprachschalter, sobald sichtbar) in der Fensterecke.
-const EINRUECKUNG = I18N_OEFFENTLICH ? "pl-40 sm:pl-44" : "pl-16 sm:pl-20";
+// Mit Sprachschalter: schmal ein Knopf (7rem Platz), ab sm zwei (10rem); breit erst, wenn der
+// Rand neben max-w-360 den Schalter fasst (ab 1700 px).
+const EINRUECKUNG = I18N_OEFFENTLICH ? "pl-28 sm:pl-40 min-[1700px]:pl-8" : "pl-16 sm:pl-20 min-[1640px]:pl-8";
 
 type Props = {
   sprache: Sprache;
@@ -54,7 +56,7 @@ export function Kopf({ sprache, w }: Props) {
           (Nutzer 2026-09-25); bis der Rand breit genug ist, rückt der Kopf dafür ein. */}
       <ThemaSchalter texte={w.kopf.thema} />
       <SprachSchalter aktuell={sprache} gruppe={w.sprache.gruppe} />
-      <div className={`mx-auto grid w-full max-w-360 grid-cols-[1fr_auto_auto] items-center gap-x-4 gap-y-2 py-2 pr-4 sm:pr-8 min-[1640px]:pl-8 lg:grid-cols-[auto_1fr_auto_auto] ${EINRUECKUNG}`}>
+      <div className={`mx-auto grid w-full max-w-360 grid-cols-[1fr_auto_auto] items-center gap-x-4 gap-y-2 py-2 pr-4 sm:pr-8 lg:grid-cols-[auto_1fr_auto_auto] ${EINRUECKUNG}`}>
         {/* Logo statt einzeiliger Wortmarke (Nutzer 2026-09-26): "Book of" klein oben,
             "Terpz" im Fokus, Konturen, Verlauf und Glanz wie im Auftakt. */}
         <Link href="/" className="inline-flex min-h-11 items-center justify-self-start px-2 py-1">

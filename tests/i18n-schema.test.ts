@@ -29,3 +29,8 @@ test("jede Geschmacksachse hat in beiden Sprachen einen Namen", () => {
     assert.ok(en.label.geschmack[kategorie]);
   }
 });
+
+test("de.aroma.satz spiegelt die Aroma-Saetze aus lib/terpen-aromen.ts", async () => {
+  const { aromaSatz } = await import("@/lib/terpen-aromen");
+  for (const [schluessel, satz] of Object.entries(de.aroma.satz)) assert.equal(aromaSatz(schluessel), satz, schluessel);
+});

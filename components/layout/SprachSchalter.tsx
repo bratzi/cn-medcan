@@ -12,6 +12,8 @@ type Props = {
  * DE/EN neben dem Grow-Zelt (Spec 4.3). Keine Flaggen: Flaggen zeigen Laender,
  * nicht Sprachen. Jeder Knopf nennt seine Sprache in ihr selbst (lang).
  * Formular statt onClick: geht ohne JS und vor dem Hydrieren.
+ * Schmal (unter sm) steht nur die andere Sprache da, damit Logo und Konto Platz
+ * behalten; die gewaehlte Sprache zeigt dort <html lang> und die Seite selbst.
  * Verborgen, bis alle Wellen uebersetzt sind (lib/i18n/schalter.ts).
  */
 export function SprachSchalter({ aktuell, gruppe }: Props) {
@@ -26,7 +28,7 @@ export function SprachSchalter({ aktuell, gruppe }: Props) {
           value={sprache}
           lang={sprache}
           aria-pressed={sprache === aktuell}
-          className="inline-flex h-11 min-w-11 items-center justify-center rounded-full px-2 font-sans text-[0.75rem] font-medium uppercase tracking-gesperrt aria-pressed:underline aria-pressed:decoration-2 aria-pressed:underline-offset-4"
+          className="inline-flex h-11 min-w-11 items-center justify-center rounded-full px-2 font-sans text-[0.75rem] font-medium uppercase tracking-gesperrt aria-pressed:underline aria-pressed:decoration-2 aria-pressed:underline-offset-4 max-sm:aria-pressed:hidden"
         >
           <span aria-hidden="true">{sprache.toUpperCase()}</span>
           <span className="sr-only">{SPRACH_NAMEN[sprache]}</span>
