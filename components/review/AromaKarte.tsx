@@ -704,7 +704,8 @@ export function AromaKarte({
           <g opacity={kartenSichtbar * 0.7}>
             {SKALA.map((stufe) => {
               const x = balkenEnde(karte[0], stufe, 0, balken).x;
-              const y = karte[0].y - 26;
+              // Über der Beschriftung der ersten Achse, die seit 2026-09-27 über ihrem Balken steht.
+              const y = karte[0].y - 34;
               return (
                 <g key={stufe}>
                   <line
@@ -753,7 +754,8 @@ export function AromaKarte({
           ))}
         </svg>
 
-        {/* Beschriftung als HTML in fester Größe; zugleich die Ziele fürs Hervorheben. */}
+        {/* Beschriftung als HTML in fester Größe; zugleich die Ziele fürs Hervorheben. In der
+            Karte steht sie über dem Balken, sonst streicht ein gefüllter Balken sie durch. */}
         {knoten.map((punkt, index) => (
           <button
             key={GESCHMACKS_ACHSEN[index].key}
@@ -768,8 +770,10 @@ export function AromaKarte({
               achseBetont(index) ? "text-text" : "text-text-muted",
             )}
             style={{
-              left: `${((t < 0.5 ? punkt.x - 150 * kartenSichtbar : punkt.x) / aktBreite) * 100}%`,
-              top: `${(punkt.y / HOEHE) * 100}%`,
+              // Mindestens 124 vom Rand, damit der längste Name (Icon + KRÄUTRIG, rund 118 px)
+              // auf schmalen Karten nicht links hinausragt.
+              left: `${((t < 0.5 ? Math.max(punkt.x - 150 * kartenSichtbar, 124) : punkt.x) / aktBreite) * 100}%`,
+              top: `${((punkt.y - 20 * kartenSichtbar) / HOEHE) * 100}%`,
             }}
           >
             <GeschmackIcon geschmack={GESCHMACKS_ACHSEN[index].enumWert} />
@@ -809,13 +813,17 @@ export function AromaKarte({
             onMouseEnter={() => terpenUeberfahren(begleiter[index].name)}
             onFocus={() => terpenUeberfahren(begleiter[index].name)}
             className={cn(
-              "absolute inline-flex -translate-y-1/2 items-center gap-1.5 pl-4 text-small whitespace-nowrap italic transition-colors duration-normal",
+              "absolute flex -translate-y-1/2 flex-col items-start pl-4 text-left whitespace-nowrap transition-colors duration-normal",
               terpenBetont(begleiter[index].name) ? "text-text" : "text-text-muted",
             )}
             style={{ left: `${(punkt.x / aktBreite) * 100}%`, top: `${(punkt.y / HOEHE) * 100}%`, opacity: kartenSichtbar }}
           >
-            <TerpenIcon name={begleiter[index].name} />
-            {begleiter[index].name} <span className="not-italic">({begleiter[index].hinweis})</span>
+            {/* Hinweis in eigener Zeile, sonst ragt er über schmale Karten (Doppelseite) hinaus. */}
+            <span className="inline-flex items-center gap-1.5 text-small italic">
+              <TerpenIcon name={begleiter[index].name} />
+              {begleiter[index].name}
+            </span>
+            <span className="text-caption font-normal">{begleiter[index].hinweis}</span>
           </button>
         ))}
       </div>
