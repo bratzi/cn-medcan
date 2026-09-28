@@ -58,7 +58,13 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
   „we check.“). **Aufgeschobene Minor-Punkte (Abschluss-Review):** `app/error.tsx` liest `lang` im Render (auf
   useSyncExternalStore umstellen); `server-only` in `lib/i18n/de.ts`/`en.ts` erwägen; `/api/sprache` (GET mit
   Seiteneffekt) entfernen oder POST; `<html lang>` en → en-GB; `terpenAnzeige` Ausnahmen (Guajol, Eukalyptol);
-  veraltete Kommentare in SprachSchalter.tsx und ZugangFelder.tsx.
+  veraltete Kommentare in SprachSchalter.tsx und ZugangFelder.tsx. → **Erledigt `b6d364e`** (en-GB, error.tsx per
+  useSyncExternalStore, /api/sprache entfernt, Guaiol/Eucalyptol); `server-only` bleibt nur in index.ts/sprache.ts
+  (de.ts/en.ts sind reine Daten, werden auch von Client-Tests gelesen).
+- **A5 Teil 1 (2026-09-28, Cloud-Session):** `npm test` 289/289, `eslint` sauber, `tsc` sauber (vorher
+  `prisma generate` + `next typegen` nötig). `npm audit --omit=dev`: 4× high in `mysql2` ≤3.23 und `deepmerge-ts` <8,
+  nur über `prisma`/`better-auth` (Laufzeit nutzt D1, mysql2 wird nie geladen); Fix nur per `--force` mit Prisma-
+  Downgrade → bewusst nicht angewendet. Offen in A5: Code-Review Sessions 22–24, Live-Stichprobe (braucht Chrome).
   **Wichtige Rulings:** /admin, Impressum/Datenschutz, Wortmarke inkl. „Terpen für Terpen“, tote Dateien (Netzdiagramm,
   TerpenErgaenzen, BestandTabelle) und Alt-Texte in lib/medien.ts (Bilder alle dekorativ) bleiben deutsch;
   Bewertungsschema bleibt deutsch in lib/query/bewertung.ts, Wörterbuch `schema` spiegelt es (Test i18n-schema);
