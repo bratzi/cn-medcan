@@ -334,9 +334,17 @@
 
   /* Medien je Thema (Hero hell/dunkel): das verborgene Video schneidet nie
      den Viewport, loops.ts startet es also nicht. */
+  /* Sparmodus (T2): Endlosschleifen stehen, Einblendungen laufen zu Ende. */
+  :root[data-sparmodus] :is(.glanz-wort, .auftakt-marke [data-marke-zeile], .blob-morph, .blob-linie, .bild-zoom,
+      .bild-wechsel > *, .bild-schweben > *, .marke-kontur > span, .fazit-puls, .marke-puls, .glas-maske,
+      .delta-puls, .bogen-puls, .bogen-fluss) {
+    animation-play-state: paused !important;
+  }
+
   :root[data-theme="dark"] .nur-hell,
   :root:not([data-theme="dark"]) .nur-dunkel {
-    display: none;
+    /* important: sonst gewinnt das `block` der Utility-Schicht (Loop.tsx). */
+    display: none !important;
   }
 
   /* Inspiration hat nur 400: keine künstlich fetten oder kursiven Schnitte. */
@@ -1030,80 +1038,110 @@ html.joint-cursor :is(input:not([type="range"]):not([type="radio"]):not([type="c
   margin: -0.2em -0.3em -0.25em -0.25em;
 }
 
-/* Hell/Dunkel als Lampe (components/layout/ThemaSchalter.tsx): fest in der Fensterecke oben
-   links vor der Wortmarke (Nutzer 2026-09-25), Schatten statt Rahmen, 44 px
-   Trefferfläche. Lampe an = hell. */
-.thema-lampe {
+/* Schalterleiste unten rechts (components/layout/SchalterLeiste.tsx, T2): senkrecht,
+   zurückgenommen bis Hover oder Fokus. Sichtbar 2 rem, Trefferfläche 44 px. */
+.schalter-leiste {
   position: fixed;
-  top: 0.5rem;
-  left: 0.75rem;
+  right: 0.5rem;
+  bottom: 0.5rem;
   z-index: 50;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  opacity: 0.55;
+  transition: opacity 200ms cubic-bezier(0.2, 0, 0, 1);
+}
+
+.schalter-leiste:hover,
+.schalter-leiste:focus-within {
+  opacity: 1;
+}
+
+@media (hover: none) {
+  .schalter-leiste {
+    opacity: 0.8;
+  }
+}
+
+.schalter-knopf {
+  position: relative;
   display: grid;
   place-items: center;
   width: 2.75rem;
   height: 2.75rem;
-  border-radius: 9999px;
   color: var(--color-text);
-  background: color-mix(in oklab, var(--color-surface-raised) 92%, transparent);
-  box-shadow:
-    0 0 0 1px color-mix(in oklab, var(--color-text) 8%, transparent),
-    0 2px 4px color-mix(in oklab, black 10%, transparent),
-    0 8px 20px color-mix(in oklab, black 12%, transparent);
-  transition-property: scale, box-shadow;
-  transition-duration: 150ms;
-  transition-timing-function: cubic-bezier(0.2, 0, 0, 1);
 }
 
-/* Sprachschalter DE/EN (components/layout/SprachSchalter.tsx) rechts neben dem Zelt,
-   gleiche Hoehe, gleiche Flaeche; erst sichtbar, wenn lib/i18n/schalter.ts es erlaubt. */
-.sprach-schalter {
-  position: fixed;
-  top: 0.5rem;
-  left: 3.75rem;
-  z-index: 50;
-  display: flex;
-  height: 2.75rem;
+/* Sichtbare Scheibe kleiner als die Trefferfläche. */
+.schalter-knopf::before {
+  content: "";
+  position: absolute;
+  inset: 0.375rem;
   border-radius: 9999px;
-  color: var(--color-text);
-  background: color-mix(in oklab, var(--color-surface-raised) 92%, transparent);
-  box-shadow:
-    0 0 0 1px color-mix(in oklab, var(--color-text) 8%, transparent),
-    0 2px 4px color-mix(in oklab, black 10%, transparent),
-    0 8px 20px color-mix(in oklab, black 12%, transparent);
+  background: color-mix(in oklab, var(--color-surface-raised) 85%, transparent);
+  box-shadow: 0 0 0 1px color-mix(in oklab, var(--color-text) 12%, transparent);
+  transition: box-shadow 150ms cubic-bezier(0.2, 0, 0, 1);
 }
 
-.sprach-schalter button:focus-visible {
+.schalter-knopf:hover::before {
+  box-shadow: 0 0 0 1px color-mix(in oklab, var(--color-kopierstift) 45%, transparent);
+}
+
+.schalter-knopf:active {
+  scale: 0.94;
+}
+
+.schalter-knopf:focus-visible {
   outline: 2px solid var(--color-focus-ring);
-  outline-offset: 3px;
+  outline-offset: -2px;
+  border-radius: 9999px;
 }
 
-.thema-lampe:hover {
-  box-shadow:
-    0 0 0 1px color-mix(in oklab, var(--color-kopierstift) 35%, transparent),
-    0 2px 4px color-mix(in oklab, black 10%, transparent),
-    0 10px 28px color-mix(in oklab, var(--color-kopierstift) 22%, transparent);
-}
-
-.thema-lampe:active {
-  scale: 0.96;
-}
-
-.thema-lampe:focus-visible {
-  outline: 2px solid var(--color-focus-ring);
-  outline-offset: 3px;
-}
-
-.thema-lampe svg {
+.schalter-knopf svg {
+  position: relative;
   grid-area: 1 / 1;
-  width: 1.5rem;
-  height: 1.5rem;
+  width: 1.125rem;
+  height: 1.125rem;
   stroke: currentColor;
-  /* Filigraner (Nutzer 2026-09-26): dünnere, etwas zurückgenommene Linien. */
-  stroke-width: 1;
-  stroke-opacity: 0.8;
+  stroke-width: 1.4;
+  fill: none;
   transition-property: opacity, scale, filter;
   transition-duration: 300ms;
   transition-timing-function: cubic-bezier(0.2, 0, 0, 1);
+}
+
+.schalter-knopf .flagge {
+  width: 1.25rem;
+  height: 1.25rem;
+  border-radius: 9999px;
+  stroke: none;
+  box-shadow: 0 0 0 1px color-mix(in oklab, var(--color-text) 15%, transparent);
+}
+
+/* Aus-Zustand der Umschalter: blass und durchgestrichen wirkt zu laut, also nur blasser. */
+.schalter-knopf[aria-pressed="false"] svg {
+  opacity: 0.45;
+}
+
+.schalter-knopf[aria-pressed="true"]:not(.schalter-zeiger) svg {
+  color: var(--color-accent);
+}
+
+.schalter-glut {
+  fill: #e8743b;
+  stroke: none;
+}
+
+/* Den Zeiger gibt es nur mit feiner Maus. */
+@media not ((hover: hover) and (pointer: fine)) {
+  .schalter-zeiger {
+    display: none;
+  }
+}
+
+.thema-lampe svg {
+  stroke-width: 1;
+  stroke-opacity: 0.8;
 }
 
 /* Offen (hell): Licht aus dem Grow-Zelt, warm, mit Schein. */
@@ -1415,23 +1453,6 @@ html.joint-cursor :is(input:not([type="range"]):not([type="radio"]):not([type="c
   position: absolute;
   top: 0.5rem;
   right: 1rem;
-}
-
-/* Im Menü stehen Zelt und Sprache im Fluss, beide Sprachen sichtbar. */
-.kopf-menue .thema-lampe,
-.kopf-menue .sprach-schalter {
-  position: static;
-}
-
-.kopf-menue .sprach-schalter button[aria-pressed="true"] {
-  display: inline-flex;
-}
-
-@media (width < 64rem) {
-  .kopf > .thema-lampe,
-  .kopf > .sprach-schalter {
-    display: none;
-  }
 }
 
 @media (width >= 64rem) {
