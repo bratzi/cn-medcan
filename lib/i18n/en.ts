@@ -234,10 +234,12 @@ export const en: Woerterbuch = {
       intensitaet: "Terpene intensity",
       jeTerpen: "Per terpene",
       communityFazit: "Community verdict",
+      chargenFazit: "Batch verdict",
       deinFazit: "Your verdict",
+      deineCharge: "Your batch",
       ausReglern: "from your sliders",
       fazitErklaerung:
-        "The verdict from the three stages: overall, how closely the terpz match the producer's information, and quality, each stage weighted equally. 100 % means: everything top and exactly as stated.",
+        "The strain verdict combines overall, terpz match and star rating. The batch verdict is the quality balance of this batch alone, kept separate from the strain. Each stage counts equally; 100 % means everything top and exactly as stated.",
       zuruecksetzen: "Reset",
     },
     gesamteindruck: "Overall impression",

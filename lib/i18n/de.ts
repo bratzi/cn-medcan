@@ -238,10 +238,12 @@ export const de = {
       intensitaet: "Terpen-Intensität",
       jeTerpen: "Je Terpen",
       communityFazit: "Community-Fazit",
+      chargenFazit: "Charge-Fazit",
       deinFazit: "Dein Fazit",
+      deineCharge: "Deine Charge",
       ausReglern: "aus deinen Reglern",
       fazitErklaerung:
-        "Das Fazit aus den drei Stufen: Overall, wie nah die Terpz an der Herstellerangabe liegen, und Qualität, jede Stufe zu gleichen Teilen. 100 % heißt: alles top und genau wie angegeben.",
+        "Das Sortenfazit fasst Overall, Terpen-Abgleich und Gesamtnote zusammen. Das Charge-Fazit zeigt allein die Qualitäts-Balance dieser Charge, getrennt von der Sorte. Jede Stufe zählt gleich viel; 100 % heißt: alles top und genau wie angegeben.",
       zuruecksetzen: "Zurücksetzen",
     },
     gesamteindruck: "Gesamteindruck",

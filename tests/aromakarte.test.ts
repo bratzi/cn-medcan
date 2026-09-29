@@ -324,17 +324,25 @@ test("Erkundungsdaten: der Community-Median aus sorten_kennwerte trägt Reihe, S
     BEWERTUNG({ ...MATRIX, erdig: 2 }, { Myrcen: 2 }),
     BEWERTUNG({ ...MATRIX, erdig: 5 }, { Myrcen: 5 }),
   ];
-  const kennwerte = { terpenMedian: '{"Myrcen":2}', geschmackMedian: JSON.stringify({ ...MATRIX, erdig: 2 }), anzahl: 3 };
+  const kennwerte = {
+    terpenMedian: '{"Myrcen":2}',
+    geschmackMedian: JSON.stringify({ ...MATRIX, erdig: 2 }),
+    gesamtnoteMedian: 4,
+    anzahl: 3,
+  };
   const daten = erkundungsDaten([MYRCEN], reviews, NAMEN, kennwerte);
   assert.deepEqual(daten.median, { geschmack: { ...MATRIX, erdig: 2 }, terpene: { Myrcen: 2 }, anzahl: 3 });
   // Eine Community-Stimme auf der Karte: die lila Reihe steht auf dem Median, nicht auf dem Mittel (2,7).
   assert.equal(daten.serien.find((serie) => serie.ton === "lila")?.matrix.erdig, 2);
   assert.deepEqual(daten.zeilen, [{ terpen: "Myrcen", wert: 2, anzahl: 3 }]);
+  // Median der Gesamtnote reicht bis in die Erkundung (T6, Sortenfazit).
+  assert.equal(daten.gesamtnoteMedian, 4);
 });
 
 test("Erkundungsdaten: ohne Kennwerte kein Median (kein grüner Regler), die Reihe bleibt das Mittel", () => {
   const daten = erkundungsDaten([MYRCEN], [BEWERTUNG({ ...MATRIX, erdig: 1 }, {}), BEWERTUNG({ ...MATRIX, erdig: 4 }, {})], NAMEN, null);
   assert.equal(daten.median, null);
   assert.equal(daten.serien.find((serie) => serie.ton === "lila")?.matrix.erdig, 2.5);
+  assert.equal(daten.gesamtnoteMedian, null);
   assert.equal(erkundungsDaten([MYRCEN], [], NAMEN).median, null);
 });

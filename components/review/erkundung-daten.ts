@@ -23,7 +23,7 @@ type Bewertung = {
 };
 
 /** Die Zeile aus `sorten_kennwerte` (T3), roh wie aus D1. */
-type RoheKennwerte = { terpenMedian: unknown; geschmackMedian: unknown; anzahl: number };
+type RoheKennwerte = { terpenMedian: unknown; geschmackMedian: unknown; gesamtnoteMedian: number | null; anzahl: number };
 
 /**
  * Die Daten der Aroma-Erkundung aus Terpenen und freigegebenen Bewertungen,
@@ -68,5 +68,8 @@ export function erkundungsDaten(
         feuchte: review.feuchtigkeitProzent,
       })),
     ),
+    // Median der Gesamtnote (sorten_kennwerte, T3): eine Stufe des Sortenfazits
+    // (lib/fazit.ts, sortenFazit), beim Speichern vorberechnet, nie je Seitenaufruf.
+    gesamtnoteMedian: kennwerte?.gesamtnoteMedian ?? null,
   };
 }

@@ -37,6 +37,8 @@ type Props = {
   median: CommunityMedian | null;
   gesamteindruck: Gesamteindruck;
   beschaffenheit: BeschaffenheitsWerte;
+  /** Median der Gesamtnote aus sorten_kennwerte (T3): Teil des Sortenfazits (T6). */
+  gesamtnoteMedian: number | null;
   /** Texte der Aroma-Bausteine (lib/i18n/typen.ts, aromaTexte). */
   aromaTexte: AromaTexte;
   texte: Woerterbuch["bewerten"];

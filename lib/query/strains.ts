@@ -225,11 +225,15 @@ export type StrainDetail = {
   aktualisiertAm: Date;
 };
 
-/** Rohzeile aus `sorten_kennwerte`; gelesen wird sie in lib/aromakarte.ts (communityMedian). */
-export type KennwerteZeile = { terpenMedian: string; geschmackMedian: string; anzahl: number };
+/**
+ * Rohzeile aus `sorten_kennwerte`; gelesen wird sie in lib/aromakarte.ts
+ * (communityMedian) und, seit T6, `gesamtnoteMedian` im Sortenfazit
+ * (lib/fazit.ts, sortenFazit) - ohne Bewertungen mit Gesamtnote bleibt sie null.
+ */
+export type KennwerteZeile = { terpenMedian: string; geschmackMedian: string; gesamtnoteMedian: number | null; anzahl: number };
 
 /** Die Kennwerte werden mit der Sorte gelesen, nicht je Aufruf aus allen Bewertungen berechnet. */
-const KENNWERTE_SELECT = { select: { terpenMedian: true, geschmackMedian: true, anzahl: true } } as const;
+const KENNWERTE_SELECT = { select: { terpenMedian: true, geschmackMedian: true, gesamtnoteMedian: true, anzahl: true } } as const;
 
 // ---------------------------------------------------------------------------
 //  Liste

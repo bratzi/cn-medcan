@@ -24,7 +24,7 @@ import {
 } from "@/lib/aromakarte";
 import { BEWERTUNGS_ACHSEN, GESCHMACKS_ACHSEN, leereGeschmacksMatrix, type GeschmacksMatrix } from "@/lib/query/bewertung";
 import type { Vorbelegung } from "@/lib/bewertung-vorbelegung";
-import { communityFazit } from "@/lib/fazit";
+import { chargenFazit, sortenFazit } from "@/lib/fazit";
 import { formatiereAnteil, formatiereZahl } from "@/lib/format";
 import { mehrzahl, t } from "@/lib/i18n/text";
 import type { AromaTexte } from "@/lib/i18n/typen";
@@ -52,6 +52,7 @@ export function AromaErkundung({
   treue = null,
   beschaffenheit,
   gesamteindruck,
+  gesamtnoteMedian = null,
   eingabe = false,
   vorbelegung = null,
   zwischenruf,
@@ -78,6 +79,12 @@ export function AromaErkundung({
   beschaffenheit?: BeschaffenheitsWerte;
   /** Allgemeine Noten 1 bis 5, gemittelt über die Bewertungen. */
   gesamteindruck?: Gesamteindruck;
+  /**
+   * Median der Gesamtnote aus `sorten_kennwerte` (T3): eine Stufe des
+   * Sortenfazits (lib/fazit.ts, T6), falls schon jemand eine Gesamtnote
+   * vergeben hat, sonst null (fällt dann aus dem Fazit heraus).
+   */
+  gesamtnoteMedian?: number | null;
   /**
    * Bewertungsmaske (Nutzer 2026-09-25: sieht exakt aus wie die Startseite):
    * die Regler sind die Eingabe, ihre Werte gehen als versteckte Felder ins
@@ -107,12 +114,6 @@ export function AromaErkundung({
   const [eigeneBeschaffenheit, setEigeneBeschaffenheit] = useState(anfang.beschaffenheit);
   const [eigeneNoten, setEigeneNoten] = useState(anfang.noten);
   const [eigeneIntensitaet, setEigeneIntensitaet] = useState<Record<string, number>>(anfang.intensitaet);
-  // Eigene Werte da (bewegt oder vorbelegt): dann steht „Dein Fazit“.
-  const bewegt =
-    eigen !== null ||
-    Object.keys(eigeneBeschaffenheit).length > 0 ||
-    Object.keys(eigeneNoten).length > 0 ||
-    Object.keys(eigeneIntensitaet).length > 0;
   const geaendert =
     eigen !== anfang.geschmack ||
     eigeneBeschaffenheit !== anfang.beschaffenheit ||
@@ -168,25 +169,34 @@ export function AromaErkundung({
       ]
     : [...serien];
 
-  // Community-Fazit aus den drei Stufen; "Dein Fazit" setzt die eigenen Regler
-  // über die Community-Werte, sobald etwas bewegt wurde.
-  const fazit = communityFazit({
+  // Sortenfazit aus Overall, Terpen-Abgleich und Gesamtnote-Median (T6); "Dein Fazit" setzt
+  // die eigenen Regler über die Community-Werte, sobald etwas bewegt wurde. Das Chargenfazit
+  // (Qualitäts-Balance der Beschaffenheit) ist ein eigener Wert und fließt hier nie ein.
+  const sortenFazitWert = sortenFazit({
     eindruck: gesamteindruck?.werte ?? {},
     treue: treue?.wert ?? null,
-    beschaffenheit: beschaffenheit?.werte ?? {},
+    gesamtnote: gesamtnoteMedian,
   });
+  const chargenFazitWert = chargenFazit(beschaffenheit?.werte ?? {});
   const { feuchte: eigeneFeuchte, ...eigeneAchsen } = eigeneBeschaffenheit;
   // Wirkung zählt nicht ins Fazit (steht nicht auf der öffentlichen Karte).
   const { wirkung: _wirkung, ...eigeneEindruecke } = eigeneNoten;
   void _wirkung;
   const mittelNoten: Partial<Record<NotenKey, number>> = gesamteindruck?.werte ?? {};
-  const eigenesFazit = bewegt
-    ? communityFazit({
+  // Eigenes Sortenfazit nur, wenn Terpene (Karte) oder Overall tatsächlich bewegt wurden: nur diese
+  // beiden Stufen fließen hinein, sonst wäre die Zahl bloß eine Kopie des Community-Werts, obwohl
+  // man nur an der Charge gedreht hat.
+  const sorteBewegt = eigen !== null || Object.keys(eigeneEindruecke).length > 0;
+  const eigenerSortenFazit = sorteBewegt
+    ? sortenFazit({
         eindruck: { ...(gesamteindruck?.werte ?? {}), ...eigeneEindruecke },
         treue: eigeneTreue ?? treue?.wert ?? null,
-        beschaffenheit: { ...(beschaffenheit?.werte ?? {}), ...eigeneAchsen },
+        gesamtnote: gesamtnoteMedian,
       })
     : null;
+  // Eigenes Chargenfazit nur, wenn die Beschaffenheit selbst bewegt wurde (nicht nur Terpene/Overall).
+  const chargeBewegt = Object.keys(eigeneAchsen).length > 0;
+  const eigenerChargenFazit = chargeBewegt ? chargenFazit({ ...(beschaffenheit?.werte ?? {}), ...eigeneAchsen }) : null;
   const anzahlBewertungen = Math.max(treue?.anzahl ?? 0, gesamteindruck?.anzahl ?? 0, beschaffenheit?.anzahl ?? 0);
 
   return (
@@ -343,34 +353,61 @@ export function AromaErkundung({
           genau in der Mitte zwischen Qualität und Fazit (Nutzer 2026-09-26). */}
       {zwischenruf ? <div className="relative -my-8 h-0 md:-my-12">{zwischenruf}</div> : null}
 
-      {/* Community-Fazit nach allen drei Schritten (Nutzer 2026-09-25, zuvor darüber): das Fazit
-          aus Gesamteindruck, Terpenen und Beschaffenheit, in der Handschrift des Logos,
-          weil es die Stimme der Community ist (Ausnahme zu Regel 3, ui-design-engine). */}
-      {fazit !== null ? (
+      {/* Zwei Fazits nach allen drei Schritten (Nutzer 2026-09-25, seit T6 getrennt): das
+          Sortenfazit aus Overall, Terpen-Abgleich und Gesamtnote steht groß in der Handschrift
+          des Logos, weil es die Stimme der Community ist (Ausnahme zu Regel 3, ui-design-engine).
+          Das Chargenfazit (Qualitäts-Balance) steht kleiner daneben und fließt nie in die Sorte. */}
+      {sortenFazitWert !== null || chargenFazitWert !== null ? (
         <div className="flex flex-col items-center gap-4 text-center">
           <dl className="flex flex-wrap items-end justify-center gap-x-24 gap-y-8">
-            <div className="flex flex-col items-center gap-2">
-              <dt className="text-small uppercase tracking-wide text-text-muted">{texte.aroma.erkundung.communityFazit}</dt>
-              {/* tabular-nums auf dem dd: gilt für die Zahl und ihre Konturen gleich,
-                  damit die Konturen deckungsgleich bleiben. */}
-              <dd className="relative isolate flex justify-center tabular-nums">
-                {/* Die Essenz der Seite (Nutzer 2026-09-25): dieselben driftenden Konturen
-                    wie die Wortmarke im Hero, dazu ein ruhiges Pulsieren. */}
-                {["marke-kontur-1", "marke-kontur-2", "marke-kontur-3", "marke-kontur-4"].map((klasse) => (
-                  <span key={klasse} aria-hidden="true" className={`marke-kontur ${klasse} font-hand text-umschlag leading-none`}>
-                    <span>{prozent(fazit, texte.sprache)}</span>
+            {sortenFazitWert !== null ? (
+              <div className="flex flex-col items-center gap-2">
+                <dt className="text-small uppercase tracking-wide text-text-muted">{texte.aroma.erkundung.communityFazit}</dt>
+                {/* tabular-nums auf dem dd: gilt für die Zahl und ihre Konturen gleich,
+                    damit die Konturen deckungsgleich bleiben. */}
+                <dd className="relative isolate flex justify-center tabular-nums">
+                  {/* Die Essenz der Seite (Nutzer 2026-09-25): dieselben driftenden Konturen
+                      wie die Wortmarke im Hero, dazu ein ruhiges Pulsieren. */}
+                  {["marke-kontur-1", "marke-kontur-2", "marke-kontur-3", "marke-kontur-4"].map((klasse) => (
+                    <span key={klasse} aria-hidden="true" className={`marke-kontur ${klasse} font-hand text-umschlag leading-none`}>
+                      <span>{prozent(sortenFazitWert, texte.sprache)}</span>
+                    </span>
+                  ))}
+                  <span className="fazit-puls farbverlauf font-hand text-umschlag leading-none">
+                    {prozent(sortenFazitWert, texte.sprache)}
                   </span>
-                ))}
-                <span className="fazit-puls farbverlauf font-hand text-umschlag leading-none">{prozent(fazit, texte.sprache)}</span>
-              </dd>
-              <dd className="text-caption text-text-muted">
-                {mehrzahl(texte.sprache, texte.aroma.ausBewertungen, anzahlBewertungen)}
-              </dd>
-            </div>
-            {eigenesFazit !== null ? (
+                </dd>
+                <dd className="text-caption text-text-muted">
+                  {mehrzahl(texte.sprache, texte.aroma.ausBewertungen, anzahlBewertungen)}
+                </dd>
+              </div>
+            ) : null}
+            {chargenFazitWert !== null ? (
+              <div className="flex flex-col items-center gap-2">
+                <dt className="text-small uppercase tracking-wide text-text-muted">{texte.aroma.erkundung.chargenFazit}</dt>
+                <dd className="farbverlauf font-hand text-notiz leading-none tabular-nums">
+                  {prozent(chargenFazitWert, texte.sprache)}
+                </dd>
+                <dd className="text-caption text-text-muted">
+                  {mehrzahl(texte.sprache, texte.aroma.ausBewertungen, beschaffenheit?.anzahl ?? 0)}
+                </dd>
+              </div>
+            ) : null}
+            {eigenerSortenFazit !== null ? (
               <div className="flex flex-col items-center gap-2" aria-live="polite">
                 <dt className="text-small uppercase tracking-wide text-text-muted">{texte.aroma.erkundung.deinFazit}</dt>
-                <dd className="farbverlauf font-hand text-notiz leading-none tabular-nums">{prozent(eigenesFazit, texte.sprache)}</dd>
+                <dd className="farbverlauf font-hand text-notiz leading-none tabular-nums">
+                  {prozent(eigenerSortenFazit, texte.sprache)}
+                </dd>
+                <dd className="text-caption text-text-muted">{texte.aroma.erkundung.ausReglern}</dd>
+              </div>
+            ) : null}
+            {eigenerChargenFazit !== null ? (
+              <div className="flex flex-col items-center gap-2" aria-live="polite">
+                <dt className="text-small uppercase tracking-wide text-text-muted">{texte.aroma.erkundung.deineCharge}</dt>
+                <dd className="farbverlauf font-hand text-notiz leading-none tabular-nums">
+                  {prozent(eigenerChargenFazit, texte.sprache)}
+                </dd>
                 <dd className="text-caption text-text-muted">{texte.aroma.erkundung.ausReglern}</dd>
               </div>
             ) : null}
