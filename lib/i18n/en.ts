@@ -12,6 +12,10 @@ export const en: Woerterbuch = {
   },
   kopf: {
     hauptnavigation: "Main navigation",
+    menue: {
+      oeffnen: "Open menu",
+      schliessen: "Close menu",
+    },
     navigation: {
       bewertungen: "Reviews",
       abstimmung: "Vote",

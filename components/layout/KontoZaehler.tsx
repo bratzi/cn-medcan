@@ -89,7 +89,7 @@ export function KontoZaehler({ texte, sprache }: { texte: Mehrzahl; sprache: Spr
 
   if (anzahl === 0) return null;
   return (
-    <span className="numeric ml-2 inline-grid min-w-6 place-items-center rounded-full bg-accent px-2 text-caption text-accent-fg">
+    <span className="numeric inline-grid max-lg:absolute max-lg:-top-1 max-lg:-right-1 lg:ml-2 min-w-6 place-items-center rounded-full bg-accent px-2 text-caption text-accent-fg">
       <span aria-hidden="true">{anzahl}</span>
       <span className="sr-only">
         {mehrzahl(sprache, texte, anzahl)}

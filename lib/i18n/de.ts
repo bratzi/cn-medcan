@@ -16,6 +16,10 @@ export const de = {
   },
   kopf: {
     hauptnavigation: "Hauptnavigation",
+    menue: {
+      oeffnen: "Menü öffnen",
+      schliessen: "Menü schließen",
+    },
     navigation: {
       bewertungen: "Bewertungen",
       abstimmung: "Abstimmung",
