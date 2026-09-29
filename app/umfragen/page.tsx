@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { ABSCHNITT_TITEL, Seitenkopf, seitenRahmen } from "@/components/layout/Seitenkopf";
-import { Badge, Blatt, EmptyState, buttonKlassen, namenLinkKlassen, textLinkKlassen } from "@/components/ui";
+import { Avatar, Badge, Blatt, EmptyState, buttonKlassen, namenLinkKlassen, textLinkKlassen } from "@/components/ui";
 import { UmfrageKarte } from "@/components/umfrage/UmfrageKarte";
 import { VorschlagFormular } from "@/components/umfrage/VorschlagFormular";
 import { phasenLabel } from "@/components/umfrage/phasen";
@@ -159,7 +159,8 @@ async function UmfragenInhalt({ w, sprache }: { w: Woerterbuch; sprache: Sprache
                       <Badge variante="neutral">{texte.offen}</Badge>
                     )}
                   </div>
-                  <p className="text-small text-text-muted">
+                  <p className="flex items-center gap-2 text-small text-text-muted max-md:justify-center">
+                    <Avatar name={vorschlag.vonAnzeigename} bildId={vorschlag.vonAvatarId} groesse="sm" />
                     {t(texte.von, { name: vorschlag.vonAnzeigename, datum: formatiereDatum(vorschlag.erstelltAm, sprache) })}
                   </p>
                   {vorschlag.begruendung ? (

@@ -44,6 +44,7 @@ export type RedaktionelleReview = {
   /** Immer die Stimme des Betreibers; so passt die Review ohne Umbau in die Doppelseite. */
   istBetreiber: true;
   autorName: string | null;
+  autorAvatarId?: string | null;
   gesamtnote: number | null;
   terpene: KartenTerpen[];
   terpenIntensitaet: TerpenIntensitaet;
@@ -69,7 +70,7 @@ const AUSWAHL = {
   erstelltAm: true,
   // Linke Seite der Doppelseite (T7): Name und Blätter-Note.
   gesamtnote: true,
-  autor: { select: { anzeigename: true } },
+  autor: { select: { anzeigename: true, avatar: { select: { id: true } } } },
   strain: {
     select: {
       handelsname: true,
@@ -101,7 +102,7 @@ type Satz = {
   instagramReelUrl: string | null;
   erstelltAm: Date;
   gesamtnote: number | null;
-  autor: { anzeigename: string } | null;
+  autor: { anzeigename: string; avatar: { id: string } | null } | null;
   strain: {
     handelsname: string;
     slug: string;
@@ -133,6 +134,7 @@ function zuAnsicht(satz: Satz): RedaktionelleReview {
     erstelltAm: satz.erstelltAm,
     istBetreiber: true,
     autorName: satz.autor?.anzeigename ?? null,
+    autorAvatarId: satz.autor?.avatar?.id ?? null,
     gesamtnote: satz.gesamtnote,
     terpene: satz.strain.terpene.map((eintrag) => ({
       name: eintrag.terpen.name,

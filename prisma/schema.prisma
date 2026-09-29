@@ -417,6 +417,7 @@ model Mitglied {
 
   sortenVorschlaege  SortenVorschlag[]
   benachrichtigungen Benachrichtigung[]
+  avatar             NutzerAvatar?
 
   @@index([freigegeben])
   @@map("mitglied")
@@ -624,4 +625,17 @@ model Benachrichtigung {
 
   @@index([mitgliedId, gelesenAm])
   @@map("benachrichtigungen")
+}
+
+/// Profilbild eines Mitglieds (T8): 128 x 128 WebP, hoechstens 30 KB, als BLOB in
+/// D1. Die id wechselt bei jedem Upload (Bild-URL /api/bild/<id> ist deshalb
+/// unveraenderlich cachebar). Abfragen zeigen nur die id, nie `bild`.
+model NutzerAvatar {
+  id         String   @id @default(uuid())
+  mitgliedId String   @unique @map("mitglied_id")
+  mitglied   Mitglied @relation(fields: [mitgliedId], references: [id], onDelete: Cascade)
+  bild       Bytes
+  erstelltAm DateTime @default(now()) @map("erstellt_am")
+
+  @@map("nutzer_avatar")
 }

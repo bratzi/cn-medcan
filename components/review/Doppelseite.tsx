@@ -9,7 +9,7 @@ import { KartenBild } from "@/components/review/SortenKopf";
 import { SweetSpot } from "@/components/review/SweetSpot";
 import { herstellerProfil } from "@/lib/aromakarte";
 import { eintragAnker, eintragHref, type EintragDaten } from "@/components/review/eintrag";
-import { Badge, buttonKlassen, type BadgeVariante } from "@/components/ui";
+import { Avatar, Badge, buttonKlassen, type BadgeVariante } from "@/components/ui";
 import { cn } from "@/lib/cn";
 import { formatiereDatum, formatiereProzent, formatiereWert, formatiereZahl } from "@/lib/format";
 import type { Sprache } from "@/lib/i18n/sprache-kern";
@@ -135,10 +135,12 @@ export function Doppelseite({ eintrag, umfang, ueberschrift: Ueberschrift, story
             dasselbe wie in der Blütenübersicht (Nutzer 2026-09-26). */}
         {eintrag.bildPfad ? <KartenBild bildPfad={eintrag.bildPfad} symbolbild={w.aroma.sortenKopf.symbolbild} /> : null}
 
-        {/* Wer spricht. Platz für die Komponente <Avatar> (T8, Ruling R3): sie kommt
-            in diesen Block vor den Namen (dann als Zeile Avatar + Name); bis dahin
-            steht der Name ohne Bild. */}
-        <div>
+        {/* Wer spricht: Avatar (T8) vor dem Namen. Ohne Autor und ohne Betreiber
+            (ohneName) gibt es keinen Kreis, sonst stünde ein Initial für "Anonym". */}
+        <div className="flex items-center gap-4">
+          {eintrag.autorName || eintrag.istBetreiber ? (
+            <Avatar name={name} bildId={eintrag.autorAvatarId} groesse="md" />
+          ) : null}
           {/* gap-1 = 4px: Name und Datum bzw. Marke sind ein Paar. Die Zeilen sind
               Blöcke, damit sie der Textausrichtung der Seite folgen. */}
           <p className="flex flex-col gap-1">

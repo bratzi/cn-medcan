@@ -1,5 +1,5 @@
 import { BlueteFreigabe } from "@/components/admin/BlueteFreigabe";
-import { Badge, Card, CardBody, CardHeader, EmptyState, textLinkKlassen } from "@/components/ui";
+import { Avatar, Badge, Card, CardBody, CardHeader, EmptyState, textLinkKlassen } from "@/components/ui";
 import { ladeStrainAuswahl } from "@/lib/query/strains";
 import { herstellerNamen, offeneVorschlaegeFuerAdmin, terpenNamen } from "@/lib/query/vorschlaege";
 import { freigabeVorbelegen, quelleAlsLink, vorschlaegeBuendeln } from "@/lib/vorschlag-eingabe";
@@ -49,6 +49,7 @@ export async function BlueteVorschlaege() {
                     const link = quelleAlsLink(v.quelle);
                     return (
                       <li key={v.id} className="text-small text-text">
+                        <Avatar name={v.anzeigename} bildId={v.avatarId} groesse="sm" className="mr-2 align-middle" />
                         <span className="font-medium">{v.anzeigename}</span>
                         <span className="text-text-muted">, {DATUM.format(v.erstelltAm)}. Quelle: </span>
                         {link ? (

@@ -45,3 +45,6 @@ export {
 export type { TableProps, TableHeaderCellProps } from "./Table";
 
 export { useHydriert } from "./useHydriert";
+
+export { Avatar } from "./Avatar";
+export type { AvatarGroesse } from "./Avatar";

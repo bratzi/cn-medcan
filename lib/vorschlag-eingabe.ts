@@ -213,6 +213,8 @@ export type OffenerVorschlag = {
   id: string;
   mitgliedId: string;
   anzeigename: string;
+  /** Bild-Id des Profilbilds (T8), null ohne Bild. */
+  avatarId?: string | null;
   handelsname: string;
   schluessel: string;
   hersteller: string | null;

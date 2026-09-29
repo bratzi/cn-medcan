@@ -167,6 +167,8 @@ export type VorschlagAnsicht = {
   begruendung: string | null;
   uebernommen: boolean;
   vonAnzeigename: string;
+  /** Bild-Id des Profilbilds (T8), null ohne Bild. */
+  vonAvatarId: string | null;
   erstelltAm: Date;
 };
 
@@ -182,7 +184,7 @@ export async function vorschlaegeLaden(umfrageId: string): Promise<VorschlagAnsi
       uebernommen: true,
       erstelltAm: true,
       strain: { select: { handelsname: true, slug: true } },
-      mitglied: { select: { anzeigename: true } },
+      mitglied: { select: { anzeigename: true, avatar: { select: { id: true } } } },
     },
     // Offene Vorschlaege zuerst - das ist die Arbeit, die ansteht.
     orderBy: [{ uebernommen: "asc" }, { erstelltAm: "asc" }],
@@ -197,6 +199,7 @@ export async function vorschlaegeLaden(umfrageId: string): Promise<VorschlagAnsi
     begruendung: v.begruendung,
     uebernommen: v.uebernommen,
     vonAnzeigename: v.mitglied.anzeigename,
+    vonAvatarId: v.mitglied.avatar?.id ?? null,
     erstelltAm: v.erstelltAm,
   }));
 }

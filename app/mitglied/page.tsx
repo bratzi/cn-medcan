@@ -4,8 +4,9 @@ import { redirect } from "next/navigation";
 
 import { AbmeldeButton } from "@/components/auth/AbmeldeButton";
 import { ProfilFormular } from "@/components/auth/ProfilFormular";
+import { AvatarFormular } from "@/components/mitglied/AvatarFormular";
 import { GelesenMarkieren } from "@/components/mitglied/GelesenMarkieren";
-import { Badge, buttonKlassen, Card, CardBody, CardHeader, textLinkKlassen } from "@/components/ui";
+import { Avatar, Badge, buttonKlassen, Card, CardBody, CardHeader, textLinkKlassen } from "@/components/ui";
 import { benachrichtigungenLaden } from "@/lib/query/benachrichtigungen";
 import { eigeneVorschlaege } from "@/lib/query/vorschlaege";
 import { holeWoerterbuch } from "@/lib/i18n";
@@ -41,9 +42,12 @@ export default async function MitgliedPage() {
   return (
     <div className="mx-auto w-full max-w-180 px-4 py-16 sm:px-8">
       <div className="flex flex-wrap items-start justify-between gap-4">
-        <div>
-          <h1 className="text-h1 text-text">{w.kopf.navigation.konto}</h1>
-          <p className="mt-2 text-body text-text-muted">{mitglied.email}</p>
+        <div className="flex items-center gap-4">
+          <Avatar name={mitglied.anzeigename} bildId={mitglied.avatarId} groesse="md" />
+          <div>
+            <h1 className="text-h1 text-text">{w.kopf.navigation.konto}</h1>
+            <p className="mt-2 text-body text-text-muted">{mitglied.email}</p>
+          </div>
         </div>
         <AbmeldeButton texte={w.auth.formular} />
       </div>
@@ -172,6 +176,24 @@ export default async function MitgliedPage() {
           </Card>
         </section>
       ) : null}
+
+      <section aria-labelledby="avatar-titel" className="mt-8">
+        <Card>
+          <CardHeader>
+            <h2 id="avatar-titel" className="text-h3 text-text">
+              {texte.avatar.titel}
+            </h2>
+          </CardHeader>
+          <CardBody>
+            <AvatarFormular
+              name={mitglied.anzeigename}
+              avatarId={mitglied.avatarId}
+              texte={texte.avatar}
+              meldungen={w.meldung}
+            />
+          </CardBody>
+        </Card>
+      </section>
 
       <section aria-labelledby="profil-titel" className="mt-8">
         <Card>

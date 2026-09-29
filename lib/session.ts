@@ -26,6 +26,8 @@ export type AngemeldetesMitglied = {
   email: string;
   anzeigename: string;
   instagramHandle: string | null;
+  /// Bild-Id des Profilbilds (/api/bild/<id>), null ohne Bild. Nie das BLOB selbst.
+  avatarId: string | null;
   /// Manuell vom Betreiber freigegeben - erst damit besteht Stimmrecht.
   freigegeben: boolean;
   rolle: MitgliedRolle;
@@ -56,12 +58,14 @@ export const aktuellesMitglied = cache(async (): Promise<AngemeldetesMitglied | 
   const prisma = await getPrisma();
   // Erst lesen: der Satz existiert fast immer. Nur wenn er fehlt, nachlegen -
   // kein Schreibzugriff je Render. Eindeutigkeit sichert der Unique-Index auf userId.
+  const mitAvatar = { avatar: { select: { id: true } } } as const;
   const satz =
-    (await prisma.mitglied.findUnique({ where: { userId: sitz.user.id } })) ??
+    (await prisma.mitglied.findUnique({ where: { userId: sitz.user.id }, include: mitAvatar })) ??
     (await prisma.mitglied.upsert({
       where: { userId: sitz.user.id },
       create: { userId: sitz.user.id, anzeigename: sitz.user.name },
       update: {},
+      include: mitAvatar,
     }));
 
   return {
@@ -70,6 +74,7 @@ export const aktuellesMitglied = cache(async (): Promise<AngemeldetesMitglied | 
     email: sitz.user.email,
     anzeigename: satz.anzeigename,
     instagramHandle: satz.instagramHandle,
+    avatarId: satz.avatar?.id ?? null,
     freigegeben: satz.freigegeben,
     // Ein Wert, der an den Triggern vorbei in die Spalte kam, faellt hier auf
     // die niedrigste Rolle zurueck statt ungeprueft Rechte zu tragen.

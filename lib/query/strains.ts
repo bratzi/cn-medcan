@@ -170,6 +170,8 @@ export type ReviewEintrag = {
   istRedaktionell: boolean;
   /** Anzeigename des Autors (Buch, T7); null ohne Autor (Seed, gelöschtes Mitglied). */
   autorName: string | null;
+  /** Bild-Id des Profilbilds (T8), nie das BLOB. */
+  autorAvatarId?: string | null;
   /** Gesamtnote in Blättern (T4); null bei Altbewertungen. */
   gesamtnote: number | null;
   aussehen: number;
@@ -610,7 +612,7 @@ export async function ladeStrainDetail(
           gesamtnote: true,
           charge: { select: { chargenNr: true } },
           // Der Name steht öffentlich im Buch (Profil: "Unter diesem Namen erscheinen deine Bewertungen").
-          autor: { select: { anzeigename: true } },
+          autor: { select: { anzeigename: true, avatar: { select: { id: true } } } },
         },
       },
       kennwerte: KENNWERTE_SELECT,
@@ -683,6 +685,7 @@ export async function ladeStrainDetail(
       id: review.id,
       istRedaktionell: review.istRedaktionell,
       autorName: review.autor?.anzeigename ?? null,
+      autorAvatarId: review.autor?.avatar?.id ?? null,
       gesamtnote: zuZahl(review.gesamtnote),
       aussehen: review.aussehen,
       geruch: review.geruch,

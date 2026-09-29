@@ -46,12 +46,13 @@ export async function offeneVorschlaegeFuerAdmin(): Promise<OffenerVorschlag[]> 
     where: { status: "OFFEN" },
     orderBy: { erstelltAm: "asc" },
     take: MAX_ADMIN,
-    include: { mitglied: { select: { anzeigename: true } } },
+    include: { mitglied: { select: { anzeigename: true, avatar: { select: { id: true } } } } },
   });
   return zeilen.map((z) => ({
     id: z.id,
     mitgliedId: z.mitgliedId,
     anzeigename: z.mitglied.anzeigename,
+    avatarId: z.mitglied.avatar?.id ?? null,
     handelsname: z.handelsname,
     schluessel: z.schluessel,
     hersteller: z.hersteller,

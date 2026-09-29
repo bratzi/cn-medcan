@@ -10,6 +10,7 @@ import { RundeAnlegenFormular } from "@/components/admin/RundeAnlegenFormular";
 import { RundeSteuerung } from "@/components/admin/RundeSteuerung";
 import { VorschlagListe } from "@/components/admin/VorschlagListe";
 import {
+  Avatar,
   Badge,
   buttonKlassen,
   Card,
@@ -218,6 +219,7 @@ async function MitgliederBereich({ eigeneMitgliedId }: { eigeneMitgliedId: strin
         freigegebenAm: true,
         rolle: true,
         erstelltAm: true,
+        avatar: { select: { id: true } },
         user: { select: { email: true } },
       },
       // Offene Freigaben zuerst - das ist die Arbeit, die hier ansteht.
@@ -284,7 +286,8 @@ async function MitgliederBereich({ eigeneMitgliedId }: { eigeneMitgliedId: strin
                     return (
                       <TableRow key={satz.id}>
                         <TableCell>
-                          <span className="block font-medium text-text">
+                          <span className="flex items-center gap-2 font-medium text-text">
+                            <Avatar name={satz.anzeigename} bildId={satz.avatar?.id} groesse="sm" />
                             {satz.anzeigename}
                           </span>
                           <span className="block text-small text-text-muted">

@@ -34,3 +34,23 @@ export function Bild({ id, sizes, className, prioritaet = false, dekorativ = fal
     />
   );
 }
+
+/**
+ * Bild eines Mitglieds aus D1 (T8, Avatare, Nutzer 2026-09-29): kommt von
+ * /api/bild/<id>, nicht aus der Medien-Pipeline, und bleibt deshalb eine
+ * eigene Komponente, aber in dieser Datei, weil hier die einzige Stelle mit
+ * <img> ist. Immer dekorativ (alt leer): der Name steht daneben.
+ */
+export function NutzerBild({ id, seite, className }: { id: string; seite: number; className?: string }) {
+  return (
+    <img
+      src={`/api/bild/${id}`}
+      width={seite}
+      height={seite}
+      alt=""
+      loading="lazy"
+      decoding="async"
+      className={cn("block object-cover", className)}
+    />
+  );
+}

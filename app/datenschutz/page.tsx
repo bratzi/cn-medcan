@@ -37,6 +37,10 @@ import {
  * - Schriften: next/font/google in app/layout.tsx (beim Build eingebettet,
  *   keine Anfrage an Google im Browser). Medien aus public/medien.
  * - Keine Analyse- oder Werbedienste im Code und in package.json.
+ * - Profilbild: prisma/schema.prisma (NutzerAvatar, BLOB in D1, 128 x 128 WebP,
+ *   höchstens 30 KB), app/mitglied/aktionen.ts (setzen und löschen nur für das
+ *   eigene Mitglied), app/api/bild/[id]/route.ts (öffentlich abrufbar per
+ *   Zufalls-ID); Cascade beim Löschen des Mitglieds.
  * - Löschen: User -> Mitglied, Sitzungen, Konto per Cascade; Stimmen,
  *   Vorschläge, Blütenvorschläge, Benachrichtigungen per Cascade;
  *   Bewertungen per SetNull (bleiben ohne Autor). Kein Selbstlöschen im
@@ -97,7 +101,7 @@ const SPEICHER: Speicher[] = [
   {
     name: "benachrichtigungen-ungelesen",
     art: "sessionStorage",
-    zweck: "Zwischenspeicher für die Zahl ungelesener Nachrichten an der Kontopille.",
+    zweck: "Zwischenspeicher für die Zahl ungelesener Nachrichten, deinen Anzeigenamen und die Kennung deines Profilbilds an der Kontopille.",
     dauer: "Höchstens bis du den Tab schließt",
   },
 ];
@@ -195,8 +199,18 @@ export default async function DatenschutzPage() {
               uns.
             </p>
             <p className="text-pretty">
+              Ein Profilbild ist freiwillig. Dein Browser schneidet es auf 128 × 128 Punkte zu und
+              verkleinert es, bevor es hochgeladen wird. Wir speichern nur dieses kleine Bild, nie
+              das Original, in unserer Datenbank (Cloudflare D1, EU). Es erscheint neben deinem
+              Anzeigenamen bei Bewertungen und Vorschlägen und ist über seine Adresse abrufbar.
+              Ohne Bild zeigen wir deine Initialen. Du kannst es jederzeit unter „Mein Konto“
+              austauschen oder entfernen; dann wird es gelöscht. Beim Löschen deines Kontos
+              verschwindet es mit.
+            </p>
+            <p className="text-pretty">
               Rechtsgrundlage ist die Mitgliedschaft, die du mit der Registrierung eingehst (Art. 6
-              Abs. 1 lit. b DSGVO).
+              Abs. 1 lit. b DSGVO), beim Profilbild deine Einwilligung durch das Hochladen (Art. 6
+              Abs. 1 lit. a DSGVO).
             </p>
           </Abschnitt>
 

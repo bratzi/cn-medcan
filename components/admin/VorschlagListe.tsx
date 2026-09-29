@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 import { VorschlagUebernehmen } from "@/components/admin/VorschlagUebernehmen";
-import { Badge, Card, CardBody, CardHeader } from "@/components/ui";
+import { Avatar, Badge, Card, CardBody, CardHeader } from "@/components/ui";
 import { formatiereDatum } from "@/lib/format";
 import type { VorschlagAnsicht } from "@/lib/query/umfragen";
 import type { UmfragePhase } from "@/db/enums";
@@ -62,7 +62,8 @@ export function VorschlagListe({ vorschlaege, phase }: Props) {
                       >
                         {vorschlag.handelsname}
                       </Link>
-                      <p className="mt-2 text-small text-text-muted">
+                      <p className="mt-2 flex items-center gap-2 text-small text-text-muted">
+                        <Avatar name={vorschlag.vonAnzeigename} bildId={vorschlag.vonAvatarId} groesse="sm" />
                         {`Von ${vorschlag.vonAnzeigename} · ${formatiereDatum(vorschlag.erstelltAm)}`}
                       </p>
                       {vorschlag.begruendung ? (
