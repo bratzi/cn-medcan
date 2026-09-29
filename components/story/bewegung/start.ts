@@ -75,11 +75,15 @@ export async function starteBuehne(): Promise<() => void> {
   ]);
   gsap.registerPlugin(ScrollTrigger, SplitText);
 
-  // Lenis als einzige Scroll-Glaettung, getaktet ueber den GSAP-Ticker.
-  const lenis = new Lenis({ autoRaf: false });
-  lenis.on("scroll", ScrollTrigger.update);
-  const takt = (sekunden: number) => lenis.raf(sekunden * 1000);
-  gsap.ticker.add(takt);
+  // Lenis als einzige Scroll-Glaettung, getaktet ueber den GSAP-Ticker. Auf
+  // Touch glaettet Lenis nicht (syncTouch aus) und kostete nur Takt: dort
+  // scrollt das Fenster nativ, und die Adressleiste loest kein Neumessen aus.
+  const touch = window.matchMedia("(pointer: coarse)").matches;
+  const lenis = touch ? null : new Lenis({ autoRaf: false });
+  lenis?.on("scroll", ScrollTrigger.update);
+  const takt = (sekunden: number) => lenis?.raf(sekunden * 1000);
+  if (lenis) gsap.ticker.add(takt);
+  if (touch) ScrollTrigger.config({ ignoreMobileResize: true });
   gsap.ticker.lagSmoothing(0);
 
   const mm = gsap.matchMedia();
@@ -122,6 +126,6 @@ export async function starteBuehne(): Promise<() => void> {
     mm.revert();
     ctx.revert();
     gsap.ticker.remove(takt);
-    lenis.destroy();
+    lenis?.destroy();
   };
 }
