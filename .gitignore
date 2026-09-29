@@ -61,3 +61,7 @@ next-env.d.ts
 
 # Arbeitskopie fuer `prisma migrate diff` (siehe db/README.md)
 db/.migrate-diff.sqlite
+
+# private Sammlung des Nutzers, Repo ist public
+/1.json
+__pycache__/
