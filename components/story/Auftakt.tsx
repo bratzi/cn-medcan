@@ -98,7 +98,7 @@ export async function Auftakt() {
           <Link
             href="/blueten"
             data-punkt-tiefe="1"
-            className="konto-pille inline-flex h-14 items-center rounded-full px-10 font-sans text-small font-medium uppercase tracking-gesperrt text-text"
+            className="konto-pille inline-flex h-14 items-center justify-center rounded-full px-8 text-center whitespace-nowrap sm:px-10 font-sans text-small font-medium uppercase tracking-gesperrt text-text"
           >
             {texte.mitmachen}
           </Link>
