@@ -38,7 +38,8 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 - web-perf live (/, warm): TTFB 3,1 s (CPU-Limit Free, Entscheid c), load 4,1 s; 1 MB JS entpackt, Schrift 296 KB
   (Newsreader normal+kursiv mit opsz, Designentscheid, belassen), Bilder 73 KB. Kein weiterer schneller Hebel.
 - Hell-Modus 390 px: /blueten, /reviews sauber, kein Überlauf. / und /admin/vorschlaege lieferten 08:04 UTC 1102.
-- Offen A6: Hell-Modus Startseite mobil ansehen, Testblüte freigeben (A2), beides wenn der Worker nicht 1102 liefert.
+- Hell-Modus Startseite mobil geprüft; einziger Befund Hero-Knopf umbrach linksbündig, behoben `336789f` (live geprüft).
+- A2 erledigt: keine offenen Vorschläge, Testblüte ist freigegeben und mit Review sichtbar. **A6 damit abgeschlossen.**
 - Alt-Liste A6: Lenis/GSAP-Last, web-perf, Hell-Modus mobil, Credits-Links im Fuß ERLEDIGT `a4522f3` (pointer-coarse 44 px; live: Klassen und CSS-Regeln von a4522f3 und f858c9f ausgeliefert, echtes Handy nicht getestet), Testblüte freigeben (A2).
 
 ### ⇢ SESSION 25 (2026-09-28/29, läuft) — Nutzerauftrag Mobil vorgezogen
