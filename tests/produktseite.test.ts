@@ -12,7 +12,8 @@ test("Produktseite: Rückweg als 44-px-Einzellink", () => {
 test("Produktseite: die Bewertungsmaske sitzt am Anker #bewerten, kein Link führt mehr auf /bewerten", () => {
   assert.match(QUELLE, /id="bewerten"/);
   assert.match(QUELLE, /<BewertungsFormular\b/);
-  assert.equal(QUELLE.match(/href="#bewerten"/g)?.length, 2);
+  // Der zweite Weg ("Erste Bewertung abgeben") steht seit T7 über dem Buch: tests/buch.test.ts.
+  assert.equal(QUELLE.match(/href="#bewerten"/g)?.length, 1);
   assert.doesNotMatch(QUELLE, /["`]\/bewerten\//);
   // Gäste kommen nach dem Anmelden zurück an die Maske: das Fragment steckt kodiert im Ziel.
   assert.match(QUELLE, /\/anmelden\?weiter=\$\{encodeURIComponent\(`\/blueten\/\$\{strain\.slug\}#bewerten`\)\}/);

@@ -7,8 +7,6 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { CannabinoidBar } from "@/components/produkt/CannabinoidBar";
 import { TerpenChips } from "@/components/produkt/TerpenChips";
 import { Titelblatt, type TitelblattProps } from "@/components/produkt/Titelblatt";
-import { CommunityStimmen } from "@/components/review/CommunityStimmen";
-import type { ReviewEintrag } from "@/lib/query/strains";
 import { de } from "@/lib/i18n/de";
 
 const BASIS: TitelblattProps = {
@@ -60,36 +58,7 @@ test("Keine Verfügbarkeit im Titelblatt: Apotheken nur in Aussicht (Nutzer 2026
   assert.doesNotMatch(zeige({ ...BASIS, anzahlApothekenVerfuegbar: 0 }), /lieferbar/);
 });
 
-function stimme(id: string, note: number, notiz: string | null): ReviewEintrag {
-  return {
-    id,
-    istRedaktionell: false,
-    aussehen: note,
-    geruch: note,
-    geschmack: note,
-    wirkung: note,
-    konsistenz: note,
-    feuchtigkeitProzent: null,
-    geschmacksMatrix: null,
-    terpenIntensitaet: null,
-    beschaffenheit: null,
-    notiz,
-    instagramReelUrl: null,
-    chargenNr: null,
-    erstelltAm: TAG,
-  };
-}
-
-test("Community: Mittel in Einzahl und Mehrzahl als ganze Sätze", () => {
-  const eine = renderToStaticMarkup(createElement(CommunityStimmen, { bewertungen: [stimme("c1", 3, null)], mittel: 3, w: de, sprache: "de" }));
-  assert.match(eine, /Aus einer Bewertung: <span class="numeric">3,0<\/span> von 5/);
-  const zwei = renderToStaticMarkup(
-    createElement(CommunityStimmen, { bewertungen: [stimme("c1", 3, "Gut."), stimme("c2", 4, null)], mittel: 3.5, w: de, sprache: "de" }),
-  );
-  assert.match(zwei, /Mittel aus 2 Bewertungen: <span class="numeric">3,5<\/span> von 5/);
-  assert.equal(zwei.match(/<li/g)?.length, 2);
-  assert.match(zwei, /<h2[^>]*>Stimmen der Community<\/h2>/);
-});
+// Das Mittel der Community steht seit T7 über dem Buch: tests/buch.test.ts.
 
 test("Datengrafik in Tinte, Terpen-Chips als Pillen ohne Grün", () => {
   const balken = renderToStaticMarkup(createElement(CannabinoidBar, { thcMin: 20, thcMax: 24, cbdMin: 0, cbdMax: 1, w: de, sprache: "de" }));

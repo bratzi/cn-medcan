@@ -27,6 +27,9 @@ function eintrag(teil: Partial<EintragDaten> = {}): EintragDaten {
     instagramReelUrl: null,
     chargenNr: "CH-2401",
     erstelltAm: new Date("2026-09-12T12:00:00Z"),
+    istBetreiber: true,
+    autorName: "Waldi",
+    gesamtnote: 3.5,
     terpene: [],
     terpenIntensitaet: { Myrcen: 3, Limonen: 4 },
     beschaffenheit: {},
@@ -37,12 +40,19 @@ function eintrag(teil: Partial<EintragDaten> = {}): EintragDaten {
 const zeige = (props: Omit<DoppelseiteProps, "w" | "sprache">) =>
   renderToStaticMarkup(createElement(Doppelseite, { ...props, w: de, sprache: "de" }));
 
+/** Die zwei Seiten einer Doppelseite getrennt: alles vor der rechten Seite ist die linke. */
+function seiten(html: string) {
+  const teil = html.split('data-buchseite="rechts"');
+  assert.equal(teil.length, 2, "genau eine rechte Seite");
+  assert.equal(teil[0].split('data-buchseite="links"').length, 2, "genau eine linke Seite");
+  return { links: teil[0], rechts: teil[1] };
+}
+
 test("Auszug: vier Noten ohne Wirkung, Link springt auf den Eintrag", () => {
   const html = zeige({ eintrag: eintrag(), umfang: "auszug", ueberschrift: "h3" });
   assert.equal(html.match(/<dt/g)?.length, 4);
   assert.doesNotMatch(html, /Wirkung/);
   assert.match(html, /href="\/blueten\/nebelharz-22#eintrag-r1"/);
-  assert.match(html, /line-clamp-3/);
   assert.match(html, />Nebelharz 22 \(fiktiv\)<\/h3>/);
 });
 
@@ -53,12 +63,68 @@ test("Voll: fünf Noten, Überschrift mit Datum, Restfeuchte, kein Link", () => 
   assert.match(html, /Bewertung vom/);
   assert.match(html, /Restfeuchte optimal/);
   assert.doesNotMatch(html, /Ganzen Eintrag lesen/);
-  assert.doesNotMatch(html, /line-clamp-3/);
+  assert.doesNotMatch(html, /line-clamp/);
 });
 
-test("Voll ohne Charge sagt es ausdrücklich", () => {
+test("Links Kopf, Name, Blätter-Note und darunter der Text; rechts Werte, Karte und Charge", () => {
+  for (const umfang of ["auszug", "voll"] as const) {
+    const { links, rechts } = seiten(zeige({ eintrag: eintrag(), umfang, ueberschrift: "h3" }));
+    assert.match(links, /<h3 id="eintrag-r1-titel"/, umfang);
+    assert.match(links, />Waldi</, umfang);
+    assert.match(links, /3,5 von 5 Blättern/, umfang);
+    assert.match(links, /Sehr dichte Blüten\./, umfang);
+    // Der Text steht unter Name und Note, nicht darüber.
+    assert.ok(links.indexOf("3,5 von 5 Blättern") < links.indexOf("Sehr dichte Blüten."), umfang);
+    assert.doesNotMatch(links, /<dt|<figure|Charge CH-2401/, umfang);
+    assert.match(rechts, /<dt/, umfang);
+    assert.match(rechts, /<figure/, umfang);
+    assert.match(rechts, /Charge CH-2401/, umfang);
+    assert.doesNotMatch(rechts, /Sehr dichte Blüten\./, umfang);
+  }
+});
+
+test("Die Blätter-Note ist die Anzeige der Blattnote, ohne Eingabe", () => {
+  const { links } = seiten(zeige({ eintrag: eintrag({ gesamtnote: 3.5 }), umfang: "voll", ueberschrift: "h3" }));
+  assert.doesNotMatch(links, /<input|<fieldset|<button/);
+  // Fünf Blätter: drei volle, ein halbes, ein leeres (je zwei Hälften plus Kontur und Stiel).
+  assert.equal(links.match(/<svg aria-hidden="true" viewBox="0 0 24 24"/g)?.length, 5);
+  assert.equal(links.match(/fill-accent opacity-100/g)?.length, 7);
+});
+
+test("Ohne Gesamtnote (Altbewertung) keine Blätter und keine leere Zahl", () => {
+  const html = zeige({ eintrag: eintrag({ gesamtnote: null }), umfang: "voll", ueberschrift: "h3" });
+  assert.doesNotMatch(html, /von 5 Blättern|NaN/);
+});
+
+test("Voll: Betreiber und Community sind an der Marke zu unterscheiden", () => {
+  const betreiber = seiten(zeige({ eintrag: eintrag(), umfang: "voll", ueberschrift: "h3" })).links;
+  assert.match(betreiber, />Betreiber</);
+  assert.doesNotMatch(betreiber, />Community</);
+  const community = seiten(
+    zeige({ eintrag: eintrag({ istBetreiber: false, autorName: "Mia" }), umfang: "voll", ueberschrift: "h3" }),
+  ).links;
+  assert.match(community, />Mia</);
+  assert.match(community, />Community</);
+  assert.doesNotMatch(community, />Betreiber</);
+});
+
+test("Ohne Autor (Seed, gelöschtes Mitglied) steht ein Ersatzname statt einer Lücke", () => {
+  const betreiber = zeige({ eintrag: eintrag({ autorName: null }), umfang: "voll", ueberschrift: "h3" });
+  assert.match(seiten(betreiber).links, />Book of Terpz</);
+  const community = zeige({ eintrag: eintrag({ autorName: null, istBetreiber: false }), umfang: "voll", ueberschrift: "h3" });
+  assert.match(seiten(community).links, />Mitglied</);
+});
+
+test("Auszug: Datum beim Namen, Charge rechts; der Text links bleibt gekürzt", () => {
+  const { links, rechts } = seiten(zeige({ eintrag: eintrag(), umfang: "auszug", ueberschrift: "h3" }));
+  assert.match(links, /<time [^>]*>12\.09\.2026<\/time>/);
+  assert.match(links, /line-clamp-6/);
+  assert.match(rechts, /Charge CH-2401/);
+});
+
+test("Voll ohne Charge sagt es ausdrücklich, auf der rechten Seite", () => {
   const html = zeige({ eintrag: eintrag({ chargenNr: null }), umfang: "voll", ueberschrift: "h3" });
-  assert.match(html, /Charge nicht angegeben/);
+  assert.match(seiten(html).rechts, /Charge nicht angegeben/);
 });
 
 test("Id und Überschrift eindeutig je Eintrag", () => {
@@ -97,11 +163,13 @@ test("Lange Handelsnamen brechen um statt überzulaufen", () => {
   assert.match(html, /hyphens-auto/);
 });
 
-test("alsEintrag: Name und Slug vom Produkt, kaputte Matrix wird neutral", () => {
+test("alsEintrag: Name und Slug vom Produkt, kaputte Matrix wird neutral, Autor und Gesamtnote durchgereicht", () => {
   const e = alsEintrag(
     {
       id: "r1",
-      istRedaktionell: true,
+      istRedaktionell: false,
+      autorName: "Mia",
+      gesamtnote: 4.5,
       aussehen: 4,
       geruch: 4,
       geschmack: 4,
@@ -121,6 +189,9 @@ test("alsEintrag: Name und Slug vom Produkt, kaputte Matrix wird neutral", () =>
   assert.equal(e.handelsname, "Nebelharz 22 (fiktiv)");
   assert.equal(e.slug, "nebelharz-22");
   assert.deepEqual(e.geschmacksMatrix, leereGeschmacksMatrix());
+  assert.equal(e.istBetreiber, false);
+  assert.equal(e.autorName, "Mia");
+  assert.equal(e.gesamtnote, 4.5);
   assert.equal(eintragHref("nebelharz-22", "r1"), "/blueten/nebelharz-22#eintrag-r1");
 });
 
@@ -132,12 +203,17 @@ test("Überschrift: auf Unterseiten kleiner als der Abschnittstitel, auf der Sta
   assert.match(startseite, /<h3 id="eintrag-r1-titel" class="[^"]*\btext-kapitel\b/);
 });
 
-test("Buchfalz ab lg: leiser Verlauf genau an der Mitte, 2rem je Seite", () => {
+test("Buchfalz ab lg: je Seite ein leiser Verlauf von 2rem an der Mitte, die Seiten deckend fürs Umblättern", () => {
   const html = zeige({ eintrag: eintrag(), umfang: "auszug", ueberschrift: "h3" });
+  assert.match(html, /<article [^>]*class="[^"]*\blg:grid-cols-2\b/);
   assert.match(
     html,
-    /<article [^>]*class="[^"]*\blg:grid-cols-2 lg:bg-\[linear-gradient\(90deg,transparent_calc\(50%_-_2rem\),color-mix\(in_oklab,var\(--color-text\)_7%,transparent\)_50%,transparent_calc\(50%_\+_2rem\)\)\]/,
+    /data-buchseite="links" class="[^"]*\bbg-surface-raised\b[^"]*\blg:bg-\[linear-gradient\(to_left,color-mix\(in_oklab,var\(--color-text\)_7%,transparent\),transparent_2rem\)\]/,
+  );
+  assert.match(
+    html,
+    /data-buchseite="rechts" class="[^"]*\bbg-surface-raised\b[^"]*\blg:bg-\[linear-gradient\(to_right,color-mix\(in_oklab,var\(--color-text\)_7%,transparent\),transparent_2rem\)\]/,
   );
   // Die Seiten haben ab sm 3rem Innenabstand: der Falz (2rem) reicht nicht unter Bild oder Text.
-  assert.equal(html.match(/flex min-w-0 flex-col gap-8 p-6 sm:p-12/g)?.length, 2);
+  assert.equal(html.match(/relative flex min-w-0 flex-col gap-8 bg-surface-raised p-6 sm:p-12/g)?.length, 2);
 });

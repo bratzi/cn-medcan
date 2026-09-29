@@ -42,7 +42,12 @@ const UMGESTELLT: string[] = [
   "components/review/GesamteindruckLeiste.tsx",
   "components/review/BeschaffenheitsLeiste.tsx",
   "components/review/Aufklaerung.tsx",
-  "components/review/CommunityStimmen.tsx",
+  // T7: Buch zum Blättern (CommunityStimmen ging darin auf).
+  "components/review/Buch.tsx",
+  "components/review/BewertungsBuch.tsx",
+  "components/review/BlattAnzeige.tsx",
+  "components/medien/SchalterSymbole.tsx",
+  "lib/buch.ts",
   "components/review/Inhaltsverzeichnis.tsx",
   "components/review/Doppelseite.tsx",
   "components/review/erkundung-daten.ts",

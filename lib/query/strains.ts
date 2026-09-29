@@ -168,6 +168,10 @@ export type ReviewEintrag = {
   id: string;
   /** true = Bewertung des Betreibers, false = Community (Zweitstimme). */
   istRedaktionell: boolean;
+  /** Anzeigename des Autors (Buch, T7); null ohne Autor (Seed, gelöschtes Mitglied). */
+  autorName: string | null;
+  /** Gesamtnote in Blättern (T4); null bei Altbewertungen. */
+  gesamtnote: number | null;
   aussehen: number;
   geruch: number;
   geschmack: number;
@@ -602,7 +606,10 @@ export async function ladeStrainDetail(
           notiz: true,
           instagramReelUrl: true,
           erstelltAm: true,
+          gesamtnote: true,
           charge: { select: { chargenNr: true } },
+          // Der Name steht öffentlich im Buch (Profil: "Unter diesem Namen erscheinen deine Bewertungen").
+          autor: { select: { anzeigename: true } },
         },
       },
       kennwerte: KENNWERTE_SELECT,
@@ -674,6 +681,8 @@ export async function ladeStrainDetail(
     reviews: zeile.reviews.map((review) => ({
       id: review.id,
       istRedaktionell: review.istRedaktionell,
+      autorName: review.autor?.anzeigename ?? null,
+      gesamtnote: zuZahl(review.gesamtnote),
       aussehen: review.aussehen,
       geruch: review.geruch,
       geschmack: review.geschmack,

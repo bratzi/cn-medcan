@@ -2,20 +2,17 @@
 
 import { useId, useRef, useState } from "react";
 
+import { BlattGlyphe, blattFuellungen } from "@/components/review/BlattAnzeige";
 import { cn } from "@/lib/cn";
 import { formatiereWert } from "@/lib/format";
 import type { Sprache } from "@/lib/i18n/sprache-kern";
 import { t } from "@/lib/i18n/text";
 import type { Woerterbuch } from "@/lib/i18n/typen";
 
-export type Fuellung = "voll" | "halb" | "leer";
+// Zeichnung und Füllung teilen Eingabe und Anzeige (BlattAnzeige.tsx, T7).
+export { blattFuellungen, type Fuellung } from "@/components/review/BlattAnzeige";
 
 const BLAETTER = [1, 2, 3, 4, 5] as const;
-
-/** Je Blatt: voll ab der ganzen Stufe, halb ab der halben, sonst leer. */
-export function blattFuellungen(note: number | null): Fuellung[] {
-  return BLAETTER.map((blatt) => (note === null || note < blatt - 0.5 ? "leer" : note >= blatt ? "voll" : "halb"));
-}
 
 /** Ein halbes Blatt mehr (+1) oder weniger (-1), in den Grenzen 0,5 bis 5; ohne Note beginnt Plus bei 0,5. */
 export function halbSchritt(note: number | null, richtung: 1 | -1): number | null {
@@ -27,42 +24,6 @@ export function halbSchritt(note: number | null, richtung: 1 | -1): number | nul
 const STUFEN_KNOPF =
   "hidden size-11 items-center justify-center rounded-full border border-border-strong bg-surface-raised text-h3 text-text " +
   "transition-colors duration-fast ease-standard hover:bg-surface-sunken aria-disabled:opacity-50 pointer-coarse:inline-flex";
-
-/*
- * Fächerblatt mit sieben Fingern im 24er-Raster, spiegelgleich zur Mittelachse
- * x = 12. Die zwei Hälften sind eigene Flächen (der Mittelfinger längs geteilt),
- * so füllt sich ein halbes Blatt ohne clipPath und ohne ids im Dokument.
- */
-const KONTUR =
-  "M12 16.5Q9 9 12 1.5Q15 9 12 16.5ZM12 16.5Q10.4 9.9 4.7 6.4Q6.2 13 12 16.5ZM12 16.5Q8 12.5 2.3 12.6Q6.3 16.6 12 16.5ZM12 16.5Q8.7 15.8 6.2 18.2Q9.6 18.9 12 16.5ZM12 16.5Q17.8 13 19.3 6.4Q13.6 9.9 12 16.5ZM12 16.5Q17.7 16.6 21.7 12.6Q16 12.5 12 16.5ZM12 16.5Q14.4 18.9 17.8 18.2Q15.3 15.8 12 16.5Z";
-const LINKS =
-  "M12 16.5Q9 9 12 1.5ZM12 16.5Q10.4 9.9 4.7 6.4Q6.2 13 12 16.5ZM12 16.5Q8 12.5 2.3 12.6Q6.3 16.6 12 16.5ZM12 16.5Q8.7 15.8 6.2 18.2Q9.6 18.9 12 16.5Z";
-const RECHTS =
-  "M12 16.5Q15 9 12 1.5ZM12 16.5Q17.8 13 19.3 6.4Q13.6 9.9 12 16.5ZM12 16.5Q17.7 16.6 21.7 12.6Q16 12.5 12 16.5ZM12 16.5Q14.4 18.9 17.8 18.2Q15.3 15.8 12 16.5Z";
-
-/**
- * Ein Blatt, rein dekorativ: gefüllt in `accent`, leer nur die Kontur. Die
- * Vorschau unter dem Zeiger füllt in `accent-hover` (Hover über das eigene
- * Token, nicht über Deckkraft). Bewegung nur Farbe und Deckkraft, kurz; bei
- * reduzierter Bewegung (globale Regel) und im Sparmodus (globals.css,
- * `.blatt-note`) wechselt der Zustand sofort.
- */
-function BlattGlyphe({ fuellung, vorschau }: { fuellung: Fuellung; vorschau: boolean }) {
-  const flaeche = (an: boolean) =>
-    cn(
-      "transition-[fill,opacity] duration-fast ease-standard",
-      vorschau ? "fill-accent-hover" : "fill-accent",
-      an ? "opacity-100" : "opacity-0",
-    );
-  return (
-    <svg aria-hidden="true" viewBox="0 0 24 24" className="pointer-events-none absolute inset-0 size-full text-accent">
-      <path d={LINKS} className={flaeche(fuellung !== "leer")} />
-      <path d={RECHTS} className={flaeche(fuellung === "voll")} />
-      <path d={KONTUR} fill="none" stroke="currentColor" strokeWidth={1} strokeLinejoin="round" />
-      <path d="M12 16.5v5.5" fill="none" stroke="currentColor" strokeWidth={1} strokeLinecap="round" />
-    </svg>
-  );
-}
 
 export type BlattNoteTexte = Pick<
   Woerterbuch["bewerten"],

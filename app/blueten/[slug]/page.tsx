@@ -8,13 +8,12 @@ import { CannabinoidBar } from "@/components/produkt/CannabinoidBar";
 import { TerpenChips } from "@/components/produkt/TerpenChips";
 import { Titelblatt } from "@/components/produkt/Titelblatt";
 import { blueteBild } from "@/lib/medien";
-import { CommunityStimmen } from "@/components/review/CommunityStimmen";
-import { Doppelseite } from "@/components/review/Doppelseite";
 import { Aufklaerung } from "@/components/review/Aufklaerung";
 import { AromaErkundung } from "@/components/review/AromaErkundung";
 import { BewertungsFormular } from "@/components/review/BewertungsFormular";
+import { BewertungsBuch } from "@/components/review/BewertungsBuch";
 import { erkundungsDaten } from "@/components/review/erkundung-daten";
-import { alsEintrag } from "@/components/review/eintrag";
+import { eintragAnker } from "@/components/review/eintrag";
 import {
   Faktenliste,
   buttonKlassen,
@@ -152,10 +151,11 @@ function Chargentabelle({ chargen, w, sprache }: { chargen: StrainDetail["charge
 }
 
 /**
- * Der vollstaendige Eintrag (Spec TP2 4.3): der Kern vorn. Titelblatt, meine
- * Bewertungen, Geschmacksprofil mit der Bewertungsmaske (#bewerten),
- * Community, dann die Produktdaten. Leere Abschnitte entfallen, statt einen
- * Leerzustand zu zeigen (Spec 13.3).
+ * Der vollstaendige Eintrag (Spec TP2 4.3): der Kern vorn. Titelblatt, das
+ * Buch mit allen Bewertungen (seit T7: Betreiber, dann Community), das
+ * Geschmacksprofil mit der Bewertungsmaske (#bewerten), dann die
+ * Produktdaten. Leere Abschnitte entfallen, statt einen Leerzustand zu zeigen
+ * (Spec 13.3).
  */
 async function ProduktInhalt({ slug, w, sprache }: { slug: string; w: Woerterbuch; sprache: Sprache }) {
   const fachkreis = await istFachkreis();
@@ -167,7 +167,7 @@ async function ProduktInhalt({ slug, w, sprache }: { slug: string; w: Woerterbuc
   ]);
   if (!strain) notFound();
 
-  const { eigene, community, meineNote, communityMittel } = teileBewertungen(strain.reviews);
+  const { eigene, community, meineNote } = teileBewertungen(strain.reviews);
   const neuesteEigene = eigene[0];
   const geschmack = verdichteGeschmacksMatrix(strain.reviews);
   const produkt = { handelsname: strain.handelsname, slug: strain.slug, terpene: strain.terpene, bildPfad: strain.herstellerBildPfad };
@@ -206,7 +206,11 @@ async function ProduktInhalt({ slug, w, sprache }: { slug: string; w: Woerterbuc
         <a href="#bewerten" className={buttonKlassen("primary", "md")}>
           {texte.bewerten}
         </a>
-        <a href="#community-titel" className="text-small text-accent underline underline-offset-4 hover:text-accent-hover">
+        {/* Mit Community-Bewertungen schlägt der Link im Buch deren erste Seite auf (Anker #eintrag-…). */}
+        <a
+          href={community.length > 0 ? `#${eintragAnker(community[0].id)}` : "#bewertungen-titel"}
+          className="text-small text-accent underline underline-offset-4 hover:text-accent-hover"
+        >
           {community.length > 0
             ? mehrzahl(sprache, texte.communityLesen, community.length)
             : texte.nochKeineCommunity}
@@ -217,16 +221,11 @@ async function ProduktInhalt({ slug, w, sprache }: { slug: string; w: Woerterbuc
         <p className="mt-8 max-w-[68ch] text-body text-pretty text-text">{strain.beschreibung}</p>
       ) : null}
 
-      {eigene.length > 0 ? (
-        <section aria-labelledby="meine-titel" className={cn(ABSTAND, "flex flex-col gap-8")}>
-          <h2 id="meine-titel" className={ABSCHNITT_TITEL}>
-            {mehrzahl(sprache, texte.unsereBewertung, eigene.length)}
-          </h2>
-          {eigene.map((review) => (
-            <Doppelseite key={review.id} eintrag={alsEintrag(review, produkt)} umfang="voll" ueberschrift="h3" w={w} sprache={sprache} />
-          ))}
-        </section>
-      ) : null}
+      {/* Alle Bewertungen der Sorte als ein Buch zum Blättern (T7): Betreiber zuerst,
+          dann die Community. Ersetzt die eigenen Doppelseiten untereinander und die Liste. */}
+      <div className={ABSTAND}>
+        <BewertungsBuch reviews={strain.reviews} produkt={produkt} w={w} sprache={sprache} />
+      </div>
 
       {/* Bewerten an der Stelle der Erkundung (Masterplan Bewertung v2, T4; /bewerten entfällt):
           freigeschaltete Mitglieder sehen die Maske, vorbelegt mit ihrer eigenen Bewertung; alle
@@ -299,24 +298,6 @@ async function ProduktInhalt({ slug, w, sprache }: { slug: string; w: Woerterbuc
         )}
         {erkundung.serien.length > 0 ? <Aufklaerung texte={w.aroma.aufklaerung} /> : null}
       </section>
-
-      {community.length > 0 && communityMittel !== null ? (
-        <div className={ABSTAND}>
-          <CommunityStimmen bewertungen={community} mittel={communityMittel} w={w} sprache={sprache} />
-        </div>
-      ) : (
-        <section aria-labelledby="community-titel" className={cn(ABSTAND, "flex flex-col items-start gap-4")}>
-          <h2 id="community-titel" className={ABSCHNITT_TITEL}>
-            {texte.communityTitel}
-          </h2>
-          <p className="max-w-[60ch] text-body text-text-muted text-pretty">
-            {t(texte.communityLeer, { handelsname: strain.handelsname })}
-          </p>
-          <a href="#bewerten" className={buttonKlassen("secondary", "md")}>
-            {texte.ersteBewertung}
-          </a>
-        </section>
-      )}
 
       <section aria-labelledby="daten-titel" className={ABSTAND}>
         <h2 id="daten-titel" className={ABSCHNITT_TITEL}>

@@ -3,13 +3,15 @@ import Link from "next/link";
 import { InstagramEmbed, baueEmbedUrl } from "@/components/produkt/InstagramEmbed";
 import { AromaKarte, type AromaSerie } from "@/components/review/AromaKarte";
 import { BeschaffenheitsLeiste } from "@/components/review/BeschaffenheitsLeiste";
+import { BlattAnzeige } from "@/components/review/BlattAnzeige";
+import { NurAufgeschlagen } from "@/components/review/NurAufgeschlagen";
 import { KartenBild } from "@/components/review/SortenKopf";
 import { SweetSpot } from "@/components/review/SweetSpot";
 import { herstellerProfil } from "@/lib/aromakarte";
 import { eintragAnker, eintragHref, type EintragDaten } from "@/components/review/eintrag";
 import { Badge, buttonKlassen, type BadgeVariante } from "@/components/ui";
 import { cn } from "@/lib/cn";
-import { formatiereDatum, formatiereProzent, formatiereZahl } from "@/lib/format";
+import { formatiereDatum, formatiereProzent, formatiereWert, formatiereZahl } from "@/lib/format";
 import type { Sprache } from "@/lib/i18n/sprache-kern";
 import type { Woerterbuch } from "@/lib/i18n/typen";
 import { t } from "@/lib/i18n/text";
@@ -41,9 +43,21 @@ const FEUCHTE_HINWEIS = {
   unbekannt: "unbekannt",
 } as const satisfies Record<FeuchtigkeitsEinordnung, string>;
 
+/**
+ * Eine Seite der Doppelseite. Deckend (eigene Fläche) und `relative`, weil das
+ * Buch (Buch.tsx) die zwei Hälften einzeln um den Falz dreht; der Falz ab lg
+ * ist je Seite ein leiser Verlauf von 2rem an der Mitte. Die Seiten haben ab
+ * sm 3rem Innenabstand, der Falz reicht also nie unter Bild oder Text.
+ */
+const SEITE = "relative flex min-w-0 flex-col gap-8 bg-surface-raised p-6 sm:p-12";
+const FALZ_LINKS =
+  "lg:border-r lg:border-border lg:bg-[linear-gradient(to_left,color-mix(in_oklab,var(--color-text)_7%,transparent),transparent_2rem)]";
+const FALZ_RECHTS =
+  "lg:bg-[linear-gradient(to_right,color-mix(in_oklab,var(--color-text)_7%,transparent),transparent_2rem)]";
+
 export type DoppelseiteProps = {
   eintrag: EintragDaten;
-  /** "auszug": Startseite und /reviews; "voll": Produktseite. */
+  /** "auszug": Startseite und /reviews; "voll": Buch auf der Blütenseite. */
   umfang: "auszug" | "voll";
   ueberschrift: "h2" | "h3";
   /** Nur die Startseite: Ziele fuer die StoryBuehne (aufschlagen, hochzaehlen). */
@@ -52,12 +66,6 @@ export type DoppelseiteProps = {
   sprache: Sprache;
 };
 
-/**
- * Eine Bewertung als aufgeschlagene Doppelseite (Spec TP2 4.3). Links
- * Kopf und Noten, rechts Geschmack, Notiz und im vollen Eintrag das Reel.
- * Id und Ueberschrift sind je Eintrag eindeutig, damit mehrere Doppelseiten
- * auf einer Seite stehen koennen und "Ganzen Eintrag lesen" darauf springt.
- */
 /** Zwei Serien: was die Herstellerangaben erwarten lassen und was diese Bewertung gefunden hat. */
 function aromaSerien(eintrag: EintragDaten, w: Woerterbuch): AromaSerie[] {
   const hersteller = herstellerProfil(eintrag.terpene);
@@ -67,6 +75,14 @@ function aromaSerien(eintrag: EintragDaten, w: Woerterbuch): AromaSerie[] {
   return serien;
 }
 
+/**
+ * Eine Bewertung als aufgeschlagene Doppelseite (Spec TP2 4.3, seit T7,
+ * Nutzer 2026-09-29, neu geordnet): links Kopf, Name, Datum, Blätter-Note und
+ * darunter der Bewertungstext, der die freie Fläche füllt; rechts Werte,
+ * Karte und Charge. Id und Ueberschrift sind je Eintrag eindeutig, damit
+ * mehrere Doppelseiten auf einer Seite (im Buch gestapelt) stehen koennen und
+ * "Ganzen Eintrag lesen" darauf springt.
+ */
 export function Doppelseite({ eintrag, umfang, ueberschrift: Ueberschrift, story = false, w, sprache }: DoppelseiteProps) {
   const texte = aromaTexte(w, sprache);
   const voll = umfang === "voll";
@@ -76,6 +92,7 @@ export function Doppelseite({ eintrag, umfang, ueberschrift: Ueberschrift, story
   const datum = (
     <time dateTime={eintrag.erstelltAm.toISOString()}>{formatiereDatum(eintrag.erstelltAm, sprache)}</time>
   );
+  const name = eintrag.autorName ?? (eintrag.istBetreiber ? w.buch.betreiberName : w.buch.ohneName);
   const feuchtigkeit = bewerteFeuchtigkeit(eintrag.feuchtigkeitProzent);
   const feuchtigkeitsText =
     eintrag.feuchtigkeitProzent === null
@@ -83,40 +100,17 @@ export function Doppelseite({ eintrag, umfang, ueberschrift: Ueberschrift, story
       : `${w.review.feuchte[feuchtigkeit.einordnung]} · ${formatiereProzent(eintrag.feuchtigkeitProzent, 1, sprache)}`;
   // Kein Ersatz aus der Umgebung: nur eine gueltige eigene URL ergibt ein Reel.
   const reel = voll && baueEmbedUrl(eintrag.instagramReelUrl) ? eintrag.instagramReelUrl : null;
+  const charge = eintrag.chargenNr ? t(w.bluete.charge, { charge: eintrag.chargenNr }) : voll ? w.review.chargeFehlt : null;
 
   return (
-    // Buchfalz ab lg: ein leiser Schatten je 2rem links und rechts der Mitte, genau
-    // am Spalt der zwei gleich breiten Seiten. Die Seiten haben mindestens 3rem
-    // Innenabstand, der Falz reicht also nie unter Bild oder Text.
     <article
       id={anker}
       aria-labelledby={titelId}
       data-story={story ? "doppelseite" : undefined}
-      className="grid scroll-mt-8 grid-cols-1 border border-border-strong bg-surface-raised shadow-md lg:grid-cols-2 lg:bg-[linear-gradient(90deg,transparent_calc(50%_-_2rem),color-mix(in_oklab,var(--color-text)_7%,transparent)_50%,transparent_calc(50%_+_2rem))]"
+      className="grid scroll-mt-8 grid-cols-1 border border-border-strong bg-surface-raised shadow-md lg:grid-cols-2"
     >
-      <div className="flex min-w-0 flex-col gap-8 p-6 sm:p-12 lg:border-r lg:border-border">
-        <p className="text-small text-text-muted">
-          {voll ? (
-            eintrag.chargenNr ? (
-              <>
-                <span className="numeric">{t(w.bluete.charge, { charge: eintrag.chargenNr })}</span>
-              </>
-            ) : (
-              w.review.chargeFehlt
-            )
-          ) : (
-            <>
-              {datum}
-              {eintrag.chargenNr ? (
-                <>
-                  {" · "}
-                  <span className="numeric">{t(w.bluete.charge, { charge: eintrag.chargenNr })}</span>
-                </>
-              ) : null}
-            </>
-          )}
-        </p>
-
+      <div data-buchseite="links" className={cn(SEITE, FALZ_LINKS)}>
+        {/* Kopf */}
         <Ueberschrift
           id={titelId}
           className={cn(
@@ -141,6 +135,39 @@ export function Doppelseite({ eintrag, umfang, ueberschrift: Ueberschrift, story
             dasselbe wie in der Blütenübersicht (Nutzer 2026-09-26). */}
         {eintrag.bildPfad ? <KartenBild bildPfad={eintrag.bildPfad} symbolbild={w.aroma.sortenKopf.symbolbild} /> : null}
 
+        {/* Wer spricht. Platz für die Komponente <Avatar> (T8, Ruling R3): sie kommt
+            in diesen Block vor den Namen (dann als Zeile Avatar + Name); bis dahin
+            steht der Name ohne Bild. */}
+        <div>
+          {/* gap-1 = 4px: Name und Datum bzw. Marke sind ein Paar. Die Zeilen sind
+              Blöcke, damit sie der Textausrichtung der Seite folgen. */}
+          <p className="flex flex-col gap-1">
+            <span className="text-body font-medium text-text wrap-break-word">{name}</span>
+            <span className="text-small text-text-muted">
+              {voll ? (
+                <Badge variante={eintrag.istBetreiber ? "accent" : "neutral"} zeichen={false}>
+                  {eintrag.istBetreiber ? w.buch.betreiber : w.buch.community}
+                </Badge>
+              ) : (
+                datum
+              )}
+            </span>
+          </p>
+        </div>
+
+        {eintrag.gesamtnote !== null ? (
+          <BlattAnzeige
+            note={eintrag.gesamtnote}
+            text={t(w.bewerten.blattWert, { wert: formatiereWert(eintrag.gesamtnote, sprache) })}
+          />
+        ) : null}
+
+        {eintrag.notiz ? (
+          <p className={cn("max-w-[56ch] text-body text-pretty text-text", voll ? null : "line-clamp-6")}>{eintrag.notiz}</p>
+        ) : null}
+      </div>
+
+      <div data-buchseite="rechts" className={cn(SEITE, FALZ_RECHTS)}>
         <dl className="grid grid-cols-2 gap-6">
           {achsen.map((achse) => (
             // gap-1 = 4px: Bezeichnung und Wert sind ein Paar.
@@ -168,10 +195,11 @@ export function Doppelseite({ eintrag, umfang, ueberschrift: Ueberschrift, story
             <p className="max-w-[56ch] text-small text-text-muted max-md:mx-auto">{w.schema.feuchte[FEUCHTE_HINWEIS[feuchtigkeit.einordnung]]}</p>
           </div>
         ) : null}
-      </div>
 
-      <div className="flex min-w-0 flex-col gap-8 p-6 sm:p-12">
-        <AromaKarte terpene={eintrag.terpene} serien={aromaSerien(eintrag, w)} texte={texte} />
+        {/* Im Buch nur auf nahen Seiten (CPU-Limit), sonst immer. */}
+        <NurAufgeschlagen>
+          <AromaKarte terpene={eintrag.terpene} serien={aromaSerien(eintrag, w)} texte={texte} />
+        </NurAufgeschlagen>
         {voll ? (
           <SweetSpot
             titel={w.aroma.erkundung.intensitaet}
@@ -182,24 +210,23 @@ export function Doppelseite({ eintrag, umfang, ueberschrift: Ueberschrift, story
         {voll ? (
           <BeschaffenheitsLeiste werte={eintrag.beschaffenheit} feuchte={null} texte={texte} />
         ) : null}
-        {eintrag.notiz ? (
-          <p
-            className={cn(
-              "max-w-[56ch] text-body",
-              voll ? "text-text" : "line-clamp-3 text-text-muted",
-            )}
-          >
-            {eintrag.notiz}
-          </p>
-        ) : null}
         {reel ? <InstagramEmbed url={reel} bezeichnung={eintrag.handelsname} texte={w.reel} /> : null}
-        {voll ? null : (
-          <p className="mt-auto">
-            <Link href={eintragHref(eintrag.slug, eintrag.id)} className={buttonKlassen("secondary", "md")}>
-              {w.review.ganzerEintrag}
-            </Link>
-          </p>
-        )}
+
+        {/* Die Charge schließt die Seite ab wie eine Fußnote; im Auszug darunter der Weg zum ganzen Eintrag. */}
+        {charge || !voll ? (
+          <div className="mt-auto flex flex-col gap-4">
+            {charge ? (
+              <p className={cn("text-small text-text-muted", eintrag.chargenNr && "numeric")}>{charge}</p>
+            ) : null}
+            {voll ? null : (
+              <p>
+                <Link href={eintragHref(eintrag.slug, eintrag.id)} className={buttonKlassen("secondary", "md")}>
+                  {w.review.ganzerEintrag}
+                </Link>
+              </p>
+            )}
+          </div>
+        ) : null}
       </div>
     </article>
   );

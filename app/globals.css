@@ -1225,6 +1225,112 @@ html.joint-cursor :is(input:not([type="range"]):not([type="radio"]):not([type="c
   display: block;
 }
 
+/* Buch zum Blättern (components/review/Buch.tsx, T7, Nutzer 2026-09-29).
+   Ohne Skript stehen alle Doppelseiten untereinander und die Knöpfe fehlen;
+   mit Skript liegen sie gestapelt in einer Zelle (so hoch wie die längste,
+   kein Sprung beim Blättern), sichtbar nur die aufgeschlagene und die, die
+   gerade umschlägt. Die Drehung selbst läuft per WAAPI in Buch.tsx. */
+.buch-stapel {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  /* Schatten am Falz, Farbton wie die Ebenen-Schatten; dunkel tiefer. */
+  --buch-schatten: oklch(0.2 0.009 165 / 0.22);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .buch-stapel {
+    --buch-schatten: oklch(0 0 0 / 0.5);
+  }
+}
+
+:root[data-theme="dark"] .buch-stapel {
+  --buch-schatten: oklch(0 0 0 / 0.5);
+}
+
+.buch-stapel > .buch-seite {
+  position: relative;
+  display: grid;
+}
+
+@media (scripting: enabled) {
+  .buch-stapel {
+    display: grid;
+    /* Eigene Ebene: das drehende Blatt (z-index 1) liegt über der anderen Seite, nie über Kopf oder Leiste. */
+    isolation: isolate;
+  }
+
+  .buch-stapel > .buch-seite {
+    grid-area: 1 / 1;
+  }
+
+  .buch-stapel > .buch-seite:not([data-aktiv], [data-geht]) {
+    visibility: hidden;
+  }
+
+  /* Verdeckte Seiten ruhen: der Puls ihrer Karte läuft nicht unsichtbar weiter. */
+  .buch-stapel > .buch-seite:not([data-aktiv], [data-geht]) *,
+  .buch-stapel > .buch-seite:not([data-aktiv], [data-geht]) *::before,
+  .buch-stapel > .buch-seite:not([data-aktiv], [data-geht]) *::after {
+    animation-play-state: paused;
+  }
+}
+
+@media (scripting: none) {
+  .buch-steuerung {
+    display: none;
+  }
+}
+
+/* Schatten am Falz während der Drehung (::after): Buch.tsx blendet ihn per WAAPI
+   ein und aus. Schmal dreht die ganze Seite um den Rücken links. */
+.buch-stapel[data-blaettern] > .buch-seite::after,
+.buch-stapel[data-blaettern] [data-buchseite]::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+}
+
+.buch-stapel[data-blaettern] > .buch-seite::after,
+.buch-stapel[data-blaettern] [data-buchseite="rechts"]::after {
+  background: linear-gradient(to right, var(--buch-schatten), transparent 70%);
+}
+
+.buch-stapel[data-blaettern] [data-buchseite="links"]::after {
+  background: linear-gradient(to left, var(--buch-schatten), transparent 70%);
+}
+
+/* Hinweis beim Überfahren, nur Maus und nur nebeneinander: die freie Kante der
+   Seite, in deren Richtung es weitergeht, wirft einen leisen Schatten. */
+@media (hover: hover) and (pointer: fine) and (width >= 64rem) {
+  .buch-stapel[data-blaettern] [data-buchseite]::before {
+    content: "";
+    position: absolute;
+    inset-block: 0;
+    width: 2rem;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity var(--duration-fast) var(--ease-standard);
+  }
+
+  .buch-stapel[data-blaettern] [data-buchseite="links"]::before {
+    left: 0;
+    background: linear-gradient(to right, var(--buch-schatten), transparent);
+  }
+
+  .buch-stapel[data-blaettern] [data-buchseite="rechts"]::before {
+    right: 0;
+    background: linear-gradient(to left, var(--buch-schatten), transparent);
+  }
+
+  .buch-stapel[data-zurueck] > .buch-seite[data-aktiv] [data-buchseite="links"]:hover::before,
+  .buch-stapel[data-weiter] > .buch-seite[data-aktiv] [data-buchseite="rechts"]:hover::before {
+    opacity: 1;
+  }
+}
+
 /* Hintergrundvideo einer Sektion (GemeinsamLernen): läuft oben und unten weich
    ins Papier aus, statt an der Sektionskante hart abzubrechen. In der
    ausgeblendeten Kante hängen die Schlagworte (Schlagwort oben=top-0) und

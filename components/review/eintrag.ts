@@ -25,6 +25,12 @@ export type EintragDaten = {
   instagramReelUrl: string | null;
   chargenNr: string | null;
   erstelltAm: Date;
+  /** Bewertung des Betreibers (istRedaktionell); sonst Community. */
+  istBetreiber: boolean;
+  /** Anzeigename des Autors; null ohne Autor (Seed, gelöschtes Mitglied). */
+  autorName: string | null;
+  /** Gesamtnote 0,5 bis 5 in Blättern (T4); null bei Altbewertungen. */
+  gesamtnote: number | null;
   /** Terpene der Sorte für die Aroma-Karte (Bögen, Herstellerprofil). */
   terpene: KartenTerpen[];
   /** Sweet Spot je Terpen (1-5, 3 = Ziel), leer ohne Angabe. */
@@ -66,6 +72,9 @@ export function alsEintrag(
     instagramReelUrl: review.instagramReelUrl,
     chargenNr: review.chargenNr,
     erstelltAm: review.erstelltAm,
+    istBetreiber: review.istRedaktionell,
+    autorName: review.autorName,
+    gesamtnote: review.gesamtnote,
     terpene: produkt.terpene ?? [],
     terpenIntensitaet: parseTerpenIntensitaet(review.terpenIntensitaet),
     beschaffenheit: parseBeschaffenheit(review.beschaffenheit),
