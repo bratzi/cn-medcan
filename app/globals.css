@@ -1238,9 +1238,11 @@ html.joint-cursor :is(input:not([type="range"]):not([type="radio"]):not([type="c
 
 /* Delta zwischen Hersteller- und lila Balken in der Aroma-Karte (Nutzer 2026-09-26):
    das überstehende Stück glüht und pulsiert in der Farbe des längeren Balkens. */
+/* Ohne filter und ohne stroke-width im Takt (2026-09-28, Mobil zu träge): ein Blur je
+   Frame im SVG kostet mehr als der ganze Rest der Karte. Es pulsiert stroke-opacity,
+   damit das Einblenden über opacity (kartenSichtbar) unberührt bleibt. */
 .delta-puls {
   stroke-width: 6px;
-  filter: drop-shadow(0 0 4px var(--delta-farbe));
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -1252,12 +1254,10 @@ html.joint-cursor :is(input:not([type="range"]):not([type="radio"]):not([type="c
 @keyframes delta-puls {
   0%,
   100% {
-    stroke-width: 5px;
-    filter: drop-shadow(0 0 2px var(--delta-farbe));
+    stroke-opacity: 0.55;
   }
   50% {
-    stroke-width: 8px;
-    filter: drop-shadow(0 0 9px var(--delta-farbe));
+    stroke-opacity: 1;
   }
 }
 
@@ -1272,14 +1272,15 @@ html.joint-cursor :is(input:not([type="range"]):not([type="radio"]):not([type="c
 }
 
 @media (prefers-reduced-motion: no-preference) {
+  /* Leuchten als breiter, blasser Strich statt Blur; im Takt nur die Deckkraft. */
   .bogen-puls {
     visibility: visible;
+    stroke-width: calc(var(--bogen-breite) * 2.6);
     animation: bogen-puls 1.8s ease-in-out infinite;
   }
 
   .bogen-fluss {
     visibility: visible;
-    filter: drop-shadow(0 0 4px var(--bogen-farbe));
     animation: bogen-fluss 3s linear infinite;
   }
 }
@@ -1287,14 +1288,10 @@ html.joint-cursor :is(input:not([type="range"]):not([type="radio"]):not([type="c
 @keyframes bogen-puls {
   0%,
   100% {
-    opacity: 0.08;
-    stroke-width: var(--bogen-breite);
-    filter: drop-shadow(0 0 1px var(--bogen-farbe));
+    opacity: 0.06;
   }
   50% {
-    opacity: 0.85;
-    stroke-width: calc(var(--bogen-breite) * 1.8);
-    filter: drop-shadow(0 0 calc(var(--bogen-glow) * 1px) var(--bogen-farbe));
+    opacity: 0.4;
   }
 }
 
@@ -1439,5 +1436,60 @@ html.joint-cursor :is(input:not([type="range"]):not([type="radio"]):not([type="c
 @media (prefers-reduced-motion: reduce) {
   .kopf-menue {
     transition: none;
+  }
+}
+
+/* ==========================================================================
+   Leistung auf Touch und schmal (2026-09-28, Nutzer: Storytelling-Videos und
+   Karten-Animationen machen den Browser mobil träge). Teuer sind Weichzeichner
+   über laufendem Video und Formen, deren border-radius sich je Frame ändert:
+   beides zwingt zu neuem Malen statt reinem Compositing. Hier bleiben nur
+   Drehung und Verschiebung (transform), die der Grafikchip allein erledigt.
+   ========================================================================== */
+@media (hover: none), (width < 64rem) {
+  .kopf[data-gescrollt] {
+    background: color-mix(in oklab, var(--color-surface) 97%, transparent);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+
+  .glas-maske {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) and ((hover: none) or (width < 64rem)) {
+  .blob-morph,
+  .blob-linie[data-takt] {
+    animation-name: blob-drehen;
+  }
+
+  .glas-maske {
+    animation-name: blob-drehen, glas-schwingen;
+  }
+
+  /* Karte: keine Endlosschleifen im SVG, das Leuchten steht still. */
+  .delta-puls,
+  .bogen-puls,
+  .bogen-fluss {
+    animation: none;
+  }
+
+  .bogen-puls {
+    opacity: 0.25;
+  }
+
+  .bogen-fluss {
+    visibility: hidden;
+  }
+}
+
+@keyframes blob-drehen {
+  from {
+    rotate: -3deg;
+  }
+  to {
+    rotate: 4deg;
   }
 }

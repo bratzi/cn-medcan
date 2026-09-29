@@ -62,7 +62,7 @@ export async function Abstimmung() {
       className="relative isolate overflow-x-clip px-4 pt-32 pb-24 sm:px-8 sm:pt-48 sm:pb-32"
     >
       <div className="mx-auto grid w-full max-w-360 grid-cols-1 gap-12 lg:grid-cols-[2fr_3fr] lg:items-start">
-        <div className="flex flex-col items-start gap-6">
+        <div className="flex flex-col items-start gap-6 max-lg:items-center max-lg:text-center">
           <h2 id="abstimmung-titel" className="font-buch text-kapitel text-text text-balance">
             {texte.titel}
           </h2>

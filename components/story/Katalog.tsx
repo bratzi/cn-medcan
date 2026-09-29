@@ -69,7 +69,7 @@ export async function Katalog() {
   return (
     <section aria-labelledby="katalog-titel" data-story="katalog" className="relative isolate overflow-x-clip px-4 py-24 sm:px-8 sm:py-32">
       <div className="mx-auto flex w-full max-w-360 flex-col gap-8">
-        <div className="flex flex-wrap items-end justify-between gap-6">
+        <div className="flex flex-wrap items-end justify-between gap-6 max-md:flex-col max-md:items-center max-md:text-center">
           <div className="flex max-w-2xl flex-col gap-4">
             <h2 id="katalog-titel" className="font-buch text-kapitel text-text">
               {texte.vor} <em className="farbverlauf hand-betont">{texte.betont}</em>
@@ -83,7 +83,7 @@ export async function Katalog() {
           </Link>
         </div>
 
-        <ul aria-label={texte.einstiege} className="flex flex-wrap gap-2">
+        <ul aria-label={texte.einstiege} className="flex flex-wrap gap-2 max-md:justify-center">
           {EINSTIEGE.map((eintrag) => (
             <li key={eintrag.href}>
               <Link href={eintrag.href} className={buttonKlassen("secondary", "sm")}>

@@ -74,12 +74,12 @@ export async function AromaSektion() {
       <div className="mx-auto w-full max-w-360">
         <h2
           id="aroma-titel"
-          className="relative isolate max-w-4xl font-buch text-kapitel text-text text-balance"
+          className="relative isolate max-w-4xl font-buch text-kapitel text-text text-balance max-md:mx-auto max-md:text-center"
           style={ueberlaufPlatz}
         >
           {texte.titel} <UeberlaufWort wort={texte.ueberlauf} />
         </h2>
-        <p className="mt-6 max-w-[60ch] text-body text-text-muted text-pretty">
+        <p className="mt-6 max-w-[60ch] text-body text-text-muted text-pretty max-md:mx-auto max-md:text-center">
           {texte.text}
         </p>
         <Suspense fallback={<div className="mt-16 aspect-4/3 w-full max-w-4xl bg-surface-sunken" data-skelett="" />}>

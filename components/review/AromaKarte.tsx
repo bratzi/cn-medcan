@@ -440,7 +440,6 @@ export function AromaKarte({
                 const geschmack = GESCHMACKS_ACHSEN[achse].enumWert;
                 const grundfarbe = LINIEN_FARBE[geschmack];
                 const farbe = grundfarbe ?? `url(#${spurId}-${geschmack})`;
-                const leuchtfarbe = grundfarbe ?? VERLAUF[geschmack]?.[1] ?? "white";
                 // Ausprägung 0 bis 1: Stärke des Terpens mal Anteil der Note. Schwach = ausgegraut
                 // (entsättigt, blass), stark = satt und mit Glow (Nutzer 2026-09-26).
                 const auspraegung = kraft * (0.4 + 0.6 * notenAnteil);
@@ -462,11 +461,10 @@ export function AromaKarte({
                       style={{
                         strokeWidth: vorhanden ? breite : 0.8,
                         filter:
-                          vorhanden && bogenFilter
-                            ? `saturate(${(0.1 + 0.9 * auspraegung).toFixed(2)})${
-                                auspraegung > 0.45 ? ` drop-shadow(0 0 ${(2 + 8 * auspraegung).toFixed(1)}px ${leuchtfarbe})` : ""
-                              }`
-                            : "none",
+                          // Nur saturate, kein drop-shadow (2026-09-28, Mobil zu träge): jede
+                          // Animation im SVG malt alle Bögen neu, ein Blur je Bogen kostete
+                          // dann jeden Frame. Das Leuchten trägt die Ebene .bogen-puls.
+                          vorhanden && bogenFilter ? `saturate(${(0.1 + 0.9 * auspraegung).toFixed(2)})` : "none",
                       }}
                       // Unterwegs ohne filter in der Transition: der Filter fällt sofort
                       // weg, statt 250 ms lang auf wandernden Pfaden überzublenden.
@@ -490,9 +488,7 @@ export function AromaKarte({
                           className="bogen-puls"
                           style={
                             {
-                              "--bogen-farbe": leuchtfarbe,
                               "--bogen-breite": `${breite.toFixed(2)}px`,
-                              "--bogen-glow": (4 + 10 * auspraegung).toFixed(1),
                             } as React.CSSProperties
                           }
                         />
@@ -506,7 +502,6 @@ export function AromaKarte({
                           className="bogen-fluss"
                           style={
                             {
-                              "--bogen-farbe": leuchtfarbe,
                               strokeWidth: Math.max(2, breite * 1.5),
                               opacity: 0.5 + 0.5 * auspraegung,
                               animationDelay: versatz,

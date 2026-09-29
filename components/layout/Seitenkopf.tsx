@@ -24,11 +24,12 @@ export type SeitenkopfProps = {
 
 /**
  * Kopf jeder Unterseite (Spec TP2 3.2): Titel in Newsreader 200, ein Satz in
- * Du und Ich, keine Oberzeile. Linksbuendig, auf allen Seiten gleich.
+ * Du und Ich, keine Oberzeile. Ab md linksbuendig, schmal zentriert
+ * (Nutzer 2026-09-27: mobil wirkte alles zu linksbuendig).
  */
 export function Seitenkopf({ titel, satz, zurueck, schmal = false, children }: SeitenkopfProps) {
   return (
-    <header className={cn(seitenRahmen(schmal), "pt-16 sm:pt-24")}>
+    <header className={cn(seitenRahmen(schmal), "pt-16 max-md:text-center sm:pt-24")}>
       {zurueck ? (
         <p className="mb-8">
           <Link href={zurueck.href} className={einzelLinkKlassen()}>
@@ -37,7 +38,7 @@ export function Seitenkopf({ titel, satz, zurueck, schmal = false, children }: S
         </p>
       ) : null}
       <h1 className="font-buch text-kapitel text-balance text-text wrap-break-word">{titel}</h1>
-      {satz ? <p className="mt-4 max-w-[56ch] text-body text-pretty text-text-muted">{satz}</p> : null}
+      {satz ? <p className="mt-4 max-w-[56ch] text-body text-pretty text-text-muted max-md:mx-auto">{satz}</p> : null}
       {children ? <div className="mt-4">{children}</div> : null}
     </header>
   );

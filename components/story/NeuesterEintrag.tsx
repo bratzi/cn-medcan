@@ -55,7 +55,7 @@ export async function NeuesterEintrag() {
       {/* Unter dem Eintrag, nicht darüber (Nutzer 2026-09-25). */}
       <Schlagwort satz={texte.schlagwort} ton="gruen" oben="bottom-0 translate-y-1/2" />
       <div className="mx-auto flex w-full max-w-360 flex-col gap-12">
-        <h2 id="eintrag-titel" className="font-buch text-kapitel text-text">
+        <h2 id="eintrag-titel" className="font-buch text-kapitel text-text max-md:text-center">
           {texte.vor} <em className="farbverlauf hand-betont">{texte.betont}</em> {texte.nach}
         </h2>
         <Suspense fallback={<DoppelseitenSkelett ansage={w.start.skelett.eintrag} />}>

@@ -125,7 +125,7 @@ function Paar({
       {/* Buchschrift; nur das eine Schlagwort je Absatz (Buzz) steht in der Logoschrift (Nutzer 2026-09-25). */}
       <p
         data-manifest-zeile=""
-        className={`font-buch text-erzaehlung leading-[1.08] text-text md:max-w-[20ch] ${videoLinks ? "md:order-2" : ""}`}
+        className={`font-buch text-erzaehlung leading-[1.08] text-text max-md:text-center md:max-w-[20ch] ${videoLinks ? "md:order-2" : ""}`}
       >
         {children}
       </p>
