@@ -58,9 +58,12 @@ impl-contract.md + Report-Pfad; Reviewer bekommt review-contract.md + Brief + Re
   (nur INSERT … ON CONFLICT DO NOTHING, idempotent). Ohne sie zeigen Sorten mit Altbewertungen „Noch kein
   Community-Wert“, nichts bricht. Dasselbe gilt für die kommenden Migrationen aus T8, T9, T11 (0011 ff.):
   **vor** dem Push, der sie braucht, vom Nutzer einspielen lassen, sonst 500 auf den neuen Tabellen.
-- **T6 lief beim Sichern als Subagent** (Fazit Sorte/Charge). Nach einem Clear ist er tot: `git status` prüfen;
-  uncommittete Änderungen sind ein halber T6-Stand → verwerfen (`git restore .` und neue Dateien löschen) und T6
-  neu dispatchen. Hat er schon committet, Ledger um den Commit ergänzen und Review starten.
+- **T6 IMPLEMENTIERT, REVIEW OFFEN:** `cbc5683` (Fazit in Sorte und Charge getrennt, 345/345 Tests, lokal, NICHT
+  gepusht, weil ein Push den laufenden T4/T5-Build abbrechen würde). Nächster Schritt: Review-Paket
+  `472e2ea..cbc5683` (BASE ist der HANDOFF-Commit, der Code-Stand davor ist 4fda47d), Reviewer mit
+  review-contract.md dispatchen. Report: `task-6-report.md`. Implementer-Bedenken: „Betreiber-Bewertung im
+  Vergleich“ hat kein eigenes Label (istBetreiber nicht durchgereicht); treue/gesamteindruck in erkundung-daten.ts
+  weiter live gerechnet (nur gesamtnoteMedian neu aus Kennwerten). Beides im Review bewerten lassen.
 - **Offen danach:** T7–T13 per Subagenten, dann Final-Review (opus), dann ein Push, Live-Prüfung, HANDOFF.
 - **T14 Impressum:** Fragen im Chat gestellt, noch unbeantwortet: Betreiber (Name/Firma, Anschrift, Land),
   Kontakt (E-Mail + zweiter schneller Weg), Register/USt-IdNr. ja/nein, inhaltlich verantwortlich = dieselbe
