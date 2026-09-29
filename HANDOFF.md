@@ -3,7 +3,7 @@
 > Übergabemedium zwischen Sessions. Wird nach jedem Arbeitsblock aktualisiert und committet.
 > Wer hier weiterarbeitet, liest diese Datei zuerst und braucht den Chatverlauf nicht.
 
-**Letzte Aktualisierung:** 2026-09-27 (Session 24, Englisch fertig)
+**Letzte Aktualisierung:** 2026-09-29 (Session 25, Mobil + Review-Fixes)
 **Repo:** https://github.com/bratzi/cn-medcan (public)
 **Branch:** `main` (Makeover „Grünes Buch“ Teilprojekt 1 ist seit 2026-09-24 auf `main`)
 
@@ -27,6 +27,35 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 ---
 
 ## ⇢ Hier geht es weiter
+
+### ⇢ SESSION 25 (2026-09-28/29, läuft) — Nutzerauftrag Mobil vorgezogen
+
+Wochenlimit war am 27.09. erschöpft (Agents brachen ab), seit 28.09. 23 Uhr wieder frei.
+- **Englisch-Nacharbeiten** `b6d364e` (live): html lang en-GB, error.tsx per useSyncExternalStore, /api/sprache
+  entfernt, Guaiol/Eucalyptol. `server-only` in de.ts/en.ts bewusst NICHT (Tests importieren die Wörterbücher).
+- **Nutzerauftrag 2026-09-27 (Mobil):** Texte/Überschriften mittig, Kopf mit Icons/Aufklappmenü, Videos und
+  Karten-Animationen flüssiger (auch Desktop). Umgesetzt:
+  - `dfb77f8` Kopf unter lg: Logo, Konto als Symbol (Zähler als Punkt), Menüknopf; natives Popover
+    (`components/layout/KopfMenue.tsx`, CSS `.kopf-menue`) mit Navigation, Zelt, DE/EN. Ab lg unverändert.
+  - `a8799be` Leistung: Touch/schmal ohne backdrop-filter (Kopf, Glas), Blobs nur `rotate` (`blob-drehen`)
+    statt border-radius-Morph, Karte ohne Endlosschleifen; überall Karte ohne drop-shadow je Bogen, Pulse nur
+    über Deckkraft. Zentrierung: Story-Überschriften unter md/lg, Seitenkopf unter md.
+  - **Live noch NICHT geprüft** (Build lief beim Schreiben). Prüfen: Menü öffnen/schließen (auch Linkklick),
+    Konto-Symbol mit Zähler, Überlaufwort in AromaSektion zentriert (ragt evtl. rechts raus), Hell/Dunkel.
+- **Abschluss-Review (A5)**, Teil 1 per Agent (Admin/Auth/Umfrage/lib): 3 Befunde, alle behoben in `8b829ad`
+  (Vorschlagsfrist serverseitig + UI via `nimmtVorschlaegeAn`, Zuordnen mit inaktiven Blüten + Reaktivieren,
+  Impressum/Datenschutz `lang="de"` + englischer Hinweis). **Teil 2 offen:** Review von components/story,
+  components/review, components/layout, components/produkt. `npm audit`: 4× high nur in der Prisma-CLI-Kette
+  (deepmerge-ts, mysql2), Fix nur per Prisma-6-Downgrade → belassen.
+- **1.json (Nutzer 2026-09-27: analysieren und Daten anreichern).** Analyse fertig (Skripte `profil.py`,
+  `abgleich.py` im Scratchpad der Session, ggf. neu schreiben): 587 Sorten, 55 Hersteller, keine IDs/PZN/Preise.
+  Nutzbar: Hersteller, Kultivar, THC/CBD, Anbauland (füllt 17), Terpene nur als Rang (füllt 34), Aromen (74).
+  **Nicht nutzbar (HWG):** `effect`, `medicaleffect`. Abgleich über Hersteller+Kultivar (+THC ±2): ~85 von 307
+  unserer Sorten; 467 ohne Treffer. **Wartet auf Nutzer:** Herkunft der Datei (vermutlich Scrape eines
+  Strain-Finders, Datenbankschutz §87a UrhG) und Freigabe, nur leere Felder zu füllen. Danach Skript unter
+  `scripts/stamm/`, Hersteller-Aliasliste, Quelle je Produkt vermerken, sql-erzeugen.py.
+- Offen aus A2: Testblüte in /admin/vorschlaege freigeben (braucht Chrome im Vordergrund; im Hintergrund-Tab
+  setzt React das Formular nicht ein).
 
 ### ⇢ SESSION 24 (2026-09-27, läuft)
 
