@@ -75,11 +75,11 @@ export function Fuss({ w }: { w: Woerterbuch }) {
             <summary className="inline-flex min-h-11 cursor-pointer items-center text-caption text-text-muted">
               {w.fuss.bildnachweise}
             </summary>
-            <ul className="mt-2 flex flex-col gap-2 pb-2 text-caption text-text-muted">
+            <ul className="mt-2 flex flex-col gap-2 pointer-coarse:gap-0 pb-2 text-caption text-text-muted">
               {MEDIEN.map((m) => (
                 <li key={m.id}>
                   {`${artLabel[m.art]}: `}
-                  <a href={m.quelle} rel="noopener noreferrer" className="text-accent underline underline-offset-2">
+                  <a href={m.quelle} rel="noopener noreferrer" className="text-accent underline underline-offset-2 pointer-coarse:inline-flex pointer-coarse:min-h-11 pointer-coarse:items-center">
                     {m.urheber}
                   </a>
                   {w.fuss.aufPexels}
