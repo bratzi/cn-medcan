@@ -332,6 +332,13 @@
     display: none;
   }
 
+  /* Medien je Thema (Hero hell/dunkel): das verborgene Video schneidet nie
+     den Viewport, loops.ts startet es also nicht. */
+  :root[data-theme="dark"] .nur-hell,
+  :root:not([data-theme="dark"]) .nur-dunkel {
+    display: none;
+  }
+
   /* Inspiration hat nur 400: keine künstlich fetten oder kursiven Schnitte. */
   .font-hand {
     font-synthesis: none;

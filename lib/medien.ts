@@ -47,6 +47,18 @@ export const MEDIEN: readonly Medium[] = [
     quelle: "https://www.pexels.com/video/person-hands-cigarette-dried-7684711/",
     freigestellt: true,
   },
+  // Hero im hellen Thema (Nutzer 2026-09-29); dunkel bleibt auftakt-loop.
+  {
+    id: "auftakt-loop-hell",
+    art: "video",
+    pexelsId: 3153124,
+    datei: "auftakt-loop-hell",
+    breite: 1920,
+    hoehe: 1080,
+    alt: "",
+    urheber: "Yash Lucid",
+    quelle: "https://www.pexels.com/video/stop-motion-video-of-person-rolling-marijuana-joint-3153124/",
+  },
   {
     id: "frei-bluete",
     art: "foto",
@@ -106,16 +118,17 @@ export const MEDIEN: readonly Medium[] = [
     urheber: "Kindel Media",
     quelle: "https://www.pexels.com/video/lush-green-leaves-of-a-cannabis-tree-7667040/",
   },
+  // Nutzer 2026-09-29: ersetzt 4823275 (drehende Blüte).
   {
     id: "aussehen-loop",
     art: "video",
-    pexelsId: 4823275,
+    pexelsId: 7667290,
     datei: "aussehen-loop",
-    breite: 1920,
-    hoehe: 1080,
+    breite: 3840,
+    hoehe: 2160,
     alt: "",
-    urheber: "Creative Jawnboree",
-    quelle: "https://www.pexels.com/video/a-spinning-cannabis-bud-4823275/",
+    urheber: "Kindel Media",
+    quelle: "https://www.pexels.com/video/holding-cannabis-by-the-palm-7667290/",
   },
   {
     id: "geruch-loop",

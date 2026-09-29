@@ -36,7 +36,8 @@ const KONTUREN = [
 export async function Auftakt() {
   const texte = (await holeWoerterbuch()).start.auftakt;
   // Standbild ist das größte Bild der ersten Ansicht: vor allem anderen anfordern.
-  preload("/medien/auftakt-loop-standbild.webp", { as: "image", fetchPriority: "high" });
+  // Die Seite startet hell (lib/thema.ts), also das Standbild des hellen Videos.
+  preload("/medien/auftakt-loop-hell-standbild.webp", { as: "image", fetchPriority: "high" });
 
   return (
     <section
@@ -45,7 +46,9 @@ export async function Auftakt() {
       className="buehne-dunkel relative isolate -mt-(--kopf-h,4rem) flex min-h-svh flex-col overflow-hidden pt-[calc(var(--kopf-h,4rem)+4rem)] pb-8"
     >
       <div aria-hidden="true" data-story="auftakt-film" className="pointer-events-none absolute inset-0 -z-10">
-        <Loop id="auftakt-loop" buehne className="h-full opacity-75" />
+        {/* Je Thema ein eigenes Video (Nutzer 2026-09-29); das verborgene lädt nichts. */}
+        <Loop id="auftakt-loop" buehne className="nur-dunkel h-full opacity-75" />
+        <Loop id="auftakt-loop-hell" buehne className="nur-hell h-full opacity-75" />
         <div className="absolute inset-0 bg-linear-to-b from-surface/40 via-surface/5 to-surface" />
       </div>
 
