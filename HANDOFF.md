@@ -28,6 +28,13 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 
 ## ⇢ Hier geht es weiter
 
+### ⇢ SESSION 27 (2026-09-29) — A6 Mobil begonnen
+
+- Messung 390 px (iframe) auf /, /blueten, /reviews, /umfragen, /mitglied: kein waagerechter Überlauf.
+- `f858c9f`: Button `sm` und Karte/Netz-Umschalter per `pointer-coarse:h-11` auf 44 px (Desktop unverändert). Live noch nicht geprüft.
+- Kein Befund: Filterzeilen schon min-h-11; Regler-Inputs pointer-events-none (Fläche drumherum zieht); Achsennamen der Karte aria-hidden, bleiben.
+- Offen A6: Hero-Video mobil (Datenmenge), Lenis/GSAP-Last, web-perf, Hell-Modus mobil, Credits-Links im Fuß (13–29 px hoch), Testblüte freigeben (A2).
+
 ### ⇢ SESSION 25 (2026-09-28/29, läuft) — Nutzerauftrag Mobil vorgezogen
 
 Wochenlimit war am 27.09. erschöpft (Agents brachen ab), seit 28.09. 23 Uhr wieder frei.
