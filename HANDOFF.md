@@ -62,9 +62,8 @@ sauber, Tests 290/290, zwei Tests an neue Klassen angepasst). Schritt 2 halb: Sk
 62 ergänzt, 16 übersprungen, Stamm 727; import.sql 707 Sorten (20 ohne THC ausgelassen), keine Slug-Kollision
 mit live (einzige Admin-Blüte `420-evolution-33-1-ca-scm` bleibt unberührt). Skript schreibt jetzt CRLF und
 vereinheitlicht Aromen. Neue Blüten haben kein Symbolbild (`hersteller_bild_pfad` NULL).
-**OFFEN: Remote-Import wurde vom Auto-Mode als Produktions-Deploy gesperrt** → Nutzer führt aus oder gibt frei:
-`npx wrangler d1 execute cn-medcan-db --remote --file data/stamm/import.sql`. Danach live /blueten prüfen,
-dann Schritt 3 und 4.
+Remote-Import nach Nutzerfreigabe ERLEDIGT: live 708 Blüten, alle aktiv. Nächste: live /blueten Stichprobe,
+dann Schritt 3 (Mobil-Live-Prüfung) und 4 (Abschluss-Review Teil 2).
 
 **⇢ (erledigt bis auf Import) STAND ZUM CLEAR (2026-09-29): Shell war gesperrt (Auto-Mode-Prüfung antwortete nicht), deshalb liegen
 Änderungen UNCOMMITTED im Baum. Nächste Session, der Reihe nach:**
