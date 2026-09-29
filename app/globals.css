@@ -1473,8 +1473,12 @@ html.joint-cursor :is(input:not([type="range"]):not([type="radio"]):not([type="c
   right: 1rem;
 }
 
+/* Ab lg weder Menü noch Knopf. Der Knopf braucht das hier: display: grid oben steht
+   ohne Layer und schlägt damit lg:hidden aus @layer utilities (Nutzer 2026-09-29:
+   Knopf erschien auf dem Desktop hinter dem Logo). */
 @media (width >= 64rem) {
-  .kopf-menue {
+  .kopf-menue,
+  .kopf-menue-knopf {
     display: none;
   }
 }

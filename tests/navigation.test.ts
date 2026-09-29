@@ -44,6 +44,15 @@ test("Kopf: Leiste erst ab lg, darunter Menüknopf mit Popover und Konto als Sym
   assert.match(html, /class="max-lg:sr-only">Mein Konto/);
 });
 
+test("Kopf: Menüknopf ist ab lg per CSS verborgen, nicht nur per Utility", async () => {
+  // .kopf-menue-knopf { display: grid } steht ohne Layer und schlägt damit lg:hidden aus
+  // @layer utilities (Nutzer 2026-09-29: Knopf erschien auf dem Desktop hinter dem Logo).
+  const { readFileSync } = await import("node:fs");
+  const { join } = await import("node:path");
+  const css = readFileSync(join(process.cwd(), "app/globals.css"), "utf8");
+  assert.match(css, /@media \(width >= 64rem\) \{[^}]*\.kopf-menue-knopf[^{]*\{\s*display: none;/);
+});
+
 test("Kopf: Aktiv-Markierung am Wort, keine Kapitelnummern mehr", async () => {
   const { createElement } = await import("react");
   const { renderToStaticMarkup } = await import("react-dom/server");
