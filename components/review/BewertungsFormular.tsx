@@ -77,6 +77,10 @@ export function BewertungsFormular({
   // Neuer Stand nach dem Speichern: Blätter und Regler beginnen neu mit den gespeicherten
   // Werten, damit „Zurücksetzen“ zu ihnen zurückkehrt.
   const stand = vorbelegung?.stand ?? "neu";
+  // Eigene Gesamtnote aus BlattNote, für das eigene Sortenfazit in der Erkundung (lib/fazit.ts, T6,
+  // Review-Befund T6-R1): Startwert die vorbelegte eigene Bewertung, danach jede Änderung über den
+  // Rückruf von BlattNote. Nie den Community-Median unterschieben, wenn keine eigene Note gesetzt ist.
+  const [eigeneGesamtnote, setEigeneGesamtnote] = useState<number | null>(vorbelegung?.gesamtnote ?? null);
 
   async function absenden(ereignis: React.FormEvent<HTMLFormElement>) {
     ereignis.preventDefault();
@@ -100,7 +104,13 @@ export function BewertungsFormular({
     <form onSubmit={absenden} className="flex flex-col gap-16 md:gap-24">
       <input type="hidden" name="strainId" value={strainId} />
 
-      <BlattNote key={`note-${stand}`} start={vorbelegung?.gesamtnote ?? null} texte={texte} sprache={aromaTexte.sprache} />
+      <BlattNote
+        key={`note-${stand}`}
+        start={vorbelegung?.gesamtnote ?? null}
+        texte={texte}
+        sprache={aromaTexte.sprache}
+        onChange={setEigeneGesamtnote}
+      />
 
       <AromaErkundung
         key={`erkundung-${stand}`}
@@ -109,6 +119,8 @@ export function BewertungsFormular({
         katalog={katalog}
         eingabe
         vorbelegung={vorbelegung}
+        eigeneGesamtnote={eigeneGesamtnote}
+        istBetreiber={istBetreiber}
         texte={aromaTexte}
         {...daten}
       />

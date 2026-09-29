@@ -53,8 +53,10 @@ export function AromaErkundung({
   beschaffenheit,
   gesamteindruck,
   gesamtnoteMedian = null,
+  eigeneGesamtnote = null,
   eingabe = false,
   vorbelegung = null,
+  istBetreiber = false,
   zwischenruf,
   children,
   texte,
@@ -86,6 +88,13 @@ export function AromaErkundung({
    */
   gesamtnoteMedian?: number | null;
   /**
+   * Eigene Gesamtnote aus `BlattNote` (Sterne, kein Teil von `vorbelegung` hier: `BlattNote` ist ein
+   * Geschwister-Baustein in `BewertungsFormular`, nicht in dieser Komponente). Stufe des eigenen
+   * Sortenfazits (Review-Befund T6-R1); ohne eigene Note fällt die Stufe heraus, nie die
+   * Community-Gesamtnote (`gesamtnoteMedian`) unterschieben.
+   */
+  eigeneGesamtnote?: number | null;
+  /**
    * Bewertungsmaske (Nutzer 2026-09-25: sieht exakt aus wie die Startseite):
    * die Regler sind die Eingabe, ihre Werte gehen als versteckte Felder ins
    * umschließende Formular (Feldnamen wie lib/bewertung-eingabe.ts).
@@ -96,6 +105,11 @@ export function AromaErkundung({
    * v2, T4): „Dein Fazit“ steht sofort, „Zurücksetzen“ kehrt zu ihr zurück.
    */
   vorbelegung?: Pick<Vorbelegung, "geschmack" | "noten" | "intensitaet" | "beschaffenheit"> | null;
+  /**
+   * Betreiber sehen die eigenen Fazit-Blöcke unter eigenem Namen (Review-Befund T6-R1, Brief-Hinweis
+   * „Deine Bewertung im Vergleich“ bzw. „Betreiber-Bewertung im Vergleich“).
+   */
+  istBetreiber?: boolean;
   texte: AromaTexte;
   /** Hintergrundsatz (Schlagwort) mittig zwischen Qualität und Fazit, nur auf der Startseite. */
   zwischenruf?: React.ReactNode;
@@ -183,15 +197,17 @@ export function AromaErkundung({
   const { wirkung: _wirkung, ...eigeneEindruecke } = eigeneNoten;
   void _wirkung;
   const mittelNoten: Partial<Record<NotenKey, number>> = gesamteindruck?.werte ?? {};
-  // Eigenes Sortenfazit nur, wenn Terpene (Karte) oder Overall tatsächlich bewegt wurden: nur diese
-  // beiden Stufen fließen hinein, sonst wäre die Zahl bloß eine Kopie des Community-Werts, obwohl
-  // man nur an der Charge gedreht hat.
-  const sorteBewegt = eigen !== null || Object.keys(eigeneEindruecke).length > 0;
+  // Eigenes Sortenfazit nur, wenn Terpene (Karte), Overall oder die eigene Gesamtnote (BlattNote)
+  // tatsächlich gesetzt wurden: nur diese drei Stufen fließen hinein, sonst wäre die Zahl bloß eine
+  // Kopie des Community-Werts, obwohl man nur an der Charge gedreht hat. Die Gesamtnote kommt als
+  // eigener Wert von außen (Review-Befund T6-R1); ohne sie fällt die Stufe im Fazit heraus
+  // (sortenFazit lässt gesamtnote: null bereits herausfallen), nie den Community-Median unterschieben.
+  const sorteBewegt = eigen !== null || Object.keys(eigeneEindruecke).length > 0 || eigeneGesamtnote !== null;
   const eigenerSortenFazit = sorteBewegt
     ? sortenFazit({
         eindruck: { ...(gesamteindruck?.werte ?? {}), ...eigeneEindruecke },
         treue: eigeneTreue ?? treue?.wert ?? null,
-        gesamtnote: gesamtnoteMedian,
+        gesamtnote: eigeneGesamtnote,
       })
     : null;
   // Eigenes Chargenfazit nur, wenn die Beschaffenheit selbst bewegt wurde (nicht nur Terpene/Overall).
@@ -395,7 +411,9 @@ export function AromaErkundung({
             ) : null}
             {eigenerSortenFazit !== null ? (
               <div className="flex flex-col items-center gap-2" aria-live="polite">
-                <dt className="text-small uppercase tracking-wide text-text-muted">{texte.aroma.erkundung.deinFazit}</dt>
+                <dt className="text-small uppercase tracking-wide text-text-muted">
+                  {istBetreiber ? texte.aroma.erkundung.deinFazitBetreiber : texte.aroma.erkundung.deinFazit}
+                </dt>
                 <dd className="farbverlauf font-hand text-notiz leading-none tabular-nums">
                   {prozent(eigenerSortenFazit, texte.sprache)}
                 </dd>
@@ -404,7 +422,9 @@ export function AromaErkundung({
             ) : null}
             {eigenerChargenFazit !== null ? (
               <div className="flex flex-col items-center gap-2" aria-live="polite">
-                <dt className="text-small uppercase tracking-wide text-text-muted">{texte.aroma.erkundung.deineCharge}</dt>
+                <dt className="text-small uppercase tracking-wide text-text-muted">
+                  {istBetreiber ? texte.aroma.erkundung.deineChargeBetreiber : texte.aroma.erkundung.deineCharge}
+                </dt>
                 <dd className="farbverlauf font-hand text-notiz leading-none tabular-nums">
                   {prozent(eigenerChargenFazit, texte.sprache)}
                 </dd>

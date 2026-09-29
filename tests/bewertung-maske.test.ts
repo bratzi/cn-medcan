@@ -8,6 +8,7 @@ import { bewertungPruefen } from "@/lib/bewertung-eingabe";
 import { vorbelegungAus } from "@/lib/bewertung-vorbelegung";
 import { de } from "@/lib/i18n/de";
 import { aromaTexte } from "@/lib/i18n/typen";
+import { formatiereAnteil } from "@/lib/format";
 import type { KartenTerpen } from "@/lib/aromakarte";
 
 const TERPENE: KartenTerpen[] = [
@@ -32,7 +33,7 @@ const VORBELEGUNG = vorbelegungAus({
   aktualisiertAm: new Date("2026-09-29T10:00:00.000Z"),
 });
 
-function maske(vorbelegung = VORBELEGUNG) {
+function maske(vorbelegung = VORBELEGUNG, istBetreiber = false) {
   return renderToStaticMarkup(
     createElement(AromaErkundung, {
       titel: "Nebelharz 22 (fiktiv)",
@@ -44,6 +45,7 @@ function maske(vorbelegung = VORBELEGUNG) {
       beschaffenheit: { werte: { chlorophyll: 1, trichomFarbe: 1 }, feuchte: 9, anzahl: 2 },
       eingabe: true,
       vorbelegung,
+      istBetreiber,
       texte: aromaTexte(de, "de"),
     }),
   );
@@ -76,6 +78,64 @@ test("Maske: mit Vorbelegung steht „Dein Fazit“ sofort, Zurücksetzen erst n
   const html = maske();
   assert.match(html, new RegExp(de.aroma.erkundung.deinFazit));
   assert.doesNotMatch(html, new RegExp(`>${de.aroma.erkundung.zuruecksetzen}<`));
+});
+
+test("Maske: Betreiber sehen „Betreiber-Fazit“/„Betreiber-Charge“ statt „Dein Fazit“/„Deine Charge“ (Review-Befund T6-R1)", () => {
+  const html = maske(VORBELEGUNG, true);
+  assert.match(html, new RegExp(`>${de.aroma.erkundung.deinFazitBetreiber}<`));
+  assert.match(html, new RegExp(`>${de.aroma.erkundung.deineChargeBetreiber}<`));
+  assert.doesNotMatch(html, new RegExp(`>${de.aroma.erkundung.deinFazit}<`));
+  assert.doesNotMatch(html, new RegExp(`>${de.aroma.erkundung.deineCharge}<`));
+});
+
+test("Maske: Mitglieder sehen weiterhin „Dein Fazit“/„Deine Charge“, kein Betreiber-Label", () => {
+  const html = maske(VORBELEGUNG, false);
+  assert.match(html, new RegExp(`>${de.aroma.erkundung.deinFazit}<`));
+  assert.match(html, new RegExp(`>${de.aroma.erkundung.deineCharge}<`));
+  assert.doesNotMatch(html, new RegExp(de.aroma.erkundung.deinFazitBetreiber));
+  assert.doesNotMatch(html, new RegExp(de.aroma.erkundung.deineChargeBetreiber));
+});
+
+test("Maske: „Dein Fazit“ rechnet mit der eigenen Gesamtnote, nie mit dem Community-Median (Review-Befund T6-R1)", () => {
+  // Eigene Gesamtnote 5 (Sweet-Spot-fern zum Community-Median 1): ohne Overall/Treue-Werte ist die
+  // Gesamtnote die einzige Stufe, das Fazit zeigt also genau ihren Anteil, nie den des Community-Werts.
+  const eigenerAnteil = formatiereAnteil((5 - 0.5) / 4.5, 0, "de");
+  const communityAnteil = formatiereAnteil((1 - 0.5) / 4.5, 0, "de");
+  assert.notEqual(eigenerAnteil, communityAnteil);
+  const html = renderToStaticMarkup(
+    createElement(AromaErkundung, {
+      titel: "Nebelharz 22 (fiktiv)",
+      terpene: [],
+      serien: [],
+      zeilen: [],
+      gesamtnoteMedian: 1,
+      eigeneGesamtnote: 5,
+      texte: aromaTexte(de, "de"),
+    }),
+  );
+  const deinFazitIndex = html.indexOf(de.aroma.erkundung.deinFazit);
+  assert.notEqual(deinFazitIndex, -1, "„Dein Fazit“ erscheint allein durch die eigene Gesamtnote (sorteBewegt)");
+  const communityBlock = html.slice(0, deinFazitIndex);
+  const deinFazitBlock = html.slice(deinFazitIndex);
+  assert.ok(communityBlock.includes(communityAnteil), "Community-Fazit zeigt weiterhin den Median-Anteil");
+  assert.ok(deinFazitBlock.includes(eigenerAnteil), "Dein Fazit zeigt den Anteil der eigenen Gesamtnote");
+  assert.ok(!deinFazitBlock.includes(communityAnteil), "Dein Fazit unterschiebt nie den Community-Anteil");
+});
+
+test("Maske: ohne eigene Gesamtnote fällt die Stufe im eigenen Fazit heraus, nie eine geborgte Zahl", () => {
+  const html = renderToStaticMarkup(
+    createElement(AromaErkundung, {
+      titel: "Nebelharz 22 (fiktiv)",
+      terpene: [],
+      serien: [],
+      zeilen: [],
+      gesamtnoteMedian: 1,
+      eigeneGesamtnote: null,
+      texte: aromaTexte(de, "de"),
+    }),
+  );
+  // Ohne eigene Terpene/Overall/Gesamtnote bewegt sich nichts Eigenes: kein „Dein Fazit“-Block.
+  assert.doesNotMatch(html, new RegExp(`>${de.aroma.erkundung.deinFazit}<`));
 });
 
 test("Maske: der Qualitätsschritt heißt „Diese Charge“ und zeigt den Sweet Spot in der Mitte", () => {

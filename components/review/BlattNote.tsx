@@ -90,7 +90,23 @@ export type BlattNoteTexte = Pick<
  *   Paar Minus/Plus (44 × 44 px) unter der Reihe. Die beiden sitzen fest an
  *   den Rändern der Reihe und springen nicht, wenn sich der Wert ändert.
  */
-export function BlattNote({ start, texte, sprache }: { start: number | null; texte: BlattNoteTexte; sprache: Sprache }) {
+export function BlattNote({
+  start,
+  texte,
+  sprache,
+  onChange,
+}: {
+  start: number | null;
+  texte: BlattNoteTexte;
+  sprache: Sprache;
+  /**
+   * Ruft bei jeder Änderung den neuen Wert (Blatt-Klick, Minus/Plus oder Entfernen); das Formular
+   * bleibt unverändert (Radios), der Rückruf ist zusätzlich. `BewertungsFormular` hält so die eigene
+   * Gesamtnote für das Sortenfazit (lib/fazit.ts, T6, Review-Befund T6-R1: nie die
+   * Community-Gesamtnote unterschieben).
+   */
+  onChange?: (note: number | null) => void;
+}) {
   const [note, setNote] = useState(start);
   const [vorschau, setVorschau] = useState<number | null>(null);
   // Ansage nach Minus/Plus: der Fokus bleibt am Knopf, die Radios sagen den Wert dort nicht an.
@@ -99,10 +115,15 @@ export function BlattNote({ start, texte, sprache }: { start: number | null; tex
   const erstesRadio = useRef<HTMLInputElement>(null);
   const fuellungen = blattFuellungen(vorschau ?? note);
   const wertText = (wert: number) => t(texte.blattWert, { wert: formatiereWert(wert, sprache) });
+  // Setzt den Wert und meldet ihn nach oben, an jeder der drei Stellen, die note ändern.
+  const melden = (neu: number | null) => {
+    setNote(neu);
+    onChange?.(neu);
+  };
   const schritt = (richtung: 1 | -1) => {
     const neu = halbSchritt(note, richtung);
     if (neu === note) return;
-    setNote(neu);
+    melden(neu);
     setAnsage(neu === null ? texte.keineNote : wertText(neu));
   };
 
@@ -137,7 +158,7 @@ export function BlattNote({ start, texte, sprache }: { start: number | null; tex
                     name="gesamtnote"
                     value={stufe}
                     checked={note === stufe}
-                    onChange={() => setNote(stufe)}
+                    onChange={() => melden(stufe)}
                     className="sr-only"
                   />
                   <span className="sr-only">{wertText(stufe)}</span>
@@ -176,7 +197,7 @@ export function BlattNote({ start, texte, sprache }: { start: number | null; tex
         <button
           type="button"
           onClick={() => {
-            setNote(null);
+            melden(null);
             // Der Knopf verschwindet; der Fokus bleibt in der Gruppe statt auf der Seite.
             erstesRadio.current?.focus();
           }}

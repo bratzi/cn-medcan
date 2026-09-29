@@ -241,6 +241,10 @@ export const de = {
       chargenFazit: "Charge-Fazit",
       deinFazit: "Dein Fazit",
       deineCharge: "Deine Charge",
+      // Betreiber sehen ihr eigenes Fazit unter eigenem Namen statt "Dein" (Review-Befund T6-R1,
+      // Brief-Hinweis "Deine Bewertung im Vergleich" bzw. "Betreiber-Bewertung im Vergleich").
+      deinFazitBetreiber: "Betreiber-Fazit",
+      deineChargeBetreiber: "Betreiber-Charge",
       ausReglern: "aus deinen Reglern",
       fazitErklaerung:
         "Das Sortenfazit fasst Overall, Terpen-Abgleich und Gesamtnote zusammen. Das Charge-Fazit zeigt allein die Qualitäts-Balance dieser Charge, getrennt von der Sorte. Jede Stufe zählt gleich viel; 100 % heißt: alles top und genau wie angegeben.",

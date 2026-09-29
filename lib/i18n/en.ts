@@ -237,6 +237,9 @@ export const en: Woerterbuch = {
       chargenFazit: "Batch verdict",
       deinFazit: "Your verdict",
       deineCharge: "Your batch",
+      // Operators see their own verdict under its own name instead of "Your" (review finding T6-R1).
+      deinFazitBetreiber: "Operator verdict",
+      deineChargeBetreiber: "Operator batch",
       ausReglern: "from your sliders",
       fazitErklaerung:
         "The strain verdict combines overall, terpz match and star rating. The batch verdict is the quality balance of this batch alone, kept separate from the strain. Each stage counts equally; 100 % means everything top and exactly as stated.",
