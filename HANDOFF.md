@@ -66,7 +66,10 @@ Remote-Import nach Nutzerfreigabe ERLEDIGT: live 708 Blüten, alle aktiv. Abschl
 `5bb6c41`: Kopf prüft nach Seitenwechsel neu (usePathname), JointCursor-rAF ruht ohne Bewegung (3 s Nachlauf),
 main tabIndex -1 für „Zurück zum Anfang“, Menü-Schließknopf autoFocus. Tote Dateien mit hartem Deutsch
 (TerpenErgaenzen außer Typ KatalogEintrag, Netzdiagramm, BestandTabelle) bleiben wie entschieden.
-Chrome-Erweiterung war nicht verbunden → Live-Prüfung (Schritt 3 + /blueten) steht aus. Nächste: live /blueten Stichprobe,
+Live geprüft (Build 08:51): /blueten zeigt 708 (neue ohne Bild), mobil Kopf Menü/Logo/Konto,
+Aufklappmenü, „prüfen wir nach.“ mittig ohne Überlauf. Hell-Modus mobil nicht geprüft. Tipp: Browser über
+list_connected_browsers + select_browser verbinden, tabs_context allein meldet „nicht verbunden“.
+Nächstes: A6 Mobile-Optimierung Rest (siehe Gesamtliste), Testblüte freigeben (A2). Nächste: live /blueten Stichprobe,
 dann Schritt 3 (Mobil-Live-Prüfung) und 4 (Abschluss-Review Teil 2).
 
 **⇢ (erledigt bis auf Import) STAND ZUM CLEAR (2026-09-29): Shell war gesperrt (Auto-Mode-Prüfung antwortete nicht), deshalb liegen
