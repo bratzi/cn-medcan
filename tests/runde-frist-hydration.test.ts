@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 
-import { vorschlagFristPruefen } from "@/lib/umfrage-eingabe";
+import { nimmtVorschlaegeAn, vorschlagFristPruefen } from "@/lib/umfrage-eingabe";
 
 function quelle(datei: string): string {
   return readFileSync(join(process.cwd(), datei), "utf8");
@@ -66,3 +66,11 @@ for (const datei of [
     assert.match(q, /disabled=\{!hydriert \|\| laeuft\}/);
   });
 }
+
+test("nimmtVorschlaegeAn: nur in der Vorschlagsphase und nur bis zur Frist", () => {
+  const jetzt = new Date("2026-10-05T10:00:00Z");
+  assert.equal(nimmtVorschlaegeAn({ phase: "VORSCHLAG", vorschlagBisAm: null }, jetzt), true);
+  assert.equal(nimmtVorschlaegeAn({ phase: "VORSCHLAG", vorschlagBisAm: new Date("2026-10-06T00:00:00Z") }, jetzt), true);
+  assert.equal(nimmtVorschlaegeAn({ phase: "VORSCHLAG", vorschlagBisAm: new Date("2026-10-01T21:59:59Z") }, jetzt), false);
+  assert.equal(nimmtVorschlaegeAn({ phase: "ABSTIMMUNG", vorschlagBisAm: null }, jetzt), false);
+});

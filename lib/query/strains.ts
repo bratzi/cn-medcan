@@ -1020,6 +1020,7 @@ const MAX_AUSWAHL = 500;
 export type StrainAuswahlEintrag = {
   id: string;
   handelsname: string;
+  aktiv: boolean;
 };
 
 /**
@@ -1029,11 +1030,13 @@ export type StrainAuswahlEintrag = {
  * Bewusst nicht `ladeStrainListe`: die holt Terpene, Bestaende und Preise
  * mit. Fuer ein `<select>` waere das ein Vielfaches der noetigen Daten.
  */
-export async function ladeStrainAuswahl(): Promise<StrainAuswahlEintrag[]> {
+export async function ladeStrainAuswahl({ mitInaktiven = false } = {}): Promise<StrainAuswahlEintrag[]> {
   const prisma = await getPrisma();
   return prisma.strain.findMany({
-    where: { aktiv: true },
-    select: { id: true, handelsname: true },
+    // Die Admin-Zuordnung braucht auch abgeschaltete Blüten: ein Vorschlag
+    // kann eine inaktive Blüte treffen, die Freigabe verweist dann hierher.
+    where: mitInaktiven ? {} : { aktiv: true },
+    select: { id: true, handelsname: true, aktiv: true },
     orderBy: { handelsname: "asc" },
     take: MAX_AUSWAHL,
   });

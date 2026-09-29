@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Seitenkopf, seitenRahmen } from "@/components/layout/Seitenkopf";
 import { textLinkKlassen } from "@/components/ui/textlink";
 import { cn } from "@/lib/cn";
+import { holeSprache, holeWoerterbuch } from "@/lib/i18n";
 import { BETREIBER, INHALTLICH_VERANTWORTLICH, istPlatzhalter } from "@/lib/rechtliches";
 
 /*
@@ -32,10 +33,17 @@ function Angabe({ wert }: { wert: string }) {
   );
 }
 
-export default function ImpressumPage() {
+export default async function ImpressumPage() {
   const b = BETREIBER;
+  // Rechtstexte gibt es nur auf Deutsch: lang="de" fuer Vorleseprogramme,
+  // auf Englisch ein Hinweis davor (Review 2026-09-28, WCAG 3.1.2).
+  const [sprache, w] = await Promise.all([holeSprache(), holeWoerterbuch()]);
   return (
     <>
+      {sprache === "en" ? (
+        <p className={cn(seitenRahmen(), "pt-8 text-small text-text-muted")}>{w.rahmen.nurDeutsch}</p>
+      ) : null}
+      <div lang="de">
       <Seitenkopf titel="Impressum" satz="Angaben nach § 5 DDG und § 18 Abs. 2 MStV." />
 
       <div className={cn(seitenRahmen(), "pt-16 pb-24")}>
@@ -138,6 +146,7 @@ export default function ImpressumPage() {
             </p>
           </section>
         </div>
+      </div>
       </div>
     </>
   );

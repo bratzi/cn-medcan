@@ -8,6 +8,7 @@
 export const de = {
   rahmen: {
     direktZumInhalt: "Direkt zum Inhalt",
+    nurDeutsch: "Diese Seite gibt es nur auf Deutsch.",
     beschreibung:
       "Bewertungen verschreibungspflichtiger Cannabisarzneimittel nach festem Schema, jeweils an eine Charge gebunden. Die Community stimmt ab, welche Sorte als Nächstes bewertet wird.",
   },

@@ -12,11 +12,11 @@ export async function BlueteVorschlaege() {
   const [offene, terpene, strains, hersteller] = await Promise.all([
     offeneVorschlaegeFuerAdmin(),
     terpenNamen(),
-    ladeStrainAuswahl(),
+    ladeStrainAuswahl({ mitInaktiven: true }),
     herstellerNamen(),
   ]);
   const gruppen = vorschlaegeBuendeln(offene);
-  const katalog = strains.map((s) => ({ wert: s.id, label: s.handelsname }));
+  const katalog = strains.map((s) => ({ wert: s.id, label: s.aktiv ? s.handelsname : `${s.handelsname} (inaktiv)` }));
 
   return (
     <section aria-labelledby="vorschlaege-titel">

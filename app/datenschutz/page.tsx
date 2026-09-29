@@ -5,6 +5,7 @@ import type { ReactNode } from "react";
 import { Seitenkopf, seitenRahmen } from "@/components/layout/Seitenkopf";
 import { textLinkKlassen } from "@/components/ui/textlink";
 import { cn } from "@/lib/cn";
+import { holeSprache, holeWoerterbuch } from "@/lib/i18n";
 import {
   AUFSICHTSBEHOERDE,
   BETREIBER,
@@ -101,10 +102,17 @@ const SPEICHER: Speicher[] = [
   },
 ];
 
-export default function DatenschutzPage() {
+export default async function DatenschutzPage() {
   const b = BETREIBER;
+  // Rechtstexte gibt es nur auf Deutsch: lang="de" fuer Vorleseprogramme,
+  // auf Englisch ein Hinweis davor (Review 2026-09-28, WCAG 3.1.2).
+  const [sprache, w] = await Promise.all([holeSprache(), holeWoerterbuch()]);
   return (
     <>
+      {sprache === "en" ? (
+        <p className={cn(seitenRahmen(), "pt-8 text-small text-text-muted")}>{w.rahmen.nurDeutsch}</p>
+      ) : null}
+      <div lang="de">
       <Seitenkopf
         titel="Datenschutz"
         satz="Welche Daten wir verarbeiten, wofür und wie lange. Kurz gesagt: nur, was die Seite zum Funktionieren braucht, keine Analyse, keine Werbung."
@@ -293,6 +301,7 @@ export default function DatenschutzPage() {
             Stand: <Angabe wert={DATENSCHUTZ_STAND} />
           </p>
         </div>
+      </div>
       </div>
     </>
   );

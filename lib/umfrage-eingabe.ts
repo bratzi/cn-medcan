@@ -189,6 +189,19 @@ export function vorschlagFristPruefen(
 }
 
 /**
+ * Nimmt die Runde gerade Vorschläge an? Nur in der Vorschlagsphase und, wenn
+ * eine Frist gesetzt ist, bis zu ihr (Ende des Tages, siehe oben). Server
+ * Action und Oberfläche fragen beide hier, damit sie nicht auseinanderlaufen.
+ */
+export function nimmtVorschlaegeAn(
+  umfrage: { phase: string; vorschlagBisAm: Date | null },
+  jetzt: Date = new Date(),
+): boolean {
+  if (umfrage.phase !== "VORSCHLAG") return false;
+  return umfrage.vorschlagBisAm === null || umfrage.vorschlagBisAm.getTime() >= jetzt.getTime();
+}
+
+/**
  * Wer gewinnt.
  *
  * Alle GESETZTEN Plaetze gewinnen immer - sie sind die Wahl des Betreibers

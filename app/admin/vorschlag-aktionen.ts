@@ -230,12 +230,16 @@ export async function blueteZuordnen(formData: FormData): Promise<AdminVorschlag
   const prisma = await getPrisma();
   const strain = await prisma.strain.findUnique({
     where: { id: strainId },
-    select: { id: true, slug: true, handelsname: true },
+    select: { id: true, slug: true, handelsname: true, aktiv: true },
   });
   if (!strain) return { ok: false, fehler: "Diese Blüte gibt es nicht." };
 
   const offene = await offeneLaden(schluessel);
   if (offene.length === 0) return { ok: false, fehler: "Zu diesem Vorschlag ist nichts mehr offen." };
+
+  // Wie bei der Freigabe: eine abgeschaltete Blüte kommt zurück in den Katalog,
+  // sonst zeigte die Benachrichtigung auf eine Seite, die es nicht gibt.
+  if (!strain.aktiv) await prisma.strain.update({ where: { id: strain.id }, data: { aktiv: true } });
 
   await abschliessen(
     offene,

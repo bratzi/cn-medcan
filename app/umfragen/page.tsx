@@ -21,6 +21,7 @@ import {
 import { aktuellesMitglied } from "@/lib/session";
 import { holeSprache, holeWoerterbuch, type Sprache, type Woerterbuch } from "@/lib/i18n";
 import { t } from "@/lib/i18n/text";
+import { nimmtVorschlaegeAn } from "@/lib/umfrage-eingabe";
 
 /** Nutzerbezogen (eigene Stimme, Freischaltung) - siehe app/page.tsx. */
 export const dynamic = "force-dynamic";
@@ -74,7 +75,7 @@ async function UmfragenInhalt({ w, sprache }: { w: Woerterbuch; sprache: Sprache
 
   // Das Vorschlagsformular braucht die Katalogliste. Sie wird nur geladen,
   // wenn sie auch angezeigt wird - sonst waere es eine Abfrage fuer nichts.
-  const darfVorschlagen = umfrage?.phase === "VORSCHLAG" && mitglied?.freigegeben === true;
+  const darfVorschlagen = !!umfrage && nimmtVorschlaegeAn(umfrage) && mitglied?.freigegeben === true;
 
   const [vorschlaege, strains, runden] = await Promise.all([
     umfrage ? vorschlaegeLaden(umfrage.id) : Promise.resolve([]),

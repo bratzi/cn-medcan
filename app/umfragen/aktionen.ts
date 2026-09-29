@@ -5,7 +5,7 @@ import { revalidatePath } from "next/cache";
 import { freigabeErforderlich } from "@/lib/session";
 import { getPrisma } from "@/lib/prisma";
 import { istEindeutigkeitsfehler } from "@/lib/prisma-fehler";
-import { stimmeEingabePruefen, vorschlagEingabePruefen } from "@/lib/umfrage-eingabe";
+import { nimmtVorschlaegeAn, stimmeEingabePruefen, vorschlagEingabePruefen } from "@/lib/umfrage-eingabe";
 import { holeWoerterbuch } from "@/lib/i18n";
 import { meldungText } from "@/lib/i18n/text";
 
@@ -43,10 +43,11 @@ export async function vorschlagEinreichen(formData: FormData): Promise<UmfrageEr
   // nicht gefaehrlich, nur falsch.
   const umfrage = await prisma.umfrage.findUnique({
     where: { id: geprueft.wert.umfrageId },
-    select: { phase: true },
+    select: { phase: true, vorschlagBisAm: true },
   });
   if (!umfrage) return { ok: false, fehler: w.meldung["umfrage.gibtEsNicht"] };
-  if (umfrage.phase !== "VORSCHLAG") {
+  // Auch nach Ablauf der Frist nicht mehr (Review 2026-09-28: sie stand nur auf dem Stimmzettel).
+  if (!nimmtVorschlaegeAn(umfrage)) {
     return { ok: false, fehler: w.meldung["umfrage.keineVorschlaege"] };
   }
 

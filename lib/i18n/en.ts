@@ -4,6 +4,7 @@ import type { Woerterbuch } from "./typen";
 export const en: Woerterbuch = {
   rahmen: {
     direktZumInhalt: "Skip to content",
+    nurDeutsch: "This page is only available in German.",
     beschreibung:
       "Reviews of prescription medical cannabis following a fixed scheme, each tied to one batch. The community votes on which strain is reviewed next.",
   },

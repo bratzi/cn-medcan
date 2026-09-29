@@ -10,6 +10,7 @@ import type { Sprache } from "@/lib/i18n/sprache-kern";
 import type { Woerterbuch } from "@/lib/i18n/typen";
 import { mehrzahl } from "@/lib/i18n/text";
 import type { UmfrageAnsicht } from "@/lib/query/umfragen";
+import { nimmtVorschlaegeAn } from "@/lib/umfrage-eingabe";
 
 /**
  * Der Zustand des Betrachters gegenueber dieser Runde.
@@ -63,6 +64,9 @@ function Aktionsbereich({
   }
 
   if (umfrage.phase === "VORSCHLAG") {
+    if (!nimmtVorschlaegeAn(umfrage)) {
+      return <p className="text-small text-text-muted">{w.meldung["umfrage.keineVorschlaege"]}</p>;
+    }
     return (
       <div className="flex flex-wrap items-center gap-4">
         <p className="text-small text-text-muted">
