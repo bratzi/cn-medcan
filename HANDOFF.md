@@ -31,9 +31,9 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 ### ⇢ SESSION 27 (2026-09-29) — A6 Mobil begonnen
 
 - Messung 390 px (iframe) auf /, /blueten, /reviews, /umfragen, /mitglied: kein waagerechter Überlauf.
-- `f858c9f`: Button `sm` und Karte/Netz-Umschalter per `pointer-coarse:h-11` auf 44 px (Desktop unverändert). Live noch nicht geprüft.
+- `f858c9f`: Button `sm` und Karte/Netz-Umschalter per `pointer-coarse:h-11` auf 44 px (Desktop unverändert). Live ausgeliefert (CSS geprüft).
 - Kein Befund: Filterzeilen schon min-h-11; Regler-Inputs pointer-events-none (Fläche drumherum zieht); Achsennamen der Karte aria-hidden, bleiben.
-- Offen A6: Hero-Video mobil (Datenmenge), Lenis/GSAP-Last, web-perf, Hell-Modus mobil, Credits-Links im Fuß ERLEDIGT `a4522f3` (pointer-coarse 44 px, live ungeprüft), Testblüte freigeben (A2).
+- Offen A6: Hero-Video mobil (Datenmenge), Lenis/GSAP-Last, web-perf, Hell-Modus mobil, Credits-Links im Fuß ERLEDIGT `a4522f3` (pointer-coarse 44 px; live: Klassen und CSS-Regeln von a4522f3 und f858c9f ausgeliefert, echtes Handy nicht getestet), Testblüte freigeben (A2).
 
 ### ⇢ SESSION 25 (2026-09-28/29, läuft) — Nutzerauftrag Mobil vorgezogen
 
