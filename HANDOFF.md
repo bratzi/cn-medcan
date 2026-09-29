@@ -35,7 +35,7 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 - **T6 ERLEDIGT** (Review + Fix-Runde, sauber), live gepusht 23:03 zusammen mit Menüknopf-Fix `71fae10`
   (Knopf ab 64rem verborgen; unlayered display:grid schlug lg:hidden). **Live noch NICHT geprüft** (Desktop: kein
   Menüknopf hinter dem Logo; mobil Knopf da).
-- **T7 implementiert, lokal `77d43cc`, NICHT gepusht.** Review lief beim Clear (abgebrochen) → neu dispatchen:
+- **T7 implementiert, lokal `77d43cc`, NICHT gepusht.** Review 1 fertig: 5 Important in `task-7-findings-r1.md` → Fix-Runde 1 (frischer Implementer opus, FIX_BASE 77d43cc), dann Re-Review. Altes Paket:
   Paket `review-98651d7..d882697.diff` (Inhalt = 77d43cc), Brief/Report task-7-*.md, opus. Offene Nutzerfrage:
   Autorname im Buch öffentlich, auch Betreibername auf Startseite/reviews statt „wir“ – gewollt?
 - **T5b NEU (Nutzer, Entwurf freigegeben):** Aromakarte v2, Brief `task-5b-brief.md`. Lief im Worktree
