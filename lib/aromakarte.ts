@@ -315,7 +315,7 @@ export function mittlereHerstellerTreue(
  * Denkfehler bis T5: ein Geschmack aktivierte alle Terpene, die ihn tragen,
  * auch solche, die gar nicht in der Sorte stecken. Jetzt hat jedes Terpen der
  * Karte eine Ebene:
- * - `hersteller`: laut Herstellerangabe enthalten (voller Puls),
+ * - `hersteller`: laut Herstellerangabe enthalten (seit T5b stiller Streifen),
  * - `ergaenzt`: der Nutzer hat es selbst im Sweet Spot gesetzt (Stufe > 0),
  * - `geist`: nur über den Geschmack verbunden, laut Hersteller nicht enthalten.
  */
@@ -359,28 +359,131 @@ export function ebenenStaerken(
   );
 }
 
-/** Wie ein Bogen gezeichnet wird: satt mit Puls, gestrichelt in eigener Farbe, blass. */
-export type BogenArt = "voll" | "ergaenzt" | "geist" | "geistFokus";
+// ---------------------------------------------------------------------------
+//  Karte v2: nur die eigene Bewertung bewegt sich (T5b, Nutzer 2026-09-29)
+// ---------------------------------------------------------------------------
+
+/** Ab diesem Wert ist eine Geschmacksrichtung spürbar: Balken und Linie erscheinen. */
+export const SPUERBAR = 0.05;
+
+/** Nebennoten zeichnen feiner als die Hauptnote (Anteil 0 bis 1). */
+const notenGewicht = (anteil: number) => 0.35 + 0.65 * anteil;
+const zweiStellen = (zahl: number) => Math.round(zahl * 100) / 100;
 
 /**
- * Terpene der Sorte (Ebene 1 und 2) leuchten, wenn ihre Richtung aktiv ist und
- * sie Kraft haben, oder wenn man sie selbst überfährt. Alles andere bleibt ein
- * Geist ohne Puls; ein überfahrener Geist tritt nur etwas hervor.
+ * Breite der eigenen Linie über dem Streifen (Nutzer 2026-09-29: „desto
+ * weniger, desto dünner“): ohne spürbaren Wert keine Linie, sonst 1,5 px bei
+ * 0,5 bis 6 px bei 5, mal dem Notenanteil, damit Nebennoten feiner bleiben.
  */
-export function bogenArt({
+export function linienBreite(wert: number, anteil = 1): number {
+  if (!(wert > SPUERBAR)) return 0;
+  return zweiStellen((1 + Math.min(wert, MAX)) * notenGewicht(anteil));
+}
+
+const FLUSS_LANGSAM = 6;
+const FLUSS_SCHNELL = 1.2;
+
+/**
+ * Dauer eines Lichtflusses in Sekunden (Nutzer 2026-09-29: „desto stärker,
+ * desto schneller“): 6 s bei 0,5, 1,2 s bei 5. Geometrisch dazwischen, damit
+ * jeder halbe Schritt gleich stark schneller wirkt (Tempo wird als Verhältnis
+ * wahrgenommen); auf Zehntel gerundet, damit sich die Dauer beim Ziehen nur in
+ * Stufen ändert.
+ */
+export function flussDauer(wert: number): number {
+  const anteil = (Math.min(Math.max(wert, 0.5), MAX) - 0.5) / (MAX - 0.5);
+  return Math.round(FLUSS_LANGSAM * (FLUSS_SCHNELL / FLUSS_LANGSAM) ** anteil * 10) / 10;
+}
+
+/** Unterschied, ab dem ein Balken über oder unter seinem Bezug liegt (sonst gleichauf). */
+const GLEICHAUF = 0.1;
+
+export type BalkenVergleich = {
+  ton: "gruen" | "lila";
+  /** Pulsierendes Stück zwischen Bezug und Balkenende; gleichauf oder ohne Bezug null. */
+  puls: { art: "ueber" | "fehlt"; von: number; bis: number } | null;
+};
+
+/**
+ * Farbe und Puls des Bewertungsbalkens (Nutzer 2026-09-29): über dem Bezug
+ * (Community-Median, in der Anzeige die grüne Serie) lila, der Überstand
+ * pulsiert; auf oder unter ihm grün, das Fehlstück bis zum Bezug pulsiert;
+ * gleichauf grün ohne Puls. Ohne Bezug lila, kein Vergleich. Ohne eigenen
+ * Wert gibt es keinen Balken und kein Fehlstück, die Karte zeigt nur Streifen.
+ */
+export function balkenVergleich(wert: number, bezug: number | null | undefined): BalkenVergleich {
+  if (bezug === null || bezug === undefined) return { ton: "lila", puls: null };
+  const differenz = wert - bezug;
+  if (differenz >= GLEICHAUF) return { ton: "lila", puls: { art: "ueber", von: bezug, bis: wert } };
+  if (!(wert > SPUERBAR) || differenz > -GLEICHAUF) return { ton: "gruen", puls: null };
+  return { ton: "gruen", puls: { art: "fehlt", von: wert, bis: bezug } };
+}
+
+/**
+ * Der stille Streifen der Herstellerangabe hinter der Linie: breit und blass
+ * (3 bis 14 px, Deckkraft 0,12 bis 0,3), nach Ausprägung aus Kraft des Terpens
+ * (0 bis 1) und Notenanteil. Er bewegt sich nie.
+ */
+export function streifen(kraft: number, anteil: number): { breite: number; deckkraft: number } {
+  const auspraegung = Math.min(Math.max(kraft, 0), 1) * (0.4 + 0.6 * anteil);
+  return { breite: zweiStellen(3 + 11 * auspraegung), deckkraft: zweiStellen(0.12 + 0.18 * auspraegung) };
+}
+
+/**
+ * Kraft je angegebenem Terpen, 0 bis 1, allein aus der Herstellerangabe
+ * (Konzentration, sonst Rang): das stärkste ist 1. Eigene Stufen fließen nicht
+ * ein, der Streifen gehört dem Hersteller.
+ */
+export function herstellerKraft(terpene: readonly KartenTerpen[]): Record<string, number> {
+  const gewichte = terpene.map((terpen) => terpen.konzentrationProzent ?? Math.max(1, 4 - terpen.rang));
+  const hoechstes = Math.max(0, ...gewichte);
+  return Object.fromEntries(terpene.map((terpen, index) => [terpen.name, hoechstes > 0 ? gewichte[index] / hoechstes : 0]));
+}
+
+export type BogenSchicht = {
+  /** Stiller Streifen der Herstellerangabe. */
+  streifen: boolean;
+  /** Bunte Linie der Bewertung mit Lichtfluss. */
+  linie: boolean;
+  /** Dünner grauer Bogen für Terpene ohne Herstellerangabe und ohne Linie. */
+  geist: "blass" | "fokus" | null;
+};
+
+/**
+ * Was ein Bogen Geschmack → Terpen zeigt (T5b): Terpene laut Hersteller immer
+ * ihren Streifen; die Linie nur, wenn die Bewertung auf der Achse einen Wert
+ * hat und die Achse im Blick ist (keine andere gewählt) oder man das Terpen
+ * selbst überfährt. Ergänzte Terpene tragen keine Herstellerangabe, also nur
+ * die Linie; Geister (T5) bekommen nie eine Linie, ein Geschmack allein zündet
+ * kein Terpen, das nicht in der Sorte steckt.
+ */
+export function bogenSchicht({
   ebene,
-  kraft,
-  richtungAktiv,
+  wert,
+  imBlick,
   imFokus,
 }: {
   ebene: TerpenEbene;
-  kraft: number;
-  richtungAktiv: boolean;
+  wert: number;
+  imBlick: boolean;
   imFokus: boolean;
-}): BogenArt {
-  if (ebene === "geist") return imFokus ? "geistFokus" : "geist";
-  if (!imFokus && !(richtungAktiv && kraft > 0)) return "geist";
-  return ebene === "hersteller" ? "voll" : "ergaenzt";
+}): BogenSchicht {
+  const linie = ebene !== "geist" && wert > SPUERBAR && (imBlick || imFokus);
+  const geist = ebene === "hersteller" || linie ? null : ebene === "geist" && imFokus ? "fokus" : "blass";
+  return { streifen: ebene === "hersteller", linie, geist };
+}
+
+/**
+ * Welche eigenen Terpenstufen zählen: ein Herstellerterpen auf 0 heißt „nicht
+ * geschmeckt“ und zählt; ein ergänztes auf 0 ist nicht ergänzt und fällt weg
+ * (T5). Eine Regel für die versteckten Felder der Maske und die Abweichung.
+ */
+export function gezaehlteTerpene(
+  eigene: Readonly<Record<string, number>>,
+  hersteller: readonly string[],
+): Record<string, number> {
+  const angegeben = new Set(hersteller);
+  return Object.fromEntries(Object.entries(eigene).filter(([name, wert]) => angegeben.has(name) || wert > 0));
 }
 
 /**
@@ -453,10 +556,8 @@ export function nasenAbweichung(
   hersteller: readonly string[],
 ): { delta: number; ergaenzt: number } | null {
   if (!median) return null;
-  const angegeben = new Set(hersteller);
   // Ein ergänztes Terpen auf 0 zurückgezogen gilt als nicht ergänzt.
-  const gesetzt = Object.fromEntries(Object.entries(eigene).filter(([name, wert]) => angegeben.has(name) || wert > 0));
-  const { mittlereAbweichung, ergaenzt } = abweichungZurCommunity(gesetzt, median, hersteller);
+  const { mittlereAbweichung, ergaenzt } = abweichungZurCommunity(gezaehlteTerpene(eigene, hersteller), median, hersteller);
   if (mittlereAbweichung === null) return null;
   return { delta: mittlereAbweichung, ergaenzt: ergaenzt.length };
 }

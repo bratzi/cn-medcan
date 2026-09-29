@@ -24,8 +24,9 @@ const LIMONEN: KartenTerpen = { name: "Limonen", geschmack: "ZITRUS", konzentrat
 const VOLL = { ...leereGeschmacksMatrix(), zitrus: 5, kraeutrig: 5, blumig: 5, holzig: 5 };
 const HERSTELLER = { name: "Laut Hersteller", ton: "gruen" as const, matrix: VOLL };
 
+const BEWERTUNG = { name: "Diese Bewertung", ton: "lila" as const, matrix: VOLL };
 const karte = (props: Partial<Parameters<typeof AromaKarte>[0]>) =>
-  renderToStaticMarkup(createElement(AromaKarte, { terpene: [TERPINOLEN], serien: [HERSTELLER], texte, ...props }));
+  renderToStaticMarkup(createElement(AromaKarte, { terpene: [TERPINOLEN], serien: [HERSTELLER, BEWERTUNG], texte, ...props }));
 
 test("Geist: ein Geschmack allein zündet kein Terpen, blasser Bogen ohne Puls und ohne Lichtpunkt", () => {
   // Selbst mit Kraft (wie früher über den Geschmack) bleibt ein Geist ein Geist: die Ebene entscheidet.
@@ -44,10 +45,11 @@ test("Ergänzt: gestrichelt in eigener Farbe (Kopierstift), Lichtpunkt ja, volle
   assert.match(html, /<circle[^>]*stroke="var\(--color-kopierstift\)"[^>]*stroke-dasharray="3 2.5"/);
 });
 
-test("Herstellerangabe: voller Puls wie bisher", () => {
+test("Herstellerangabe (T5b): stiller Streifen, die Bewertung darüber mit Lichtfluss, kein Puls", () => {
   const html = karte({ terpene: [LIMONEN], ebenen: { Limonen: "hersteller" } });
-  assert.match(html, /class="bogen-puls"/);
+  assert.match(html, /data-schicht="streifen"/);
   assert.match(html, /class="bogen-fluss"/);
+  assert.doesNotMatch(html, /bogen-puls/);
 });
 
 test("Legende der Ebenen nur, wenn es mehr als die Herstellerangabe gibt", () => {

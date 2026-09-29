@@ -176,7 +176,7 @@ export const en: Woerterbuch = {
     },
   },
   aroma: {
-    serien: { hersteller: "Per producer", community: "Per community", eigen: "Your impression" },
+    serien: { hersteller: "Per producer", community: "Per community", eigen: "Your impression", bewertung: "Your rating" },
     karte: {
       titel: "Aroma map",
       ansicht: "View",
@@ -194,6 +194,7 @@ export const en: Woerterbuch = {
       geschmack: "Flavour",
       median: "Community median",
       keinMedian: "No community value yet",
+      streifen: "Producer information",
       ebenen: {
         hersteller: "Stated by the producer",
         ergaenzt: "Added by you",
@@ -372,7 +373,8 @@ export const en: Woerterbuch = {
     communityLesen: { one: "Read {anzahl} community review", other: "Read {anzahl} community reviews" },
     nochKeineCommunity: "No community review yet",
     profilFrage: "Does the profile match?",
-    profilMitCommunity: "Green is what the producer's information suggests, purple is what {anzahl} reviews found.",
+    profilMitCommunity:
+      "The green mark shows what the producer's information suggests, the bars what {anzahl} reviews found: green up to it, purple beyond.",
     profilOhneCommunity: "Green is what the producer's information suggests. The comparison appears with the first reviews.",
     deineBewertung: "Your review",
     communityLeer:

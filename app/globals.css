@@ -337,7 +337,7 @@
   /* Sparmodus (T2): Endlosschleifen stehen, Einblendungen laufen zu Ende. */
   :root[data-sparmodus] :is(.glanz-wort, .auftakt-marke [data-marke-zeile], .blob-morph, .blob-linie, .bild-zoom,
       .bild-wechsel > *, .bild-schweben > *, .marke-kontur > span, .fazit-puls, .marke-puls, .glas-maske,
-      .delta-puls, .bogen-puls, .bogen-fluss) {
+      .delta-puls, .bogen-fluss) {
     animation-play-state: paused !important;
   }
 
@@ -1405,13 +1405,23 @@ html.joint-cursor :is(input:not([type="range"]):not([type="radio"]):not([type="c
   }
 }
 
-/* Delta zwischen Hersteller- und lila Balken in der Aroma-Karte (Nutzer 2026-09-26):
-   das überstehende Stück glüht und pulsiert in der Farbe des längeren Balkens. */
-/* Ohne filter und ohne stroke-width im Takt (2026-09-28, Mobil zu träge): ein Blur je
-   Frame im SVG kostet mehr als der ganze Rest der Karte. Es pulsiert stroke-opacity,
-   damit das Einblenden über opacity (kartenSichtbar) unberührt bleibt. */
+/* Delta des Bewertungsbalkens gegen seinen Bezug (Nutzer 2026-09-26, seit T5b 2026-09-29
+   gegen Community-Median bzw. grüne Serie): lila Überstand und grünes Fehlstück pulsieren.
+   Nur stroke-opacity (2026-09-28, Mobil). Ohne Bewegung steht das Fehlstück blass
+   (--delta-ruhe), damit es nicht wie ein Stück Balken aussieht. */
 .delta-puls {
+  --delta-tief: 0.55;
+  --delta-hoch: 1;
+  --delta-ruhe: 1;
   stroke-width: 6px;
+  stroke-opacity: var(--delta-ruhe);
+}
+
+.delta-puls[data-delta="fehlt"] {
+  --delta-tief: 0.15;
+  --delta-hoch: 0.6;
+  --delta-ruhe: 0.35;
+  stroke-width: 4px;
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -1423,45 +1433,30 @@ html.joint-cursor :is(input:not([type="range"]):not([type="radio"]):not([type="c
 @keyframes delta-puls {
   0%,
   100% {
-    stroke-opacity: 0.55;
+    stroke-opacity: var(--delta-tief);
   }
   50% {
-    stroke-opacity: 1;
+    stroke-opacity: var(--delta-hoch);
   }
 }
 
-/* Aktive Bögen der Aroma-Karte (Nutzer 2026-09-26): eine Leuchtschicht über dem
-   Bogen glüht und pulsiert im Takt von .delta-puls in der Farbe des Geschmacks,
-   ein Lichtpunkt läuft vom Geschmack zum Terpen (pathLength 100, Strich 6 von 200,
-   danach eine Pause außerhalb des Pfads). Ohne Bewegung: beides aus, der Bogen
-   selbst bleibt farbig stehen. */
-.bogen-puls,
+/* Lichtfluss nur auf der Linie der Bewertung (T5b, Nutzer 2026-09-29): Tempo je Bogen
+   über --fluss-dauer (lib/aromakarte.ts flussDauer), linear, nur stroke-dashoffset.
+   Ohne Bewegung und im Sparmodus aus; die Linie bleibt farbig stehen. */
 .bogen-fluss {
   visibility: hidden;
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  /* Leuchten als breiter, blasser Strich statt Blur; im Takt nur die Deckkraft. */
-  .bogen-puls {
-    visibility: visible;
-    stroke-width: calc(var(--bogen-breite) * 2.6);
-    animation: bogen-puls 1.8s ease-in-out infinite;
-  }
-
   .bogen-fluss {
     visibility: visible;
-    animation: bogen-fluss 3s linear infinite;
+    animation: bogen-fluss var(--fluss-dauer, 3s) linear infinite;
   }
 }
 
-@keyframes bogen-puls {
-  0%,
-  100% {
-    opacity: 0.06;
-  }
-  50% {
-    opacity: 0.4;
-  }
+/* Sparmodus: der stehende Lichtpunkt verschwindet, statt als Klecks zu bleiben. */
+:root[data-sparmodus] .bogen-fluss {
+  visibility: hidden;
 }
 
 @keyframes bogen-fluss {
@@ -1627,13 +1622,8 @@ html.joint-cursor :is(input:not([type="range"]):not([type="radio"]):not([type="c
 
   /* Karte: keine Endlosschleifen im SVG, das Leuchten steht still. */
   .delta-puls,
-  .bogen-puls,
   .bogen-fluss {
     animation: none;
-  }
-
-  .bogen-puls {
-    opacity: 0.25;
   }
 
   .bogen-fluss {

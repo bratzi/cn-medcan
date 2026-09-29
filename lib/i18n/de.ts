@@ -180,7 +180,7 @@ export const de = {
     },
   },
   aroma: {
-    serien: { hersteller: "Laut Hersteller", community: "Laut Community", eigen: "Dein Eindruck" },
+    serien: { hersteller: "Laut Hersteller", community: "Laut Community", eigen: "Dein Eindruck", bewertung: "Deine Bewertung" },
     karte: {
       titel: "Aroma-Karte",
       ansicht: "Ansicht",
@@ -198,6 +198,8 @@ export const de = {
       geschmack: "Geschmack",
       median: "Community-Median",
       keinMedian: "Noch kein Community-Wert",
+      // Stiller Streifen hinter den Linien (T5b, Nutzer 2026-09-29).
+      streifen: "Herstellerangabe",
       ebenen: {
         hersteller: "Laut Hersteller enthalten",
         ergaenzt: "Von dir ergänzt",
@@ -377,7 +379,8 @@ export const de = {
     communityLesen: { one: "{anzahl} Bewertung der Community lesen", other: "{anzahl} Bewertungen der Community lesen" },
     nochKeineCommunity: "Noch keine Community-Bewertung",
     profilFrage: "Stimmt das Profil?",
-    profilMitCommunity: "Grün ist, was die Herstellerangaben erwarten lassen, Lila, was {anzahl} Bewertungen gefunden haben.",
+    profilMitCommunity:
+      "Der grüne Strich zeigt, was die Herstellerangaben erwarten lassen, die Balken, was {anzahl} Bewertungen gefunden haben: grün bis dorthin, lila darüber.",
     profilOhneCommunity: "Grün ist, was die Herstellerangaben erwarten lassen. Mit den ersten Bewertungen kommt der Vergleich dazu.",
     deineBewertung: "Deine Bewertung",
     communityLeer:

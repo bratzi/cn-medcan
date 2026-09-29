@@ -166,12 +166,11 @@ test("Pfeiltasten im Ansichts-Schalter laufen um, Pos1/Ende springen an den Rand
   assert.equal(naechsteAnsicht("Tab", 1), null);
 });
 
-test("Im Stand der Karte tragen aktive Bögen Filter, Puls und Lichtpunkt wie zuvor", () => {
+test("T5b: Herstellerangabe allein bleibt still, ohne Filter, Puls und Lichtpunkt", () => {
   const html = karte();
-  assert.match(html, /filter:saturate\(/);
-  assert.match(html, /transition-\[opacity,stroke-width,filter,stroke\]/);
-  assert.match(html, /class="bogen-puls"/);
-  assert.match(html, /class="bogen-fluss"/);
+  assert.doesNotMatch(html, /filter:saturate/);
+  assert.doesNotMatch(html, /bogen-puls/);
+  assert.doesNotMatch(html, /class="bogen-fluss"/);
 });
 
 test("Regler: Tastaturfokus zeichnet einen eigenen Ring im Fokus-Token, nur bei :focus-visible", () => {
@@ -196,7 +195,6 @@ test("Schmale Karte (Handy): Achse bei 42 %, Terpene 124 vor dem Rand, Netz klei
 // ---------------------------------------------------------------------------
 
 import {
-  bogenArt,
   communityMedian,
   ebenenStaerken,
   leuchtendeTerpene,
@@ -245,17 +243,6 @@ test("Stärken: ein Geschmack allein zündet kein Terpen, Katalogterpene verwäs
     Terpinolen: 3,
   });
   assert.ok(Math.abs(sweetSpot.Terpinolen - 0.36) < 1e-9);
-});
-
-test("Bogenart: Terpene der Sorte leuchten bei aktiver Richtung, Geister bleiben blass und pulsieren nie", () => {
-  assert.equal(bogenArt({ ebene: "hersteller", kraft: 0.5, richtungAktiv: true, imFokus: false }), "voll");
-  assert.equal(bogenArt({ ebene: "hersteller", kraft: 0.5, richtungAktiv: false, imFokus: false }), "geist");
-  assert.equal(bogenArt({ ebene: "hersteller", kraft: 0, richtungAktiv: true, imFokus: false }), "geist");
-  assert.equal(bogenArt({ ebene: "hersteller", kraft: 0, richtungAktiv: false, imFokus: true }), "voll");
-  assert.equal(bogenArt({ ebene: "ergaenzt", kraft: 0.36, richtungAktiv: true, imFokus: false }), "ergaenzt");
-  assert.equal(bogenArt({ ebene: "ergaenzt", kraft: 0.36, richtungAktiv: false, imFokus: false }), "geist");
-  assert.equal(bogenArt({ ebene: "geist", kraft: 1, richtungAktiv: true, imFokus: false }), "geist");
-  assert.equal(bogenArt({ ebene: "geist", kraft: 0, richtungAktiv: false, imFokus: true }), "geistFokus");
 });
 
 test("Gewählte Geschmacksrichtung: nur die Schnittmenge mit Ebene 1 und 2 leuchtet", () => {

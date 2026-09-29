@@ -14,6 +14,7 @@ import { TerpenErgaenzen, type KatalogEintrag } from "@/components/review/Terpen
 import {
   ebenenStaerken,
   ergaenztesTerpen,
+  gezaehlteTerpene,
   herstellerProfil,
   herstellerTreue,
   nasenAbweichung,
@@ -168,20 +169,29 @@ export function AromaErkundung({
 
   const hersteller = herstellerProfil(terpene);
   const community = serien.find((serie) => serie.ton === "lila")?.matrix;
-  // Start der Regler: was die Community geschmeckt hat, sonst die Herstellerangabe.
-  const start = community ?? hersteller ?? leereGeschmacksMatrix();
+  // Start der Regler. In der Maske (T5b, Nutzer 2026-09-29: „die Userwerte immer initial
+  // nullen, die Regler setzt der User“) bei 0; wer die Sorte schon bewertet hat, bei den
+  // eigenen gespeicherten Werten, sonst überschriebe Speichern sie mit 0. Unberührte Regler
+  // gehen als 0 ins Formular, „Zurücksetzen“ kehrt hierher zurück. In der Anzeige ohne
+  // Maske wie bisher: was die Community geschmeckt hat, sonst die Herstellerangabe.
+  const start = eingabe
+    ? (anfang.geschmack ?? leereGeschmacksMatrix())
+    : (community ?? hersteller ?? leereGeschmacksMatrix());
   const werte = eigen ?? start;
   // Stärke je Terpen nach Ebene: Herstellerterpene nach ihrer Angabe, ergänzte nach
   // der eigenen Stufe, Geister 0 (lib/aromakarte.ts, ebenenStaerken).
   const staerken = ebenenStaerken(kartenTerpene, ebenen, stufen);
   const eigeneTreue =
     eigen && hersteller ? herstellerTreue(hersteller, eigen) : null;
-  const alleSerien: AromaSerie[] = eigen
-    ? [
-        ...serien.filter((serie) => serie.ton === "gruen"),
-        { name: texte.aroma.serien.eigen, ton: "lila", matrix: eigen },
-      ]
-    : [...serien];
+  // In der Maske ist die eigene Bewertung immer die lila Reihe, auch bei 0 (dann zeigt die
+  // Karte nur Streifen); die Community steht dort als Ring am Regler (T5b). In der Anzeige
+  // ersetzt der eigene Eindruck die Community erst, wenn man etwas bewegt.
+  const gruen = serien.filter((serie) => serie.ton === "gruen");
+  const alleSerien: AromaSerie[] = eingabe
+    ? [...gruen, { name: texte.aroma.serien.bewertung, ton: "lila", matrix: werte }]
+    : eigen
+      ? [...gruen, { name: texte.aroma.serien.eigen, ton: "lila", matrix: eigen }]
+      : [...serien];
 
   // Sortenfazit aus Overall, Terpen-Abgleich und Gesamtnote-Median (T6); "Dein Fazit" setzt
   // die eigenen Regler über die Community-Werte, sobald etwas bewegt wurde. Das Chargenfazit
@@ -233,12 +243,10 @@ export function AromaErkundung({
           ))}
           {eigeneFeuchte !== undefined ? <input type="hidden" name="feuchtigkeit" value={eigeneFeuchte} /> : null}
           {/* Herstellerterpene auf 0 heißen „nicht geschmeckt“ und zählen; ein ergänztes auf 0
-              ist nicht ergänzt und geht nicht in den Median (T5). */}
-          {Object.entries(eigeneIntensitaet)
-            .filter(([terpen, wert]) => angegeben.has(terpen) || wert > 0)
-            .map(([terpen, wert]) => (
-              <input key={terpen} type="hidden" name={`terpen-${terpen}`} value={wert} />
-            ))}
+              ist nicht ergänzt und geht nicht in den Median (T5, lib/aromakarte.ts). */}
+          {Object.entries(gezaehlteTerpene(eigeneIntensitaet, herstellerNamen)).map(([terpen, wert]) => (
+            <input key={terpen} type="hidden" name={`terpen-${terpen}`} value={wert} />
+          ))}
         </div>
       ) : null}
       {/* Sortenkopf ganz oben (Nutzer 2026-09-25): erst sieht man, was bewertet wurde. */}
@@ -288,6 +296,8 @@ export function AromaErkundung({
             serien={alleSerien}
             staerken={staerken}
             ebenen={ebenen}
+            // Balkenfarbe (T5b): in der Maske gegen den Community-Median, in der Anzeige gegen die Herstellerangabe.
+            bezug={eingabe ? "median" : "serie"}
             regler={{
               werte,
               // Grüner Regler auf dem Community-Median (T5, zuvor die Herstellerangabe).

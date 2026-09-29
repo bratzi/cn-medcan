@@ -14,18 +14,23 @@ import {
   mitteVon,
   netzPunkt,
   achsenLage,
+  balkenVergleich,
   begleitBoegen,
-  bogenArt,
+  bogenSchicht,
+  flussDauer,
+  herstellerKraft,
   leuchtendeTerpene,
+  linienBreite,
   MIN_BREITE,
   radiusVon,
   sanft,
+  SPUERBAR,
+  streifen,
   terpenBoegen,
   terpeneImKarte,
   terpenStaerken,
   type KartenTerpen,
   type Punkt,
-  type BogenArt,
   type TerpenEbene,
 } from "@/lib/aromakarte";
 import { cn } from "@/lib/cn";
@@ -66,6 +71,13 @@ type Props = {
     vergleich?: GeschmacksMatrix;
     aendern: (key: keyof GeschmacksMatrix, wert: number) => void;
   };
+  /**
+   * Woran sich die Farbe des Bewertungsbalkens misst (T5b, Nutzer 2026-09-29):
+   * "median" in der Maske (der grüne Ring am Regler, der grüne Herstellerbalken
+   * entfällt), "serie" in der Anzeige (die grüne Serie als Soll-Strich). Bewegt
+   * wird nur die lila Serie, die angezeigte Bewertung.
+   */
+  bezug?: "median" | "serie";
   /** Alle bekannten Terpene: zeigt zur aktiven Geschmacksrichtung, welche Terpene sie tragen. */
   lernen?: readonly { name: string; geschmack: KartenTerpen["geschmack"] }[];
   texte: AromaTexte;
@@ -97,17 +109,8 @@ const VERLAUF: Record<string, readonly string[]> = {
   FRUCHTIG: ["#ff4d4d", "#ff9f1c", "#ffd23f", "#b5179e"],
   BLUMIG: ["#c77dff", "#ff70a6", "#ffd670", "#8ecae6"],
 };
-/**
- * Deckkraft je Bogenart (T5): Herstellerangabe nach Ausprägung, ergänzt etwas
- * kräftiger (der Strich ist gestrichelt und dünner), Geister blass, ein
- * überfahrener Geist tritt hervor, bleibt aber grau und ohne Puls.
- */
-const BOGEN_DECKKRAFT: Record<BogenArt, (auspraegung: number) => number> = {
-  voll: (auspraegung) => 0.35 + 0.65 * auspraegung,
-  ergaenzt: (auspraegung) => 0.5 + 0.5 * auspraegung,
-  geistFokus: () => 0.7,
-  geist: () => 0.22,
-};
+/** Deckkraft der Geister (T5): blass, ein überfahrener Geist tritt hervor, bleibt aber grau. */
+const GEIST_DECKKRAFT = { blass: 0.22, fokus: 0.7 } as const;
 const RINGE = [1, 2, 3, 4, 5] as const;
 const SKALA = [0, 1, 2, 3, 4, 5] as const;
 const GLEIT_MS = 420;
@@ -188,6 +191,7 @@ export function AromaKarte({
   staerken,
   ebenen,
   regler,
+  bezug = "serie",
   lernen,
   texte,
 }: Props) {
@@ -269,9 +273,18 @@ export function AromaKarte({
     ) as GeschmacksMatrix,
   }));
   const staerke = staerken ?? terpenStaerken(terpene);
+  // Karte v2 (T5b, Nutzer 2026-09-29): bewegt wird nur die angezeigte Bewertung, die lila
+  // Serie (in der Maske die eigenen Regler). Ihr Balken misst sich am Bezug: in der Maske
+  // am Community-Median (Ring), in der Anzeige an der grünen Serie (Soll-Strich).
+  const bewertung = serien.find((serie) => serie.ton === "lila") ?? null;
+  const bewertungZiel = roheSerien.find((serie) => serie.ton === "lila") ?? null;
+  const sollSerie = bezug === "serie" ? (serien.find((serie) => serie.ton === "gruen") ?? null) : null;
+  const bezugMatrix = bezug === "median" ? (regler?.vergleich ?? null) : (sollSerie?.matrix ?? null);
+  /** Wert der Bewertung auf einer Achse (gleitend), 0 ohne Bewertung. */
+  const wertAuf = (achse: number) => bewertung?.matrix[GESCHMACKS_ACHSEN[achse].key] ?? 0;
+  const vergleich = (achse: number) => balkenVergleich(wertAuf(achse), bezugMatrix?.[GESCHMACKS_ACHSEN[achse].key]);
   /** Farbig ist nur, was gerade aktiv ist: die hervorgehobene Achse, sonst jede Achse mit Wert. */
-  const achseFarbig = (index: number) =>
-    aktiv === null ? serien.some((serie) => serie.matrix[GESCHMACKS_ACHSEN[index].key] > 0.05) : aktiv === index;
+  const achseFarbig = (index: number) => (aktiv === null ? wertAuf(index) > SPUERBAR : aktiv === index);
   // Welche Richtungen ein Terpen oder Begleitstoff spürbar trägt (Anteil ab 20 %, stärkste zuerst):
   // verbindet beim Überfahren beide Seiten der Karte.
   const traeger = new Map<string, { achse: number; anteil: number }[]>([
@@ -291,6 +304,9 @@ export function AromaKarte({
   const achseBetont = (index: number) => aktiv === index || achseVerbunden(index);
   const ebeneVon = (name: string): TerpenEbene => (ebenen ? (ebenen[name] ?? "geist") : "hersteller");
   const alleEbenen = Object.fromEntries(terpene.map((terpen) => [terpen.name, ebeneVon(terpen.name)]));
+  // Streifen allein aus der Herstellerangabe: eigene Stufen verändern ihn nie (T5b).
+  const angegebene = terpene.filter((terpen) => ebeneVon(terpen.name) === "hersteller");
+  const kraft = herstellerKraft(angegebene);
   // Gewählte Richtung: nur Terpene der Sorte (Hersteller, ergänzt) leuchten, Geister bleiben blass (T5).
   const leuchtend = new Set(aktiv === null ? [] : leuchtendeTerpene(aktiv, terpene, alleEbenen));
   /** Terpen ist betont: selbst überfahren oder als Terpen der Sorte Träger der überfahrenen Achse. */
@@ -330,15 +346,13 @@ export function AromaKarte({
   const platz = new Map(reihe.map((eintrag, index) => [eintrag.schluessel, spalte[index]]));
   const terpenKnoten = terpene.map((_, index) => platz.get(`t-${index}`)!);
   const begleitKnoten = begleiter.map((_, index) => platz.get(`b-${index}`)!);
-  /** Höchster Wert einer Serie auf der Achse: ab 0,05 ist die Note spürbar. */
-  const achsenWert = (achse: number) =>
-    Math.max(0, ...serien.map((serie) => serie.matrix[GESCHMACKS_ACHSEN[achse].key]));
   const kartenSichtbar = 1 - t;
 
-  const serienPunkte = serien.map((serie, s) =>
+  // Ein Balken je Achse (T5b), mittig auf der Spur; die Netzpunkte wie bisher.
+  const serienPunkte = serien.map((serie) =>
     GESCHMACKS_ACHSEN.map((achse, index) =>
       mische(
-        balkenEnde(karte[index], serie.matrix[achse.key], s * 6 - 3, balken),
+        balkenEnde(karte[index], serie.matrix[achse.key], 0, balken),
         netzPunkt(index, serie.matrix[achse.key], radius, mitte),
         t,
       ),
@@ -346,13 +360,6 @@ export function AromaKarte({
   );
 
   const aktiveAchse = aktiv === null ? null : GESCHMACKS_ACHSEN[aktiv];
-  // Sättigung und Glow der Bögen nur im Stand der Karte: während des Morphs ändert
-  // jeder Bogen in jedem Frame seine Form, ein drop-shadow auf 30 bis 50 Pfaden
-  // müsste dann jedes Mal neu gerastert werden. Unterwegs zählen nur Deckkraft und
-  // Strichbreite; am Ziel blendet der Filter über die Transition ein (Endzustand
-  // wie zuvor). Im Netz sind die Bögen unsichtbar. Das Gleiten der Werte ändert
-  // die Bögen nicht (ihre Form hängt nur an t), dort bleibt der Filter stehen.
-  const bogenFilter = t === 0;
   // Fokusring der Tastatur: am Griff in der Karte, am Wert im Netz, folgt dem Morph.
   const fokusPunkt =
     regler && tastatur !== null
@@ -419,13 +426,39 @@ export function AromaKarte({
       </div>
 
 
-      <ul className="flex flex-wrap gap-6 text-small text-text">
-        {serien.map((serie) => (
-          <li key={serie.name} className="inline-flex items-center gap-2">
-            <span aria-hidden="true" className="inline-block size-3 rounded-full" style={{ background: FARBE[serie.ton] }} />
-            {serie.name}
-          </li>
-        ))}
+      {/* Legende: im Netz die Serien wie bisher. In der Karte (T5b) der Balken der Bewertung
+          (grün bis zum Bezug, lila darüber), der Soll-Strich der grünen Serie und der stille
+          Streifen der Herstellerangabe; der Ring des Community-Medians steht links bei der Skala. */}
+      <ul className="flex flex-wrap justify-end gap-x-6 gap-y-2 text-small text-text">
+        {ansicht === "netz" ? (
+          serien.map((serie) => (
+            <li key={serie.name} className="inline-flex items-center gap-2">
+              <span aria-hidden="true" className="inline-block size-3 rounded-full" style={{ background: FARBE[serie.ton] }} />
+              {serie.name}
+            </li>
+          ))
+        ) : (
+          <>
+            {bewertung ? (
+              <li className="inline-flex items-center gap-2">
+                <LegendenMuster art={bezugMatrix ? "balken" : "balkenLila"} />
+                {bewertung.name}
+              </li>
+            ) : null}
+            {sollSerie ? (
+              <li className="inline-flex items-center gap-2">
+                <LegendenMuster art="soll" />
+                {sollSerie.name}
+              </li>
+            ) : null}
+            {angegebene.length > 0 ? (
+              <li className="inline-flex items-center gap-2">
+                <LegendenMuster art="streifen" />
+                {kt.streifen}
+              </li>
+            ) : null}
+          </>
+        )}
       </ul>
       </div>
       </div>
@@ -483,95 +516,89 @@ export function AromaKarte({
           <g opacity={kartenSichtbar}>
             {terpene.flatMap((terpen, index) =>
               terpenBoegen(terpen).map(({ achse, anteil: notenAnteil }) => {
-                // Drei Ebenen (T5): Herstellerterpene satt mit Puls, ergänzte gestrichelt in
-                // Kopierstift mit Lichtpunkt, Geister blass ohne Puls. Ein überfahrenes Terpen der
-                // Sorte leuchtet mit Mindeststärke 0,6; ein überfahrener Geist tritt nur hervor.
+                // Karte v2 (T5b, Nutzer 2026-09-29): hinten liegt die Herstellerangabe als stiller,
+                // breiter, blasser Streifen in der Geschmacksfarbe. Erst wenn die Bewertung auf der
+                // Achse einen Wert hat, liegt darüber eine dünnere bunte Linie mit Lichtfluss: wenig
+                // Wert dünn und langsam, viel Wert dick und schnell. So sieht man, wo die Bewertung
+                // über oder unter der Herstellerangabe liegt. Ergänzte Terpene (T5) haben keinen
+                // Streifen, ihre Linie ist gestrichelt in Kopierstift; Geister bleiben grau.
                 const imFokus = terpenAktiv === terpen.name;
                 const gedimmt = terpenAktiv !== null && !imFokus;
-                const art = bogenArt({
-                  ebene: ebeneVon(terpen.name),
-                  kraft: staerke[terpen.name] ?? 0,
-                  richtungAktiv: achseFarbig(achse),
-                  imFokus,
-                });
-                const kraft = imFokus ? Math.max(staerke[terpen.name] ?? 0, 0.6) : (staerke[terpen.name] ?? 0);
-                const vorhanden = art === "voll" || art === "ergaenzt";
+                const imBlick = aktiv === null || aktiv === achse;
+                const ebene = ebeneVon(terpen.name);
+                const wert = wertAuf(achse);
+                const schicht = bogenSchicht({ ebene, wert, imBlick, imFokus });
                 const geschmack = GESCHMACKS_ACHSEN[achse].enumWert;
-                const grundfarbe = LINIEN_FARBE[geschmack];
-                // Ergänzt: die Farbe des eigenen Eindrucks (Kopierstift), gestrichelt.
-                const farbe = art === "ergaenzt" ? FARBE.lila : (grundfarbe ?? `url(#${spurId}-${geschmack})`);
-                // Ausprägung 0 bis 1: Stärke des Terpens mal Anteil der Note. Schwach = ausgegraut
-                // (entsättigt, blass), stark = satt und mit Glow (Nutzer 2026-09-26).
-                const auspraegung = kraft * (0.4 + 0.6 * notenAnteil);
-                // Nebennoten zeichnen feiner als die Hauptnote (Anteil 0 bis 1).
-                const gewicht = 0.35 + 0.65 * notenAnteil;
-                const breite = (1 + 3.5 * kraft) * gewicht;
+                const farbe = LINIEN_FARBE[geschmack] ?? `url(#${spurId}-${geschmack})`;
+                const linienFarbe = ebene === "ergaenzt" ? FARBE.lila : farbe;
                 const pfad = bogen(knoten[achse], terpenKnoten[index]);
-                // Versatz je Bogen, damit die Lichtpunkte nicht im Gleichschritt laufen.
-                const versatz = `${-((index * 0.37 + achse * 0.13) % 3).toFixed(2)}s`;
+                const band = streifen(kraft[terpen.name] ?? 0, notenAnteil);
+                const breite = linienBreite(wert, notenAnteil);
+                // Tempo aus dem Zielwert, nicht aus dem gleitenden: sonst wechselte die Dauer
+                // in jedem Frame des Gleitens und der Lichtpunkt spränge.
+                const dauer = flussDauer(bewertungZiel?.matrix[GESCHMACKS_ACHSEN[achse].key] ?? 0);
+                // Versatz je Bogen als Anteil der Dauer, damit die Lichtpunkte nicht im Gleichschritt laufen.
+                const versatz = `${-(((index * 0.37 + achse * 0.13) % 1) * dauer).toFixed(2)}s`;
                 return (
                   <Fragment key={`${terpen.name}-${achse}`}>
-                    <path
-                      d={pfad}
-                      fill="none"
-                      stroke={vorhanden ? farbe : art === "geistFokus" ? "var(--color-text-muted)" : GRAU}
-                      strokeLinecap="round"
-                      strokeDasharray={art === "ergaenzt" ? "6 5" : undefined}
-                      opacity={BOGEN_DECKKRAFT[art](auspraegung) * (gedimmt ? 0.2 : 1)}
-                      style={{
-                        strokeWidth: art === "voll" ? breite : art === "ergaenzt" ? Math.max(1.5, breite) : art === "geistFokus" ? 1.5 : 0.8,
-                        filter:
-                          // Nur saturate, kein drop-shadow (2026-09-28, Mobil zu träge): jede
-                          // Animation im SVG malt alle Bögen neu, ein Blur je Bogen kostete
-                          // dann jeden Frame. Das Leuchten trägt die Ebene .bogen-puls.
-                          art === "voll" && bogenFilter ? `saturate(${(0.1 + 0.9 * auspraegung).toFixed(2)})` : "none",
-                      }}
-                      // Unterwegs ohne filter in der Transition: der Filter fällt sofort
-                      // weg, statt 250 ms lang auf wandernden Pfaden überzublenden.
-                      className={
-                        bogenFilter
-                          ? "transition-[opacity,stroke-width,filter,stroke] duration-normal"
-                          : "transition-[opacity,stroke-width,stroke] duration-normal"
-                      }
-                    />
-                    {/* Aktive Bögen glühen und pulsieren im Takt der Delta-Balken links, in
-                        ihrer eigenen Farbe; ein Lichtpunkt läuft vom Geschmack zum Terpen
-                        (Nutzer 2026-09-26, globals.css .bogen-puls/.bogen-fluss). Im Netz
-                        (t = 1) sind sie unsichtbar und laufen dann nicht endlos weiter. */}
-                    {vorhanden && !gedimmt && t < 1 ? (
-                      <>
-                        {/* Voller Puls nur für die Herstellerangabe; ergänzte tragen nur den Lichtpunkt. */}
-                        {art === "voll" ? (
-                          <path
-                            d={pfad}
-                            fill="none"
-                            stroke={farbe}
-                            strokeLinecap="round"
-                            className="bogen-puls"
-                            style={
-                              {
-                                "--bogen-breite": `${breite.toFixed(2)}px`,
-                              } as React.CSSProperties
-                            }
-                          />
-                        ) : null}
-                        <path
-                          d={pfad}
-                          pathLength={100}
-                          fill="none"
-                          stroke={farbe}
-                          strokeLinecap="round"
-                          strokeDasharray="6 194"
-                          className="bogen-fluss"
-                          style={
-                            {
-                              strokeWidth: Math.max(2, breite * 1.5),
-                              opacity: 0.5 + 0.5 * auspraegung,
-                              animationDelay: versatz,
-                            } as React.CSSProperties
-                          }
-                        />
-                      </>
+                    {schicht.streifen ? (
+                      <path
+                        data-schicht="streifen"
+                        d={pfad}
+                        fill="none"
+                        stroke={farbe}
+                        strokeLinecap="round"
+                        // Überfahrenes Terpen tritt hervor, eine andere gewählte Richtung tritt zurück.
+                        opacity={band.deckkraft * (imFokus ? 1.5 : 1) * (gedimmt || !imBlick ? 0.4 : 1)}
+                        style={{ strokeWidth: band.breite }}
+                        className="transition-opacity duration-normal"
+                      />
+                    ) : null}
+                    {schicht.geist ? (
+                      <path
+                        d={pfad}
+                        fill="none"
+                        stroke={schicht.geist === "fokus" ? "var(--color-text-muted)" : GRAU}
+                        strokeLinecap="round"
+                        opacity={GEIST_DECKKRAFT[schicht.geist] * (gedimmt ? 0.2 : 1)}
+                        style={{ strokeWidth: schicht.geist === "fokus" ? 1.5 : 0.8 }}
+                        className="transition-[opacity,stroke] duration-normal"
+                      />
+                    ) : null}
+                    {schicht.linie ? (
+                      <path
+                        data-schicht="linie"
+                        d={pfad}
+                        fill="none"
+                        stroke={linienFarbe}
+                        strokeLinecap="round"
+                        strokeDasharray={ebene === "ergaenzt" ? "6 5" : undefined}
+                        opacity={gedimmt ? 0.2 : 0.95}
+                        style={{ strokeWidth: ebene === "ergaenzt" ? Math.max(1.5, breite) : breite }}
+                        className="transition-opacity duration-normal"
+                      />
+                    ) : null}
+                    {/* Lichtfluss vom Geschmack zum Terpen (globals.css .bogen-fluss): nur auf der
+                        Linie, Tempo aus --fluss-dauer. Im Netz (t = 1) unsichtbar, dann läuft er
+                        nicht endlos weiter. Sparmodus und reduzierte Bewegung: aus. */}
+                    {schicht.linie && !gedimmt && t < 1 ? (
+                      <path
+                        d={pfad}
+                        pathLength={100}
+                        fill="none"
+                        stroke={linienFarbe}
+                        strokeLinecap="round"
+                        strokeDasharray="6 194"
+                        className="bogen-fluss"
+                        style={
+                          {
+                            strokeWidth: breite + 2.5,
+                            opacity: 0.85,
+                            animationDelay: versatz,
+                            "--fluss-dauer": `${dauer}s`,
+                          } as React.CSSProperties
+                        }
+                      />
                     ) : null}
                   </Fragment>
                 );
@@ -581,7 +608,7 @@ export function AromaKarte({
             {begleiter.flatMap((stoff, index) =>
               stoff.boegen.map(({ achse, anteil }) => {
                 const imFokus = terpenAktiv === stoff.name;
-                const spuerbar = imFokus || achsenWert(achse) > 0.05;
+                const spuerbar = imFokus || wertAuf(achse) > SPUERBAR;
                 return (
                   <path
                     key={`${stoff.name}-${achse}`}
@@ -644,71 +671,127 @@ export function AromaKarte({
             })}
           </g>
 
-          {/* Serien: Balken in der Karte, Flächen im Netz. */}
-          {serien.map((serie, s) => (
-            <g key={serie.name}>
-              <polygon
-                points={alsPolygon(serienPunkte[s])}
-                fill={FARBE[serie.ton]}
-                fillOpacity={0.18 * t}
-                stroke={FARBE[serie.ton]}
-                strokeOpacity={t}
-                strokeWidth={2.5}
-                strokeLinejoin="round"
-              />
-              {serienPunkte[s].map((punkt, index) => (
-                <line
-                  key={GESCHMACKS_ACHSEN[index].key}
-                  x1={mische({ x: karte[index].x - 16, y: karte[index].y + s * 6 - 3 }, punkt, t).x}
-                  y1={punkt.y}
-                  x2={punkt.x}
-                  y2={punkt.y}
-                  stroke={achseFarbig(index) ? FARBE[serie.ton] : GRAU}
-                  strokeWidth={achseBetont(index) ? 6 : 4}
-                  strokeLinecap="round"
-                  opacity={(serie.matrix[GESCHMACKS_ACHSEN[index].key] > 0.05 ? kartenSichtbar : 0) * (achseFarbig(index) ? 1 : 0.6)}
-                />
-              ))}
-              {serienPunkte[s].map((punkt, index) => (
-                <circle
-                  key={`p-${GESCHMACKS_ACHSEN[index].key}`}
-                  cx={punkt.x}
-                  cy={punkt.y}
-                  r={achseBetont(index) ? 6 : 4}
-                  fill={achseFarbig(index) || t > 0.5 ? FARBE[serie.ton] : GRAU}
-                  opacity={serie.matrix[GESCHMACKS_ACHSEN[index].key] > 0.05 ? 1 : t}
-                />
-              ))}
-            </g>
-          ))}
-
-          {/* Delta je Achse (Nutzer 2026-09-26): das Stück, um das der längere Balken
-              übersteht, glüht und pulsiert in dessen Farbe (globals.css, .delta-puls). */}
-          {serien.length >= 2 && kartenSichtbar > 0.5
-            ? GESCHMACKS_ACHSEN.map((achse, index) => {
-                const werte = serien.map((serie) => serie.matrix[achse.key]);
-                const lang = werte[0] >= werte[1] ? 0 : 1;
-                const kurz = 1 - lang;
-                if (Math.abs(werte[0] - werte[1]) < 0.1) return null;
-                const von = serienPunkte[kurz][index];
-                const bis = serienPunkte[lang][index];
+          {/* Spur der Regler im Sweet-Spot-Stil, unter den Balken (T5b): beim Ziehen wird die
+              Spur kräftiger, der grüne oder lila Balken bleibt darüber lesbar. */}
+          {regler && kartenSichtbar > 0.5
+            ? karte.map((knoten, index) => {
+                const links = balkenEnde(knoten, MAX, 0, balken).x;
+                const rechts = balkenEnde(knoten, 0, 0, balken).x;
                 return (
-                  <line
-                    key={`delta-${achse.key}`}
-                    x1={von.x}
-                    y1={bis.y}
-                    x2={bis.x}
-                    y2={bis.y}
-                    stroke={FARBE[serien[lang].ton]}
-                    strokeLinecap="round"
-                    className="delta-puls"
-                    style={{ opacity: kartenSichtbar, "--delta-farbe": FARBE[serien[lang].ton] } as React.CSSProperties}
+                  <rect
+                    key={`s-${GESCHMACKS_ACHSEN[index].key}`}
+                    x={links - 4}
+                    y={knoten.y - 5}
+                    width={rechts - links + 8}
+                    height={10}
+                    rx={5}
+                    fill={`url(#${spurId})`}
+                    opacity={(aktiv === index ? 0.9 : 0.35) * kartenSichtbar}
+                    className="transition-opacity duration-fast"
                   />
                 );
               })
             : null}
 
-          {/* Regler: je Achse eine Spur im Sweet-Spot-Stil, Griff am eigenen Wert. */}
+          {/* Serien: im Netz Flächen wie bisher. In der Karte nur der Balken der Bewertung
+              (T5b, Nutzer 2026-09-29): grün auf oder unter dem Bezug, lila darüber. */}
+          {serien.map((serie, s) => {
+            const istBewertung = serie === bewertung;
+            const wert = (index: number) => serie.matrix[GESCHMACKS_ACHSEN[index].key];
+            return (
+              <g key={serie.name}>
+                <polygon
+                  points={alsPolygon(serienPunkte[s])}
+                  fill={FARBE[serie.ton]}
+                  fillOpacity={0.18 * t}
+                  stroke={FARBE[serie.ton]}
+                  strokeOpacity={t}
+                  strokeWidth={2.5}
+                  strokeLinejoin="round"
+                />
+                {istBewertung
+                  ? serienPunkte[s].map((punkt, index) => (
+                      <line
+                        key={GESCHMACKS_ACHSEN[index].key}
+                        data-schicht="balken"
+                        x1={mische({ x: karte[index].x - 16, y: karte[index].y }, punkt, t).x}
+                        y1={punkt.y}
+                        x2={punkt.x}
+                        y2={punkt.y}
+                        stroke={achseFarbig(index) ? FARBE[vergleich(index).ton] : GRAU}
+                        strokeWidth={achseBetont(index) ? 6 : 4}
+                        strokeLinecap="round"
+                        opacity={(wert(index) > SPUERBAR ? kartenSichtbar : 0) * (achseFarbig(index) ? 1 : 0.6)}
+                      />
+                    ))
+                  : null}
+                {/* Endpunkte: in der Karte nur die der Bewertung, im Netz die Ecken jeder Fläche. */}
+                {serienPunkte[s].map((punkt, index) => (
+                  <circle
+                    key={`p-${GESCHMACKS_ACHSEN[index].key}`}
+                    cx={punkt.x}
+                    cy={punkt.y}
+                    r={achseBetont(index) ? 6 : 4}
+                    fill={t > 0.5 ? FARBE[serie.ton] : achseFarbig(index) ? FARBE[vergleich(index).ton] : GRAU}
+                    opacity={istBewertung && wert(index) > SPUERBAR ? 1 : t}
+                  />
+                ))}
+              </g>
+            );
+          })}
+
+          {/* Delta je Achse (Nutzer 2026-09-26, seit T5b gegen den Bezug): darüber pulsiert der
+              lila Überstand vom Bezug bis zum Balkenende, darunter das grüne Fehlstück vom
+              Balkenende bis zum Bezug (globals.css, .delta-puls). Gleichauf oder ohne Bezug nichts. */}
+          {bewertung && kartenSichtbar > 0.5
+            ? GESCHMACKS_ACHSEN.map((achse, index) => {
+                const { ton, puls } = vergleich(index);
+                if (!puls) return null;
+                const y = karte[index].y;
+                return (
+                  <line
+                    key={`delta-${achse.key}`}
+                    className="delta-puls"
+                    data-delta={puls.art}
+                    x1={balkenEnde(karte[index], puls.von, 0, balken).x}
+                    y1={y}
+                    x2={balkenEnde(karte[index], puls.bis, 0, balken).x}
+                    y2={y}
+                    stroke={FARBE[ton]}
+                    strokeLinecap="round"
+                    style={{ opacity: kartenSichtbar }}
+                  />
+                );
+              })
+            : null}
+
+          {/* Soll-Strich (T5b): in der Anzeige ist die grüne Serie der Bezug. Sie steht als
+              ruhiger grüner Strich auf der Achse statt als eigener Balken, mit Saum in
+              Papierfarbe wie der Ring. */}
+          {sollSerie && kartenSichtbar > 0.5 ? (
+            <g opacity={kartenSichtbar} pointerEvents="none">
+              {karte.map((knoten, index) => {
+                const x = balkenEnde(knoten, sollSerie.matrix[GESCHMACKS_ACHSEN[index].key], 0, balken).x;
+                return (
+                  <Fragment key={`soll-${GESCHMACKS_ACHSEN[index].key}`}>
+                    <line x1={x} y1={knoten.y - 9} x2={x} y2={knoten.y + 9} stroke="var(--color-surface)" strokeWidth={6} strokeLinecap="round" />
+                    <line
+                      data-schicht="soll"
+                      x1={x}
+                      y1={knoten.y - 9}
+                      x2={x}
+                      y2={knoten.y + 9}
+                      stroke={FARBE.gruen}
+                      strokeWidth={2.5}
+                      strokeLinecap="round"
+                    />
+                  </Fragment>
+                );
+              })}
+            </g>
+          ) : null}
+
+          {/* Regler: Ring am Community-Median, Griff am eigenen Wert, Trefferfläche. */}
           {regler && kartenSichtbar > 0.5
             ? karte.map((knoten, index) => {
                 const key = GESCHMACKS_ACHSEN[index].key;
@@ -721,23 +804,13 @@ export function AromaKarte({
                   if (!ctm) return regler.werte[key];
                   const p = new DOMPoint(clientX, clientY).matrixTransform(ctm.inverse());
                   const roh = Math.min(Math.max(((rechts - p.x) / (rechts - links)) * MAX, 0), MAX);
-                  const vergleich = regler.vergleich?.[key];
-                  if (vergleich !== undefined && Math.abs(roh - vergleich) <= 0.15) return vergleich;
+                  const median = regler.vergleich?.[key];
+                  if (median !== undefined && Math.abs(roh - median) <= 0.15) return median;
                   // Halbe Schritte wie beim Speichern: leichter zu treffen (Nutzer 2026-09-25).
                   return Math.round(roh * 2) / 2;
                 };
                 return (
                   <g key={`r-${key}`} opacity={kartenSichtbar}>
-                    <rect
-                      x={links - 4}
-                      y={knoten.y - 5}
-                      width={rechts - links + 8}
-                      height={10}
-                      rx={5}
-                      fill={`url(#${spurId})`}
-                      opacity={aktiv === index ? 0.9 : 0.35}
-                      className="transition-opacity duration-fast"
-                    />
                     {/* Grüner Ring: der Community-Median (T5). Ein Saum in Papierfarbe hebt ihn
                         von der grünen Spur und den Balken ab. */}
                     {ring !== null ? (
@@ -1163,8 +1236,9 @@ function tragendeStoffe(
 /** Reihenfolge der Ebenen in der Legende. */
 const EBENEN: readonly TerpenEbene[] = ["hersteller", "ergaenzt", "geist"];
 
-/** Strichmuster einer Ebene in der Legende, wie die Bögen gezeichnet. */
+/** Strichmuster einer Ebene in der Legende, wie die Bögen gezeichnet (Herstellerangabe seit T5b als Streifen). */
 function EbenenMuster({ ebene }: { ebene: TerpenEbene }) {
+  if (ebene === "hersteller") return <LegendenMuster art="streifen" />;
   return (
     <svg aria-hidden="true" viewBox="0 0 24 8" className="h-2 w-6 shrink-0 overflow-visible text-text">
       <line
@@ -1173,10 +1247,34 @@ function EbenenMuster({ ebene }: { ebene: TerpenEbene }) {
         x2={22}
         y2={4}
         strokeLinecap="round"
-        stroke={ebene === "hersteller" ? "currentColor" : ebene === "ergaenzt" ? FARBE.lila : GRAU}
-        strokeWidth={ebene === "hersteller" ? 3 : ebene === "ergaenzt" ? 2 : 1}
+        stroke={ebene === "ergaenzt" ? FARBE.lila : GRAU}
+        strokeWidth={ebene === "ergaenzt" ? 2 : 1}
         strokeDasharray={ebene === "ergaenzt" ? "4 3" : undefined}
       />
+    </svg>
+  );
+}
+
+/**
+ * Muster in der Legende der Karte (T5b): der Balken der Bewertung halb grün, halb lila
+ * (grün bis zum Bezug, lila darüber; ohne Bezug nur lila), der grüne Soll-Strich und der
+ * breite, blasse Streifen der Herstellerangabe. Form und Farbe wie in der Karte.
+ */
+function LegendenMuster({ art }: { art: "balken" | "balkenLila" | "soll" | "streifen" }) {
+  return (
+    <svg aria-hidden="true" viewBox="0 0 24 8" className="h-2 w-6 shrink-0 overflow-visible text-text">
+      {art === "streifen" ? (
+        <line x1={4} y1={4} x2={20} y2={4} stroke="currentColor" strokeOpacity={0.25} strokeWidth={8} strokeLinecap="round" />
+      ) : art === "soll" ? (
+        <line x1={12} y1={-1} x2={12} y2={9} stroke={FARBE.gruen} strokeWidth={2.5} strokeLinecap="round" />
+      ) : art === "balken" ? (
+        <>
+          <line x1={2} y1={4} x2={12} y2={4} stroke={FARBE.gruen} strokeWidth={4} strokeLinecap="round" />
+          <line x1={12} y1={4} x2={22} y2={4} stroke={FARBE.lila} strokeWidth={4} strokeLinecap="round" />
+        </>
+      ) : (
+        <line x1={2} y1={4} x2={22} y2={4} stroke={FARBE.lila} strokeWidth={4} strokeLinecap="round" />
+      )}
     </svg>
   );
 }
