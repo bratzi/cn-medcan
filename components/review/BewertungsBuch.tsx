@@ -10,27 +10,31 @@ import type { Sprache } from "@/lib/i18n/sprache-kern";
 import { mehrzahl, t } from "@/lib/i18n/text";
 import type { Woerterbuch } from "@/lib/i18n/typen";
 import { teileBewertungen } from "@/lib/query/bewertung";
-import type { ReviewEintrag } from "@/lib/query/strains";
+import type { KennwerteZeile, ReviewEintrag } from "@/lib/query/strains";
 
 /**
  * Die Bewertungen einer Sorte als Buch (Masterplan Bewertung v2, T7, Nutzer
  * 2026-09-29): ersetzt auf der Blütenseite die eigenen Doppelseiten
- * untereinander und die Liste der Community. Über dem Buch das Mittel der
- * Community; ohne Community-Bewertung kein Mittel (nie 0 oder NaN), dafür der
- * Weg zur ersten. Ganz ohne Bewertung gibt es kein Buch.
+ * untereinander und die Liste der Community. Über dem Buch der Median aller
+ * Gesamtnoten aus den gespeicherten Kennwerten (beim Speichern berechnet, wie
+ * die Blätter der Seiten); ohne Kennwert kein Wert (nie 0 oder NaN). Ohne
+ * Community-Bewertung der Weg zur ersten. Ganz ohne Bewertung kein Buch.
  */
 export function BewertungsBuch({
   reviews,
+  kennwerte,
   produkt,
   w,
   sprache,
 }: {
   reviews: readonly ReviewEintrag[];
+  kennwerte: Pick<KennwerteZeile, "gesamtnoteMedian" | "anzahl"> | null;
   produkt: { handelsname: string; slug: string; terpene?: KartenTerpen[]; bildPfad?: string | null };
   w: Woerterbuch;
   sprache: Sprache;
 }) {
-  const { community, communityMittel } = teileBewertungen(reviews);
+  const { community } = teileBewertungen(reviews);
+  const median = kennwerte?.gesamtnoteMedian ?? null;
   const seiten = buchReihenfolge(reviews);
   return (
     <section aria-labelledby="bewertungen-titel" className="flex flex-col gap-8">
@@ -38,13 +42,14 @@ export function BewertungsBuch({
         <h2 id="bewertungen-titel" className={ABSCHNITT_TITEL}>
           {w.buch.titel}
         </h2>
-        {communityMittel !== null ? (
+        {median !== null && kennwerte ? (
           <p className="text-body text-text">
-            {mehrzahl(sprache, w.buch.communityMittel, community.length)}{" "}
-            <span className="numeric">{formatiereZahl(communityMittel, 1, sprache)}</span>
+            {mehrzahl(sprache, w.buch.median, kennwerte.anzahl)}{" "}
+            <span className="numeric">{formatiereZahl(median, 1, sprache)}</span>
             {` ${w.bluete.vonFuenf}`}
           </p>
-        ) : (
+        ) : null}
+        {community.length > 0 ? null : (
           <>
             <p className="max-w-[60ch] text-body text-text-muted text-pretty">
               {t(w.bluete.communityLeer, { handelsname: produkt.handelsname })}

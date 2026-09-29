@@ -449,7 +449,7 @@ export const de = {
     community: "Community",
     ohneName: "Mitglied",
     betreiberName: "Book of Terpz",
-    communityMittel: { one: "Community aus einer Bewertung:", other: "Community im Mittel aus {anzahl} Bewertungen:" },
+    median: { one: "Median aus einer Bewertung:", other: "Median aller {anzahl} Bewertungen:" },
   },
   reviews: {
     titel: "Bewertungen",

@@ -125,7 +125,16 @@ function haelfte(seite: HTMLElement, welche: Haelfte): HTMLElement | null {
 /** Setzt Drehpunkt und Ebene eines Blatts für die Dauer der Drehung. */
 function anheben(element: HTMLElement, falz: "left" | "right") {
   element.style.transformOrigin = `${falz} ${mitteImBild(element)}px`;
-  element.style.zIndex = "1";
+  element.style.zIndex = "2";
+}
+
+/**
+ * Hebt eine liegende Hälfte über die deckenden Artikel beider Seiten (Ebene 1,
+ * unter dem drehenden Blatt): sonst verdeckte der Artikel der jeweils anderen
+ * Seite sie, und neben dem Blatt stünde eine leere Fläche (T7-Review).
+ */
+function unterlegen(element: HTMLElement | null) {
+  if (element) element.style.zIndex = "1";
 }
 
 function ablegen(...elemente: (HTMLElement | null)[]) {
@@ -150,6 +159,8 @@ function doppelseiteUmschlagen(geht: HTMLElement, kommt: HTMLElement, richtung: 
   if (!hebt || !legt) return { animationen: [], elemente: [] };
   anheben(hebt, plan.hebt.falz);
   anheben(legt, plan.legt.falz);
+  unterlegen(wirdFrei);
+  unterlegen(wirdZugedeckt);
   const hoch = dreh(plan.hebt.bis);
   const quer = dreh(plan.legt.von);
   const animationen = [
@@ -178,7 +189,7 @@ function doppelseiteUmschlagen(geht: HTMLElement, kommt: HTMLElement, richtung: 
     wirdFrei ? animiere(wirdFrei, schatten(1, 0, 0), DAUER_DOPPELSEITE_MS, "::after") : null,
     wirdZugedeckt ? animiere(wirdZugedeckt, schatten(0, 0, 1), DAUER_DOPPELSEITE_MS, "::after") : null,
   ];
-  return { animationen, elemente: [hebt, legt] };
+  return { animationen, elemente: [hebt, legt, wirdFrei, wirdZugedeckt] };
 }
 
 /**
@@ -405,7 +416,8 @@ export function Buch({ seiten, bezeichnung, texte }: { seiten: readonly BuchSeit
           : undefined
       }
       onPointerLeave={mehrere ? () => setZeiger(false) : undefined}
-      onFocus={mehrere ? () => setFokus(true) : undefined}
+      // Fokus auf Play/Pause ist kein Lesen: sonst hielte ausgerechnet der Knopf, der abspielt, das Blättern an.
+      onFocus={mehrere ? (ereignis) => setFokus(!(ereignis.target instanceof Element && ereignis.target.closest("[data-abspielen]"))) : undefined}
       onBlur={
         mehrere
           ? (ereignis) => {
@@ -491,6 +503,7 @@ export function Buch({ seiten, bezeichnung, texte }: { seiten: readonly BuchSeit
                 type="button"
                 aria-label={laeuft ? texte.anhalten : texte.abspielen}
                 data-angehalten={laeuft ? undefined : ""}
+                data-abspielen=""
                 onClick={() => setLaeuft(!laeuft)}
                 className="loop-schalter"
               >

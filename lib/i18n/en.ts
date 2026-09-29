@@ -443,7 +443,7 @@ export const en: Woerterbuch = {
     community: "Community",
     ohneName: "Member",
     betreiberName: "Book of Terpz",
-    communityMittel: { one: "Community, from one review:", other: "Community average from {anzahl} reviews:" },
+    median: { one: "Median from one review:", other: "Median of all {anzahl} reviews:" },
   },
   reviews: {
     titel: "Reviews",

@@ -34,8 +34,8 @@ function bewertung(id: string, istRedaktionell: boolean, tag: number, note = 4, 
   };
 }
 
-const zeige = (reviews: ReviewEintrag[]) =>
-  renderToStaticMarkup(createElement(BewertungsBuch, { reviews, produkt: PRODUKT, w: de, sprache: "de" }));
+const zeige = (reviews: ReviewEintrag[], kennwerte: { gesamtnoteMedian: number | null; anzahl: number } | null = null) =>
+  renderToStaticMarkup(createElement(BewertungsBuch, { reviews, kennwerte, produkt: PRODUKT, w: de, sprache: "de" }));
 
 /** Die Artikel-Ids in der Reihenfolge des Dokuments. */
 const reihenfolge = (html: string) => [...html.matchAll(/<article id="eintrag-([^"]+)"/g)].map((m) => m[1]);
@@ -81,12 +81,19 @@ test("Genau eine Bewertung: kein Blättern, kein Play-Knopf, keine Klickziele", 
   assert.doesNotMatch(html, /data-blaettern|role="group"/);
 });
 
-test("Community-Mittel über dem Buch, als ganzer Satz in Einzahl und Mehrzahl", () => {
-  const eine = zeige([bewertung("b", true, 1, 5), bewertung("c1", false, 2, 3)]);
-  assert.match(eine, /Community aus einer Bewertung: <span class="numeric">3,0<\/span> von 5/);
-  const zwei = zeige([bewertung("c1", false, 2, 3), bewertung("c2", false, 3, 4)]);
-  assert.match(zwei, /Community im Mittel aus 2 Bewertungen: <span class="numeric">3,5<\/span> von 5/);
+test("Über dem Buch der gespeicherte Median aller Bewertungen, nicht ein Mittel der Achsen", () => {
+  // Achsen 5 und 3, Gesamtnote je 3,5: das Buch zeigt den Kennwert, keinen eigenen Durchschnitt.
+  const eine = zeige([bewertung("c1", false, 2, 5)], { gesamtnoteMedian: 3.5, anzahl: 1 });
+  assert.match(eine, /Median aus einer Bewertung: <span class="numeric">3,5<\/span> von 5/);
+  const zwei = zeige([bewertung("b", true, 1, 5), bewertung("c1", false, 2, 3)], { gesamtnoteMedian: 4, anzahl: 2 });
+  assert.match(zwei, /Median aller 2 Bewertungen: <span class="numeric">4,0<\/span> von 5/);
   assert.match(zwei, /<h2[^>]*id="bewertungen-titel"[^>]*>Bewertungen<\/h2>/);
+});
+
+test("Ohne Kennwert steht kein Wert über dem Buch (nie 0 oder NaN)", () => {
+  const html = zeige([bewertung("c1", false, 2, 3)], { gesamtnoteMedian: null, anzahl: 1 });
+  assert.doesNotMatch(html, /Median|NaN|numeric">0/);
+  assert.doesNotMatch(zeige([bewertung("c1", false, 2, 3)]), /Median|NaN/);
 });
 
 test("Ohne Community-Bewertung: kein Mittel, keine 0 und kein NaN, dafür der Weg zur ersten", () => {
@@ -115,14 +122,23 @@ test("Ohne JavaScript stehen alle Seiten untereinander und die Knöpfe fehlen; m
   assert.match(mit[1], /\.buch-stapel > \.buch-seite:not\(\[data-aktiv\], \[data-geht\]\)\s*\{\s*visibility:\s*hidden;/);
 });
 
-test("CPU-Budget: die teure Aroma-Karte rendert der Server nur für die offene Seite und ihre Nachbarn", () => {
-  const html = zeige([1, 2, 3, 4, 5].map((tag) => bewertung(`c${tag}`, false, tag)));
-  // Alle fünf Seiten mit Text und Werten, Karten nur auf Seite 1, 2 und 5 (Nachbar über das Ende).
+test("CPU-Budget: die rechte Hälfte rendert der Server nur für die offene Seite und ihre Nachbarn", () => {
+  const html = zeige([1, 2, 3, 4, 5].map((tag) => bewertung(`c${tag}`, false, tag, 4, `Text ${tag}.`)));
+  // Alle fünf Seiten mit linker Hälfte (Kopf, Name, Text), Werte und Karte nur auf Seite 1, 2 und 5 (Nachbar über das Ende).
   assert.equal(html.match(/<article /g)?.length, 5);
-  assert.equal(html.match(/<dt/g)?.length, 25);
   const seiten = html.split('<div class="buch-seite"').slice(1);
+  for (const [i, seite] of seiten.entries()) assert.match(seite, new RegExp(`Text ${5 - i}\.`));
   assert.deepEqual(
-    seiten.map((seite) => seite.includes("<figure")),
-    [true, true, false, false, true],
+    seiten.map((seite) => [seite.includes("<dt"), seite.includes("<figure")]),
+    [[true, true], [true, true], [false, false], [false, false], [true, true]],
   );
+  // Die leere rechte Hälfte bleibt als Fläche stehen, das Buch dreht sie beim Blättern.
+  assert.equal(html.match(/data-buchseite="rechts"/g)?.length, 5);
+});
+
+test("Abfrage: Bewertungen des Betreibers zuerst, damit er bei mehr als 20 nicht aus dem Buch fällt", () => {
+  const quelle = readFileSync(join(process.cwd(), "lib/query/strains.ts"), "utf8");
+  const reviews = /reviews: \{\s*where: \{ freigegeben: true \},\s*(?:\/\/[^\n]*\s*)?orderBy: ([^\n]*),\s*take: 20/.exec(quelle);
+  assert.ok(reviews, "Abfrage der Bewertungen nicht gefunden");
+  assert.equal(reviews[1], '[{ istRedaktionell: "desc" }, { erstelltAm: "desc" }]');
 });

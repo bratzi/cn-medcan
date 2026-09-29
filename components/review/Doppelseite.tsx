@@ -168,65 +168,66 @@ export function Doppelseite({ eintrag, umfang, ueberschrift: Ueberschrift, story
       </div>
 
       <div data-buchseite="rechts" className={cn(SEITE, FALZ_RECHTS)}>
-        <dl className="grid grid-cols-2 gap-6">
-          {achsen.map((achse) => (
-            // gap-1 = 4px: Bezeichnung und Wert sind ein Paar.
-            <div key={achse.key} className="flex flex-col gap-1">
-              <dt className="text-small text-text-muted">{w.schema.noten[achse.key].label}</dt>
-              <dd className="numeric text-h1 text-text">
-                <span
-                  aria-hidden="true"
-                  {...(story ? { "data-zaehler": "", "data-ziel": eintrag[achse.key] } : {})}
-                >
-                  {formatiereZahl(eintrag[achse.key], 1, sprache)}
-                </span>
-                <span aria-hidden="true" className="text-h3 text-text-muted">
-                  {" / 5"}
-                </span>
-                <span className="sr-only">{`${formatiereZahl(eintrag[achse.key], 1, sprache)} ${w.bluete.vonFuenf}`}</span>
-              </dd>
-            </div>
-          ))}
-        </dl>
-
-        {voll ? (
-          <div className="flex flex-col items-start gap-2 max-md:items-center">
-            <Badge variante={FEUCHTIGKEIT[feuchtigkeit.einordnung]}>{feuchtigkeitsText}</Badge>
-            <p className="max-w-[56ch] text-small text-text-muted max-md:mx-auto">{w.schema.feuchte[FEUCHTE_HINWEIS[feuchtigkeit.einordnung]]}</p>
-          </div>
-        ) : null}
-
-        {/* Im Buch nur auf nahen Seiten (CPU-Limit), sonst immer. */}
+        {/* Im Buch nur auf nahen Seiten (CPU-Limit, T7-Review), sonst immer. Die
+            Fläche bleibt stehen: das Buch dreht sie beim Blättern. */}
         <NurAufgeschlagen>
-          <AromaKarte terpene={eintrag.terpene} serien={aromaSerien(eintrag, w)} texte={texte} />
-        </NurAufgeschlagen>
-        {voll ? (
-          <SweetSpot
-            titel={w.aroma.erkundung.intensitaet}
-            texte={texte}
-            zeilen={Object.entries(eintrag.terpenIntensitaet).map(([terpen, wert]) => ({ terpen, wert }))}
-          />
-        ) : null}
-        {voll ? (
-          <BeschaffenheitsLeiste werte={eintrag.beschaffenheit} feuchte={null} texte={texte} />
-        ) : null}
-        {reel ? <InstagramEmbed url={reel} bezeichnung={eintrag.handelsname} texte={w.reel} /> : null}
+          <dl className="grid grid-cols-2 gap-6">
+            {achsen.map((achse) => (
+              // gap-1 = 4px: Bezeichnung und Wert sind ein Paar.
+              <div key={achse.key} className="flex flex-col gap-1">
+                <dt className="text-small text-text-muted">{w.schema.noten[achse.key].label}</dt>
+                <dd className="numeric text-h1 text-text">
+                  <span
+                    aria-hidden="true"
+                    {...(story ? { "data-zaehler": "", "data-ziel": eintrag[achse.key] } : {})}
+                  >
+                    {formatiereZahl(eintrag[achse.key], 1, sprache)}
+                  </span>
+                  <span aria-hidden="true" className="text-h3 text-text-muted">
+                    {" / 5"}
+                  </span>
+                  <span className="sr-only">{`${formatiereZahl(eintrag[achse.key], 1, sprache)} ${w.bluete.vonFuenf}`}</span>
+                </dd>
+              </div>
+            ))}
+          </dl>
 
-        {/* Die Charge schließt die Seite ab wie eine Fußnote; im Auszug darunter der Weg zum ganzen Eintrag. */}
-        {charge || !voll ? (
-          <div className="mt-auto flex flex-col gap-4">
-            {charge ? (
-              <p className={cn("text-small text-text-muted", eintrag.chargenNr && "numeric")}>{charge}</p>
-            ) : null}
-            {voll ? null : (
-              <p>
-                <Link href={eintragHref(eintrag.slug, eintrag.id)} className={buttonKlassen("secondary", "md")}>
-                  {w.review.ganzerEintrag}
-                </Link>
-              </p>
-            )}
-          </div>
-        ) : null}
+          {voll ? (
+            <div className="flex flex-col items-start gap-2 max-md:items-center">
+              <Badge variante={FEUCHTIGKEIT[feuchtigkeit.einordnung]}>{feuchtigkeitsText}</Badge>
+              <p className="max-w-[56ch] text-small text-text-muted max-md:mx-auto">{w.schema.feuchte[FEUCHTE_HINWEIS[feuchtigkeit.einordnung]]}</p>
+            </div>
+          ) : null}
+
+          <AromaKarte terpene={eintrag.terpene} serien={aromaSerien(eintrag, w)} texte={texte} />
+          {voll ? (
+            <SweetSpot
+              titel={w.aroma.erkundung.intensitaet}
+              texte={texte}
+              zeilen={Object.entries(eintrag.terpenIntensitaet).map(([terpen, wert]) => ({ terpen, wert }))}
+            />
+          ) : null}
+          {voll ? (
+            <BeschaffenheitsLeiste werte={eintrag.beschaffenheit} feuchte={null} texte={texte} />
+          ) : null}
+          {reel ? <InstagramEmbed url={reel} bezeichnung={eintrag.handelsname} texte={w.reel} /> : null}
+
+          {/* Die Charge schließt die Seite ab wie eine Fußnote; im Auszug darunter der Weg zum ganzen Eintrag. */}
+          {charge || !voll ? (
+            <div className="mt-auto flex flex-col gap-4">
+              {charge ? (
+                <p className={cn("text-small text-text-muted", eintrag.chargenNr && "numeric")}>{charge}</p>
+              ) : null}
+              {voll ? null : (
+                <p>
+                  <Link href={eintragHref(eintrag.slug, eintrag.id)} className={buttonKlassen("secondary", "md")}>
+                    {w.review.ganzerEintrag}
+                  </Link>
+                </p>
+              )}
+            </div>
+          ) : null}
+        </NurAufgeschlagen>
       </div>
     </article>
   );

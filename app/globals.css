@@ -1256,7 +1256,7 @@ html.joint-cursor :is(input:not([type="range"]):not([type="radio"]):not([type="c
 @media (scripting: enabled) {
   .buch-stapel {
     display: grid;
-    /* Eigene Ebene: das drehende Blatt (z-index 1) liegt über der anderen Seite, nie über Kopf oder Leiste. */
+    /* Eigene Ebene: das drehende Blatt (z-index 2) und die liegenden Hälften (1) liegen über beiden Artikeln, nie über Kopf oder Leiste. */
     isolation: isolate;
   }
 

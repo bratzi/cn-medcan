@@ -589,7 +589,8 @@ export async function ladeStrainDetail(
       },
       reviews: {
         where: { freigegeben: true },
-        orderBy: { erstelltAm: "desc" },
+        // Betreiber zuerst: bei mehr als 20 Bewertungen fiele er sonst aus dem Buch (T7-Review, Nutzer 2026-09-29).
+        orderBy: [{ istRedaktionell: "desc" }, { erstelltAm: "desc" }],
         take: 20,
         select: {
           id: true,

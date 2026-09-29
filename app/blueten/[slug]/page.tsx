@@ -224,7 +224,7 @@ async function ProduktInhalt({ slug, w, sprache }: { slug: string; w: Woerterbuc
       {/* Alle Bewertungen der Sorte als ein Buch zum Blättern (T7): Betreiber zuerst,
           dann die Community. Ersetzt die eigenen Doppelseiten untereinander und die Liste. */}
       <div className={ABSTAND}>
-        <BewertungsBuch reviews={strain.reviews} produkt={produkt} w={w} sprache={sprache} />
+        <BewertungsBuch reviews={strain.reviews} kennwerte={strain.kennwerte} produkt={produkt} w={w} sprache={sprache} />
       </div>
 
       {/* Bewerten an der Stelle der Erkundung (Masterplan Bewertung v2, T4; /bewerten entfällt):
