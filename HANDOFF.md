@@ -28,6 +28,18 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 
 ## ⇢ Hier geht es weiter
 
+### ⇢ SESSION 28 (2026-09-29): Masterplan Bewertung v2 (T0–T14)
+
+- Nutzerauftrag (Buch zum Blättern, Bewertung v2, Empfehlungen, Avatare, Budpics, Schalterleiste, Videos, Impressum):
+  **Masterplan `docs/superpowers/plans/2026-09-29-buch-bewertung-v2-master.md`**. Je Task eine Session: Detailplan,
+  umsetzen, live prüfen, Nutzer melden, HANDOFF, Clear.
+- `.gitignore`: 1.json und __pycache__.
+- **T0 ERLEDIGT:** Testnutzer `testnutzer@book-of-terpz.test`, freigegeben (direkt in D1, Nutzer hat D1-Schreiben
+  erlaubt), Zugangsdaten in `.env.local` (TESTNUTZER_EMAIL/PASSWORT), Hash gegen Passwort geprüft.
+  Befund: `SITE_PASSWORD` in .env.local passt NICHT zum Live-Secret (/api/zugang → fehler=1), API-Tests per Node
+  gehen daher nicht; Browser-MCP nutzen (Achtung: Testnutzer-Login löst Admin-Sitzung ab).
+- **Weiter mit T1** (Videos Pexels 7667290 / 3153124 hell).
+
 ### ⇢ SESSION 27 (2026-09-29) — A6 Mobil begonnen
 
 - Messung 390 px (iframe) auf /, /blueten, /reviews, /umfragen, /mitglied: kein waagerechter Überlauf.
