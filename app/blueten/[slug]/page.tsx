@@ -171,7 +171,7 @@ async function ProduktInhalt({ slug, w, sprache }: { slug: string; w: Woerterbuc
   const neuesteEigene = eigene[0];
   const geschmack = verdichteGeschmacksMatrix(strain.reviews);
   const produkt = { handelsname: strain.handelsname, slug: strain.slug, terpene: strain.terpene, bildPfad: strain.herstellerBildPfad };
-  const erkundung = erkundungsDaten(strain.terpene, strain.reviews, w.aroma.serien);
+  const erkundung = erkundungsDaten(strain.terpene, strain.reviews, w.aroma.serien, strain.kennwerte);
   // Die eigene Bewertung (auch unfreigegeben) belegt die Maske vor; nur wer bewerten darf, braucht sie.
   const eigeneBewertung = mitglied?.freigegeben ? await ladeEigeneBewertung(mitglied.mitgliedId, strain.id) : null;
   const vorbelegung = eigeneBewertung ? vorbelegungAus(eigeneBewertung) : null;

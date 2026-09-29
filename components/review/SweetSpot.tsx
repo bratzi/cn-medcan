@@ -9,7 +9,7 @@ import { INTENSITAETS_STUFEN } from "@/lib/query/bewertung";
 
 export type SweetSpotZeile = {
   terpen: string;
-  /** Wert der Bewertung oder Mittel der Community, 1 bis 5. */
+  /** Wert der Bewertung oder Community-Median (T5, zuvor das Mittel), 0 bis 5. */
   wert: number;
   /** Nur beim Mittel: wie viele Bewertungen dahinterstehen. */
   anzahl?: number;
@@ -56,7 +56,9 @@ type Bedienung = {
  * Stufe 3. Die Markierung sitzt bei wert / 5 der Breite, 0 heißt nicht geschmeckt.
  *
  * Mit `bedienung` wird jede Spur zum Regler: der Punkt zeigt den eigenen
- * Wert, ein blasser Ring den Wert der Bewertung oder Community.
+ * Wert, ein grüner Ring den Community-Median (Masterplan Bewertung v2, T5,
+ * wie der grüne Ring der Aroma-Karte). Vom Nutzer ergänzte Terpene stehen
+ * gestrichelt in Kopierstift wie ihre Bögen in der Karte.
  */
 export function SweetSpot({
   zeilen,
@@ -99,7 +101,8 @@ export function SweetSpot({
               key={zeile.terpen}
               className={cn(
                 "flex flex-col gap-2",
-                quer && "w-56 shrink-0 snap-start rounded-lg border border-border bg-surface-raised p-4",
+                quer && "w-56 shrink-0 snap-start rounded-lg border bg-surface-raised p-4",
+                quer && (zeile.ergaenzt ? "border-dashed border-kopierstift" : "border-border"),
                 quer && gezeigt < 0.05 && "opacity-70",
               )}
               onPointerEnter={() => bedienung?.aktivieren?.(zeile.terpen)}
@@ -142,10 +145,13 @@ export function SweetSpot({
                     : undefined
                 }
               >
+                {/* Community-Median: grüner Ring, eine Stufe größer als der eigene Punkt, damit er
+                    ihn umschließt, wenn beide gleich sind; der Saum in Papierfarbe hebt ihn von der
+                    grünen Mitte der Spur ab. */}
                 {bedienung && zeile.anzahl ? (
                   <span
                     aria-hidden="true"
-                    className="absolute top-1/2 size-5 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-kopierstift/40"
+                    className="absolute top-1/2 size-6 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-accent ring-2 ring-surface"
                     style={{ left: `${anteil(zeile.wert)}%` }}
                   />
                 ) : null}

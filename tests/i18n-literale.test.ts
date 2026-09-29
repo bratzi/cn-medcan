@@ -46,6 +46,7 @@ const UMGESTELLT: string[] = [
   "components/review/Inhaltsverzeichnis.tsx",
   "components/review/Doppelseite.tsx",
   "components/review/erkundung-daten.ts",
+  "components/review/TerpenErgaenzen.tsx",
   // Welle 3: Reviews und Bewerten
   "app/reviews/page.tsx",
   "app/blueten/[slug]/aktionen.ts",

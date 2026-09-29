@@ -13,7 +13,7 @@ import type { SweetSpotZeile } from "@/components/review/SweetSpot";
 import type { KatalogEintrag } from "@/components/review/TerpenErgaenzen";
 import { Button, Field, Input, Meldung } from "@/components/ui";
 import { useHydriert } from "@/components/ui/useHydriert";
-import type { KartenTerpen, Treue } from "@/lib/aromakarte";
+import type { CommunityMedian, KartenTerpen, Treue } from "@/lib/aromakarte";
 import { MAX_NOTIZ } from "@/lib/bewertung-eingabe";
 import type { Vorbelegung } from "@/lib/bewertung-vorbelegung";
 import type { AromaTexte, Woerterbuch } from "@/lib/i18n/typen";
@@ -33,6 +33,8 @@ type Props = {
   serien: readonly AromaSerie[];
   treue: Treue | null;
   zeilen: readonly SweetSpotZeile[];
+  /** Community-Median aus sorten_kennwerte (T5): grüner Regler und „Deine Nase vs. Community“. */
+  median: CommunityMedian | null;
   gesamteindruck: Gesamteindruck;
   beschaffenheit: BeschaffenheitsWerte;
   /** Texte der Aroma-Bausteine (lib/i18n/typen.ts, aromaTexte). */

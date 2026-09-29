@@ -10,22 +10,23 @@ import {
   type BeschaffenheitsWerte,
 } from "@/components/review/BeschaffenheitsLeiste";
 import { GesamteindruckLeiste, type Gesamteindruck, type NotenKey } from "@/components/review/GesamteindruckLeiste";
-import type { KatalogEintrag } from "@/components/review/TerpenErgaenzen";
+import { TerpenErgaenzen, type KatalogEintrag } from "@/components/review/TerpenErgaenzen";
 import {
-  achsenIndex,
+  ebenenStaerken,
   ergaenztesTerpen,
-  MAX,
   herstellerProfil,
   herstellerTreue,
-  terpenStaerken,
+  nasenAbweichung,
+  terpenEbenen,
+  type CommunityMedian,
   type KartenTerpen,
   type Treue,
 } from "@/lib/aromakarte";
 import { BEWERTUNGS_ACHSEN, GESCHMACKS_ACHSEN, leereGeschmacksMatrix, type GeschmacksMatrix } from "@/lib/query/bewertung";
 import type { Vorbelegung } from "@/lib/bewertung-vorbelegung";
 import { communityFazit } from "@/lib/fazit";
-import { formatiereAnteil } from "@/lib/format";
-import { mehrzahl } from "@/lib/i18n/text";
+import { formatiereAnteil, formatiereZahl } from "@/lib/format";
+import { mehrzahl, t } from "@/lib/i18n/text";
 import type { AromaTexte } from "@/lib/i18n/typen";
 
 const prozent = (anteil: number, sprache: AromaTexte["sprache"]) => formatiereAnteil(anteil, 0, sprache);
@@ -35,8 +36,10 @@ const prozent = (anteil: number, sprache: AromaTexte["sprache"]) => formatiereAn
  * jeder in voller Breite; das Community-Fazit aus allen drei steht danach (Nutzer 2026-09-25). Im Terpen-Schritt geschieht alles in der Karte: die Geschmacksbalken links
  * sind Regler; man zieht, wie stark man jede Geschmacksrichtung schmeckt,
  * und sieht als lila Serie das eigene Profil gegen die Herstellerangabe.
- * Lerneffekt: zur gezogenen Richtung leuchten die Terpene auf, die sie
- * tragen, und die Karte nennt sie. Ohne Anmeldung, speichert nichts.
+ * Lerneffekt: zur gezogenen Richtung leuchten die Terpene dieser Sorte auf,
+ * die sie tragen; alle übrigen Terpene des Katalogs stehen als blasse Geister
+ * daneben (Masterplan Bewertung v2, T5: ein Geschmack zündet kein Terpen, das
+ * nicht in der Sorte steckt). Ohne Anmeldung, speichert nichts.
  */
 export function AromaErkundung({
   titel,
@@ -44,6 +47,7 @@ export function AromaErkundung({
   terpene,
   serien,
   zeilen,
+  median = null,
   katalog = [],
   treue = null,
   beschaffenheit,
@@ -59,8 +63,13 @@ export function AromaErkundung({
   bild?: React.ReactNode;
   terpene: readonly KartenTerpen[];
   serien: readonly AromaSerie[];
-  /** Community-Mittel je Terpen; Terpene ohne Bewertung starten im Sweet Spot. */
+  /** Community-Wert je Terpen (Median, sonst Mittel); Terpene ohne Bewertung starten im Sweet Spot. */
   zeilen: readonly SweetSpotZeile[];
+  /**
+   * Community-Median aus `sorten_kennwerte` (T5): der grüne Regler der Karte und
+   * die Abweichung „Deine Nase vs. Community“. Ohne Median fehlt beides.
+   */
+  median?: CommunityMedian | null;
   /** Alle bekannten Terpene: für Terpene, die der Hersteller nicht angibt. */
   katalog?: readonly KatalogEintrag[];
   /** Herstellertreue aus allen Bewertungen der Sorte. */
@@ -110,40 +119,46 @@ export function AromaErkundung({
     eigeneNoten !== anfang.noten ||
     eigeneIntensitaet !== anfang.intensitaet;
 
-  // Karte: alle bekannten Terpene. Was der Hersteller nicht angibt, steht grau
-  // daneben und wird farbig, sobald seine Geschmacksrichtung über 0 liegt.
-  const angegeben = new Set(terpene.map((terpen) => terpen.name));
-  const ergaenzt: KartenTerpen[] = katalog
+  // Karte: alle bekannten Terpene in drei Ebenen (T5). Laut Hersteller enthalten,
+  // vom Nutzer selbst im Sweet Spot ergänzt (Stufe > 0), sonst ein blasser Geist:
+  // ein Geschmack allein zündet kein Terpen, das nicht in der Sorte steckt.
+  const herstellerNamen = terpene.map((terpen) => terpen.name);
+  const angegeben = new Set(herstellerNamen);
+  const ausKatalog: KartenTerpen[] = katalog
     .filter((terpen) => !angegeben.has(terpen.name))
     .map((terpen) => ergaenztesTerpen(terpen.name, terpen.geschmack));
-  const kartenTerpene = [...terpene, ...ergaenzt];
+  const kartenTerpene = [...terpene, ...ausKatalog];
+  const ebenen = terpenEbenen(
+    kartenTerpene.map((terpen) => terpen.name),
+    herstellerNamen,
+    eigeneIntensitaet,
+  );
   const stufen = {
     ...Object.fromEntries(zeilen.map((zeile) => [zeile.terpen, zeile.wert])),
     ...eigeneIntensitaet,
   };
   // Sweet Spot in der Maske (Nutzer 2026-09-26: wieder erfassen): je Herstellerterpen
-  // eine Spur, Start am Community-Mittel, ohne Bewertung im Sweet Spot (3).
-  const sweetSpotZeilen: SweetSpotZeile[] = terpene.map(
-    (terpen) => zeilen.find((zeile) => zeile.terpen === terpen.name) ?? { terpen: terpen.name, wert: 3 },
-  );
+  // eine Spur, Start am Community-Wert, ohne Bewertung im Sweet Spot (3). Dazu je
+  // ergänztem Terpen eine Spur (T5), auch auf 0 zurückgezogen, damit sie nicht verschwindet.
+  const zeileVon = (terpen: string): SweetSpotZeile =>
+    zeilen.find((zeile) => zeile.terpen === terpen) ?? { terpen, wert: 3 };
+  const sweetSpotZeilen: SweetSpotZeile[] = [
+    ...herstellerNamen.map(zeileVon),
+    ...Object.keys(eigeneIntensitaet)
+      .filter((terpen) => !angegeben.has(terpen))
+      .map((terpen) => ({ ...zeileVon(terpen), ergaenzt: true })),
+  ];
+  // Deine Nase vs. Community (T5): nur mit eigenen Terpenstufen und Median.
+  const nase = nasenAbweichung(eigeneIntensitaet, median?.terpene ?? null, herstellerNamen);
 
   const hersteller = herstellerProfil(terpene);
   const community = serien.find((serie) => serie.ton === "lila")?.matrix;
   // Start der Regler: was die Community geschmeckt hat, sonst die Herstellerangabe.
   const start = community ?? hersteller ?? leereGeschmacksMatrix();
   const werte = eigen ?? start;
-  // Stärke je Terpen: Herstellerterpene leuchten nach ihrer Angabe; nicht
-  // angegebene bleiben grau, bis ihre Geschmacksrichtung spürbar ist (ab 0,5),
-  // kleine Community-Rauschwerte färben sie also nicht.
-  const basis = terpenStaerken(kartenTerpene, stufen);
-  const staerken = Object.fromEntries(
-    kartenTerpene.map((terpen) => {
-      if (angegeben.has(terpen.name)) return [terpen.name, basis[terpen.name] ?? 0];
-      const achse = GESCHMACKS_ACHSEN[achsenIndex(terpen.geschmack)];
-      const wert = achse ? werte[achse.key] : 0;
-      return [terpen.name, wert < 0.5 ? 0 : Math.min(wert / MAX, 1) * 0.6];
-    }),
-  );
+  // Stärke je Terpen nach Ebene: Herstellerterpene nach ihrer Angabe, ergänzte nach
+  // der eigenen Stufe, Geister 0 (lib/aromakarte.ts, ebenenStaerken).
+  const staerken = ebenenStaerken(kartenTerpene, ebenen, stufen);
   const eigeneTreue =
     eigen && hersteller ? herstellerTreue(hersteller, eigen) : null;
   const alleSerien: AromaSerie[] = eigen
@@ -191,9 +206,13 @@ export function AromaErkundung({
             <input key={key} type="hidden" name={`beschaffenheit-${key}`} value={Math.round((wert ?? 0) * 2) / 2} />
           ))}
           {eigeneFeuchte !== undefined ? <input type="hidden" name="feuchtigkeit" value={eigeneFeuchte} /> : null}
-          {Object.entries(eigeneIntensitaet).map(([terpen, wert]) => (
-            <input key={terpen} type="hidden" name={`terpen-${terpen}`} value={wert} />
-          ))}
+          {/* Herstellerterpene auf 0 heißen „nicht geschmeckt“ und zählen; ein ergänztes auf 0
+              ist nicht ergänzt und geht nicht in den Median (T5). */}
+          {Object.entries(eigeneIntensitaet)
+            .filter(([terpen, wert]) => angegeben.has(terpen) || wert > 0)
+            .map(([terpen, wert]) => (
+              <input key={terpen} type="hidden" name={`terpen-${terpen}`} value={wert} />
+            ))}
         </div>
       ) : null}
       {/* Sortenkopf ganz oben (Nutzer 2026-09-25): erst sieht man, was bewertet wurde. */}
@@ -242,28 +261,57 @@ export function AromaErkundung({
             terpene={kartenTerpene}
             serien={alleSerien}
             staerken={staerken}
+            ebenen={ebenen}
             regler={{
               werte,
-              vergleich: hersteller ?? community,
+              // Grüner Regler auf dem Community-Median (T5, zuvor die Herstellerangabe).
+              vergleich: median?.geschmack ?? undefined,
               aendern: (key, wert) =>
                 setEigen((alt) => ({ ...(alt ?? start), [key]: wert })),
             }}
             lernen={katalog}
             texte={texte}
           />
+          {/* Am Kartenende: Deine Nase vs. Community (T5), mittlere |Δ| zum Median und die
+              Zahl der ergänzten Terpene. Der Wert in Kopierstift wie „Dein Eindruck“. */}
+          {nase ? (
+            <p className="mt-6 text-center text-small text-text-muted text-pretty">
+              <span className="font-medium text-text">{texte.aroma.karte.nase}</span>{" "}
+              <span aria-hidden="true" className="numeric text-kopierstift">
+                {t(texte.aroma.karte.delta, { wert: formatiereZahl(nase.delta, 1, texte.sprache) })}
+              </span>
+              <span className="sr-only">
+                {t(texte.aroma.karte.deltaVorgelesen, { wert: formatiereZahl(nase.delta, 1, texte.sprache) })}
+              </span>
+              {", "}
+              {mehrzahl(texte.sprache, texte.aroma.karte.ergaenzteTerpene, nase.ergaenzt)}
+            </p>
+          ) : null}
         </div>
         {eingabe ? (
-          <SweetSpot
-            titel={texte.aroma.erkundung.intensitaet}
-            quer
-            texte={texte}
-            zeilen={sweetSpotZeilen}
-            bedienung={{
-              eigen: eigeneIntensitaet,
-              // Ganze Stufen, wie die Server Action sie annimmt (lib/bewertung-eingabe.ts).
-              aendern: (terpen, wert) => setEigeneIntensitaet((alt) => ({ ...alt, [terpen]: Math.round(wert) })),
-            }}
-          />
+          <>
+            {/* Die Skala links in der Karte trägt schon „Terpen-Intensität: Sweet Spot gesucht“;
+                die Spuren darunter sind die einzelnen Terpene. */}
+            <SweetSpot
+              titel={texte.aroma.erkundung.jeTerpen}
+              quer
+              texte={texte}
+              zeilen={sweetSpotZeilen}
+              bedienung={{
+                eigen: eigeneIntensitaet,
+                // Ganze Stufen, wie die Server Action sie annimmt (lib/bewertung-eingabe.ts).
+                aendern: (terpen, wert) => setEigeneIntensitaet((alt) => ({ ...alt, [terpen]: Math.round(wert) })),
+              }}
+            />
+            {/* Ebene 2 der Karte: ein Terpen ohne Herstellerangabe selbst setzen, es startet im
+                Sweet Spot und steht in der Karte gestrichelt als „von dir ergänzt“. */}
+            <TerpenErgaenzen
+              katalog={katalog}
+              vorhanden={sweetSpotZeilen.map((zeile) => zeile.terpen)}
+              hinzufuegen={(terpen) => setEigeneIntensitaet((alt) => ({ ...alt, [terpen.name]: 3 }))}
+              texte={texte}
+            />
+          </>
         ) : null}
       </Schritt>
 

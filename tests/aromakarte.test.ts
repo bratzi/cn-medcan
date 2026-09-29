@@ -190,3 +190,151 @@ test("Schmale Karte (Handy): Achse bei 42 %, Terpene 124 vor dem Rand, Netz klei
   assert.equal(radiusVon(1200), RADIUS);
   assert.equal(achsenImKarte(640)[0].x, 260);
 });
+
+// ---------------------------------------------------------------------------
+//  Masterplan Bewertung v2, T5: drei Ebenen, Community-Median, Abweichung
+// ---------------------------------------------------------------------------
+
+import {
+  bogenArt,
+  communityMedian,
+  ebenenStaerken,
+  leuchtendeTerpene,
+  nasenAbweichung,
+  terpenEbenen,
+  type KartenTerpen,
+} from "@/lib/aromakarte";
+
+const T = (name: string, geschmack: KartenTerpen["geschmack"], konzentrationProzent: number | null, rang: number): KartenTerpen => ({
+  name,
+  geschmack,
+  konzentrationProzent,
+  rang,
+});
+const MYRCEN = T("Myrcen", "ERDIG", 0.8, 1);
+const LIMO = T("Limonen", "ZITRUS", 0.4, 2);
+// Aus dem Katalog, laut Hersteller nicht enthalten (hinterster Rang wie ergaenztesTerpen).
+const TERPINOLEN = T("Terpinolen", "KRAEUTRIG", null, 99);
+const OCIMEN = T("Ocimen", "SUESS", null, 99);
+
+test("Ebenen: Herstellerangabe, vom Nutzer im Sweet Spot gesetzt (Stufe > 0), sonst Geist", () => {
+  const ebenen = terpenEbenen(["Myrcen", "Limonen", "Terpinolen", "Ocimen", "Linalool"], ["Myrcen", "Limonen"], {
+    Myrcen: 0,
+    Terpinolen: 3,
+    Ocimen: 0,
+  });
+  assert.deepEqual(ebenen, {
+    Myrcen: "hersteller",
+    Limonen: "hersteller",
+    Terpinolen: "ergaenzt",
+    Ocimen: "geist",
+    Linalool: "geist",
+  });
+});
+
+test("Stärken: ein Geschmack allein zündet kein Terpen, Katalogterpene verwässern die Angabe nicht", () => {
+  const ebenen = terpenEbenen(["Myrcen", "Limonen", "Terpinolen", "Ocimen"], ["Myrcen", "Limonen"], { Terpinolen: 5 });
+  const staerken = ebenenStaerken([MYRCEN, LIMO, TERPINOLEN, OCIMEN], ebenen, { Terpinolen: 5 });
+  // Hersteller wie terpenStaerken, nur über die Herstellerterpene: 0,8 / (0,8 · 5/3) = 0,6.
+  assert.equal(staerken.Myrcen, 0.6);
+  assert.equal(staerken.Limonen, 0.3);
+  // Ergänzt nach der eigenen Stufe, höchstens 0,6: Stufe 5 ergibt 0,6.
+  assert.equal(staerken.Terpinolen, 0.6);
+  assert.equal(staerken.Ocimen, 0);
+  const sweetSpot = ebenenStaerken([MYRCEN, TERPINOLEN], terpenEbenen(["Myrcen", "Terpinolen"], ["Myrcen"], { Terpinolen: 3 }), {
+    Terpinolen: 3,
+  });
+  assert.ok(Math.abs(sweetSpot.Terpinolen - 0.36) < 1e-9);
+});
+
+test("Bogenart: Terpene der Sorte leuchten bei aktiver Richtung, Geister bleiben blass und pulsieren nie", () => {
+  assert.equal(bogenArt({ ebene: "hersteller", kraft: 0.5, richtungAktiv: true, imFokus: false }), "voll");
+  assert.equal(bogenArt({ ebene: "hersteller", kraft: 0.5, richtungAktiv: false, imFokus: false }), "geist");
+  assert.equal(bogenArt({ ebene: "hersteller", kraft: 0, richtungAktiv: true, imFokus: false }), "geist");
+  assert.equal(bogenArt({ ebene: "hersteller", kraft: 0, richtungAktiv: false, imFokus: true }), "voll");
+  assert.equal(bogenArt({ ebene: "ergaenzt", kraft: 0.36, richtungAktiv: true, imFokus: false }), "ergaenzt");
+  assert.equal(bogenArt({ ebene: "ergaenzt", kraft: 0.36, richtungAktiv: false, imFokus: false }), "geist");
+  assert.equal(bogenArt({ ebene: "geist", kraft: 1, richtungAktiv: true, imFokus: false }), "geist");
+  assert.equal(bogenArt({ ebene: "geist", kraft: 0, richtungAktiv: false, imFokus: true }), "geistFokus");
+});
+
+test("Gewählte Geschmacksrichtung: nur die Schnittmenge mit Ebene 1 und 2 leuchtet", () => {
+  const zitrus = achsenIndex("ZITRUS");
+  const terpene = [MYRCEN, LIMO, TERPINOLEN];
+  // Terpinolen trägt Zitrus (20 %), ist laut Hersteller aber nicht enthalten: Geist.
+  assert.deepEqual(leuchtendeTerpene(zitrus, terpene, terpenEbenen(["Myrcen", "Limonen", "Terpinolen"], ["Myrcen", "Limonen"], {})), [
+    "Limonen",
+  ]);
+  // Setzt der Nutzer es selbst im Sweet Spot, gehört es dazu.
+  assert.deepEqual(
+    leuchtendeTerpene(zitrus, terpene, terpenEbenen(["Myrcen", "Limonen", "Terpinolen"], ["Myrcen", "Limonen"], { Terpinolen: 2 })),
+    ["Limonen", "Terpinolen"],
+  );
+});
+
+const MATRIX = { zitrus: 2.5, fruchtig: 1, suess: 0, blumig: 0, kraeutrig: 1.5, minzig: 0, holzig: 0, wuerzig: 0.5, erdig: 4, diesel: 0 };
+
+test("Community-Median aus sorten_kennwerte: ohne Zeile oder ohne Bewertung null, kaputte Werte fallen weg", () => {
+  assert.equal(communityMedian(null), null);
+  assert.equal(communityMedian(undefined), null);
+  assert.equal(communityMedian({ terpenMedian: "{}", geschmackMedian: "{}", anzahl: 0 }), null);
+  assert.deepEqual(
+    communityMedian({ terpenMedian: '{"Myrcen":2.5,"Limonen":4}', geschmackMedian: JSON.stringify(MATRIX), anzahl: 3 }),
+    { geschmack: MATRIX, terpene: { Myrcen: 2.5, Limonen: 4 }, anzahl: 3 },
+  );
+  assert.deepEqual(
+    communityMedian({ terpenMedian: '{"Myrcen":7,"Limonen":"x","Linalool":3}', geschmackMedian: "kaputt", anzahl: 2 }),
+    { geschmack: null, terpene: { Linalool: 3 }, anzahl: 2 },
+  );
+  // Nichts Brauchbares: wie kein Median (Review Focus 1, nie 0 oder NaN).
+  assert.equal(communityMedian({ terpenMedian: "{}", geschmackMedian: "{}", anzahl: 2 }), null);
+});
+
+test("Deine Nase vs. Community: mittlere |Δ| zum Median und ergänzte Terpene mit Stufe > 0", () => {
+  const median = { Myrcen: 3, Limonen: 3, Linalool: 2 };
+  assert.equal(nasenAbweichung({ Myrcen: 4 }, null, ["Myrcen"]), null);
+  assert.equal(nasenAbweichung({}, median, ["Myrcen"]), null);
+  // Keine Überschneidung mit dem Median: nichts zu vergleichen.
+  assert.equal(nasenAbweichung({ Ocimen: 3 }, median, ["Myrcen"]), null);
+  assert.deepEqual(nasenAbweichung({ Myrcen: 4, Limonen: 2, Linalool: 3, Ocimen: 0 }, median, ["Myrcen", "Limonen"]), {
+    delta: 1,
+    ergaenzt: 1,
+  });
+  // Genau getroffen ist ein echter Wert, kein fehlender.
+  assert.deepEqual(nasenAbweichung({ Myrcen: 3 }, median, ["Myrcen"]), { delta: 0, ergaenzt: 0 });
+});
+
+import { erkundungsDaten } from "@/components/review/erkundung-daten";
+
+const BEWERTUNG = (geschmack: Record<string, number>, terpene: Record<string, number>) => ({
+  aussehen: 3,
+  geruch: 3,
+  geschmack: 3,
+  konsistenz: 3,
+  feuchtigkeitProzent: null,
+  geschmacksMatrix: JSON.stringify(geschmack),
+  terpenIntensitaet: JSON.stringify(terpene),
+  beschaffenheit: null,
+});
+const NAMEN = { hersteller: "Laut Hersteller", community: "Laut Community" };
+
+test("Erkundungsdaten: der Community-Median aus sorten_kennwerte trägt Reihe, Sweet-Spot-Zeilen und grünen Regler", () => {
+  const reviews = [
+    BEWERTUNG({ ...MATRIX, erdig: 1 }, { Myrcen: 1 }),
+    BEWERTUNG({ ...MATRIX, erdig: 2 }, { Myrcen: 2 }),
+    BEWERTUNG({ ...MATRIX, erdig: 5 }, { Myrcen: 5 }),
+  ];
+  const kennwerte = { terpenMedian: '{"Myrcen":2}', geschmackMedian: JSON.stringify({ ...MATRIX, erdig: 2 }), anzahl: 3 };
+  const daten = erkundungsDaten([MYRCEN], reviews, NAMEN, kennwerte);
+  assert.deepEqual(daten.median, { geschmack: { ...MATRIX, erdig: 2 }, terpene: { Myrcen: 2 }, anzahl: 3 });
+  // Eine Community-Stimme auf der Karte: die lila Reihe steht auf dem Median, nicht auf dem Mittel (2,7).
+  assert.equal(daten.serien.find((serie) => serie.ton === "lila")?.matrix.erdig, 2);
+  assert.deepEqual(daten.zeilen, [{ terpen: "Myrcen", wert: 2, anzahl: 3 }]);
+});
+
+test("Erkundungsdaten: ohne Kennwerte kein Median (kein grüner Regler), die Reihe bleibt das Mittel", () => {
+  const daten = erkundungsDaten([MYRCEN], [BEWERTUNG({ ...MATRIX, erdig: 1 }, {}), BEWERTUNG({ ...MATRIX, erdig: 4 }, {})], NAMEN, null);
+  assert.equal(daten.median, null);
+  assert.equal(daten.serien.find((serie) => serie.ton === "lila")?.matrix.erdig, 2.5);
+  assert.equal(erkundungsDaten([MYRCEN], [], NAMEN).median, null);
+});

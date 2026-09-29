@@ -4,7 +4,13 @@
  * Terpen-Poster; per Schalter morphen die Knoten ins Netzdiagramm. Reine
  * Funktionen, damit Darstellung und Verdichtung testbar bleiben.
  */
-import { GESCHMACKS_ACHSEN, leereGeschmacksMatrix, type GeschmacksMatrix } from "@/lib/query/bewertung";
+import { abweichungZurCommunity } from "@/lib/bewertung-v2";
+import {
+  GESCHMACKS_ACHSEN,
+  geschmacksMatrixSchema,
+  leereGeschmacksMatrix,
+  type GeschmacksMatrix,
+} from "@/lib/query/bewertung";
 import type { GeschmacksKategorie } from "@/db/enums";
 import { aromaAnteile } from "@/lib/terpen-aromen";
 
@@ -299,4 +305,158 @@ export function mittlereHerstellerTreue(
   });
   if (werte.length === 0) return null;
   return { wert: werte.reduce((a, b) => a + b, 0) / werte.length, anzahl: werte.length };
+}
+
+// ---------------------------------------------------------------------------
+//  Drei Ebenen der Karte (Masterplan Bewertung v2, T5, Nutzer 2026-09-29)
+// ---------------------------------------------------------------------------
+
+/**
+ * Denkfehler bis T5: ein Geschmack aktivierte alle Terpene, die ihn tragen,
+ * auch solche, die gar nicht in der Sorte stecken. Jetzt hat jedes Terpen der
+ * Karte eine Ebene:
+ * - `hersteller`: laut Herstellerangabe enthalten (voller Puls),
+ * - `ergaenzt`: der Nutzer hat es selbst im Sweet Spot gesetzt (Stufe > 0),
+ * - `geist`: nur über den Geschmack verbunden, laut Hersteller nicht enthalten.
+ */
+export type TerpenEbene = "hersteller" | "ergaenzt" | "geist";
+
+export function terpenEbenen(
+  namen: readonly string[],
+  hersteller: readonly string[],
+  eigene: Readonly<Record<string, number>>,
+): Record<string, TerpenEbene> {
+  const angegeben = new Set(hersteller);
+  return Object.fromEntries(
+    namen.map((name) => [name, angegeben.has(name) ? "hersteller" : (eigene[name] ?? 0) > 0 ? "ergaenzt" : "geist"]),
+  );
+}
+
+/** Ergänzte Terpene leuchten höchstens so stark (Stufe 5), damit die Herstellerangabe führt. */
+const ERGAENZT_HOECHSTENS = 0.6;
+
+/**
+ * Leuchtkraft je Terpen, 0 bis 1: Herstellerterpene wie `terpenStaerken`, aber
+ * nur untereinander verglichen (Katalogterpene verwässern die Angabe nicht);
+ * ergänzte nach der eigenen Stufe; Geister 0, ein Geschmack allein zündet sie nicht.
+ */
+export function ebenenStaerken(
+  terpene: readonly KartenTerpen[],
+  ebenen: Readonly<Record<string, TerpenEbene>>,
+  stufen: Readonly<Record<string, number>> = {},
+): Record<string, number> {
+  const hersteller = terpenStaerken(
+    terpene.filter((terpen) => ebenen[terpen.name] === "hersteller"),
+    stufen,
+  );
+  return Object.fromEntries(
+    terpene.map((terpen) => {
+      const ebene = ebenen[terpen.name] ?? "geist";
+      if (ebene === "hersteller") return [terpen.name, hersteller[terpen.name] ?? 0];
+      if (ebene === "ergaenzt") return [terpen.name, Math.min(1, (stufen[terpen.name] ?? 0) / MAX) * ERGAENZT_HOECHSTENS];
+      return [terpen.name, 0];
+    }),
+  );
+}
+
+/** Wie ein Bogen gezeichnet wird: satt mit Puls, gestrichelt in eigener Farbe, blass. */
+export type BogenArt = "voll" | "ergaenzt" | "geist" | "geistFokus";
+
+/**
+ * Terpene der Sorte (Ebene 1 und 2) leuchten, wenn ihre Richtung aktiv ist und
+ * sie Kraft haben, oder wenn man sie selbst überfährt. Alles andere bleibt ein
+ * Geist ohne Puls; ein überfahrener Geist tritt nur etwas hervor.
+ */
+export function bogenArt({
+  ebene,
+  kraft,
+  richtungAktiv,
+  imFokus,
+}: {
+  ebene: TerpenEbene;
+  kraft: number;
+  richtungAktiv: boolean;
+  imFokus: boolean;
+}): BogenArt {
+  if (ebene === "geist") return imFokus ? "geistFokus" : "geist";
+  if (!imFokus && !(richtungAktiv && kraft > 0)) return "geist";
+  return ebene === "hersteller" ? "voll" : "ergaenzt";
+}
+
+/**
+ * Wählt man eine Geschmacksrichtung, leuchten nur Terpene der Sorte (Ebene 1
+ * und 2), die sie spürbar tragen (Anteil ab 20 %); die übrigen bleiben Geister.
+ */
+export function leuchtendeTerpene(
+  achse: number,
+  terpene: readonly KartenTerpen[],
+  ebenen: Readonly<Record<string, TerpenEbene>>,
+): string[] {
+  return terpene
+    .filter((terpen) => (ebenen[terpen.name] ?? "geist") !== "geist")
+    .filter((terpen) => terpenBoegen(terpen).some((b) => b.achse === achse && b.anteil >= 0.2))
+    .map((terpen) => terpen.name);
+}
+
+/** Community-Median einer Sorte aus `sorten_kennwerte` (T3), beim Speichern vorberechnet. */
+export type CommunityMedian = {
+  /** Median je Geschmacksrichtung; null, wenn die Spalte unbrauchbar ist. */
+  geschmack: GeschmacksMatrix | null;
+  /** Median der Terpen-Intensität je Terpen (0 bis 5, auch halbe Werte). */
+  terpene: Record<string, number>;
+  anzahl: number;
+};
+
+function alsObjekt(roh: unknown): unknown {
+  if (typeof roh !== "string") return roh;
+  try {
+    return JSON.parse(roh);
+  } catch {
+    return undefined;
+  }
+}
+
+/**
+ * Liest die Kennwerte der Sorte. Ohne Zeile, ohne Bewertung oder ohne
+ * brauchbaren Wert: null, damit nirgends 0 oder NaN als Community-Wert steht
+ * (Review Focus 1). Die JSON-Spalten werden wie überall geprüft gelesen.
+ */
+export function communityMedian(
+  roh: { terpenMedian: unknown; geschmackMedian: unknown; anzahl: number } | null | undefined,
+): CommunityMedian | null {
+  if (!roh || !(roh.anzahl > 0)) return null;
+  const matrix = geschmacksMatrixSchema.safeParse(alsObjekt(roh.geschmackMedian));
+  const terpenRoh = alsObjekt(roh.terpenMedian);
+  const terpene =
+    terpenRoh && typeof terpenRoh === "object" && !Array.isArray(terpenRoh)
+      ? Object.fromEntries(
+          Object.entries(terpenRoh).filter(
+            (eintrag): eintrag is [string, number] =>
+              typeof eintrag[1] === "number" && Number.isFinite(eintrag[1]) && eintrag[1] >= 0 && eintrag[1] <= MAX,
+          ),
+        )
+      : {};
+  const geschmack = matrix.success ? matrix.data : null;
+  if (!geschmack && Object.keys(terpene).length === 0) return null;
+  return { geschmack, terpene, anzahl: roh.anzahl };
+}
+
+/**
+ * „Deine Nase vs. Community“: mittlere |Δ| der eigenen Terpenstufen zum
+ * Community-Median (über die Terpene, die beide haben, lib/bewertung-v2.ts)
+ * und die Zahl der Terpene, die man ohne Herstellerangabe ergänzt hat (Stufe
+ * > 0). Ohne eigene Werte, ohne Median oder ohne Überschneidung: null.
+ */
+export function nasenAbweichung(
+  eigene: Readonly<Record<string, number>>,
+  median: Readonly<Record<string, number>> | null,
+  hersteller: readonly string[],
+): { delta: number; ergaenzt: number } | null {
+  if (!median) return null;
+  const angegeben = new Set(hersteller);
+  // Ein ergänztes Terpen auf 0 zurückgezogen gilt als nicht ergänzt.
+  const gesetzt = Object.fromEntries(Object.entries(eigene).filter(([name, wert]) => angegeben.has(name) || wert > 0));
+  const { mittlereAbweichung, ergaenzt } = abweichungZurCommunity(gesetzt, median, hersteller);
+  if (mittlereAbweichung === null) return null;
+  return { delta: mittlereAbweichung, ergaenzt: ergaenzt.length };
 }

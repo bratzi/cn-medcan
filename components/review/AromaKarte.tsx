@@ -15,6 +15,8 @@ import {
   netzPunkt,
   achsenLage,
   begleitBoegen,
+  bogenArt,
+  leuchtendeTerpene,
   MIN_BREITE,
   radiusVon,
   sanft,
@@ -23,6 +25,8 @@ import {
   terpenStaerken,
   type KartenTerpen,
   type Punkt,
+  type BogenArt,
+  type TerpenEbene,
 } from "@/lib/aromakarte";
 import { cn } from "@/lib/cn";
 import { GESCHMACKS_ACHSEN, type GeschmacksMatrix } from "@/lib/query/bewertung";
@@ -46,9 +50,16 @@ type Props = {
   /** Stärke je Terpen (0 bis 1) für das Leuchten der Pfade; sonst aus den Herstellerangaben. */
   staerken?: Readonly<Record<string, number>>;
   /**
+   * Ebene je Terpen (Masterplan Bewertung v2, T5): Herstellerangabe, vom Nutzer
+   * ergänzt oder nur über den Geschmack verbunden (Geist). Ohne Angabe gilt jedes
+   * Terpen als Herstellerangabe (Doppelseite: dort stehen nur diese).
+   */
+  ebenen?: Readonly<Record<string, TerpenEbene>>;
+  /**
    * Macht die Balken links zu Reglern: man zieht den eigenen Wert je
-   * Geschmacksrichtung direkt in der Karte (0 bis 5). `vergleich` zeigt einen
-   * Ring, an dem der Griff einrastet.
+   * Geschmacksrichtung direkt in der Karte (0 bis 5). `vergleich` ist der
+   * Community-Median (T5, zuvor die Herstellerangabe): ein grüner Ring, an dem
+   * der Griff einrastet. Ohne Median kein Ring, dafür ein Hinweis.
    */
   regler?: {
     werte: GeschmacksMatrix;
@@ -85,6 +96,17 @@ const LINIEN_FARBE: Record<string, string | null> = {
 const VERLAUF: Record<string, readonly string[]> = {
   FRUCHTIG: ["#ff4d4d", "#ff9f1c", "#ffd23f", "#b5179e"],
   BLUMIG: ["#c77dff", "#ff70a6", "#ffd670", "#8ecae6"],
+};
+/**
+ * Deckkraft je Bogenart (T5): Herstellerangabe nach Ausprägung, ergänzt etwas
+ * kräftiger (der Strich ist gestrichelt und dünner), Geister blass, ein
+ * überfahrener Geist tritt hervor, bleibt aber grau und ohne Puls.
+ */
+const BOGEN_DECKKRAFT: Record<BogenArt, (auspraegung: number) => number> = {
+  voll: (auspraegung) => 0.35 + 0.65 * auspraegung,
+  ergaenzt: (auspraegung) => 0.5 + 0.5 * auspraegung,
+  geistFokus: () => 0.7,
+  geist: () => 0.22,
 };
 const RINGE = [1, 2, 3, 4, 5] as const;
 const SKALA = [0, 1, 2, 3, 4, 5] as const;
@@ -164,6 +186,7 @@ export function AromaKarte({
   ohneTitel = false,
   hervorheben = null,
   staerken,
+  ebenen,
   regler,
   lernen,
   texte,
@@ -171,6 +194,7 @@ export function AromaKarte({
   const titel = titelRoh ?? texte.aroma.karte.titel;
   const sprache = texte.sprache;
   const kt = texte.aroma.karte;
+  const skalaTitel = `${texte.aroma.erkundung.intensitaet}: ${text(texte.aroma.sweetSpot.ueberschrift, { marke: texte.aroma.sweetSpot.marke })}`;
   const WERT = { format: (wert: number) => formatiereZahl(wert, 1, sprache) };
   const achsenName = (index: number) => texte.geschmack[GESCHMACKS_ACHSEN[index].enumWert];
   const satz = (name: string) => (texte.aroma.satz as Record<string, string>)[name.trim().toLowerCase()] ?? null;
@@ -265,9 +289,22 @@ export function AromaKarte({
     terpenAktiv !== null && (traeger.get(terpenAktiv) ?? []).some((b) => b.achse === index);
   /** Achse ist betont: selbst überfahren oder vom überfahrenen Terpen getragen. */
   const achseBetont = (index: number) => aktiv === index || achseVerbunden(index);
-  /** Terpen ist betont: selbst überfahren oder trägt die überfahrene Achse. */
-  const terpenBetont = (name: string) =>
+  const ebeneVon = (name: string): TerpenEbene => (ebenen ? (ebenen[name] ?? "geist") : "hersteller");
+  const alleEbenen = Object.fromEntries(terpene.map((terpen) => [terpen.name, ebeneVon(terpen.name)]));
+  // Gewählte Richtung: nur Terpene der Sorte (Hersteller, ergänzt) leuchten, Geister bleiben blass (T5).
+  const leuchtend = new Set(aktiv === null ? [] : leuchtendeTerpene(aktiv, terpene, alleEbenen));
+  /** Terpen ist betont: selbst überfahren oder als Terpen der Sorte Träger der überfahrenen Achse. */
+  const terpenBetont = (name: string) => terpenAktiv === name || leuchtend.has(name);
+  /** Begleitstoffe sind keine Terpene und haben keine Ebene: sie folgen der Achse wie bisher. */
+  const begleitBetont = (name: string) =>
     terpenAktiv === name || (aktiv !== null && (traeger.get(name) ?? []).some((b) => b.achse === aktiv));
+  const vorhandeneEbenen = new Set(Object.values(alleEbenen));
+  /** Hinweis im Infotext eines Terpens außerhalb der Herstellerangabe (Begleitstoffe haben keinen). */
+  const ebenenHinweis = (name: string) => {
+    if (BEGLEITSTOFFE.some((stoff) => stoff.name === name)) return undefined;
+    const ebene = ebeneVon(name);
+    return ebene === "geist" ? kt.geistHinweis : ebene === "ergaenzt" ? kt.ergaenztHinweis : undefined;
+  };
   const etwasUeberfahren = aktiv !== null || terpenAktiv !== null;
 
   // Vor der ersten Messung wie früher im Maßstab 640 (dann per max-w-3xl
@@ -328,11 +365,27 @@ export function AromaKarte({
 
   return (
     <figure aria-label={titel} className="flex flex-col gap-6">
-      {/* Kopf der Karte: links der Name in Logoschrift mit Verlauf, rechts Ansicht und Legende. */}
-      <div className={cn("flex flex-wrap items-start gap-8", ohneTitel ? "justify-end" : "justify-between")}>
+      {/* Kopf der Karte: links der Name in Logoschrift mit Verlauf und, mit Reglern, die Skala;
+          rechts Ansicht und Legende. */}
+      <div className={cn("flex flex-wrap items-start gap-8", ohneTitel && !regler ? "justify-end" : "justify-between")}>
       {ohneTitel ? null : (
         <p className="farbverlauf font-hand text-erzaehlung text-balance wrap-break-word leading-[0.9]">{titel}</p>
       )}
+      {/* Skala links (T5): was die Regler messen, und was der grüne Ring ist. Ohne Median steht
+          statt des Rings der Hinweis, nie eine 0 (Review Focus 1). */}
+      {regler ? (
+        <div className="flex flex-col gap-2">
+          <p className="text-caption font-medium uppercase tracking-wide text-text-muted">{skalaTitel}</p>
+          {regler.vergleich ? (
+            <p className="inline-flex items-center gap-2 text-small text-text">
+              <span aria-hidden="true" className="inline-block size-4 rounded-full border-2 border-accent" />
+              {kt.median}
+            </p>
+          ) : (
+            <p className="text-small text-text-muted">{kt.keinMedian}</p>
+          )}
+        </div>
+      ) : null}
       <div className="flex flex-col items-end gap-6">
       <div className="flex flex-wrap items-center justify-end gap-4">
         {/* Ansichts-Schalter als Radiogroup (APG): ein Tabstopp, Pfeiltasten wählen.
@@ -430,16 +483,23 @@ export function AromaKarte({
           <g opacity={kartenSichtbar}>
             {terpene.flatMap((terpen, index) =>
               terpenBoegen(terpen).map(({ achse, anteil: notenAnteil }) => {
-                // Überfahrenes Terpen: seine Bögen leuchten auch, wenn es nicht angegeben ist
-                // (Lerneffekt, Mindeststärke 0,6); alle anderen Bögen treten zurück.
+                // Drei Ebenen (T5): Herstellerterpene satt mit Puls, ergänzte gestrichelt in
+                // Kopierstift mit Lichtpunkt, Geister blass ohne Puls. Ein überfahrenes Terpen der
+                // Sorte leuchtet mit Mindeststärke 0,6; ein überfahrener Geist tritt nur hervor.
                 const imFokus = terpenAktiv === terpen.name;
                 const gedimmt = terpenAktiv !== null && !imFokus;
+                const art = bogenArt({
+                  ebene: ebeneVon(terpen.name),
+                  kraft: staerke[terpen.name] ?? 0,
+                  richtungAktiv: achseFarbig(achse),
+                  imFokus,
+                });
                 const kraft = imFokus ? Math.max(staerke[terpen.name] ?? 0, 0.6) : (staerke[terpen.name] ?? 0);
-                // Vorhanden: das Terpen trägt (Stärke > 0) und die Richtung ist aktiv; sonst gestrichelt grau.
-                const vorhanden = imFokus || (achseFarbig(achse) && kraft > 0);
+                const vorhanden = art === "voll" || art === "ergaenzt";
                 const geschmack = GESCHMACKS_ACHSEN[achse].enumWert;
                 const grundfarbe = LINIEN_FARBE[geschmack];
-                const farbe = grundfarbe ?? `url(#${spurId}-${geschmack})`;
+                // Ergänzt: die Farbe des eigenen Eindrucks (Kopierstift), gestrichelt.
+                const farbe = art === "ergaenzt" ? FARBE.lila : (grundfarbe ?? `url(#${spurId}-${geschmack})`);
                 // Ausprägung 0 bis 1: Stärke des Terpens mal Anteil der Note. Schwach = ausgegraut
                 // (entsättigt, blass), stark = satt und mit Glow (Nutzer 2026-09-26).
                 const auspraegung = kraft * (0.4 + 0.6 * notenAnteil);
@@ -454,17 +514,17 @@ export function AromaKarte({
                     <path
                       d={pfad}
                       fill="none"
-                      stroke={vorhanden ? farbe : GRAU}
+                      stroke={vorhanden ? farbe : art === "geistFokus" ? "var(--color-text-muted)" : GRAU}
                       strokeLinecap="round"
-                      strokeDasharray={vorhanden ? undefined : "6 8"}
-                      opacity={(vorhanden ? 0.35 + 0.65 * auspraegung : 0.22) * (gedimmt ? 0.2 : 1)}
+                      strokeDasharray={art === "ergaenzt" ? "6 5" : undefined}
+                      opacity={BOGEN_DECKKRAFT[art](auspraegung) * (gedimmt ? 0.2 : 1)}
                       style={{
-                        strokeWidth: vorhanden ? breite : 0.8,
+                        strokeWidth: art === "voll" ? breite : art === "ergaenzt" ? Math.max(1.5, breite) : art === "geistFokus" ? 1.5 : 0.8,
                         filter:
                           // Nur saturate, kein drop-shadow (2026-09-28, Mobil zu träge): jede
                           // Animation im SVG malt alle Bögen neu, ein Blur je Bogen kostete
                           // dann jeden Frame. Das Leuchten trägt die Ebene .bogen-puls.
-                          vorhanden && bogenFilter ? `saturate(${(0.1 + 0.9 * auspraegung).toFixed(2)})` : "none",
+                          art === "voll" && bogenFilter ? `saturate(${(0.1 + 0.9 * auspraegung).toFixed(2)})` : "none",
                       }}
                       // Unterwegs ohne filter in der Transition: der Filter fällt sofort
                       // weg, statt 250 ms lang auf wandernden Pfaden überzublenden.
@@ -480,18 +540,21 @@ export function AromaKarte({
                         (t = 1) sind sie unsichtbar und laufen dann nicht endlos weiter. */}
                     {vorhanden && !gedimmt && t < 1 ? (
                       <>
-                        <path
-                          d={pfad}
-                          fill="none"
-                          stroke={farbe}
-                          strokeLinecap="round"
-                          className="bogen-puls"
-                          style={
-                            {
-                              "--bogen-breite": `${breite.toFixed(2)}px`,
-                            } as React.CSSProperties
-                          }
-                        />
+                        {/* Voller Puls nur für die Herstellerangabe; ergänzte tragen nur den Lichtpunkt. */}
+                        {art === "voll" ? (
+                          <path
+                            d={pfad}
+                            fill="none"
+                            stroke={farbe}
+                            strokeLinecap="round"
+                            className="bogen-puls"
+                            style={
+                              {
+                                "--bogen-breite": `${breite.toFixed(2)}px`,
+                              } as React.CSSProperties
+                            }
+                          />
+                        ) : null}
                         <path
                           d={pfad}
                           pathLength={100}
@@ -539,22 +602,46 @@ export function AromaKarte({
                 key={begleiter[index].name}
                 cx={punkt.x}
                 cy={punkt.y}
-                r={terpenBetont(begleiter[index].name) ? 7 : 5}
+                r={begleitBetont(begleiter[index].name) ? 7 : 5}
                 fill="none"
-                stroke={terpenBetont(begleiter[index].name) ? "currentColor" : GRAU}
+                stroke={begleitBetont(begleiter[index].name) ? "currentColor" : GRAU}
                 strokeWidth={1.5}
               />
             ))}
-            {/* Knoten wachsen wie die Punkte der Geschmacksachsen, wenn ihr Terpen betont ist. */}
-            {terpenKnoten.map((punkt, index) => (
-              <circle
-                key={terpene[index].name}
-                cx={punkt.x}
-                cy={punkt.y}
-                r={terpenBetont(terpene[index].name) ? 8 : 6}
-                fill={(staerke[terpene[index].name] ?? 0) > 0 || terpenBetont(terpene[index].name) ? "currentColor" : GRAU}
-              />
-            ))}
+            {/* Knoten wachsen wie die Punkte der Geschmacksachsen, wenn ihr Terpen betont ist.
+                Ebenen (T5): Herstellerangabe gefüllt, ergänzt mit gestrichelter Kontur in
+                Kopierstift, Geister klein und grau; so trägt auch die Form die Ebene, nicht nur die Farbe. */}
+            {terpenKnoten.map((punkt, index) => {
+              const name = terpene[index].name;
+              const betont = terpenBetont(name);
+              const ebene = ebeneVon(name);
+              if (ebene === "ergaenzt") {
+                return (
+                  <circle
+                    key={name}
+                    cx={punkt.x}
+                    cy={punkt.y}
+                    r={betont ? 8 : 6}
+                    fill="var(--color-surface)"
+                    stroke={FARBE.lila}
+                    strokeWidth={2}
+                    strokeDasharray="3 2.5"
+                  />
+                );
+              }
+              if (ebene === "geist") {
+                return <circle key={name} cx={punkt.x} cy={punkt.y} r={betont ? 6 : 4} fill={betont ? "currentColor" : GRAU} />;
+              }
+              return (
+                <circle
+                  key={name}
+                  cx={punkt.x}
+                  cy={punkt.y}
+                  r={betont ? 8 : 6}
+                  fill={(staerke[name] ?? 0) > 0 || betont ? "currentColor" : GRAU}
+                />
+              );
+            })}
           </g>
 
           {/* Serien: Balken in der Karte, Flächen im Netz. */}
@@ -651,8 +738,13 @@ export function AromaKarte({
                       opacity={aktiv === index ? 0.9 : 0.35}
                       className="transition-opacity duration-fast"
                     />
+                    {/* Grüner Ring: der Community-Median (T5). Ein Saum in Papierfarbe hebt ihn
+                        von der grünen Spur und den Balken ab. */}
                     {ring !== null ? (
-                      <circle cx={ring} cy={knoten.y} r={11.5} fill="none" stroke={FARBE.gruen} strokeOpacity={0.8} strokeWidth={2} />
+                      <>
+                        <circle cx={ring} cy={knoten.y} r={11.5} fill="none" stroke="var(--color-surface)" strokeWidth={5} />
+                        <circle cx={ring} cy={knoten.y} r={11.5} fill="none" stroke={FARBE.gruen} strokeWidth={2} />
+                      </>
                     ) : null}
                     <circle
                       cx={griff}
@@ -832,7 +924,7 @@ export function AromaKarte({
             onFocus={() => terpenUeberfahren(begleiter[index].name)}
             className={cn(
               "absolute flex -translate-y-1/2 flex-col items-start pl-4 text-left whitespace-nowrap transition-colors duration-normal",
-              terpenBetont(begleiter[index].name) ? "text-text" : "text-text-muted",
+              begleitBetont(begleiter[index].name) ? "text-text" : "text-text-muted",
             )}
             style={{ left: `${(punkt.x / aktBreite) * 100}%`, top: `${(punkt.y / HOEHE) * 100}%`, opacity: kartenSichtbar }}
           >
@@ -858,8 +950,8 @@ export function AromaKarte({
             icon={<GeschmackIcon geschmack={aktiveAchse.enumWert} className={ICON_TITEL} />}
             titel={texte.geschmack[aktiveAchse.enumWert]}
             bezugTitel={lernen ? kt.stecktIn : undefined}
-            bezug={lernen ? tragendeStoffe(aktiv!, lernen).map((name) => (
-              <Pille key={name} icon={<TerpenIcon name={name} className={ICON_PILLE} />}>
+            bezug={lernen ? tragendeStoffe(aktiv!, lernen, ebenen ? ebeneVon : null).map(({ name, ebene }) => (
+              <Pille key={name} ebene={ebene} icon={<TerpenIcon name={name} className={ICON_PILLE} />}>
                 {terpenAnzeige(name, sprache)}
               </Pille>
             )) : []}
@@ -880,6 +972,7 @@ export function AromaKarte({
             art={BEGLEITSTOFFE.some((stoff) => stoff.name === terpenAktiv) ? kt.begleitstoff : kt.terpen}
             icon={<TerpenIcon name={terpenAktiv} className={ICON_TITEL} />}
             titel={terpenAnzeige(terpenAktiv, sprache)}
+            hinweis={ebenenHinweis(terpenAktiv)}
             bezugTitel={kt.traegt}
             bezug={(traeger.get(terpenAktiv) ?? []).map(({ achse }) => (
               <Pille
@@ -893,14 +986,26 @@ export function AromaKarte({
             {satz(terpenAktiv)}
           </InfoTafel>
         ) : (
-          <p
+          <div
             key="hinweis"
-            className="max-w-md pt-8 text-center font-buch text-body text-text-muted italic text-balance transition-opacity duration-normal ease-out starting:opacity-0"
+            className="flex flex-col items-center gap-6 pt-8 transition-opacity duration-normal ease-out starting:opacity-0"
           >
-            {regler
-              ? kt.hinweisRegler
-              : kt.hinweisErkunden}
-          </p>
+            <p className="max-w-md text-center font-buch text-body text-text-muted italic text-balance">
+              {regler ? kt.hinweisRegler : kt.hinweisErkunden}
+            </p>
+            {/* Legende der Ebenen (T5), nur wenn es mehr gibt als die Herstellerangabe: Strich,
+                Strichelung und Farbe wie die Bögen, damit die Ebene nicht nur an der Farbe hängt. */}
+            {[...vorhandeneEbenen].some((ebene) => ebene !== "hersteller") ? (
+              <ul className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-caption text-text-muted">
+                {EBENEN.filter((ebene) => vorhandeneEbenen.has(ebene)).map((ebene) => (
+                  <li key={ebene} className="inline-flex items-center gap-2">
+                    <EbenenMuster ebene={ebene} />
+                    {kt.ebenen[ebene]}
+                  </li>
+                ))}
+              </ul>
+            ) : null}
+          </div>
         )}
       </div>
 
@@ -973,6 +1078,7 @@ function InfoTafel({
   art,
   icon,
   titel,
+  hinweis,
   bezugTitel,
   bezug,
   children,
@@ -980,6 +1086,8 @@ function InfoTafel({
   art: string;
   icon: React.ReactNode;
   titel: string;
+  /** Zusatz unter dem Namen, etwa „laut Hersteller nicht enthalten“ (T5). */
+  hinweis?: string;
   bezugTitel?: string;
   bezug: readonly React.ReactNode[];
   children: React.ReactNode;
@@ -993,6 +1101,7 @@ function InfoTafel({
         </span>
         {titel}
       </p>
+      {hinweis ? <p className="text-caption text-text-muted text-pretty">{hinweis}</p> : null}
       {children ? <p className="max-w-md font-buch text-body text-text-muted italic text-pretty">{children}</p> : null}
       {bezug.length > 0 ? (
         <div className="mt-2 flex flex-col items-center gap-2">
@@ -1004,10 +1113,23 @@ function InfoTafel({
   );
 }
 
-/** Eine Verbindung als ruhige Pille: Icon abgesetzt links, Name rechts. */
-function Pille({ icon, children }: { icon: React.ReactNode; children: React.ReactNode }) {
+/**
+ * Eine Verbindung als ruhige Pille: Icon abgesetzt links, Name rechts. Terpene
+ * tragen ihre Ebene wie die Bögen (T5): ergänzt gestrichelt in Kopierstift,
+ * Geister gedämpft.
+ */
+function Pille({ icon, ebene, children }: { icon: React.ReactNode; ebene?: TerpenEbene; children: React.ReactNode }) {
   return (
-    <li className="inline-flex h-8 items-center gap-2 rounded-full border border-border px-4 text-caption text-text">
+    <li
+      className={cn(
+        "inline-flex h-8 items-center gap-2 rounded-full border px-4 text-caption",
+        ebene === "ergaenzt"
+          ? "border-dashed border-kopierstift text-text"
+          : ebene === "geist"
+            ? "border-border text-text-muted"
+            : "border-border text-text",
+      )}
+    >
       <span aria-hidden="true" className="flex">
         {icon}
       </span>
@@ -1016,15 +1138,45 @@ function Pille({ icon, children }: { icon: React.ReactNode; children: React.Reac
   );
 }
 
-/** Lerneffekt: Terpene und Begleitstoffe, die spürbar auf diese Richtung einzahlen (Anteil ab 20 %). */
-function tragendeStoffe(achse: number, lernen: NonNullable<Props["lernen"]>): string[] {
-  const namen = lernen
+/**
+ * Lerneffekt: Terpene und Begleitstoffe, die spürbar auf diese Richtung einzahlen (Anteil ab 20 %).
+ * Mit Ebenen (T5) stehen die Terpene der Sorte vorn, die Geister danach; Begleitstoffe ohne Ebene.
+ */
+function tragendeStoffe(
+  achse: number,
+  lernen: NonNullable<Props["lernen"]>,
+  ebeneVon: ((name: string) => TerpenEbene) | null,
+): { name: string; ebene?: TerpenEbene }[] {
+  const RANG: Record<TerpenEbene, number> = { hersteller: 0, ergaenzt: 1, geist: 2 };
+  const terpene = lernen
     .filter((terpen) =>
       terpenBoegen({ ...terpen, konzentrationProzent: null, rang: 99 }).some((b) => b.achse === achse && b.anteil >= 0.2),
     )
-    .map((terpen) => terpen.name);
+    .map((terpen) => ({ name: terpen.name, ebene: ebeneVon?.(terpen.name) }))
+    .sort((a, b) => (a.ebene && b.ebene ? RANG[a.ebene] - RANG[b.ebene] : 0));
   const stoffe = BEGLEITSTOFFE.filter((stoff) =>
     begleitBoegen(stoff.noten).some((b) => b.achse === achse && b.anteil >= 0.2),
-  ).map((stoff) => stoff.name);
-  return [...namen, ...stoffe];
+  ).map((stoff) => ({ name: stoff.name }));
+  return [...terpene, ...stoffe];
+}
+
+/** Reihenfolge der Ebenen in der Legende. */
+const EBENEN: readonly TerpenEbene[] = ["hersteller", "ergaenzt", "geist"];
+
+/** Strichmuster einer Ebene in der Legende, wie die Bögen gezeichnet. */
+function EbenenMuster({ ebene }: { ebene: TerpenEbene }) {
+  return (
+    <svg aria-hidden="true" viewBox="0 0 24 8" className="h-2 w-6 shrink-0 overflow-visible text-text">
+      <line
+        x1={2}
+        y1={4}
+        x2={22}
+        y2={4}
+        strokeLinecap="round"
+        stroke={ebene === "hersteller" ? "currentColor" : ebene === "ergaenzt" ? FARBE.lila : GRAU}
+        strokeWidth={ebene === "hersteller" ? 3 : ebene === "ergaenzt" ? 2 : 1}
+        strokeDasharray={ebene === "ergaenzt" ? "4 3" : undefined}
+      />
+    </svg>
+  );
 }

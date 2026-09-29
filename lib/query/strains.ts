@@ -220,8 +220,16 @@ export type StrainDetail = {
   anzahlApothekenVerfuegbar: number;
   chargen: ChargeEintrag[];
   reviews: ReviewEintrag[];
+  /** Community-Mediane (sorten_kennwerte, T3), beim Speichern vorberechnet; null ohne Bewertung. */
+  kennwerte: KennwerteZeile | null;
   aktualisiertAm: Date;
 };
+
+/** Rohzeile aus `sorten_kennwerte`; gelesen wird sie in lib/aromakarte.ts (communityMedian). */
+export type KennwerteZeile = { terpenMedian: string; geschmackMedian: string; anzahl: number };
+
+/** Die Kennwerte werden mit der Sorte gelesen, nicht je Aufruf aus allen Bewertungen berechnet. */
+const KENNWERTE_SELECT = { select: { terpenMedian: true, geschmackMedian: true, anzahl: true } } as const;
 
 // ---------------------------------------------------------------------------
 //  Liste
@@ -593,6 +601,7 @@ export async function ladeStrainDetail(
           charge: { select: { chargenNr: true } },
         },
       },
+      kennwerte: KENNWERTE_SELECT,
     },
   });
 
@@ -675,6 +684,7 @@ export async function ladeStrainDetail(
       chargenNr: review.charge?.chargenNr ?? null,
       erstelltAm: review.erstelltAm,
     })),
+    kennwerte: zeile.kennwerte,
     aktualisiertAm: zeile.aktualisiertAm,
   };
 }
@@ -1073,6 +1083,7 @@ export type AromaVorzeige = {
     geschmack: number;
     konsistenz: number;
   }[];
+  kennwerte: KennwerteZeile | null;
 };
 
 /**
@@ -1119,6 +1130,7 @@ export async function ladeAromaVorzeige(): Promise<AromaVorzeige | null> {
           konsistenz: true,
         },
       },
+      kennwerte: KENNWERTE_SELECT,
     },
   });
   if (!zeile) return null;
@@ -1142,6 +1154,7 @@ export async function ladeAromaVorzeige(): Promise<AromaVorzeige | null> {
       rang: eintrag.rang,
     })),
     reviews: zeile.reviews.map((review) => ({ ...review, feuchtigkeitProzent: zuZahl(review.feuchtigkeitProzent) })),
+    kennwerte: zeile.kennwerte,
   };
 }
 
