@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 
 import { bewertungPruefen } from "@/lib/bewertung-eingabe";
+import { kennwerteFortschreiben } from "@/lib/kennwerte";
 import { getPrisma } from "@/lib/prisma";
 import { freigabeErforderlich } from "@/lib/session";
 import { holeSprache, holeWoerterbuch, type Sprache, type Woerterbuch } from "@/lib/i18n";
@@ -81,22 +82,26 @@ export async function bewertungSpeichern(formData: FormData): Promise<BewertungE
     chargeId = charge.id;
   }
 
-  await prisma.review.create({
-    data: {
-      strainId: strain.id,
-      chargeId,
-      autorId: mitglied.mitgliedId,
-      istRedaktionell: istBetreiber,
-      freigegeben: istBetreiber,
-      ...e.noten,
-      feuchtigkeitProzent: e.feuchtigkeitProzent,
-      geschmacksMatrix: JSON.stringify(e.geschmacksMatrix),
-      terpenIntensitaet: Object.keys(e.terpenIntensitaet).length > 0 ? JSON.stringify(e.terpenIntensitaet) : null,
-      beschaffenheit: Object.keys(e.beschaffenheit).length > 0 ? JSON.stringify(e.beschaffenheit) : null,
-      notiz: e.notiz,
-      instagramReelUrl: istBetreiber ? e.instagramReelUrl : null,
-    },
+  // Eine Bewertung je Mitglied und Sorte: erneutes Speichern ueberschreibt.
+  const daten = {
+    gesamtnote: e.gesamtnote,
+    chargeId,
+    istRedaktionell: istBetreiber,
+    freigegeben: istBetreiber,
+    ...e.noten,
+    feuchtigkeitProzent: e.feuchtigkeitProzent,
+    geschmacksMatrix: JSON.stringify(e.geschmacksMatrix),
+    terpenIntensitaet: Object.keys(e.terpenIntensitaet).length > 0 ? JSON.stringify(e.terpenIntensitaet) : null,
+    beschaffenheit: Object.keys(e.beschaffenheit).length > 0 ? JSON.stringify(e.beschaffenheit) : null,
+    notiz: e.notiz,
+    instagramReelUrl: istBetreiber ? e.instagramReelUrl : null,
+  };
+  await prisma.review.upsert({
+    where: { autorId_strainId: { autorId: mitglied.mitgliedId, strainId: strain.id } },
+    create: { strainId: strain.id, autorId: mitglied.mitgliedId, ...daten },
+    update: daten,
   });
+  await kennwerteFortschreiben(strain.id);
 
   revalidatePath(`/blueten/${strain.slug}`);
   revalidatePath("/");

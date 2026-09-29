@@ -47,7 +47,18 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
   Vorgabe an bei saveData. Zelt/Sprache aus Kopf und Menü entfernt, Kopf-Einrückung weg. Tests 294/294.
   Live per JS geprüft (Leiste 44×176 unten rechts, 4 Knöpfe, Sparmodus pausiert). Screenshot ging nicht
   (Hintergrund-Tab) → Optik vom Nutzer ansehen lassen.
-- **Weiter mit T3** (Datenmodell Bewertung v2), erst Detailplan schreiben.
+- **T3 halb (Session 29, UNCOMMITTED, NICHT pushen vor Migration!):** Code fertig, tsc sauber, Tests 300/300:
+  `lib/bewertung-v2.ts` (+Test: Median, Gesamtnote, Qualitäts-Score, Abweichung, Sortenkennwerte),
+  `lib/kennwerte.ts` (fortschreiben bei Speichern, Admin-Freigabe, Admin-Löschen), Eingabe `gesamtnote` optional
+  (+i18n `bewertung.gesamtnote`), Speichern per upsert auf (autorId, strainId), Prisma-Schema (gesamtnote,
+  @@unique, Modell SortenKennwerte), `migrations/0009_bewertung_v2.sql`, Trigger-Prüfung gesamtnote in
+  db/constraints.sql. Qualität der Charge = bestehende `beschaffenheit` (hängt über charge_id), keine neue Spalte.
+  **Remote-Migration scheiterte:** UNIQUE (autor_id, strain_id) verletzt, es GIBT live doppelte Bewertungen
+  (Vorabprüfung war abgeschnitten). constraints.sql-Import: Authentication error 10000 (`--file` = Import-API;
+  ggf. `wrangler login` neu). Unklar, ob ALTER TABLE gesamtnote schon live ist (prüfen per pragma_table_info).
+  Nächste Schritte: Doppelte auflisten, Nutzer fragen, welche weg (vermutlich Testbewertungen), dann Migration
+  (Befehle einzeln per --command, falls --file weiter Auth-Fehler), dann eslint, commit, push, live prüfen.
+  Shell-Autoprüfung fiel mitten in der Session aus.
 
 ### ⇢ SESSION 27 (2026-09-29) — A6 Mobil begonnen
 

@@ -5,6 +5,7 @@
  */
 import { z } from "zod";
 
+import { gesamtnoteGueltig } from "@/lib/bewertung-v2";
 import {
   BESCHAFFENHEIT_ACHSEN,
   BEWERTUNGS_ACHSEN,
@@ -18,6 +19,8 @@ export const MAX_NOTIZ = 1500;
 export type BewertungEingabe = {
   strainId: string;
   chargenNr: string | null;
+  /** 0,5-5 in halben Schritten, optional (Bewertung v2). */
+  gesamtnote: number | null;
   noten: Record<(typeof BEWERTUNGS_ACHSEN)[number]["key"], number>;
   feuchtigkeitProzent: number | null;
   geschmacksMatrix: GeschmacksMatrix;
@@ -64,6 +67,10 @@ export function bewertungPruefen(formular: Lesbar, terpenNamen: readonly string[
     noten[key] = wert.data;
   }
 
+  const gesamtRoh = text(formular.get("gesamtnote")).replace(",", ".");
+  const gesamtnote = gesamtRoh ? Number(gesamtRoh) : null;
+  if (gesamtnote !== null && !gesamtnoteGueltig(gesamtnote)) return { ok: false, fehler: { schluessel: "bewertung.gesamtnote" } };
+
   const feuchtRoh = text(formular.get("feuchtigkeit")).replace(",", ".");
   let feuchtigkeitProzent: number | null = null;
   if (feuchtRoh) {
@@ -109,6 +116,6 @@ export function bewertungPruefen(formular: Lesbar, terpenNamen: readonly string[
 
   return {
     ok: true,
-    wert: { strainId, chargenNr, noten, feuchtigkeitProzent, geschmacksMatrix, terpenIntensitaet, beschaffenheit, notiz, instagramReelUrl },
+    wert: { strainId, chargenNr, gesamtnote, noten, feuchtigkeitProzent, geschmacksMatrix, terpenIntensitaet, beschaffenheit, notiz, instagramReelUrl },
   };
 }

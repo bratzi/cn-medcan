@@ -745,6 +745,7 @@ export const en: Woerterbuch = {
     "bewertung.note": "{label}: please choose a score from 1 to 5.",
     "bewertung.feuchte": "Please enter residual moisture as a percentage between 0 and 30.",
     "bewertung.halbeSchritte": "{label}: value from 0 to 5 in half steps.",
+    "bewertung.gesamtnote": "Overall score: 0.5 to 5 in half steps.",
     "bewertung.intensitaet": "{label}: choose an intensity from 0 to 5.",
     "bewertung.notizLang": "The note may have at most {max} characters.",
     "bewertung.reelUrl": "Please enter a public Instagram URL (reel or post).",

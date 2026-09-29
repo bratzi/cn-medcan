@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 
 import { adminErforderlich } from "@/lib/session";
+import { kennwerteFortschreiben } from "@/lib/kennwerte";
 import { getPrisma } from "@/lib/prisma";
 import { freigabeEingabePruefen, reviewIdPruefen, rolleEingabePruefen } from "@/lib/admin-eingabe";
 
@@ -92,7 +93,8 @@ export async function bewertungFreigeben(formData: FormData): Promise<AdminErgeb
   if (!slug) return { ok: false, fehler: "Die Bewertung gibt es nicht mehr." };
 
   const prisma = await getPrisma();
-  await prisma.review.update({ where: { id: geprueft.wert }, data: { freigegeben: true } });
+  const review = await prisma.review.update({ where: { id: geprueft.wert }, data: { freigegeben: true }, select: { strainId: true } });
+  await kennwerteFortschreiben(review.strainId);
 
   bewertungPfadeNeuLaden(slug);
   return { ok: true };
@@ -109,7 +111,8 @@ export async function bewertungVerwerfen(formData: FormData): Promise<AdminErgeb
   if (!slug) return { ok: false, fehler: "Die Bewertung gibt es nicht mehr." };
 
   const prisma = await getPrisma();
-  await prisma.review.delete({ where: { id: geprueft.wert } });
+  const review = await prisma.review.delete({ where: { id: geprueft.wert }, select: { strainId: true } });
+  await kennwerteFortschreiben(review.strainId);
 
   bewertungPfadeNeuLaden(slug);
   return { ok: true };

@@ -191,6 +191,7 @@ begin
   select case when NEW.konsistenz not between 1 and 5 then raise(abort, 'reviews.konsistenz ausserhalb 1..5') end;
   select case when NEW.feuchtigkeit_prozent is not null and (NEW.feuchtigkeit_prozent < 0 or NEW.feuchtigkeit_prozent > 100) then raise(abort, 'reviews.feuchtigkeit_prozent ausserhalb 0..100') end;
   select case when json_valid(NEW.geschmacks_matrix) = 0 then raise(abort, 'reviews.geschmacks_matrix ist kein gueltiges JSON') end;
+  select case when NEW.gesamtnote is not null and (NEW.gesamtnote < 0.5 or NEW.gesamtnote > 5 or NEW.gesamtnote * 2 <> cast(NEW.gesamtnote * 2 as integer)) then raise(abort, 'reviews.gesamtnote ausserhalb 0.5..5 in halben Schritten') end;
 end;
 
 drop trigger if exists reviews_update_chk;
@@ -205,6 +206,7 @@ begin
   select case when NEW.konsistenz not between 1 and 5 then raise(abort, 'reviews.konsistenz ausserhalb 1..5') end;
   select case when NEW.feuchtigkeit_prozent is not null and (NEW.feuchtigkeit_prozent < 0 or NEW.feuchtigkeit_prozent > 100) then raise(abort, 'reviews.feuchtigkeit_prozent ausserhalb 0..100') end;
   select case when json_valid(NEW.geschmacks_matrix) = 0 then raise(abort, 'reviews.geschmacks_matrix ist kein gueltiges JSON') end;
+  select case when NEW.gesamtnote is not null and (NEW.gesamtnote < 0.5 or NEW.gesamtnote > 5 or NEW.gesamtnote * 2 <> cast(NEW.gesamtnote * 2 as integer)) then raise(abort, 'reviews.gesamtnote ausserhalb 0.5..5 in halben Schritten') end;
 end;
 
 

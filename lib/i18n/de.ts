@@ -749,6 +749,7 @@ export const de = {
     "bewertung.note": "{label}: bitte eine Note von 1 bis 5 wählen.",
     "bewertung.feuchte": "Restfeuchte bitte als Prozent zwischen 0 und 30 angeben.",
     "bewertung.halbeSchritte": "{label}: Wert von 0 bis 5 in halben Schritten.",
+    "bewertung.gesamtnote": "Gesamtnote: 0,5 bis 5 in halben Schritten.",
     "bewertung.intensitaet": "{label}: Intensität von 0 bis 5 wählen.",
     "bewertung.notizLang": "Die Notiz darf höchstens {max} Zeichen haben.",
     "bewertung.reelUrl": "Bitte eine öffentliche Instagram-URL (Reel oder Beitrag) angeben.",

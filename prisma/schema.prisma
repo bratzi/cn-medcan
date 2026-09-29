@@ -114,6 +114,7 @@ model Strain {
   bestaende PharmacyStock[]
   chargen   Charge[]
   reviews   Review[]
+  kennwerte SortenKennwerte?
 
   umfrageVorschlaege UmfrageVorschlag[]
   umfrageOptionen    UmfrageOption[]
@@ -263,6 +264,9 @@ model Review {
   terpenIntensitaet String? @map("terpen_intensitaet")
   beschaffenheit    String? @map("beschaffenheit")
 
+  /// Gesamtnote 0,5-5 in halben Schritten (Bewertung v2). NULL bei Altbewertungen.
+  gesamtnote Float?
+
   notiz String?
 
   /// Oeffentliche Instagram-Reel-URL zur Bewertung.
@@ -281,8 +285,24 @@ model Review {
   @@index([strainId, freigegeben])
   @@index([chargeId])
   @@index([autorId])
+  @@unique([autorId, strainId])
   @@index([istRedaktionell, erstelltAm])
   @@map("reviews")
+}
+
+/// Community-Kennwerte je Sorte (Bewertung v2), beim Speichern fortgeschrieben.
+/// Mediane als JSON-Text: Terpenname bzw. Geschmacksachse zu Wert.
+model SortenKennwerte {
+  strainId         String   @id @map("strain_id")
+  strain           Strain   @relation(fields: [strainId], references: [id], onDelete: Cascade)
+  terpenMedian     String   @map("terpen_median")
+  geschmackMedian  String   @map("geschmack_median")
+  gesamtnoteMedian Float?   @map("gesamtnote_median")
+  gesamtnoteMittel Float?   @map("gesamtnote_mittel")
+  anzahl           Int
+  aktualisiertAm   DateTime @updatedAt @map("aktualisiert_am")
+
+  @@map("sorten_kennwerte")
 }
 
 // ---------------------------------------------------------------------------
