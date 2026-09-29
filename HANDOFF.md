@@ -62,7 +62,11 @@ sauber, Tests 290/290, zwei Tests an neue Klassen angepasst). Schritt 2 halb: Sk
 62 ergänzt, 16 übersprungen, Stamm 727; import.sql 707 Sorten (20 ohne THC ausgelassen), keine Slug-Kollision
 mit live (einzige Admin-Blüte `420-evolution-33-1-ca-scm` bleibt unberührt). Skript schreibt jetzt CRLF und
 vereinheitlicht Aromen. Neue Blüten haben kein Symbolbild (`hersteller_bild_pfad` NULL).
-Remote-Import nach Nutzerfreigabe ERLEDIGT: live 708 Blüten, alle aktiv. Nächste: live /blueten Stichprobe,
+Remote-Import nach Nutzerfreigabe ERLEDIGT: live 708 Blüten, alle aktiv. Abschluss-Review Teil 2 ERLEDIGT
+`5bb6c41`: Kopf prüft nach Seitenwechsel neu (usePathname), JointCursor-rAF ruht ohne Bewegung (3 s Nachlauf),
+main tabIndex -1 für „Zurück zum Anfang“, Menü-Schließknopf autoFocus. Tote Dateien mit hartem Deutsch
+(TerpenErgaenzen außer Typ KatalogEintrag, Netzdiagramm, BestandTabelle) bleiben wie entschieden.
+Chrome-Erweiterung war nicht verbunden → Live-Prüfung (Schritt 3 + /blueten) steht aus. Nächste: live /blueten Stichprobe,
 dann Schritt 3 (Mobil-Live-Prüfung) und 4 (Abschluss-Review Teil 2).
 
 **⇢ (erledigt bis auf Import) STAND ZUM CLEAR (2026-09-29): Shell war gesperrt (Auto-Mode-Prüfung antwortete nicht), deshalb liegen
