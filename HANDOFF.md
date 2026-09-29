@@ -38,7 +38,16 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
   erlaubt), Zugangsdaten in `.env.local` (TESTNUTZER_EMAIL/PASSWORT), Hash gegen Passwort geprüft.
   Befund: `SITE_PASSWORD` in .env.local passt NICHT zum Live-Secret (/api/zugang → fehler=1), API-Tests per Node
   gehen daher nicht; Browser-MCP nutzen (Achtung: Testnutzer-Login löst Admin-Sitzung ab).
-- **Weiter mit T1** (Videos Pexels 7667290 / 3153124 hell).
+- **T1 ERLEDIGT** `6695edf` + `16971b6`: aussehen-loop = Pexels 7667290 (erstes Storytelling-Video), Hero hell =
+  3153124 (`auftakt-loop-hell`, 6,4 MB), dunkel bleibt 7684711; Umschaltung per `.nur-hell/.nur-dunkel`
+  (display none !important, sonst gewinnt Utility `block`). Live per JS geprüft: je Thema genau ein Hero-Video sichtbar.
+- **T2 ERLEDIGT** `974419d`: `SchalterLeiste` unten rechts senkrecht (Flagge der aktiven Sprache, Zelt, Joint-Zeiger
+  an/aus nur mit feiner Maus, Sparmodus). `lib/einstellungen.ts` (+Test): data-zeiger/data-sparmodus auf <html>,
+  Kopf-Skript, Ereignis; Sparmodus stoppt StoryBuehne (damit Videos, Lenis, GSAP), JointCursor und CSS-Endlosschleifen;
+  Vorgabe an bei saveData. Zelt/Sprache aus Kopf und Menü entfernt, Kopf-Einrückung weg. Tests 294/294.
+  Live per JS geprüft (Leiste 44×176 unten rechts, 4 Knöpfe, Sparmodus pausiert). Screenshot ging nicht
+  (Hintergrund-Tab) → Optik vom Nutzer ansehen lassen.
+- **Weiter mit T3** (Datenmodell Bewertung v2), erst Detailplan schreiben.
 
 ### ⇢ SESSION 27 (2026-09-29) — A6 Mobil begonnen
 
