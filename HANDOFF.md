@@ -3,7 +3,7 @@
 > Übergabemedium zwischen Sessions. Wird nach jedem Arbeitsblock aktualisiert und committet.
 > Wer hier weiterarbeitet, liest diese Datei zuerst und braucht den Chatverlauf nicht.
 
-**Letzte Aktualisierung:** 2026-09-29 (Session 25, Mobil + Review-Fixes)
+**Letzte Aktualisierung:** 2026-09-29 abends (Session 29, T4+T5 per Subagenten, Zwischensicherung)
 **Repo:** https://github.com/bratzi/cn-medcan (public)
 **Branch:** `main` (Makeover „Grünes Buch“ Teilprojekt 1 ist seit 2026-09-24 auf `main`)
 
@@ -27,6 +27,46 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 ---
 
 ## ⇢ Hier geht es weiter
+
+### ⇢ SESSION 29 (2026-09-29 abends): T4–T14 per Subagenten (SDD), Zwischensicherung
+
+**Nutzerauftrag:** „mit Subagenten den gesamten Todo abarbeiten, jeder Agent nutzt die besten Skills; wenn alle
+durch sind live pushen und safe 4 clear.“ Zwischendurch (20:30) „safe 4 clear wenn möglich“ → diese Sicherung.
+
+**Wiedereinstieg (ohne Rückfrage):** Skill `superpowers:subagent-driven-development` laden, dann den Ledger
+`.superpowers/sdd/2026-09-29-buch-bewertung-v2-master/progress.md` lesen (lokal, gitignored, überlebt den Clear).
+Dort stehen Rulings R1–R9, jeder Task-Stand, zurückgestellte Minors. Weiter beim ersten Task ohne
+`Task <N>: complete`. Im selben Ordner: `common.md` (Projektregeln für Agenten), `impl-contract.md`
+(Implementer-Vertrag), `review-contract.md` (Reviewer-Vertrag), `task-<N>-brief.md` für T4–T13 (Masterplan-Text
+plus „Hinweise des Controllers“), Reports `task-<N>-report.md`, Review-Pakete per
+`bash <skill>/scripts/review-package <plan> BASE HEAD`. Dispatch-Muster: Implementer bekommt Brief + common.md +
+impl-contract.md + Report-Pfad; Reviewer bekommt review-contract.md + Brief + Report + Diff-Datei. Modellwahl R7.
+
+**Stand:**
+- **T4 ERLEDIGT** `875d763` + `a660176` (Review sauber): Maske in der Blütenseite (Anker `#bewerten`), vorbelegt mit
+  eigener Bewertung, BlattNote (5 Blätter, halbe Schritte; Touch: ganzes Blatt ≥ 57 px plus −/+ 44 px),
+  „Diese Charge“ mit Sweet Spot, `/bewerten/:slug` → 308 `/blueten/:slug#bewerten`, Aktion jetzt
+  `app/blueten/[slug]/aktionen.ts`.
+- **T5 ERLEDIGT** `12df2e6` + `4fda47d` (Review sauber): Karte mit drei Ebenen (Hersteller, ergänzt, Geist),
+  grüner Ring = Community-Median aus `sorten_kennwerte`, „Deine Nase vs. Community“, TerpenErgaenzen wieder in der
+  Maske (übersetzt).
+- **Live:** T4+T5 mit dieser Sicherung gepusht (ungeprüft live, Build ~13 min). Live-Prüflisten in
+  `task-4-report.md` und `task-5-report.md` (Workspace-Ordner oben).
+- **⚠ Migration 0010 NICHT remote eingespielt:** Das Auto-Mode-Prüfsystem verweigert Claude Produktionszugriffe
+  auf D1 („Production Reads“). Nutzer muss selbst ausführen (PowerShell):
+  `npx.cmd wrangler d1 execute cn-medcan-db --remote --file migrations/0010_kennwerte_nachtragen.sql`
+  (nur INSERT … ON CONFLICT DO NOTHING, idempotent). Ohne sie zeigen Sorten mit Altbewertungen „Noch kein
+  Community-Wert“, nichts bricht. Dasselbe gilt für die kommenden Migrationen aus T8, T9, T11 (0011 ff.):
+  **vor** dem Push, der sie braucht, vom Nutzer einspielen lassen, sonst 500 auf den neuen Tabellen.
+- **T6 lief beim Sichern als Subagent** (Fazit Sorte/Charge). Nach einem Clear ist er tot: `git status` prüfen;
+  uncommittete Änderungen sind ein halber T6-Stand → verwerfen (`git restore .` und neue Dateien löschen) und T6
+  neu dispatchen. Hat er schon committet, Ledger um den Commit ergänzen und Review starten.
+- **Offen danach:** T7–T13 per Subagenten, dann Final-Review (opus), dann ein Push, Live-Prüfung, HANDOFF.
+- **T14 Impressum:** Fragen im Chat gestellt, noch unbeantwortet: Betreiber (Name/Firma, Anschrift, Land),
+  Kontakt (E-Mail + zweiter schneller Weg), Register/USt-IdNr. ja/nein, inhaltlich verantwortlich = dieselbe
+  Person?, Bundesland (Aufsichtsbehörde), Cloudflare über EU-US DPF + DPA eintragen? Hinweis an Nutzer: Repo ist
+  öffentlich, Anschrift landet in der Historie (Alternative: als Secret einlesen).
+- **Mit Nutzer live klären:** R8 (grüner Ring = Community-Median, grüne Balken = Hersteller, gleiche Farbe).
 
 ### ⇢ SESSION 28 (2026-09-29): Masterplan Bewertung v2 (T0–T14)
 
