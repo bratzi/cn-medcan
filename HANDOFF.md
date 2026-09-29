@@ -34,7 +34,12 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 - `f858c9f`: Button `sm` und Karte/Netz-Umschalter per `pointer-coarse:h-11` auf 44 px (Desktop unverändert). Live ausgeliefert (CSS geprüft).
 - Kein Befund: Filterzeilen schon min-h-11; Regler-Inputs pointer-events-none (Fläche drumherum zieht); Achsennamen der Karte aria-hidden, bleiben.
 - Videos: bei saveData oder 2g/3g startet loops.ts nichts (Standbilder), kein ffmpeg zum Verkleinern da.
-- Offen A6: Lenis/GSAP-Last, web-perf, Hell-Modus mobil, Credits-Links im Fuß ERLEDIGT `a4522f3` (pointer-coarse 44 px; live: Klassen und CSS-Regeln von a4522f3 und f858c9f ausgeliefert, echtes Handy nicht getestet), Testblüte freigeben (A2).
+- `14b1e37`: Lenis nur mit feinem Zeiger (Touch scrollt nativ), ScrollTrigger ignoreMobileResize auf Touch.
+- web-perf live (/, warm): TTFB 3,1 s (CPU-Limit Free, Entscheid c), load 4,1 s; 1 MB JS entpackt, Schrift 296 KB
+  (Newsreader normal+kursiv mit opsz, Designentscheid, belassen), Bilder 73 KB. Kein weiterer schneller Hebel.
+- Hell-Modus 390 px: /blueten, /reviews sauber, kein Überlauf. / und /admin/vorschlaege lieferten 08:04 UTC 1102.
+- Offen A6: Hell-Modus Startseite mobil ansehen, Testblüte freigeben (A2), beides wenn der Worker nicht 1102 liefert.
+- Alt-Liste A6: Lenis/GSAP-Last, web-perf, Hell-Modus mobil, Credits-Links im Fuß ERLEDIGT `a4522f3` (pointer-coarse 44 px; live: Klassen und CSS-Regeln von a4522f3 und f858c9f ausgeliefert, echtes Handy nicht getestet), Testblüte freigeben (A2).
 
 ### ⇢ SESSION 25 (2026-09-28/29, läuft) — Nutzerauftrag Mobil vorgezogen
 
