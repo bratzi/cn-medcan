@@ -47,7 +47,12 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
   Vorgabe an bei saveData. Zelt/Sprache aus Kopf und Menü entfernt, Kopf-Einrückung weg. Tests 294/294.
   Live per JS geprüft (Leiste 44×176 unten rechts, 4 Knöpfe, Sparmodus pausiert). Screenshot ging nicht
   (Hintergrund-Tab) → Optik vom Nutzer ansehen lassen.
-- **T3 halb (Session 29, UNCOMMITTED, NICHT pushen vor Migration!):** Code fertig, tsc sauber, Tests 300/300:
+- **T3 ERLEDIGT** `b55b6ad`: Doppelte Betreiber-Bewertung 420-evolution (B, 09:26) auf Nutzerwunsch gelöscht, A
+  bleibt; 0009 und constraints.sql remote eingespielt (mit `npx.cmd`, `--file` ging diesmal). Nutzer hat live
+  bestätigt: Startseite zeigt Notiz A. Tipp: im PowerShell-Fenster des Nutzers blockiert die Execution Policy
+  `npx`, dort `npx.cmd` angeben. Weiter mit **T4**, erst Detailplan schreiben.
+  Alter Stand zur Info:
+- **T3 (alt):** Code fertig, tsc sauber, Tests 300/300:
   `lib/bewertung-v2.ts` (+Test: Median, Gesamtnote, Qualitäts-Score, Abweichung, Sortenkennwerte),
   `lib/kennwerte.ts` (fortschreiben bei Speichern, Admin-Freigabe, Admin-Löschen), Eingabe `gesamtnote` optional
   (+i18n `bewertung.gesamtnote`), Speichern per upsert auf (autorId, strainId), Prisma-Schema (gesamtnote,
