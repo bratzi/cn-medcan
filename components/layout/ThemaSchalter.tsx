@@ -6,8 +6,8 @@ import type { Woerterbuch } from "@/lib/i18n/typen";
 import { THEMA_SCHLUESSEL, anderesThema } from "@/lib/thema";
 
 /**
- * Hell/Dunkel-Schalter als Grow-Zelt (seit 2026-09-25, vorher Lampe), fest
- * oben links: offen mit Licht = hell, zu = dunkel. Welches Symbol steht, entscheidet allein data-theme per
+ * Hell/Dunkel-Schalter als Grow-Zelt (seit 2026-09-25, vorher Lampe), in der
+ * Schalterleiste unten rechts (T2): offen mit Licht = hell, zu = dunkel. Welches Symbol steht, entscheidet allein data-theme per
  * CSS (globals.css .thema-lampe), also ohne React-Zustand und ohne Aufblitzen
  * vor dem Hydrieren. Beim Umschalten sind Übergänge für einen Frame aus, damit
  * die Seite springt statt zu verschmieren (better-ui).
@@ -36,7 +36,7 @@ export function ThemaSchalter({ texte }: { texte: Woerterbuch["kopf"]["thema"] }
   };
 
   return (
-    <button type="button" onClick={wechsle} className="thema-lampe">
+    <button type="button" onClick={wechsle} className="schalter-knopf thema-lampe">
       <span className="sr-only thema-ziel-dunkel">{texte.dunkel}</span>
       <span className="sr-only thema-ziel-hell">{texte.hell}</span>
       {/* Grow-Zelt offen (hell, Nutzer 2026-09-25): Tür hochgerollt, Licht fällt

@@ -35,6 +35,11 @@ export const de = {
       dunkel: "Licht aus, dunkel darstellen",
       hell: "Licht an, hell darstellen",
     },
+    schalter: {
+      leiste: "Darstellung",
+      zeiger: "Joint als Mauszeiger",
+      spar: "Sparmodus: Videos und Animationen anhalten",
+    },
   },
   fuss: {
     schlusszeile: "Wir lesen mit. Wir wählen mit.",

@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
 import { Inspiration, Newsreader } from "next/font/google";
 import { JointCursor } from "@/components/layout/JointCursor";
+import { SchalterLeiste } from "@/components/layout/SchalterLeiste";
 import { Fuss } from "@/components/layout/Fuss";
 import { Kopf } from "@/components/layout/Kopf";
 import { holeSprache, holeWoerterbuch } from "@/lib/i18n";
+import { EINSTELLUNG_SKRIPT } from "@/lib/einstellungen";
 import { THEMA_SKRIPT, THEMA_STANDARD } from "@/lib/thema";
 import "./globals.css";
 
@@ -50,6 +52,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
     >
       <head>
         <script dangerouslySetInnerHTML={{ __html: THEMA_SKRIPT }} />
+        <script dangerouslySetInnerHTML={{ __html: EINSTELLUNG_SKRIPT }} />
       </head>
       <body className="min-h-full flex flex-col">
         <a
@@ -66,6 +69,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
         </main>
 
         <Fuss w={w} />
+        <SchalterLeiste sprache={sprache} w={w} />
         <JointCursor />
       </body>
     </html>

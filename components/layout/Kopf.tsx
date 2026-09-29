@@ -5,9 +5,6 @@ import { Logo } from "@/components/marke/Logo";
 import { KontoZaehler } from "@/components/layout/KontoZaehler";
 import { KopfMenue } from "@/components/layout/KopfMenue";
 import { KopfZustand } from "@/components/layout/KopfZustand";
-import { SprachSchalter } from "@/components/layout/SprachSchalter";
-import { ThemaSchalter } from "@/components/layout/ThemaSchalter";
-import { I18N_OEFFENTLICH } from "@/lib/i18n/schalter";
 import type { Sprache } from "@/lib/i18n/sprache-kern";
 import type { Woerterbuch } from "@/lib/i18n/typen";
 import { HAUPTNAVIGATION, KONTO_LINK } from "@/lib/navigation";
@@ -37,11 +34,8 @@ const AKTIV = "underline decoration-text decoration-2 underline-offset-8";
 /** Das Wort trägt den Stiftstrich; die Nummer ist Dekoration (aria-hidden). */
 const AKTIV_WORT = "kapitel-wort";
 
-// Platz fuer Zelt und Sprachschalter in der Fensterecke, nur ab lg (darunter stehen beide im Menü);
-// breit erst, wenn der Rand neben max-w-360 die Schalter fasst (ab 1700 px).
-const EINRUECKUNG = I18N_OEFFENTLICH
-  ? "pl-2 sm:pl-6 lg:pl-40 min-[1700px]:pl-8"
-  : "pl-2 sm:pl-6 lg:pl-20 min-[1640px]:pl-8";
+// Zelt und Sprache stehen seit T2 in der Schalterleiste unten rechts: keine Einrückung mehr.
+const EINRUECKUNG = "pl-2 sm:pl-6 lg:pl-8";
 
 /** Menüpunkt unter lg: gedruckt, groß, ganze Zeile als Trefferfläche. */
 const MENUE_LINK =
@@ -58,10 +52,6 @@ type Props = {
 export function Kopf({ sprache, w }: Props) {
   return (
     <header data-kopf="" className="kopf fixed inset-x-0 top-0 z-40">
-      {/* Hell/Dunkel fest in der linken oberen Fensterecke, außerhalb des Inhalts
-          (Nutzer 2026-09-25); bis der Rand breit genug ist, rückt der Kopf dafür ein. */}
-      <ThemaSchalter texte={w.kopf.thema} />
-      <SprachSchalter aktuell={sprache} gruppe={w.sprache.gruppe} />
       <div className={`mx-auto grid w-full max-w-360 grid-cols-[1fr_auto_1fr] items-center gap-x-2 py-2 pr-2 sm:pr-6 lg:grid-cols-[auto_1fr_auto] lg:gap-x-4 lg:pr-8 ${EINRUECKUNG}`}>
         {/* Logo statt einzeiliger Wortmarke (Nutzer 2026-09-26): "Book of" klein oben,
             "Terpz" im Fokus, Konturen, Verlauf und Glanz wie im Auftakt. */}
@@ -115,10 +105,6 @@ export function Kopf({ sprache, w }: Props) {
               </li>
             </ul>
           </nav>
-          <div className="flex items-center gap-4 pt-8">
-            <ThemaSchalter texte={w.kopf.thema} />
-            <SprachSchalter aktuell={sprache} gruppe={w.sprache.gruppe} />
-          </div>
         </KopfMenue>
       </div>
       <KopfZustand />

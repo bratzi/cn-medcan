@@ -31,6 +31,11 @@ export const en: Woerterbuch = {
       dunkel: "Lights off, dark mode",
       hell: "Lights on, light mode",
     },
+    schalter: {
+      leiste: "Display",
+      zeiger: "Joint as mouse pointer",
+      spar: "Saver mode: pause videos and animations",
+    },
   },
   fuss: {
     schlusszeile: "We read along. We vote along.",

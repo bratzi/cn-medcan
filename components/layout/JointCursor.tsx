@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useSyncExternalStore } from "react";
 
 import { starteRauch, type RauchMaschine } from "@/components/layout/joint-rauch";
+import { abonniereEinstellungen, aktuellerZeiger, istSparmodus } from "@/lib/einstellungen";
 
 /** Wie lange gehalten, bis die Glut ganz aufgeglüht ist (ms). */
 const GLUEHEN_VOLL_MS = 2500;
@@ -18,13 +19,19 @@ const NACHLAUF_MS = 3000;
  * Glut flackert unregelmäßig (zwei überlagerte Schwingungen), nie im Takt.
  * Nur mit feiner Maus; bei reduzierter Bewegung ohne Spur und Rauch.
  * Folgt dem Zeiger über transform im rAF, ohne React-Renders je Bewegung.
+ * Aus, wenn in der Schalterleiste der normale Zeiger oder der Sparmodus gilt.
  */
 export function JointCursor() {
   const joint = useRef<HTMLDivElement>(null);
+  const an = useSyncExternalStore(
+    abonniereEinstellungen,
+    () => aktuellerZeiger() === "joint" && !istSparmodus(),
+    () => false,
+  );
 
   useEffect(() => {
     const el = joint.current;
-    if (!el || !window.matchMedia("(hover: hover) and (pointer: fine)").matches) return;
+    if (!an || !el || !window.matchMedia("(hover: hover) and (pointer: fine)").matches) return;
     const ruhig = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const wurzel = document.documentElement;
     wurzel.classList.add("joint-cursor");
@@ -119,8 +126,9 @@ export function JointCursor() {
       window.removeEventListener("pointerup", hoch);
       window.removeEventListener("blur", hoch);
       document.removeEventListener("pointerleave", raus);
+      delete el.dataset.sichtbar;
     };
-  }, []);
+  }, [an]);
 
   return (
     <div ref={joint} aria-hidden="true" className="joint-zeiger">

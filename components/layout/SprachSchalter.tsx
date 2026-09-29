@@ -8,32 +8,46 @@ type Props = {
   gruppe: string;
 };
 
+/** Flaggen als kleine, runde Marken; Deutschland und Vereinigtes Königreich (en-GB). */
+function Flagge({ sprache }: { sprache: Sprache }) {
+  if (sprache === "de") {
+    return (
+      <svg aria-hidden="true" viewBox="0 0 24 24" className="flagge">
+        <path d="M0 0h24v8H0z" fill="#1a1a1a" />
+        <path d="M0 8h24v8H0z" fill="#dd0000" />
+        <path d="M0 16h24v8H0z" fill="#ffce00" />
+      </svg>
+    );
+  }
+  return (
+    <svg aria-hidden="true" viewBox="0 0 24 24" className="flagge">
+      <path d="M0 0h24v24H0z" fill="#012169" />
+      <path d="M0 0l24 24M24 0L0 24" stroke="#fff" strokeWidth="4.8" />
+      <path d="M0 0l24 24M24 0L0 24" stroke="#c8102e" strokeWidth="1.6" />
+      <path d="M12 0v24M0 12h24" stroke="#fff" strokeWidth="7" />
+      <path d="M12 0v24M0 12h24" stroke="#c8102e" strokeWidth="4" />
+    </svg>
+  );
+}
+
 /**
- * DE/EN neben dem Grow-Zelt (Spec 4.3). Keine Flaggen: Flaggen zeigen Laender,
- * nicht Sprachen. Jeder Knopf nennt seine Sprache in ihr selbst (lang).
- * Formular statt onClick: geht ohne JS und vor dem Hydrieren.
- * Schmal (unter sm) steht nur die andere Sprache da, damit Logo und Konto Platz
- * behalten; die gewaehlte Sprache zeigt dort <html lang> und die Seite selbst.
+ * Sprache in der Schalterleiste (T2, Nutzer 2026-09-29): ein Knopf, der die
+ * Flagge der aktiven Sprache zeigt und zur anderen wechselt. Der zugängliche
+ * Name ist das Ziel, in seiner eigenen Sprache (lang). Formular statt onClick:
+ * geht ohne JS und vor dem Hydrieren.
  * Sichtbar, solange I18N_OEFFENTLICH gilt (lib/i18n/schalter.ts).
  */
 export function SprachSchalter({ aktuell, gruppe }: Props) {
   if (!I18N_OEFFENTLICH) return null;
+  const ziel = SPRACHEN.find((sprache) => sprache !== aktuell) ?? aktuell;
   return (
-    <form action={spracheSetzen} className="sprach-schalter" aria-label={gruppe}>
-      {SPRACHEN.map((sprache) => (
-        <button
-          key={sprache}
-          type="submit"
-          name="sprache"
-          value={sprache}
-          lang={sprache}
-          aria-pressed={sprache === aktuell}
-          className="inline-flex h-11 min-w-11 items-center justify-center rounded-full px-2 font-sans text-[0.75rem] font-medium uppercase tracking-gesperrt aria-pressed:underline aria-pressed:decoration-2 aria-pressed:underline-offset-4 max-sm:aria-pressed:hidden"
-        >
-          <span aria-hidden="true">{sprache.toUpperCase()}</span>
-          <span className="sr-only">{SPRACH_NAMEN[sprache]}</span>
-        </button>
-      ))}
+    <form action={spracheSetzen} aria-label={gruppe}>
+      <button type="submit" name="sprache" value={ziel} className="schalter-knopf" title={SPRACH_NAMEN[ziel]}>
+        <Flagge sprache={aktuell} />
+        <span className="sr-only" lang={ziel}>
+          {SPRACH_NAMEN[ziel]}
+        </span>
+      </button>
     </form>
   );
 }

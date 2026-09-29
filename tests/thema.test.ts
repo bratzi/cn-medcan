@@ -46,7 +46,10 @@ test("Layout: startet hell, Skript im head, DOM gewinnt beim Hydrieren", () => {
   const layout = lies("app/layout.tsx");
   assert.match(layout, /data-theme=\{THEMA_STANDARD\}/);
   assert.match(layout, /suppressHydrationWarning/);
-  assert.match(layout, /<head>\s*<script dangerouslySetInnerHTML=\{\{ __html: THEMA_SKRIPT \}\} \/>\s*<\/head>/);
+  assert.match(
+    layout,
+    /<head>\s*<script dangerouslySetInnerHTML=\{\{ __html: THEMA_SKRIPT \}\} \/>\s*<script dangerouslySetInnerHTML=\{\{ __html: EINSTELLUNG_SKRIPT \}\} \/>\s*<\/head>/,
+  );
 });
 
 test("Schalter: eine Lampe, der zugängliche Name nennt das Ziel, per CSS ohne Aufblitzen", async () => {
@@ -59,7 +62,8 @@ test("Schalter: eine Lampe, der zugängliche Name nennt das Ziel, per CSS ohne A
   assert.match(css, /:root\[data-theme="dark"\] \.thema-ziel-dunkel,\s*:root:not\(\[data-theme="dark"\]\) \.thema-ziel-hell \{\s*display: none;/);
 });
 
-test("Schalter sitzt im Kopf oben links, nicht mehr fest im Layout (Nutzer 2026-09-25)", () => {
-  assert.doesNotMatch(lies("app/layout.tsx"), /ThemaSchalter/);
-  assert.match(lies("components/layout/Kopf.tsx"), /<ThemaSchalter texte=\{w\.kopf\.thema\} \/>/);
+test("Schalter sitzt in der Leiste unten rechts, nicht mehr im Kopf (Nutzer 2026-09-29)", () => {
+  assert.doesNotMatch(lies("components/layout/Kopf.tsx"), /ThemaSchalter|SprachSchalter/);
+  assert.match(lies("components/layout/SchalterLeiste.tsx"), /<ThemaSchalter texte=\{w\.kopf\.thema\} \/>/);
+  assert.match(lies("app/layout.tsx"), /<SchalterLeiste sprache=\{sprache\} w=\{w\} \/>/);
 });
