@@ -1,7 +1,8 @@
 import type { CSSProperties } from "react";
 
 /** Schriftgrad des Worts; die Überschrift reserviert darunter etwas Platz danach. */
-export const UEBERLAUF_GRAD = "clamp(3.5rem, 1rem + 12vw, 16rem)";
+// Schmal kleiner (Nutzer 2026-09-29): bei 390 px rund 50 px, damit das Wort ins Bild passt.
+export const UEBERLAUF_GRAD = "clamp(2.5rem, 0.25rem + 12vw, 16rem)";
 
 /** Etwas Platz unter dem Satz für den Versatz nach unten. */
 export const ueberlaufPlatz: CSSProperties = {

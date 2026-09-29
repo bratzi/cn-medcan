@@ -32,7 +32,7 @@ export function KopfMenue({ texte, children }: Props) {
 
   return (
     <>
-      <button type="button" popoverTarget={MENUE_ID} className="kopf-menue-knopf lg:hidden">
+      <button type="button" popoverTarget={MENUE_ID} className="kopf-menue-knopf col-start-1 row-start-1 justify-self-start lg:hidden">
         <span className="sr-only">{texte.oeffnen}</span>
         <svg aria-hidden="true" viewBox="0 0 24 24">
           <path d="M4 7h16M4 12h16M4 17h10" />

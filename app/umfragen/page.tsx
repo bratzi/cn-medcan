@@ -88,7 +88,7 @@ async function UmfragenInhalt({ w, sprache }: { w: Woerterbuch; sprache: Sprache
       <section aria-labelledby="runde-titel" className="flex flex-col gap-8">
         {umfrage ? (
           <>
-            <h2 id="runde-titel" className={cn(HAND_TITEL, "self-start")}>
+            <h2 id="runde-titel" className={cn(HAND_TITEL, "self-start max-md:self-center")}>
               {umfrage.phase === "VORSCHLAG" ? texte.schlagVor : texte.stimmAb}
             </h2>
             <UmfrageKarte umfrage={umfrage} zustand={zustand} ort="umfragen" w={w} sprache={sprache} />
@@ -108,12 +108,12 @@ async function UmfragenInhalt({ w, sprache }: { w: Woerterbuch; sprache: Sprache
 
       {umfrage ? (
         <section id="vorschlaege" aria-labelledby="vorschlaege-titel" className="flex scroll-mt-8 flex-col gap-8">
-          <h2 id="vorschlaege-titel" className={cn(HAND_TITEL, "self-start")}>
+          <h2 id="vorschlaege-titel" className={cn(HAND_TITEL, "self-start max-md:self-center")}>
             {texte.eureVorschlaege}
           </h2>
 
           {darfVorschlagen ? (
-            <Blatt className="max-w-3xl">
+            <Blatt className="max-w-3xl text-left max-md:mx-auto">
               <h3 className="text-h3 text-text">{texte.deinVorschlag}</h3>
               <div className="mt-6">
                 <VorschlagFormular
@@ -126,7 +126,7 @@ async function UmfragenInhalt({ w, sprache }: { w: Woerterbuch; sprache: Sprache
           ) : null}
 
           {umfrage.phase === "VORSCHLAG" && !mitglied ? (
-            <div className="flex flex-wrap items-center gap-4">
+            <div className="flex flex-wrap items-center gap-4 max-md:justify-center">
               <p className="text-body text-text-muted">
                 {texte.vorschlagenAnonym}
               </p>
@@ -146,7 +146,7 @@ async function UmfragenInhalt({ w, sprache }: { w: Woerterbuch; sprache: Sprache
             <ul className="flex flex-col divide-y divide-border">
               {vorschlaege.map((vorschlag) => (
                 <li key={vorschlag.id} className="flex flex-col gap-2 py-6">
-                  <div className="flex flex-wrap items-baseline justify-between gap-4">
+                  <div className="flex flex-wrap items-baseline justify-between gap-4 max-md:justify-center">
                     <Link
                       href={`/blueten/${vorschlag.slug}`}
                       className={namenLinkKlassen("min-w-0 font-buch text-h2 font-medium wrap-break-word")}
@@ -163,7 +163,7 @@ async function UmfragenInhalt({ w, sprache }: { w: Woerterbuch; sprache: Sprache
                     {t(texte.von, { name: vorschlag.vonAnzeigename, datum: formatiereDatum(vorschlag.erstelltAm, sprache) })}
                   </p>
                   {vorschlag.begruendung ? (
-                    <p className="max-w-[68ch] text-body text-text">{vorschlag.begruendung}</p>
+                    <p className="max-w-[68ch] text-body text-text max-md:mx-auto">{vorschlag.begruendung}</p>
                   ) : null}
                 </li>
               ))}
@@ -195,7 +195,7 @@ export default async function UmfragenPage() {
   return (
     <>
       <Seitenkopf titel={w.umfrage.titel} satz={w.umfrage.satz} />
-      <div className={cn(seitenRahmen(), "pt-12 pb-24 sm:pt-16")}>
+      <div className={cn(seitenRahmen(), "pt-12 pb-24 max-md:text-center sm:pt-16")}>
         {/* Bewusst ohne Suspense-Grenze: der Inhalt steht im ersten HTML, damit er ohne JavaScript lesbar ist und Sprungziele (#eintrag-…) existieren. */}
         <UmfragenInhalt w={w} sprache={sprache} />
       </div>

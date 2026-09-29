@@ -22,7 +22,7 @@ import { HAUPTNAVIGATION, KONTO_LINK } from "@/lib/navigation";
  * Seite dynamisch. /mitglied leitet ohne Anmeldung selbst auf /anmelden weiter.
  *
  * Bis lg (Nutzer 2026-09-27, vorher eine wischbare Leiste): eine Zeile mit
- * Logo, Konto als Symbol und dem Menüknopf; Navigation, Zelt und Sprache
+ * Menüknopf links, Logo mittig und Konto als Symbol rechts; Navigation, Zelt und Sprache
  * stehen im Aufklappmenü (KopfMenue). Einzeilig mit allen Punkten erst ab lg:
  * die Zeile braucht rund 940 px (Punkte, Wortmarke, Konto, Abstände).
  */
@@ -62,10 +62,10 @@ export function Kopf({ sprache, w }: Props) {
           (Nutzer 2026-09-25); bis der Rand breit genug ist, rückt der Kopf dafür ein. */}
       <ThemaSchalter texte={w.kopf.thema} />
       <SprachSchalter aktuell={sprache} gruppe={w.sprache.gruppe} />
-      <div className={`mx-auto grid w-full max-w-360 grid-cols-[1fr_auto_auto] items-center gap-x-2 py-2 pr-4 sm:pr-8 lg:grid-cols-[auto_1fr_auto] lg:gap-x-4 ${EINRUECKUNG}`}>
+      <div className={`mx-auto grid w-full max-w-360 grid-cols-[1fr_auto_1fr] items-center gap-x-2 py-2 pr-2 sm:pr-6 lg:grid-cols-[auto_1fr_auto] lg:gap-x-4 lg:pr-8 ${EINRUECKUNG}`}>
         {/* Logo statt einzeiliger Wortmarke (Nutzer 2026-09-26): "Book of" klein oben,
             "Terpz" im Fokus, Konturen, Verlauf und Glanz wie im Auftakt. */}
-        <Link href="/" className="inline-flex min-h-11 items-center justify-self-start px-2 py-1">
+        <Link href="/" className="col-start-2 row-start-1 inline-flex min-h-11 items-center justify-self-center px-2 py-1 lg:col-start-1 lg:justify-self-start">
           <Logo className="text-marke" />
         </Link>
 
@@ -86,7 +86,7 @@ export function Kopf({ sprache, w }: Props) {
 
         <NavLink
           href={KONTO_LINK.href}
-          className="konto-pille relative inline-flex size-11 items-center justify-center rounded-full font-sans text-[0.75rem] font-medium uppercase tracking-gesperrt text-text lg:w-auto lg:px-5"
+          className="konto-pille relative col-start-3 row-start-1 inline-flex size-11 justify-self-end items-center justify-center rounded-full font-sans text-[0.75rem] font-medium uppercase tracking-gesperrt text-text lg:w-auto lg:px-5"
           aktivKlasse={AKTIV}
         >
           <span className="max-lg:sr-only">{w.kopf.navigation[KONTO_LINK.schluessel]}</span>

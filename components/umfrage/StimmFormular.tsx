@@ -66,7 +66,7 @@ export function StimmFormular({ umfrageId, optionen, texte }: Props) {
               {/* py-2/px-4 halten das Ziel bei 44px Mindesthoehe. */}
               <label
                 htmlFor={`stimme-${option.id}`}
-                className="flex min-h-11 cursor-pointer items-center gap-2 rounded-md border border-border-strong bg-surface-raised px-4 py-2 text-body text-text transition-colors duration-fast ease-standard hover:bg-surface-sunken has-[:checked]:border-accent"
+                className="flex min-h-11 cursor-pointer items-center gap-2 max-md:justify-center rounded-md border border-border-strong bg-surface-raised px-4 py-2 text-body text-text transition-colors duration-fast ease-standard hover:bg-surface-sunken has-[:checked]:border-accent"
               >
                 <input
                   id={`stimme-${option.id}`}

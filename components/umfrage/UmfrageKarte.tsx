@@ -68,7 +68,7 @@ function Aktionsbereich({
       return <p className="text-small text-text-muted">{w.meldung["umfrage.keineVorschlaege"]}</p>;
     }
     return (
-      <div className="flex flex-wrap items-center gap-4">
+      <div className="flex flex-wrap items-center gap-4 max-md:justify-center">
         <p className="text-small text-text-muted">
           {texte.vorschlagsphase}
         </p>
@@ -82,7 +82,7 @@ function Aktionsbereich({
   // Ab hier: ABSTIMMUNG.
   if (zustand.art === "ANONYM") {
     return (
-      <div className="flex flex-wrap items-center gap-4">
+      <div className="flex flex-wrap items-center gap-4 max-md:justify-center">
         <p className="text-small text-text-muted">
           {texte.anonym}
         </p>
@@ -95,7 +95,7 @@ function Aktionsbereich({
 
   if (zustand.art === "FREIGABE_OFFEN") {
     return (
-      <div className="flex flex-wrap items-center gap-2">
+      <div className="flex flex-wrap items-center gap-2 max-md:justify-center">
         <Badge variante="warning">{texte.nichtFreigeschaltet}</Badge>
         <p className="text-small text-text-muted">{texte.freigabe}</p>
       </div>
@@ -138,8 +138,8 @@ export function UmfrageKarte({ umfrage, zustand, className, ort = "startseite", 
   const fristLabel = umfrage.phase === "VORSCHLAG" ? texte.fristVorschlag : texte.fristAbstimmung;
 
   return (
-    <div className={cn("stimmzettel border border-border-strong bg-surface-raised shadow-md", className)}>
-      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-border px-6 py-4">
+    <div className={cn("stimmzettel border border-border-strong bg-surface-raised shadow-md max-md:text-center", className)}>
+      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-border px-6 py-4 max-md:justify-center">
         <Badge variante="accent">{phasenLabel(w, umfrage.phase)}</Badge>
         {frist && umfrage.phase !== "BEENDET" ? (
           <p className="text-small text-text-muted">
@@ -153,9 +153,9 @@ export function UmfrageKarte({ umfrage, zustand, className, ort = "startseite", 
       </div>
 
       <div className="px-6 py-6">
-        <h3 className="max-w-[68ch] text-h2 text-text">{umfrage.titel}</h3>
+        <h3 className="max-w-[68ch] text-h2 text-text max-md:mx-auto">{umfrage.titel}</h3>
         {umfrage.beschreibung ? (
-          <p className="mt-4 max-w-[68ch] text-body text-text-muted">{umfrage.beschreibung}</p>
+          <p className="mt-4 max-w-[68ch] text-body text-text-muted max-md:mx-auto">{umfrage.beschreibung}</p>
         ) : null}
 
         <ul className="mt-8 flex flex-col">

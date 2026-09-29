@@ -42,7 +42,7 @@ function stimmenText(stimmen: number, texte: KandidatProps["texte"], sprache: Sp
 export function Kandidat({ option, gesamt, gewaehlt, zeigeStimmen, texte, sprache }: KandidatProps) {
   return (
     <li className="border-t border-border py-4 first:border-t-0 first:pt-0">
-      <div className="flex flex-wrap items-baseline justify-between gap-2">
+      <div className="flex flex-wrap items-baseline justify-between gap-2 max-md:justify-center">
         <span className="flex min-w-0 items-baseline gap-2">
           {gewaehlt ? (
             <span aria-hidden="true" data-story="vermerk" className={VERMERK}>

@@ -29,7 +29,7 @@ export function Fuss({ w }: { w: Woerterbuch }) {
         {/* Vorgelesen wird nur die sr-only-Fassung: die sichtbaren Ebenen teilt
             die StoryBuehne in Wörter, und ein aria-label auf einem span lesen
             Screenreader nicht zuverlässig vor. */}
-        <p data-story="schluss" className="schlusszeile font-buch text-titel font-medium text-text">
+        <p data-story="schluss" className="schlusszeile font-buch text-titel font-medium text-text max-md:text-center">
           <span className="sr-only">{w.fuss.schlusszeile}</span>
           <span aria-hidden="true" className="schlusszeile-kontur">
             {w.fuss.schlusszeile}
@@ -41,7 +41,7 @@ export function Fuss({ w }: { w: Woerterbuch }) {
       </div>
 
       <div className="mx-auto grid w-full max-w-360 grid-cols-1 gap-12 px-4 pt-16 pb-24 sm:px-8 md:grid-cols-[1fr_1.4fr_1fr] md:items-start">
-        <div className="flex flex-col items-start gap-6">
+        <div className="flex flex-col items-start gap-6 max-md:items-center max-md:text-center">
           <Unterzeile className="text-text-muted" />
           {/* Zurückhaltend in der normalen Schrift und klein (Nutzer 2026-09-26). */}
           <a href="#inhalt" className="inline-flex min-h-11 items-center text-small whitespace-nowrap text-text-muted transition-colors duration-fast hover:text-text">
@@ -49,7 +49,7 @@ export function Fuss({ w }: { w: Woerterbuch }) {
           </a>
         </div>
 
-        <nav aria-label={w.fuss.navigation}>
+        <nav aria-label={w.fuss.navigation} className="max-md:text-center">
           <p className="mb-4 text-caption uppercase tracking-gesperrt text-text-muted">{w.fuss.inhalt}</p>
           <ol className="flex flex-col gap-1">
             {LINKS.map((link, index) => (
@@ -65,8 +65,8 @@ export function Fuss({ w }: { w: Woerterbuch }) {
           </ol>
         </nav>
 
-        <div className="flex flex-col items-start gap-6">
-          <p className="max-w-[40ch] border-l-2 border-border-strong pl-4 text-caption text-text-muted text-pretty">
+        <div className="flex flex-col items-start gap-6 max-md:items-center max-md:text-center">
+          <p className="max-w-[40ch] border-l-2 border-border-strong pl-4 max-md:border-l-0 max-md:pl-0 text-caption text-text-muted text-pretty">
             {w.fuss.hinweis}
           </p>
           {/* Bildnachweise nach oben in die Spalte (Nutzer 2026-09-26): keine eigene Zeile
@@ -89,7 +89,7 @@ export function Fuss({ w }: { w: Woerterbuch }) {
           </details>
           {/* Pflichtlinks: ohne Passwort erreichbar (proxy.ts), klein wie die Bildnachweise. */}
           <nav aria-label={w.fuss.rechtliches}>
-            <ul className="flex flex-wrap gap-x-6">
+            <ul className="flex flex-wrap gap-x-6 max-md:justify-center">
               {RECHTLICHE_LINKS.map((link) => (
                 <li key={link.href}>
                   <Link

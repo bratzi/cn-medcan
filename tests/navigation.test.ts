@@ -38,7 +38,7 @@ test("Kopf: Leiste erst ab lg, darunter Menüknopf mit Popover und Konto als Sym
   assert.match(html, /lg:grid-cols-\[auto_1fr_auto]/);
   const leiste = html.match(/<nav aria-label="Hauptnavigation" class="([^"]*)"/)?.[1] ?? "";
   assert.match(leiste, /(^| )max-lg:hidden( |$)/);
-  assert.match(html, /<button type="button" popoverTarget="kopf-menue" class="kopf-menue-knopf lg:hidden">/i);
+  assert.match(html, /<button type="button" popoverTarget="kopf-menue" class="kopf-menue-knopf [^"]*lg:hidden">/i);
   assert.match(html, /<div id="kopf-menue" popover="auto"/);
   assert.match(html, /Menü öffnen/);
   assert.match(html, /class="max-lg:sr-only">Mein Konto/);

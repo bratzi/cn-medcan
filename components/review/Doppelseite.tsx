@@ -163,9 +163,9 @@ export function Doppelseite({ eintrag, umfang, ueberschrift: Ueberschrift, story
         </dl>
 
         {voll ? (
-          <div className="flex flex-col items-start gap-2">
+          <div className="flex flex-col items-start gap-2 max-md:items-center">
             <Badge variante={FEUCHTIGKEIT[feuchtigkeit.einordnung]}>{feuchtigkeitsText}</Badge>
-            <p className="max-w-[56ch] text-small text-text-muted">{w.schema.feuchte[FEUCHTE_HINWEIS[feuchtigkeit.einordnung]]}</p>
+            <p className="max-w-[56ch] text-small text-text-muted max-md:mx-auto">{w.schema.feuchte[FEUCHTE_HINWEIS[feuchtigkeit.einordnung]]}</p>
           </div>
         ) : null}
       </div>

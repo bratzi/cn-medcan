@@ -144,7 +144,7 @@ test("Das x hängt an derselben Bedingung wie die Zähler: nie in der Vorschlags
 test("/umfragen: Community-Überschriften von Hand, ohne Nebel und ohne Drehung", () => {
   const quelle = lies("app/umfragen/page.tsx");
   assert.match(quelle, /const HAND_TITEL = "font-hand text-notiz text-kopierstift";/);
-  assert.equal(quelle.match(/className=\{cn\(HAND_TITEL, "self-start"\)\}/g)?.length, 2);
+  assert.equal(quelle.match(/className=\{cn\(HAND_TITEL, "self-start max-md:self-center"\)\}/g)?.length, 2);
   assert.doesNotMatch(quelle, /Textur|font-wand|WAND_TITEL|rotate/);
 });
 

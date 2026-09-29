@@ -77,7 +77,14 @@ export async function AromaSektion() {
           className="relative isolate max-w-4xl font-buch text-kapitel text-text text-balance max-md:mx-auto max-md:text-center"
           style={ueberlaufPlatz}
         >
-          {texte.titel} <UeberlaufWort wort={texte.ueberlauf} />
+          {texte.titel}{" "}
+          {/* Schmal eigene Zeile unter dem Satz (Nutzer 2026-09-29: ragte rechts aus dem Bild). */}
+          <span className="max-md:hidden">
+            <UeberlaufWort wort={texte.ueberlauf} />
+          </span>
+          <span className="md:hidden">
+            <UeberlaufWort wort={texte.ueberlauf} absatz />
+          </span>
         </h2>
         <p className="mt-6 max-w-[60ch] text-body text-text-muted text-pretty max-md:mx-auto max-md:text-center">
           {texte.text}

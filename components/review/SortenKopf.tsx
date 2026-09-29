@@ -45,14 +45,14 @@ export function SortenKopf(props: SortenKopfProps) {
       className="grid grid-cols-1 items-center gap-12 border-b-2 border-border-strong pb-16 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-24"
     >
       {bildId ? (
-        <figure className="flex w-full max-w-lg flex-col items-start gap-2 justify-self-center">
+        <figure className="flex w-full max-w-lg flex-col items-start gap-2 justify-self-center max-lg:items-center">
           <Bild id={bildId} dekorativ sizes="(min-width: 1024px) 40vw, 90vw" className="aspect-square w-full object-contain" />
           <figcaption className="text-caption text-text-muted">{texte.symbolbild}</figcaption>
         </figure>
       ) : null}
 
       <div className="flex min-w-0 flex-col gap-8">
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-4 max-lg:items-center max-lg:text-center">
           <p className="text-small uppercase tracking-wide text-text-muted">{texte.dasBewertenWir}</p>
           {/* Logoschrift im Farbverlauf wie die Schlagworte (Nutzer 2026-09-25). Bewusste
               Nutzerausnahme zu Leitplanke 4 (Handelsnamen gedruckt); am 2026-09-26 bestätigt
@@ -76,7 +76,7 @@ export function SortenKopf(props: SortenKopfProps) {
             <span className="whitespace-nowrap">{`CBD ${formatiereProzentSpanne(props.cbdMin, props.cbdMax, 1, props.sprache)}`}</span>
           </p>
           {fakten.length > 0 ? (
-            <dl className="flex flex-wrap gap-x-8 gap-y-2 text-small">
+            <dl className="flex flex-wrap gap-x-8 gap-y-2 text-small max-lg:justify-center">
               {fakten.map((fakt) => (
                 <div key={fakt.label} className="flex gap-2">
                   <dt className="text-text-muted">{fakt.label}</dt>
@@ -131,7 +131,7 @@ export function KartenBild({ bildPfad, symbolbild }: { bildPfad: string | null; 
   const bildId = blueteBild(bildPfad);
   if (!bildId) return null;
   return (
-    <figure className="flex flex-col items-start gap-1">
+    <figure className="flex flex-col items-start gap-1 max-lg:items-center">
       <div className="relative w-full">
         <Bild id={bildId} dekorativ sizes="(min-width: 1024px) 40vw, 90vw" className="h-auto w-full object-contain" />
       </div>

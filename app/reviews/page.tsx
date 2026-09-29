@@ -68,7 +68,7 @@ export default async function ReviewsPage() {
         titel={w.reviews.titel}
         satz={w.reviews.satz}
       />
-      <div className={cn(seitenRahmen(), "pt-12 pb-24 sm:pt-16")}>
+      <div className={cn(seitenRahmen(), "pt-12 pb-24 max-md:text-center sm:pt-16")}>
         {/* Bewusst ohne Suspense-Grenze: der Inhalt steht im ersten HTML, damit er ohne JavaScript lesbar ist und Sprungziele (#eintrag-…) existieren. */}
         <ReviewsInhalt />
       </div>
