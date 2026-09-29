@@ -354,7 +354,7 @@ export function AromaKarte({
                 e.currentTarget.parentElement?.querySelectorAll<HTMLButtonElement>('[role="radio"]')[ziel]?.focus();
               }}
               className={cn(
-                "inline-flex h-9 items-center rounded-full px-4 text-small font-medium",
+                "inline-flex h-9 items-center rounded-full px-4 text-small font-medium pointer-coarse:h-11",
                 "transition-[color,background-color,scale] duration-[var(--duration-fast),var(--duration-fast),120ms] ease-[cubic-bezier(0.23,1,0.32,1)] motion-safe:active:scale-[0.97]",
                 ansicht === wahl ? "bg-accent text-accent-fg" : "text-text hover:text-accent-hover",
               )}

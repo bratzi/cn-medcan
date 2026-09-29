@@ -23,7 +23,7 @@ const VARIANTEN: Record<ButtonVariante, string> = {
 const GROESSEN: Record<ButtonGroesse, string> = {
   lg: "h-14 px-10 text-h3",
   md: "h-11 px-6 text-body",
-  sm: "h-9 px-4 text-small",
+  sm: "h-9 px-4 text-small pointer-coarse:h-11",
 };
 
 /** Damit ein `<Link>` denselben Look bekommt, ohne `asChild`-Magie. */
