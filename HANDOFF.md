@@ -51,9 +51,37 @@ Wochenlimit war am 27.09. erschöpft (Agents brachen ab), seit 28.09. 23 Uhr wie
   `abgleich.py` im Scratchpad der Session, ggf. neu schreiben): 587 Sorten, 55 Hersteller, keine IDs/PZN/Preise.
   Nutzbar: Hersteller, Kultivar, THC/CBD, Anbauland (füllt 17), Terpene nur als Rang (füllt 34), Aromen (74).
   **Nicht nutzbar (HWG):** `effect`, `medicaleffect`. Abgleich über Hersteller+Kultivar (+THC ±2): ~85 von 307
-  unserer Sorten; 467 ohne Treffer. **Wartet auf Nutzer:** Herkunft der Datei (vermutlich Scrape eines
-  Strain-Finders, Datenbankschutz §87a UrhG) und Freigabe, nur leere Felder zu füllen. Danach Skript unter
-  `scripts/stamm/`, Hersteller-Aliasliste, Quelle je Produkt vermerken, sql-erzeugen.py.
+  unserer Sorten; 467 ohne Treffer. **Nutzerentscheid 2026-09-29:** Datei hat der Nutzer selbst mühsam
+  zusammengetragen (Herkunft geklärt); **neue Blüten daraus anlegen**, soweit Angaben da sind. 1.json selbst NICHT
+  committen (Repo ist öffentlich), nur das Ergebnis im Produktstamm.
+  **Skript geschrieben, noch NIE gelaufen:** `scripts/stamm/sammlung-einlesen.py` (neu anlegen, bei Vorhandenen
+  nur leere Felder, effect/medicaleffect nie gelesen, BfArM nicht als Hersteller, Quelle in `quellen`).
+
+**⇢ STAND 2026-09-29 später (Session 26):** Schritt 1 erledigt: Mobil-Zentrierung `a2a9df2` gepusht (tsc/eslint
+sauber, Tests 290/290, zwei Tests an neue Klassen angepasst). Schritt 2 halb: Skript lief, `1f64b04`: 420 neu,
+62 ergänzt, 16 übersprungen, Stamm 727; import.sql 707 Sorten (20 ohne THC ausgelassen), keine Slug-Kollision
+mit live (einzige Admin-Blüte `420-evolution-33-1-ca-scm` bleibt unberührt). Skript schreibt jetzt CRLF und
+vereinheitlicht Aromen. Neue Blüten haben kein Symbolbild (`hersteller_bild_pfad` NULL).
+**OFFEN: Remote-Import wurde vom Auto-Mode als Produktions-Deploy gesperrt** → Nutzer führt aus oder gibt frei:
+`npx wrangler d1 execute cn-medcan-db --remote --file data/stamm/import.sql`. Danach live /blueten prüfen,
+dann Schritt 3 und 4.
+
+**⇢ (erledigt bis auf Import) STAND ZUM CLEAR (2026-09-29): Shell war gesperrt (Auto-Mode-Prüfung antwortete nicht), deshalb liegen
+Änderungen UNCOMMITTED im Baum. Nächste Session, der Reihe nach:**
+1. `npx tsc --noEmit`, `npm test`, `npx eslint` über die geänderten Dateien. Uncommitted (Nutzerauftrag
+   2026-09-29 „mobil zentrieren“): Kopf (Menü links, Logo mittig, Konto rechts: Kopf.tsx, KopfMenue.tsx), Fuß
+   (Fuss.tsx), /reviews (page + Doppelseite), /umfragen (page, UmfrageKarte, Kandidat, StimmFormular),
+   SortenKopf (Bild + Name mittig), AromaSektion („prüfen wir nach.“ ragte raus: schmal als eigene Zeile, absatz-
+   Variante) + UEBERLAUF_GRAD kleiner (clamp(2.5rem, 0.25rem + 12vw, 16rem)). Ungenutzt im Scratchpad:
+   mitte.py (dieselben Änderungen, NICHT mehr laufen lassen, sind per Edit schon drin). Dann committen + pushen.
+2. `python -X utf8 scripts/stamm/sammlung-einlesen.py` → Zahlen prüfen (erwartet: einige hundert neu), Stichprobe
+   in produktstamm.json (keine Wirkangaben!), dann `python scripts/stamm/sql-erzeugen.py`, import.sql prüfen
+   (Slug-Kollisionen mit Admin-Blüten wie der Testblüte?), committen, dann **remote** einspielen:
+   `npx wrangler d1 execute cn-medcan-db --remote --file data/stamm/import.sql` (Nutzer hat das Anlegen beauftragt).
+   Live /blueten Stichprobe.
+3. Live-Prüfung Mobil (Chrome-Erweiterung war getrennt): Menü, Logo mittig, Zentrierungen, Überlaufwort, Karte
+   flüssig, Hell/Dunkel.
+4. Abschluss-Review Teil 2 (components/story, review, layout, produkt), Testblüte freigeben (A2), dann A6 Rest.
 - Offen aus A2: Testblüte in /admin/vorschlaege freigeben (braucht Chrome im Vordergrund; im Hintergrund-Tab
   setzt React das Formular nicht ein).
 
