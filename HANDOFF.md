@@ -39,7 +39,7 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
   Paket `review-98651d7..d882697.diff` (Inhalt = 77d43cc), Brief/Report task-7-*.md, opus. Offene Nutzerfrage:
   Autorname im Buch öffentlich, auch Betreibername auf Startseite/reviews statt „wir“ – gewollt?
 - **T5b NEU (Nutzer, Entwurf freigegeben):** Aromakarte v2, Brief `task-5b-brief.md`. Lief im Worktree
-  `C:\cn-t5b` (Branch `t5b-karte`, Junctions node_modules/lib/generated, .next/types kopiert); Agent beim Clear
+  `C:\cn-t5b` (Branch `t5b-karte`, Junctions node_modules/lib/generated, .next/types kopiert); Agent am Ausgabelimit abgebrochen (unkommittete Teiländerungen: AromaErkundung, AromaKarte, lib/aromakarte.ts, de/en, tests/aromakarte-v2.test.ts; CSS fehlt noch)
   abgebrochen. Erst `git -C C:\cn-t5b status`/`log` prüfen: Commit da → Review; nur Teiländerungen → neuen
   Implementer (opus) mit Brief + Report-Pfad dort weitermachen lassen. Danach cherry-pick nach main, Worktree
   entfernen (`git worktree remove`, Junctions vorher mit `cmd /c rmdir` lösen, NICHT rekursiv löschen!).
