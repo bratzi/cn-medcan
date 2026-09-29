@@ -10,10 +10,10 @@ import { Titelblatt } from "@/components/produkt/Titelblatt";
 import { blueteBild } from "@/lib/medien";
 import { CommunityStimmen } from "@/components/review/CommunityStimmen";
 import { Doppelseite } from "@/components/review/Doppelseite";
-import { type AromaSerie } from "@/components/review/AromaKarte";
 import { Aufklaerung } from "@/components/review/Aufklaerung";
 import { AromaErkundung } from "@/components/review/AromaErkundung";
-import { herstellerProfil, mittlereHerstellerTreue } from "@/lib/aromakarte";
+import { BewertungsFormular } from "@/components/review/BewertungsFormular";
+import { erkundungsDaten } from "@/components/review/erkundung-daten";
 import { alsEintrag } from "@/components/review/eintrag";
 import {
   Faktenliste,
@@ -38,11 +38,18 @@ import {
 import { holeSprache, holeWoerterbuch, type Sprache, type Woerterbuch } from "@/lib/i18n";
 import { mehrzahl, t } from "@/lib/i18n/text";
 import { aromaTexte } from "@/lib/i18n/typen";
-import { parseGeschmacksMatrix, teileBewertungen, verdichteGeschmacksMatrix, mittleTerpenIntensitaet, parseBeschaffenheit, parseTerpenIntensitaet } from "@/lib/query/bewertung";
-import { mittleBeschaffenheit } from "@/components/review/BeschaffenheitsLeiste";
-import { mittleNoten } from "@/components/review/GesamteindruckLeiste";
+import { vorbelegungAus } from "@/lib/bewertung-vorbelegung";
+import { teileBewertungen, verdichteGeschmacksMatrix } from "@/lib/query/bewertung";
 import { istFachkreis } from "@/lib/query/fachkreis";
-import { ladeStrainDetail, ladeStrainTitel, ladeTerpenKatalog, type StrainDetail, type UnternehmenEintrag } from "@/lib/query/strains";
+import {
+  ladeEigeneBewertung,
+  ladeStrainDetail,
+  ladeStrainTitel,
+  ladeTerpenKatalog,
+  type StrainDetail,
+  type UnternehmenEintrag,
+} from "@/lib/query/strains";
+import { aktuellesMitglied } from "@/lib/session";
 
 /**
  * Kein Prerender zur Buildzeit: es gibt derzeit keine zur Buildzeit
@@ -146,27 +153,30 @@ function Chargentabelle({ chargen, w, sprache }: { chargen: StrainDetail["charge
 
 /**
  * Der vollstaendige Eintrag (Spec TP2 4.3): der Kern vorn. Titelblatt, meine
- * Bewertungen, Geschmacksprofil, Community, dann die Produktdaten. Leere
- * Abschnitte entfallen, statt einen Leerzustand zu zeigen (Spec 13.3).
+ * Bewertungen, Geschmacksprofil mit der Bewertungsmaske (#bewerten),
+ * Community, dann die Produktdaten. Leere Abschnitte entfallen, statt einen
+ * Leerzustand zu zeigen (Spec 13.3).
  */
 async function ProduktInhalt({ slug, w, sprache }: { slug: string; w: Woerterbuch; sprache: Sprache }) {
   const fachkreis = await istFachkreis();
   const texte = w.bluete;
-  const [strain, katalog] = await Promise.all([ladeStrainDetail(slug, fachkreis), ladeTerpenKatalog()]);
+  const [strain, katalog, mitglied] = await Promise.all([
+    ladeStrainDetail(slug, fachkreis),
+    ladeTerpenKatalog(),
+    aktuellesMitglied(),
+  ]);
   if (!strain) notFound();
 
   const { eigene, community, meineNote, communityMittel } = teileBewertungen(strain.reviews);
   const neuesteEigene = eigene[0];
   const geschmack = verdichteGeschmacksMatrix(strain.reviews);
   const produkt = { handelsname: strain.handelsname, slug: strain.slug, terpene: strain.terpene, bildPfad: strain.herstellerBildPfad };
-  const hersteller = herstellerProfil(strain.terpene);
-  const intensitaet = mittleTerpenIntensitaet(strain.reviews.map((review) => parseTerpenIntensitaet(review.terpenIntensitaet)));
-  const aromaSerien: AromaSerie[] = [
-    ...(hersteller ? [{ name: w.aroma.serien.hersteller, ton: "gruen" as const, matrix: hersteller }] : []),
-    ...(geschmack.anzahlBewertungen >= 1
-      ? [{ name: w.aroma.serien.community, ton: "lila" as const, matrix: geschmack.matrix }]
-      : []),
-  ];
+  const erkundung = erkundungsDaten(strain.terpene, strain.reviews, w.aroma.serien);
+  // Die eigene Bewertung (auch unfreigegeben) belegt die Maske vor; nur wer bewerten darf, braucht sie.
+  const eigeneBewertung = mitglied?.freigegeben ? await ladeEigeneBewertung(mitglied.mitgliedId, strain.id) : null;
+  const vorbelegung = eigeneBewertung ? vorbelegungAus(eigeneBewertung) : null;
+  // Nach dem Anmelden zurück an die Maske; das Fragment kodiert, sonst gehört es zu /anmelden.
+  const anmelden = `/anmelden?weiter=${encodeURIComponent(`/blueten/${strain.slug}#bewerten`)}`;
 
   return (
     <>
@@ -193,9 +203,9 @@ async function ProduktInhalt({ slug, w, sprache }: { slug: string; w: Woerterbuc
       {/* Jede Sorte ist bewertbar, unabhängig von einer Umfrage; die Umfrage rückt
           eine Sorte nur zeitweise nach vorn. */}
       <p className="mt-8 flex flex-wrap items-center gap-4">
-        <Link href={`/bewerten/${strain.slug}`} className={buttonKlassen("primary", "md")}>
+        <a href="#bewerten" className={buttonKlassen("primary", "md")}>
           {texte.bewerten}
-        </Link>
+        </a>
         <a href="#community-titel" className="text-small text-accent underline underline-offset-4 hover:text-accent-hover">
           {community.length > 0
             ? mehrzahl(sprache, texte.communityLesen, community.length)
@@ -218,42 +228,77 @@ async function ProduktInhalt({ slug, w, sprache }: { slug: string; w: Woerterbuc
         </section>
       ) : null}
 
-      {aromaSerien.length > 0 ? (
-        <section aria-labelledby="geschmack-titel" className={cn(ABSTAND, "flex flex-col gap-4")}>
-          <h2 id="geschmack-titel" className={ABSCHNITT_TITEL}>
-            {texte.profilFrage}
-          </h2>
-          <p className="max-w-[68ch] text-body text-text-muted text-pretty">
-            {geschmack.anzahlBewertungen >= 1
-              ? t(texte.profilMitCommunity, { anzahl: geschmack.anzahlBewertungen })
-              : texte.profilOhneCommunity}
-          </p>
-          <div className="mt-4">
-            <AromaErkundung
-              titel={strain.handelsname}
-              terpene={strain.terpene}
-              serien={aromaSerien}
-              katalog={katalog}
-              texte={aromaTexte(w, sprache)}
-              treue={mittlereHerstellerTreue(hersteller, strain.reviews.map((review) => parseGeschmacksMatrix(review.geschmacksMatrix)))}
-              zeilen={Object.entries(intensitaet).map(([terpen, { mittel, anzahl }]) => ({ terpen, wert: mittel, anzahl }))}
-              gesamteindruck={mittleNoten(strain.reviews)}
-              beschaffenheit={mittleBeschaffenheit(
-                strain.reviews.map((review) => ({
-                  beschaffenheit: parseBeschaffenheit(review.beschaffenheit),
-                  feuchte: review.feuchtigkeitProzent,
-                })),
+      {/* Bewerten an der Stelle der Erkundung (Masterplan Bewertung v2, T4; /bewerten entfällt):
+          freigeschaltete Mitglieder sehen die Maske, vorbelegt mit ihrer eigenen Bewertung; alle
+          anderen die Erkundung zum Ausprobieren und darunter, was ihnen zum Bewerten fehlt. */}
+      <section
+        id="bewerten"
+        aria-labelledby="bewerten-titel"
+        className={cn(ABSTAND, "flex scroll-mt-[calc(var(--kopf-h,4rem)+2rem)] flex-col gap-4")}
+      >
+        <h2 id="bewerten-titel" className={ABSCHNITT_TITEL}>
+          {mitglied?.freigegeben
+            ? vorbelegung
+              ? texte.deineBewertung
+              : texte.bewerten
+            : erkundung.serien.length > 0
+              ? texte.profilFrage
+              : texte.bewerten}
+        </h2>
+        {mitglied?.freigegeben ? (
+          <>
+            <p className="max-w-[68ch] text-body text-text-muted text-pretty">{w.bewerten.satz}</p>
+            <div className="mt-4">
+              <BewertungsFormular
+                strainId={strain.id}
+                handelsname={strain.handelsname}
+                terpene={strain.terpene}
+                chargen={strain.chargen.map((charge) => charge.chargenNr)}
+                istBetreiber={mitglied.rolle === "ADMIN"}
+                katalog={katalog}
+                vorbelegung={vorbelegung}
+                aromaTexte={aromaTexte(w, sprache)}
+                texte={w.bewerten}
+                {...erkundung}
+              />
+            </div>
+          </>
+        ) : (
+          <>
+            {erkundung.serien.length > 0 ? (
+              <>
+                <p className="max-w-[68ch] text-body text-text-muted text-pretty">
+                  {geschmack.anzahlBewertungen >= 1
+                    ? t(texte.profilMitCommunity, { anzahl: geschmack.anzahlBewertungen })
+                    : texte.profilOhneCommunity}
+                </p>
+                <div className="mt-4">
+                  <AromaErkundung
+                    titel={strain.handelsname}
+                    terpene={strain.terpene}
+                    katalog={katalog}
+                    texte={aromaTexte(w, sprache)}
+                    {...erkundung}
+                  />
+                </div>
+              </>
+            ) : null}
+            <div className="mt-8 flex flex-col items-start gap-4">
+              {mitglied ? (
+                <p className="max-w-[60ch] text-body text-text">{w.bewerten.nichtFreigegeben}</p>
+              ) : (
+                <>
+                  <p className="max-w-[60ch] text-body text-text">{w.bewerten.anmeldenHinweis}</p>
+                  <Link href={anmelden} className={buttonKlassen("primary", "md")}>
+                    {w.bewerten.anmelden}
+                  </Link>
+                </>
               )}
-            />
-          </div>
-          <p className="mt-8">
-            <Link href={`/bewerten/${strain.slug}`} className={buttonKlassen("primary", "md")}>
-              {texte.selbstBewerten}
-            </Link>
-          </p>
-          <Aufklaerung texte={w.aroma.aufklaerung} />
-        </section>
-      ) : null}
+            </div>
+          </>
+        )}
+        {erkundung.serien.length > 0 ? <Aufklaerung texte={w.aroma.aufklaerung} /> : null}
+      </section>
 
       {community.length > 0 && communityMittel !== null ? (
         <div className={ABSTAND}>
@@ -267,9 +312,9 @@ async function ProduktInhalt({ slug, w, sprache }: { slug: string; w: Woerterbuc
           <p className="max-w-[60ch] text-body text-text-muted text-pretty">
             {t(texte.communityLeer, { handelsname: strain.handelsname })}
           </p>
-          <Link href={`/bewerten/${strain.slug}`} className={buttonKlassen("secondary", "md")}>
+          <a href="#bewerten" className={buttonKlassen("secondary", "md")}>
             {texte.ersteBewertung}
-          </Link>
+          </a>
         </section>
       )}
 

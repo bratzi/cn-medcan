@@ -1,3 +1,4 @@
+import { QUALITAET_MITTE } from "@/lib/bewertung-v2";
 import { cn } from "@/lib/cn";
 import { BESCHAFFENHEIT_ACHSEN, type Beschaffenheit } from "@/lib/query/bewertung";
 import { formatiereWert } from "@/lib/format";
@@ -54,6 +55,8 @@ type SpurProps = {
   band?: readonly [number, number];
   /** Vergleichswert als Ring, nur wenn der eigene Wert abweicht. */
   ring?: number;
+  /** Sweet Spot: die Spur leuchtet zur Mitte hin statt sich von links zu füllen. */
+  mitte?: number;
   /** Ist er gesetzt, wird die Spur zum Regler. */
   aendern?: (wert: number) => void;
 };
@@ -63,7 +66,7 @@ type SpurProps = {
  * Sweet-Spot-Spur), rastet am Vergleichswert ein; Tastatur über ein
  * unsichtbares Range-Input darüber.
  */
-export function Spur({ label, wert, max, schritt, band, ring, aendern }: SpurProps) {
+export function Spur({ label, wert, max, schritt, band, ring, mitte, aendern }: SpurProps) {
   const anteil = (w: number) => (Math.min(Math.max(w, 0), max) / max) * 100;
   const wertAm = (spur: HTMLElement, clientX: number) => {
     const rect = spur.getBoundingClientRect();
@@ -74,11 +77,13 @@ export function Spur({ label, wert, max, schritt, band, ring, aendern }: SpurPro
   return (
     <div
       className={cn(
-        "relative h-2 rounded-full bg-border outline-offset-8 outline-focus-ring has-[input:focus-visible]:outline-2",
+        "relative h-2 rounded-full outline-offset-8 outline-focus-ring has-[input:focus-visible]:outline-2",
         // Als Regler (Nutzer 2026-09-25: leichter zu bedienen): dickere Spur und
         // 44 px Trefferhöhe über ein Pseudo-Element, der Griff größer.
         aendern && "h-3 cursor-pointer touch-none before:absolute before:inset-x-0 before:-inset-y-4 before:content-['']",
+        mitte === undefined ? "bg-border" : "sweet-spot-mitte",
       )}
+      style={mitte === undefined ? undefined : ({ "--mitte": `${anteil(mitte)}%` } as React.CSSProperties)}
       onPointerDown={
         aendern
           ? (e) => {
@@ -96,7 +101,7 @@ export function Spur({ label, wert, max, schritt, band, ring, aendern }: SpurPro
           : undefined
       }
     >
-      {band ? (
+      {mitte !== undefined ? null : band ? (
         <span
           aria-hidden="true"
           className="absolute inset-y-0 rounded-full bg-accent-subtle"
@@ -150,11 +155,18 @@ export function BeschaffenheitsLeiste({
   className,
   bedienung,
   ohneTitel = false,
+  sweetSpot = false,
   texte,
 }: BeschaffenheitsWerte & {
   titel?: string;
   className?: string;
   bedienung?: BeschaffenheitsBedienung;
+  /**
+   * Bewertung v2 (Masterplan T4): Qualität der Charge mit Sweet Spot in der
+   * Mitte der Skala (QUALITAET_MITTE), nicht „mehr ist besser“. Die Spur
+   * leuchtet zur Mitte hin, darunter steht die Mittenmarke.
+   */
+  sweetSpot?: boolean;
   /** In der Erkundung trägt der Schritt die Überschrift; hier dann nur die Anzahl. */
   ohneTitel?: boolean;
   texte: AromaTexte;
@@ -221,11 +233,14 @@ export function BeschaffenheitsLeiste({
                 max={5}
                 schritt={0.1}
                 ring={bedienung ? mittel : undefined}
+                mitte={sweetSpot ? QUALITAET_MITTE : undefined}
                 aendern={bedienung ? (neu) => bedienung.aendern(achse.key, neu) : undefined}
               />
-              <div aria-hidden="true" className="flex justify-between text-caption text-text-muted">
+              {/* Drei gleiche Spalten: die Mittenmarke steht genau unter der Skalenmitte (2,5 von 5). */}
+              <div aria-hidden="true" className={cn("text-caption text-text-muted", sweetSpot ? "grid grid-cols-3" : "flex justify-between")}>
                 <span>{texte.schema.beschaffenheit[achse.key].links}</span>
-                <span>{texte.schema.beschaffenheit[achse.key].rechts}</span>
+                {sweetSpot ? <span className="text-center font-medium text-text">{texte.aroma.sweetSpot.marke}</span> : null}
+                <span className="text-right">{texte.schema.beschaffenheit[achse.key].rechts}</span>
               </div>
             </div>
           );

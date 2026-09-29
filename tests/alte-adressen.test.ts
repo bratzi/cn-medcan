@@ -20,7 +20,8 @@ function weiterleiten(pfad: string, query: Record<string, string> = {}) {
       query,
     });
     const suche = new URLSearchParams(parsedDestination.query as Record<string, string>).toString();
-    return { ziel: parsedDestination.pathname + (suche ? `?${suche}` : ""), permanent: regel.permanent };
+    const ziel = parsedDestination.pathname + (suche ? `?${suche}` : "") + (parsedDestination.hash ?? "");
+    return { ziel, permanent: regel.permanent };
   }
   return null;
 }
@@ -41,11 +42,16 @@ test("/produkte/:slug leitet dauerhaft auf /blueten/:slug", () => {
   });
 });
 
+test("/bewerten/:slug leitet dauerhaft auf die Maske in der Blütenseite (#bewerten)", () => {
+  assert.deepEqual(weiterleiten("/bewerten/nebelharz-22"), { ziel: "/blueten/nebelharz-22#bewerten", permanent: true });
+});
+
 test("nur die alten Adressen werden umgeleitet", () => {
   assert.equal(weiterleiten("/blueten"), null);
   assert.equal(weiterleiten("/blueten/nebelharz-22"), null);
   assert.equal(weiterleiten("/produkte-archiv"), null);
   assert.equal(weiterleiten("/produkte/a/b"), null);
+  assert.equal(weiterleiten("/bewerten/a/b"), null);
 });
 
 test("Ziel existiert als Route, die alte Route ist weg, next.config nutzt die Regeln", () => {
@@ -53,6 +59,8 @@ test("Ziel existiert als Route, die alte Route ist weg, next.config nutzt die Re
   assert.ok(existsSync(join(wurzel, "app/blueten/page.tsx")));
   assert.ok(existsSync(join(wurzel, "app/blueten/[slug]/page.tsx")));
   assert.ok(!existsSync(join(wurzel, "app/produkte")));
+  assert.ok(!existsSync(join(wurzel, "app/bewerten")));
+  assert.ok(existsSync(join(wurzel, "app/blueten/[slug]/aktionen.ts")));
   const config = readFileSync(join(wurzel, "next.config.ts"), "utf8");
   assert.match(config, /redirects\(\)\s*\{\s*return \[\.\.\.ALTE_KATALOG_WEITERLEITUNGEN\]/);
 });

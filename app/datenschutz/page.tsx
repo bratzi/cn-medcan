@@ -33,7 +33,7 @@ import {
  *   Instagram laden“ keine Anfrage an instagram.com, danach iframe mit
  *   referrerPolicy="no-referrer"; die Wahl wird nicht gespeichert; nur in
  *   Doppelseite.tsx, nur wenn der Betreiber ein Reel verknüpft hat
- *   (app/bewerten/aktionen.ts).
+ *   (app/blueten/[slug]/aktionen.ts).
  * - Schriften: next/font/google in app/layout.tsx (beim Build eingebettet,
  *   keine Anfrage an Google im Browser). Medien aus public/medien.
  * - Keine Analyse- oder Werbedienste im Code und in package.json.

@@ -341,6 +341,11 @@
     animation-play-state: paused !important;
   }
 
+  /* Sparmodus (T4): die Blattnote der Bewertung wechselt sofort, ohne Übergang. */
+  :root[data-sparmodus] .blatt-note * {
+    transition: none !important;
+  }
+
   :root[data-theme="dark"] .nur-hell,
   :root:not([data-theme="dark"]) .nur-dunkel {
     /* important: sonst gewinnt das `block` der Utility-Schicht (Loop.tsx). */
@@ -534,6 +539,19 @@
     var(--color-accent-subtle) 40%,
     var(--color-accent) 60%,
     var(--color-accent-subtle) 80%,
+    var(--color-border) 100%
+  );
+}
+
+/* Sweet Spot in der Mitte (Bewertung v2, T4): Qualität der Charge. Wie die
+   Terpen-Spur, nur um --mitte zentriert (Spur in BeschaffenheitsLeiste). */
+.sweet-spot-mitte {
+  background: linear-gradient(
+    90deg,
+    var(--color-border) 0%,
+    var(--color-accent-subtle) calc(var(--mitte, 50%) - 20%),
+    var(--color-accent) var(--mitte, 50%),
+    var(--color-accent-subtle) calc(var(--mitte, 50%) + 20%),
     var(--color-border) 100%
   );
 }

@@ -22,6 +22,7 @@ import {
   type Treue,
 } from "@/lib/aromakarte";
 import { BEWERTUNGS_ACHSEN, GESCHMACKS_ACHSEN, leereGeschmacksMatrix, type GeschmacksMatrix } from "@/lib/query/bewertung";
+import type { Vorbelegung } from "@/lib/bewertung-vorbelegung";
 import { communityFazit } from "@/lib/fazit";
 import { formatiereAnteil } from "@/lib/format";
 import { mehrzahl } from "@/lib/i18n/text";
@@ -48,6 +49,7 @@ export function AromaErkundung({
   beschaffenheit,
   gesamteindruck,
   eingabe = false,
+  vorbelegung = null,
   zwischenruf,
   children,
   texte,
@@ -73,22 +75,40 @@ export function AromaErkundung({
    * umschließende Formular (Feldnamen wie lib/bewertung-eingabe.ts).
    */
   eingabe?: boolean;
+  /**
+   * Eigene gespeicherte Bewertung als Start der Regler (Masterplan Bewertung
+   * v2, T4): „Dein Fazit“ steht sofort, „Zurücksetzen“ kehrt zu ihr zurück.
+   */
+  vorbelegung?: Pick<Vorbelegung, "geschmack" | "noten" | "intensitaet" | "beschaffenheit"> | null;
   texte: AromaTexte;
   /** Hintergrundsatz (Schlagwort) mittig zwischen Qualität und Fazit, nur auf der Startseite. */
   zwischenruf?: React.ReactNode;
   children?: React.ReactNode;
 }) {
-  const [eigen, setEigen] = useState<GeschmacksMatrix | null>(null);
-  const [eigeneBeschaffenheit, setEigeneBeschaffenheit] = useState<
-    Partial<Record<BeschaffenheitsSchluessel, number>>
-  >({});
-  const [eigeneNoten, setEigeneNoten] = useState<Partial<Record<NotenKey, number>>>({});
-  const [eigeneIntensitaet, setEigeneIntensitaet] = useState<Record<string, number>>({});
+  // Start der eigenen Regler: leer oder die gespeicherte Bewertung. Die Startobjekte
+  // bleiben als Referenz stehen: jede Änderung ersetzt sie, „Zurücksetzen“ setzt genau
+  // sie wieder ein. So heißt „geändert“ einfach: nicht mehr dasselbe Objekt.
+  const [anfang] = useState(() => ({
+    geschmack: vorbelegung?.geschmack ?? null,
+    beschaffenheit: (vorbelegung?.beschaffenheit ?? {}) as Partial<Record<BeschaffenheitsSchluessel, number>>,
+    noten: (vorbelegung?.noten ?? {}) as Partial<Record<NotenKey, number>>,
+    intensitaet: vorbelegung?.intensitaet ?? {},
+  }));
+  const [eigen, setEigen] = useState<GeschmacksMatrix | null>(anfang.geschmack);
+  const [eigeneBeschaffenheit, setEigeneBeschaffenheit] = useState(anfang.beschaffenheit);
+  const [eigeneNoten, setEigeneNoten] = useState(anfang.noten);
+  const [eigeneIntensitaet, setEigeneIntensitaet] = useState<Record<string, number>>(anfang.intensitaet);
+  // Eigene Werte da (bewegt oder vorbelegt): dann steht „Dein Fazit“.
   const bewegt =
     eigen !== null ||
     Object.keys(eigeneBeschaffenheit).length > 0 ||
     Object.keys(eigeneNoten).length > 0 ||
     Object.keys(eigeneIntensitaet).length > 0;
+  const geaendert =
+    eigen !== anfang.geschmack ||
+    eigeneBeschaffenheit !== anfang.beschaffenheit ||
+    eigeneNoten !== anfang.noten ||
+    eigeneIntensitaet !== anfang.intensitaet;
 
   // Karte: alle bekannten Terpene. Was der Hersteller nicht angibt, steht grau
   // daneben und wird farbig, sobald seine Geschmacksrichtung über 0 liegt.
@@ -248,11 +268,16 @@ export function AromaErkundung({
       </Schritt>
 
       {beschaffenheit ? (
-        <Schritt nummer="3" titel={texte.aroma.erkundung.qualitaet}>
+        // In der Maske gilt die Qualität der eigenen Charge, nicht der Sorte (Bewertung v2, T4).
+        <Schritt nummer="3" titel={eingabe ? texte.aroma.erkundung.dieseCharge : texte.aroma.erkundung.qualitaet}>
+          {eingabe ? (
+            <p className="max-w-[60ch] text-small text-text-muted text-pretty">{texte.aroma.erkundung.chargeSatz}</p>
+          ) : null}
           <BeschaffenheitsLeiste
             {...beschaffenheit}
             className="w-full"
             ohneTitel
+            sweetSpot={eingabe}
             texte={texte}
             bedienung={{
               eigen: eigeneBeschaffenheit,
@@ -308,17 +333,17 @@ export function AromaErkundung({
         </div>
       ) : null}
 
-      {bewegt || children ? (
+      {geaendert || children ? (
         <div className="flex flex-wrap items-center justify-center gap-6">
           {children}
-          {bewegt ? (
+          {geaendert ? (
             <button
               type="button"
               onClick={() => {
-                setEigen(null);
-                setEigeneBeschaffenheit({});
-                setEigeneNoten({});
-                setEigeneIntensitaet({});
+                setEigen(anfang.geschmack);
+                setEigeneBeschaffenheit(anfang.beschaffenheit);
+                setEigeneNoten(anfang.noten);
+                setEigeneIntensitaet(anfang.intensitaet);
               }}
               className="min-h-11 text-small text-accent underline underline-offset-4 hover:text-accent-hover"
             >

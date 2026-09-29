@@ -11,6 +11,7 @@ import {
   type KultivarTyp,
   type RezeptStatus,
 } from "@/db/enums";
+import type { GespeicherteBewertung } from "@/lib/bewertung-vorbelegung";
 import { getPrisma } from "@/lib/prisma";
 
 import { TREFFER_PRO_SEITE, type StrainFilter } from "./filter";
@@ -1142,6 +1143,37 @@ export async function ladeAromaVorzeige(): Promise<AromaVorzeige | null> {
     })),
     reviews: zeile.reviews.map((review) => ({ ...review, feuchtigkeitProzent: zuZahl(review.feuchtigkeitProzent) })),
   };
+}
+
+/**
+ * Die eigene Bewertung eines Mitglieds zu einer Sorte, auch solange sie noch
+ * nicht freigegeben ist (Vorbelegung der Maske, Bewertung v2 T4). Je Mitglied
+ * und Sorte gibt es höchstens eine (Unique-Index autorId × strainId), also
+ * ein Zugriff über den Index, nicht aus der öffentlichen Liste.
+ */
+export async function ladeEigeneBewertung(autorId: string, strainId: string): Promise<GespeicherteBewertung | null> {
+  const prisma = await getPrisma();
+  const zeile = await prisma.review.findUnique({
+    where: { autorId_strainId: { autorId, strainId } },
+    select: {
+      aussehen: true,
+      geruch: true,
+      geschmack: true,
+      wirkung: true,
+      konsistenz: true,
+      gesamtnote: true,
+      feuchtigkeitProzent: true,
+      geschmacksMatrix: true,
+      terpenIntensitaet: true,
+      beschaffenheit: true,
+      notiz: true,
+      instagramReelUrl: true,
+      aktualisiertAm: true,
+      charge: { select: { chargenNr: true } },
+    },
+  });
+  if (!zeile) return null;
+  return { ...zeile, feuchtigkeitProzent: zuZahl(zeile.feuchtigkeitProzent), gesamtnote: zuZahl(zeile.gesamtnote) };
 }
 
 /** Alle bekannten Terpene mit Geschmacksachse: zum Ergänzen, was der Hersteller nicht angibt. */
