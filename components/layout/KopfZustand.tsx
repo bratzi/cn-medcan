@@ -1,5 +1,6 @@
 "use client";
 
+import { usePathname } from "next/navigation";
 import { useEffect } from "react";
 
 /**
@@ -9,6 +10,9 @@ import { useEffect } from "react";
  * transparent über dem Auftakt schwebt.
  */
 export function KopfZustand() {
+  // Der Kopf bleibt im Root-Layout stehen: nach einem Seitenwechsel neu prüfen,
+  // sonst bliebe er ohne Scroll dunkel (Start → Unterseite) oder hell.
+  const pfad = usePathname();
   useEffect(() => {
     const kopf = document.querySelector<HTMLElement>("[data-kopf]");
     if (!kopf) return;
@@ -47,6 +51,6 @@ export function KopfZustand() {
       window.removeEventListener("scroll", planen);
       window.removeEventListener("resize", planen);
     };
-  }, []);
+  }, [pfad]);
   return null;
 }

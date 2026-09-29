@@ -39,7 +39,7 @@ export function KopfMenue({ texte, children }: Props) {
         </svg>
       </button>
       <div ref={tafel} id={MENUE_ID} popover="auto" className="kopf-menue" onClick={linkGeklickt}>
-        <button type="button" popoverTarget={MENUE_ID} popoverTargetAction="hide" className="kopf-menue-knopf kopf-menue-zu">
+        <button type="button" popoverTarget={MENUE_ID} popoverTargetAction="hide" autoFocus className="kopf-menue-knopf kopf-menue-zu">
           <span className="sr-only">{texte.schliessen}</span>
           <svg aria-hidden="true" viewBox="0 0 24 24">
             <path d="M6 6l12 12M18 6L6 18" />

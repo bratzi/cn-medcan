@@ -6,6 +6,8 @@ import { starteRauch, type RauchMaschine } from "@/components/layout/joint-rauch
 
 /** Wie lange gehalten, bis die Glut ganz aufgeglüht ist (ms). */
 const GLUEHEN_VOLL_MS = 2500;
+/** So lange zeichnet der Cursor nach der letzten Bewegung weiter, bis Qualm und Spur verklungen sind (ms). */
+const NACHLAUF_MS = 3000;
 
 /**
  * Der Cursor als Joint, schräg angestellt wie der gewöhnliche Pfeil: die
@@ -37,6 +39,7 @@ export function JointCursor() {
     let spurZeit = 0;
     let letzteZeit = 0;
     let glutJetzt = 0;
+    let aktivBis = 0;
     const rauch: RauchMaschine | null = ruhig ? null : starteRauch();
 
     const zeichnen = (jetzt: number) => {
@@ -62,9 +65,19 @@ export function JointCursor() {
         rauch.spur(letztX + 4, letztY + 4);
       }
       rauch?.schritt(dt, jetzt / 1000);
+      if (gedrueckt || x !== letztX || y !== letztY) aktivBis = jetzt + NACHLAUF_MS;
       letztX = x;
       letztY = y;
-      rahmen = requestAnimationFrame(zeichnen);
+      // Nur weiterzeichnen, solange etwas passiert oder Qualm abklingt: sonst ruht die Seite.
+      if (jetzt < aktivBis) {
+        rahmen = requestAnimationFrame(zeichnen);
+      } else {
+        rahmen = 0;
+        letzteZeit = 0;
+      }
+    };
+    const wecken = () => {
+      if (!rahmen) rahmen = requestAnimationFrame(zeichnen);
     };
 
     const bewegen = (e: PointerEvent) => {
@@ -72,11 +85,13 @@ export function JointCursor() {
       x = e.clientX;
       y = e.clientY;
       el.dataset.sichtbar = "";
+      wecken();
     };
     const runter = (e: PointerEvent) => {
       if (e.pointerType !== "mouse" || e.button !== 0) return;
       gedrueckt = performance.now();
       el.dataset.gedrueckt = "";
+      wecken();
     };
     const hoch = () => {
       if (gedrueckt && rauch) rauch.ausatmen(x + 3, y + 3, glutJetzt);
@@ -84,6 +99,7 @@ export function JointCursor() {
       glutJetzt = 0;
       delete el.dataset.gedrueckt;
       el.style.setProperty("--glut", "0");
+      wecken();
     };
     const raus = () => delete el.dataset.sichtbar;
 
@@ -92,7 +108,7 @@ export function JointCursor() {
     window.addEventListener("pointerup", hoch, { passive: true });
     window.addEventListener("blur", hoch);
     document.addEventListener("pointerleave", raus);
-    rahmen = requestAnimationFrame(zeichnen);
+    wecken();
 
     return () => {
       cancelAnimationFrame(rahmen);

@@ -61,7 +61,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
 
         <Kopf sprache={sprache} w={w} />
 
-        <main id="inhalt" className="flex-1 pt-(--kopf-h,4rem)">
+        <main id="inhalt" tabIndex={-1} className="flex-1 focus:outline-none pt-(--kopf-h,4rem)">
           {children}
         </main>
 
