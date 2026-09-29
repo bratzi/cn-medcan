@@ -28,6 +28,26 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 
 ## ⇢ Hier geht es weiter
 
+### ⇢ SESSION 30 (2026-09-29 spät): Zwischensicherung zum Clear
+
+**Wiedereinstieg (ohne Rückfrage):** Skill `superpowers:subagent-driven-development` laden, Ledger
+`.superpowers/sdd/2026-09-29-buch-bewertung-v2-master/progress.md` lesen (Rulings R1–R14, Stand je Task).
+- **T6 ERLEDIGT** (Review + Fix-Runde, sauber), live gepusht 23:03 zusammen mit Menüknopf-Fix `71fae10`
+  (Knopf ab 64rem verborgen; unlayered display:grid schlug lg:hidden). **Live noch NICHT geprüft** (Desktop: kein
+  Menüknopf hinter dem Logo; mobil Knopf da).
+- **T7 implementiert, lokal `77d43cc`, NICHT gepusht.** Review lief beim Clear (abgebrochen) → neu dispatchen:
+  Paket `review-98651d7..d882697.diff` (Inhalt = 77d43cc), Brief/Report task-7-*.md, opus. Offene Nutzerfrage:
+  Autorname im Buch öffentlich, auch Betreibername auf Startseite/reviews statt „wir“ – gewollt?
+- **T5b NEU (Nutzer, Entwurf freigegeben):** Aromakarte v2, Brief `task-5b-brief.md`. Lief im Worktree
+  `C:\cn-t5b` (Branch `t5b-karte`, Junctions node_modules/lib/generated, .next/types kopiert); Agent beim Clear
+  abgebrochen. Erst `git -C C:\cn-t5b status`/`log` prüfen: Commit da → Review; nur Teiländerungen → neuen
+  Implementer (opus) mit Brief + Report-Pfad dort weitermachen lassen. Danach cherry-pick nach main, Worktree
+  entfernen (`git worktree remove`, Junctions vorher mit `cmd /c rmdir` lösen, NICHT rekursiv löschen!).
+- Danach T8–T13, Final-Review, Migrationen durch Nutzer, Push, Live-Prüfung. T14 Impressum-Fragen offen.
+- **Nutzer muss noch ausführen:** `npx.cmd wrangler d1 execute cn-medcan-db --remote --file migrations/0010_kennwerte_nachtragen.sql`
+- Overall-Noten starten weiter beim Community-Mittel (R13), Frage an Nutzer unbeantwortet.
+
+
 ### ⇢ SESSION 29 (2026-09-29 abends): T4–T14 per Subagenten (SDD), Zwischensicherung
 
 **Nutzerauftrag:** „mit Subagenten den gesamten Todo abarbeiten, jeder Agent nutzt die besten Skills; wenn alle
