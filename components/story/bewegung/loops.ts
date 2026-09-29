@@ -8,6 +8,11 @@
  * Hat jemand angehalten, startet auch das erneute Hineinscrollen nichts.
  */
 export function beobachteLoops(): { stoppen: () => void } {
+  // Datensparmodus oder langsames Netz: nichts laden, Standbilder bleiben
+  // (Videos zusammen ~14 MB). Nur Chromium kennt navigator.connection.
+  const netz = (navigator as Navigator & { connection?: { saveData?: boolean; effectiveType?: string } }).connection;
+  if (netz?.saveData || /(^|-)2g$|^3g$/.test(netz?.effectiveType ?? "")) return { stoppen: () => undefined };
+
   const videos = [...document.querySelectorAll<HTMLVideoElement>("video[data-loop]")];
   const schalter = [...document.querySelectorAll<HTMLButtonElement>("button[data-loop-schalter]")];
   const inDerNaehe = new Set<HTMLVideoElement>();
