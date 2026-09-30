@@ -66,6 +66,7 @@ export function SweetSpot({
   titel,
   bedienung,
   quer = false,
+  spalten = false,
   texte,
 }: {
   zeilen: readonly SweetSpotZeile[];
@@ -73,6 +74,8 @@ export function SweetSpot({
   bedienung?: Bedienung;
   /** Spuren als Karten nebeneinander, horizontal scrollbar (wie der Katalog). */
   quer?: boolean;
+  /** Buchseite ab lg (T7b, Nutzer 2026-09-30): Spuren zweispaltig, damit sie auf die Seite passen. */
+  spalten?: boolean;
   texte: AromaTexte;
 }) {
   const sprache = texte.sprache;
@@ -91,7 +94,7 @@ export function SweetSpot({
         className={
           quer
             ? "flex snap-x snap-mandatory gap-3 overflow-x-auto pb-3"
-            : "flex flex-col gap-6"
+            : cn("flex flex-col gap-6", spalten && "lg:grid lg:grid-cols-2 lg:gap-x-8 lg:gap-y-4")
         }
         onPointerLeave={() => bedienung?.aktivieren?.(null)}>
         {zeilen.map((zeile) => {

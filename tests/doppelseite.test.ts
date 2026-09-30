@@ -63,11 +63,14 @@ test("Voll: fünf Noten, Überschrift mit Datum, Restfeuchte, kein Link", () => 
   assert.match(html, /Bewertung vom/);
   assert.match(html, /Restfeuchte optimal/);
   assert.doesNotMatch(html, /Ganzen Eintrag lesen/);
-  assert.doesNotMatch(html, /line-clamp/);
+  // Kurzer Text: ab lg begrenzt, aber ohne Knopf; unter lg ganz.
+  assert.match(html, /lg:line-clamp-6/);
+  assert.doesNotMatch(html, /[" ]line-clamp-6/);
+  assert.doesNotMatch(html, /Weiterlesen/);
 });
 
-test("Links Kopf, Name, Blätter-Note und darunter der Text; rechts Werte, Karte und Charge", () => {
-  for (const umfang of ["auszug", "voll"] as const) {
+test("Auszug: links Kopf, Name, Blätter-Note und darunter der Text; rechts Werte, Karte und Charge", () => {
+  for (const umfang of ["auszug"] as const) {
     const { links, rechts } = seiten(zeige({ eintrag: eintrag(), umfang, ueberschrift: "h3" }));
     assert.match(links, /<h3 id="eintrag-r1-titel"/, umfang);
     assert.match(links, />Waldi</, umfang);
@@ -122,9 +125,41 @@ test("Auszug: Datum beim Namen, Charge rechts; der Text links bleibt gekürzt", 
   assert.match(rechts, /Charge CH-2401/);
 });
 
-test("Voll ohne Charge sagt es ausdrücklich, auf der rechten Seite", () => {
+test("Voll ohne Charge sagt es ausdrücklich, als Fuß der linken Seite", () => {
   const html = zeige({ eintrag: eintrag({ chargenNr: null }), umfang: "voll", ueberschrift: "h3" });
-  assert.match(seiten(html).rechts, /Charge nicht angegeben/);
+  assert.match(seiten(html).links, /Charge nicht angegeben/);
+});
+
+test("Buch (voll, T7b): links Kopf, Name, Blätter, Noten, Restfeuchte, Text und Charge; rechts die Karte als Reiter", () => {
+  const { links, rechts } = seiten(zeige({ eintrag: eintrag(), umfang: "voll", ueberschrift: "h3" }));
+  for (const teil of [/<h3 id="eintrag-r1-titel"/, />Waldi</, /3,5 von 5 Blättern/, /<dt/, /Restfeuchte optimal/, /Sehr dichte Blüten\./, /Charge CH-2401/]) {
+    assert.match(links, teil);
+  }
+  const reihe = ["3,5 von 5 Blättern", "<dt", "Restfeuchte optimal", "Sehr dichte Blüten.", "Charge CH-2401"].map((x) => links.indexOf(x));
+  assert.deepEqual([...reihe].sort((a, b) => a - b), reihe, "Reihenfolge links");
+  assert.doesNotMatch(links, /<figure/);
+  assert.match(rechts, /<figure/);
+  assert.match(rechts, /role="tablist"/);
+  assert.match(rechts, /role="tab"[^>]*aria-selected="true"[^>]*>Aroma-Karte</);
+  assert.match(rechts, />Sweet Spot</);
+  assert.doesNotMatch(rechts, /<dt|Charge CH-2401|Sehr dichte Blüten\./);
+});
+
+test("Buch (voll, T7b): feste Höhe ab lg, dichte Seiten, Karte dicht und verkleinerbar", () => {
+  const html = zeige({ eintrag: eintrag(), umfang: "voll", ueberschrift: "h3" });
+  assert.match(html, /<article [^>]*class="[^"]*\blg:h-\(--buch-h\)/);
+  assert.match(html, /data-buchseite="links" class="[^"]*\blg:overflow-clip\b[^"]*\blg:p-6\b/);
+  assert.match(html, /class="buch-karte"/);
+  assert.match(html, /\blg:grid-cols-5\b/);
+  const auszug = zeige({ eintrag: eintrag(), umfang: "auszug", ueberschrift: "h3" });
+  assert.doesNotMatch(auszug, /--buch-h|buch-karte|role="tablist"|lg:grid-cols-5/);
+});
+
+test("Buch (voll, T7b): langer Text ab lg begrenzt mit Weiterlesen, kurzer ohne", () => {
+  const lang = "Sehr dichte Blüten. ".repeat(20);
+  const html = zeige({ eintrag: eintrag({ notiz: lang }), umfang: "voll", ueberschrift: "h3" });
+  assert.match(html, /aria-expanded="false"[^>]*>Weiterlesen</);
+  assert.match(html, /max-lg:hidden/);
 });
 
 test("Id und Überschrift eindeutig je Eintrag", () => {

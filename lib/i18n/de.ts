@@ -453,6 +453,13 @@ export const de = {
     ohneName: "Mitglied",
     betreiberName: "Book of Terpz",
     median: { one: "Median aus einer Bewertung:", other: "Median aller {anzahl} Bewertungen:" },
+    reiter: "Werte dieser Bewertung",
+    reiterKarte: "Aroma-Karte",
+    reiterSweetSpot: "Sweet Spot",
+    reiterBeschaffenheit: "Beschaffenheit",
+    reiterReel: "Reel",
+    weiterlesen: "Weiterlesen",
+    schliessen: "Schließen",
   },
   reviews: {
     titel: "Bewertungen",

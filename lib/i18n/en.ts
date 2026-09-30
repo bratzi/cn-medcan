@@ -446,6 +446,13 @@ export const en: Woerterbuch = {
     ohneName: "Member",
     betreiberName: "Book of Terpz",
     median: { one: "Median from one review:", other: "Median of all {anzahl} reviews:" },
+    reiter: "Values of this review",
+    reiterKarte: "Aroma map",
+    reiterSweetSpot: "Sweet spot",
+    reiterBeschaffenheit: "Condition",
+    reiterReel: "Reel",
+    weiterlesen: "Read more",
+    schliessen: "Close",
   },
   reviews: {
     titel: "Reviews",

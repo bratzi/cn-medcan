@@ -128,9 +128,10 @@ test("CPU-Budget: die rechte Hälfte rendert der Server nur für die offene Seit
   assert.equal(html.match(/<article /g)?.length, 5);
   const seiten = html.split('<div class="buch-seite"').slice(1);
   for (const [i, seite] of seiten.entries()) assert.match(seite, new RegExp(`Text ${5 - i}\.`));
+  // Seit T7b stehen die Noten links (billig, immer im Server-HTML); die Karte rechts nur nah.
   assert.deepEqual(
     seiten.map((seite) => [seite.includes("<dt"), seite.includes("<figure")]),
-    [[true, true], [true, true], [false, false], [false, false], [true, true]],
+    [[true, true], [true, true], [true, false], [true, false], [true, true]],
   );
   // Die leere rechte Hälfte bleibt als Fläche stehen, das Buch dreht sie beim Blättern.
   assert.equal(html.match(/data-buchseite="rechts"/g)?.length, 5);

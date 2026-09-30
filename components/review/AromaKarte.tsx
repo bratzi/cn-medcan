@@ -81,6 +81,12 @@ type Props = {
   bezug?: "median" | "serie";
   /** Alle bekannten Terpene: zeigt zur aktiven Geschmacksrichtung, welche Terpene sie tragen. */
   lernen?: readonly { name: string; geschmack: KartenTerpen["geschmack"] }[];
+  /**
+   * Dicht für die Buchseite ab lg (T7b, Nutzer 2026-09-30): Schalter und
+   * Legende in einer Zeile, die Tafel beim Überfahren liegt über dem unteren
+   * Rand der Karte statt darunter Platz zu halten. Unter lg wie sonst.
+   */
+  kompakt?: boolean;
   texte: AromaTexte;
 };
 
@@ -194,6 +200,7 @@ export function AromaKarte({
   regler,
   bezug = "serie",
   lernen,
+  kompakt = false,
   texte,
 }: Props) {
   const titel = titelRoh ?? texte.aroma.karte.titel;
@@ -372,12 +379,12 @@ export function AromaKarte({
       : null;
 
   return (
-    <figure aria-label={titel} className="flex flex-col gap-6">
+    <figure aria-label={titel} className={cn("flex flex-col gap-6", kompakt && "lg:relative lg:gap-4")}>
       {/* Kopf der Karte: links der Name in Logoschrift mit Verlauf und, mit Reglern, die Skala;
           rechts Ansicht und Legende. */}
       <div className={cn("flex flex-wrap items-start gap-8", ohneTitel && !regler ? "justify-end" : "justify-between")}>
       {ohneTitel ? null : (
-        <p className="farbverlauf font-hand text-erzaehlung text-balance wrap-break-word leading-[0.9]">{titel}</p>
+        <p className={cn("farbverlauf font-hand text-erzaehlung text-balance wrap-break-word leading-[0.9]", kompakt && "lg:hidden")}>{titel}</p>
       )}
       {/* Skala links (T5): was die Regler messen, und was der grüne Ring ist. Ohne Median steht
           statt des Rings der Hinweis, nie eine 0 (Review Focus 1). */}
@@ -394,7 +401,7 @@ export function AromaKarte({
           )}
         </div>
       ) : null}
-      <div className="flex flex-col items-end gap-6">
+      <div className={cn("flex flex-col items-end gap-6", kompakt && "lg:flex-row lg:flex-wrap lg:items-center lg:justify-end lg:gap-4")}>
       <div className="flex flex-wrap items-center justify-end gap-4">
         {/* Ansichts-Schalter als Radiogroup (APG): ein Tabstopp, Pfeiltasten wählen.
             Druck-Rückmeldung per scale 0.97, nur ohne reduzierte Bewegung. */}
@@ -1015,7 +1022,15 @@ export function AromaKarte({
       {/* Infotext unter der Karte (Nutzer 2026-09-26, 2026-09-27): zentriert wie eine Legende im Buch.
           Die Höhe ist fest reserviert, damit die Sektion beim Überfahren nicht springt; der Inhalt
           blendet beim Wechsel nur über (Deckkraft). */}
-      <div aria-live="polite" className="grid min-h-80 justify-items-center sm:min-h-56">
+      <div
+        aria-live="polite"
+        className={cn(
+          "grid min-h-80 justify-items-center sm:min-h-56",
+          // Dicht: über dem unteren Rand der Karte, ohne eigene Höhe; nur die Tafel fängt Zeiger.
+          kompakt &&
+            "lg:pointer-events-none lg:absolute lg:inset-x-0 lg:bottom-0 lg:z-10 lg:min-h-0 lg:*:rounded-lg lg:*:border lg:*:border-border lg:*:bg-surface-raised lg:*:p-4 lg:*:shadow-md",
+        )}
+      >
         {aktiveAchse ? (
           <InfoTafel
             key={`achse-${aktiveAchse.key}`}
@@ -1061,7 +1076,8 @@ export function AromaKarte({
         ) : (
           <div
             key="hinweis"
-            className="flex flex-col items-center gap-6 pt-8 transition-opacity duration-normal ease-out starting:opacity-0"
+            // Dicht (Buch, ab lg): ohne Hinweis; die Doppelseite reicht keine Ebenen, die Legende fiele ohnehin weg.
+            className={cn("flex flex-col items-center gap-6 pt-8 transition-opacity duration-normal ease-out starting:opacity-0", kompakt && "lg:hidden")}
           >
             <p className="max-w-md text-center font-buch text-body text-text-muted italic text-balance">
               {regler ? kt.hinweisRegler : kt.hinweisErkunden}

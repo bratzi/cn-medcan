@@ -62,7 +62,7 @@ const TIEFE = "perspective(2400px)";
 const NEBENEINANDER = "(min-width: 64rem)";
 const REDUZIERT = "(prefers-reduced-motion: reduce)";
 /** Was selbst auf Klicks und Pfeiltasten hört, blättert nicht um. */
-const BEDIENBAR = "a, button, input, select, textarea, label, summary, iframe, video, [role='button'], [role='radio'], [role='slider']";
+const BEDIENBAR = "a, button, input, select, textarea, label, summary, iframe, video, [role='button'], [role='radio'], [role='slider'], [role='tab'], [data-buch-eigen]";
 const EIGENE_PFEILE = "input, textarea, select, [contenteditable], [role='radiogroup'], [role='slider'], [role='tablist'], [role='listbox'], [role='menu']";
 
 /** Ruhe: reduzierte Bewegung oder Sparmodus der Schalterleiste (T2). */
@@ -406,7 +406,7 @@ export function Buch({ seiten, bezeichnung, texte }: { seiten: readonly BuchSeit
   return (
     <div
       ref={huelle}
-      className="flex flex-col gap-6"
+      className="flex flex-col gap-6 lg:gap-4"
       onKeyDown={mehrere ? beiTaste : undefined}
       onPointerEnter={
         mehrere
