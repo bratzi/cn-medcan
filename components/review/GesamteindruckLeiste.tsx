@@ -47,6 +47,8 @@ export function GesamteindruckLeiste({
   bedienung?: {
     eigen: Readonly<Partial<Record<NotenKey, number>>>;
     aendern: (key: NotenKey, wert: number) => void;
+    /** Bewertungsmaske (T5c): Skala 0 bis 5, Start bei 0 = noch nicht gesetzt. */
+    abNull?: boolean;
   };
   /** Bewertungsmaske: Wirkung als zusätzliche Note (Pflicht beim Speichern). */
   mitWirkung?: boolean;
@@ -79,24 +81,30 @@ export function GesamteindruckLeiste({
       <dl className="flex flex-col gap-4">
         {achsen.map((achse) => {
           const mittel = mittelWerte[achse.key];
-          const wert = bedienung?.eigen[achse.key] ?? mittel ?? 3;
-          // Skala 1 bis 5 auf die Spur 0 bis 4 abgebildet.
+          // Als Regler startet die Note bei 0 = noch nicht gesetzt (T5c, Nutzer 2026-09-30, wie die
+          // Aromaregler seit T5b); eine gespeicherte eigene Note bleibt Startwert. Sonst (Anzeige,
+          // Spielwiese) Start am Community-Mittel auf der Skala 1 bis 5 (Spur 0 bis 4).
+          const abNull = bedienung?.abNull === true;
+          const wert = bedienung?.eigen[achse.key] ?? (abNull ? 0 : (mittel ?? 3));
+          const versatz = abNull ? 0 : 1;
+          const wertText = (w: number) => t(texte.aroma.vonFuenf, { wert: formatiereWert(w + versatz, texte.sprache) });
           return (
             <div key={achse.key} className="flex flex-col gap-1.5">
               <div className="flex items-baseline justify-between gap-4">
                 <dt className="text-small font-medium text-text">{texte.schema.noten[achse.key].label}</dt>
-                <dd className="numeric text-small text-text-muted">{t(texte.aroma.vonFuenf, { wert: formatiereWert(wert, texte.sprache) })}</dd>
+                <dd className="numeric text-small text-text-muted">{wertText(wert - versatz)}</dd>
               </div>
               <Spur
-                label={t(texte.aroma.skala, { label: texte.schema.noten[achse.key].label, von: 1, bis: 5 })}
-                wert={wert - 1}
-                max={4}
+                label={t(texte.aroma.skala, { label: texte.schema.noten[achse.key].label, von: abNull ? 0 : 1, bis: 5 })}
+                wert={wert - versatz}
+                max={5 - versatz}
                 schritt={1}
-                ring={bedienung && mittel !== undefined ? mittel - 1 : undefined}
-                aendern={bedienung ? (neu) => bedienung.aendern(achse.key, neu + 1) : undefined}
+                ring={bedienung && mittel !== undefined ? mittel - versatz : undefined}
+                aendern={bedienung ? (neu) => bedienung.aendern(achse.key, neu + versatz) : undefined}
+                wertText={wertText}
               />
               <div aria-hidden="true" className="flex justify-between text-caption text-text-muted">
-                <span>1</span>
+                <span>{abNull ? 0 : 1}</span>
                 <span>5</span>
               </div>
             </div>

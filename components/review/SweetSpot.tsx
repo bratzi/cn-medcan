@@ -1,6 +1,7 @@
 "use client";
 
 import { cn } from "@/lib/cn";
+import { rasten, tasteZuWert } from "@/lib/regler-raster";
 import { formatiereWert } from "@/lib/format";
 import { terpenAnzeige } from "@/lib/i18n/terpen";
 import { t } from "@/lib/i18n/text";
@@ -38,8 +39,8 @@ function anteil(wert: number): number {
 function wertAmZeiger(spur: HTMLElement, clientX: number, vergleich?: number): number {
   const rect = spur.getBoundingClientRect();
   const roh = Math.min(Math.max((clientX - rect.left) / rect.width, 0), 1) * MAX;
-  if (vergleich !== undefined && Math.abs(roh - vergleich) <= 0.15) return vergleich;
-  return Math.round(roh * 10) / 10;
+  // Median neben dem Raster bleibt treffbar, die Nachbarstufen auch (T5c).
+  return rasten(roh, { schritt: 0.1, max: MAX, ziel: vergleich });
 }
 
 type Bedienung = {
@@ -165,8 +166,19 @@ export function SweetSpot({
                     type="range"
                     min={0}
                     max={MAX}
-                    step={0.1}
+                    // step="any" und eigene Pfeiltasten (T5c): der Median neben dem Raster bleibt erreichbar.
+                    step="any"
                     value={gezeigt}
+                    onKeyDown={(e) => {
+                      const neu = tasteZuWert(e.key, gezeigt, {
+                        schritt: 0.1,
+                        max: MAX,
+                        ziel: zeile.anzahl ? zeile.wert : undefined,
+                      });
+                      if (neu === null) return;
+                      e.preventDefault();
+                      bedienung.aendern(zeile.terpen, neu);
+                    }}
                     aria-label={t(sw.intensitaetVon, { terpen: terpenAnzeige(zeile.terpen, sprache) })}
                     aria-valuetext={`${einordnung(gezeigt, texte)}, ${t(texte.aroma.vonFuenf, { wert: formatiereWert(gezeigt, sprache) })}`}
                     onFocus={() => bedienung.aktivieren?.(zeile.terpen)}

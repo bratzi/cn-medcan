@@ -204,9 +204,12 @@ export function AromaErkundung({
   const chargenFazitWert = chargenFazit(beschaffenheit?.werte ?? {});
   const { feuchte: eigeneFeuchte, ...eigeneAchsen } = eigeneBeschaffenheit;
   // Wirkung zählt nicht ins Fazit (steht nicht auf der öffentlichen Karte).
-  const { wirkung: _wirkung, ...eigeneEindruecke } = eigeneNoten;
+  const { wirkung: _wirkung, ...alleEindruecke } = eigeneNoten;
+  // Eine auf 0 zurückgezogene Note heißt „keine Note“ (T5c) und zählt nicht.
+  const eigeneEindruecke = Object.fromEntries(
+    Object.entries(alleEindruecke).filter(([, wert]) => (wert ?? 0) >= 1),
+  ) as typeof alleEindruecke;
   void _wirkung;
-  const mittelNoten: Partial<Record<NotenKey, number>> = gesamteindruck?.werte ?? {};
   // Eigenes Sortenfazit nur, wenn Terpene (Karte), Overall oder die eigene Gesamtnote (BlattNote)
   // tatsächlich gesetzt wurden: nur diese drei Stufen fließen hinein, sonst wäre die Zahl bloß eine
   // Kopie des Community-Werts, obwohl man nur an der Charge gedreht hat. Die Gesamtnote kommt als
@@ -228,13 +231,15 @@ export function AromaErkundung({
   return (
     <div className="flex flex-col gap-16 md:gap-24">
       {eingabe ? (
-        // Werte der Regler fürs umschließende Formular: Noten immer (Pflicht, Start
-        // am Community-Mittel, sonst 3), Geschmack immer, Beschaffenheit und
-        // Restfeuchte nur, was bewegt wurde (optional).
+        // Werte der Regler fürs umschließende Formular: Noten nur, wenn gesetzt (Start bei 0 =
+        // keine Note, T5c; Pflicht, der Server meldet eine fehlende Note, statt 0 zu speichern),
+        // Geschmack immer, Beschaffenheit und Restfeuchte nur, was bewegt wurde (optional).
         <div hidden>
-          {BEWERTUNGS_ACHSEN.map(({ key }) => (
-            <input key={key} type="hidden" name={`note-${key}`} value={Math.round(eigeneNoten[key] ?? mittelNoten[key] ?? 3)} />
-          ))}
+          {BEWERTUNGS_ACHSEN.map(({ key }) =>
+            (eigeneNoten[key] ?? 0) >= 1 ? (
+              <input key={key} type="hidden" name={`note-${key}`} value={Math.round(eigeneNoten[key]!)} />
+            ) : null,
+          )}
           {GESCHMACKS_ACHSEN.map(({ key }) => (
             <input key={key} type="hidden" name={`geschmack-${key}`} value={Math.round(werte[key] * 2) / 2} />
           ))}
@@ -263,6 +268,7 @@ export function AromaErkundung({
             bedienung={{
               eigen: eigeneNoten,
               aendern: (key, wert) => setEigeneNoten((alt) => ({ ...alt, [key]: wert })),
+              abNull: eingabe,
             }}
           />
         </Schritt>

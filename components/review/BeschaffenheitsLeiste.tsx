@@ -4,6 +4,7 @@ import { BESCHAFFENHEIT_ACHSEN, type Beschaffenheit } from "@/lib/query/bewertun
 import { formatiereWert } from "@/lib/format";
 import type { AromaTexte } from "@/lib/i18n/typen";
 import { mehrzahl, t } from "@/lib/i18n/text";
+import { rasten, tasteZuWert } from "@/lib/regler-raster";
 
 
 
@@ -59,6 +60,8 @@ type SpurProps = {
   mitte?: number;
   /** Ist er gesetzt, wird die Spur zum Regler. */
   aendern?: (wert: number) => void;
+  /** Ansage des Werts für Screenreader (aria-valuetext), etwa „3 von 5“. */
+  wertText?: (wert: number) => string;
 };
 
 /**
@@ -66,13 +69,12 @@ type SpurProps = {
  * Sweet-Spot-Spur), rastet am Vergleichswert ein; Tastatur über ein
  * unsichtbares Range-Input darüber.
  */
-export function Spur({ label, wert, max, schritt, band, ring, mitte, aendern }: SpurProps) {
+export function Spur({ label, wert, max, schritt, band, ring, mitte, aendern, wertText }: SpurProps) {
   const anteil = (w: number) => (Math.min(Math.max(w, 0), max) / max) * 100;
   const wertAm = (spur: HTMLElement, clientX: number) => {
     const rect = spur.getBoundingClientRect();
     const roh = Math.min(Math.max((clientX - rect.left) / rect.width, 0), 1) * max;
-    if (ring !== undefined && Math.abs(roh - ring) <= max * 0.03) return ring;
-    return Math.round(Math.round(roh / schritt) * schritt * 10) / 10;
+    return rasten(roh, { schritt, max, ziel: ring });
   };
   return (
     <div
@@ -130,10 +132,19 @@ export function Spur({ label, wert, max, schritt, band, ring, mitte, aendern }: 
           type="range"
           min={0}
           max={max}
-          step={schritt}
+          // step="any": der Community-Wert liegt oft neben dem Raster und darf nicht auf die
+          // nächste Stufe gezogen werden; die Pfeiltasten rechnet tasteZuWert (T5c).
+          step="any"
           value={wert}
           aria-label={label}
-          onChange={(e) => aendern(Number(e.target.value))}
+          aria-valuetext={wertText?.(wert)}
+          onKeyDown={(e) => {
+            const neu = tasteZuWert(e.key, wert, { schritt, max, ziel: ring });
+            if (neu === null) return;
+            e.preventDefault();
+            aendern(neu);
+          }}
+          onChange={(e) => aendern(rasten(Number(e.target.value), { schritt, max, ziel: ring }))}
           className="pointer-events-none absolute inset-x-0 top-1/2 h-8 w-full -translate-y-1/2 opacity-0"
         />
       ) : null}
@@ -210,6 +221,7 @@ export function BeschaffenheitsLeiste({
               band={FEUCHTE_GUT}
               ring={bedienung && feuchte !== null ? feuchte : undefined}
               aendern={bedienung ? (wert) => bedienung.aendern("feuchte", wert) : undefined}
+              wertText={(wert) => `${formatiereWert(wert, texte.sprache)} %`}
             />
             <div aria-hidden="true" className="flex justify-between text-caption text-text-muted">
               <span>{texte.aroma.beschaffenheit.trocken}</span>
@@ -233,6 +245,7 @@ export function BeschaffenheitsLeiste({
                 max={5}
                 schritt={0.1}
                 ring={bedienung ? mittel : undefined}
+                wertText={(wert) => t(texte.aroma.vonFuenf, { wert: formatiereWert(wert, texte.sprache) })}
                 mitte={sweetSpot ? QUALITAET_MITTE : undefined}
                 aendern={bedienung ? (neu) => bedienung.aendern(achse.key, neu) : undefined}
               />

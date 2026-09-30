@@ -38,6 +38,7 @@ import { GESCHMACKS_ACHSEN, type GeschmacksMatrix } from "@/lib/query/bewertung"
 import { GeschmackIcon, TerpenIcon } from "@/components/review/AromaIcon";
 import { BEGLEITSTOFFE } from "@/lib/terpen-aromen";
 import { formatiereZahl } from "@/lib/format";
+import { rasten, tasteZuWert } from "@/lib/regler-raster";
 import { terpenAnzeige } from "@/lib/i18n/terpen";
 import { t as text } from "@/lib/i18n/text";
 import type { AromaTexte } from "@/lib/i18n/typen";
@@ -804,10 +805,9 @@ export function AromaKarte({
                   if (!ctm) return regler.werte[key];
                   const p = new DOMPoint(clientX, clientY).matrixTransform(ctm.inverse());
                   const roh = Math.min(Math.max(((rechts - p.x) / (rechts - links)) * MAX, 0), MAX);
-                  const median = regler.vergleich?.[key];
-                  if (median !== undefined && Math.abs(roh - median) <= 0.15) return median;
-                  // Halbe Schritte wie beim Speichern: leichter zu treffen (Nutzer 2026-09-25).
-                  return Math.round(roh * 2) / 2;
+                  // Halbe Schritte wie beim Speichern: leichter zu treffen (Nutzer 2026-09-25);
+                  // der Median neben dem Raster bleibt treffbar (T5c).
+                  return rasten(roh, { schritt: 0.5, max: MAX, ziel: regler.vergleich?.[key] });
                 };
                 return (
                   <g key={`r-${key}`} opacity={kartenSichtbar}>
@@ -1092,8 +1092,20 @@ export function AromaKarte({
                 type="range"
                 min={0}
                 max={MAX}
-                step={0.1}
+                // step="any" und eigene Pfeiltasten (T5c): der Median neben dem Raster bleibt erreichbar.
+                step="any"
                 value={regler.werte[achse.key]}
+                aria-valuetext={text(texte.aroma.vonFuenf, { wert: WERT.format(regler.werte[achse.key]) })}
+                onKeyDown={(e) => {
+                  const neu = tasteZuWert(e.key, regler.werte[achse.key], {
+                    schritt: 0.1,
+                    max: MAX,
+                    ziel: regler.vergleich?.[achse.key],
+                  });
+                  if (neu === null) return;
+                  e.preventDefault();
+                  regler.aendern(achse.key, neu);
+                }}
                 onFocus={(e) => {
                   setAktiv(index);
                   setTastatur(e.currentTarget.matches(":focus-visible") ? index : null);
