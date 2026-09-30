@@ -1214,3 +1214,32 @@ export async function ladeTerpenKatalog(): Promise<KatalogTerpen[]> {
   const zeilen = await prisma.terpen.findMany({ orderBy: { name: "asc" }, select: { name: true, geschmack: true }, take: 200 });
   return zeilen.map((zeile) => ({ name: zeile.name, geschmack: alsGeschmacksKategorie(zeile.geschmack) }));
 }
+
+/** Ein Terpen des Katalogs mit der Zahl unserer aktiven Sorten, die es angeben (T12). */
+export type RegisterKatalogTerpen = KatalogTerpen & { sorten: number; aromaProfil: string };
+
+/**
+ * Terpenkatalog für das Register der Startseite (T12, Nutzer 2026-09-29): eine
+ * einzige Abfrage, gezählt wird in D1 (gefilterter Relations-Count), nicht in JS.
+ * Ungecacht wie die übrigen Startseitendaten (siehe TODO an ladeFilterFacetten:
+ * ISR bräuchte erst die Cache-Bindings).
+ */
+export async function ladeTerpenRegister(): Promise<RegisterKatalogTerpen[]> {
+  const prisma = await getPrisma();
+  const zeilen = await prisma.terpen.findMany({
+    orderBy: { name: "asc" },
+    take: 200,
+    select: {
+      name: true,
+      geschmack: true,
+      aromaProfil: true,
+      _count: { select: { strains: { where: { strain: { aktiv: true } } } } },
+    },
+  });
+  return zeilen.map((zeile) => ({
+    name: zeile.name,
+    geschmack: alsGeschmacksKategorie(zeile.geschmack),
+    aromaProfil: zeile.aromaProfil,
+    sorten: zeile._count.strains,
+  }));
+}

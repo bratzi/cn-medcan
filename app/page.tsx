@@ -7,6 +7,7 @@ import { GemeinsamLernen } from "@/components/story/GemeinsamLernen";
 import { Katalog } from "@/components/story/Katalog";
 import { NeuesterEintrag } from "@/components/story/NeuesterEintrag";
 import { StoryBuehne } from "@/components/story/StoryBuehne";
+import { TerpenRegister } from "@/components/story/TerpenRegister";
 import { TransparentMachen } from "@/components/story/TransparentMachen";
 import { WissenBuendeln } from "@/components/story/WissenBuendeln";
 
@@ -27,6 +28,8 @@ export default function StartPage() {
       <FeldbuchRaster />
       <Auftakt />
       <TransparentMachen />
+      {/* T12: Register der Terpene und Geschmäcker, vor der Aroma-Karte (Nutzer 2026-09-29). */}
+      <TerpenRegister />
       <AromaSektion />
       <WissenBuendeln />
       <GemeinsamLernen />

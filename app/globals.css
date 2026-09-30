@@ -1365,6 +1365,26 @@ html.joint-cursor :is(input:not([type="range"]):not([type="radio"]):not([type="c
   }
 }
 
+/* Register "Terpene und Geschmäcker" (T12, Nutzer 2026-09-29): mit JavaScript zeigt
+   nur die gewählte Tafel (data-aktiv, RegisterAuswahl.tsx). Ohne stehen alle Tafeln
+   untereinander über die volle Breite, die wirkungslosen Knöpfe entfallen. */
+@media (scripting: enabled) {
+  [data-register-tafel]:not([data-aktiv]) {
+    display: none;
+  }
+}
+
+@media (scripting: none) {
+  .register-knoepfe {
+    display: none;
+  }
+
+  .register-tafeln {
+    grid-column: 1 / -1;
+    position: static;
+  }
+}
+
 /* Schatten am Falz während der Drehung (::after): Buch.tsx blendet ihn per WAAPI
    ein und aus. Schmal dreht die ganze Seite um den Rücken links. */
 .buch-stapel[data-blaettern] > .buch-seite::after,
