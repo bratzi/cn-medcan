@@ -333,3 +333,21 @@ test("Erkundungsdaten: ohne Kennwerte kein Median (kein grüner Regler), die Rei
   assert.equal(daten.gesamtnoteMedian, null);
   assert.equal(erkundungsDaten([MYRCEN], [], NAMEN).median, null);
 });
+
+test("Geometrie mit eigener Höhe (Buch, T7b): Spalten und Netz passen in die Höhe, Standard bleibt 480", () => {
+  // Standard unverändert.
+  assert.equal(radiusVon(640), RADIUS);
+  assert.deepEqual(mitteVon(640), { x: 320, y: 240 });
+  // 360 hoch: erste Achse oben bei 48, letzte bei 360 - 48; Terpene ebenso.
+  const achsen = achsenImKarte(640, 360);
+  assert.equal(achsen[0].y, 48);
+  assert.equal(achsen[achsen.length - 1].y, 312);
+  const terpene = terpeneImKarte(3, 640, 360);
+  assert.equal(terpene[0].y, 48);
+  assert.equal(terpene[2].y, 312);
+  assert.deepEqual(mitteVon(640, 360), { x: 320, y: 180 });
+  // Netz samt Beschriftung (radius + 34) bleibt mit Rand in der Höhe.
+  const r = radiusVon(640, 360);
+  assert.equal(r, 120);
+  assert.ok(r + 34 + 20 <= 180);
+});

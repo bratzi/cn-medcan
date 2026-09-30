@@ -58,7 +58,10 @@ test("Auszug: vier Noten ohne Wirkung, Link springt auf den Eintrag", () => {
 
 test("Voll: fünf Noten, Überschrift mit Datum, Restfeuchte, kein Link", () => {
   const html = zeige({ eintrag: eintrag(), umfang: "voll", ueberschrift: "h3" });
-  assert.equal(html.match(/<dt/g)?.length, 5);
+  // Fünf Noten je Fassung: links ab lg, rechts unter lg (T7b, je eine per display verborgen).
+  const { links, rechts } = seiten(html);
+  assert.equal(links.match(/<dt/g)?.length, 5);
+  assert.equal(rechts.match(/<dt/g)?.length, 5);
   assert.match(html, /Wirkung/);
   assert.match(html, /Bewertung vom/);
   assert.match(html, /Restfeuchte optimal/);
@@ -130,36 +133,63 @@ test("Voll ohne Charge sagt es ausdrücklich, als Fuß der linken Seite", () => 
   assert.match(seiten(html).links, /Charge nicht angegeben/);
 });
 
-test("Buch (voll, T7b): links Kopf, Name, Blätter, Noten, Restfeuchte, Text und Charge; rechts die Karte als Reiter", () => {
-  const { links, rechts } = seiten(zeige({ eintrag: eintrag(), umfang: "voll", ueberschrift: "h3" }));
-  for (const teil of [/<h3 id="eintrag-r1-titel"/, />Waldi</, /3,5 von 5 Blättern/, /<dt/, /Restfeuchte optimal/, /Sehr dichte Blüten\./, /Charge CH-2401/]) {
+test("Buch (voll, T7b): ab lg links Kopf, Name, Blätter, Noten, Restfeuchte, Text und Charge; rechts die Karte als Reiter", () => {
+  const { links, rechts } = seiten(zeige({ eintrag: eintrag({ beschaffenheit: { budDichte: 3 } }), umfang: "voll", ueberschrift: "h3" }));
+  for (const teil of [/<h3 id="eintrag-r1-titel"/, />Waldi</, /3,5 von 5 Blättern/, /<dt/, /Restfeuchte optimal/, /Sehr dichte Blüten./, /Charge CH-2401/]) {
     assert.match(links, teil);
   }
   const reihe = ["3,5 von 5 Blättern", "<dt", "Restfeuchte optimal", "Sehr dichte Blüten.", "Charge CH-2401"].map((x) => links.indexOf(x));
   assert.deepEqual([...reihe].sort((a, b) => a - b), reihe, "Reihenfolge links");
+  // Noten, Restfeuchte und Charge links nur ab lg.
+  assert.match(links, /<div class="hidden lg:contents"><dl/);
+  assert.match(links, /<div class="hidden lg:contents"><div class="mt-auto[^"]*"><p [^>]*>Charge CH-2401/);
   assert.doesNotMatch(links, /<figure/);
   assert.match(rechts, /<figure/);
   assert.match(rechts, /role="tablist"/);
   assert.match(rechts, /role="tab"[^>]*aria-selected="true"[^>]*>Aroma-Karte</);
-  assert.match(rechts, />Sweet Spot</);
-  assert.doesNotMatch(rechts, /<dt|Charge CH-2401|Sehr dichte Blüten\./);
+  assert.doesNotMatch(rechts, /Sehr dichte Blüten./);
 });
 
-test("Buch (voll, T7b): feste Höhe ab lg, dichte Seiten, Karte dicht und verkleinerbar", () => {
+test("Buch (voll, T7b): Sweet Spot entfällt (Nutzer 2026-09-30)", () => {
+  const html = zeige({ eintrag: eintrag(), umfang: "voll", ueberschrift: "h3" });
+  assert.doesNotMatch(html, /Sweet Spot|Sweet-Spot/i);
+});
+
+test("Buch (voll, T7b): mobil wie vorher, rechts Noten und Restfeuchte über der Karte, Charge darunter", () => {
+  const { rechts } = seiten(zeige({ eintrag: eintrag(), umfang: "voll", ueberschrift: "h3" }));
+  assert.match(rechts, /<div class="contents lg:hidden"><dl/);
+  const reihe = ["<dl", "Restfeuchte optimal", "<figure", "Charge CH-2401"].map((x) => rechts.indexOf(x));
+  assert.ok(reihe.every((i) => i >= 0), "alles da");
+  assert.deepEqual([...reihe].sort((a, b) => a - b), reihe, "Reihenfolge rechts");
+  assert.match(rechts, /<div class="contents lg:hidden"><div class="mt-auto/);
+});
+
+test("Buch (voll, T7b): feste Höhe ab lg, nichts abgeschnitten, kein zoom; Auszug unberührt", () => {
   const html = zeige({ eintrag: eintrag(), umfang: "voll", ueberschrift: "h3" });
   assert.match(html, /<article [^>]*class="[^"]*\blg:h-\(--buch-h\)/);
-  assert.match(html, /data-buchseite="links" class="[^"]*\blg:overflow-clip\b[^"]*\blg:p-6\b/);
-  assert.match(html, /class="buch-karte"/);
+  assert.match(html, /data-buchseite="links" class="[^"]*\blg:py-4\b/);
+  // Die Seiten schneiden nichts ab (T7b Review 1), und die Karte wird nicht per zoom verkleinert.
+  assert.doesNotMatch(html, /(<article|data-buchseite="(links|rechts)") [^>]*class="[^"]*overflow-(clip|hidden)/);
+  assert.doesNotMatch(html, /buch-karte|zoom/);
   assert.match(html, /\blg:grid-cols-5\b/);
+  // Einzeilig gekürzt heißt: ganz im title (und im Text für Vorleser).
+  assert.match(html, /title="Waldi" class="[^"]*\blg:truncate\b/);
+  assert.match(html, /title="Charge CH-2401" class="[^"]*\blg:truncate\b/);
   const auszug = zeige({ eintrag: eintrag(), umfang: "auszug", ueberschrift: "h3" });
-  assert.doesNotMatch(auszug, /--buch-h|buch-karte|role="tablist"|lg:grid-cols-5/);
+  assert.doesNotMatch(auszug, /--buch-h|role="tablist"|lg:grid-cols-5|lg:truncate|lg:contents/);
 });
 
-test("Buch (voll, T7b): langer Text ab lg begrenzt mit Weiterlesen, kurzer ohne", () => {
+test("Buch (voll, T7b): Reel als Reiter, erst nach Klick geladen, ab lg so hoch wie die Tafel", () => {
+  const html = zeige({ eintrag: eintrag({ instagramReelUrl: "https://www.instagram.com/reel/ABCdef123/" }), umfang: "voll", ueberschrift: "h3" });
+  assert.match(html, /role="tab"[^>]*>Reel</);
+  assert.doesNotMatch(html, /<iframe/);
+  assert.match(html, /class="[^"]*\blg:h-full\b[^"]*\blg:w-auto\b/);
+});
+
+test("Buch (voll, T7b): langer Text ab lg begrenzt mit Weiterlesen (nur ab lg), kurzer ohne", () => {
   const lang = "Sehr dichte Blüten. ".repeat(20);
   const html = zeige({ eintrag: eintrag({ notiz: lang }), umfang: "voll", ueberschrift: "h3" });
-  assert.match(html, /aria-expanded="false"[^>]*>Weiterlesen</);
-  assert.match(html, /max-lg:hidden/);
+  assert.match(html, /<button [^>]*aria-expanded="false"[^>]*class="[^"]*\bmax-lg:hidden\b[^"]*"[^>]*>Weiterlesen<\/button>/);
 });
 
 test("Id und Überschrift eindeutig je Eintrag", () => {

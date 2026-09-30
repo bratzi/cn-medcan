@@ -448,7 +448,6 @@ export const en: Woerterbuch = {
     median: { one: "Median from one review:", other: "Median of all {anzahl} reviews:" },
     reiter: "Values of this review",
     reiterKarte: "Aroma map",
-    reiterSweetSpot: "Sweet spot",
     reiterBeschaffenheit: "Condition",
     reiterReel: "Reel",
     weiterlesen: "Read more",

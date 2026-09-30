@@ -54,12 +54,18 @@ const RECHTS_ABSTAND = 150;
 /** Auf schmalen Karten weniger Platz rechts; lange Namen brechen dort um. */
 const RECHTS_ABSTAND_SCHMAL = 124;
 const OBEN = 48;
-const UNTEN = HOEHE - 48;
+/** Rand unten wie oben (Skala unter der letzten Achse). */
+const RAND_UNTEN = 48;
 export const RADIUS = 180;
 
-/** Netzradius: RADIUS, auf schmalen Karten so klein, dass die Achsennamen am Rand Platz haben. */
-export function radiusVon(breite: number = BREITE): number {
-  return Math.min(RADIUS, runde(breite / 2 - 80));
+/**
+ * Netzradius: RADIUS, auf schmalen Karten so klein, dass die Achsennamen am Rand
+ * Platz haben; auf niedrigen Karten (Buch ab lg, T7b, Nutzer 2026-09-30) so
+ * klein, dass Netz und Namen (radius + 34) in die Höhe passen. Bei HOEHE bleibt
+ * es bei RADIUS.
+ */
+export function radiusVon(breite: number = BREITE, hoehe: number = HOEHE): number {
+  return Math.min(RADIUS, runde(breite / 2 - 80), runde(hoehe / 2 - 60));
 }
 
 const runde = (zahl: number) => Math.round(zahl * 10) / 10 + 0;
@@ -69,28 +75,28 @@ const runde = (zahl: number) => Math.round(zahl * 10) / 10 + 0;
  * der (ggf. breiteren) Karte; die Höhe und damit RADIUS ändern sich nicht,
  * das Netz bleibt also immer gleich groß, nur zentriert auf breite/2.
  */
-export function mitteVon(breite: number = BREITE): Punkt {
-  return { x: breite / 2, y: HOEHE / 2 };
+export function mitteVon(breite: number = BREITE, hoehe: number = HOEHE): Punkt {
+  return { x: breite / 2, y: hoehe / 2 };
 }
 
 export const MITTE: Punkt = mitteVon();
 
 /** Gleichmäßig verteilte y-Positionen einer Spalte. */
-function spalte(anzahl: number, index: number): number {
-  if (anzahl <= 1) return HOEHE / 2;
-  return runde(OBEN + ((UNTEN - OBEN) / (anzahl - 1)) * index);
+function spalte(anzahl: number, index: number, hoehe: number = HOEHE): number {
+  if (anzahl <= 1) return hoehe / 2;
+  return runde(OBEN + ((hoehe - RAND_UNTEN - OBEN) / (anzahl - 1)) * index);
 }
 
 /** Knoten der Geschmacksachsen in der Karten-Ansicht (linke Spalte). */
-export function achsenImKarte(breite: number = BREITE): Punkt[] {
+export function achsenImKarte(breite: number = BREITE, hoehe: number = HOEHE): Punkt[] {
   const x = achsenX(breite);
-  return GESCHMACKS_ACHSEN.map((_, index) => ({ x, y: spalte(GESCHMACKS_ACHSEN.length, index) }));
+  return GESCHMACKS_ACHSEN.map((_, index) => ({ x, y: spalte(GESCHMACKS_ACHSEN.length, index, hoehe) }));
 }
 
 /** Knoten der Terpene (rechte Spalte). */
-export function terpeneImKarte(anzahl: number, breite: number = BREITE): Punkt[] {
+export function terpeneImKarte(anzahl: number, breite: number = BREITE, hoehe: number = HOEHE): Punkt[] {
   const x = runde(breite - (breite < BREITE ? RECHTS_ABSTAND_SCHMAL : RECHTS_ABSTAND));
-  return Array.from({ length: anzahl }, (_, index) => ({ x, y: spalte(anzahl, index) }));
+  return Array.from({ length: anzahl }, (_, index) => ({ x, y: spalte(anzahl, index, hoehe) }));
 }
 
 /**

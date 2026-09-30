@@ -43,8 +43,8 @@ const reihenfolge = (html: string) => [...html.matchAll(/<article id="eintrag-([
 test("Eine Doppelseite für alle: Betreiber zuerst, dann die Community, je neueste zuerst", () => {
   const html = zeige([bewertung("c-alt", false, 2), bewertung("b", true, 1), bewertung("c-neu", false, 9)]);
   assert.deepEqual(reihenfolge(html), ["b", "c-neu", "c-alt"]);
-  // Jede Seite ist eine Doppelseite im vollen Umfang (fünf Noten).
-  assert.equal(html.match(/<dt/g)?.length, 15);
+  // Jede Seite ist eine Doppelseite im vollen Umfang: fünf Noten, seit T7b zweimal (ab lg links, mobil rechts).
+  assert.equal(html.match(/<dt/g)?.length, 30);
 });
 
 test("Nur die erste Seite ist aufgeschlagen, die übrigen liegen gestapelt im DOM", () => {

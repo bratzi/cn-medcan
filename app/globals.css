@@ -1252,34 +1252,12 @@ html.joint-cursor :is(input:not([type="range"]):not([type="radio"]):not([type="c
   /* Schatten am Falz, Farbton wie die Ebenen-Schatten; dunkel tiefer. */
   --buch-schatten: oklch(0.2 0.009 165 / 0.22);
   /* Feste Höhe der Doppelseite ab lg (Doppelseite.tsx, T7b, Nutzer 2026-09-30):
-     Bildschirm minus fester Kopf, minus 6rem = 2rem Luft über dem Buch (wie
-     sein scroll-mt) + 1rem Abstand + 44px Steuerung + 4px Rest. So passt die
-     ganze Doppelseite samt Blättern auf einen Bildschirm, ohne Scrollen.
-     Untergrenze 30rem, darüber hinaus bleibt sie bei 46rem. */
-  --buch-h: clamp(30rem, calc(100svh - var(--kopf-h, 4rem) - 6rem), 46rem);
-}
-
-/* Die Aroma-Karte ist im Browser immer 480px hoch (viewBox-Höhe fest,
-   AromaKarte.tsx). Auf niedrigen Bildschirmen verkleinert zoom sie samt
-   Schalter und Tafel, damit sie auf die feste Seite passt (T7b). Stufen
-   aus: Karte dicht 542px (Schalter 46 + 16 + 480) + Reiter 62px + Innenabstand und Rand 50px +
-   --buch-h-Abzug 96px + Kopf 65px: Bildschirm ab 542·z + 273px. */
-@media (min-width: 64rem) and (max-height: 826px) {
-  .buch-karte {
-    zoom: 0.9;
-  }
-}
-
-@media (min-width: 64rem) and (max-height: 770px) {
-  .buch-karte {
-    zoom: 0.8;
-  }
-}
-
-@media (min-width: 64rem) and (max-height: 713px) {
-  .buch-karte {
-    zoom: 0.7;
-  }
+     Bildschirm minus fester Kopf, minus 5rem = 1rem Luft über dem Buch (sein
+     scroll-mt) + 1rem Abstand + 44px Steuerung + 4px Rest. So passt die ganze
+     Doppelseite samt Blättern auf einen Bildschirm, ohne Scrollen. Untergrenze
+     31.5rem: darunter hätte die Aroma-Karte (mindestens 360px, AromaKarte.tsx)
+     mit Kopfzeile keinen Platz mehr; nach oben bleibt sie bei 46rem. */
+  --buch-h: clamp(31.5rem, calc(100svh - var(--kopf-h, 4rem) - 5rem), 46rem);
 }
 
 @media (prefers-color-scheme: dark) {

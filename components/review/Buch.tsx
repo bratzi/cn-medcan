@@ -429,7 +429,7 @@ export function Buch({ seiten, bezeichnung, texte }: { seiten: readonly BuchSeit
       <div
         ref={buehne}
         // Waagerecht wischt das Buch, senkrecht scrollt und zoomt weiter der Browser.
-        className={cn("buch-stapel", mehrere && "scroll-mt-[calc(var(--kopf-h,4rem)+2rem)] touch-pan-y touch-pinch-zoom")}
+        className={cn("buch-stapel", mehrere && "scroll-mt-[calc(var(--kopf-h,4rem)+1rem)] touch-pan-y touch-pinch-zoom")}
         {...(mehrere
           ? {
               role: "group",

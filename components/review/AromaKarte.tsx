@@ -82,15 +82,23 @@ type Props = {
   /** Alle bekannten Terpene: zeigt zur aktiven Geschmacksrichtung, welche Terpene sie tragen. */
   lernen?: readonly { name: string; geschmack: KartenTerpen["geschmack"] }[];
   /**
-   * Dicht für die Buchseite ab lg (T7b, Nutzer 2026-09-30): Schalter und
-   * Legende in einer Zeile, die Tafel beim Überfahren liegt über dem unteren
-   * Rand der Karte statt darunter Platz zu halten. Unter lg wie sonst.
+   * Dicht für die Buchseite ab lg (T7b, Nutzer 2026-09-30): ohne Titel, oben
+   * `kopf` und Ansicht in einer Zeile, darunter die Legende; die Karte füllt
+   * die restliche Höhe der Seite (gemessen, Achsen rücken zusammen, Schrift
+   * bleibt gleich groß); die Tafel beim Überfahren liegt über dem unteren Rand
+   * der Karte statt darunter Platz zu halten. Unter lg wie sonst.
    */
   kompakt?: boolean;
+  /** Dicht: steht links in der Kopfzeile (die Reiterleiste des Buchs, T7b). */
+  kopf?: React.ReactNode;
   texte: AromaTexte;
 };
 
 const DAUER_MS = 900;
+/** Ab lg liegen die Seiten des Buchs nebeneinander (Buch.tsx). */
+const NEBENEINANDER = "(min-width: 64rem)";
+/** Niedrigste dichte Karte: zehn Achsen im Abstand von rund 29 px, Name über dem Balken. */
+const MIN_HOEHE = 360;
 const FARBE = { gruen: "var(--color-accent)", lila: "var(--color-kopierstift)" } as const;
 const GRAU = "var(--color-border-strong)";
 
@@ -201,6 +209,7 @@ export function AromaKarte({
   bezug = "serie",
   lernen,
   kompakt = false,
+  kopf,
   texte,
 }: Props) {
   const titel = titelRoh ?? texte.aroma.karte.titel;
@@ -240,18 +249,24 @@ export function AromaKarte({
   // Karte nur länger wird, nicht größer.
   const messRef = useRef<HTMLDivElement>(null);
   const [breite, setBreite] = useState<number | null>(null);
+  // Dicht im Buch ab lg (T7b, Nutzer 2026-09-30): die Höhe gibt die feste Seite vor
+  // (Fläche flex-1, SVG absolut darin); sie wird gemessen und ergibt die viewBox-Höhe,
+  // die Karte rückt also enger zusammen, statt verkleinert zu werden. Schrift bleibt groß.
+  const [hoehe, setHoehe] = useState<number | null>(null);
 
   useEffect(() => {
     const element = messRef.current;
     if (!element) return;
     const beobachter = new ResizeObserver((eintraege) => {
-      const gemessen = eintraege[0]?.contentRect.width;
-      if (!gemessen) return;
-      setBreite(Math.max(MIN_BREITE, Math.round(gemessen)));
+      const rahmen = eintraege[0]?.contentRect;
+      if (!rahmen?.width) return;
+      setBreite(Math.max(MIN_BREITE, Math.round(rahmen.width)));
+      const dicht = kompakt && window.matchMedia(NEBENEINANDER).matches && rahmen.height > 0;
+      setHoehe(dicht ? Math.max(MIN_HOEHE, Math.round(rahmen.height)) : null);
     });
     beobachter.observe(element);
     return () => beobachter.disconnect();
-  }, []);
+  }, [kompakt]);
 
   useEffect(() => {
     const ziel = ansicht === "netz" ? 1 : 0;
@@ -335,10 +350,11 @@ export function AromaKarte({
   // dargestellt); danach die gemessene viewBox-Breite. Das Netz (RADIUS)
   // bleibt bei jeder Breite gleich groß, nur sein Mittelpunkt wandert mit.
   const aktBreite = breite ?? BREITE;
-  const mitte = mitteVon(aktBreite);
-  const radius = radiusVon(aktBreite);
+  const aktHoehe = hoehe ?? HOEHE;
+  const mitte = mitteVon(aktBreite, aktHoehe);
+  const radius = radiusVon(aktBreite, aktHoehe);
   const schmal = aktBreite < BREITE;
-  const karte = achsenImKarte(aktBreite);
+  const karte = achsenImKarte(aktBreite, aktHoehe);
   const balken = balkenLaenge(aktBreite);
   const knoten = karte.map((punkt, index) => mische(punkt, netzPunkt(index, MAX, radius + 34, mitte), t));
   // Rechte Spalte: Terpene und Begleitstoffe (Ester, Thiole; keine Terpene) gemeinsam nach
@@ -350,7 +366,7 @@ export function AromaKarte({
     ...terpene.map((terpen, index) => ({ schluessel: `t-${index}`, lage: achsenLage(terpenBoegen(terpen)), name: terpen.name })),
     ...begleiter.map((stoff, index) => ({ schluessel: `b-${index}`, lage: achsenLage(stoff.boegen), name: stoff.name })),
   ].sort((a, b) => a.lage - b.lage || a.name.localeCompare(b.name, "de"));
-  const spalte = terpeneImKarte(reihe.length, aktBreite);
+  const spalte = terpeneImKarte(reihe.length, aktBreite, aktHoehe);
   const platz = new Map(reihe.map((eintrag, index) => [eintrag.schluessel, spalte[index]]));
   const terpenKnoten = terpene.map((_, index) => platz.get(`t-${index}`)!);
   const begleitKnoten = begleiter.map((_, index) => platz.get(`b-${index}`)!);
@@ -379,10 +395,18 @@ export function AromaKarte({
       : null;
 
   return (
-    <figure aria-label={titel} className={cn("flex flex-col gap-6", kompakt && "lg:relative lg:gap-4")}>
+    <figure aria-label={titel} className={cn("flex flex-col gap-6", kompakt && "lg:relative lg:min-h-0 lg:flex-1 lg:gap-4")}>
       {/* Kopf der Karte: links der Name in Logoschrift mit Verlauf und, mit Reglern, die Skala;
           rechts Ansicht und Legende. */}
-      <div className={cn("flex flex-wrap items-start gap-8", ohneTitel && !regler ? "justify-end" : "justify-between")}>
+      <div
+        className={cn(
+          "flex flex-wrap items-start gap-8",
+          ohneTitel && !regler ? "justify-end" : "justify-between",
+          // Dicht: Zeile 1 Reiterleiste des Buchs und Ansicht, Zeile 2 die Legende über die volle Breite.
+          kompakt && "lg:items-center lg:gap-x-4 lg:gap-y-2",
+        )}
+      >
+      {kopf}
       {ohneTitel ? null : (
         <p className={cn("farbverlauf font-hand text-erzaehlung text-balance wrap-break-word leading-[0.9]", kompakt && "lg:hidden")}>{titel}</p>
       )}
@@ -401,7 +425,7 @@ export function AromaKarte({
           )}
         </div>
       ) : null}
-      <div className={cn("flex flex-col items-end gap-6", kompakt && "lg:flex-row lg:flex-wrap lg:items-center lg:justify-end lg:gap-4")}>
+      <div className={cn("flex flex-col items-end gap-6", kompakt && "lg:contents")}>
       <div className="flex flex-wrap items-center justify-end gap-4">
         {/* Ansichts-Schalter als Radiogroup (APG): ein Tabstopp, Pfeiltasten wählen.
             Druck-Rückmeldung per scale 0.97, nur ohne reduzierte Bewegung. */}
@@ -437,7 +461,7 @@ export function AromaKarte({
       {/* Legende: im Netz die Serien wie bisher. In der Karte (T5b) der Balken der Bewertung
           (grün bis zum Bezug, lila darüber), der Soll-Strich der grünen Serie und der stille
           Streifen der Herstellerangabe; der Ring des Community-Medians steht links bei der Skala. */}
-      <ul className="flex flex-wrap justify-end gap-x-6 gap-y-2 text-small text-text">
+      <ul className={cn("flex flex-wrap justify-end gap-x-6 gap-y-2 text-small text-text", kompakt && "lg:basis-full")}>
         {ansicht === "netz" ? (
           serien.map((serie) => (
             <li key={serie.name} className="inline-flex items-center gap-2">
@@ -473,13 +497,15 @@ export function AromaKarte({
 
       <div
         ref={messRef}
-        className={cn("relative w-full", breite === null && "mx-auto max-w-3xl")}
+        className={cn("relative w-full", breite === null && "mx-auto max-w-3xl", kompakt && "lg:min-h-90 lg:max-h-120 lg:flex-1")}
         onMouseLeave={() => {
           setAktiv(null);
           setTerpenAktiv(null);
         }}
       >
-        <svg ref={svgRef} viewBox={`0 0 ${aktBreite} ${HOEHE}`} aria-hidden="true" className="block w-full text-text">
+        <svg ref={svgRef} viewBox={`0 0 ${aktBreite} ${aktHoehe}`}
+          aria-hidden="true"
+          className={cn("block w-full text-text", kompakt && "lg:absolute lg:inset-0 lg:h-full")}>
           <defs>
             {/* Sweet-Spot-Stil der Regler-Spur: rechts 0, links 5 (Balken wachsen nach links). */}
             <linearGradient id={spurId} x1="1" x2="0" y1="0" y2="0">
@@ -956,7 +982,7 @@ export function AromaKarte({
               // Mindestens 124 vom Rand, damit der längste Name (Icon + KRÄUTRIG, rund 118 px)
               // auf schmalen Karten nicht links hinausragt.
               left: `${((t < 0.5 ? Math.max(punkt.x - 150 * kartenSichtbar, 124) : punkt.x) / aktBreite) * 100}%`,
-              top: `${((punkt.y - 20 * kartenSichtbar) / HOEHE) * 100}%`,
+              top: `${((punkt.y - 20 * kartenSichtbar) / aktHoehe) * 100}%`,
             }}
           >
             <GeschmackIcon geschmack={GESCHMACKS_ACHSEN[index].enumWert} />
@@ -982,7 +1008,7 @@ export function AromaKarte({
               )}
               style={{
                 left: `${(punkt.x / aktBreite) * 100}%`,
-                top: `${(punkt.y / HOEHE) * 100}%`,
+                top: `${(punkt.y / aktHoehe) * 100}%`,
                 opacity: kartenSichtbar,
                 // Schmal: lange Namen (beta-Caryophyllen) brechen am Bindestrich um statt hinauszuragen.
                 maxWidth: schmal ? `${aktBreite - punkt.x}px` : undefined,
@@ -1006,7 +1032,7 @@ export function AromaKarte({
               "absolute flex -translate-y-1/2 flex-col items-start pl-4 text-left whitespace-nowrap transition-colors duration-normal",
               begleitBetont(begleiter[index].name) ? "text-text" : "text-text-muted",
             )}
-            style={{ left: `${(punkt.x / aktBreite) * 100}%`, top: `${(punkt.y / HOEHE) * 100}%`, opacity: kartenSichtbar }}
+            style={{ left: `${(punkt.x / aktBreite) * 100}%`, top: `${(punkt.y / aktHoehe) * 100}%`, opacity: kartenSichtbar }}
           >
             {/* Hinweis in eigener Zeile, sonst ragt er über schmale Karten (Doppelseite) hinaus. */}
             <span className="inline-flex items-center gap-1.5 text-small italic">
@@ -1026,7 +1052,8 @@ export function AromaKarte({
         aria-live="polite"
         className={cn(
           "grid min-h-80 justify-items-center sm:min-h-56",
-          // Dicht: über dem unteren Rand der Karte, ohne eigene Höhe; nur die Tafel fängt Zeiger.
+          // Dicht: über dem unteren Rand der Karte, ohne eigene Höhe. Fängt keine Zeiger (auch die
+          // Tafel nicht, pointer-events erbt), damit das Überfahren der Karte darunter weiterläuft.
           kompakt &&
             "lg:pointer-events-none lg:absolute lg:inset-x-0 lg:bottom-0 lg:z-10 lg:min-h-0 lg:*:rounded-lg lg:*:border lg:*:border-border lg:*:bg-surface-raised lg:*:p-4 lg:*:shadow-md",
         )}

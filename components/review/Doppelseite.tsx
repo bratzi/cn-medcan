@@ -1,4 +1,5 @@
 import Link from "next/link";
+import type { ReactNode } from "react";
 
 import { InstagramEmbed, baueEmbedUrl } from "@/components/produkt/InstagramEmbed";
 import { AromaKarte, type AromaSerie } from "@/components/review/AromaKarte";
@@ -8,7 +9,6 @@ import { BuchNotiz } from "@/components/review/BuchNotiz";
 import { BuchReiter, type BuchReiterEintrag } from "@/components/review/BuchReiter";
 import { NurAufgeschlagen } from "@/components/review/NurAufgeschlagen";
 import { KartenBild } from "@/components/review/SortenKopf";
-import { SweetSpot } from "@/components/review/SweetSpot";
 import { herstellerProfil } from "@/lib/aromakarte";
 import { eintragAnker, eintragHref, type EintragDaten } from "@/components/review/eintrag";
 import { Avatar, Badge, buttonKlassen, type BadgeVariante } from "@/components/ui";
@@ -125,10 +125,18 @@ export function Doppelseite({ eintrag, umfang, ueberschrift: Ueberschrift, story
   );
 
   // Die Charge schließt die Seite ab wie eine Fußnote; im Auszug darunter der Weg zum ganzen Eintrag.
+  // Im Buch ab lg eine Zeile (truncate, ganz im title und für Vorleser), damit sie nie unter den Rand rutscht.
   const fuss =
     charge || !voll ? (
-      <div className="mt-auto flex flex-col gap-4">
-        {charge ? <p className={cn("text-small text-text-muted", eintrag.chargenNr && "numeric")}>{charge}</p> : null}
+      <div className="mt-auto flex min-w-0 flex-col gap-4">
+        {charge ? (
+          <p
+            title={voll ? charge : undefined}
+            className={cn("text-small text-text-muted", eintrag.chargenNr && "numeric", voll && "lg:truncate")}
+          >
+            {charge}
+          </p>
+        ) : null}
         {voll ? null : (
           <p>
             <Link href={eintragHref(eintrag.slug, eintrag.id)} className={buttonKlassen("secondary", "md")}>
@@ -139,19 +147,22 @@ export function Doppelseite({ eintrag, umfang, ueberschrift: Ueberschrift, story
       </div>
     ) : null;
 
-  const karte = <AromaKarte terpene={eintrag.terpene} serien={aromaSerien(eintrag, w)} texte={texte} kompakt={voll} />;
-  const intensitaet = Object.entries(eintrag.terpenIntensitaet).map(([terpen, wert]) => ({ terpen, wert }));
-  const reiter: BuchReiterEintrag[] = [
-    // buch-karte: auf niedrigen Bildschirmen verkleinert (globals.css), damit sie auf die Seite passt.
-    { schluessel: "karte", titel: w.buch.reiterKarte, inhalt: <div className="buch-karte">{karte}</div> },
-  ];
-  if (intensitaet.length > 0) {
-    reiter.push({
-      schluessel: "sweetspot",
-      titel: w.buch.reiterSweetSpot,
-      inhalt: <SweetSpot titel={w.aroma.erkundung.intensitaet} texte={texte} spalten zeilen={intensitaet} />,
-    });
-  }
+  const feuchteHinweis = w.schema.feuchte[FEUCHTE_HINWEIS[feuchtigkeit.einordnung]];
+  const feuchte = (
+    <div className="flex flex-col items-start gap-2 max-md:items-center lg:flex-row lg:items-center lg:gap-4">
+      <Badge variante={FEUCHTIGKEIT[feuchtigkeit.einordnung]}>{feuchtigkeitsText}</Badge>
+      {/* Ab lg höchstens zwei Zeilen; der ganze Satz steht im title und bleibt für Vorleser. */}
+      <p title={feuchteHinweis} className="max-w-[56ch] text-small text-text-muted max-md:mx-auto lg:line-clamp-2">
+        {feuchteHinweis}
+      </p>
+    </div>
+  );
+
+  const karte = (kopf?: ReactNode) => (
+    <AromaKarte terpene={eintrag.terpene} serien={aromaSerien(eintrag, w)} texte={texte} kompakt={voll} kopf={kopf} />
+  );
+  // Sweet Spot entfällt im Buch (Nutzer 2026-09-30: „Sweetspot raus bei den terpenen“).
+  const reiter: BuchReiterEintrag[] = [{ schluessel: "karte", titel: w.buch.reiterKarte, inhalt: karte }];
   if (Object.keys(eintrag.beschaffenheit).length > 0) {
     reiter.push({
       schluessel: "beschaffenheit",
@@ -163,15 +174,28 @@ export function Doppelseite({ eintrag, umfang, ueberschrift: Ueberschrift, story
     reiter.push({
       schluessel: "reel",
       titel: w.buch.reiterReel,
-      inhalt: <InstagramEmbed url={reel} bezeichnung={eintrag.handelsname} texte={w.reel} />,
+      // Ab lg so hoch wie die Tafel, die Breite folgt dem Hochformat; der iframe lädt erst nach dem Klick.
+      inhalt: (
+        <div className="lg:min-h-0 lg:flex-1">
+          <InstagramEmbed
+            url={reel}
+            bezeichnung={eintrag.handelsname}
+            texte={w.reel}
+            className="lg:h-full lg:w-auto lg:max-w-full lg:min-w-72"
+          />
+        </div>
+      ),
     });
   }
 
   /* Im Buch (voll) ab lg hat die Doppelseite eine feste Höhe (--buch-h, globals.css), damit sie samt
      Steuerung auf einen Bildschirm passt (T7b, Nutzer 2026-09-30). Links Kopf, Name mit Blättern, die
-     Noten in einer Zeile, Restfeuchte, der Text (begrenzt, „Weiterlesen“) und die Charge; rechts die
-     großen Werte als Reiter. Unter lg (mobil zurückgestellt) steht alles untereinander. */
-  const seite = cn(SEITE, voll && "lg:gap-4 lg:overflow-clip lg:p-6");
+     Noten in einer Zeile, Restfeuchte, der Text (so viele Zeilen, wie Platz ist, dazu „Weiterlesen“) und
+     die Charge; rechts Aroma-Karte, Beschaffenheit und Reel als Reiter. Unter lg (mobil zurückgestellt)
+     wie vor T7b: Noten, Restfeuchte und Charge in der rechten Hälfte um die Karte; sie stehen deshalb
+     zweimal im HTML, je eine Fassung ist per display verborgen (auch für Vorleser). Nichts wird
+     abgeschnitten: jeder Teil hat eine feste oder begrenzte Höhe, nur der Text nimmt den Rest. */
+  const seite = cn(SEITE, voll && "lg:gap-4 lg:px-6 lg:py-4");
 
   return (
     <article
@@ -214,22 +238,27 @@ export function Doppelseite({ eintrag, umfang, ueberschrift: Ueberschrift, story
           </div>
         ) : null}
 
-        {/* Im Buch ab lg stehen Name und Blätter in einer Zeile, sonst untereinander. */}
+        {/* Im Buch ab lg stehen Name und Blätter in einer Zeile (der Name kürzt sich), sonst untereinander. */}
         <div
           className={
-            voll ? "flex flex-col gap-8 lg:flex-row lg:flex-wrap lg:items-center lg:justify-between lg:gap-4" : "contents"
+            voll ? "flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between lg:gap-4" : "contents"
           }
         >
           {/* Wer spricht: Avatar (T8) vor dem Namen. Ohne Autor und ohne Betreiber
               (ohneName) gibt es keinen Kreis, sonst stünde ein Initial für "Anonym". */}
-          <div className="flex items-center gap-4">
+          <div className="flex min-w-0 items-center gap-4">
             {eintrag.autorName || eintrag.istBetreiber ? (
               <Avatar name={name} bildId={eintrag.autorAvatarId} groesse="md" />
             ) : null}
             {/* gap-1 = 4px: Name und Datum bzw. Marke sind ein Paar. Die Zeilen sind
                 Blöcke, damit sie der Textausrichtung der Seite folgen. */}
-            <p className="flex flex-col gap-1">
-              <span className="text-body font-medium text-text wrap-break-word">{name}</span>
+            <p className="flex min-w-0 flex-col gap-1">
+              <span
+                title={voll ? name : undefined}
+                className={cn("text-body font-medium text-text wrap-break-word", voll && "lg:truncate")}
+              >
+                {name}
+              </span>
               <span className="text-small text-text-muted">
                 {voll ? (
                   <Badge variante={eintrag.istBetreiber ? "accent" : "neutral"} zeichen={false}>
@@ -243,23 +272,20 @@ export function Doppelseite({ eintrag, umfang, ueberschrift: Ueberschrift, story
           </div>
 
           {eintrag.gesamtnote !== null ? (
-            <BlattAnzeige
-              note={eintrag.gesamtnote}
-              text={t(w.bewerten.blattWert, { wert: formatiereWert(eintrag.gesamtnote, sprache) })}
-            />
+            <div className={voll ? "lg:shrink-0" : "contents"}>
+              <BlattAnzeige
+                note={eintrag.gesamtnote}
+                text={t(w.bewerten.blattWert, { wert: formatiereWert(eintrag.gesamtnote, sprache) })}
+              />
+            </div>
           ) : null}
         </div>
 
         {voll ? (
-          <>
+          <div className="hidden lg:contents">
             {noten}
-            <div className="flex flex-col items-start gap-2 max-md:items-center lg:flex-row lg:items-center lg:gap-4">
-              <Badge variante={FEUCHTIGKEIT[feuchtigkeit.einordnung]}>{feuchtigkeitsText}</Badge>
-              <p className="max-w-[56ch] text-small text-text-muted max-md:mx-auto lg:line-clamp-2">
-                {w.schema.feuchte[FEUCHTE_HINWEIS[feuchtigkeit.einordnung]]}
-              </p>
-            </div>
-          </>
+            {feuchte}
+          </div>
         ) : null}
 
         {eintrag.notiz ? (
@@ -270,7 +296,7 @@ export function Doppelseite({ eintrag, umfang, ueberschrift: Ueberschrift, story
           )
         ) : null}
 
-        {voll ? fuss : null}
+        {voll ? <div className="hidden lg:contents">{fuss}</div> : null}
       </div>
 
       <div data-buchseite="rechts" className={cn(seite, FALZ_RECHTS)}>
@@ -278,11 +304,18 @@ export function Doppelseite({ eintrag, umfang, ueberschrift: Ueberschrift, story
             Fläche bleibt stehen: das Buch dreht sie beim Blättern. */}
         <NurAufgeschlagen>
           {voll ? (
-            <BuchReiter bezeichnung={w.buch.reiter} reiter={reiter} />
+            <>
+              <div className="contents lg:hidden">
+                {noten}
+                {feuchte}
+              </div>
+              <BuchReiter bezeichnung={w.buch.reiter} reiter={reiter} />
+              <div className="contents lg:hidden">{fuss}</div>
+            </>
           ) : (
             <>
               {noten}
-              {karte}
+              {karte()}
               {fuss}
             </>
           )}
