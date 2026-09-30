@@ -36,6 +36,7 @@ export function FazitLauf({
   const leiste = useRef<HTMLButtonElement>(null);
   const schliessen = useRef<HTMLButtonElement>(null);
   const warOffen = useRef(false);
+  const sheet = useRef<HTMLElement>(null);
 
   useEffect(() => {
     const ziel = beobachte.current;
@@ -50,8 +51,24 @@ export function FazitLauf({
     if (offen) {
       warOffen.current = true;
       schliessen.current?.focus();
+      // Echt modal (T16-Fix I2): Tab und Umschalt+Tab bleiben im Sheet.
       const taste = (ereignis: KeyboardEvent) => {
         if (ereignis.key === "Escape") setOffen(false);
+        if (ereignis.key !== "Tab" || !sheet.current) return;
+        const fokussierbar = Array.from(
+          sheet.current.querySelectorAll<HTMLElement>('a[href], button:not([disabled]), input, select, textarea, [tabindex]:not([tabindex="-1"])'),
+        );
+        const erstes = fokussierbar[0];
+        const letztes = fokussierbar[fokussierbar.length - 1];
+        if (!erstes || !letztes) return;
+        const aktiv = document.activeElement;
+        if (ereignis.shiftKey && (aktiv === erstes || !sheet.current.contains(aktiv))) {
+          ereignis.preventDefault();
+          letztes.focus();
+        } else if (!ereignis.shiftKey && (aktiv === letztes || !sheet.current.contains(aktiv))) {
+          ereignis.preventDefault();
+          erstes.focus();
+        }
       };
       document.addEventListener("keydown", taste);
       return () => document.removeEventListener("keydown", taste);
@@ -82,13 +99,14 @@ export function FazitLauf({
       ) : null}
 
       <aside
+        ref={sheet}
         id={id}
         aria-label={texte.aroma.fazitLauf.titel}
         {...(offen ? { role: "dialog", "aria-modal": true } : {})}
         className={
           "xl:sticky xl:top-[calc(var(--kopf-h,4rem)+2rem)] xl:block xl:self-start " +
           (offen
-            ? "fazit-lauf-bewegt fixed inset-x-0 bottom-0 z-50 max-h-[85svh] overflow-y-auto rounded-t-lg border-t border-border bg-surface px-4 pt-4 pb-[calc(2rem+env(safe-area-inset-bottom))] shadow-lg transition-transform duration-normal ease-out starting:translate-y-full xl:static xl:z-auto xl:max-h-none xl:overflow-visible xl:rounded-none xl:border-0 xl:bg-transparent xl:p-0 xl:shadow-none"
+            ? "fazit-lauf-bewegt fixed inset-x-0 bottom-0 z-50 max-h-[85svh] overflow-y-auto rounded-t-lg border-t border-border bg-surface px-4 pt-4 pb-[calc(2rem+env(safe-area-inset-bottom))] overscroll-contain shadow-lg transition-transform duration-normal ease-out starting:translate-y-full xl:static xl:z-auto xl:max-h-none xl:overflow-visible xl:rounded-none xl:border-0 xl:bg-transparent xl:p-0 xl:shadow-none"
             : "hidden")
         }
       >

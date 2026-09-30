@@ -435,13 +435,14 @@ export function AromaErkundung({
                       damit die Konturen deckungsgleich bleiben. */}
                   <dd className="relative isolate flex justify-center tabular-nums">
                     {/* Die Essenz der Seite (Nutzer 2026-09-25): dieselben driftenden Konturen
-                        wie die Wortmarke im Hero, dazu ein ruhiges Pulsieren. */}
+                        wie die Wortmarke im Hero, dazu ein ruhiges Pulsieren. In der 18rem-Spalte ab xl fest
+                          4rem (T16-Fix I1): text-umschlag wüchse dort bis 16rem und bräche um. */}
                     {["marke-kontur-1", "marke-kontur-2", "marke-kontur-3", "marke-kontur-4"].map((klasse) => (
-                      <span key={klasse} aria-hidden="true" className={`marke-kontur ${klasse} font-hand text-umschlag leading-none`}>
+                      <span key={klasse} aria-hidden="true" className={`marke-kontur ${klasse} font-hand text-umschlag leading-none xl:text-[4rem]`}>
                         <span>{prozent(sortenFazitWert, texte.sprache)}</span>
                       </span>
                     ))}
-                    <span className="fazit-puls farbverlauf font-hand text-umschlag leading-none">
+                    <span className="fazit-puls farbverlauf font-hand text-umschlag leading-none xl:text-[4rem]">
                       {prozent(sortenFazitWert, texte.sprache)}
                     </span>
                   </dd>

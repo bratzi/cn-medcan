@@ -56,3 +56,18 @@ test("Ohne eigene Werte zeigt die Leiste den Community-Wert, ohne Delta", () => 
   assert.match(leiste, new RegExp(de.aroma.erkundung.communityFazit));
   assert.doesNotMatch(leiste, /Pkt\./);
 });
+
+test("Handschrift-Zahl des Sortenfazits bleibt in der 18rem-Spalte ab xl bei 4rem (Fix I1)", () => {
+  const html = erkundung(true);
+  const zahlen = html.match(/class="[^"]*text-umschlag[^"]*"/g) ?? [];
+  assert.ok(zahlen.length >= 2);
+  for (const klasse of zahlen) assert.match(klasse, /xl:text-\[4rem\]/);
+});
+
+test("Sheet hält den Fokus: Tab-Falle im Quelltext von FazitLauf (Fix I2)", async () => {
+  const { readFileSync } = await import("node:fs");
+  const quelle = readFileSync("components/review/FazitLauf.tsx", "utf8");
+  assert.match(quelle, /ereignis\.key !== "Tab"/);
+  assert.match(quelle, /letztes\.focus\(\)/);
+  assert.match(quelle, /erstes\.focus\(\)/);
+});
