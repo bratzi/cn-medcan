@@ -1,4 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
+import { bewertenWeiterleitung } from "@/lib/alte-adressen";
 import { COOKIE_NAME, tokenPruefen } from "@/lib/gate";
 
 /**
@@ -12,6 +13,10 @@ import { COOKIE_NAME, tokenPruefen } from "@/lib/gate";
  * Secret gesetzt sein, siehe README.
  */
 export async function proxy(request: NextRequest) {
+  // Alte Bewertungsadresse, dauerhaft; vor dem Gate, das greift auf dem Ziel.
+  const bewerten = bewertenWeiterleitung(request.nextUrl.pathname, request.nextUrl.search);
+  if (bewerten) return NextResponse.redirect(new URL(bewerten, request.url), 308);
+
   const passwort = process.env.SITE_PASSWORD;
   const secret = process.env.SITE_SESSION_SECRET;
 

@@ -6,7 +6,7 @@ import { join } from "node:path";
 import { getPathMatch } from "next/dist/shared/lib/router/utils/path-match";
 import { prepareDestination } from "next/dist/shared/lib/router/utils/prepare-destination";
 
-import { ALTE_KATALOG_WEITERLEITUNGEN } from "@/lib/alte-adressen";
+import { ALTE_KATALOG_WEITERLEITUNGEN, bewertenWeiterleitung } from "@/lib/alte-adressen";
 
 /** Spielt die Redirect-Regeln so durch, wie Next sie auswertet. */
 function weiterleiten(pfad: string, query: Record<string, string> = {}) {
@@ -42,8 +42,16 @@ test("/produkte/:slug leitet dauerhaft auf /blueten/:slug", () => {
   });
 });
 
-test("/bewerten/:slug leitet dauerhaft auf die Maske in der Blütenseite (#bewerten)", () => {
-  assert.deepEqual(weiterleiten("/bewerten/nebelharz-22"), { ziel: "/blueten/nebelharz-22#bewerten", permanent: true });
+test("/bewerten/:slug: Query steht vor dem Fragment, dauerhaft", () => {
+  assert.deepEqual(bewertenWeiterleitung("/bewerten/nebelharz-22", ""), "/blueten/nebelharz-22#bewerten");
+  assert.deepEqual(bewertenWeiterleitung("/bewerten/apples-bananas", "?a=1"), "/blueten/apples-bananas?a=1#bewerten");
+  assert.equal(bewertenWeiterleitung("/bewerten/a/b", ""), null);
+  assert.equal(bewertenWeiterleitung("/blueten/a", ""), null);
+});
+
+test("config-Redirects tragen kein Fragment: OpenNext haengt die Query hinter den fertigen Zielstring", () => {
+  for (const regel of ALTE_KATALOG_WEITERLEITUNGEN) assert.ok(!regel.destination.includes("#"), regel.source);
+  assert.equal(weiterleiten("/bewerten/nebelharz-22"), null);
 });
 
 test("nur die alten Adressen werden umgeleitet", () => {
@@ -51,8 +59,7 @@ test("nur die alten Adressen werden umgeleitet", () => {
   assert.equal(weiterleiten("/blueten/nebelharz-22"), null);
   assert.equal(weiterleiten("/produkte-archiv"), null);
   assert.equal(weiterleiten("/produkte/a/b"), null);
-  assert.equal(weiterleiten("/bewerten/a/b"), null);
-});
+  });
 
 test("Ziel existiert als Route, die alte Route ist weg, next.config nutzt die Regeln", () => {
   const wurzel = process.cwd();
