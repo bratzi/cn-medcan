@@ -95,7 +95,15 @@ export function BudpicDiashow({ bilder, name, texte, rahmen = "aspect-square w-f
       onBlur={() => setFokus(false)}
     >
       <div className={cn("relative overflow-hidden bg-surface-sunken", rahmen)} title={zeigt.beschriftung}>
-        {bilder.map((bild, i) => (
+        {bilder.map((bild, i) => {
+          // Im DOM stehen nur das aktuelle und das naechste Bild (im Sparmodus nur das
+          // aktuelle): das naechste ist geladen, bevor es ueberblendet wird. Waehrend des
+          // Ueberblendens bleibt zusaetzlich das eben verlassene Bild darunter stehen, sonst
+          // gaebe es beim Ueberblenden einen Sprung auf den leeren Grund.
+          const naechstes = anzahl > 1 && i === (nr + 1) % anzahl;
+          const vorheriges = !ruhig && anzahl > 1 && i === (nr - 1 + anzahl) % anzahl;
+          if (i !== nr && !(naechstes && !sparen) && !vorheriges) return null;
+          return (
           <div
             key={bild.id}
             aria-hidden={i !== nr}
@@ -111,11 +119,12 @@ export function BudpicDiashow({ bilder, name, texte, rahmen = "aspect-square w-f
               breite={bild.breite}
               hoehe={bild.hoehe}
               alt={t(texte.alt, { name })}
-              lazy={i !== 0}
+              lazy={i !== nr}
               className="size-full object-cover"
             />
           </div>
-        ))}
+          );
+        })}
       </div>
       <figcaption className="flex flex-wrap items-center justify-between gap-2 text-caption text-text-muted">
         <span>{zeigt.beschriftung}</span>

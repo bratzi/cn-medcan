@@ -35,12 +35,15 @@ export async function ladeFreieBudpics(strainIds: readonly string[]): Promise<Ma
 
 export type OffenesBudpic = { id: string; strainSlug: string; handelsname: string; nutzer: string; erstelltAm: Date; breite: number; hoehe: number};
 
-/** Offene Budpics fuer /admin, aelteste zuerst; ohne `daten`. */
-export async function ladeOffeneBudpics(): Promise<{ eintraege: OffenesBudpic[]; gesamt: number }> {
+/**
+ * Budpics eines Status fuer /admin; ohne `daten`. Offene aelteste zuerst
+ * (die Warteschlange), freigegebene neueste zuerst (zum Zurueckziehen).
+ */
+export async function ladeBudpicsNachStatus(status: "OFFEN" | "FREIGEGEBEN"): Promise<{ eintraege: OffenesBudpic[]; gesamt: number }> {
   const prisma = await getPrisma();
   const [zeilen, gesamt] = await Promise.all([
     prisma.budpic.findMany({
-      where: { status: "OFFEN" },
+      where: { status },
       select: {
         id: true,
         erstelltAm: true,
@@ -49,10 +52,10 @@ export async function ladeOffeneBudpics(): Promise<{ eintraege: OffenesBudpic[];
         strain: { select: { slug: true, handelsname: true } },
         mitglied: { select: { anzeigename: true } },
       },
-      orderBy: { erstelltAm: "asc" },
+      orderBy: { erstelltAm: status === "OFFEN" ? "asc" : "desc" },
       take: 50,
     }),
-    prisma.budpic.count({ where: { status: "OFFEN" } }),
+    prisma.budpic.count({ where: { status } }),
   ]);
   return {
     gesamt,

@@ -10,6 +10,8 @@ type Props = {
   breite: number;
   hoehe: number;
   handelsname: string;
+  /** Offene Bilder lassen sich freigeben; freigegebene nur ablehnen oder loeschen (Zurueckziehen). */
+  freigegeben?: boolean;
 };
 
 /**
@@ -17,7 +19,7 @@ type Props = {
  * Die Vorschau kommt ueber /api/bild/offen/<id>, die nur der Betreiber sieht.
  * Die Aktionen pruefen die Berechtigung selbst (app/admin/budpic-aktionen.ts).
  */
-export function BudpicFreigabe({ id, breite, hoehe, handelsname }: Props) {
+export function BudpicFreigabe({ id, breite, hoehe, handelsname, freigegeben = false }: Props) {
   const aktion = useAktion();
 
   function los(lauf: (fd: FormData) => Promise<{ ok: true } | { ok: false; fehler: string }>) {
@@ -32,11 +34,13 @@ export function BudpicFreigabe({ id, breite, hoehe, handelsname }: Props) {
         <BudpicBild id={id} offen breite={breite} hoehe={hoehe} alt={`Vorschau: ${handelsname}`} className="size-full object-cover" />
       </div>
       <div className="flex flex-wrap gap-2">
-        <Button groesse="sm" disabled={!aktion.bereit} onClick={() => los(budpicFreigeben)}>
-          Freigeben
-        </Button>
+        {freigegeben ? null : (
+          <Button groesse="sm" disabled={!aktion.bereit} onClick={() => los(budpicFreigeben)}>
+            Freigeben
+          </Button>
+        )}
         <Button groesse="sm" variante="secondary" disabled={!aktion.bereit} onClick={() => los(budpicAblehnen)}>
-          Ablehnen
+          {freigegeben ? "Zurückziehen (ablehnen)" : "Ablehnen"}
         </Button>
         <Button groesse="sm" variante="ghost" disabled={!aktion.bereit} onClick={() => los(budpicLoeschen)}>
           Löschen

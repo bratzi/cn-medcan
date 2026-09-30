@@ -66,3 +66,19 @@ test("Migration 0012 legt budpics mit Statuspruefung an", () => {
   assert.match(m, /CREATE TABLE "budpics"/);
   assert.match(m, /CHECK \("status" IN \('OFFEN', 'FREIGEGEBEN', 'ABGELEHNT'\)\)/);
 });
+
+test("Diashow rendert nur aktuelles, naechstes und (zum Ueberblenden) vorheriges Bild", () => {
+  const vier = Array.from({ length: 4 }, (_, i) => ({ ...liste[0], id: `${i}f2b8c1e-0a4d-4e6b-9c1a-2d5e7f809abc` }));
+  const html = renderToStaticMarkup(createElement(BudpicDiashow, { bilder: alsDiashow(vier, de, "de"), name: "Nebel", texte: de.budpic }));
+  assert.equal((html.match(/<img/g) ?? []).length, 3);
+  assert.doesNotMatch(html, /2f2b8c1e/);
+});
+
+test("Ablehnen leert den BLOB, Freigegebene lassen sich in /admin zurueckziehen und loeschen", () => {
+  const ad = readFileSync("app/admin/budpic-aktionen.ts", "utf8");
+  assert.match(ad, /status: was, daten: new Uint8Array\(0\)/);
+  assert.match(ad, /budpic\.delete/);
+  const seite = readFileSync("app/admin/page.tsx", "utf8");
+  assert.match(seite, /<BudpicListe status="FREIGEGEBEN"/);
+  assert.match(readFileSync("components/admin/BudpicFreigabe.tsx", "utf8"), /budpicLoeschen/);
+});

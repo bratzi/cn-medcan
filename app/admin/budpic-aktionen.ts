@@ -37,6 +37,8 @@ async function aendern(formData: FormData, was: "FREIGEGEBEN" | "ABGELEHNT" | "L
 
   const prisma = await getPrisma();
   if (was === "LOESCHEN") await prisma.budpic.delete({ where: { id } });
+  // Abgelehnt: die Zeile bleibt als Spur, das Bild nicht (kein toter BLOB in D1, 150 KB je Bild).
+  else if (was === "ABGELEHNT") await prisma.budpic.update({ where: { id }, data: { status: was, daten: new Uint8Array(0) } });
   else await prisma.budpic.update({ where: { id }, data: { status: was } });
   neuLaden(sorte.slug);
   return { ok: true };
