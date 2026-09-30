@@ -49,3 +49,23 @@ export function tasteZuWert(taste: string, wert: number, raster: Raster): number
   if (ziel !== undefined && (ziel - wert) * richtung > EPS && (naechste - ziel) * richtung > EPS) return ziel;
   return naechste;
 }
+
+/**
+ * Terpen-Regler (T20, Nutzer 2026-09-30): gespeichert werden nur ganze Stufen 0 bis 5
+ * (lib/bewertung-eingabe.ts, AromaErkundung rundet). Ein feineres Raster oder ein Einrasten
+ * auf einen Median zwischen den Stufen lief nach dem Runden auf den alten Wert zurück, die
+ * Pfeiltasten bewegten nichts. Der Median-Ring bleibt nur Anzeige, ohne Einrasten.
+ */
+export const TERPEN_STUFEN_MAX = 5;
+const TERPEN_RASTER: Raster = { schritt: 1, max: TERPEN_STUFEN_MAX };
+
+/** Wert unter dem Zeiger, auf eine ganze Stufe. */
+export function terpenZeiger(roh: number): number {
+  return rasten(roh, TERPEN_RASTER);
+}
+
+/** Neuer Wert für eine Taste: Pfeile und Bild-Tasten ± eine ganze Stufe, Pos1 = 0, Ende = 5. */
+export function terpenTaste(taste: string, wert: number): number | null {
+  const bild = taste === "PageUp" ? "ArrowUp" : taste === "PageDown" ? "ArrowDown" : taste;
+  return tasteZuWert(bild, Math.round(wert), TERPEN_RASTER);
+}

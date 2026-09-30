@@ -4,7 +4,7 @@ import { useState } from "react";
 
 import type { GeschmacksKategorie } from "@/db/enums";
 import { cn } from "@/lib/cn";
-import { rasten, tasteZuWert } from "@/lib/regler-raster";
+import { terpenTaste, terpenZeiger } from "@/lib/regler-raster";
 import { weitereOffen } from "@/lib/aromakarte";
 import { formatiereWert } from "@/lib/format";
 import { terpenAnzeige } from "@/lib/i18n/terpen";
@@ -37,13 +37,13 @@ function anteil(wert: number): number {
 
 /**
  * Wert unter dem Zeiger: genau die Position des sichtbaren Punkts, ohne den
- * Daumen-Einzug des nativen Reglers. Nahe am Community-Median rastet er dort ein.
+ * Daumen-Einzug des nativen Reglers, auf ganze Stufen gerastet.
  */
-function wertAmZeiger(spur: HTMLElement, clientX: number, vergleich?: number): number {
+function wertAmZeiger(spur: HTMLElement, clientX: number): number {
   const rect = spur.getBoundingClientRect();
   const roh = Math.min(Math.max((clientX - rect.left) / rect.width, 0), 1) * MAX;
-  // Median neben dem Raster bleibt treffbar, die Nachbarstufen auch (T5c).
-  return rasten(roh, { schritt: 0.1, max: MAX, ziel: vergleich });
+  // Ganze Stufen wie gespeichert, kein Einrasten auf den Median (T20).
+  return terpenZeiger(roh);
 }
 
 type Bedienung = {
@@ -155,11 +155,11 @@ function Spur({
           const el = e.currentTarget;
           el.setPointerCapture(e.pointerId);
           el.querySelector("input")?.focus();
-          bedienung.aendern(name, wertAmZeiger(el, e.clientX, ring));
+          bedienung.aendern(name, wertAmZeiger(el, e.clientX));
         }}
         onPointerMove={(e) => {
           if (!e.currentTarget.hasPointerCapture(e.pointerId)) return;
-          bedienung.aendern(name, wertAmZeiger(e.currentTarget, e.clientX, ring));
+          bedienung.aendern(name, wertAmZeiger(e.currentTarget, e.clientX));
         }}
       >
         {/* Community-Median: grüner Ring, eine Stufe größer als der eigene Punkt, damit er
@@ -180,11 +180,11 @@ function Spur({
           type="range"
           min={0}
           max={MAX}
-          // step="any" und eigene Pfeiltasten (T5c): der Median neben dem Raster bleibt erreichbar.
-          step="any"
+          // Ganze Stufen wie gespeichert (T20); eigene Tasten, damit Pos1/Ende/Bild-Tasten stimmen.
+          step={1}
           value={gezeigt}
           onKeyDown={(e) => {
-            const neu = tasteZuWert(e.key, gezeigt, { schritt: 0.1, max: MAX, ziel: ring });
+            const neu = terpenTaste(e.key, gezeigt);
             if (neu === null) return;
             e.preventDefault();
             bedienung.aendern(name, neu);
