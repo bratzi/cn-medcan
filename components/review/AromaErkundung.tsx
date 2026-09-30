@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useId, useRef, useState } from "react";
 
 import { AromaKarte, type AromaSerie } from "@/components/review/AromaKarte";
+import { FazitLauf } from "@/components/review/FazitLauf";
 import {
   BeschaffenheitsLeiste,
   type BeschaffenheitsSchluessel,
@@ -26,6 +27,7 @@ import {
 import { BEWERTUNGS_ACHSEN, GESCHMACKS_ACHSEN, leereGeschmacksMatrix, type GeschmacksMatrix } from "@/lib/query/bewertung";
 import type { Vorbelegung } from "@/lib/bewertung-vorbelegung";
 import { chargenFazit, sortenFazit } from "@/lib/fazit";
+import { fazitDelta } from "@/lib/fazit-delta";
 import { formatiereAnteil, formatiereZahl } from "@/lib/format";
 import { mehrzahl, t } from "@/lib/i18n/text";
 import type { AromaTexte } from "@/lib/i18n/typen";
@@ -34,7 +36,8 @@ const prozent = (anteil: number, sprache: AromaTexte["sprache"]) => formatiereAn
 
 /**
  * Aroma-Erkundung in drei Schritten: Gesamteindruck, Terpene, Beschaffenheit,
- * jeder in voller Breite; das Community-Fazit aus allen drei steht danach (Nutzer 2026-09-25). Im Terpen-Schritt geschieht alles in der Karte: die Geschmacksbalken links
+ * jeder in voller Breite; das Fazit aus allen drei läuft beim Regeln mit (T16, Nutzer 2026-09-30:
+ * ab xl sticky rechts, darunter Leiste unten mit Sheet, components/review/FazitLauf.tsx). Im Terpen-Schritt geschieht alles in der Karte: die Geschmacksbalken links
  * sind Regler; man zieht, wie stark man jede Geschmacksrichtung schmeckt,
  * und sieht als lila Serie das eigene Profil gegen die Herstellerangabe.
  * Lerneffekt: zur gezogenen Richtung leuchten die Terpene dieser Sorte auf,
@@ -119,6 +122,8 @@ export function AromaErkundung({
   // Start der eigenen Regler: leer oder die gespeicherte Bewertung. Die Startobjekte
   // bleiben als Referenz stehen: jede Änderung ersetzt sie, „Zurücksetzen“ setzt genau
   // sie wieder ein. So heißt „geändert“ einfach: nicht mehr dasselbe Objekt.
+  const wurzel = useRef<HTMLDivElement>(null);
+  const fazitId = useId();
   const [anfang] = useState(() => ({
     geschmack: vorbelegung?.geschmack ?? null,
     beschaffenheit: (vorbelegung?.beschaffenheit ?? {}) as Partial<Record<BeschaffenheitsSchluessel, number>>,
@@ -223,8 +228,22 @@ export function AromaErkundung({
   const eigenerChargenFazit = chargeBewegt ? chargenFazit({ ...(beschaffenheit?.werte ?? {}), ...eigeneAchsen }) : null;
   const anzahlBewertungen = Math.max(treue?.anzahl ?? 0, gesamteindruck?.anzahl ?? 0, beschaffenheit?.anzahl ?? 0);
 
+  const hatFazit = sortenFazitWert !== null || chargenFazitWert !== null;
+  // Kurz-Fazit der mobilen Leiste (T16): eigene Sortennote, solange nichts bewegt wurde die der
+  // Community; das Delta erst, wenn beide Werte stehen.
+  const kurzWert = eigenerSortenFazit ?? sortenFazitWert ?? chargenFazitWert;
+  const kurzLabel =
+    eigenerSortenFazit !== null
+      ? istBetreiber
+        ? texte.aroma.erkundung.deinFazitBetreiber
+        : texte.aroma.erkundung.deinFazit
+      : sortenFazitWert !== null
+        ? texte.aroma.erkundung.communityFazit
+        : texte.aroma.erkundung.chargenFazit;
+
   return (
-    <div className="flex flex-col gap-16 md:gap-24">
+    // Ab xl zwei Spalten: links die Schritte, rechts das mitlaufende Fazit (T16).
+    <div ref={wurzel} className="flex flex-col gap-16 md:gap-24 xl:grid xl:grid-cols-[minmax(0,1fr)_18rem] xl:gap-x-16">
       {eingabe ? (
         // Werte der Regler fürs umschließende Formular: Noten nur, wenn gesetzt (Start bei 0 =
         // keine Note, T5c; Pflicht, der Server meldet eine fehlende Note, statt 0 zu speichern),
@@ -250,212 +269,226 @@ export function AromaErkundung({
         </div>
       ) : null}
       {/* Sortenkopf ganz oben (Nutzer 2026-09-25): erst sieht man, was bewertet wurde. */}
-      {bild}
+      {bild ? <div className="xl:col-span-2">{bild}</div> : null}
 
-      {gesamteindruck ? (
-        <Schritt nummer="1" titel={texte.aroma.erkundung.overall}>
-          <GesamteindruckLeiste
-            {...gesamteindruck}
-            className="w-full"
-            mitWirkung={eingabe}
-            texte={texte}
-            ohneTitel
-            bedienung={{
-              eigen: eigeneNoten,
-              aendern: (key, wert) => setEigeneNoten((alt) => ({ ...alt, [key]: wert })),
-              abNull: eingabe,
-            }}
-          />
-        </Schritt>
-      ) : null}
+      <div className="flex min-w-0 flex-col gap-16 md:gap-24">
 
-      <Schritt nummer="2" titel={texte.aroma.erkundung.terpz}>
-        {treue || eigeneTreue !== null ? (
-          <p className="text-small text-text-muted">
-            {treue ? (
-              <>
-                {texte.aroma.erkundung.naehe}{" "}
-                <span className="numeric text-text">{prozent(treue.wert, texte.sprache)}</span>
-              </>
-            ) : null}
-            {eigeneTreue !== null ? (
-              <>
-                {treue ? " · " : ""}{texte.aroma.erkundung.deinEindruck}{" "}
-                <span className="numeric text-kopierstift">{prozent(eigeneTreue, texte.sprache)}</span>
-              </>
-            ) : null}
-          </p>
-        ) : null}
-        <p className="max-w-[60ch] text-small text-text-muted text-pretty">
-          {texte.aroma.erkundung.anleitung}{eingabe ? "" : ` ${texte.aroma.erkundung.nichtsGespeichert}`}
-        </p>
-        <div className="w-full min-w-0">
-          <AromaKarte
-            titel={titel}
-            ohneTitel
-            terpene={kartenTerpene}
-            serien={alleSerien}
-            staerken={staerken}
-            ebenen={ebenen}
-            // Balkenfarbe (T5b): in der Maske gegen den Community-Median, in der Anzeige gegen die Herstellerangabe.
-            bezug={eingabe ? "median" : "serie"}
-            regler={{
-              werte,
-              // Grüner Regler auf dem Community-Median (T5, zuvor die Herstellerangabe).
-              vergleich: median?.geschmack ?? undefined,
-              aendern: (key, wert) =>
-                setEigen((alt) => ({ ...(alt ?? start), [key]: wert })),
-            }}
-            lernen={katalog}
-            texte={texte}
-          />
-          {/* Am Kartenende: Deine Nase vs. Community (T5), mittlere |Δ| zum Median und die
-              Zahl der ergänzten Terpene. Der Wert in Kopierstift wie „Dein Eindruck“. */}
-          {nase ? (
-            <p className="mt-6 text-center text-small text-text-muted text-pretty">
-              <span className="font-medium text-text">{texte.aroma.karte.nase}</span>{" "}
-              <span aria-hidden="true" className="numeric text-kopierstift">
-                {t(texte.aroma.karte.delta, { wert: formatiereZahl(nase.delta, 1, texte.sprache) })}
-              </span>
-              <span className="sr-only">
-                {t(texte.aroma.karte.deltaVorgelesen, { wert: formatiereZahl(nase.delta, 1, texte.sprache) })}
-              </span>
-              {", "}
-              {mehrzahl(texte.sprache, texte.aroma.karte.ergaenzteTerpene, nase.ergaenzt)}
-            </p>
-          ) : null}
-        </div>
-        {eingabe ? (
-          <TerpenRegler
-              titel={texte.aroma.erkundung.jeTerpen}
-              hersteller={reglerOrdnung.hersteller}
-              weitere={reglerOrdnung.weitere}
-              zeilen={zeilen}
+        {gesamteindruck ? (
+          <Schritt nummer="1" titel={texte.aroma.erkundung.overall}>
+            <GesamteindruckLeiste
+              {...gesamteindruck}
+              className="w-full"
+              mitWirkung={eingabe}
               texte={texte}
+              ohneTitel
               bedienung={{
-                eigen: eigeneIntensitaet,
-                // Ganze Stufen, wie die Server Action sie annimmt (lib/bewertung-eingabe.ts).
-                aendern: (terpen, wert) => setEigeneIntensitaet((alt) => ({ ...alt, [terpen]: Math.round(wert) })),
+                eigen: eigeneNoten,
+                aendern: (key, wert) => setEigeneNoten((alt) => ({ ...alt, [key]: wert })),
+                abNull: eingabe,
               }}
             />
+          </Schritt>
         ) : null}
-      </Schritt>
 
-      {beschaffenheit ? (
-        // In der Maske gilt die Qualität der eigenen Charge, nicht der Sorte (Bewertung v2, T4).
-        <Schritt nummer="3" titel={eingabe ? texte.aroma.erkundung.dieseCharge : texte.aroma.erkundung.qualitaet}>
-          {eingabe ? (
-            <p className="max-w-[60ch] text-small text-text-muted text-pretty">{texte.aroma.erkundung.chargeSatz}</p>
+        <Schritt nummer="2" titel={texte.aroma.erkundung.terpz}>
+          {treue || eigeneTreue !== null ? (
+            <p className="text-small text-text-muted">
+              {treue ? (
+                <>
+                  {texte.aroma.erkundung.naehe}{" "}
+                  <span className="numeric text-text">{prozent(treue.wert, texte.sprache)}</span>
+                </>
+              ) : null}
+              {eigeneTreue !== null ? (
+                <>
+                  {treue ? " · " : ""}{texte.aroma.erkundung.deinEindruck}{" "}
+                  <span className="numeric text-kopierstift">{prozent(eigeneTreue, texte.sprache)}</span>
+                </>
+              ) : null}
+            </p>
           ) : null}
-          <BeschaffenheitsLeiste
-            {...beschaffenheit}
-            className="w-full"
-            ohneTitel
-            sweetSpot={eingabe}
-            texte={texte}
-            bedienung={{
-              eigen: eigeneBeschaffenheit,
-              aendern: (schluessel, wert) =>
-                setEigeneBeschaffenheit((alt) => ({
-                  ...alt,
-                  [schluessel]: wert,
-                })),
-            }}
-          />
-        </Schritt>
-      ) : null}
-
-      {/* Nullhoch, die negativen Ränder heben die zusätzliche Lücke auf: der Satz sitzt
-          genau in der Mitte zwischen Qualität und Fazit (Nutzer 2026-09-26). */}
-      {zwischenruf ? <div className="relative -my-8 h-0 md:-my-12">{zwischenruf}</div> : null}
-
-      {/* Zwei Fazits nach allen drei Schritten (Nutzer 2026-09-25, seit T6 getrennt): das
-          Sortenfazit aus Overall, Terpen-Abgleich und Gesamtnote steht groß in der Handschrift
-          des Logos, weil es die Stimme der Community ist (Ausnahme zu Regel 3, ui-design-engine).
-          Das Chargenfazit (Qualitäts-Balance) steht kleiner daneben und fließt nie in die Sorte. */}
-      {sortenFazitWert !== null || chargenFazitWert !== null ? (
-        <div className="flex flex-col items-center gap-4 text-center">
-          <dl className="flex flex-wrap items-end justify-center gap-x-24 gap-y-8">
-            {sortenFazitWert !== null ? (
-              <div className="flex flex-col items-center gap-2">
-                <dt className="text-small uppercase tracking-wide text-text-muted">{texte.aroma.erkundung.communityFazit}</dt>
-                {/* tabular-nums auf dem dd: gilt für die Zahl und ihre Konturen gleich,
-                    damit die Konturen deckungsgleich bleiben. */}
-                <dd className="relative isolate flex justify-center tabular-nums">
-                  {/* Die Essenz der Seite (Nutzer 2026-09-25): dieselben driftenden Konturen
-                      wie die Wortmarke im Hero, dazu ein ruhiges Pulsieren. */}
-                  {["marke-kontur-1", "marke-kontur-2", "marke-kontur-3", "marke-kontur-4"].map((klasse) => (
-                    <span key={klasse} aria-hidden="true" className={`marke-kontur ${klasse} font-hand text-umschlag leading-none`}>
-                      <span>{prozent(sortenFazitWert, texte.sprache)}</span>
-                    </span>
-                  ))}
-                  <span className="fazit-puls farbverlauf font-hand text-umschlag leading-none">
-                    {prozent(sortenFazitWert, texte.sprache)}
-                  </span>
-                </dd>
-                <dd className="text-caption text-text-muted">
-                  {mehrzahl(texte.sprache, texte.aroma.ausBewertungen, anzahlBewertungen)}
-                </dd>
-              </div>
-            ) : null}
-            {chargenFazitWert !== null ? (
-              <div className="flex flex-col items-center gap-2">
-                <dt className="text-small uppercase tracking-wide text-text-muted">{texte.aroma.erkundung.chargenFazit}</dt>
-                <dd className="farbverlauf font-hand text-notiz leading-none tabular-nums">
-                  {prozent(chargenFazitWert, texte.sprache)}
-                </dd>
-                <dd className="text-caption text-text-muted">
-                  {mehrzahl(texte.sprache, texte.aroma.ausBewertungen, beschaffenheit?.anzahl ?? 0)}
-                </dd>
-              </div>
-            ) : null}
-            {eigenerSortenFazit !== null ? (
-              <div className="flex flex-col items-center gap-2" aria-live="polite">
-                <dt className="text-small uppercase tracking-wide text-text-muted">
-                  {istBetreiber ? texte.aroma.erkundung.deinFazitBetreiber : texte.aroma.erkundung.deinFazit}
-                </dt>
-                <dd className="farbverlauf font-hand text-notiz leading-none tabular-nums">
-                  {prozent(eigenerSortenFazit, texte.sprache)}
-                </dd>
-                <dd className="text-caption text-text-muted">{texte.aroma.erkundung.ausReglern}</dd>
-              </div>
-            ) : null}
-            {eigenerChargenFazit !== null ? (
-              <div className="flex flex-col items-center gap-2" aria-live="polite">
-                <dt className="text-small uppercase tracking-wide text-text-muted">
-                  {istBetreiber ? texte.aroma.erkundung.deineChargeBetreiber : texte.aroma.erkundung.deineCharge}
-                </dt>
-                <dd className="farbverlauf font-hand text-notiz leading-none tabular-nums">
-                  {prozent(eigenerChargenFazit, texte.sprache)}
-                </dd>
-                <dd className="text-caption text-text-muted">{texte.aroma.erkundung.ausReglern}</dd>
-              </div>
-            ) : null}
-          </dl>
-          <p className="max-w-[60ch] text-caption text-text-muted text-pretty">
-            {texte.aroma.erkundung.fazitErklaerung}
+          <p className="max-w-[60ch] text-small text-text-muted text-pretty">
+            {texte.aroma.erkundung.anleitung}{eingabe ? "" : ` ${texte.aroma.erkundung.nichtsGespeichert}`}
           </p>
-        </div>
-      ) : null}
-
-      {geaendert || children ? (
-        <div className="flex flex-wrap items-center justify-center gap-6">
-          {children}
-          {geaendert ? (
-            <button
-              type="button"
-              onClick={() => {
-                setEigen(anfang.geschmack);
-                setEigeneBeschaffenheit(anfang.beschaffenheit);
-                setEigeneNoten(anfang.noten);
-                setEigeneIntensitaet(anfang.intensitaet);
+          <div className="w-full min-w-0">
+            <AromaKarte
+              titel={titel}
+              ohneTitel
+              terpene={kartenTerpene}
+              serien={alleSerien}
+              staerken={staerken}
+              ebenen={ebenen}
+              // Balkenfarbe (T5b): in der Maske gegen den Community-Median, in der Anzeige gegen die Herstellerangabe.
+              bezug={eingabe ? "median" : "serie"}
+              regler={{
+                werte,
+                // Grüner Regler auf dem Community-Median (T5, zuvor die Herstellerangabe).
+                vergleich: median?.geschmack ?? undefined,
+                aendern: (key, wert) =>
+                  setEigen((alt) => ({ ...(alt ?? start), [key]: wert })),
               }}
-              className="min-h-11 text-small text-accent underline underline-offset-4 hover:text-accent-hover"
-            >
-              {texte.aroma.erkundung.zuruecksetzen}
-            </button>
+              lernen={katalog}
+              texte={texte}
+            />
+            {/* Am Kartenende: Deine Nase vs. Community (T5), mittlere |Δ| zum Median und die
+                Zahl der ergänzten Terpene. Der Wert in Kopierstift wie „Dein Eindruck“. */}
+            {nase ? (
+              <p className="mt-6 text-center text-small text-text-muted text-pretty">
+                <span className="font-medium text-text">{texte.aroma.karte.nase}</span>{" "}
+                <span aria-hidden="true" className="numeric text-kopierstift">
+                  {t(texte.aroma.karte.delta, { wert: formatiereZahl(nase.delta, 1, texte.sprache) })}
+                </span>
+                <span className="sr-only">
+                  {t(texte.aroma.karte.deltaVorgelesen, { wert: formatiereZahl(nase.delta, 1, texte.sprache) })}
+                </span>
+                {", "}
+                {mehrzahl(texte.sprache, texte.aroma.karte.ergaenzteTerpene, nase.ergaenzt)}
+              </p>
+            ) : null}
+          </div>
+          {eingabe ? (
+            <TerpenRegler
+                titel={texte.aroma.erkundung.jeTerpen}
+                hersteller={reglerOrdnung.hersteller}
+                weitere={reglerOrdnung.weitere}
+                zeilen={zeilen}
+                texte={texte}
+                bedienung={{
+                  eigen: eigeneIntensitaet,
+                  // Ganze Stufen, wie die Server Action sie annimmt (lib/bewertung-eingabe.ts).
+                  aendern: (terpen, wert) => setEigeneIntensitaet((alt) => ({ ...alt, [terpen]: Math.round(wert) })),
+                }}
+              />
           ) : null}
-        </div>
+        </Schritt>
+
+        {beschaffenheit ? (
+          // In der Maske gilt die Qualität der eigenen Charge, nicht der Sorte (Bewertung v2, T4).
+          <Schritt nummer="3" titel={eingabe ? texte.aroma.erkundung.dieseCharge : texte.aroma.erkundung.qualitaet}>
+            {eingabe ? (
+              <p className="max-w-[60ch] text-small text-text-muted text-pretty">{texte.aroma.erkundung.chargeSatz}</p>
+            ) : null}
+            <BeschaffenheitsLeiste
+              {...beschaffenheit}
+              className="w-full"
+              ohneTitel
+              sweetSpot={eingabe}
+              texte={texte}
+              bedienung={{
+                eigen: eigeneBeschaffenheit,
+                aendern: (schluessel, wert) =>
+                  setEigeneBeschaffenheit((alt) => ({
+                    ...alt,
+                    [schluessel]: wert,
+                  })),
+              }}
+            />
+          </Schritt>
+        ) : null}
+
+        {/* Nullhoch, die negativen Ränder heben die zusätzliche Lücke auf: der Satz sitzt
+            genau in der Mitte zwischen Qualität und Fazit (Nutzer 2026-09-26). */}
+        {zwischenruf ? <div className="relative -my-8 h-0 md:-my-12">{zwischenruf}</div> : null}
+
+        {geaendert || children ? (
+          <div className="flex flex-wrap items-center justify-center gap-6">
+            {children}
+            {geaendert ? (
+              <button
+                type="button"
+                onClick={() => {
+                  setEigen(anfang.geschmack);
+                  setEigeneBeschaffenheit(anfang.beschaffenheit);
+                  setEigeneNoten(anfang.noten);
+                  setEigeneIntensitaet(anfang.intensitaet);
+                }}
+                className="min-h-11 text-small text-accent underline underline-offset-4 hover:text-accent-hover"
+              >
+                {texte.aroma.erkundung.zuruecksetzen}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+      </div>
+
+      {hatFazit && kurzWert !== null ? (
+        <FazitLauf
+          id={fazitId}
+          beobachte={wurzel}
+          texte={texte}
+          kurz={{
+            label: kurzLabel,
+            wert: prozent(kurzWert, texte.sprache),
+            delta: fazitDelta(eigenerSortenFazit, sortenFazitWert),
+          }}
+        >
+          {/* Zwei Fazits, seit T16 mitlaufend statt nach den Schritten (Nutzer 2026-09-25, seit T6 getrennt): das
+              Sortenfazit aus Overall, Terpen-Abgleich und Gesamtnote steht groß in der Handschrift
+              des Logos, weil es die Stimme der Community ist (Ausnahme zu Regel 3, ui-design-engine).
+              Das Chargenfazit (Qualitäts-Balance) steht kleiner daneben und fließt nie in die Sorte. */}
+          <div className="flex flex-col items-center gap-4 text-center">
+            <dl className="flex flex-wrap items-end justify-center gap-x-24 gap-y-8">
+              {sortenFazitWert !== null ? (
+                <div className="flex flex-col items-center gap-2">
+                  <dt className="text-small uppercase tracking-wide text-text-muted">{texte.aroma.erkundung.communityFazit}</dt>
+                  {/* tabular-nums auf dem dd: gilt für die Zahl und ihre Konturen gleich,
+                      damit die Konturen deckungsgleich bleiben. */}
+                  <dd className="relative isolate flex justify-center tabular-nums">
+                    {/* Die Essenz der Seite (Nutzer 2026-09-25): dieselben driftenden Konturen
+                        wie die Wortmarke im Hero, dazu ein ruhiges Pulsieren. */}
+                    {["marke-kontur-1", "marke-kontur-2", "marke-kontur-3", "marke-kontur-4"].map((klasse) => (
+                      <span key={klasse} aria-hidden="true" className={`marke-kontur ${klasse} font-hand text-umschlag leading-none`}>
+                        <span>{prozent(sortenFazitWert, texte.sprache)}</span>
+                      </span>
+                    ))}
+                    <span className="fazit-puls farbverlauf font-hand text-umschlag leading-none">
+                      {prozent(sortenFazitWert, texte.sprache)}
+                    </span>
+                  </dd>
+                  <dd className="text-caption text-text-muted">
+                    {mehrzahl(texte.sprache, texte.aroma.ausBewertungen, anzahlBewertungen)}
+                  </dd>
+                </div>
+              ) : null}
+              {chargenFazitWert !== null ? (
+                <div className="flex flex-col items-center gap-2">
+                  <dt className="text-small uppercase tracking-wide text-text-muted">{texte.aroma.erkundung.chargenFazit}</dt>
+                  <dd className="farbverlauf font-hand text-notiz leading-none tabular-nums">
+                    {prozent(chargenFazitWert, texte.sprache)}
+                  </dd>
+                  <dd className="text-caption text-text-muted">
+                    {mehrzahl(texte.sprache, texte.aroma.ausBewertungen, beschaffenheit?.anzahl ?? 0)}
+                  </dd>
+                </div>
+              ) : null}
+              {eigenerSortenFazit !== null ? (
+                <div className="flex flex-col items-center gap-2" aria-live="polite">
+                  <dt className="text-small uppercase tracking-wide text-text-muted">
+                    {istBetreiber ? texte.aroma.erkundung.deinFazitBetreiber : texte.aroma.erkundung.deinFazit}
+                  </dt>
+                  <dd className="farbverlauf font-hand text-notiz leading-none tabular-nums">
+                    {prozent(eigenerSortenFazit, texte.sprache)}
+                  </dd>
+                  <dd className="text-caption text-text-muted">{texte.aroma.erkundung.ausReglern}</dd>
+                </div>
+              ) : null}
+              {eigenerChargenFazit !== null ? (
+                <div className="flex flex-col items-center gap-2" aria-live="polite">
+                  <dt className="text-small uppercase tracking-wide text-text-muted">
+                    {istBetreiber ? texte.aroma.erkundung.deineChargeBetreiber : texte.aroma.erkundung.deineCharge}
+                  </dt>
+                  <dd className="farbverlauf font-hand text-notiz leading-none tabular-nums">
+                    {prozent(eigenerChargenFazit, texte.sprache)}
+                  </dd>
+                  <dd className="text-caption text-text-muted">{texte.aroma.erkundung.ausReglern}</dd>
+                </div>
+              ) : null}
+            </dl>
+            <p className="max-w-[60ch] text-caption text-text-muted text-pretty">
+              {texte.aroma.erkundung.fazitErklaerung}
+            </p>
+          </div>
+        </FazitLauf>
       ) : null}
     </div>
   );

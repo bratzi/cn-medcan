@@ -36,6 +36,7 @@ const UMGESTELLT: string[] = [
   "components/produkt/CannabinoidBar.tsx",
   "lib/labels.ts",
   "components/review/AromaErkundung.tsx",
+  "components/review/FazitLauf.tsx",
   "components/review/AromaKarte.tsx",
   "components/review/SortenKopf.tsx",
   "components/review/TerpenRegler.tsx",

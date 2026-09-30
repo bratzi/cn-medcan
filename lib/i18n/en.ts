@@ -249,6 +249,16 @@ export const en: Woerterbuch = {
         "The strain verdict combines overall, terpz match and star rating. The batch verdict is the quality balance of this batch alone, kept separate from the strain. Each stage counts equally; 100 % means everything top and exactly as stated.",
       zuruecksetzen: "Reset",
     },
+    // Live verdict while rating (T16, user 2026-09-30): sticky on the right on desktop, bottom bar with sheet on mobile.
+    fazitLauf: {
+      titel: "Verdict",
+      anzeigen: "Show verdict",
+      schliessen: "Close verdict",
+      delta: "{wert} pts",
+      ueber: "{wert} percentage points above the community verdict",
+      unter: "{wert} percentage points below the community verdict",
+      gleich: "same as the community verdict",
+    },
     gesamteindruck: "Overall impression",
     ausBewertungen: { one: "from {anzahl} review", other: "from {anzahl} reviews" },
     vonFuenf: "{wert} of 5",

@@ -255,6 +255,16 @@ export const de = {
         "Das Sortenfazit fasst Overall, Terpen-Abgleich und Gesamtnote zusammen. Das Charge-Fazit zeigt allein die Qualitäts-Balance dieser Charge, getrennt von der Sorte. Jede Stufe zählt gleich viel; 100 % heißt: alles top und genau wie angegeben.",
       zuruecksetzen: "Zurücksetzen",
     },
+    // Mitlaufendes Fazit beim Bewerten (T16, Nutzer 2026-09-30): Desktop sticky rechts, mobil Leiste unten mit Sheet.
+    fazitLauf: {
+      titel: "Fazit",
+      anzeigen: "Fazit anzeigen",
+      schliessen: "Fazit schließen",
+      delta: "{wert} Pkt.",
+      ueber: "{wert} Prozentpunkte über dem Community-Fazit",
+      unter: "{wert} Prozentpunkte unter dem Community-Fazit",
+      gleich: "gleich dem Community-Fazit",
+    },
     gesamteindruck: "Gesamteindruck",
     ausBewertungen: { one: "aus {anzahl} Bewertung", other: "aus {anzahl} Bewertungen" },
     vonFuenf: "{wert} von 5",

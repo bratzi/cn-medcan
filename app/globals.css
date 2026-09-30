@@ -1569,6 +1569,12 @@ html.joint-cursor :is(input:not([type="range"]):not([type="radio"]):not([type="c
 
 /* Sparmodus: der stehende Lichtstrich, der Puls und die Funken verschwinden, statt als
    Klecks zu bleiben; der Überstand bleibt als lila Stück stehen. */
+/* Mitlaufendes Fazit (T16): Leiste und Sheet erscheinen im Sparmodus ohne Bewegung;
+   reduzierte Bewegung deckt die globale Regel oben ab. */
+:root[data-sparmodus] .fazit-lauf-bewegt {
+  transition: none;
+}
+
 :root[data-sparmodus] :is(.bogen-fluss, .bogen-voll, .delta-funke) {
   visibility: hidden;
 }
