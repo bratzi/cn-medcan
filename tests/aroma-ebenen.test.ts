@@ -49,7 +49,9 @@ test("Ergänzt: gestrichelt in eigener Farbe (Kopierstift), Lichtpunkt ja, volle
 test("Herstellerangabe (T5b): stiller Streifen, die Bewertung darüber mit Lichtfluss, kein Puls", () => {
   const html = karte({ terpene: [LIMONEN], ebenen: { Limonen: "hersteller" } });
   assert.match(html, /data-schicht="streifen"/);
-  assert.match(html, /class="bogen-(fluss|voll)"/);
+  // Zitrus steht auf 5 (VOLL): die ganze Linie pulsiert, kein laufender Strich (T5d).
+  assert.match(html, /class="bogen-voll"/);
+  assert.doesNotMatch(html, /class="bogen-fluss"/);
   assert.doesNotMatch(html, /bogen-puls/);
 });
 
@@ -201,4 +203,24 @@ test("Terpen-Regler: der Community-Wert ist ein grüner Ring um den eigenen Punk
   );
   assert.match(html, /border-accent/);
   assert.match(html, /Community-Median 2,5/);
+});
+
+test("Terpen-Regler: Herstellerterpen nie gestrichelt, Zusatzterpen über 0 gestrichelt in Kopierstift", () => {
+  const regler = (eigen: Record<string, number>) =>
+    renderToStaticMarkup(
+      createElement(TerpenRegler, {
+        titel: "Je Terpen",
+        hersteller: ["Myrcen"],
+        weitere: ["Ocimen"],
+        zeilen: [],
+        texte,
+        bedienung: { eigen, aendern: () => {} },
+      }),
+    );
+  const karten = (html: string) => [...html.matchAll(/<li class="([^"]*)"/g)].map(([, klasse]) => klasse);
+  const [myrcen, ocimen] = karten(regler({ Myrcen: 5, Ocimen: 3 }));
+  assert.doesNotMatch(myrcen, /border-dashed/);
+  assert.match(ocimen, /border-dashed border-kopierstift/);
+  // Auf 0 zurück: nicht mehr ergänzt, also nicht gestrichelt.
+  assert.doesNotMatch(karten(regler({ Myrcen: 5, Ocimen: 0 }))[1], /border-dashed/);
 });

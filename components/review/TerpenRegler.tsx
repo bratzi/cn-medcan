@@ -1,8 +1,11 @@
 "use client";
 
+import { useState } from "react";
+
 import type { GeschmacksKategorie } from "@/db/enums";
 import { cn } from "@/lib/cn";
 import { rasten, tasteZuWert } from "@/lib/regler-raster";
+import { weitereOffen } from "@/lib/aromakarte";
 import { formatiereWert } from "@/lib/format";
 import { terpenAnzeige } from "@/lib/i18n/terpen";
 import { t } from "@/lib/i18n/text";
@@ -78,6 +81,9 @@ export function TerpenRegler({
   const tr = texte.aroma.terpenRegler;
   const median = new Map(zeilen.map((zeile) => [zeile.terpen, zeile]));
   const ergaenztAnzahl = weitere.filter((name) => (bedienung.eigen[name] ?? 0) > 0).length;
+  // Offen-Zustand gehört nach dem Start dem Nutzer (Review 1): nur der Anfang kommt aus den
+  // Ergänzungen; zieht er eine Ergänzung auf 0 zurück, klappt nichts mitten im Ziehen zu.
+  const [offen, setOffen] = useState(() => weitereOffen(false, ergaenztAnzahl, hersteller.length));
   const spur = (name: string, ergaenzbar: boolean) => (
     <Spur key={name} name={name} zeile={median.get(name)} ergaenzbar={ergaenzbar} bedienung={bedienung} texte={texte} />
   );
@@ -90,7 +96,11 @@ export function TerpenRegler({
       {weitere.length > 0 ? (
         // Zugeklappt, solange nichts ergänzt ist; mit Ergänzungen (z. B. aus der eigenen
         // gespeicherten Bewertung) offen, damit sie sichtbar bleiben.
-        <details open={ergaenztAnzahl > 0 || hersteller.length === 0 || undefined} className="flex flex-col gap-3">
+        <details
+          open={offen}
+          onToggle={(e) => setOffen(e.currentTarget.open)}
+          className="flex flex-col gap-3"
+        >
           <summary className="inline-flex min-h-11 cursor-pointer items-center gap-2 rounded-md text-small font-medium text-text hover:text-accent-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring">
             {tr.weitere}
             <span className="numeric text-text-muted">({weitere.length})</span>

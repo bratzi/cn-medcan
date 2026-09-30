@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 
-import { flussStrich, funkenPunkte, reglerTerpene, terpenEbenen } from "@/lib/aromakarte";
+import { flussStrich, funkenPunkte, reglerTerpene, terpenEbenen, weitereOffen } from "@/lib/aromakarte";
 
 /**
  * T5d (Nutzer 2026-09-30): ergänzte Terpene folgen allein dem Regler, die
@@ -41,4 +41,13 @@ test("Funken: nur über dem Median, verteilt zwischen Median und Wert, ohne Medi
   // Mehr Überstand, mehr Funken, höchstens sechs.
   assert.ok(funkenPunkte(5, 0.5).length > funkenPunkte(3, 2.5).length);
   assert.ok(funkenPunkte(5, 0).length <= 6);
+});
+
+test("Weitere Terpene: öffnen sich mit einer Ergänzung und bleiben offen, wenn der Wert auf 0 zurückgeht", () => {
+  assert.equal(weitereOffen(false, 0, 2), false);
+  assert.equal(weitereOffen(false, 1, 2), true);
+  // Zurück auf 0 bei geöffnetem Abschnitt: kein Zuklappen mitten im Ziehen.
+  assert.equal(weitereOffen(true, 0, 2), true);
+  // Ohne Herstellerterpene gibt es nur diese Regler: immer offen.
+  assert.equal(weitereOffen(false, 0, 0), true);
 });

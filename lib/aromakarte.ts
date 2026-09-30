@@ -416,6 +416,18 @@ export function flussStrich(wert: number): { laenge: number; durchgehend: boolea
   return { laenge: Math.round(STRICH_KURZ + (100 - STRICH_KURZ) * anteil), durchgehend: false };
 }
 
+/**
+ * Ob der Abschnitt „Weitere Terpene“ offen steht (T5d, Review 1): offen mit einer
+ * Ergänzung und ohne Herstellerterpene; was einmal offen ist, klappt nicht von
+ * selbst zu, auch nicht, wenn eine Ergänzung auf 0 zurückgeht.
+ */
+export function weitereOffen(bisher: boolean, ergaenzt: number, hersteller: number): boolean {
+  return bisher || ergaenzt > 0 || hersteller === 0;
+}
+
+/** Unterschied, ab dem ein Balken über oder unter seinem Bezug liegt (sonst gleichauf). */
+const GLEICHAUF = 0.1;
+
 /** Höchstens so viele Funken je Achse: Partikel bleiben günstig. */
 const FUNKEN_HOECHSTENS = 6;
 
@@ -446,9 +458,6 @@ export function reglerTerpene(
     weitere: katalog.filter((name) => !angegeben.has(name)).sort((a, b) => a.localeCompare(b, "de")),
   };
 }
-
-/** Unterschied, ab dem ein Balken über oder unter seinem Bezug liegt (sonst gleichauf). */
-const GLEICHAUF = 0.1;
 
 export type BalkenVergleich = {
   ton: "gruen" | "lila";
