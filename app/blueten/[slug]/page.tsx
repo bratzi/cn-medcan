@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import type { Metadata } from "next";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, unstable_rethrow } from "next/navigation";
 
 import { ABSCHNITT_TITEL, seitenRahmen } from "@/components/layout/Seitenkopf";
 import { CannabinoidBar } from "@/components/produkt/CannabinoidBar";
@@ -175,7 +175,13 @@ async function ProduktInhalt({ slug, w, sprache }: { slug: string; w: Woerterbuc
   // „Ähnlich im Aroma“ (T11) rechnet D1, nicht der Worker; ohne Terpene entfällt es.
   const [budpicListe, aehnliche] = await Promise.all([
     ladeFreieBudpics([strain.id]),
-    strain.terpene.length > 0 ? aehnlichImAroma(strain.id) : Promise.resolve([]),
+    strain.terpene.length > 0
+      ? aehnlichImAroma(strain.id).catch((fehler: unknown) => {
+          unstable_rethrow(fehler);
+          console.error("aehnlichImAroma fehlgeschlagen", fehler);
+          return [];
+        })
+      : Promise.resolve([]),
   ]);
   const budpics = budpicListe.get(strain.id) ?? [];
   const eigeneTerpene = strain.terpene.map((terpen) => terpen.name);

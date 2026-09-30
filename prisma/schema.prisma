@@ -123,6 +123,7 @@ model Strain {
 
   empfohlenIn NutzerEmpfehlung[] @relation("EmpfohleneSorte")
   bezugIn     NutzerEmpfehlung[] @relation("BezugSorte")
+  aehnlich    SortenAehnlich?
 
   erstelltAm     DateTime @default(now()) @map("erstellt_am")
   aktualisiertAm DateTime @updatedAt @map("aktualisiert_am")
@@ -707,4 +708,15 @@ model NutzerEmpfehlung {
   @@id([mitgliedId, strainId])
   @@index([mitgliedId, rang])
   @@map("nutzer_empfehlungen")
+}
+
+/// „Ähnlich im Aroma“ je Sorte (Review T11), höchstens einmal je Woche in D1
+/// gerechnet. `liste` ist JSON [{slug, handelsname, gemeinsam}].
+model SortenAehnlich {
+  strainId    String @id @map("strain_id")
+  strain      Strain @relation(fields: [strainId], references: [id], onDelete: Cascade)
+  liste       String
+  berechnetAm DateTime @map("berechnet_am")
+
+  @@map("sorten_aehnlich")
 }

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { redirect } from "next/navigation";
+import { redirect, unstable_rethrow } from "next/navigation";
 
 import { AbmeldeButton } from "@/components/auth/AbmeldeButton";
 import { ProfilFormular } from "@/components/auth/ProfilFormular";
@@ -39,7 +39,12 @@ export default async function MitgliedPage() {
   const [nachrichten, vorschlaege, empfehlungen] = await Promise.all([
     benachrichtigungenLaden(mitglied.mitgliedId),
     eigeneVorschlaege(mitglied.mitgliedId),
-    ladeEmpfehlungen(mitglied.mitgliedId),
+    // Wie auf der Startseite: ein Fehler der Empfehlungen reißt die Seite nicht mit.
+    ladeEmpfehlungen(mitglied.mitgliedId).catch((fehler: unknown) => {
+      unstable_rethrow(fehler);
+      console.error("ladeEmpfehlungen fehlgeschlagen", fehler);
+      return null;
+    }),
   ]);
   const ungelesen = nachrichten.filter((n) => !n.gelesen).map((n) => n.id);
 
@@ -129,7 +134,9 @@ export default async function MitgliedPage() {
             </h2>
           </CardHeader>
           <CardBody className="flex flex-col items-start gap-6">
-            {empfehlungen.length === 0 ? (
+            {empfehlungen === null ? (
+              <p className="max-w-[68ch] text-body text-text">{w.empfehlung.fehler}</p>
+            ) : empfehlungen.length === 0 ? (
               <p className="max-w-[68ch] text-body text-text-muted">{w.empfehlung.leer}</p>
             ) : (
               <EmpfehlungsListe

@@ -24,3 +24,16 @@ CREATE TABLE "nutzer_empfehlungen" (
 
 -- CreateIndex
 CREATE INDEX "nutzer_empfehlungen_mitglied_id_rang_idx" ON "nutzer_empfehlungen"("mitglied_id", "rang");
+
+-- „Ähnlich im Aroma“ je Sorte, auch für Gäste (Review T11): höchstens einmal je
+-- Sorte und Woche in D1 gerechnet, statt je Seitenaufruf tausende Zeilen zu
+-- lesen. `liste` ist JSON [{slug, handelsname, gemeinsam: [Terpenname]}].
+-- Der Index strain_terpene(terpen_id) besteht seit 0001.
+
+-- CreateTable
+CREATE TABLE "sorten_aehnlich" (
+    "strain_id" TEXT NOT NULL PRIMARY KEY,
+    "liste" TEXT NOT NULL,
+    "berechnet_am" DATETIME NOT NULL,
+    CONSTRAINT "sorten_aehnlich_strain_id_fkey" FOREIGN KEY ("strain_id") REFERENCES "strains" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);

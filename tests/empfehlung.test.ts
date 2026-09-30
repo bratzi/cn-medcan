@@ -7,6 +7,17 @@ import {
   AEHNLICH_SQL,
   bewertungsGewicht,
   empfehlungenBerechnen,
+  empfehlungenErsetzen,
+  KANDIDATEN_ANZAHL,
+  KANDIDATEN_SQL,
+  profilTerpene,
+  SORTEN_AROMA_SQL,
+  sortenAusZeilen,
+  aehnlichVeraltet,
+  AEHNLICH_GUELTIG_MS,
+  type EigeneBewertung,
+  type SortenAromaZeile,
+  type TerpenZeile,
   kosinus,
   sortenVektor,
   type SortenAroma,
@@ -57,8 +68,8 @@ test("empfehlungen: ähnliches Aroma zuerst, Bewertetes nie, Begründung mit Bez
   assert.ok(liste[0].gemeinsam.includes("t:Limonen"));
   assert.ok(liste[0].gemeinsam.length <= 3);
   assert.ok(!liste.some((e) => e.strainId === "zitrus"));
-  // Erdig-würzige Sorten teilen nur wenig und stehen hinten.
-  assert.ok(liste.findIndex((e) => e.strainId === "erde") > 0);
+  // Sorten ohne ein gemeinsames, positiv bewertetes Terpen sind keine Kandidaten.
+  assert.ok(!liste.some((e) => e.strainId === "erde" || e.strainId === "erde2"));
 });
 
 test("empfehlungen: negative Sorte zieht ähnliche Sorten nach hinten", () => {
@@ -98,36 +109,152 @@ test("empfehlungen: ohne positive Bewertung leer, höchstens sechs", () => {
   );
 });
 
-test("empfehlungen: 700 Sorten deutlich unter dem CPU-Budget", () => {
-  const namen: [string, GeschmacksKategorie][] = [
-    ["Myrcen", "ERDIG"], ["Limonen", "ZITRUS"], ["beta-Caryophyllen", "WUERZIG"], ["Linalool", "BLUMIG"],
-    ["alpha-Pinen", "HOLZIG"], ["Terpinolen", "KRAEUTRIG"], ["Humulen", "HOLZIG"], ["Ocimen", "SUESS"],
-  ];
-  const sorten = Array.from({ length: 700 }, (_, i) =>
-    sorte(`s${i}`, [namen[i % 8], namen[(i * 3 + 1) % 8], namen[(i * 5 + 2) % 8]].filter(
-      (n, j, a) => a.findIndex((m) => m[0] === n[0]) === j,
-    )),
-  );
+/** 700 synthetische Sorten als rohe Zeilen, wie sie aus D1 kommen (je fünf Terpene, jede dritte mit Median). */
+function synthetischeZeilen() {
+  const terpene = [
+    ["m", "Myrcen", "ERDIG"], ["l", "Limonen", "ZITRUS"], ["c", "beta-Caryophyllen", "WUERZIG"], ["li", "Linalool", "BLUMIG"],
+    ["p", "alpha-Pinen", "HOLZIG"], ["te", "Terpinolen", "KRAEUTRIG"], ["h", "Humulen", "HOLZIG"], ["o", "Ocimen", "SUESS"],
+    ["f", "Farnesen", "FRUCHTIG"], ["n", "Nerolidol", "HOLZIG"], ["b", "Bisabolol", "BLUMIG"], ["g", "Geraniol", "BLUMIG"],
+  ].map(([id, name, geschmack]) => ({ id, name, geschmack }));
+  const zeilen: SortenAromaZeile[] = Array.from({ length: 700 }, (_, i) => {
+    const ids = [...new Set([0, 1, 2, 3, 4].map((j) => terpene[(i * (j + 3) + j * 5) % terpene.length].id))];
+    return {
+      sid: `s${i}`,
+      tp: ids.map((id, r) => `${id}:${r + 1}`).join(","),
+      gm: i % 3 === 0 ? JSON.stringify({ zitrus: 3.5, erdig: 2, suess: 1 }) : null,
+    };
+  });
   const bewertungen = Array.from({ length: 30 }, (_, i) => ({
     strainId: `s${i * 7}`,
     gesamtnote: i % 3 === 0 ? 1.5 : 4.5,
-    terpene: { Myrcen: 3 },
+    terpene: { Myrcen: 3, Limonen: 4 },
     geschmack: { zitrus: 4 },
   }));
-  empfehlungenBerechnen(bewertungen, sorten); // Aufwärmen
-  let dauer = Infinity;
-  let liste = empfehlungenBerechnen(bewertungen, sorten);
-  // Bestes von fünf Läufen: misst die Rechnung, nicht die Last des Rechners.
-  for (let i = 0; i < 5; i++) {
-    const start = performance.now();
-    liste = empfehlungenBerechnen(bewertungen, sorten);
-    dauer = Math.min(dauer, performance.now() - start);
+  return { terpene, zeilen, bewertungen };
+}
+
+/** Die Synthese als D1-Tabellen im Speicher, für die SQL-Vorauswahl. */
+function synthetischeDatenbank() {
+  const { terpene, zeilen, bewertungen } = synthetischeZeilen();
+  const db = new Database(":memory:");
+  db.exec(`
+    CREATE TABLE strains (id TEXT PRIMARY KEY, aktiv INTEGER);
+    CREATE TABLE terpene (id TEXT PRIMARY KEY, name TEXT, geschmack TEXT);
+    CREATE TABLE strain_terpene (strain_id TEXT, terpen_id TEXT, rang INTEGER);
+    CREATE TABLE sorten_kennwerte (strain_id TEXT PRIMARY KEY, geschmack_median TEXT, anzahl INTEGER);
+  `);
+  for (const t of terpene) db.prepare(`INSERT INTO terpene VALUES (?, ?, ?)`).run(t.id, t.name, t.geschmack);
+  for (const z of zeilen) {
+    db.prepare(`INSERT INTO strains VALUES (?, 1)`).run(z.sid);
+    for (const teil of z.tp!.split(",")) {
+      const [tid, rang] = teil.split(":");
+      db.prepare(`INSERT INTO strain_terpene VALUES (?, ?, ?)`).run(z.sid, tid, Number(rang));
+    }
+    if (z.gm) db.prepare(`INSERT INTO sorten_kennwerte VALUES (?, ?, 3)`).run(z.sid, z.gm);
   }
-  assert.equal(liste.length, 6);
-  assert.ok(dauer < 5, `zu langsam: ${dauer.toFixed(2)} ms`);
+  return { db, terpene, zeilen, bewertungen };
+}
+
+/** Der Ablauf von empfehlungenFortschreiben ohne Prisma: Profil, Vorauswahl in SQL, genaue Rechnung. */
+function mitVorauswahl(db: Database, terpene: TerpenZeile[], bewertungen: EigeneBewertung[]) {
+  const ids = JSON.stringify([...new Set(bewertungen.map((b) => b.strainId))]);
+  const bewertete = sortenAusZeilen(terpene, db.prepare(SORTEN_AROMA_SQL).all(ids) as SortenAromaZeile[]);
+  const gewichte = profilTerpene(bewertungen, bewertete, terpene);
+  const roh = db.prepare(KANDIDATEN_SQL).all(JSON.stringify(gewichte), ids, KANDIDATEN_ANZAHL) as SortenAromaZeile[];
+  return { roh, bewertete, gewichte };
+}
+
+test("Vorauswahl in D1: höchstens 150 Kandidaten, ohne Bewertete, gleiche Top 6 wie über alle Sorten", () => {
+  const { db, terpene, zeilen, bewertungen } = synthetischeDatenbank();
+  const { roh, bewertete } = mitVorauswahl(db, terpene, bewertungen);
+  assert.ok(roh.length <= KANDIDATEN_ANZAHL && roh.length > 6);
+  const bewertet = new Set(bewertungen.map((b) => b.strainId));
+  assert.ok(!roh.some((z) => bewertet.has(z.sid)));
+  const vorausgewaehlt = empfehlungenBerechnen(bewertungen, [...bewertete, ...sortenAusZeilen(terpene, roh)]);
+  const ueberAlle = empfehlungenBerechnen(bewertungen, sortenAusZeilen(terpene, zeilen));
+  assert.deepEqual(vorausgewaehlt, ueberAlle);
 });
 
-test("ähnlich im Aroma (SQL): Kosinus über Rang, ohne sich selbst, nur aktive", () => {
+test("Vorauswahl in D1: ohne positive Bewertung keine Terpengewichte", () => {
+  const { db, terpene } = synthetischeDatenbank();
+  const { gewichte } = mitVorauswahl(db, terpene, [{ strainId: "s1", gesamtnote: 1, terpene: {}, geschmack: {} }]);
+  assert.deepEqual(gewichte, {});
+});
+
+test("empfehlungen: Rechnung im Worker samt Umwandlung der Zeilen unter dem CPU-Budget", (t) => {
+  const { db, terpene, bewertungen } = synthetischeDatenbank();
+  const { roh } = mitVorauswahl(db, terpene, bewertungen);
+  const ids = JSON.stringify([...new Set(bewertungen.map((b) => b.strainId))]);
+  const bewerteteRoh = db.prepare(SORTEN_AROMA_SQL).all(ids) as SortenAromaZeile[];
+  // Gemessen wird, was der Worker tut: Zeilen umwandeln, Profil, genaue Rechnung.
+  const lauf = () => {
+    const bewertete = sortenAusZeilen(terpene, bewerteteRoh);
+    profilTerpene(bewertungen, bewertete, terpene);
+    return empfehlungenBerechnen(bewertungen, [...bewertete, ...sortenAusZeilen(terpene, roh)]);
+  };
+  const kaltStart = performance.now();
+  let liste = lauf();
+  const kalt = performance.now() - kaltStart;
+  let warm = Infinity;
+  for (let i = 0; i < 5; i++) {
+    const start = performance.now();
+    liste = lauf();
+    warm = Math.min(warm, performance.now() - start);
+  }
+  t.diagnostic(`kalt ${kalt.toFixed(2)} ms, warm ${warm.toFixed(2)} ms`);
+  assert.equal(liste.length, 6);
+  // Großzügige Schranken gegen Flackern; die genaue Messung steht im Report.
+  assert.ok(kalt < 100, `kalt zu langsam: ${kalt.toFixed(2)} ms`);
+  assert.ok(warm < 10, `warm zu langsam: ${warm.toFixed(2)} ms`);
+});
+
+test("sortenAusZeilen: Terpene nach Id und Rang, Median als Zahlen, Unbekanntes entfällt", () => {
+  const sorten = sortenAusZeilen(
+    [{ id: "m", name: "Myrcen", geschmack: "ERDIG" }, { id: "x", name: "Kaputt", geschmack: "UNBEKANNT" }],
+    [
+      { sid: "a", tp: "m:1,x:2,fehlt:3", gm: '{"zitrus":3,"erdig":"hoch"}' },
+      { sid: "b", tp: "x:1", gm: null },
+      { sid: "c", tp: null, gm: "kaputt" },
+    ],
+  );
+  assert.deepEqual(sorten, [
+    { strainId: "a", terpene: [{ name: "Myrcen", geschmack: "ERDIG", rang: 1 }], geschmackMedian: { zitrus: 3 } },
+  ]);
+});
+
+test("empfehlungenErsetzen: zweimal speichern ersetzt die Liste atomar, höchstens sechs Zeilen", () => {
+  const db = new Database(":memory:");
+  db.exec(`CREATE TABLE nutzer_empfehlungen (mitglied_id TEXT, strain_id TEXT, rang INTEGER, score REAL,
+    bezug_strain_id TEXT, gemeinsam TEXT, PRIMARY KEY (mitglied_id, strain_id))`);
+  // Wie D1-batch: alle Anweisungen in einer Transaktion.
+  const batch = db.transaction((anweisungen: ReturnType<typeof empfehlungenErsetzen>) => {
+    for (const a of anweisungen) db.prepare(a.sql).run(...a.params);
+  });
+  const { terpene, zeilen } = synthetischeZeilen();
+  const sorten = sortenAusZeilen(terpene, zeilen);
+  const erste = empfehlungenBerechnen([{ strainId: "s0", gesamtnote: 5, terpene: {}, geschmack: {} }], sorten);
+  batch(empfehlungenErsetzen("m1", erste));
+  batch(empfehlungenErsetzen("andere", erste.slice(0, 2)));
+  const zweite = empfehlungenBerechnen(
+    [
+      { strainId: "s0", gesamtnote: 5, terpene: {}, geschmack: {} },
+      { strainId: erste[0].strainId, gesamtnote: 4, terpene: {}, geschmack: {} },
+    ],
+    sorten,
+  );
+  batch(empfehlungenErsetzen("m1", zweite));
+  const gespeichert = db.prepare(`SELECT strain_id AS s FROM nutzer_empfehlungen WHERE mitglied_id = 'm1' ORDER BY rang`).all() as { s: string }[];
+  assert.equal(gespeichert.length, 6);
+  assert.deepEqual(gespeichert.map((z) => z.s), zweite.map((e) => e.strainId));
+  assert.ok(!gespeichert.some((z) => z.s === erste[0].strainId));
+  assert.equal((db.prepare(`SELECT COUNT(*) AS n FROM nutzer_empfehlungen WHERE mitglied_id = 'andere'`).get() as { n: number }).n, 2);
+  // Scheitert eine Anweisung, bleibt der alte Stand vollständig.
+  const kaputt = [...empfehlungenErsetzen("m1", erste), empfehlungenErsetzen("m1", erste)[1]];
+  assert.throws(() => batch(kaputt));
+  assert.equal((db.prepare(`SELECT COUNT(*) AS n FROM nutzer_empfehlungen WHERE mitglied_id = 'm1'`).get() as { n: number }).n, 6);
+});
+
+test("ähnlich im Aroma (SQL): Kosinus über Rang, ohne sich selbst, nur aktive, ab Mindestähnlichkeit", () => {
   const db = new Database(":memory:");
   db.exec(`
     CREATE TABLE strains (id TEXT PRIMARY KEY, slug TEXT, handelsname TEXT, aktiv INTEGER);
@@ -143,8 +270,15 @@ test("ähnlich im Aroma (SQL): Kosinus über Rang, ohne sich selbst, nur aktive"
       ('e','h',1);
   `);
   const zeilen = db.prepare(AEHNLICH_SQL).all("a", "a") as { slug: string; gemeinsam: string }[];
-  assert.deepEqual(zeilen.map((z) => z.slug), ["b", "c"]);
+  // C teilt nur Myrcen auf hinterem Rang: Kosinus unter der Mindestähnlichkeit.
+  assert.deepEqual(zeilen.map((z) => z.slug), ["b"]);
   assert.deepEqual(zeilen[0].gemeinsam.split("|").sort(), ["Limonen", "Myrcen"]);
+});
+
+test("aehnlichVeraltet: fehlt oder älter als eine Woche, dann neu rechnen", () => {
+  assert.equal(aehnlichVeraltet(null, 1000), true);
+  assert.equal(aehnlichVeraltet(1000, 1000 + AEHNLICH_GUELTIG_MS), false);
+  assert.equal(aehnlichVeraltet(1000, 1001 + AEHNLICH_GUELTIG_MS), true);
 });
 
 test("aromenText: Terpene als Name, Geschmack als Adjektiv, je Sprache", () => {

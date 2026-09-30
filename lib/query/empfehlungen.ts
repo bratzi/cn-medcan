@@ -1,96 +1,73 @@
-import { istGeschmacksKategorie } from "@/db/enums";
-import type { Werte } from "@/lib/bewertung-v2";
-import { AEHNLICH_SQL, empfehlungenBerechnen, type SortenAroma } from "@/lib/empfehlung";
+import {
+  AEHNLICH_SQL,
+  aehnlichVeraltet,
+  empfehlungenBerechnen,
+  empfehlungenErsetzen,
+  KANDIDATEN_ANZAHL,
+  KANDIDATEN_SQL,
+  profilTerpene,
+  SORTEN_AROMA_SQL,
+  sortenAusZeilen,
+  TERPENE_SQL,
+  type SortenAromaZeile,
+  type TerpenZeile,
+} from "@/lib/empfehlung";
+import { getEnv } from "@/lib/cloudflare";
 import { getPrisma } from "@/lib/prisma";
 import { parseGeschmacksMatrix, parseTerpenIntensitaet } from "@/lib/query/bewertung";
 
-/** Obergrenze der Zeilen beim Neuberechnen; heute rund 700 aktive Sorten mit je bis zu fünf Terpenen. */
-const ZEILEN_HOECHSTENS = 20000;
-
-/** Community-Median als Zahlen je Achse; kaputter Text ergibt ein leeres Objekt. */
-function werteAus(roh: string | null | undefined): Werte {
-  if (!roh) return {};
-  try {
-    const obj: unknown = JSON.parse(roh);
-    if (!obj || typeof obj !== "object") return {};
-    const aus: Werte = {};
-    for (const [k, v] of Object.entries(obj)) if (typeof v === "number" && Number.isFinite(v)) aus[k] = v;
-    return aus;
-  } catch {
-    return {};
-  }
-}
+/** Obergrenze eigener Bewertungen im Profil; erreicht wird geloggt. */
+const BEWERTUNGEN_HOECHSTENS = 1000;
 
 /**
  * Empfehlungen eines Mitglieds neu berechnen und in `nutzer_empfehlungen`
  * schreiben (T11, Nutzer 2026-09-29). Läuft beim Speichern einer Bewertung,
  * nie je Seitenaufruf. Zählen alle eigenen Bewertungen, auch noch nicht
  * freigegebene: es geht um den Geschmack des Mitglieds, nicht um die Community.
+ * Aroma aller Sorten kommt als eine Zeile je Sorte (Review T11: CPU 10 ms).
  */
 export async function empfehlungenFortschreiben(mitgliedId: string): Promise<void> {
   const prisma = await getPrisma();
-  // Terpene aller aktiven Sorten flach in einer Abfrage (T11: schlank für das
-  // CPU-Limit, keine verschachtelte Relation über 700 Sorten).
-  const [eigene, terpenZeilen, medianZeilen] = await Promise.all([
+  const [eigene, terpene] = await Promise.all([
     prisma.review.findMany({
       where: { autorId: mitgliedId },
+      orderBy: { erstelltAm: "desc" },
       select: { strainId: true, gesamtnote: true, terpenIntensitaet: true, geschmacksMatrix: true },
-      take: 1000,
+      take: BEWERTUNGEN_HOECHSTENS,
     }),
-    prisma.$queryRawUnsafe<{ sid: string; rang: number; name: string; geschmack: string }[]>(
-      `SELECT st.strain_id AS sid, st.rang AS rang, t.name AS name, t.geschmack AS geschmack
-       FROM strain_terpene st
-       JOIN strains s ON s.id = st.strain_id AND s.aktiv = 1
-       JOIN terpene t ON t.id = st.terpen_id
-       LIMIT ${ZEILEN_HOECHSTENS}`,
-    ),
-    prisma.sortenKennwerte.findMany({
-      where: { anzahl: { gt: 0 }, strain: { aktiv: true } },
-      select: { strainId: true, geschmackMedian: true },
-      take: ZEILEN_HOECHSTENS,
-    }),
+    prisma.$queryRawUnsafe<TerpenZeile[]>(TERPENE_SQL),
   ]);
+  if (eigene.length >= BEWERTUNGEN_HOECHSTENS) console.warn("empfehlungen: Bewertungsgrenze erreicht", BEWERTUNGEN_HOECHSTENS);
+  const bewertungen = eigene.map((r) => ({
+    strainId: r.strainId,
+    gesamtnote: r.gesamtnote,
+    terpene: parseTerpenIntensitaet(r.terpenIntensitaet),
+    geschmack: parseGeschmacksMatrix(r.geschmacksMatrix),
+  }));
+  const bewerteteIds = JSON.stringify([...new Set(bewertungen.map((b) => b.strainId))]);
 
-  const jeSorte = new Map<string, SortenAroma>();
-  for (const z of terpenZeilen) {
-    if (!istGeschmacksKategorie(z.geschmack)) continue;
-    let sorte = jeSorte.get(z.sid);
-    if (!sorte) jeSorte.set(z.sid, (sorte = { strainId: z.sid, terpene: [] }));
-    (sorte.terpene as { name: string; geschmack: typeof z.geschmack; rang: number }[]).push({
-      name: z.name,
-      geschmack: z.geschmack,
-      rang: Number(z.rang),
-    });
-  }
-  for (const k of medianZeilen) {
-    const sorte = jeSorte.get(k.strainId);
-    if (sorte) sorte.geschmackMedian = werteAus(k.geschmackMedian);
-  }
-  const aromen = [...jeSorte.values()];
-  const liste = empfehlungenBerechnen(
-    eigene.map((r) => ({
-      strainId: r.strainId,
-      gesamtnote: r.gesamtnote,
-      terpene: parseTerpenIntensitaet(r.terpenIntensitaet),
-      geschmack: parseGeschmacksMatrix(r.geschmacksMatrix),
-    })),
-    aromen,
-  );
+  // Erst das Profil aus den bewerteten Sorten, dann nur die Kandidaten, die D1
+  // danach vorsortiert: der Worker rechnet über rund 150 statt 700 Sorten.
+  const bewertete = sortenAusZeilen(terpene, await prisma.$queryRawUnsafe<SortenAromaZeile[]>(SORTEN_AROMA_SQL, bewerteteIds));
+  const gewichte = profilTerpene(bewertungen, bewertete, terpene);
+  const kandidaten =
+    Object.keys(gewichte).length === 0
+      ? []
+      : sortenAusZeilen(
+          terpene,
+          await prisma.$queryRawUnsafe<SortenAromaZeile[]>(
+            KANDIDATEN_SQL,
+            JSON.stringify(gewichte),
+            bewerteteIds,
+            KANDIDATEN_ANZAHL,
+          ),
+        );
+  const liste = empfehlungenBerechnen(bewertungen, [...bewertete, ...kandidaten]);
 
-  // Ersetzen statt abgleichen: höchstens sechs Zeilen je Mitglied.
-  await prisma.nutzerEmpfehlung.deleteMany({ where: { mitgliedId } });
-  if (liste.length > 0) {
-    await prisma.nutzerEmpfehlung.createMany({
-      data: liste.map((e) => ({
-        mitgliedId,
-        strainId: e.strainId,
-        rang: e.rang,
-        score: e.score,
-        bezugStrainId: e.bezugStrainId,
-        gemeinsam: JSON.stringify(e.gemeinsam),
-      })),
-    });
-  }
+  // Atomar ersetzen: D1-batch läuft als eine Transaktion, Prismas $transaction
+  // auf D1 dagegen als Einzelabfragen (siehe lib/auth.ts).
+  const { DB } = await getEnv();
+  await DB.batch(empfehlungenErsetzen(mitgliedId, liste).map((a) => DB.prepare(a.sql).bind(...a.params)));
 }
 
 export type GespeicherteEmpfehlung = {
@@ -135,23 +112,44 @@ export async function ladeEmpfehlungen(mitgliedId: string): Promise<Gespeicherte
 
 export type AehnlicheSorte = { slug: string; handelsname: string; gemeinsam: string[] };
 
+function aehnlicheAus(roh: string): AehnlicheSorte[] {
+  try {
+    const obj: unknown = JSON.parse(roh);
+    if (!Array.isArray(obj)) return [];
+    return obj.filter(
+      (x): x is AehnlicheSorte =>
+        !!x && typeof x.slug === "string" && typeof x.handelsname === "string" && Array.isArray(x.gemeinsam),
+    );
+  } catch {
+    return [];
+  }
+}
+
 /**
- * „Ähnlich im Aroma“ auf der Blütenseite, auch für Gäste: Kosinus über die
- * Herstellerterpene (Gewicht 1/Rang), gerechnet in D1 statt im Worker. So
- * kostet der Seitenaufruf keine Worker-CPU für 700 Sorten; D1 liest nur die
- * Sorten, die mindestens ein Terpen teilen (Index auf terpen_id). Sortiert
- * wird nach dem quadrierten Kosinus (gleiche Reihenfolge, ohne SQRT).
+ * „Ähnlich im Aroma“ auf der Blütenseite, auch für Gäste: liest eine Zeile aus
+ * `sorten_aehnlich`. Fehlt sie oder ist sie älter als eine Woche, rechnet D1
+ * einmal neu (`AEHNLICH_SQL`) und speichert das Ergebnis (Review T11).
  */
 export async function aehnlichImAroma(strainId: string): Promise<AehnlicheSorte[]> {
   const prisma = await getPrisma();
+  const gespeichert = await prisma.sortenAehnlich.findUnique({ where: { strainId } });
+  const jetzt = Date.now();
+  if (gespeichert && !aehnlichVeraltet(gespeichert.berechnetAm.getTime(), jetzt)) return aehnlicheAus(gespeichert.liste);
+
   const zeilen = await prisma.$queryRawUnsafe<{ slug: string; handelsname: string; gemeinsam: string | null }[]>(
     AEHNLICH_SQL,
     strainId,
     strainId,
   );
-  return zeilen.map((z) => ({
+  const liste: AehnlicheSorte[] = zeilen.map((z) => ({
     slug: z.slug,
     handelsname: z.handelsname,
     gemeinsam: (z.gemeinsam ?? "").split("|").filter(Boolean),
   }));
+  const daten = { liste: JSON.stringify(liste), berechnetAm: new Date(jetzt) };
+  // Scheitert das Speichern (etwa zwei Aufrufe zugleich), gilt die Liste trotzdem.
+  await prisma.sortenAehnlich
+    .upsert({ where: { strainId }, create: { strainId, ...daten }, update: daten })
+    .catch((fehler: unknown) => console.error("sorten_aehnlich speichern fehlgeschlagen", fehler));
+  return liste;
 }
