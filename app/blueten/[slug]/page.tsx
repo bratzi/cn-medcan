@@ -11,6 +11,9 @@ import { blueteBild } from "@/lib/medien";
 import { alsDiashow } from "@/lib/budpic-anzeige";
 import { musterBildId } from "@/lib/budpics";
 import { ladeFreieBudpics } from "@/lib/query/budpics";
+import { aehnlichImAroma } from "@/lib/query/empfehlungen";
+import { EmpfehlungsListe } from "@/components/empfehlung/EmpfehlungsListe";
+import { aromenText } from "@/lib/empfehlung-text";
 import { Aufklaerung } from "@/components/review/Aufklaerung";
 import { AromaErkundung } from "@/components/review/AromaErkundung";
 import { BewertungsFormular } from "@/components/review/BewertungsFormular";
@@ -169,7 +172,13 @@ async function ProduktInhalt({ slug, w, sprache }: { slug: string; w: Woerterbuc
     aktuellesMitglied(),
   ]);
   if (!strain) notFound();
-  const budpics = (await ladeFreieBudpics([strain.id])).get(strain.id) ?? [];
+  // „Ähnlich im Aroma“ (T11) rechnet D1, nicht der Worker; ohne Terpene entfällt es.
+  const [budpicListe, aehnliche] = await Promise.all([
+    ladeFreieBudpics([strain.id]),
+    strain.terpene.length > 0 ? aehnlichImAroma(strain.id) : Promise.resolve([]),
+  ]);
+  const budpics = budpicListe.get(strain.id) ?? [];
+  const eigeneTerpene = strain.terpene.map((terpen) => terpen.name);
 
   const { eigene, community, meineNote } = teileBewertungen(strain.reviews);
   const neuesteEigene = eigene[0];
@@ -341,6 +350,32 @@ async function ProduktInhalt({ slug, w, sprache }: { slug: string; w: Woerterbuc
           </div>
         </div>
       </section>
+
+      {aehnliche.length > 0 ? (
+        <section aria-labelledby="aehnlich-titel" className={ABSTAND}>
+          <h2 id="aehnlich-titel" className={ABSCHNITT_TITEL}>
+            {w.empfehlung.bluetenTitel}
+          </h2>
+          <p className="mt-2 max-w-[68ch] text-small text-text-muted">
+            {w.empfehlung.bluetenSatz} {w.empfehlung.hinweis}
+          </p>
+          <EmpfehlungsListe
+            className="mt-8"
+            eintraege={aehnliche.map((a) => ({
+              slug: a.slug,
+              handelsname: a.handelsname,
+              // Gemeinsame Terpene in der Rangfolge dieser Sorte, höchstens drei.
+              begruendung: t(w.empfehlung.gemeinsam, {
+                aromen: aromenText(
+                  eigeneTerpene.filter((name) => a.gemeinsam.includes(name)).slice(0, 3).map((name) => `t:${name}`),
+                  w,
+                  sprache,
+                ),
+              }),
+            }))}
+          />
+        </section>
+      ) : null}
 
       <section aria-labelledby="chargen-titel" className={ABSTAND}>
         <h2 id="chargen-titel" className={ABSCHNITT_TITEL}>

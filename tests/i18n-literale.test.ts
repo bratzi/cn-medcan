@@ -94,6 +94,10 @@ const UMGESTELLT: string[] = [
   "app/vorschlagen/aktionen.ts",
   "components/vorschlag/BlueteVorschlagFormular.tsx",
   "lib/query/benachrichtigungen.ts",
+  // T11: Empfehlungen
+  "components/story/Empfehlungen.tsx",
+  "components/empfehlung/EmpfehlungsListe.tsx",
+  "lib/empfehlung-text.ts",
 ];
 
 const ERLAUBT: string[] = ["Book of Terpz", "Deutsch"];

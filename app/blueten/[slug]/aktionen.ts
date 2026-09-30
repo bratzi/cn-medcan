@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 
 import { bewertungPruefen } from "@/lib/bewertung-eingabe";
 import { kennwerteFortschreiben } from "@/lib/kennwerte";
+import { empfehlungenFortschreiben } from "@/lib/query/empfehlungen";
 import { getPrisma } from "@/lib/prisma";
 import { freigabeErforderlich } from "@/lib/session";
 import { holeSprache, holeWoerterbuch, type Sprache, type Woerterbuch } from "@/lib/i18n";
@@ -102,9 +103,17 @@ export async function bewertungSpeichern(formData: FormData): Promise<BewertungE
     update: daten,
   });
   await kennwerteFortschreiben(strain.id);
+  // Empfehlungen nach aehnlichem Aroma (T11) hier vorberechnen, nie je Seitenaufruf.
+  // Ein Fehler darin soll die gespeicherte Bewertung nicht als gescheitert melden.
+  try {
+    await empfehlungenFortschreiben(mitglied.mitgliedId);
+  } catch (fehler) {
+    console.error("empfehlungenFortschreiben fehlgeschlagen", fehler);
+  }
 
   revalidatePath(`/blueten/${strain.slug}`);
   revalidatePath("/");
   revalidatePath("/admin");
+  revalidatePath("/mitglied");
   return { ok: true, sofortSichtbar: istBetreiber, slug: strain.slug };
 }

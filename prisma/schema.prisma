@@ -121,6 +121,9 @@ model Strain {
   umfrageOptionen    UmfrageOption[]
   sortenVorschlaege  SortenVorschlag[]
 
+  empfohlenIn NutzerEmpfehlung[] @relation("EmpfohleneSorte")
+  bezugIn     NutzerEmpfehlung[] @relation("BezugSorte")
+
   erstelltAm     DateTime @default(now()) @map("erstellt_am")
   aktualisiertAm DateTime @updatedAt @map("aktualisiert_am")
 
@@ -420,6 +423,7 @@ model Mitglied {
   benachrichtigungen Benachrichtigung[]
   avatar             NutzerAvatar?
   budpics            Budpic[]
+  empfehlungen       NutzerEmpfehlung[]
 
   @@index([freigegeben])
   @@map("mitglied")
@@ -682,4 +686,25 @@ model Budpic {
   @@index([status, erstelltAm])
   @@index([mitgliedId, status])
   @@map("budpics")
+}
+
+/// Persoenliche Empfehlungen nach aehnlichem Aroma (T11, Nutzer 2026-09-29).
+/// Beim Speichern einer Bewertung aus lib/empfehlung.ts vorberechnet (CPU-Limit
+/// 10 ms), nie je Seitenaufruf. Nur Aroma, nie Wirkung (HWG). `gemeinsam` ist
+/// ein JSON-Text mit Schluesseln wie "t:Myrcen" und "g:ZITRUS".
+model NutzerEmpfehlung {
+  mitgliedId    String   @map("mitglied_id")
+  mitglied      Mitglied @relation(fields: [mitgliedId], references: [id], onDelete: Cascade)
+  strainId      String   @map("strain_id")
+  strain        Strain   @relation("EmpfohleneSorte", fields: [strainId], references: [id], onDelete: Cascade)
+  rang          Int
+  score         Float
+  bezugStrainId String   @map("bezug_strain_id")
+  bezug         Strain   @relation("BezugSorte", fields: [bezugStrainId], references: [id], onDelete: Cascade)
+  gemeinsam     String
+  erstelltAm    DateTime @default(now()) @map("erstellt_am")
+
+  @@id([mitgliedId, strainId])
+  @@index([mitgliedId, rang])
+  @@map("nutzer_empfehlungen")
 }
