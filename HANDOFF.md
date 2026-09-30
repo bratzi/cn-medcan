@@ -3,7 +3,7 @@
 > Übergabemedium zwischen Sessions. Wird nach jedem Arbeitsblock aktualisiert und committet.
 > Wer hier weiterarbeitet, liest diese Datei zuerst und braucht den Chatverlauf nicht.
 
-**Letzte Aktualisierung:** 2026-09-30 nachts (Session 31, Sicherung zum Clear)
+**Letzte Aktualisierung:** 2026-09-30 vormittags (Session 32, Sicherung zum Clear)
 **Repo:** https://github.com/bratzi/cn-medcan (public)
 **Branch:** `main` (Makeover „Grünes Buch“ Teilprojekt 1 ist seit 2026-09-24 auf `main`)
 
@@ -27,6 +27,31 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 ---
 
 ## ⇢ Hier geht es weiter
+
+### ⇢ SESSION 32 (2026-09-30 vormittags): T11+T5c live, T7b/T15 auf WIP-Branches, Sicherung zum Clear
+
+**ALS ERSTES:** T14 Impressum – die Fragen aus Session 29 in EINER AskUserQuestion stellen (Betreiber Name/Firma,
+Anschrift, Land; Kontakt E-Mail + zweiter Weg; Register/USt-IdNr.; inhaltlich verantwortlich dieselbe Person;
+Bundesland; Cloudflare über EU-US DPF + DPA eintragen). Danach ohne Rückfrage weiter.
+
+**Nutzerwunsch:** Bei Parallelarbeit öfter clearen (Kontext wächst schnell) – nach jedem gemergten Task-Paket
+HANDOFF sichern und Clear anbieten.
+
+**Wiedereinstieg:** Skill `superpowers:subagent-driven-development`, Ledger
+`.superpowers/sdd/2026-09-29-buch-bewertung-v2-master/progress.md` (Rulings bis R22, Session-32-Einträge am Ende).
+- **Nutzerantworten 2026-09-30:** Betreibername bleibt sichtbar; Karte ohne Login bleibt; Overall-Noten ab 0 (R17).
+- **ERLEDIGT und gepusht:** T11 Empfehlungen (Review sauber, Migration 0014 remote drin, 26 Tabellen), T5c
+  (Overall ab 0, Regler rasten auf ungerade Community-Werte ein). Live NICHT geprüft (Prüflisten task-11/5c-report.md).
+- **t7b-wip `01d9d82`:** T7b Buch auf einen Screen (Desktop), Fix-Runde 1 fertig, **Re-Review offen** (Pakete
+  liegen im Ledger-Ordner). Danach nach main.
+- **t15-wip `cd47882`** (baut auf t7b-wip): Kopf leicht durchscheinend (78 %/88 %/97 %), `npm test` noch laufen
+  lassen, dann kurzer Review.
+- **T5d offen** (Brief `task-5d-brief.md`): Terpene automatisch ergänzt/entfernt nach Reglerwert, Sweet Spot raus,
+  Animationslinie ∝ Regler, Funken fürs Delta über Median. Startet nach T7b/T15 im Hauptbaum.
+- **T12/T13:** Worktrees `C:\cn-t12` (t12-terpene) und `C:\cn-t13` (t13-bong) vom Nutzer angelegt (ab ae58753, Regeln
+  `worktree-regeln.md`), Agenten gestoppt bevor sie etwas schrieben → neu dispatchen. Claude darf selbst KEINE
+  Worktrees außerhalb C:\cn anlegen (Auto-Mode).
+- Remote-D1: `--file` meldete Auth 10000 bis Nutzer `npx.cmd wrangler login` machte; danach ging es.
 
 ### ⇢ SESSION 31 (2026-09-30 nachts): T5b–T10 fertig und live, T11 halb, Sicherung zum Clear
 
