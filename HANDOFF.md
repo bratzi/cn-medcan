@@ -30,6 +30,10 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 
 ### ⇢ SESSION 35 (2026-09-30 abends): Crash-Fix, T16–T20 per SDD parallel, alles gepusht (`91adcc1`) und live geprüft
 
+**ALS ERSTES (Sessionstart):** Nutzer in EINER Frage: Register-Verbindung nur Ring/Dimmen ok, oder echte Linien
+zwischen Terpen und Geschmack zeichnen? Danach ohne Rückfrage: Knöpfe rechts unten vs. Fazit-Leiste fixen,
+Esc-Fokus prüfen, T16 ab xl live (Fenster ≥ 1280 px), Rest der Prüfliste. Alle Agents beendet, nichts in Arbeit.
+
 - **Bugs behoben:** Blütenseite zeigte nur Fehlerseite (Funktion als Prop Server→Client, `3354a65`); waagrechte
   Scrollleiste (fieldset sr-only min-content, `fd1092f`).
 - **T16** Fazit läuft mit: ab xl sticky Spalte rechts, darunter Leiste unten + Sheet (Fokusfalle, Esc). Live: Leiste
