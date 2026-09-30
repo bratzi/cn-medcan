@@ -27,6 +27,7 @@ const MELDUNGEN = [
   "bild.masse",
   "budpic.nurFreigeschaltet",
   "budpic.fehlgeschlagen",
+  "vorschlag.zuVieleBilder",
 ] as const;
 
 /** Die Meldungen, die der Upload im Browser braucht: klein, damit die Karten leicht bleiben. */

@@ -56,10 +56,8 @@ export function BlueteFreigabe({ schluessel, vorbelegung: v, terpene, katalog, h
             platzhalter="Bitte wählen"
             defaultValue={v.kultivarTyp}
           />
-          <Input id={id("thcmin")} name="thcMin" label="THC von %" required inputMode="decimal" defaultValue={v.thcMin} />
-          <Input id={id("thcmax")} name="thcMax" label="THC bis %" required inputMode="decimal" defaultValue={v.thcMax} />
-          <Input id={id("cbdmin")} name="cbdMin" label="CBD von %" required inputMode="decimal" defaultValue={v.cbdMin} />
-          <Input id={id("cbdmax")} name="cbdMax" label="CBD bis %" required inputMode="decimal" defaultValue={v.cbdMax} />
+          <Input id={id("thc")} name="thc" label="THC in %" required inputMode="decimal" defaultValue={v.thc} />
+          <Input id={id("cbd")} name="cbd" label="CBD in %" required inputMode="decimal" defaultValue={v.cbd} />
           <Input
             id={id("hersteller")}
             name="hersteller"

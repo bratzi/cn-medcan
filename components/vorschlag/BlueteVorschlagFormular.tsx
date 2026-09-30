@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { blueteVorschlagen, type VorschlagErgebnis } from "@/app/vorschlagen/aktionen";
@@ -9,10 +9,13 @@ import { Button, Field, Input, Meldung, Select, textLinkKlassen } from "@/compon
 import { useHydriert } from "@/components/ui/useHydriert";
 import type { SelectOption } from "@/components/ui";
 import { KULTIVAR_TYPEN } from "@/db/enums";
+import { BUDPIC_MAX_BYTES, BUDPIC_MAX_KANTE } from "@/lib/budpics";
+import { bildVerkleinernFrei } from "@/lib/bild-verkleinern";
 import { MAX_VORSCHLAG_NOTIZ, MAX_VORSCHLAG_TERPENE } from "@/lib/vorschlag-eingabe";
+import { VORSCHLAG_MAX_BILDER } from "@/lib/vorschlag-bilder";
 import type { Sprache } from "@/lib/i18n/sprache-kern";
 import { terpenAnzeige } from "@/lib/i18n/terpen";
-import { t } from "@/lib/i18n/text";
+import { mehrzahl, t } from "@/lib/i18n/text";
 import type { Woerterbuch } from "@/lib/i18n/typen";
 
 const RANG = ["eins", "zwei", "drei"] as const;
@@ -23,20 +26,55 @@ type Props = {
   texte: Woerterbuch["vorschlag"];
   typen: Woerterbuch["label"]["kultivarTyp"];
   sprache: Sprache;
+  /** Nur die Meldungen des Bild-Ablaufs (budpicMeldungen). */
+  meldungen: Record<string, string>;
 };
 
 /**
  * Eine fehlende Bluete vorschlagen. Die Pruefung liegt in
  * lib/vorschlag-eingabe.ts und laeuft in der Server Action; maxLength ist
  * Bedienkomfort, keine Absicherung.
+ *
+ * Bilder (T10): dieselbe Verkleinerung wie bei den Budpics, aber sie gehen mit
+ * dem Vorschlag raus und werden erst bei der Freigabe zu offenen Budpics. Der
+ * Server prueft jede Datei erneut.
  */
-export function BlueteVorschlagFormular({ terpene, nameVorbelegt, texte, typen, sprache }: Props) {
+export function BlueteVorschlagFormular({ terpene, nameVorbelegt, texte, typen, sprache, meldungen }: Props) {
   const TYPEN: SelectOption[] = KULTIVAR_TYPEN.map((typ) => ({ wert: typ, label: typen[typ] }));
   const router = useRouter();
   const hydriert = useHydriert();
   const [laeuft, setLaeuft] = useState(false);
   const [antwort, setAntwort] = useState<VorschlagErgebnis | null>(null);
+  const eingabe = useRef<HTMLInputElement>(null);
+  const [bilder, setBilder] = useState<Blob[]>([]);
+  const [bereitet, setBereitet] = useState(false);
+  const [bildFehler, setBildFehler] = useState<string[]>([]);
   const optionen: SelectOption[] = terpene.map((name) => ({ wert: name, label: terpenAnzeige(name, sprache) }));
+
+  async function bilderGewaehlt(ereignis: React.ChangeEvent<HTMLInputElement>) {
+    const alle = Array.from(ereignis.target.files ?? []);
+    // Dieselben Dateien sollen sich erneut waehlen lassen (nach einem Fehler).
+    ereignis.target.value = "";
+    if (alle.length === 0) return;
+    const platz = VORSCHLAG_MAX_BILDER - bilder.length;
+    const dateien = alle.slice(0, Math.max(platz, 0));
+    const fehler: string[] = [];
+    if (alle.length > dateien.length) fehler.push(t(meldungen["vorschlag.zuVieleBilder"], { max: VORSCHLAG_MAX_BILDER }));
+    setBildFehler([]);
+    setBereitet(true);
+    const neu: Blob[] = [];
+    try {
+      for (const datei of dateien) {
+        const klein = await bildVerkleinernFrei(datei, { maxKante: BUDPIC_MAX_KANTE, maxBytes: BUDPIC_MAX_BYTES });
+        if (klein.ok) neu.push(klein.blob);
+        else fehler.push(`${datei.name}: ${t(meldungen[klein.fehler.schluessel], klein.fehler.parameter)}`);
+      }
+    } finally {
+      setBilder((alt) => [...alt, ...neu]);
+      setBildFehler(fehler);
+      setBereitet(false);
+    }
+  }
 
   async function absenden(ereignis: React.FormEvent<HTMLFormElement>) {
     ereignis.preventDefault();
@@ -44,10 +82,13 @@ export function BlueteVorschlagFormular({ terpene, nameVorbelegt, texte, typen, 
     setLaeuft(true);
     setAntwort(null);
     try {
-      const ergebnis = await blueteVorschlagen(new FormData(formular));
+      const daten = new FormData(formular);
+      for (const bild of bilder) daten.append("bild", new File([bild], "vorschlag.webp", { type: "image/webp" }));
+      const ergebnis = await blueteVorschlagen(daten);
       setAntwort(ergebnis);
       if (ergebnis.ok) {
         formular.reset();
+        setBilder([]);
         router.refresh();
       }
     } catch {
@@ -112,6 +153,49 @@ export function BlueteVorschlagFormular({ terpene, nameVorbelegt, texte, typen, 
           />
         )}
       </Field>
+
+      <div className="flex flex-col items-start gap-2">
+        <p className="text-body font-medium text-text">{texte.bilder}</p>
+        <p className="max-w-[56ch] text-small text-text-muted">{t(texte.bilderHinweis, { max: VORSCHLAG_MAX_BILDER })}</p>
+        <input
+          ref={eingabe}
+          type="file"
+          multiple
+          accept="image/jpeg,image/png,image/webp"
+          className="hidden"
+          onChange={bilderGewaehlt}
+          tabIndex={-1}
+          aria-hidden="true"
+        />
+        <div className="flex flex-wrap items-center gap-4">
+          <Button
+            type="button"
+            variante="secondary"
+            groesse="sm"
+            disabled={!hydriert || bereitet || bilder.length >= VORSCHLAG_MAX_BILDER}
+            onClick={() => eingabe.current?.click()}
+          >
+            {bereitet ? texte.bilderPruefen : texte.bilderWaehlen}
+          </Button>
+          {bilder.length > 0 ? (
+            <>
+              <span role="status" className="text-small text-text-muted">
+                {mehrzahl(sprache, texte.bilderAusgewaehlt, bilder.length)}
+              </span>
+              <Button type="button" variante="ghost" groesse="sm" onClick={() => setBilder([])}>
+                {texte.bilderEntfernen}
+              </Button>
+            </>
+          ) : null}
+        </div>
+        {bildFehler.length > 0 ? (
+          <ul role="alert" className="flex flex-col gap-1 text-small text-danger">
+            {bildFehler.map((zeile, i) => (
+              <li key={i}>{zeile}</li>
+            ))}
+          </ul>
+        ) : null}
+      </div>
 
       {antwort && !antwort.ok ? (
         <Meldung art="fehler">

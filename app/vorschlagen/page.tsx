@@ -5,6 +5,7 @@ import { BlueteVorschlagFormular } from "@/components/vorschlag/BlueteVorschlagF
 import { terpenNamen } from "@/lib/query/vorschlaege";
 import { aktuellesMitglied } from "@/lib/session";
 import { vorschlagPfad } from "@/lib/vorschlag-eingabe";
+import { budpicMeldungen } from "@/lib/budpic-anzeige";
 import { holeSprache, holeWoerterbuch } from "@/lib/i18n";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -35,6 +36,7 @@ export default async function VorschlagenPage({ searchParams }: Props) {
           texte={w.vorschlag}
           typen={w.label.kultivarTyp}
           sprache={sprache}
+          meldungen={budpicMeldungen(w)}
         />
       </div>
     </div>

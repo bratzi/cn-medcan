@@ -155,14 +155,13 @@ export type BlueteFreigabe = {
   anbauland: string | null;
 };
 
-function spanne(formular: Lesbar, name: "THC" | "CBD", von: string, bis: string): Pruef<[number, number]> {
-  const min = zahl(formular.get(von), 100);
-  const max = zahl(formular.get(bis), 100);
-  if (min === "fehler" || max === "fehler" || min === null || max === null) {
-    return { ok: false, fehler: `${name}: bitte beide Werte zwischen 0 und 100 % angeben.` };
+/** Ein Wert je Cannabinoid (Nutzer 2026-09-29); die Spalten bleiben Spannen, der Wert steht in beiden. */
+function einzelwert(formular: Lesbar, name: "THC" | "CBD", feld: string): Pruef<number> {
+  const wert = zahl(formular.get(feld), 100);
+  if (wert === "fehler" || wert === null) {
+    return { ok: false, fehler: `${name}: bitte einen Wert zwischen 0 und 100 % angeben.` };
   }
-  if (min > max) return { ok: false, fehler: `${name}: der kleinste Wert ist größer als der größte.` };
-  return { ok: true, wert: [min, max] };
+  return { ok: true, wert };
 }
 
 export function blueteFreigabePruefen(
@@ -178,9 +177,9 @@ export function blueteFreigabePruefen(
   const typ = text(formular.get("kultivarTyp"));
   if (!istKultivarTyp(typ)) return { ok: false, fehler: "Bitte den Kultivartyp wählen." };
 
-  const thc = spanne(formular, "THC", "thcMin", "thcMax");
+  const thc = einzelwert(formular, "THC", "thc");
   if (!thc.ok) return thc;
-  const cbd = spanne(formular, "CBD", "cbdMin", "cbdMax");
+  const cbd = einzelwert(formular, "CBD", "cbd");
   if (!cbd.ok) return cbd;
 
   const terpene = terpeneAusFormular(formular, MAX_FREIGABE_TERPENE, terpenNamen);
@@ -197,10 +196,10 @@ export function blueteFreigabePruefen(
       slug: name.wert.slug,
       kultivarName: optional(formular.get("kultivarName")),
       kultivarTyp: typ,
-      thcMin: thc.wert[0],
-      thcMax: thc.wert[1],
-      cbdMin: cbd.wert[0],
-      cbdMax: cbd.wert[1],
+      thcMin: thc.wert,
+      thcMax: thc.wert,
+      cbdMin: cbd.wert,
+      cbdMax: cbd.wert,
       hersteller: optional(formular.get("hersteller")),
       terpene,
       bestrahlung: bestrahlungRoh,
@@ -245,10 +244,8 @@ export type FreigabeVorbelegung = {
   handelsname: string;
   kultivarName: string;
   kultivarTyp: string;
-  thcMin: string;
-  thcMax: string;
-  cbdMin: string;
-  cbdMax: string;
+  thc: string;
+  cbd: string;
   hersteller: string;
   terpene: string[];
 };
@@ -271,10 +268,8 @@ export function freigabeVorbelegen(gruppe: VorschlagGruppe): FreigabeVorbelegung
     handelsname: l[0]?.handelsname ?? "",
     kultivarName: erster(l, (v) => v.kultivarName) ?? "",
     kultivarTyp: erster(l, (v) => v.kultivarTyp) ?? "",
-    thcMin: thc === null ? "" : String(thc),
-    thcMax: thc === null ? "" : String(thc),
-    cbdMin: cbd === null ? "" : String(cbd),
-    cbdMax: cbd === null ? "" : String(cbd),
+    thc: thc === null ? "" : String(thc),
+    cbd: cbd === null ? "" : String(cbd),
     hersteller: erster(l, (v) => v.hersteller) ?? "",
     terpene: terpene ?? [],
   };

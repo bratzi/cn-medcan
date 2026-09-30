@@ -7,6 +7,7 @@ import { getPrisma } from "@/lib/prisma";
 import { istEindeutigkeitsfehler } from "@/lib/prisma-fehler";
 import { blueteVorhanden, terpenNamen } from "@/lib/query/vorschlaege";
 import { MAX_OFFENE_VORSCHLAEGE, blueteVorschlagPruefen } from "@/lib/vorschlag-eingabe";
+import { vorschlagBilderPruefen } from "@/lib/vorschlag-bilder";
 import { holeWoerterbuch } from "@/lib/i18n";
 import { meldungText } from "@/lib/i18n/text";
 
@@ -33,6 +34,10 @@ export async function blueteVorschlagen(formData: FormData): Promise<VorschlagEr
   if (!geprueft.ok) return { ok: false, fehler: meldungText(wb, geprueft.fehler) };
   const w = geprueft.wert;
 
+  // Bilder (freiwillig): der Server prueft sie erneut, der Browser hat nur verkleinert.
+  const bilder = await vorschlagBilderPruefen(formData.getAll("bild"));
+  if (!bilder.ok) return { ok: false, fehler: meldungText(wb, bilder.fehler) };
+
   // Eine inaktive Bluete steht nicht im Katalog: kein Link ins Leere, der
   // Vorschlag geht durch, und die Freigabe schaltet sie wieder an.
   const vorhanden = await blueteVorhanden(w.schluessel, w.handelsname);
@@ -58,7 +63,7 @@ export async function blueteVorschlagen(formData: FormData): Promise<VorschlagEr
   }
 
   try {
-    await prisma.sortenVorschlag.create({
+    const angelegt = await prisma.sortenVorschlag.create({
       data: {
         mitgliedId: mitglied.mitgliedId,
         handelsname: w.handelsname,
@@ -72,7 +77,15 @@ export async function blueteVorschlagen(formData: FormData): Promise<VorschlagEr
         quelle: w.quelle,
         notiz: w.notiz,
       },
+      select: { id: true },
     });
+    // Ein INSERT je Bild (BLOB als gebundener Parameter). Bricht es ab, steht der
+    // Vorschlag ohne Bilder da: er selbst ist gueltig, das Mitglied kann ihn ergaenzen lassen.
+    for (const bild of bilder.wert) {
+      await prisma.sortenVorschlagBild.create({
+        data: { vorschlagId: angelegt.id, daten: bild.daten, breite: bild.breite, hoehe: bild.hoehe },
+      });
+    }
   } catch (fehler) {
     if (istEindeutigkeitsfehler(fehler)) {
       return {

@@ -57,6 +57,26 @@ async function abschliessen(
   }
 }
 
+/**
+ * Bilder der Vorschlaege als OFFENE Budpics der Sorte uebernehmen (T10) und die
+ * wartenden Zeilen loeschen. Je Bild erst anlegen, dann loeschen: bricht es ab,
+ * bleibt der Vorschlag offen und ein zweiter Klick holt den Rest nach (im
+ * schlimmsten Fall ein doppeltes Bild zur Pruefung, nie ein verlorenes).
+ * Das Bild gehoert weiter dem Mitglied, das es beigetragen hat.
+ */
+async function bilderUebernehmen(offene: { id: string; mitgliedId: string }[], strainId: string) {
+  const prisma = await getPrisma();
+  for (const v of offene) {
+    const bilder = await prisma.sortenVorschlagBild.findMany({ where: { vorschlagId: v.id }, take: 10 });
+    for (const bild of bilder) {
+      await prisma.budpic.create({
+        data: { strainId, mitgliedId: v.mitgliedId, daten: bild.daten, breite: bild.breite, hoehe: bild.hoehe },
+      });
+      await prisma.sortenVorschlagBild.delete({ where: { id: bild.id } });
+    }
+  }
+}
+
 /** Hersteller finden oder mit der Id-Regel des Importskripts anlegen. */
 async function herstellerSichern(name: string): Promise<string | null> {
   const schluessel = unternehmensSchluessel(name);
@@ -189,6 +209,7 @@ export async function blueteFreigeben(formData: FormData): Promise<AdminVorschla
 
   const slug = vorhanden?.slug ?? w.slug;
   const name = vorhanden?.handelsname ?? w.handelsname;
+  await bilderUebernehmen(offene, vorhanden?.id ?? strainId);
   await abschliessen(
     offene,
     "FREIGEGEBEN",
@@ -209,6 +230,10 @@ export async function blueteAblehnen(formData: FormData): Promise<AdminVorschlag
   const offene = await offeneLaden(schluessel);
   if (offene.length === 0) return { ok: false, fehler: "Zu diesem Vorschlag ist nichts mehr offen." };
 
+  const prisma = await getPrisma();
+  for (const teil of inHaeppchen(offene.map((v) => v.id))) {
+    await prisma.sortenVorschlagBild.deleteMany({ where: { vorschlagId: { in: teil } } });
+  }
   await abschliessen(
     offene,
     "ABGELEHNT",
@@ -241,6 +266,7 @@ export async function blueteZuordnen(formData: FormData): Promise<AdminVorschlag
   // sonst zeigte die Benachrichtigung auf eine Seite, die es nicht gibt.
   if (!strain.aktiv) await prisma.strain.update({ where: { id: strain.id }, data: { aktiv: true } });
 
+  await bilderUebernehmen(offene, strain.id);
   await abschliessen(
     offene,
     "FREIGEGEBEN",

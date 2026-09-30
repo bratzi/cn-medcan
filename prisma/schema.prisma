@@ -595,6 +595,7 @@ model SortenVorschlag {
   strainId    String? @map("strain_id")
   strain      Strain? @relation(fields: [strainId], references: [id], onDelete: SetNull)
   begruendung String?
+  bilder      SortenVorschlagBild[]
 
   erstelltAm    DateTime  @default(now()) @map("erstellt_am")
   entschiedenAm DateTime? @map("entschieden_am")
@@ -605,6 +606,24 @@ model SortenVorschlag {
   @@index([mitgliedId])
   @@index([strainId])
   @@map("sorten_vorschlaege")
+}
+
+/// Bild zu einem Bluetenvorschlag (T10): dieselben Regeln wie Budpic (WebP,
+/// hoechstens 1280 px und 150 KB, BLOB in D1). Es wartet am Vorschlag, bis der
+/// Betreiber ihn freigibt oder zuordnet; dann wird es als offenes Budpic der
+/// Sorte uebernommen und diese Zeile geloescht. Abfragen waehlen `daten` nur
+/// bei der Uebernahme.
+model SortenVorschlagBild {
+  id           String          @id @default(uuid())
+  vorschlagId  String          @map("vorschlag_id")
+  vorschlag    SortenVorschlag @relation(fields: [vorschlagId], references: [id], onDelete: Cascade)
+  daten        Bytes
+  breite       Int
+  hoehe        Int
+  erstelltAm   DateTime        @default(now()) @map("erstellt_am")
+
+  @@index([vorschlagId])
+  @@map("sorten_vorschlag_bilder")
 }
 
 /// Nachricht an ein Mitglied im Mitgliederbereich. Spaeter liest ein

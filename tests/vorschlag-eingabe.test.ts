@@ -77,10 +77,8 @@ test("Freigabe: Pflichtfelder, Spannen, Slug aus dem korrigierten Namen", () => 
       vorschlagSchluessel: "apples-bananas",
       handelsname: "Apples and Bananas",
       kultivarTyp: "HYBRID",
-      thcMin: "20",
-      thcMax: "24",
-      cbdMin: "0",
-      cbdMax: "1",
+      thc: "22,5",
+      cbd: "0,8",
       terpen1: "Myrcen",
       bestrahlung: "UNBEKANNT",
     }),
@@ -89,16 +87,20 @@ test("Freigabe: Pflichtfelder, Spannen, Slug aus dem korrigierten Namen", () => 
   assert.equal(e.ok, true);
   assert.equal(e.ok && e.wert.slug, "apples-and-bananas");
   assert.equal(e.ok && e.wert.vorschlagSchluessel, "apples-bananas");
+  // Ein Wert je Cannabinoid: als min = max gespeichert (kein Schemawechsel).
+  assert.deepEqual(e.ok && [e.wert.thcMin, e.wert.thcMax, e.wert.cbdMin, e.wert.cbdMax], [22.5, 22.5, 0.8, 0.8]);
   const ohneTyp = blueteFreigabePruefen(
-    formular({ vorschlagSchluessel: "a", handelsname: "A", thcMin: "1", thcMax: "2", cbdMin: "0", cbdMax: "0" }),
+    formular({ vorschlagSchluessel: "a", handelsname: "A", thc: "1", cbd: "0" }),
     TERPENE,
   );
   assert.equal(ohneTyp.ok, false);
-  const verdreht = blueteFreigabePruefen(
-    formular({ vorschlagSchluessel: "a", handelsname: "A", kultivarTyp: "INDICA", thcMin: "25", thcMax: "20", cbdMin: "0", cbdMax: "0" }),
-    TERPENE,
-  );
-  assert.deepEqual(verdreht, { ok: false, fehler: "THC: der kleinste Wert ist größer als der größte." });
+  const basis = { vorschlagSchluessel: "a", handelsname: "A", kultivarTyp: "INDICA" };
+  const ohneThc = blueteFreigabePruefen(formular({ ...basis, cbd: "0" }), TERPENE);
+  assert.deepEqual(ohneThc, { ok: false, fehler: "THC: bitte einen Wert zwischen 0 und 100 % angeben." });
+  const cbdZuHoch = blueteFreigabePruefen(formular({ ...basis, thc: "20", cbd: "101" }), TERPENE);
+  assert.deepEqual(cbdZuHoch, { ok: false, fehler: "CBD: bitte einen Wert zwischen 0 und 100 % angeben." });
+  // Alte Spannenfelder zaehlen nicht mehr.
+  assert.equal(blueteFreigabePruefen(formular({ ...basis, thcMin: "20", thcMax: "24", cbdMin: "0", cbdMax: "1" }), TERPENE).ok, false);
   // Die Admin-Freigabe spricht weiter Deutsch, auch bei den gemeinsamen Namensfehlern.
   const ohneName = blueteFreigabePruefen(formular({ vorschlagSchluessel: "a", handelsname: "&&&" }), TERPENE);
   assert.deepEqual(ohneName, { ok: false, fehler: "Der Handelsname braucht Buchstaben oder Ziffern." });
@@ -136,7 +138,7 @@ test("vorschlaegeBuendeln: gleicher Schluessel eine Gruppe, aelteste Gruppe zuer
   ]);
 });
 
-test("freigabeVorbelegen: erster Vorschlag zuerst, Luecken aus den weiteren, Einzelwert als Spanne", () => {
+test("freigabeVorbelegen: erster Vorschlag zuerst, Luecken aus den weiteren, Einzelwert bleibt ein Wert", () => {
   const belegung = freigabeVorbelegen({
     schluessel: "apples-bananas",
     vorschlaege: [
@@ -148,10 +150,8 @@ test("freigabeVorbelegen: erster Vorschlag zuerst, Luecken aus den weiteren, Ein
     handelsname: "Apples & Bananas",
     kultivarName: "",
     kultivarTyp: "HYBRID",
-    thcMin: "22",
-    thcMax: "22",
-    cbdMin: "1",
-    cbdMax: "1",
+    thc: "22",
+    cbd: "1",
     hersteller: "Aurora",
     terpene: ["Myrcen"],
   });
