@@ -30,6 +30,7 @@ function baueAnsicht(katalog: readonly RegisterKatalogTerpen[], w: Woerterbuch, 
     terpene: register.terpene.map((terpen) => ({
       anker: terpen.anker,
       name: terpenAnzeige(terpen.name, sprache),
+      icon: terpen.name,
       sorten: terpen.sorten,
       sortenText: terpen.sorten > 0 ? mehrzahl(sprache, texte.sorten, terpen.sorten) : texte.keineSorte,
       sortenKurz: sortenKurz(terpen.sorten),
@@ -37,6 +38,7 @@ function baueAnsicht(katalog: readonly RegisterKatalogTerpen[], w: Woerterbuch, 
       vorkommen: stoffe[terpen.schluessel]?.vorkommen ?? null,
       noten: terpen.noten.map((note, index) => ({
         anker: notenAnker(note.geschmack),
+        geschmack: note.geschmack,
         label: w.label.geschmack[note.geschmack],
         anteil: note.anteil,
         haupt: index === 0,
@@ -44,10 +46,12 @@ function baueAnsicht(katalog: readonly RegisterKatalogTerpen[], w: Woerterbuch, 
     })),
     noten: register.noten.map((note) => ({
       anker: note.anker,
+      geschmack: note.geschmack,
       label: w.label.geschmack[note.geschmack],
       traeger: note.terpene.map((terpen) => ({
         anker: terpen.anker,
         name: terpenAnzeige(terpen.name, sprache),
+        icon: terpen.name,
         anteil: terpen.anteil,
         sortenKurz: sortenKurz(terpen.sorten),
       })),
@@ -99,6 +103,11 @@ async function Inhalt() {
  * dahinter. Kopf wie die Nachbarsektion (AromaSektion). Ohne JavaScript stehen
  * alle Tafeln untereinander (globals.css, `.register-*`); Bewegung kommt allein
  * aus bewegung/register.ts.
+ *
+ * `z-10` (T18, Nutzer 2026-09-30): das Schlagwort hängt halb über der oberen
+ * Kante. Die Sektion davor (TransparentMachen) liegt mit `z-10` und deckendem
+ * Papier eine Ebene höher und deckte die obere Hälfte ab; auf gleicher Ebene
+ * liegt die spätere Sektion oben, der Satz bleibt ganz lesbar.
  */
 export async function TerpenRegister() {
   const texte = (await holeWoerterbuch()).start.register;
@@ -106,7 +115,7 @@ export async function TerpenRegister() {
     <section
       aria-labelledby="register-titel"
       data-story="register"
-      className="relative isolate overflow-x-clip px-4 py-32 sm:px-8 sm:py-48"
+      className="relative isolate z-10 overflow-x-clip px-4 py-32 sm:px-8 sm:py-48"
     >
       <Schlagwort satz={texte.schlagwort} ton="lila" />
       <div className="mx-auto w-full max-w-360">

@@ -77,3 +77,25 @@ export function baueTerpenRegister(katalog: readonly KatalogEintrag[]): TerpenRe
 
   return { terpene, noten };
 }
+
+/**
+ * Verbindungen Terpen und Geschmack in beide Richtungen (T17, Nutzer
+ * 2026-09-30): je Anker die Anker der verbundenen Einträge, damit Hover,
+ * Fokus und Tippen im Register die Gegenseite hervorheben können.
+ */
+export function verbindungsKarte(
+  terpene: readonly { anker: string; noten: readonly { anker: string }[] }[],
+): Record<string, string[]> {
+  const karte: Record<string, string[]> = {};
+  const verbinde = (von: string, nach: string) => {
+    const liste = (karte[von] ??= []);
+    if (!liste.includes(nach)) liste.push(nach);
+  };
+  for (const terpen of terpene) {
+    for (const note of terpen.noten) {
+      verbinde(terpen.anker, note.anker);
+      verbinde(note.anker, terpen.anker);
+    }
+  }
+  return karte;
+}

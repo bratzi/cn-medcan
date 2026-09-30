@@ -36,6 +36,7 @@ import {
   type TerpenEbene,
 } from "@/lib/aromakarte";
 import { cn } from "@/lib/cn";
+import { LINIEN_FARBE, VERLAUF } from "@/lib/aroma-farben";
 import { GESCHMACKS_ACHSEN, type GeschmacksMatrix } from "@/lib/query/bewertung";
 import { GeschmackIcon, TerpenIcon } from "@/components/review/AromaIcon";
 import { BEGLEITSTOFFE } from "@/lib/terpen-aromen";
@@ -104,28 +105,7 @@ const MIN_HOEHE = 360;
 const FARBE = { gruen: "var(--color-accent)", lila: "var(--color-kopierstift)" } as const;
 const GRAU = "var(--color-border-strong)";
 
-/**
- * Farbe der Bögen je Geschmacksrichtung (Nutzer 2026-09-26): Zitrus gelb,
- * Süß pink, Kräutrig moosgrün, Minzig minzgrün, Holzig braun, Würzig zimt,
- * Erdig erdbraun, Diesel grau; Fruchtig und Blumig als bunter Verlauf
- * (Verweis auf die Verläufe in <defs>, null = Verlauf).
- */
-const LINIEN_FARBE: Record<string, string | null> = {
-  ZITRUS: "#f2d129",
-  FRUCHTIG: null,
-  SUESS: "#ff5fa8",
-  BLUMIG: null,
-  KRAEUTRIG: "#7d9a3c",
-  MINZIG: "#5fe0b8",
-  HOLZIG: "#9b6a3f",
-  WUERZIG: "#c98a3e",
-  ERDIG: "#7a5536",
-  DIESEL: "#9aa1a8",
-};
-const VERLAUF: Record<string, readonly string[]> = {
-  FRUCHTIG: ["#ff4d4d", "#ff9f1c", "#ffd23f", "#b5179e"],
-  BLUMIG: ["#c77dff", "#ff70a6", "#ffd670", "#8ecae6"],
-};
+// Farben je Geschmacksrichtung: lib/aroma-farben.ts (gemeinsam mit dem Startseiten-Register, T17).
 /** Deckkraft der Geister (T5): blass, ein überfahrener Geist tritt hervor, bleibt aber grau. */
 const GEIST_DECKKRAFT = { blass: 0.22, fokus: 0.7 } as const;
 const RINGE = [1, 2, 3, 4, 5] as const;
