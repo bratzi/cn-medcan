@@ -955,8 +955,11 @@ html.joint-cursor :is(input:not([type="range"]):not([type="radio"]):not([type="c
 }
 
 /* Kopf (components/layout/Kopf.tsx): fest, transparent; beim Scrollen ein
-   Streifen Papier. Über dem Auftakt leiht KopfZustand die Bühnen-Tokens. */
+   Streifen Papier leicht durchscheinend (Nutzer 2026-09-30: Video soll sichtbar sein).
+   Über dem Auftakt leiht KopfZustand die Bühnen-Tokens. */
 .kopf {
+  --kopf-deckkraft: 78%;
+  --kopf-weich: blur(10px) saturate(1.2);
   background: transparent;
   border-bottom: 1px solid transparent;
   transition:
@@ -966,24 +969,28 @@ html.joint-cursor :is(input:not([type="range"]):not([type="radio"]):not([type="c
 }
 
 .kopf[data-gescrollt] {
-  background: color-mix(in oklab, var(--color-surface) 94%, transparent);
+  background: color-mix(in oklab, var(--color-surface) var(--kopf-deckkraft), transparent);
   border-bottom-color: var(--color-border);
-  backdrop-filter: blur(12px) saturate(1.2);
-  -webkit-backdrop-filter: blur(12px) saturate(1.2);
+  backdrop-filter: var(--kopf-weich);
+  -webkit-backdrop-filter: var(--kopf-weich);
 }
 
-/* Hell-Modus: schon oben im Hero ein Streifen Papier, nicht erst beim Scrollen
-   (Nutzer 2026-09-30: wirkte über dem hellen Hero transparent). KopfZustand
-   setzt dort keine dunklen Bühnen-Tokens mehr. */
+/* Hell-Modus: schon oben im Hero ein Streifen Papier leicht durchscheinend
+   (Nutzer 2026-09-30: Video soll sichtbar sein, 78% Deckkraft).
+   KopfZustand setzt dort keine dunklen Bühnen-Tokens mehr. */
 :root[data-theme="light"] .kopf {
-  background: color-mix(in oklab, var(--color-surface) 94%, transparent);
+  background: color-mix(in oklab, var(--color-surface) var(--kopf-deckkraft), transparent);
   border-bottom-color: var(--color-border);
+  backdrop-filter: var(--kopf-weich);
+  -webkit-backdrop-filter: var(--kopf-weich);
 }
 
 @media (prefers-color-scheme: light) {
   :root:not([data-theme="dark"]) .kopf {
-    background: color-mix(in oklab, var(--color-surface) 94%, transparent);
+    background: color-mix(in oklab, var(--color-surface) var(--kopf-deckkraft), transparent);
     border-bottom-color: var(--color-border);
+    backdrop-filter: var(--kopf-weich);
+    -webkit-backdrop-filter: var(--kopf-weich);
   }
 }
 
@@ -1620,15 +1627,21 @@ html.joint-cursor :is(input:not([type="range"]):not([type="radio"]):not([type="c
    Drehung und Verschiebung (transform), die der Grafikchip allein erledigt.
    ========================================================================== */
 @media (hover: none), (width < 64rem) {
-  .kopf[data-gescrollt] {
-    background: color-mix(in oklab, var(--color-surface) 97%, transparent);
-    backdrop-filter: none;
-    -webkit-backdrop-filter: none;
+  .kopf {
+    --kopf-deckkraft: 88%;
+    --kopf-weich: none;
   }
 
   .glas-maske {
     backdrop-filter: none;
     -webkit-backdrop-filter: none;
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .kopf {
+    --kopf-deckkraft: 97%;
+    --kopf-weich: none;
   }
 }
 
