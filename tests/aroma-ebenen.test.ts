@@ -39,9 +39,18 @@ test("Geist: ein Geschmack allein zündet kein Terpen, blasser Bogen ohne Puls u
 test("Ergänzt: gestrichelt in eigener Farbe (Kopierstift), Lichtpunkt ja, voller Puls nein", () => {
   const html = karte({ ebenen: { Terpinolen: "ergaenzt" }, staerken: { Terpinolen: 0.36 } });
   assert.match(html, /<path[^>]*stroke="var\(--color-kopierstift\)"[^>]*stroke-dasharray="6 5"/);
-  // Voller Wert (5): die ganze Linie pulsiert statt eines Lichtstrichs (T5d).
-  assert.match(html, /class="bogen-voll"/);
+  // Wert 5 ist „zu viel“ (Sweet-Spot-Skala, Nutzer 2026-09-30): ein kurzer Lichtstrich, kein Pulsieren.
+  assert.match(html, /class="bogen-fluss"/);
+  assert.doesNotMatch(html, /class="bogen-voll"/);
   assert.doesNotMatch(html, /class="bogen-puls"/);
+  // Genau im Sweet Spot pulsiert die ganze Linie.
+  const mitte = { ...leereGeschmacksMatrix(), zitrus: 2.5, kraeutrig: 2.5, blumig: 2.5, holzig: 2.5 };
+  const imSweetSpot = karte({
+    ebenen: { Terpinolen: "ergaenzt" },
+    serien: [HERSTELLER, { ...BEWERTUNG, matrix: mitte }],
+  });
+  assert.match(imSweetSpot, /class="bogen-voll"/);
+  assert.doesNotMatch(imSweetSpot, /class="bogen-fluss"/);
   // Knoten mit gestrichelter Kontur statt gefüllt.
   assert.match(html, /<circle[^>]*stroke="var\(--color-kopierstift\)"[^>]*stroke-dasharray="3 2.5"/);
 });
@@ -49,9 +58,9 @@ test("Ergänzt: gestrichelt in eigener Farbe (Kopierstift), Lichtpunkt ja, volle
 test("Herstellerangabe ohne Streifen (Nutzer 2026-09-30), die Bewertung mit Lichtfluss, kein Puls", () => {
   const html = karte({ terpene: [LIMONEN], ebenen: { Limonen: "hersteller" } });
   assert.doesNotMatch(html, /data-schicht="streifen"/);
-  // Zitrus steht auf 5 (VOLL): die ganze Linie pulsiert, kein laufender Strich (T5d).
-  assert.match(html, /class="bogen-voll"/);
-  assert.doesNotMatch(html, /class="bogen-fluss"/);
+  // Zitrus steht auf 5 (VOLL), also „zu viel“: ein laufender Lichtstrich statt Pulsieren.
+  assert.match(html, /class="bogen-fluss"/);
+  assert.doesNotMatch(html, /class="bogen-voll"/);
   assert.doesNotMatch(html, /bogen-puls/);
 });
 
@@ -66,10 +75,11 @@ test("Legende der Ebenen nur, wenn es mehr als die Herstellerangabe gibt", () =>
 
 const REGLER = { werte: VOLL, aendern: () => {} };
 
-test("Skala links: „Terpen-Intensität“ ohne Sweet Spot (T5d), grüner Ring auf dem Community-Median", () => {
+test("Skala links: „Sweet Spot je Geschmack“ (Nutzer 2026-09-30), grüner Ring auf dem Community-Median", () => {
   const html = karte({ regler: { ...REGLER, vergleich: { ...VOLL, zitrus: 2 } } });
-  assert.match(html, /Terpen-Intensität/);
-  assert.doesNotMatch(html, /Sweet Spot/);
+  assert.match(html, new RegExp(`>${de.aroma.karte.sweetSkala.titel}<`));
+  assert.doesNotMatch(html, /Terpen-Intensität/);
+  assert.match(html, new RegExp(`>${de.aroma.karte.sweetSkala.mitte}<`));
   assert.match(html, new RegExp(de.aroma.karte.median));
   assert.match(html, /<circle[^>]*r="11.5"[^>]*stroke="var\(--color-accent\)"/);
   assert.doesNotMatch(html, new RegExp(de.aroma.karte.keinMedian));

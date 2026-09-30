@@ -1545,7 +1545,7 @@ html.joint-cursor :is(input:not([type="range"]):not([type="radio"]):not([type="c
   }
 }
 
-/* Am Maximum (T5d, Nutzer 2026-09-30) pulsiert die ganze Linie statt eines Strichs. */
+/* Genau im Sweet Spot (Nutzer 2026-09-30, zuvor am Maximum, T5d) pulsiert die ganze Linie statt eines Strichs. */
 .bogen-voll,
 .delta-funke {
   visibility: hidden;
@@ -1557,8 +1557,8 @@ html.joint-cursor :is(input:not([type="range"]):not([type="radio"]):not([type="c
     animation: bogen-voll var(--fluss-dauer, 1.2s) ease-in-out infinite;
   }
 
-  /* Funken auf dem Überstand über dem Community-Median (T5d): kleine Punkte steigen
-     auf und verglühen, nur transform und opacity. */
+  /* Funken am Griff, wenn ein Geschmacksregler genau im Sweet Spot steht (Nutzer
+     2026-09-30): kleine Punkte steigen auf und verglühen, nur transform und opacity. */
   .delta-funke {
     visibility: visible;
     transform-box: fill-box;

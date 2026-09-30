@@ -144,14 +144,116 @@ test("Anzeige: keine Herstellerstreifen (Nutzer 2026-09-30), kein Puls, kein Fil
   assert.doesNotMatch(html, /delta-puls/);
 });
 
-test("Anzeige: die lila Serie bekommt Linie und Fluss, viel Wert dick und schnell", () => {
-  const html = karte([gruen({ zitrus: 3 }), lila({ zitrus: 5 })]);
+test("Anzeige: die lila Serie bekommt Linie und Fluss, im Sweet Spot dick, schnell und durchgehend", () => {
+  const html = karte([gruen({ zitrus: 3 }), lila({ zitrus: 2.5 })]);
   const linie = schicht(html, "linie").find((tag) => /stroke="#f2d129"/.test(tag));
   assert.ok(linie, "gelbe Linie über dem Zitrus-Streifen");
-  // Hauptnote von Limonen (75 % Zitrus) bei 5.
+  // Hauptnote von Limonen (75 % Zitrus) genau im Sweet Spot: so dick wie früher bei 5.
   assert.match(linie, new RegExp(`stroke-width:${linienBreite(5, 0.75)}[;"]`));
-  // Am Maximum läuft die Linie durchgehend und pulsiert (T5d), im Tempo des höchsten Werts.
+  // Im Sweet Spot läuft die Linie durchgehend und pulsiert, im schnellsten Tempo (Nutzer 2026-09-30).
   assert.match(html, /class="bogen-voll"[^>]*--fluss-dauer:1\.2s/);
+  assert.doesNotMatch(html, /class="bogen-fluss"/);
+});
+
+test("Anzeige: „zu viel“ (5) wie „zu wenig“ dünn, langsam und mit kurzem Lichtstrich", () => {
+  const html = karte([gruen({ zitrus: 3 }), lila({ zitrus: 5 })]);
+  const linie = schicht(html, "linie").find((tag) => /stroke="#f2d129"/.test(tag));
+  assert.ok(linie, "die Linie erscheint weiter, sobald ein Wert da ist");
+  assert.match(linie, new RegExp(`stroke-width:${linienBreite(0.5, 0.75)}[;"]`));
+  assert.match(html, /class="bogen-fluss"[^>]*--fluss-dauer:6s/);
+  assert.doesNotMatch(html, /class="bogen-voll"/);
+  // Zu wenig im gleichen Abstand zur Mitte zeichnet genauso wie zu viel.
+  const wenig = karte([gruen({ zitrus: 3 }), lila({ zitrus: 1 })]);
+  const viel = karte([gruen({ zitrus: 3 }), lila({ zitrus: 4 })]);
+  const breiteVon = (html: string) => /stroke-width:([\d.]+)/.exec(schicht(html, "linie")[0] ?? "")?.[1];
+  assert.equal(breiteVon(wenig), breiteVon(viel));
+  assert.equal(/--fluss-dauer:([\d.]+s)/.exec(wenig)?.[1], /--fluss-dauer:([\d.]+s)/.exec(viel)?.[1]);
+});
+
+const REGLER_AUS = { aendern: () => {} };
+const mitRegler = (werte: Partial<GeschmacksMatrix>, vergleich?: Partial<GeschmacksMatrix>) =>
+  renderToStaticMarkup(
+    createElement(AromaKarte, {
+      terpene: [LIMONEN],
+      serien: [lila(werte)],
+      texte,
+      bezug: "median",
+      regler: { ...REGLER_AUS, werte: matrix(werte), vergleich: vergleich ? matrix(vergleich) : undefined },
+    }),
+  );
+/** Die Funken der Karte (Kreise mit class="delta-funke"). */
+const funken = (html: string) => [...html.matchAll(/<circle[^>]*class="delta-funke"[^>]*>/g)].map(([tag]) => tag);
+
+test("Funken nur genau im Sweet Spot: Regler auf 2,5 sprüht grün am Griff, auf 3 nicht", () => {
+  const mitte = funken(mitRegler({ zitrus: 2.5 }));
+  assert.equal(mitte.length, 6);
+  for (const tag of mitte) {
+    assert.match(tag, /fill="var\(--color-accent\)"/);
+    assert.match(tag, /r="1.75"/);
+  }
+  // Versetzt, damit die Funken nicht im Gleichschritt steigen.
+  assert.equal(new Set(mitte.map((tag) => /animation-delay:([^;"]+)/.exec(tag)?.[1])).size > 1, true);
+  assert.equal(funken(mitRegler({ zitrus: 3 })).length, 0);
+  assert.equal(funken(mitRegler({ zitrus: 2.4 })).length, 0);
+  // Zwei Achsen im Sweet Spot: je Achse sechs Funken.
+  assert.equal(funken(mitRegler({ zitrus: 2.5, erdig: 2.5 })).length, 12);
+});
+
+test("Kein Funke mehr auf dem Überstand über dem Median, der pulsierende Überstand bleibt", () => {
+  const html = mitRegler({ zitrus: 4 }, { zitrus: 2 });
+  assert.match(html, /class="delta-puls"[^>]*data-delta="ueber"/);
+  assert.equal(funken(html).length, 0);
+  // Im Sweet Spot über dem Median: der Überstand pulsiert und die Funken sprühen.
+  const beides = mitRegler({ zitrus: 2.5 }, { zitrus: 1 });
+  assert.match(beides, /data-delta="ueber"/);
+  assert.equal(funken(beides).length, 6);
+  // Ohne Regler (Anzeige) keine Funken, auch im Sweet Spot.
+  assert.equal(funken(karte([gruen({ zitrus: 3 }), lila({ zitrus: 2.5 })])).length, 0);
+});
+
+test("Skala: „zu viel“ links, „Sweet Spot“ in der Mitte, „zu wenig“ rechts statt der Zahlen 0 bis 5", () => {
+  const html = karte([gruen({ zitrus: 3 }), lila({ zitrus: 2 })]);
+  const wort = (text: string) => new RegExp(`<text[^>]*>${text}</text>`).exec(html)?.[0];
+  const viel = wort(de.aroma.karte.sweetSkala.viel);
+  const mitte = wort(de.aroma.karte.sweetSkala.mitte);
+  const wenig = wort(de.aroma.karte.sweetSkala.wenig);
+  assert.ok(viel && mitte && wenig, "drei Wörter über den Balken");
+  // Die Balken wachsen nach links: 5 steht links. Anker so, dass nichts überlappt.
+  assert.match(viel, /text-anchor="start"/);
+  assert.match(mitte, /text-anchor="middle"/);
+  assert.match(wenig, /text-anchor="end"/);
+  const x = (tag: string) => Number(/ x="([\d.]+)"/.exec(tag)?.[1]);
+  assert.ok(x(viel) < x(mitte) && x(mitte) < x(wenig), "zu viel links, zu wenig rechts");
+  // Sweet Spot betont: halbfett und volle Deckkraft.
+  assert.match(mitte, /font-weight="500"/);
+  assert.doesNotMatch(mitte, /fill-opacity/);
+  // Keine Zahlen mehr über den Balken; die gestrichelten Linien bei 0 bis 5 bleiben.
+  assert.doesNotMatch(html, /<text[^>]*>[0-5]<\/text>/);
+  assert.equal(html.match(/stroke-dasharray="2 4"/g)?.length, 6);
+  // Die Linie bei 2,5 kommt dazu: durchgezogen in Blattgrün, halbe Deckkraft, genau unter dem Wort.
+  const linie = /<line[^>]*data-skala="mitte"[^>]*>/.exec(html)?.[0];
+  assert.ok(linie, "Linie bei 2,5");
+  assert.match(linie, /stroke="var\(--color-accent\)"/);
+  assert.match(linie, /stroke-opacity="0.5"/);
+  assert.doesNotMatch(linie, /stroke-dasharray/);
+  assert.equal(Number(/x1="([\d.]+)"/.exec(linie)?.[1]), x(mitte));
+});
+
+test("Regler: Titel der Skala, Spur im Sweet-Spot-Stil und Vorlesetext mit Zone", () => {
+  const html = mitRegler({ zitrus: 1, fruchtig: 2.25, suess: 2.5, blumig: 2.75, kraeutrig: 3 });
+  assert.match(html, new RegExp(`>${de.aroma.karte.sweetSkala.titel}<`));
+  assert.doesNotMatch(html, /Terpen-Intensität/);
+  // Spur symmetrisch: Rand grau, Mitte Blattgrün.
+  const spur = /<linearGradient id="spur-[^"]*" x1="1" x2="0"[^>]*>([\s\S]*?)<\/linearGradient>/.exec(html)?.[1] ?? "";
+  const stopps = [...spur.matchAll(/<stop offset="([^"]+)" stop-color="([^"]+)"/g)].map(([, offset, farbe]) => `${offset} ${farbe}`);
+  assert.deepEqual(stopps, ["0% var(--color-border)", "50% var(--color-accent)", "100% var(--color-border)"]);
+  const vorgelesen = [...html.matchAll(/aria-valuetext="([^"]*)"/g)].map(([, text]) => text);
+  // Zone aus dem genauen Wert (2,25 und 2,75 zählen zur Mitte), die Zahl wie bisher auf eine Stelle.
+  assert.equal(vorgelesen[0], "zu wenig, 1,0 von 5");
+  assert.equal(vorgelesen[1], "Sweet Spot, 2,3 von 5");
+  assert.equal(vorgelesen[2], "Sweet Spot, 2,5 von 5");
+  assert.equal(vorgelesen[3], "Sweet Spot, 2,8 von 5");
+  assert.equal(vorgelesen[4], "zu viel, 3,0 von 5");
 });
 
 test("Anzeige: Balken lila über der grünen Serie mit pulsierendem Überstand, darunter grün mit Fehlstück", () => {

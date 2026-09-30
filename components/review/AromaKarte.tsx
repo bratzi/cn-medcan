@@ -19,8 +19,8 @@ import {
   bogenSchicht,
   flussDauer,
   flussStrich,
-  funkenPunkte,
   herstellerKraft,
+  imSweetSpot,
   leuchtendeTerpene,
   linienBreite,
   MIN_BREITE,
@@ -28,6 +28,9 @@ import {
   sanft,
   SPUERBAR,
   streifen,
+  SWEET_SPOT_FUNKEN,
+  sweetSpotStaerke,
+  sweetSpotZone,
   terpenBoegen,
   terpeneImKarte,
   terpenStaerken,
@@ -35,6 +38,7 @@ import {
   type Punkt,
   type TerpenEbene,
 } from "@/lib/aromakarte";
+import { QUALITAET_MITTE } from "@/lib/bewertung-v2";
 import { cn } from "@/lib/cn";
 import { LINIEN_FARBE, VERLAUF } from "@/lib/aroma-farben";
 import { GESCHMACKS_ACHSEN, type GeschmacksMatrix } from "@/lib/query/bewertung";
@@ -66,7 +70,8 @@ type Props = {
   ebenen?: Readonly<Record<string, TerpenEbene>>;
   /**
    * Macht die Balken links zu Reglern: man zieht den eigenen Wert je
-   * Geschmacksrichtung direkt in der Karte (0 bis 5). `vergleich` ist der
+   * Geschmacksrichtung direkt in der Karte (0 bis 5 als Sweet-Spot-Skala, Nutzer
+   * 2026-09-30: 0 zu wenig, 2,5 genau richtig, 5 zu viel). `vergleich` ist der
    * Community-Median (T5, zuvor die Herstellerangabe): ein grüner Ring, an dem
    * der Griff einrastet. Ohne Median kein Ring, dafür ein Hinweis.
    */
@@ -110,6 +115,12 @@ const GRAU = "var(--color-border-strong)";
 const GEIST_DECKKRAFT = { blass: 0.22, fokus: 0.7 } as const;
 const RINGE = [1, 2, 3, 4, 5] as const;
 const SKALA = [0, 1, 2, 3, 4, 5] as const;
+/**
+ * Ab dieser Balkenlänge stehen „zu viel“, „Sweet Spot“ und „zu wenig“ nebeneinander über den
+ * Balken (je rund 30 bis 50 px breit bei 11 px); darunter (Handy) rücken die zwei Ränder unter die
+ * letzte Achse, damit sich nichts überlappt.
+ */
+const SKALA_EINZEILIG = 160;
 const GLEIT_MS = 420;
 const ANSICHTEN = ["karte", "netz"] as const;
 
@@ -197,8 +208,11 @@ export function AromaKarte({
   const titel = titelRoh ?? texte.aroma.karte.titel;
   const sprache = texte.sprache;
   const kt = texte.aroma.karte;
-  const skalaTitel = texte.aroma.erkundung.intensitaet;
+  const skalaTitel = kt.sweetSkala.titel;
   const WERT = { format: (wert: number) => formatiereZahl(wert, 1, sprache) };
+  /** Vorlesetext eines Geschmacksreglers: Zone der Sweet-Spot-Skala vorn, dann „x von 5“. */
+  const reglerText = (wert: number) =>
+    `${kt.sweetSkala[sweetSpotZone(wert)]}, ${text(texte.aroma.vonFuenf, { wert: WERT.format(wert) })}`;
   const achsenName = (index: number) => texte.geschmack[GESCHMACKS_ACHSEN[index].enumWert];
   const satz = (name: string) => (texte.aroma.satz as Record<string, string>)[name.trim().toLowerCase()] ?? null;
   const terpene = ungeordnet;
@@ -338,6 +352,11 @@ export function AromaKarte({
   const schmal = aktBreite < BREITE;
   const karte = achsenImKarte(aktBreite, aktHoehe);
   const balken = balkenLaenge(aktBreite);
+  // Skala über den Balken: über der Beschriftung der ersten Achse (die seit 2026-09-27 über ihrem
+  // Balken steht), die Linien reichen bis knapp unter die letzte Achse.
+  const skalaY = karte[0].y - 34;
+  const skalaUnten = karte[karte.length - 1].y + 10;
+  const skalaMitteX = balkenEnde(karte[0], QUALITAET_MITTE, 0, balken).x;
   const knoten = karte.map((punkt, index) => mische(punkt, netzPunkt(index, MAX, radius + 34, mitte), t));
   // Rechte Spalte: Terpene und Begleitstoffe (Ester, Thiole; keine Terpene) gemeinsam nach
   // dem Mittel ihrer Achsen geordnet, damit sich die Bögen wenig kreuzen (Nutzer 2026-09-26).
@@ -483,11 +502,12 @@ export function AromaKarte({
           aria-hidden="true"
           className={cn("block w-full text-text", kompakt && "lg:absolute lg:inset-0 lg:h-full")}>
           <defs>
-            {/* Sweet-Spot-Stil der Regler-Spur: rechts 0, links 5 (Balken wachsen nach links). */}
+            {/* Sweet-Spot-Stil der Regler-Spur (Nutzer 2026-09-30): symmetrisch, an beiden Rändern
+                (zu wenig rechts, zu viel links; Balken wachsen nach links) grau, in der Mitte Blattgrün. */}
             <linearGradient id={spurId} x1="1" x2="0" y1="0" y2="0">
               <stop offset="0%" stopColor="var(--color-border)" />
-              <stop offset="60%" stopColor="var(--color-accent-subtle)" />
-              <stop offset="100%" stopColor="var(--color-accent)" />
+              <stop offset="50%" stopColor="var(--color-accent)" />
+              <stop offset="100%" stopColor="var(--color-border)" />
             </linearGradient>
             {/* Bunte Verläufe für Fruchtig und Blumig, entlang der Bögen von der Achse zu den Terpenen. */}
             {Object.entries(VERLAUF).map(([geschmack, farben]) => (
@@ -528,10 +548,11 @@ export function AromaKarte({
               terpenBoegen(terpen).map(({ achse, anteil: notenAnteil }) => {
                 // Karte v2 (T5b, Nutzer 2026-09-29): hinten liegt die Herstellerangabe als stiller,
                 // breiter, blasser Streifen in der Geschmacksfarbe. Erst wenn die Bewertung auf der
-                // Achse einen Wert hat, liegt darüber eine dünnere bunte Linie mit Lichtfluss: wenig
-                // Wert dünn und langsam, viel Wert dick und schnell. So sieht man, wo die Bewertung
-                // über oder unter der Herstellerangabe liegt. Ergänzte Terpene (T5) haben keinen
-                // Streifen, ihre Linie ist gestrichelt in Kopierstift; Geister bleiben grau.
+                // Achse einen Wert hat, liegt darüber eine dünnere bunte Linie mit Lichtfluss. Seit
+                // der Sweet-Spot-Skala (Nutzer 2026-09-30) zählt die Nähe zur Mitte, nicht der
+                // Wert: genau im Sweet Spot dick, schnell und durchgehend pulsierend, zu wenig wie
+                // zu viel dünn und langsam. Ergänzte Terpene (T5) haben keinen Streifen, ihre
+                // Linie ist gestrichelt in Kopierstift; Geister bleiben grau.
                 const imFokus = terpenAktiv === terpen.name;
                 const gedimmt = terpenAktiv !== null && !imFokus;
                 const imBlick = aktiv === null || aktiv === achse;
@@ -543,13 +564,15 @@ export function AromaKarte({
                 const linienFarbe = ebene === "ergaenzt" ? FARBE.lila : farbe;
                 const pfad = bogen(knoten[achse], terpenKnoten[index]);
                 const band = streifen(kraft[terpen.name] ?? 0, notenAnteil);
-                const breite = linienBreite(wert, notenAnteil);
+                const breite = linienBreite(sweetSpotStaerke(wert), notenAnteil);
                 // Tempo aus dem Zielwert, nicht aus dem gleitenden: sonst wechselte die Dauer
                 // in jedem Frame des Gleitens und der Lichtpunkt spränge.
                 const zielWert = bewertungZiel?.matrix[GESCHMACKS_ACHSEN[achse].key] ?? 0;
-                const dauer = flussDauer(zielWert);
-                // Länge des Lichtstrichs aus dem Reglerwert (T5d): wenig kurz, viel lang, am Maximum durchgehend.
-                const strich = flussStrich(zielWert);
+                const zielStaerke = sweetSpotStaerke(zielWert);
+                const dauer = flussDauer(zielStaerke);
+                // Länge des Lichtstrichs (T5d) aus der Nähe zum Sweet Spot: am Rand kurz, zur Mitte
+                // lang, genau in der Mitte durchgehend.
+                const strich = flussStrich(zielStaerke);
                 // Versatz je Bogen als Anteil der Dauer, damit die Lichtpunkte nicht im Gleichschritt laufen.
                 const versatz = `${-(((index * 0.37 + achse * 0.13) % 1) * dauer).toFixed(2)}s`;
                 return (
@@ -592,8 +615,8 @@ export function AromaKarte({
                       />
                     ) : null}
                     {/* Lichtfluss vom Geschmack zum Terpen (globals.css .bogen-fluss): nur auf der
-                        Linie, Tempo aus --fluss-dauer, Strichlänge aus --fluss-strich (T5d); am
-                        Maximum pulsiert die ganze Linie (.bogen-voll). Im Netz (t = 1) unsichtbar,
+                        Linie, Tempo aus --fluss-dauer, Strichlänge aus --fluss-strich (T5d); genau
+                        im Sweet Spot pulsiert die ganze Linie (.bogen-voll). Im Netz (t = 1) unsichtbar,
                         dann läuft er nicht endlos weiter. Sparmodus und reduzierte Bewegung: aus. */}
                     {schicht.linie && !gedimmt && t < 1 ? (
                       <path
@@ -708,6 +731,20 @@ export function AromaKarte({
               })
             : null}
 
+          {/* Mitte der Sweet-Spot-Skala (Nutzer 2026-09-30): eine durchgezogene grüne Linie bei 2,5
+              über alle Achsen, unter Balken und Griffen, damit sie keinen Griff durchstreicht. Die
+              Beschriftung steht bei der Skala unten im SVG. */}
+          <line
+            data-skala="mitte"
+            x1={skalaMitteX}
+            y1={skalaY + 4}
+            x2={skalaMitteX}
+            y2={skalaUnten}
+            stroke={FARBE.gruen}
+            strokeOpacity={0.5}
+            opacity={kartenSichtbar}
+          />
+
           {/* Serien: im Netz Flächen wie bisher. In der Karte nur der Balken der Bewertung
               (T5b, Nutzer 2026-09-29): grün auf oder unter dem Bezug, lila darüber. */}
           {serien.map((serie, s) => {
@@ -757,18 +794,16 @@ export function AromaKarte({
 
           {/* Delta je Achse (Nutzer 2026-09-26, seit T5b gegen den Bezug): darüber pulsiert der
               lila Überstand vom Bezug bis zum Balkenende, darunter das grüne Fehlstück vom
-              Balkenende bis zum Bezug (globals.css, .delta-puls). Gleichauf oder ohne Bezug nichts. */}
+              Balkenende bis zum Bezug (globals.css, .delta-puls). Gleichauf oder ohne Bezug nichts.
+              Funken sprühen hier nicht mehr, nur noch im Sweet Spot am Griff (Nutzer 2026-09-30). */}
           {bewertung && kartenSichtbar > 0.5
             ? GESCHMACKS_ACHSEN.map((achse, index) => {
                 const { ton, puls } = vergleich(index);
                 if (!puls) return null;
                 const y = karte[index].y;
-                // Funken auf dem Überstand über dem Community-Median (T5d), nur in der Maske.
-                const funken =
-                  bezug === "median" && puls.art === "ueber" ? funkenPunkte(wertAuf(index), puls.von) : [];
                 return (
-                  <Fragment key={`delta-${achse.key}`}>
                   <line
+                    key={`delta-${achse.key}`}
                     className="delta-puls"
                     data-delta={puls.art}
                     x1={balkenEnde(karte[index], puls.von, 0, balken).x}
@@ -779,18 +814,6 @@ export function AromaKarte({
                     strokeLinecap="round"
                     style={{ opacity: kartenSichtbar }}
                   />
-                  {funken.map((wert, i) => (
-                    <circle
-                      key={i}
-                      className="delta-funke"
-                      cx={balkenEnde(karte[index], wert, 0, balken).x}
-                      cy={y}
-                      r={1.75}
-                      fill={FARBE.lila}
-                      style={{ animationDelay: `${-((i * 0.37) % 1) * 0.9}s` }}
-                    />
-                  ))}
-                  </Fragment>
                 );
               })
             : null}
@@ -857,6 +880,23 @@ export function AromaKarte({
                       strokeWidth={2.5}
                       style={{ filter: "drop-shadow(0 1px 2px rgb(0 0 0 / 0.3))" }}
                     />
+                    {/* Funken nur genau im Sweet Spot (Nutzer 2026-09-30: das ist der Geschmack, den
+                        man erreichen möchte), am Zielwert, nicht am gleitenden. Grün wie das Ziel,
+                        über dem Griff, damit sie auch auf schmalen Karten sichtbar steigen
+                        (globals.css .delta-funke; Sparmodus und reduzierte Bewegung: aus). */}
+                    {imSweetSpot(regler.werte[key])
+                      ? SWEET_SPOT_FUNKEN.map((wert, i) => (
+                          <circle
+                            key={wert}
+                            className="delta-funke"
+                            cx={balkenEnde(knoten, wert, 0, balken).x}
+                            cy={knoten.y}
+                            r={1.75}
+                            fill={FARBE.gruen}
+                            style={{ animationDelay: `${-((i * 0.37) % 1) * 0.9}s` }}
+                          />
+                        ))
+                      : null}
                     {/* Trefferfläche: Ziehen setzt den Wert; Tastatur über die Regler unter der Karte. */}
                     <rect
                       x={links - 12}
@@ -903,29 +943,50 @@ export function AromaKarte({
             />
           ) : null}
 
-          {/* Skala über den Balken: Länge = Wert 0 bis 5. */}
-          <g opacity={kartenSichtbar * 0.7}>
-            {SKALA.map((stufe) => {
-              const x = balkenEnde(karte[0], stufe, 0, balken).x;
-              // Über der Beschriftung der ersten Achse, die seit 2026-09-27 über ihrem Balken steht.
-              const y = karte[0].y - 34;
-              return (
-                <g key={stufe}>
+          {/* Skala über den Balken: Länge = Wert 0 bis 5, gelesen als Sweet-Spot-Skala (Nutzer
+              2026-09-30). Statt der Zahlen drei Wörter; die Balken wachsen nach links, „zu viel“
+              (5) steht also links, „zu wenig“ (0) rechts, jeweils nach innen gesetzt. Reicht die
+              Balkenlänge nicht für alle drei in einer Zeile (Handy), stehen die Ränder unter der
+              letzten Achse; „Sweet Spot“ bleibt oben, halbfett und voll deckend. */}
+          <g opacity={kartenSichtbar}>
+            <g opacity={0.7}>
+              {SKALA.map((stufe) => {
+                const x = balkenEnde(karte[0], stufe, 0, balken).x;
+                return (
                   <line
+                    key={stufe}
                     x1={x}
-                    y1={y + 4}
+                    y1={skalaY + 4}
                     x2={x}
-                    y2={karte[karte.length - 1].y + 10}
+                    y2={skalaUnten}
                     stroke="currentColor"
                     strokeOpacity={0.15}
                     strokeDasharray="2 4"
                   />
-                  <text x={x} y={y} textAnchor="middle" fontSize={11} fill="currentColor" fillOpacity={0.6}>
-                    {stufe}
-                  </text>
-                </g>
-              );
-            })}
+                );
+              })}
+              {(
+                [
+                  { stufe: MAX, wort: kt.sweetSkala.viel, anker: "start" },
+                  { stufe: 0, wort: kt.sweetSkala.wenig, anker: "end" },
+                ] as const
+              ).map(({ stufe, wort, anker }) => (
+                <text
+                  key={stufe}
+                  x={balkenEnde(karte[0], stufe, 0, balken).x}
+                  y={balken >= SKALA_EINZEILIG ? skalaY : skalaUnten + 18}
+                  textAnchor={anker}
+                  fontSize={11}
+                  fill="currentColor"
+                  fillOpacity={0.6}
+                >
+                  {wort}
+                </text>
+              ))}
+            </g>
+            <text x={skalaMitteX} y={skalaY} textAnchor="middle" fontSize={11} fontWeight={500} fill="currentColor">
+              {kt.sweetSkala.mitte}
+            </text>
           </g>
           {/* Werte am Punkt nur im Netz; in der Karte stehen sie in der Legende darunter, am
               Balkenende stießen sie an den Achsennamen der nächsten Zeile. */}
@@ -1134,7 +1195,7 @@ export function AromaKarte({
                 // step="any" und eigene Pfeiltasten (T5c): der Median neben dem Raster bleibt erreichbar.
                 step="any"
                 value={regler.werte[achse.key]}
-                aria-valuetext={text(texte.aroma.vonFuenf, { wert: WERT.format(regler.werte[achse.key]) })}
+                aria-valuetext={reglerText(regler.werte[achse.key])}
                 onKeyDown={(e) => {
                   const neu = tasteZuWert(e.key, regler.werte[achse.key], {
                     schritt: 0.1,

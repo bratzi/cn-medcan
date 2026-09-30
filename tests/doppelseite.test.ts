@@ -150,9 +150,13 @@ test("Buch (voll, T7b): ab lg links Kopf, Name, Blätter, Noten, Restfeuchte, Te
   assert.doesNotMatch(rechts, /Sehr dichte Blüten./);
 });
 
-test("Buch (voll, T7b): Sweet Spot entfällt (Nutzer 2026-09-30)", () => {
+test("Buch (voll, T7b): Sweet Spot der Terpene entfällt (Nutzer 2026-09-30), nur die Skala der Karte trägt ihn", () => {
   const html = zeige({ eintrag: eintrag(), umfang: "voll", ueberschrift: "h3" });
-  assert.doesNotMatch(html, /Sweet Spot|Sweet-Spot/i);
+  // Seit der Sweet-Spot-Skala der Geschmäcker (Nutzer 2026-09-30) beschriftet die Aroma-Karte ihre
+  // Mitte mit „Sweet Spot“, auch im Buch. Ein eigener Reiter oder Kasten für Terpene kommt nicht zurück.
+  assert.match(html, /<text[^>]*>Sweet Spot<\/text>/);
+  const ohneSkala = html.replace(/<text[^>]*>[^<]*<\/text>/g, "");
+  assert.doesNotMatch(ohneSkala, /Sweet Spot|Sweet-Spot/i);
 });
 
 test("Buch (voll, T7b): mobil wie vorher, rechts Noten und Restfeuchte über der Karte, Charge darunter", () => {

@@ -4,7 +4,7 @@
  * Terpen-Poster; per Schalter morphen die Knoten ins Netzdiagramm. Reine
  * Funktionen, damit Darstellung und Verdichtung testbar bleiben.
  */
-import { abweichungZurCommunity } from "@/lib/bewertung-v2";
+import { abweichungZurCommunity, QUALITAET_MITTE, qualitaetsScore } from "@/lib/bewertung-v2";
 import {
   GESCHMACKS_ACHSEN,
   geschmacksMatrixSchema,
@@ -416,6 +416,47 @@ export function flussStrich(wert: number): { laenge: number; durchgehend: boolea
   return { laenge: Math.round(STRICH_KURZ + (100 - STRICH_KURZ) * anteil), durchgehend: false };
 }
 
+// ---------------------------------------------------------------------------
+//  Sweet-Spot-Skala der Geschmäcker (Nutzer 2026-09-30)
+// ---------------------------------------------------------------------------
+
+/**
+ * Die Geschmacksskala ist eine Sweet-Spot-Skala (Nutzer 2026-09-30): 0 zu wenig,
+ * 2,5 genau richtig, 5 zu viel. Stärke der Linie daraus, 0,5 bis 5, damit
+ * `linienBreite`, `flussDauer` und `flussStrich` unverändert bleiben: genau im
+ * Sweet Spot 5 (dick, schnell, durchgehend pulsierend), an beiden Rändern 0,5
+ * (dünn, langsam, kurzer Lichtstrich). Ohne spürbaren Wert 0, keine Linie.
+ */
+export function sweetSpotStaerke(wert: number): number {
+  if (!(wert > SPUERBAR)) return 0;
+  return zweiStellen(0.5 + 4.5 * qualitaetsScore(wert));
+}
+
+/** Regler steht genau im Sweet Spot; die Toleranz fängt nur Rundungsrauschen ab. */
+export function imSweetSpot(wert: number): boolean {
+  return Math.abs(wert - QUALITAET_MITTE) < 0.01;
+}
+
+/**
+ * Skalenwerte der Funken rund um den Griff, wenn ein Geschmacksregler genau im
+ * Sweet Spot steht (Nutzer 2026-09-30: „Die Funken funken nur, wenn der Regler
+ * direkt auf dem Sweet Spot in der Mitte ist“). Sechs, damit Partikel günstig bleiben.
+ */
+export const SWEET_SPOT_FUNKEN: readonly number[] = [2.1, 2.25, 2.4, 2.6, 2.75, 2.9];
+
+/** Halbe Breite der Zone „Sweet Spot“ für Vorleser, um die Mitte herum. */
+const SWEET_ZONE = 0.25;
+
+/**
+ * Zone eines Geschmackswerts auf der Sweet-Spot-Skala für den Vorlesetext der
+ * Regler: unter 2,25 zu wenig, 2,25 bis 2,75 Sweet Spot, darüber zu viel.
+ */
+export function sweetSpotZone(wert: number): "wenig" | "mitte" | "viel" {
+  if (wert < QUALITAET_MITTE - SWEET_ZONE) return "wenig";
+  if (wert > QUALITAET_MITTE + SWEET_ZONE) return "viel";
+  return "mitte";
+}
+
 /**
  * Ob der Abschnitt „Weitere Terpene“ offen steht (T5d, Review 1): offen mit einer
  * Ergänzung und ohne Herstellerterpene; was einmal offen ist, klappt nicht von
@@ -427,22 +468,6 @@ export function weitereOffen(bisher: boolean, ergaenzt: number, hersteller: numb
 
 /** Unterschied, ab dem ein Balken über oder unter seinem Bezug liegt (sonst gleichauf). */
 const GLEICHAUF = 0.1;
-
-/** Höchstens so viele Funken je Achse: Partikel bleiben günstig. */
-const FUNKEN_HOECHSTENS = 6;
-
-/**
- * Funkenpunkte (Werte auf der Skala) auf dem Überstand zwischen Community-Median
- * und eigenem Wert (T5d): einer je halber Stufe, mindestens zwei, höchstens
- * sechs, gleichmäßig im Inneren verteilt. Ohne Median oder ohne Überstand keine.
- */
-export function funkenPunkte(wert: number, median: number | null | undefined): number[] {
-  if (median === null || median === undefined) return [];
-  const delta = wert - median;
-  if (delta < GLEICHAUF) return [];
-  const anzahl = Math.min(FUNKEN_HOECHSTENS, Math.max(2, Math.round(delta * 2)));
-  return Array.from({ length: anzahl }, (_, i) => zweiStellen(median + (delta * (i + 1)) / (anzahl + 1)));
-}
 
 /**
  * Reihenfolge der Terpen-Regler in der Maske (T5d): die Herstellerterpene
