@@ -154,7 +154,8 @@ test("Anzeige: die lila Serie bekommt Linie und Fluss, viel Wert dick und schnel
   assert.ok(linie, "gelbe Linie über dem Zitrus-Streifen");
   // Hauptnote von Limonen (75 % Zitrus) bei 5.
   assert.match(linie, new RegExp(`stroke-width:${linienBreite(5, 0.75)}[;"]`));
-  assert.match(html, /class="bogen-fluss"[^>]*--fluss-dauer:1\.2s/);
+  // Am Maximum läuft die Linie durchgehend und pulsiert (T5d), im Tempo des höchsten Werts.
+  assert.match(html, /class="bogen-voll"[^>]*--fluss-dauer:1\.2s/);
 });
 
 test("Anzeige: Balken lila über der grünen Serie mit pulsierendem Überstand, darunter grün mit Fehlstück", () => {
@@ -287,7 +288,9 @@ test("CSS: Fluss-Tempo per Variable, kein Puls der Bögen mehr, Sparmodus und re
   // Der Fluss läuft nur ohne reduzierte Bewegung; im Sparmodus verschwindet er ganz.
   const erlaubt = [...css.matchAll(/@media \(prefers-reduced-motion: no-preference\) \{([\s\S]*?)\n\}/g)].map(([, block]) => block);
   assert.ok(erlaubt.some((block) => /\.bogen-fluss\s*\{[^}]*animation:\s*bogen-fluss/.test(block)));
-  assert.match(css, /:root\[data-sparmodus\] \.bogen-fluss\s*\{[^}]*visibility:\s*hidden/);
+  assert.match(css, /:root\[data-sparmodus\] :is\(\.bogen-fluss, \.bogen-voll, \.delta-funke\)\s*\{[^}]*visibility:\s*hidden/);
+  assert.ok(erlaubt.some((block) => /\.bogen-voll\s*\{[^}]*animation:\s*bogen-voll/.test(block)));
+  assert.ok(erlaubt.some((block) => /\.delta-funke\s*\{[^}]*animation:\s*delta-funke/.test(block)));
   // Das Fehlstück steht ohne Bewegung blass, damit es nicht wie ein Balken aussieht.
   assert.match(css, /\.delta-puls\[data-delta="fehlt"\]\s*\{[^}]*--delta-ruhe/);
 });

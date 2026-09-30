@@ -5,7 +5,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 
 import { AromaErkundung } from "@/components/review/AromaErkundung";
 import { AromaKarte } from "@/components/review/AromaKarte";
-import { SweetSpot } from "@/components/review/SweetSpot";
+import { TerpenRegler } from "@/components/review/TerpenRegler";
 import type { KartenTerpen } from "@/lib/aromakarte";
 import { vorbelegungAus } from "@/lib/bewertung-vorbelegung";
 import { de } from "@/lib/i18n/de";
@@ -39,7 +39,8 @@ test("Geist: ein Geschmack allein zündet kein Terpen, blasser Bogen ohne Puls u
 test("Ergänzt: gestrichelt in eigener Farbe (Kopierstift), Lichtpunkt ja, voller Puls nein", () => {
   const html = karte({ ebenen: { Terpinolen: "ergaenzt" }, staerken: { Terpinolen: 0.36 } });
   assert.match(html, /<path[^>]*stroke="var\(--color-kopierstift\)"[^>]*stroke-dasharray="6 5"/);
-  assert.match(html, /class="bogen-fluss"/);
+  // Voller Wert (5): die ganze Linie pulsiert statt eines Lichtstrichs (T5d).
+  assert.match(html, /class="bogen-voll"/);
   assert.doesNotMatch(html, /class="bogen-puls"/);
   // Knoten mit gestrichelter Kontur statt gefüllt.
   assert.match(html, /<circle[^>]*stroke="var\(--color-kopierstift\)"[^>]*stroke-dasharray="3 2.5"/);
@@ -48,7 +49,7 @@ test("Ergänzt: gestrichelt in eigener Farbe (Kopierstift), Lichtpunkt ja, volle
 test("Herstellerangabe (T5b): stiller Streifen, die Bewertung darüber mit Lichtfluss, kein Puls", () => {
   const html = karte({ terpene: [LIMONEN], ebenen: { Limonen: "hersteller" } });
   assert.match(html, /data-schicht="streifen"/);
-  assert.match(html, /class="bogen-fluss"/);
+  assert.match(html, /class="bogen-(fluss|voll)"/);
   assert.doesNotMatch(html, /bogen-puls/);
 });
 
@@ -63,9 +64,10 @@ test("Legende der Ebenen nur, wenn es mehr als die Herstellerangabe gibt", () =>
 
 const REGLER = { werte: VOLL, aendern: () => {} };
 
-test("Skala links: „Terpen-Intensität: Sweet Spot gesucht“, grüner Ring auf dem Community-Median", () => {
+test("Skala links: „Terpen-Intensität“ ohne Sweet Spot (T5d), grüner Ring auf dem Community-Median", () => {
   const html = karte({ regler: { ...REGLER, vergleich: { ...VOLL, zitrus: 2 } } });
-  assert.match(html, /Terpen-Intensität: Sweet Spot gesucht/);
+  assert.match(html, /Terpen-Intensität/);
+  assert.doesNotMatch(html, /Sweet Spot/);
   assert.match(html, new RegExp(de.aroma.karte.median));
   assert.match(html, /<circle[^>]*r="11.5"[^>]*stroke="var\(--color-accent\)"/);
   assert.doesNotMatch(html, new RegExp(de.aroma.karte.keinMedian));
@@ -160,39 +162,43 @@ function felder(html: string): Map<string, string> {
   return aus;
 }
 
-test("Maske: ergänzte Terpene stehen als eigene Sweet-Spot-Zeile, auf 0 zurückgezogen gehen sie nicht mit", () => {
+test("Maske: ergänzt folgt dem Regler, auf 0 zurückgezogen geht es nicht mit (T5d)", () => {
   const html = erkundung({ eingabe: true, vorbelegung: vorbelegung({ Myrcen: 0, Ocimen: 4, Terpinolen: 0 }) });
   const f = felder(html);
   // Herstellerterpen auf 0 heißt „nicht geschmeckt“ und zählt; ergänzt auf 0 heißt nicht ergänzt.
   assert.equal(f.get("terpen-Myrcen"), "0");
   assert.equal(f.get("terpen-Ocimen"), "4");
   assert.equal(f.has("terpen-Terpinolen"), false);
-  assert.match(html, new RegExp(de.aroma.sweetSpot.nichtAngegeben));
-  // Die Überschrift der Spuren doppelt die Skala links nicht.
-  assert.match(html, new RegExp(`${de.aroma.erkundung.jeTerpen}: `));
-  // Alle Katalogterpene stehen schon als Spur: nichts mehr zu ergänzen.
+  assert.match(html, new RegExp(de.aroma.terpenRegler.nichtAngegeben));
+  assert.match(html, new RegExp(de.aroma.terpenRegler.weitere));
+  // Kein manueller Ergänzen-Schritt und kein Sweet Spot mehr bei den Terpenen.
   assert.doesNotMatch(html, /Weiteres Terpen geschmeckt\?/);
+  assert.doesNotMatch(html, /Sweet Spot gesucht/);
 });
 
-test("Maske: ergänzen bietet nur Katalogterpene an, die noch keine Spur haben", () => {
+test("Maske: alle Katalogterpene stehen als Regler, Herstellerterpene zuerst (T5d)", () => {
   const html = erkundung({ eingabe: true, vorbelegung: vorbelegung({ Myrcen: 2 }) });
-  assert.match(html, /Weiteres Terpen geschmeckt\?/);
-  assert.match(html, /<option value="Ocimen">/);
-  assert.match(html, /<option value="Terpinolen">/);
-  assert.doesNotMatch(html, /<option value="Myrcen">/);
-  // Ohne Eingabe (Startseite) nichts davon.
-  assert.doesNotMatch(erkundung({}), /Weiteres Terpen geschmeckt\?/);
+  const myrcen = html.indexOf("Myrcen: Intensität");
+  assert.ok(myrcen >= 0);
+  assert.ok(html.indexOf("Ocimen: Intensität") > myrcen);
+  assert.ok(html.indexOf("Terpinolen: Intensität") > myrcen);
+  // Nichts ergänzt: die weiteren Terpene sind zugeklappt.
+  assert.doesNotMatch(html, /<details open/);
+  // Ohne Eingabe (Startseite) keine Regler.
+  assert.doesNotMatch(erkundung({}), /Myrcen: Intensität/);
 });
 
-test("Sweet Spot: der Community-Wert ist ein grüner Ring um den eigenen Punkt", () => {
+test("Terpen-Regler: der Community-Wert ist ein grüner Ring um den eigenen Punkt", () => {
   const html = renderToStaticMarkup(
-    createElement(SweetSpot, {
+    createElement(TerpenRegler, {
+      titel: "Je Terpen",
+      hersteller: ["Myrcen"],
+      weitere: [],
       zeilen: [{ terpen: "Myrcen", wert: 2.5, anzahl: 3 }],
       texte,
       bedienung: { eigen: { Myrcen: 4 }, aendern: () => {} },
     }),
   );
   assert.match(html, /border-accent/);
-  assert.doesNotMatch(html, /border-kopierstift\/40/);
   assert.match(html, /Community-Median 2,5/);
 });
