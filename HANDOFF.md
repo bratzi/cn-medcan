@@ -28,15 +28,21 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 
 ## ⇢ Hier geht es weiter
 
-### ⇢ SESSION 35 (2026-09-30 abends): Blütenseiten-Crash behoben (`3354a65`), live geprüft
+### ⇢ SESSION 35 (2026-09-30 abends): Crash-Fix, T16–T20 per SDD parallel, alles gepusht (`91adcc1`) und live geprüft
 
-- **Bug:** Jede Blütenseite mit Betreiber-Review zeigte „Diese Seite lässt sich gerade nicht laden“ (React #441).
-  Ursache laut `wrangler tail`: Doppelseite (Server) gab BuchReiter (Client) die Karte als Funktion. Fix: Context-Slot
-  `<ReiterLeiste />`, Regressionstest in `tests/doppelseite.test.ts`. 484/484, tsc sauber, live wieder da.
-- **T16 Mobil entschieden:** einklappbare Leiste unten mit Kurz-Fazit (Note + Delta), Tippen öffnet Sheet.
-- **Neu gesehen, offen:** `/bewerten/x?a=1` leitet auf `/blueten/x#bewerten?a=1` (Query landet im Hash, Anker greift
-  nicht; `lib/alte-adressen.ts:19`). Blütenseite Desktop zeigt horizontale Scrollleiste (Überbreite, Ursache offen).
-- Rest der Live-Prüfliste aus Session 34 noch offen, danach T16–T18.
+- **Bugs behoben:** Blütenseite zeigte nur Fehlerseite (Funktion als Prop Server→Client, `3354a65`); waagrechte
+  Scrollleiste (fieldset sr-only min-content, `fd1092f`).
+- **T16** Fazit läuft mit: ab xl sticky Spalte rechts, darunter Leiste unten + Sheet (Fokusfalle, Esc). Live: Leiste
+  „Betreiber-Fazit 67 % ↑ +5 Pkt.“, Sheet öffnet/schließt. **T17+T18** Register mit Terpen-Icons, Aromafarben,
+  Ring+Dimmen verbundener Einträge (keine gezeichneten Linien); Hintergrundtext „riech mal“ voll lesbar (z-10).
+  **T19** `/bewerten/x?a=1` → 308 `/blueten/x?a=1#bewerten` (Proxy statt config-Redirect), live per curl ok; Browser
+  hatte alte 308 gecacht. **T20** Terpen-Regler per Tastatur in ganzen Stufen, live ok.
+- `npm test` 505/505, tsc sauber. Final-Review frei; Minors (b) im Ledger `progress.md` (Session 35).
+- **Offen / live noch prüfen:** schwebende Knöpfe rechts unten überdecken das rechte Ende der Fazit-Leiste (Pfeil ⌃);
+  Fokus kehrt nach Esc evtl. nicht auf die Leiste zurück (nicht sicher gemessen); T16 ab xl (1440 px) und 390 px,
+  hell; Kontrast gedimmte Register-Pillen (opacity-60) und ring-offset dunkel; Rest der Prüfliste Session 34.
+- **Nutzerfrage offen:** Register-Verbindung nur per Ring/Dimmen – reicht das, oder echte Linien zeichnen?
+- Worktrees C:\cn-t12 (t17-register), C:\cn-t13 (t16-fazit) kann der Nutzer entfernen; alte WIP-Branches löschbar.
 
 ### ⇢ SESSION 34 (2026-09-30 nachmittags): T5d + Final-Review fertig, gepusht (`443a1fa`)
 
