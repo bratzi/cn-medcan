@@ -3,7 +3,16 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 
-import { istPlatzhalter, offeneAngaben, platzhalter, RECHTLICHE_LINKS } from "../lib/rechtliches";
+import {
+  aufsichtFuer,
+  AUFSICHTSBEHOERDEN,
+  istPlatzhalter,
+  ladeRechtliches,
+  offeneAngaben,
+  parseRechtliches,
+  platzhalter,
+  RECHTLICHE_LINKS,
+} from "../lib/rechtliches";
 
 const lesen = (datei: string) => readFileSync(join(process.cwd(), datei), "utf8");
 
@@ -34,13 +43,88 @@ test("Fuß und Zugangsseite verlinken beide Seiten", () => {
   }
 });
 
-test("fehlende Betreiberdaten bleiben sichtbare Platzhalter", () => {
+const MUSTER = {
+  name: "Erika Musterfrau",
+  strasse: "Musterstraße 1",
+  ort: "12345 Musterstadt",
+  land: "Deutschland",
+  email: "erika@example.com",
+  telefon: "+49 123 4567890",
+  bundesland: "Bayern",
+};
+
+test("Platzhalter sind als solche erkennbar", () => {
   assert.equal(platzhalter("Ort"), "[BITTE ERGÄNZEN: Ort]");
   assert.equal(istPlatzhalter("[BITTE ERGÄNZEN: Ort]"), true);
   assert.equal(istPlatzhalter("Berlin"), false);
   assert.equal(istPlatzhalter(null), false);
-  // Jede offene Angabe ist ein Platzhalter, keine erfundene Angabe.
-  for (const wert of offeneAngaben()) assert.ok(wert.startsWith("[BITTE ERGÄNZEN:"), wert);
+});
+
+test("gültiges Secret liefert alle Felder, Privatperson ohne Register, USt-IdNr. und Vertretung", () => {
+  const r = parseRechtliches(JSON.stringify(MUSTER));
+  assert.equal(r.betreiber.name, "Erika Musterfrau");
+  assert.equal(r.betreiber.strasse, "Musterstraße 1");
+  assert.equal(r.betreiber.ort, "12345 Musterstadt");
+  assert.equal(r.betreiber.land, "Deutschland");
+  assert.equal(r.betreiber.email, "erika@example.com");
+  assert.equal(r.betreiber.telefon, "+49 123 4567890");
+  assert.equal(r.betreiber.register, null);
+  assert.equal(r.betreiber.ustId, null);
+  assert.equal(r.betreiber.vertretung, null);
+  assert.equal(r.verantwortlich.name, "Erika Musterfrau");
+  assert.equal(r.verantwortlich.anschrift, "Musterstraße 1, 12345 Musterstadt, Deutschland");
+  assert.match(r.aufsicht.name, /BayLDA/);
+  assert.deepEqual(offeneAngaben(r), []);
+});
+
+test("fehlendes Secret, kaputtes JSON oder Nicht-Objekt ergeben Platzhalter statt Fehler", () => {
+  for (const json of [undefined, "", "{kaputt", "[]", "null", "42"]) {
+    const r = parseRechtliches(json);
+    for (const feld of ["name", "strasse", "ort", "land", "email", "telefon"] as const) {
+      assert.equal(istPlatzhalter(r.betreiber[feld]), true, `${json}: ${feld}`);
+    }
+    assert.equal(istPlatzhalter(r.aufsicht.name), true);
+    assert.equal(r.aufsicht.url, null);
+    assert.equal(offeneAngaben(r).length > 0, true);
+  }
+});
+
+test("fehlendes, leeres oder falsch getyptes Feld wird Platzhalter, die anderen bleiben", () => {
+  const r = parseRechtliches(JSON.stringify({ ...MUSTER, telefon: "  ", email: 5 }));
+  assert.equal(istPlatzhalter(r.betreiber.telefon), true);
+  assert.equal(istPlatzhalter(r.betreiber.email), true);
+  assert.equal(r.betreiber.name, "Erika Musterfrau");
+  const ohneName: Partial<typeof MUSTER> = { ...MUSTER };
+  delete ohneName.name;
+  assert.equal(istPlatzhalter(parseRechtliches(JSON.stringify(ohneName)).betreiber.name), true);
+});
+
+test("Aufsichtsbehörde: 16 Länder, Bayern ist das BayLDA, Unbekanntes wird Platzhalter", () => {
+  assert.equal(Object.keys(AUFSICHTSBEHOERDEN).length, 16);
+  for (const [land, a] of Object.entries(AUFSICHTSBEHOERDEN)) {
+    assert.match(a.url ?? "", /^https:\/\//, land);
+    assert.doesNotMatch(a.name, /—|\s–\s/, land);
+  }
+  assert.match(aufsichtFuer("Bayern").name, /BayLDA/);
+  assert.equal(aufsichtFuer(" nordrhein-westfalen ").url, "https://www.ldi.nrw.de");
+  for (const unbekannt of ["Atlantis", "", undefined]) {
+    const a = aufsichtFuer(unbekannt);
+    assert.equal(istPlatzhalter(a.name), true);
+    assert.equal(a.url, null);
+  }
+});
+
+test("ladeRechtliches liest IMPRESSUM_JSON und stürzt ohne Secret nicht ab", async () => {
+  const vorher = process.env.IMPRESSUM_JSON;
+  try {
+    process.env.IMPRESSUM_JSON = JSON.stringify(MUSTER);
+    assert.deepEqual(offeneAngaben(await ladeRechtliches()), []);
+    Reflect.deleteProperty(process.env, "IMPRESSUM_JSON");
+    assert.equal(offeneAngaben(await ladeRechtliches()).length > 0, true);
+  } finally {
+    if (vorher === undefined) Reflect.deleteProperty(process.env, "IMPRESSUM_JSON");
+    else process.env.IMPRESSUM_JSON = vorher;
+  }
 });
 
 test("Rechtsseiten ohne Geviertstrich und ohne Gedankenstrich als Trenner", () => {

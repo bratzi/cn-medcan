@@ -6,13 +6,7 @@ import { Seitenkopf, seitenRahmen } from "@/components/layout/Seitenkopf";
 import { textLinkKlassen } from "@/components/ui/textlink";
 import { cn } from "@/lib/cn";
 import { holeSprache, holeWoerterbuch } from "@/lib/i18n";
-import {
-  AUFSICHTSBEHOERDE,
-  BETREIBER,
-  DATENSCHUTZ_STAND,
-  HOSTING_GRUNDLAGE,
-  istPlatzhalter,
-} from "@/lib/rechtliches";
+import { DATENSCHUTZ_STAND, HOSTING_GRUNDLAGE, istPlatzhalter, ladeRechtliches } from "@/lib/rechtliches";
 
 /*
  * VORLAGE, vor dem öffentlichen Start rechtlich prüfen lassen (Art. 13 DSGVO).
@@ -112,10 +106,10 @@ const SPEICHER: Speicher[] = [
 ];
 
 export default async function DatenschutzPage() {
-  const b = BETREIBER;
   // Rechtstexte gibt es nur auf Deutsch: lang="de" fuer Vorleseprogramme,
   // auf Englisch ein Hinweis davor (Review 2026-09-28, WCAG 3.1.2).
-  const [sprache, w] = await Promise.all([holeSprache(), holeWoerterbuch()]);
+  const [sprache, w, rechtliches] = await Promise.all([holeSprache(), holeWoerterbuch(), ladeRechtliches()]);
+  const { betreiber: b, aufsicht } = rechtliches;
   return (
     <>
       {sprache === "en" ? (
@@ -179,7 +173,7 @@ export default async function DatenschutzPage() {
             </p>
             <p className="text-pretty">
               Rechtsgrundlage ist unser berechtigtes Interesse an einer sicheren, erreichbaren Seite
-              (Art. 6 Abs. 1 lit. f DSGVO). <Angabe wert={HOSTING_GRUNDLAGE} />
+              (Art. 6 Abs. 1 lit. f DSGVO). {HOSTING_GRUNDLAGE}
             </p>
           </Abschnitt>
 
@@ -323,12 +317,19 @@ export default async function DatenschutzPage() {
             </p>
             <p className="text-pretty">
               Du kannst dich außerdem bei einer Datenschutz-Aufsichtsbehörde beschweren (Art. 77
-              DSGVO). Für uns zuständig ist: <Angabe wert={AUFSICHTSBEHOERDE} />
+              DSGVO). Für uns zuständig ist:{" "}
+              {aufsicht.url ? (
+                <a href={aufsicht.url} rel="noopener noreferrer" className={textLinkKlassen("wrap-break-word")}>
+                  {aufsicht.name}
+                </a>
+              ) : (
+                <Angabe wert={aufsicht.name} />
+              )}
             </p>
           </Abschnitt>
 
           <p className="text-small text-text-muted">
-            Stand: <Angabe wert={DATENSCHUTZ_STAND} />
+            Stand: {DATENSCHUTZ_STAND}
           </p>
         </div>
       </div>

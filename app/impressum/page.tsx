@@ -5,14 +5,15 @@ import { Seitenkopf, seitenRahmen } from "@/components/layout/Seitenkopf";
 import { textLinkKlassen } from "@/components/ui/textlink";
 import { cn } from "@/lib/cn";
 import { holeSprache, holeWoerterbuch } from "@/lib/i18n";
-import { BETREIBER, INHALTLICH_VERANTWORTLICH, istPlatzhalter } from "@/lib/rechtliches";
+import { istPlatzhalter, ladeRechtliches } from "@/lib/rechtliches";
 
 /*
  * VORLAGE, vor dem öffentlichen Start rechtlich prüfen lassen.
  * Grundlage: § 5 DDG (Anbieterkennzeichnung) und § 18 Abs. 2 MStV
  * (Verantwortlicher für journalistisch-redaktionelle Inhalte, hier die
- * redaktionellen Bewertungen). Alle Betreiberdaten kommen aus
- * lib/rechtliches.ts; fehlende stehen dort als sichtbarer Platzhalter.
+ * redaktionellen Bewertungen). Alle Betreiberdaten kommen zur Laufzeit aus
+ * dem Secret IMPRESSUM_JSON (lib/rechtliches.ts); fehlende stehen dort als
+ * sichtbarer Platzhalter.
  * Die Seite ist vom Passwort-Gate ausgenommen (proxy.ts), weil das
  * Impressum ohne Hürde erreichbar sein muss.
  */
@@ -34,10 +35,10 @@ function Angabe({ wert }: { wert: string }) {
 }
 
 export default async function ImpressumPage() {
-  const b = BETREIBER;
   // Rechtstexte gibt es nur auf Deutsch: lang="de" fuer Vorleseprogramme,
   // auf Englisch ein Hinweis davor (Review 2026-09-28, WCAG 3.1.2).
-  const [sprache, w] = await Promise.all([holeSprache(), holeWoerterbuch()]);
+  const [sprache, w, rechtliches] = await Promise.all([holeSprache(), holeWoerterbuch(), ladeRechtliches()]);
+  const { betreiber: b, verantwortlich } = rechtliches;
   return (
     <>
       {sprache === "en" ? (
@@ -86,7 +87,13 @@ export default async function ImpressumPage() {
               </dd>
               <dt className="text-text-muted">Telefon</dt>
               <dd>
-                <Angabe wert={b.telefon} />
+                {istPlatzhalter(b.telefon) ? (
+                  <Angabe wert={b.telefon} />
+                ) : (
+                  <a href={`tel:${b.telefon.replace(/[^\d+]/g, "")}`} className={textLinkKlassen("wrap-break-word")}>
+                    {b.telefon}
+                  </a>
+                )}
               </dd>
             </dl>
           </section>
@@ -122,9 +129,9 @@ export default async function ImpressumPage() {
               Verantwortlich für den Inhalt nach § 18 Abs. 2 MStV
             </h2>
             <address className="not-italic">
-              <Angabe wert={INHALTLICH_VERANTWORTLICH.name} />
+              <Angabe wert={verantwortlich.name} />
               <br />
-              <Angabe wert={INHALTLICH_VERANTWORTLICH.anschrift} />
+              <Angabe wert={verantwortlich.anschrift} />
             </address>
           </section>
 
