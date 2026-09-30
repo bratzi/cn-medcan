@@ -14,7 +14,7 @@ export function SchalterLeiste({ sprache, w }: { sprache: Sprache; w: Woerterbuc
     <div role="group" aria-label={w.kopf.schalter.leiste} className="schalter-leiste">
       <SprachSchalter aktuell={sprache} gruppe={w.sprache.gruppe} />
       <ThemaSchalter texte={w.kopf.thema} />
-      <ZeigerSchalter label={w.kopf.schalter.zeiger} />
+      <ZeigerSchalter texte={w.kopf.schalter} />
       <SparSchalter label={w.kopf.schalter.spar} />
     </div>
   );

@@ -737,6 +737,60 @@ html.joint-cursor :is(input:not([type="range"]):not([type="radio"]):not([type="c
   pointer-events: none;
 }
 
+/* Bong-Zeiger (T13, Nutzer 2026-09-30): dritte Zeigerwahl in JointCursor.tsx, eigener
+   Block. Glut, Asche und Rauch teilen sich die Klassen des Joints; hier nur Glas,
+   Wasser und Blasen. Blasen steigen nur bei gehaltener Maustaste (Transform und
+   Deckkraft, ease-out) und gar nicht bei reduzierter Bewegung. */
+.bong-glas {
+  fill: color-mix(in oklab, #d9e8e4 55%, transparent);
+  stroke: #8fa8a3;
+  stroke-width: 0.7;
+  stroke-linejoin: round;
+}
+
+.bong-wasser {
+  fill: color-mix(in oklab, #7fb8c8 60%, transparent);
+}
+
+.bong-linie {
+  stroke: #8fa8a3;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  fill: none;
+}
+
+.bong-blase {
+  fill: #eaf6f8;
+  opacity: 0.55;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .bong-zeiger[data-gedrueckt] .bong-blase {
+    animation: bong-blubb 0.9s cubic-bezier(0.23, 1, 0.32, 1) infinite;
+    transform-box: fill-box;
+    transform-origin: center;
+  }
+
+  .bong-zeiger[data-gedrueckt] .bong-blase-2 {
+    animation-delay: 0.3s;
+  }
+
+  .bong-zeiger[data-gedrueckt] .bong-blase-3 {
+    animation-delay: 0.6s;
+  }
+}
+
+@keyframes bong-blubb {
+  from {
+    transform: translateY(2px) scale(0.8);
+    opacity: 0.8;
+  }
+  to {
+    transform: translateY(-9px) scale(1.1);
+    opacity: 0;
+  }
+}
+
 /* Storytelling-Prüfpunkte (TransparentMachen): Blob-Rand morpht, Inhalt
    zoomt leicht, Freisteller wechseln oder schweben. */
 @media (prefers-reduced-motion: no-preference) {

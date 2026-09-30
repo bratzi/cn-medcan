@@ -33,7 +33,10 @@ export const en: Woerterbuch = {
     },
     schalter: {
       leiste: "Display",
-      zeiger: "Joint as mouse pointer",
+      zeiger: "Change mouse pointer",
+      zeigerStandard: "Standard pointer",
+      zeigerJoint: "Joint",
+      zeigerBong: "Bong",
       spar: "Saver mode: pause videos and animations",
     },
   },

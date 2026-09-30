@@ -6,7 +6,7 @@
  * JointCursor, StoryBuehne und loops.ts ohne gemeinsamen React-Zustand folgen.
  */
 
-export type Zeiger = "standard" | "joint";
+export type Zeiger = "standard" | "joint" | "bong";
 
 export const ZEIGER_SCHLUESSEL = "gruenes-buch-zeiger";
 export const SPAR_SCHLUESSEL = "gruenes-buch-sparmodus";
@@ -21,11 +21,13 @@ export function sparVorgabe(gespeichert: string | null, saveData: boolean): bool
 }
 
 export function naechsterZeiger(zeiger: Zeiger): Zeiger {
-  return zeiger === "joint" ? "standard" : "joint";
+  // Reihum: Standard, Joint, Bong, wieder Standard (Nutzer 2026-09-30).
+  if (zeiger === "standard") return "joint";
+  return zeiger === "joint" ? "bong" : "standard";
 }
 
 /** Läuft im <head> beim Parsen; ohne Speicher bleibt alles beim Standard. */
-export const EINSTELLUNG_SKRIPT = `(function(){try{var d=document.documentElement,s=localStorage.getItem("${SPAR_SCHLUESSEL}"),n=navigator.connection;if(s==="an"||(s===null&&n&&n.saveData))d.setAttribute("data-sparmodus","");if(localStorage.getItem("${ZEIGER_SCHLUESSEL}")==="standard")d.setAttribute("data-zeiger","standard")}catch(e){}})()`;
+export const EINSTELLUNG_SKRIPT = `(function(){try{var d=document.documentElement,s=localStorage.getItem("${SPAR_SCHLUESSEL}"),n=navigator.connection;if(s==="an"||(s===null&&n&&n.saveData))d.setAttribute("data-sparmodus","");var z=localStorage.getItem("${ZEIGER_SCHLUESSEL}");if(z==="standard"||z==="bong")d.setAttribute("data-zeiger",z)}catch(e){}})()`;
 
 function melden() {
   window.dispatchEvent(new Event(EINSTELLUNG_EREIGNIS));
@@ -44,7 +46,8 @@ export function setzeSparmodus(an: boolean) {
 }
 
 export function aktuellerZeiger(): Zeiger {
-  return document.documentElement.dataset.zeiger === "standard" ? "standard" : "joint";
+  const z = document.documentElement.dataset.zeiger;
+  return z === "standard" || z === "bong" ? z : "joint";
 }
 
 export function setzeZeiger(zeiger: Zeiger) {

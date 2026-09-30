@@ -15,12 +15,14 @@ test("Sparmodus: ohne gespeicherte Wahl entscheidet saveData", () => {
 });
 
 test("Zeiger wechselt reihum und fängt Unbekanntes als Standard ab", () => {
-  assert.equal(naechsterZeiger("joint"), "standard");
   assert.equal(naechsterZeiger("standard"), "joint");
+  assert.equal(naechsterZeiger("joint"), "bong");
+  assert.equal(naechsterZeiger("bong"), "standard");
 });
 
 test("Kopf-Skript setzt beide Attribute und übersteht gesperrten Speicher", () => {
   assert.match(EINSTELLUNG_SKRIPT, /data-sparmodus/);
   assert.match(EINSTELLUNG_SKRIPT, /data-zeiger/);
+  assert.match(EINSTELLUNG_SKRIPT, /"bong"/);
   assert.match(EINSTELLUNG_SKRIPT, /^\(function\(\)\{try\{/);
 });

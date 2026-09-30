@@ -37,7 +37,10 @@ export const de = {
     },
     schalter: {
       leiste: "Darstellung",
-      zeiger: "Joint als Mauszeiger",
+      zeiger: "Mauszeiger wechseln",
+      zeigerStandard: "Standardzeiger",
+      zeigerJoint: "Joint",
+      zeigerBong: "Bong",
       spar: "Sparmodus: Videos und Animationen anhalten",
     },
   },

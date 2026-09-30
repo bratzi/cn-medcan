@@ -3,7 +3,7 @@
 import { useEffect, useRef, useSyncExternalStore } from "react";
 
 import { starteRauch, type RauchMaschine } from "@/components/layout/joint-rauch";
-import { abonniereEinstellungen, aktuellerZeiger, istSparmodus } from "@/lib/einstellungen";
+import { abonniereEinstellungen, aktuellerZeiger, istSparmodus, type Zeiger } from "@/lib/einstellungen";
 
 /** Wie lange gehalten, bis die Glut ganz aufgeglüht ist (ms). */
 const GLUEHEN_VOLL_MS = 2500;
@@ -20,14 +20,20 @@ const NACHLAUF_MS = 3000;
  * Nur mit feiner Maus; bei reduzierter Bewegung ohne Spur und Rauch.
  * Folgt dem Zeiger über transform im rAF, ohne React-Renders je Bewegung.
  * Aus, wenn in der Schalterleiste der normale Zeiger oder der Sparmodus gilt.
+ *
+ * Dritte Wahl: die Bong (T13, Nutzer 2026-09-30). Dieselbe Schleife, derselbe
+ * Rauch (joint-rauch.ts), nur ein anderes Bild: die Schale oben links ist der
+ * Klickpunkt; beim Klicken glimmt sie, qualmt und im Wasser blubbert es (CSS,
+ * nur bei gehaltener Maustaste und ohne reduzierte Bewegung).
  */
 export function JointCursor() {
   const joint = useRef<HTMLDivElement>(null);
-  const an = useSyncExternalStore(
+  const zeiger = useSyncExternalStore(
     abonniereEinstellungen,
-    () => aktuellerZeiger() === "joint" && !istSparmodus(),
-    () => false,
+    (): Zeiger => (istSparmodus() ? "standard" : aktuellerZeiger()),
+    (): Zeiger => "standard",
   );
+  const an = zeiger !== "standard";
 
   useEffect(() => {
     const el = joint.current;
@@ -130,23 +136,40 @@ export function JointCursor() {
     };
   }, [an]);
 
+  const bong = zeiger === "bong";
+
   return (
-    <div ref={joint} aria-hidden="true" className="joint-zeiger">
-      {/* Diagonal von der Spitze (1,1) zum Filter (29,29); die Spitze ist der Klickpunkt. */}
-      <svg viewBox="0 0 32 32" width="30" height="30">
-        {/* Papier: Kegel, an der Spitze breiter, zum Filter deutlich schmaler (Nutzer 2026-09-26). */}
-        <path className="joint-papier" d="M6.8 2.2 L29 27 L27 29 L2.2 6.8 Z" />
-        {/* Gedrehte Spitze. */}
-        <path className="joint-papier" d="M6.8 2.2 L1 1 L2.2 6.8 Z" />
-        {/* Filter (Crutch). */}
-        <path className="joint-filter" d="M24.3 21.7 L29 27 L27 29 L21.7 24.3 Z" />
-        {/* Naht und Filterlinie. */}
-        <path className="joint-linie" d="M5 5 L22.5 22.5" />
-        <path className="joint-linie" d="M22.4 23.6 L23.6 22.4" />
-        {/* Asche und Glut an der Spitze, sichtbar beim Klicken. */}
-        <path className="joint-asche" d="M6.8 2.2 L1 1 L2.2 6.8 L5.6 8.2 L8.2 5.6 Z" />
-        <circle className="joint-glut" cx="3.6" cy="3.6" r="2.6" />
-      </svg>
+    <div ref={joint} aria-hidden="true" className={bong ? "joint-zeiger bong-zeiger" : "joint-zeiger"}>
+      {bong ? (
+        /* Aufrecht: Schale oben links (1,1) ist der Klickpunkt, Stiel führt ins Rohr. */
+        <svg viewBox="0 0 32 32" width="30" height="30">
+          <path className="bong-glas" d="M14 2 H22 V16 L27 27 Q28 30 25 30 H11 Q8 30 9 27 L14 16 Z" />
+          <path className="bong-wasser" d="M11.3 21.5 H24.7 L27 27 Q28 30 25 30 H11 Q8 30 9 27 Z" />
+          <path className="bong-linie" d="M5.4 8 L14.6 19" />
+          <path className="joint-filter" d="M1.5 2 H8.5 L7.4 8 H2.6 Z" />
+          <path className="joint-asche" d="M1.5 2 H8.5 L8.1 4.4 H1.9 Z" />
+          <circle className="joint-glut" cx="5" cy="3.6" r="2.4" />
+          <circle className="bong-blase bong-blase-1" cx="14" cy="26" r="1.2" />
+          <circle className="bong-blase bong-blase-2" cx="18" cy="27" r="1.6" />
+          <circle className="bong-blase bong-blase-3" cx="22" cy="26" r="1" />
+        </svg>
+      ) : (
+        /* Diagonal von der Spitze (1,1) zum Filter (29,29); die Spitze ist der Klickpunkt. */
+        <svg viewBox="0 0 32 32" width="30" height="30">
+          {/* Papier: Kegel, an der Spitze breiter, zum Filter deutlich schmaler (Nutzer 2026-09-26). */}
+          <path className="joint-papier" d="M6.8 2.2 L29 27 L27 29 L2.2 6.8 Z" />
+          {/* Gedrehte Spitze. */}
+          <path className="joint-papier" d="M6.8 2.2 L1 1 L2.2 6.8 Z" />
+          {/* Filter (Crutch). */}
+          <path className="joint-filter" d="M24.3 21.7 L29 27 L27 29 L21.7 24.3 Z" />
+          {/* Naht und Filterlinie. */}
+          <path className="joint-linie" d="M5 5 L22.5 22.5" />
+          <path className="joint-linie" d="M22.4 23.6 L23.6 22.4" />
+          {/* Asche und Glut an der Spitze, sichtbar beim Klicken. */}
+          <path className="joint-asche" d="M6.8 2.2 L1 1 L2.2 6.8 L5.6 8.2 L8.2 5.6 Z" />
+          <circle className="joint-glut" cx="3.6" cy="3.6" r="2.6" />
+        </svg>
+      )}
     </div>
   );
 }
