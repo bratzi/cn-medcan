@@ -37,7 +37,13 @@ geprüft (Prüflisten `task-7b/12/13/14-report.md` im Ledger-Ordner; T15 Kopf-Ko
   `npx.cmd wrangler secret put IMPRESSUM_JSON`, eine Zeile JSON mit name, strasse, ort, land, email, telefon ohne
   „(0)“, bundesland). Ohne Secret: sichtbare Platzhalter, kein 500. Privatperson, verantwortlich = Betreiber,
   Cloudflare über DPF + DPA.
-- **Offen:** T5d (Brief `task-5d-brief.md`, im Hauptbaum), danach Final-Review (opus, Minors aus Ledger),
+**ALS ERSTES:** Browser verbinden lassen (Chrome mit Claude-Erweiterung; list_connected_browsers war leer), dann live
+prüfen: /impressum und /datenschutz zeigen Nutzerdaten (Secret IMPRESSUM_JSON ist laut Nutzer gesetzt, kein
+„[BITTE ERGÄNZEN“ mehr), dazu die Prüflisten unten. Keine offenen Nutzerfragen.
+- **T5d WIP** auf Branch `t5d-wip` `8c124e8` (Safe 4 clear, Agent mitten in TDD gestoppt, Tests rot, ungeprüft):
+  frischen Implementer (opus) mit `task-5d-brief.md` + Report-Pfad dort weitermachen lassen, BASE 54778b8,
+  dann Review, nach main.
+- **Offen:** T5d (s. o.), danach Final-Review (opus, Minors aus Ledger),
   Live-Prüfung, Worktrees C:\cn-t12 / C:\cn-t13 kann der Nutzer entfernen (`git worktree remove`).
 - Caveman-Modus bei Sessionstart laden (Memory `caveman-immer`).
 
