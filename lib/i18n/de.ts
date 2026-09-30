@@ -260,13 +260,16 @@ export const de = {
     vonFuenf: "{wert} von 5",
     skala: "{label}, {von} bis {bis}",
     sweetSpot: {
-      ueberschrift: "{marke} gesucht",
       marke: "Sweet Spot",
+    },
+    terpenRegler: {
       nichtAngegeben: "nicht angegeben",
       community: "Community-Median {wert}",
       intensitaetVon: "{terpen}: Intensität",
       schwach: "schwach",
       stark: "stark",
+      weitere: "Weitere Terpene",
+      weitereHinweis: "Nicht vom Hersteller angegeben. Ein Terpen zählt als von dir ergänzt, sobald sein Regler über 0 steht.",
     },
     beschaffenheit: {
       titel: "Beschaffenheit",
@@ -279,11 +282,6 @@ export const de = {
     netz: {
       leer: "Zu diesem Eintrag gibt es keine Geschmacksangaben.",
       unterschrift: "Geschmack, Skala 0 bis 5",
-    },
-    ergaenzen: {
-      frage: "Weiteres Terpen geschmeckt?",
-      waehlen: "Terpen wählen",
-      ergaenzen: "Ergänzen",
     },
     sortenKopf: {
       bewertetWird: "Bewertet wird: {name}",

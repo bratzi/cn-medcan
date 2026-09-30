@@ -18,6 +18,8 @@ import {
   begleitBoegen,
   bogenSchicht,
   flussDauer,
+  flussStrich,
+  funkenPunkte,
   herstellerKraft,
   leuchtendeTerpene,
   linienBreite,
@@ -215,7 +217,7 @@ export function AromaKarte({
   const titel = titelRoh ?? texte.aroma.karte.titel;
   const sprache = texte.sprache;
   const kt = texte.aroma.karte;
-  const skalaTitel = `${texte.aroma.erkundung.intensitaet}: ${text(texte.aroma.sweetSpot.ueberschrift, { marke: texte.aroma.sweetSpot.marke })}`;
+  const skalaTitel = texte.aroma.erkundung.intensitaet;
   const WERT = { format: (wert: number) => formatiereZahl(wert, 1, sprache) };
   const achsenName = (index: number) => texte.geschmack[GESCHMACKS_ACHSEN[index].enumWert];
   const satz = (name: string) => (texte.aroma.satz as Record<string, string>)[name.trim().toLowerCase()] ?? null;
@@ -570,7 +572,10 @@ export function AromaKarte({
                 const breite = linienBreite(wert, notenAnteil);
                 // Tempo aus dem Zielwert, nicht aus dem gleitenden: sonst wechselte die Dauer
                 // in jedem Frame des Gleitens und der Lichtpunkt spränge.
-                const dauer = flussDauer(bewertungZiel?.matrix[GESCHMACKS_ACHSEN[achse].key] ?? 0);
+                const zielWert = bewertungZiel?.matrix[GESCHMACKS_ACHSEN[achse].key] ?? 0;
+                const dauer = flussDauer(zielWert);
+                // Länge des Lichtstrichs aus dem Reglerwert (T5d): wenig kurz, viel lang, am Maximum durchgehend.
+                const strich = flussStrich(zielWert);
                 // Versatz je Bogen als Anteil der Dauer, damit die Lichtpunkte nicht im Gleichschritt laufen.
                 const versatz = `${-(((index * 0.37 + achse * 0.13) % 1) * dauer).toFixed(2)}s`;
                 return (
@@ -613,8 +618,9 @@ export function AromaKarte({
                       />
                     ) : null}
                     {/* Lichtfluss vom Geschmack zum Terpen (globals.css .bogen-fluss): nur auf der
-                        Linie, Tempo aus --fluss-dauer. Im Netz (t = 1) unsichtbar, dann läuft er
-                        nicht endlos weiter. Sparmodus und reduzierte Bewegung: aus. */}
+                        Linie, Tempo aus --fluss-dauer, Strichlänge aus --fluss-strich (T5d); am
+                        Maximum pulsiert die ganze Linie (.bogen-voll). Im Netz (t = 1) unsichtbar,
+                        dann läuft er nicht endlos weiter. Sparmodus und reduzierte Bewegung: aus. */}
                     {schicht.linie && !gedimmt && t < 1 ? (
                       <path
                         d={pfad}
@@ -622,14 +628,15 @@ export function AromaKarte({
                         fill="none"
                         stroke={linienFarbe}
                         strokeLinecap="round"
-                        strokeDasharray="6 194"
-                        className="bogen-fluss"
+                        strokeDasharray={strich.durchgehend ? undefined : `${strich.laenge} ${200 - strich.laenge}`}
+                        className={strich.durchgehend ? "bogen-voll" : "bogen-fluss"}
                         style={
                           {
                             strokeWidth: breite + 2.5,
                             opacity: 0.85,
                             animationDelay: versatz,
                             "--fluss-dauer": `${dauer}s`,
+                            "--fluss-strich": strich.laenge,
                           } as React.CSSProperties
                         }
                       />
@@ -782,9 +789,12 @@ export function AromaKarte({
                 const { ton, puls } = vergleich(index);
                 if (!puls) return null;
                 const y = karte[index].y;
+                // Funken auf dem Überstand über dem Community-Median (T5d), nur in der Maske.
+                const funken =
+                  bezug === "median" && puls.art === "ueber" ? funkenPunkte(wertAuf(index), puls.von) : [];
                 return (
+                  <Fragment key={`delta-${achse.key}`}>
                   <line
-                    key={`delta-${achse.key}`}
                     className="delta-puls"
                     data-delta={puls.art}
                     x1={balkenEnde(karte[index], puls.von, 0, balken).x}
@@ -795,6 +805,18 @@ export function AromaKarte({
                     strokeLinecap="round"
                     style={{ opacity: kartenSichtbar }}
                   />
+                  {funken.map((wert, i) => (
+                    <circle
+                      key={i}
+                      className="delta-funke"
+                      cx={balkenEnde(karte[index], wert, 0, balken).x}
+                      cy={y}
+                      r={1.75}
+                      fill={FARBE.lila}
+                      style={{ animationDelay: `${-((i * 0.37) % 1) * 0.9}s` }}
+                    />
+                  ))}
+                  </Fragment>
                 );
               })
             : null}

@@ -254,13 +254,16 @@ export const en: Woerterbuch = {
     vonFuenf: "{wert} of 5",
     skala: "{label}, {von} to {bis}",
     sweetSpot: {
-      ueberschrift: "Finding the {marke}",
       marke: "sweet spot",
+    },
+    terpenRegler: {
       nichtAngegeben: "not stated",
       community: "Community median {wert}",
       intensitaetVon: "{terpen}: intensity",
       schwach: "weak",
       stark: "strong",
+      weitere: "More terpenes",
+      weitereHinweis: "Not stated by the producer. A terpene counts as added by you as soon as its slider is above 0.",
     },
     beschaffenheit: {
       titel: "Condition",
@@ -273,11 +276,6 @@ export const en: Woerterbuch = {
     netz: {
       leer: "There is no flavour information for this entry.",
       unterschrift: "Flavour, scale 0 to 5",
-    },
-    ergaenzen: {
-      frage: "Tasted another terpene?",
-      waehlen: "Choose a terpene",
-      ergaenzen: "Add",
     },
     sortenKopf: {
       bewertetWird: "Being reviewed: {name}",

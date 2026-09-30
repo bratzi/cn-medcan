@@ -38,7 +38,7 @@ const UMGESTELLT: string[] = [
   "components/review/AromaErkundung.tsx",
   "components/review/AromaKarte.tsx",
   "components/review/SortenKopf.tsx",
-  "components/review/SweetSpot.tsx",
+  "components/review/TerpenRegler.tsx",
   "components/review/GesamteindruckLeiste.tsx",
   "components/review/BeschaffenheitsLeiste.tsx",
   "components/review/Aufklaerung.tsx",
@@ -51,7 +51,6 @@ const UMGESTELLT: string[] = [
   "components/review/Inhaltsverzeichnis.tsx",
   "components/review/Doppelseite.tsx",
   "components/review/erkundung-daten.ts",
-  "components/review/TerpenErgaenzen.tsx",
   // Welle 3: Reviews und Bewerten
   "app/reviews/page.tsx",
   "app/blueten/[slug]/aktionen.ts",

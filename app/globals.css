@@ -337,7 +337,7 @@
   /* Sparmodus (T2): Endlosschleifen stehen, Einblendungen laufen zu Ende. */
   :root[data-sparmodus] :is(.glanz-wort, .auftakt-marke [data-marke-zeile], .blob-morph, .blob-linie, .bild-zoom,
       .bild-wechsel > *, .bild-schweben > *, .marke-kontur > span, .fazit-puls, .marke-puls, .glas-maske,
-      .delta-puls, .bogen-fluss) {
+      .delta-puls, .bogen-fluss, .bogen-voll, .delta-funke) {
     animation-play-state: paused !important;
   }
 
@@ -529,18 +529,6 @@
   margin: -0.2em -0.3em -0.25em -0.25em;
   -webkit-box-decoration-break: clone;
   box-decoration-break: clone;
-}
-
-/* Sweet-Spot-Spur (Spec Redesign 15): blass an den Rändern, grün in der Mitte. */
-.sweet-spot-spur {
-  background: linear-gradient(
-    90deg,
-    var(--color-border) 0%,
-    var(--color-accent-subtle) 40%,
-    var(--color-accent) 60%,
-    var(--color-accent-subtle) 80%,
-    var(--color-border) 100%
-  );
 }
 
 /* Sweet Spot in der Mitte (Bewertung v2, T4): Qualität der Charge. Wie die
@@ -1557,17 +1545,62 @@ html.joint-cursor :is(input:not([type="range"]):not([type="radio"]):not([type="c
   }
 }
 
-/* Sparmodus: der stehende Lichtpunkt verschwindet, statt als Klecks zu bleiben. */
-:root[data-sparmodus] .bogen-fluss {
+/* Am Maximum (T5d, Nutzer 2026-09-30) pulsiert die ganze Linie statt eines Strichs. */
+.bogen-voll,
+.delta-funke {
   visibility: hidden;
 }
 
+@media (prefers-reduced-motion: no-preference) {
+  .bogen-voll {
+    visibility: visible;
+    animation: bogen-voll var(--fluss-dauer, 1.2s) ease-in-out infinite;
+  }
+
+  /* Funken auf dem Überstand über dem Community-Median (T5d): kleine Punkte steigen
+     auf und verglühen, nur transform und opacity. */
+  .delta-funke {
+    visibility: visible;
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: delta-funke 0.9s cubic-bezier(0.23, 1, 0.32, 1) infinite;
+  }
+}
+
+/* Sparmodus: der stehende Lichtstrich, der Puls und die Funken verschwinden, statt als
+   Klecks zu bleiben; der Überstand bleibt als lila Stück stehen. */
+:root[data-sparmodus] :is(.bogen-fluss, .bogen-voll, .delta-funke) {
+  visibility: hidden;
+}
+
+/* Der Strich (Länge --fluss-strich von 100, T5d) tritt am Anfang ein und läuft ganz hinaus. */
 @keyframes bogen-fluss {
   from {
-    stroke-dashoffset: 6;
+    stroke-dashoffset: var(--fluss-strich, 6);
   }
   to {
-    stroke-dashoffset: -160;
+    stroke-dashoffset: -100;
+  }
+}
+
+@keyframes bogen-voll {
+  0%,
+  100% {
+    opacity: 0.35;
+  }
+  50% {
+    opacity: 0.95;
+  }
+}
+
+@keyframes delta-funke {
+  from {
+    opacity: 1;
+    transform: translate(0, 0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translate(0, -10px) scale(0.6);
   }
 }
 

@@ -401,6 +401,52 @@ export function flussDauer(wert: number): number {
   return Math.round(FLUSS_LANGSAM * (FLUSS_SCHNELL / FLUSS_LANGSAM) ** anteil * 10) / 10;
 }
 
+/** Kürzester Lichtstrich (Anteil der Bogenlänge, pathLength 100), wie der frühere Lichtpunkt. */
+const STRICH_KURZ = 6;
+
+/**
+ * Länge des animierten Abschnitts einer Terpen-Linie (T5d, Nutzer 2026-09-30:
+ * „desto weniger Regler desto kürzer die animierte Linie, desto stärker desto
+ * länger“): 6 bei 0,5 bis 100 bei 5, linear, ganzzahlig. Am Maximum läuft die
+ * Linie durchgehend und pulsiert statt zu fließen.
+ */
+export function flussStrich(wert: number): { laenge: number; durchgehend: boolean } {
+  if (wert >= MAX) return { laenge: 100, durchgehend: true };
+  const anteil = (Math.min(Math.max(wert, 0.5), MAX) - 0.5) / (MAX - 0.5);
+  return { laenge: Math.round(STRICH_KURZ + (100 - STRICH_KURZ) * anteil), durchgehend: false };
+}
+
+/** Höchstens so viele Funken je Achse: Partikel bleiben günstig. */
+const FUNKEN_HOECHSTENS = 6;
+
+/**
+ * Funkenpunkte (Werte auf der Skala) auf dem Überstand zwischen Community-Median
+ * und eigenem Wert (T5d): einer je halber Stufe, mindestens zwei, höchstens
+ * sechs, gleichmäßig im Inneren verteilt. Ohne Median oder ohne Überstand keine.
+ */
+export function funkenPunkte(wert: number, median: number | null | undefined): number[] {
+  if (median === null || median === undefined) return [];
+  const delta = wert - median;
+  if (delta < GLEICHAUF) return [];
+  const anzahl = Math.min(FUNKEN_HOECHSTENS, Math.max(2, Math.round(delta * 2)));
+  return Array.from({ length: anzahl }, (_, i) => zweiStellen(median + (delta * (i + 1)) / (anzahl + 1)));
+}
+
+/**
+ * Reihenfolge der Terpen-Regler in der Maske (T5d): die Herstellerterpene
+ * zuerst, wie angegeben; alle übrigen bekannten Terpene danach alphabetisch.
+ */
+export function reglerTerpene(
+  hersteller: readonly string[],
+  katalog: readonly string[],
+): { hersteller: string[]; weitere: string[] } {
+  const angegeben = new Set(hersteller);
+  return {
+    hersteller: [...hersteller],
+    weitere: katalog.filter((name) => !angegeben.has(name)).sort((a, b) => a.localeCompare(b, "de")),
+  };
+}
+
 /** Unterschied, ab dem ein Balken über oder unter seinem Bezug liegt (sonst gleichauf). */
 const GLEICHAUF = 0.1;
 

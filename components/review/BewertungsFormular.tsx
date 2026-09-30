@@ -9,8 +9,7 @@ import type { AromaSerie } from "@/components/review/AromaKarte";
 import type { BeschaffenheitsWerte } from "@/components/review/BeschaffenheitsLeiste";
 import { BlattNote } from "@/components/review/BlattNote";
 import type { Gesamteindruck } from "@/components/review/GesamteindruckLeiste";
-import type { SweetSpotZeile } from "@/components/review/SweetSpot";
-import type { KatalogEintrag } from "@/components/review/TerpenErgaenzen";
+import type { KatalogEintrag, TerpenZeile } from "@/components/review/TerpenRegler";
 import { Button, Field, Input, Meldung } from "@/components/ui";
 import { useHydriert } from "@/components/ui/useHydriert";
 import type { CommunityMedian, KartenTerpen, Treue } from "@/lib/aromakarte";
@@ -32,7 +31,7 @@ type Props = {
   /** Daten der Erkundung aus den bisherigen Bewertungen (erkundungsDaten). */
   serien: readonly AromaSerie[];
   treue: Treue | null;
-  zeilen: readonly SweetSpotZeile[];
+  zeilen: readonly TerpenZeile[];
   /** Community-Median aus sorten_kennwerte (T5): grüner Regler und „Deine Nase vs. Community“. */
   median: CommunityMedian | null;
   gesamteindruck: Gesamteindruck;
