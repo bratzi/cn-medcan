@@ -1148,7 +1148,7 @@ export function AromaKarte({
       </div>
 
       {regler ? (
-        <fieldset className="sr-only">
+        <fieldset className="sr-only min-w-0">
           <legend>{kt.reglerLegende}</legend>
           {GESCHMACKS_ACHSEN.map((achse, index) => (
             <label key={achse.key}>

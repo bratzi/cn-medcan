@@ -351,3 +351,15 @@ test("Geometrie mit eigener HÃ¶he (Buch, T7b): Spalten und Netz passen in die HÃ
   assert.equal(r, 120);
   assert.ok(r + 34 + 20 <= 180);
 });
+
+test("Versteckte Regler-Gruppe macht die Seite nicht breiter (fieldset min-content hebelt sr-only aus)", () => {
+  const html = renderToStaticMarkup(
+    createElement(AromaKarte, {
+      terpene: [LIMONEN],
+      serien: [],
+      texte: aromaTexte(de, "de"),
+      regler: { werte: leereGeschmacksMatrix(), aendern: () => {} },
+    }),
+  );
+  assert.match(html, /<fieldset class="sr-only min-w-0"/);
+});
