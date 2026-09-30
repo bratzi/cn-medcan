@@ -10,7 +10,6 @@ import {
   type BeschaffenheitsWerte,
 } from "@/components/review/BeschaffenheitsLeiste";
 import { GesamteindruckLeiste, type Gesamteindruck, type NotenKey } from "@/components/review/GesamteindruckLeiste";
-import { TerpenRegler, type KatalogEintrag, type TerpenZeile } from "@/components/review/TerpenRegler";
 import {
   ebenenStaerken,
   ergaenztesTerpen,
@@ -18,10 +17,11 @@ import {
   herstellerProfil,
   herstellerTreue,
   nasenAbweichung,
-  reglerTerpene,
   terpenEbenen,
   type CommunityMedian,
   type KartenTerpen,
+  type KatalogEintrag,
+  type TerpenZeile,
   type Treue,
 } from "@/lib/aromakarte";
 import { BEWERTUNGS_ACHSEN, GESCHMACKS_ACHSEN, leereGeschmacksMatrix, type GeschmacksMatrix } from "@/lib/query/bewertung";
@@ -39,7 +39,8 @@ const prozent = (anteil: number, sprache: AromaTexte["sprache"]) => formatiereAn
  * jeder in voller Breite; das Fazit aus allen drei läuft beim Regeln mit (T16, Nutzer 2026-09-30:
  * ab xl sticky rechts, darunter Leiste unten mit Sheet, components/review/FazitLauf.tsx). Im Terpen-Schritt geschieht alles in der Karte: die Geschmacksbalken links
  * sind Regler; man zieht, wie stark man jede Geschmacksrichtung schmeckt,
- * und sieht als lila Serie das eigene Profil gegen die Herstellerangabe.
+ * und sieht als lila Serie das eigene Profil gegen die Herstellerangabe. In der
+ * Maske stehen rechts in der Karte zudem die Terpen-Regler (Nutzer 2026-09-30).
  * Lerneffekt: zur gezogenen Richtung leuchten die Terpene dieser Sorte auf,
  * die sie tragen; alle übrigen Terpene des Katalogs stehen als blasse Geister
  * daneben (Masterplan Bewertung v2, T5: ein Geschmack zündet kein Terpen, das
@@ -141,7 +142,7 @@ export function AromaErkundung({
     eigeneIntensitaet !== anfang.intensitaet;
 
   // Karte: alle bekannten Terpene in drei Ebenen (T5). Laut Hersteller enthalten,
-  // vom Nutzer über den Terpen-Regler ergänzt (Stufe > 0, T5d), sonst ein blasser Geist:
+  // vom Nutzer über den Terpen-Regler in der Karte ergänzt (Stufe > 0, T5d), sonst ein blasser Geist:
   // ein Geschmack allein zündet kein Terpen, das nicht in der Sorte steckt.
   const herstellerNamen = terpene.map((terpen) => terpen.name);
   const angegeben = new Set(herstellerNamen);
@@ -158,12 +159,9 @@ export function AromaErkundung({
     ...Object.fromEntries(zeilen.map((zeile) => [zeile.terpen, zeile.wert])),
     ...eigeneIntensitaet,
   };
-  // Terpen-Regler der Maske (T5d, Nutzer 2026-09-30: Sweet Spot und „Terpen ergänzen“ entfallen):
-  // Herstellerterpene zuerst, alle übrigen bekannten danach. Ergänzt ist, was über 0 steht.
-  const reglerOrdnung = reglerTerpene(
-    herstellerNamen,
-    katalog.map((terpen) => terpen.name),
-  );
+  // Community-Median je Terpen für den grünen Ring an den Terpen-Reglern der Karte: nur Terpene,
+  // die schon jemand bewertet hat (ohne Anzahl kein Ring).
+  const terpenMedian = Object.fromEntries(zeilen.filter((zeile) => zeile.anzahl).map((zeile) => [zeile.terpen, zeile.wert]));
   // Deine Nase vs. Community (T5): nur mit eigenen Terpenstufen und Median.
   const nase = nasenAbweichung(eigeneIntensitaet, median?.terpene ?? null, herstellerNamen);
 
@@ -327,6 +325,18 @@ export function AromaErkundung({
                 aendern: (key, wert) =>
                   setEigen((alt) => ({ ...(alt ?? start), [key]: wert })),
               }}
+              // Terpen-Regler rechts in der Karte (Nutzer 2026-09-30, zuvor eine eigene Box), nur in der
+              // Maske. Ergänzt ist, was über 0 steht (terpenEbenen oben).
+              terpenRegler={
+                eingabe
+                  ? {
+                      werte: eigeneIntensitaet,
+                      median: terpenMedian,
+                      // Ganze Stufen, wie die Server Action sie annimmt (lib/bewertung-eingabe.ts).
+                      aendern: (terpen, wert) => setEigeneIntensitaet((alt) => ({ ...alt, [terpen]: Math.round(wert) })),
+                    }
+                  : undefined
+              }
               lernen={katalog}
               texte={texte}
             />
@@ -346,20 +356,6 @@ export function AromaErkundung({
               </p>
             ) : null}
           </div>
-          {eingabe ? (
-            <TerpenRegler
-                titel={texte.aroma.erkundung.jeTerpen}
-                hersteller={reglerOrdnung.hersteller}
-                weitere={reglerOrdnung.weitere}
-                zeilen={zeilen}
-                texte={texte}
-                bedienung={{
-                  eigen: eigeneIntensitaet,
-                  // Ganze Stufen, wie die Server Action sie annimmt (lib/bewertung-eingabe.ts).
-                  aendern: (terpen, wert) => setEigeneIntensitaet((alt) => ({ ...alt, [terpen]: Math.round(wert) })),
-                }}
-              />
-          ) : null}
         </Schritt>
 
         {beschaffenheit ? (

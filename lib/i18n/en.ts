@@ -191,8 +191,10 @@ export const en: Woerterbuch = {
       stecktIn: "Mainly found in",
       traegt: "Mainly carries",
       hinweisRegler: "Drag the purple dots on the left: too little, just right or too much? The middle is the sweet spot.",
+      hinweisTerpenRegler: "On the right: how strongly you smell each terpene; above 0 for a terpene the producer does not state means added.",
       hinweisErkunden: "Hover over a flavour or a terpene to see the connections.",
       reglerLegende: "Your impression per flavour, sweet spot in the middle",
+      terpenLegende: "How strongly you smell each terpene, 0 to 5. Above 0 for a terpene the producer does not state means: added by you.",
       // Sweet spot scale of the flavours (user 2026-09-30): 0 too little, 2.5 just right, 5 too much.
       sweetSkala: {
         titel: "Sweet spot per flavour",
@@ -211,7 +213,7 @@ export const en: Woerterbuch = {
         geist: "Linked by flavour only",
       },
       geistHinweis: "Fits the flavour, not included according to the producer.",
-      ergaenztHinweis: "Added by you in the sweet spot, not included according to the producer.",
+      ergaenztHinweis: "Added by you, not included according to the producer.",
       nase: "Your nose vs. the community:",
       delta: "Ø Δ {wert}",
       deltaVorgelesen: "average deviation {wert}",
@@ -242,7 +244,6 @@ export const en: Woerterbuch = {
       deinEindruck: "Your impression:",
       anleitung: "Drag the purple dots on the left of the map: too little, just right or too much? The middle is the sweet spot. The terpenes of this strain that carry the flavour light up.",
       nichtsGespeichert: "Nothing is saved here.",
-      jeTerpen: "Per terpene",
       communityFazit: "Community verdict",
       chargenFazit: "Batch verdict",
       deinFazit: "Your verdict",
@@ -273,13 +274,8 @@ export const en: Woerterbuch = {
       marke: "sweet spot",
     },
     terpenRegler: {
-      nichtAngegeben: "not stated",
       community: "Community median {wert}",
       intensitaetVon: "{terpen}: intensity",
-      schwach: "weak",
-      stark: "strong",
-      weitere: "More terpenes",
-      weitereHinweis: "Not stated by the producer. A terpene counts as added by you as soon as its slider is above 0.",
     },
     beschaffenheit: {
       titel: "Condition",

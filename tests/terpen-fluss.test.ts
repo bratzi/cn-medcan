@@ -4,12 +4,10 @@ import assert from "node:assert/strict";
 import {
   flussStrich,
   imSweetSpot,
-  reglerTerpene,
   sweetSpotStaerke,
   sweetSpotZone,
   SWEET_SPOT_FUNKEN,
   terpenEbenen,
-  weitereOffen,
 } from "@/lib/aromakarte";
 
 /**
@@ -23,13 +21,6 @@ test("Ergänzt folgt dem Regler: über 0 ergänzt, auf 0 zurück ein Geist", () 
   assert.equal(terpenEbenen(namen, ["Myrcen"], { Ocimen: 1 }).Ocimen, "ergaenzt");
   assert.equal(terpenEbenen(namen, ["Myrcen"], { Ocimen: 0 }).Ocimen, "geist");
   assert.equal(terpenEbenen(namen, ["Myrcen"], {}).Ocimen, "geist");
-});
-
-test("Regler-Ordnung: Herstellerterpene zuerst in ihrer Reihenfolge, dann die übrigen alphabetisch", () => {
-  assert.deepEqual(reglerTerpene(["Myrcen", "Limonen"], ["Terpinolen", "Limonen", "Caryophyllen", "Myrcen"]), {
-    hersteller: ["Myrcen", "Limonen"],
-    weitere: ["Caryophyllen", "Terpinolen"],
-  });
 });
 
 test("Animierte Linie: kurz bei wenig, lang bei viel, bei Maximum durchgehend", () => {
@@ -76,13 +67,4 @@ test("Zone der Sweet-Spot-Skala: unter 2,25 zu wenig, 2,25 bis 2,75 Sweet Spot, 
   assert.equal(sweetSpotZone(2.75), "mitte");
   assert.equal(sweetSpotZone(2.8), "viel");
   assert.equal(sweetSpotZone(5), "viel");
-});
-
-test("Weitere Terpene: öffnen sich mit einer Ergänzung und bleiben offen, wenn der Wert auf 0 zurückgeht", () => {
-  assert.equal(weitereOffen(false, 0, 2), false);
-  assert.equal(weitereOffen(false, 1, 2), true);
-  // Zurück auf 0 bei geöffnetem Abschnitt: kein Zuklappen mitten im Ziehen.
-  assert.equal(weitereOffen(true, 0, 2), true);
-  // Ohne Herstellerterpene gibt es nur diese Regler: immer offen.
-  assert.equal(weitereOffen(false, 0, 0), true);
 });

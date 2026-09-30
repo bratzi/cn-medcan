@@ -195,8 +195,11 @@ export const de = {
       stecktIn: "Steckt vor allem in",
       traegt: "Trägt vor allem",
       hinweisRegler: "Zieh die lila Punkte links: zu wenig, genau richtig oder zu viel? Die Mitte ist der Sweet Spot.",
+      // Nur in der Bewertungsmaske an hinweisRegler angehängt: dort stehen rechts die Terpen-Regler (Nutzer 2026-09-30).
+      hinweisTerpenRegler: "Rechts: wie stark du jedes Terpen riechst; über 0 bei einem nicht angegebenen Terpen heißt ergänzt.",
       hinweisErkunden: "Fahr über eine Geschmacksrichtung oder ein Terpen, um die Verbindungen zu sehen.",
       reglerLegende: "Dein Eindruck je Geschmacksrichtung, Sweet Spot in der Mitte",
+      terpenLegende: "Wie stark du jedes Terpen riechst, 0 bis 5. Über 0 bei einem nicht angegebenen Terpen heißt: von dir ergänzt.",
       // Sweet-Spot-Skala der Geschmäcker (Nutzer 2026-09-30): 0 zu wenig, 2,5 genau richtig, 5 zu viel.
       sweetSkala: {
         titel: "Sweet Spot je Geschmack",
@@ -216,7 +219,7 @@ export const de = {
         geist: "Nur über den Geschmack verbunden",
       },
       geistHinweis: "Passt zum Geschmack, laut Hersteller nicht enthalten.",
-      ergaenztHinweis: "Von dir im Sweet Spot ergänzt, laut Hersteller nicht enthalten.",
+      ergaenztHinweis: "Von dir ergänzt, laut Hersteller nicht enthalten.",
       nase: "Deine Nase vs. Community:",
       delta: "Ø Δ {wert}",
       deltaVorgelesen: "mittlere Abweichung {wert}",
@@ -247,7 +250,6 @@ export const de = {
       deinEindruck: "Dein Eindruck:",
       anleitung: "Zieh die lila Punkte links in der Karte: zu wenig, genau richtig oder zu viel? Die Mitte ist der Sweet Spot. Dazu leuchten die Terpene dieser Sorte auf, die die Richtung tragen.",
       nichtsGespeichert: "Hier wird nichts gespeichert.",
-      jeTerpen: "Je Terpen",
       communityFazit: "Community-Fazit",
       chargenFazit: "Charge-Fazit",
       deinFazit: "Dein Fazit",
@@ -278,14 +280,10 @@ export const de = {
     sweetSpot: {
       marke: "Sweet Spot",
     },
+    // Terpen-Regler in der Aroma-Karte (seit 2026-09-30 ohne eigene Box): Name und Vorlesetext.
     terpenRegler: {
-      nichtAngegeben: "nicht angegeben",
       community: "Community-Median {wert}",
       intensitaetVon: "{terpen}: Intensität",
-      schwach: "schwach",
-      stark: "stark",
-      weitere: "Weitere Terpene",
-      weitereHinweis: "Nicht vom Hersteller angegeben. Ein Terpen zählt als von dir ergänzt, sobald sein Regler über 0 steht.",
     },
     beschaffenheit: {
       titel: "Beschaffenheit",

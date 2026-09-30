@@ -5,8 +5,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 
 import { AromaErkundung } from "@/components/review/AromaErkundung";
 import { AromaKarte } from "@/components/review/AromaKarte";
-import { TerpenRegler } from "@/components/review/TerpenRegler";
-import type { KartenTerpen } from "@/lib/aromakarte";
+import { HOEHE, kartenHoeheMitReglern, REIHE, type KartenTerpen } from "@/lib/aromakarte";
 import { vorbelegungAus } from "@/lib/bewertung-vorbelegung";
 import { de } from "@/lib/i18n/de";
 import { aromaTexte } from "@/lib/i18n/typen";
@@ -174,6 +173,14 @@ function felder(html: string): Map<string, string> {
   return aus;
 }
 
+/** Das Terpen-fieldset der Karte (sr-only), erkannt an seiner Legende; ohne Regler null. */
+function terpenFeld(html: string): string | null {
+  const start = html.indexOf(`<legend>${de.aroma.karte.terpenLegende}</legend>`);
+  return start < 0 ? null : html.slice(start, html.indexOf("</fieldset>", start));
+}
+
+const rangeRegler = (html: string) => [...html.matchAll(/<input[^>]*type="range"[^>]*>/g)].map(([tag]) => tag);
+
 test("Maske: ergänzt folgt dem Regler, auf 0 zurückgezogen geht es nicht mit (T5d)", () => {
   const html = erkundung({ eingabe: true, vorbelegung: vorbelegung({ Myrcen: 0, Ocimen: 4, Terpinolen: 0 }) });
   const f = felder(html);
@@ -181,56 +188,96 @@ test("Maske: ergänzt folgt dem Regler, auf 0 zurückgezogen geht es nicht mit (
   assert.equal(f.get("terpen-Myrcen"), "0");
   assert.equal(f.get("terpen-Ocimen"), "4");
   assert.equal(f.has("terpen-Terpinolen"), false);
-  assert.match(html, new RegExp(de.aroma.terpenRegler.nichtAngegeben));
-  assert.match(html, new RegExp(de.aroma.terpenRegler.weitere));
+  // In der Karte: nur Ocimen (über 0) trägt den gestrichelten Knoten der Ergänzung, Terpinolen bleibt Geist.
+  assert.equal(html.match(/<circle[^>]*stroke-dasharray="3 2.5"/g)?.length, 1);
   // Kein manueller Ergänzen-Schritt und kein Sweet Spot mehr bei den Terpenen.
   assert.doesNotMatch(html, /Weiteres Terpen geschmeckt\?/);
   assert.doesNotMatch(html, /Sweet Spot gesucht/);
 });
 
-test("Maske: alle Katalogterpene stehen als Regler, Herstellerterpene zuerst (T5d)", () => {
-  const html = erkundung({ eingabe: true, vorbelegung: vorbelegung({ Myrcen: 2 }) });
-  const myrcen = html.indexOf("Myrcen: Intensität");
-  assert.ok(myrcen >= 0);
-  assert.ok(html.indexOf("Ocimen: Intensität") > myrcen);
-  assert.ok(html.indexOf("Terpinolen: Intensität") > myrcen);
-  // Nichts ergänzt: die weiteren Terpene sind zugeklappt.
-  assert.doesNotMatch(html, /<details open/);
-  // Ohne Eingabe (Startseite) keine Regler.
-  assert.doesNotMatch(erkundung({}), /Myrcen: Intensität/);
+test("Maske: je Terpen ein Regler 0 bis 5 im Terpen-fieldset der Karte, die eigene Box entfällt", () => {
+  const html = erkundung({ eingabe: true, median: MEDIAN, vorbelegung: vorbelegung({ Myrcen: 2, Ocimen: 4 }) });
+  const feld = terpenFeld(html);
+  assert.ok(feld, "Terpen-fieldset in der Karte");
+  const regler = rangeRegler(feld);
+  assert.equal(regler.length, KATALOG.length);
+  for (const tag of regler) {
+    assert.match(tag, /min="0"/);
+    assert.match(tag, /max="5"/);
+    assert.match(tag, /step="1"/);
+  }
+  for (const { name } of KATALOG) assert.match(feld, new RegExp(`${name}: Intensität`));
+  // Vorlesetext wie bisher: Stufenname und „x von 5“, mit Median dazu der Community-Median.
+  assert.match(feld, /aria-valuetext="etwas schwach, 2 von 5 · Community-Median 3"/);
+  assert.match(feld, /aria-valuetext="nicht geschmeckt, 0 von 5 · Community-Median 3"/);
+  assert.match(feld, /aria-valuetext="etwas stark, 4 von 5"/);
+  assert.match(feld, /aria-valuetext="nicht geschmeckt, 0 von 5"/);
+  // Keine Box mehr unter der Karte.
+  assert.doesNotMatch(html, /Je Terpen/);
+  assert.doesNotMatch(html, /Weitere Terpene/);
+  // Der Hinweis unter der Karte nennt die rechte Seite.
+  assert.ok(html.includes(de.aroma.karte.hinweisRegler));
+  assert.ok(html.includes(de.aroma.karte.hinweisTerpenRegler));
 });
 
-test("Terpen-Regler: der Community-Wert ist ein grüner Ring um den eigenen Punkt", () => {
-  const html = renderToStaticMarkup(
-    createElement(TerpenRegler, {
-      titel: "Je Terpen",
-      hersteller: ["Myrcen"],
-      weitere: [],
-      zeilen: [{ terpen: "Myrcen", wert: 2.5, anzahl: 3 }],
-      texte,
-      bedienung: { eigen: { Myrcen: 4 }, aendern: () => {} },
-    }),
-  );
-  assert.match(html, /border-accent/);
-  assert.match(html, /Community-Median 2,5/);
+test("Anzeige ohne Maske: keine Terpen-Regler in der Karte, der Hinweis nennt nur die linke Seite", () => {
+  const html = erkundung({ median: MEDIAN });
+  assert.equal(terpenFeld(html), null);
+  assert.doesNotMatch(html, /data-terpen-griff/);
+  assert.ok(html.includes(de.aroma.karte.hinweisRegler));
+  assert.ok(!html.includes(de.aroma.karte.hinweisTerpenRegler));
+  assert.equal(terpenFeld(karte({})), null);
 });
 
-test("Terpen-Regler: Herstellerterpen nie gestrichelt, Zusatzterpen über 0 gestrichelt in Kopierstift", () => {
-  const regler = (eigen: Record<string, number>) =>
-    renderToStaticMarkup(
-      createElement(TerpenRegler, {
-        titel: "Je Terpen",
-        hersteller: ["Myrcen"],
-        weitere: ["Ocimen"],
-        zeilen: [],
-        texte,
-        bedienung: { eigen, aendern: () => {} },
-      }),
-    );
-  const karten = (html: string) => [...html.matchAll(/<li class="([^"]*)"/g)].map(([, klasse]) => klasse);
-  const [myrcen, ocimen] = karten(regler({ Myrcen: 5, Ocimen: 3 }));
-  assert.doesNotMatch(myrcen, /border-dashed/);
-  assert.match(ocimen, /border-dashed border-kopierstift/);
-  // Auf 0 zurück: nicht mehr ergänzt, also nicht gestrichelt.
-  assert.doesNotMatch(karten(regler({ Myrcen: 5, Ocimen: 0 }))[1], /border-dashed/);
+test("Karten-Regler rechts: Griff je Terpen, lila Füllung bis zum Wert, grüner Ring am Median, bei 0 blass", () => {
+  const html = karte({
+    terpene: [LIMONEN, TERPINOLEN],
+    ebenen: { Limonen: "hersteller", Terpinolen: "geist" },
+    terpenRegler: { werte: { Limonen: 4 }, median: { Limonen: 2.5 }, aendern: () => {} },
+  });
+  // Je Terpen ein Griff; Begleitstoffe (Ester, Thiole) bekommen keinen Regler.
+  assert.equal(html.match(/data-terpen-griff=/g)?.length, 2);
+  assert.doesNotMatch(html, /data-terpen-griff="(Ester|Thiole)"/);
+  assert.match(html, /<circle data-terpen-griff="Limonen"[^>]*r="7"[^>]*fill="var\(--color-kopierstift\)"[^>]*opacity="1"/);
+  // Auf 0 bleibt der Griff am Knoten sichtbar, nur blasser.
+  assert.match(html, /<circle data-terpen-griff="Terpinolen"[^>]*opacity="0.6"/);
+  // Lila Füllung nur, wo ein Wert steht; der grüne Ring nur, wo es einen Median gibt.
+  assert.equal(html.match(/data-terpen-fuellung=/g)?.length, 1);
+  assert.equal(html.match(/<circle[^>]*r="9"[^>]*stroke="var\(--color-accent\)"/g)?.length, 1);
+  assert.match(terpenFeld(html) ?? "", /aria-valuetext="etwas stark, 4 von 5 · Community-Median 2,5"/);
+});
+
+test("Karten-Regler: die Karte wächst mit der Terpenspalte, die Geschmacksachsen stehen mittig darin", () => {
+  const viele: KartenTerpen[] = Array.from({ length: 12 }, (_, i) => ({
+    name: `Terpen ${i + 1}`,
+    geschmack: "ERDIG",
+    konzentrationProzent: null,
+    rang: 99,
+  }));
+  // Zwölf Terpene und die zwei Begleitstoffe.
+  const hoehe = kartenHoeheMitReglern(12 + 2, HOEHE);
+  assert.equal(hoehe, 668);
+  const mit = karte({ terpene: viele, terpenRegler: { werte: {}, aendern: () => {} } });
+  assert.match(mit, new RegExp(`viewBox="0 0 640 ${hoehe}"`));
+  // Die Achsen behalten ihren Abstand und rücken um die halbe Mehrhöhe nach unten; die Skala
+  // (Linie bei 2,5 ab 30 über der ersten Achse) wandert mit.
+  const mitte = (html: string) => Number(/<line[^>]*data-skala="mitte"[^>]*y1="([\d.]+)"/.exec(html)?.[1]);
+  assert.equal(mitte(mit), 48 + (hoehe - HOEHE) / 2 - 30);
+  const ohne = karte({ terpene: viele });
+  assert.match(ohne, new RegExp(`viewBox="0 0 640 ${HOEHE}"`));
+  assert.equal(mitte(ohne), 48 - 30);
+});
+
+// ---------------------------------------------------------------------------
+//  Terpen-Regler in der Karte (Nutzer 2026-09-30: keine eigene Box, ein Regler je Terpen)
+// ---------------------------------------------------------------------------
+
+test("Kartenhöhe mit Terpen-Reglern: 44 je Zeile, nie niedriger als die normale Karte", () => {
+  assert.equal(REIHE, 44);
+  // Wenige Einträge: die normale Höhe reicht.
+  assert.equal(kartenHoeheMitReglern(3, HOEHE), HOEHE);
+  assert.equal(kartenHoeheMitReglern(0, HOEHE), HOEHE);
+  // Viele Einträge: Rand oben und unten plus 44 je Abstand.
+  assert.equal(kartenHoeheMitReglern(30, HOEHE), 48 + 48 + 29 * 44);
+  assert.equal(kartenHoeheMitReglern(30, HOEHE), 1372);
 });

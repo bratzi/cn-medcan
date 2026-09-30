@@ -39,7 +39,6 @@ const UMGESTELLT: string[] = [
   "components/review/FazitLauf.tsx",
   "components/review/AromaKarte.tsx",
   "components/review/SortenKopf.tsx",
-  "components/review/TerpenRegler.tsx",
   "components/review/GesamteindruckLeiste.tsx",
   "components/review/BeschaffenheitsLeiste.tsx",
   "components/review/Aufklaerung.tsx",

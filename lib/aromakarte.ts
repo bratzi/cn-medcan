@@ -17,6 +17,17 @@ import { aromaAnteile } from "@/lib/terpen-aromen";
 export type Punkt = { x: number; y: number };
 export type KartenTerpen = { name: string; geschmack: GeschmacksKategorie; konzentrationProzent: number | null; rang: number };
 
+/** Ein bekanntes Terpen des Katalogs, auch ohne Herstellerangabe in dieser Sorte. */
+export type KatalogEintrag = { name: string; geschmack: GeschmacksKategorie };
+
+export type TerpenZeile = {
+  terpen: string;
+  /** Community-Median (T5, zuvor das Mittel), 0 bis 5. */
+  wert: number;
+  /** Wie viele Bewertungen dahinterstehen; ohne Anzahl kein Community-Ring. */
+  anzahl?: number;
+};
+
 export const BREITE = 640;
 export const HOEHE = 480;
 export const MAX = 5;
@@ -57,6 +68,20 @@ const OBEN = 48;
 /** Rand unten wie oben (Skala unter der letzten Achse). */
 const RAND_UNTEN = 48;
 export const RADIUS = 180;
+
+/**
+ * Zeilenabstand der Terpenspalte mit Reglern (Nutzer 2026-09-30: die Terpen-Regler
+ * wandern in die Karte): Name darüber, Spur darunter, Trefferfläche 44 hoch.
+ */
+export const REIHE = 44;
+
+/**
+ * Höhe der Karte mit Terpen-Reglern: so hoch, dass jede Zeile der rechten Spalte
+ * (`anzahl` inklusive Begleitstoffe) ihre REIHE bekommt, nie niedriger als `hoehe`.
+ */
+export function kartenHoeheMitReglern(anzahl: number, hoehe: number): number {
+  return Math.max(hoehe, OBEN + RAND_UNTEN + (anzahl - 1) * REIHE);
+}
 
 /**
  * Netzradius: RADIUS, auf schmalen Karten so klein, dass die Achsennamen am Rand
@@ -457,32 +482,8 @@ export function sweetSpotZone(wert: number): "wenig" | "mitte" | "viel" {
   return "mitte";
 }
 
-/**
- * Ob der Abschnitt „Weitere Terpene“ offen steht (T5d, Review 1): offen mit einer
- * Ergänzung und ohne Herstellerterpene; was einmal offen ist, klappt nicht von
- * selbst zu, auch nicht, wenn eine Ergänzung auf 0 zurückgeht.
- */
-export function weitereOffen(bisher: boolean, ergaenzt: number, hersteller: number): boolean {
-  return bisher || ergaenzt > 0 || hersteller === 0;
-}
-
 /** Unterschied, ab dem ein Balken über oder unter seinem Bezug liegt (sonst gleichauf). */
 const GLEICHAUF = 0.1;
-
-/**
- * Reihenfolge der Terpen-Regler in der Maske (T5d): die Herstellerterpene
- * zuerst, wie angegeben; alle übrigen bekannten Terpene danach alphabetisch.
- */
-export function reglerTerpene(
-  hersteller: readonly string[],
-  katalog: readonly string[],
-): { hersteller: string[]; weitere: string[] } {
-  const angegeben = new Set(hersteller);
-  return {
-    hersteller: [...hersteller],
-    weitere: katalog.filter((name) => !angegeben.has(name)).sort((a, b) => a.localeCompare(b, "de")),
-  };
-}
 
 export type BalkenVergleich = {
   ton: "gruen" | "lila";
