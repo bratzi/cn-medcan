@@ -30,7 +30,11 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 
 ### ⇢ SESSION 31 (2026-09-30 nachts): T5b–T10 fertig und live, T11 halb, Sicherung zum Clear
 
-**Wiedereinstieg (ohne Rückfrage):** Skill `superpowers:subagent-driven-development` laden, Ledger
+**ALS ERSTES (Nutzerwunsch 2026-09-30):** die drei „Offenen Nutzerfragen“ unten in EINER AskUserQuestion stellen
+(Betreibername vs. „wir“ im Buch; Karte ohne Login gegen Median; Overall-Noten ab 0), Antworten umsetzen lassen bzw.
+als Ruling ins Ledger. Danach ohne weitere Rückfrage weiter.
+
+**Wiedereinstieg:** Skill `superpowers:subagent-driven-development` laden, Ledger
 `.superpowers/sdd/2026-09-29-buch-bewertung-v2-master/progress.md` lesen (Rulings R1–R16, Stand je Task,
 zurückgestellte Minors für den Final-Review).
 - **ERLEDIGT, geprüft (Review sauber) und live seit Push 02:32 (`3a34ab8`):** T6 Fazit getrennt, T5b Aromakarte v2
