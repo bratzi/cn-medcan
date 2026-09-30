@@ -1,3 +1,4 @@
+import { cache } from "react";
 import type { Prisma } from "@/lib/generated/prisma/client";
 import {
   istBestandStatus,
@@ -1224,7 +1225,8 @@ export type RegisterKatalogTerpen = KatalogTerpen & { sorten: number; aromaProfi
  * Ungecacht wie die übrigen Startseitendaten (siehe TODO an ladeFilterFacetten:
  * ISR bräuchte erst die Cache-Bindings).
  */
-export async function ladeTerpenRegister(): Promise<RegisterKatalogTerpen[]> {
+// Je Anfrage einmal (React cache): Terpen-Band und Register der Startseite teilen die Abfrage.
+export const ladeTerpenRegister = cache(async function ladeTerpenRegister(): Promise<RegisterKatalogTerpen[]> {
   const prisma = await getPrisma();
   const zeilen = await prisma.terpen.findMany({
     orderBy: { name: "asc" },
@@ -1242,4 +1244,4 @@ export async function ladeTerpenRegister(): Promise<RegisterKatalogTerpen[]> {
     aromaProfil: zeile.aromaProfil,
     sorten: zeile._count.strains,
   }));
-}
+});
