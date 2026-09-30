@@ -46,9 +46,9 @@ test("Ergänzt: gestrichelt in eigener Farbe (Kopierstift), Lichtpunkt ja, volle
   assert.match(html, /<circle[^>]*stroke="var\(--color-kopierstift\)"[^>]*stroke-dasharray="3 2.5"/);
 });
 
-test("Herstellerangabe (T5b): stiller Streifen, die Bewertung darüber mit Lichtfluss, kein Puls", () => {
+test("Herstellerangabe ohne Streifen (Nutzer 2026-09-30), die Bewertung mit Lichtfluss, kein Puls", () => {
   const html = karte({ terpene: [LIMONEN], ebenen: { Limonen: "hersteller" } });
-  assert.match(html, /data-schicht="streifen"/);
+  assert.doesNotMatch(html, /data-schicht="streifen"/);
   // Zitrus steht auf 5 (VOLL): die ganze Linie pulsiert, kein laufender Strich (T5d).
   assert.match(html, /class="bogen-voll"/);
   assert.doesNotMatch(html, /class="bogen-fluss"/);

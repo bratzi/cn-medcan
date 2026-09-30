@@ -81,13 +81,13 @@ test("Herstellerkraft: das stärkste angegebene Terpen ist 1, Konzentration schl
 
 test("Bogenschichten: Hersteller immer Streifen, Linie nur mit Wert; Geister nie eine Linie", () => {
   const ohne = { imBlick: true, imFokus: false };
-  assert.deepEqual(bogenSchicht({ ebene: "hersteller", wert: 0, ...ohne }), { streifen: true, linie: false, geist: null });
-  assert.deepEqual(bogenSchicht({ ebene: "hersteller", wert: 2, ...ohne }), { streifen: true, linie: true, geist: null });
-  // Andere Achse gewählt: die Linie tritt zurück, der Streifen bleibt.
+  assert.deepEqual(bogenSchicht({ ebene: "hersteller", wert: 0, ...ohne }), { streifen: false, linie: false, geist: "blass" });
+  assert.deepEqual(bogenSchicht({ ebene: "hersteller", wert: 2, ...ohne }), { streifen: false, linie: true, geist: null });
+  // Andere Achse gewählt: die Linie tritt zurück, kein Herstellerstreifen (Nutzer 2026-09-30).
   assert.deepEqual(bogenSchicht({ ebene: "hersteller", wert: 2, imBlick: false, imFokus: false }), {
-    streifen: true,
+    streifen: false,
     linie: false,
-    geist: null,
+    geist: "blass",
   });
   // Das Terpen selbst überfahren: seine Linien zeigen sich auf jeder Achse mit Wert.
   assert.equal(bogenSchicht({ ebene: "hersteller", wert: 2, imBlick: false, imFokus: true }).linie, true);
@@ -134,13 +134,9 @@ const sichtbareBalken = (html: string) => schicht(html, "balken").filter((tag) =
 const karte = (serien: AromaSerie[]) =>
   renderToStaticMarkup(createElement(AromaKarte, { terpene: [LIMONEN], serien, texte }));
 
-test("Anzeige: Herstellerangabe als stiller Streifen, kein Puls, kein Filter; ohne lila Serie keine Linie", () => {
+test("Anzeige: keine Herstellerstreifen (Nutzer 2026-09-30), kein Puls, kein Filter; ohne lila Serie keine Linie", () => {
   const html = karte([gruen({ zitrus: 5 })]);
-  const streifenTags = schicht(html, "streifen");
-  assert.ok(streifenTags.length > 0, "Streifen je Bogen");
-  // Geschmacksfarbe (Zitrus gelb), blass: Deckkraft höchstens 0,3.
-  assert.ok(streifenTags.some((tag) => /stroke="#f2d129"/.test(tag)));
-  for (const tag of streifenTags) assert.ok(Number(/opacity="([\d.]+)"/.exec(tag)?.[1]) <= 0.3, tag);
+  assert.equal(schicht(html, "streifen").length, 0);
   assert.doesNotMatch(html, /bogen-puls/);
   assert.doesNotMatch(html, /filter:saturate/);
   assert.equal(schicht(html, "linie").length, 0);
@@ -222,12 +218,12 @@ function geschmacksFelder(html: string): Record<string, string> {
   );
 }
 
-test("Maske ohne eigene Bewertung: alle Geschmacksregler auf 0, die Karte zeigt nur Streifen", () => {
+test("Maske ohne eigene Bewertung: alle Geschmacksregler auf 0, die Karte zeigt keine Linie", () => {
   const html = maske({});
   const felder = geschmacksFelder(html);
   assert.equal(Object.keys(felder).length, 10);
   for (const [key, wert] of Object.entries(felder)) assert.equal(wert, "0", key);
-  assert.ok(schicht(html, "streifen").length > 0);
+  assert.equal(schicht(html, "streifen").length, 0);
   assert.equal(schicht(html, "linie").length, 0);
   assert.doesNotMatch(html, /class="bogen-fluss"/);
   assert.doesNotMatch(html, /delta-puls/);
@@ -264,11 +260,11 @@ test("Maske ohne Community-Median: Balken lila, kein Vergleich, kein Puls, Hinwe
   assert.doesNotMatch(html, /NaN/);
 });
 
-test("Legende der Maske: Deine Bewertung, Community-Median und der Streifen der Herstellerangabe", () => {
+test("Legende der Maske: Deine Bewertung und Community-Median, kein Herstellerstreifen", () => {
   const html = maske({});
   assert.match(html, new RegExp(`>${de.aroma.serien.bewertung}<`));
   assert.match(html, new RegExp(de.aroma.karte.median));
-  assert.match(html, new RegExp(`>${de.aroma.karte.streifen}<`));
+  assert.doesNotMatch(html, new RegExp(`>${de.aroma.karte.streifen}<`));
   // Die Community steht in der Maske als Ring, nicht als eigene Reihe.
   assert.doesNotMatch(html, new RegExp(de.aroma.serien.community));
 });

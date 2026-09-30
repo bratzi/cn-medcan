@@ -530,8 +530,9 @@ export function bogenSchicht({
   imFokus: boolean;
 }): BogenSchicht {
   const linie = ebene !== "geist" && wert > SPUERBAR && (imBlick || imFokus);
-  const geist = ebene === "hersteller" || linie ? null : ebene === "geist" && imFokus ? "fokus" : "blass";
-  return { streifen: ebene === "hersteller", linie, geist };
+  // Keine Herstellerstreifen mehr (Nutzer 2026-09-30): der Hersteller nennt nur welche Terpene, nicht wie stark.
+  const geist = linie ? null : ebene === "geist" && imFokus ? "fokus" : "blass";
+  return { streifen: false, linie, geist };
 }
 
 /**

@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState, type CSSProperties, type FocusEvent, type PointerEvent, type ReactNode } from "react";
+import { Fragment, useEffect, useMemo, useRef, useState, type CSSProperties, type FocusEvent, type PointerEvent, type ReactNode } from "react";
 
 import { GeschmackIcon, TerpenIcon } from "@/components/review/AromaIcon";
 import type { GeschmacksKategorie } from "@/db/enums";
-import { farbFlaeche } from "@/lib/aroma-farben";
+import { farbFlaeche, LINIEN_FARBE, VERLAUF } from "@/lib/aroma-farben";
 import { verbindungsKarte } from "@/lib/terpen-register";
 
 /** Fertige Texte und Anteile aus TerpenRegister.tsx; die Insel braucht kein Wörterbuch. */
@@ -43,18 +43,23 @@ export type RegisterTexte = {
   begleitstoffe: string;
 };
 
+type Linie = { terpen: string; note: string; geschmack: GeschmacksKategorie; pfad: string };
+
+/** Linienfarbe wie in der Aroma-Karte; Verlaufsrichtungen nehmen ihre erste Farbe. */
+function linienFarbe(geschmack: GeschmacksKategorie): string {
+  return LINIEN_FARBE[geschmack] ?? VERLAUF[geschmack]?.[0] ?? "#9aa1a8";
+}
+
 /**
- * Pille im Register: 44 px hoch, gewählt gefüllt in Blattgrün (aktiver
- * Zustand), sonst Papier mit Rahmen. Schmal liegen die Pillen in einer
- * wischbaren Zeile, damit die Tafel darunter im Bild bleibt.
+ * Eintrag im Register (Nutzer 2026-09-30): frei gesetzt, ohne Kasten und ohne
+ * Knopfoptik; Icon über dem Namen, 44 px Trefferfläche. Gewählt in Blattgrün
+ * mit Unterstrich, verbunden mit Tintenunterstrich, der Rest tritt zurück.
  */
-const PILLE =
-  "group inline-flex min-h-11 shrink-0 items-center gap-2 rounded-full border border-border-strong bg-surface-raised px-4 " +
-  "text-body text-text transition-[color,background-color,border-color,opacity,box-shadow] duration-fast ease-standard hover:bg-surface-sunken " +
-  "aria-pressed:border-transparent aria-pressed:bg-accent aria-pressed:text-accent-fg aria-pressed:hover:bg-accent-hover " +
-  // Verbindung (T17): verbundene Pillen tragen einen kräftigen Tintenring (Form, nicht nur Farbe),
-  // alle übrigen treten zurück. Ohne Bewegung, darum auch bei reduzierter Bewegung und im Sparmodus.
-  "data-verbunden:ring-2 data-verbunden:ring-text data-verbunden:ring-offset-2 data-verbunden:ring-offset-surface data-gedimmt:opacity-60";
+const EINTRAG =
+  "flex min-h-11 min-w-11 flex-col items-center gap-1 px-1 py-2 text-text " +
+  "transition-[color,opacity] duration-fast ease-standard hover:text-accent " +
+  "aria-pressed:text-accent aria-pressed:underline aria-pressed:decoration-2 aria-pressed:underline-offset-4 " +
+  "data-verbunden:underline data-verbunden:decoration-2 data-verbunden:underline-offset-4 data-gedimmt:opacity-60";
 
 /** Querverweis in einer Tafel: gedruckter Name mit Unterstrich, 44 px Trefferfläche. */
 const VERWEIS =
@@ -121,7 +126,7 @@ function Tafel({
       tabIndex={-1}
       data-register-tafel=""
       data-aktiv={aktiv ? "" : undefined}
-      className="border border-border bg-surface-raised p-6 sm:p-10"
+      className="bg-surface px-4 py-8 sm:px-10"
     >
       <p data-register-zeile="" className="text-small text-text-muted">
         {art}
@@ -175,6 +180,48 @@ export function RegisterAuswahl({ ansicht, start, texte }: { ansicht: RegisterAn
   const karte = useMemo(() => verbindungsKarte(ansicht.terpene), [ansicht.terpene]);
   const quelle = hervor ?? (geloest ? null : aktiv);
   const verbunden = new Set(quelle ? (karte[quelle] ?? []) : []);
+  const flaeche = useRef<HTMLDivElement>(null);
+  const [groesse, setGroesse] = useState<{ b: number; h: number } | null>(null);
+  const [linien, setLinien] = useState<Linie[]>([]);
+
+  // Lage der Einträge messen (Nutzer 2026-09-30): Linien von der Unterkante des Terpens zur
+  // Oberkante des Geschmacks. Neu bei jeder Größenänderung, auch wenn die Beschreibung wechselt.
+  useEffect(() => {
+    const wurzel = flaeche.current;
+    if (!wurzel || typeof ResizeObserver === "undefined") return;
+    const messen = () => {
+      const basis = wurzel.getBoundingClientRect();
+      const lage = new Map<string, DOMRect>();
+      for (const knopf of wurzel.querySelectorAll<HTMLElement>("[data-register-knopf]")) {
+        const anker = knopf.getAttribute("aria-controls");
+        if (anker) lage.set(anker, knopf.getBoundingClientRect());
+      }
+      const neu: Linie[] = [];
+      for (const terpen of ansicht.terpene) {
+        const oben = lage.get(terpen.anker);
+        if (!oben) continue;
+        for (const note of terpen.noten) {
+          const unten = lage.get(note.anker);
+          if (!unten) continue;
+          const von = { x: oben.left + oben.width / 2 - basis.left, y: oben.bottom - basis.top };
+          const nach = { x: unten.left + unten.width / 2 - basis.left, y: unten.top - basis.top };
+          const mitteY = (von.y + nach.y) / 2;
+          neu.push({
+            terpen: terpen.anker,
+            note: note.anker,
+            geschmack: note.geschmack,
+            pfad: `M${von.x},${von.y} C${von.x},${mitteY} ${nach.x},${mitteY} ${nach.x},${nach.y}`,
+          });
+        }
+      }
+      setGroesse({ b: basis.width, h: basis.height });
+      setLinien(neu);
+    };
+    messen();
+    const beobachter = new ResizeObserver(messen);
+    beobachter.observe(wurzel);
+    return () => beobachter.disconnect();
+  }, [ansicht.terpene]);
 
   useEffect(() => {
     if (fokusNach.current !== aktiv) return;
@@ -211,69 +258,85 @@ export function RegisterAuswahl({ ansicht, start, texte }: { ansicht: RegisterAn
   });
 
   return (
-    <div className="register-raster mt-16 grid gap-12 md:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] md:gap-16">
-      <div className="register-knoepfe grid content-start gap-10 max-md:-mx-4 sm:max-md:-mx-8">
-        <div role="group" aria-labelledby="register-terpene" className="grid gap-4">
-          <h3 id="register-terpene" className="text-small font-medium text-text-muted max-md:px-4 sm:max-md:px-8">
-            {texte.terpene}
-          </h3>
-          <ul
-            className="flex gap-2 max-md:snap-x max-md:overflow-x-auto max-md:px-4 max-md:py-2 sm:max-md:px-8 md:flex-wrap"
-          >
-            {ansicht.terpene.map((terpen) => (
-              <li key={terpen.anker} className="shrink-0 snap-start">
-                <button
-                  type="button"
-                  aria-pressed={aktiv === terpen.anker}
-                  aria-controls={terpen.anker}
-                  onClick={() => tippe(terpen.anker)}
-                  {...pille(terpen.anker)}
-                  data-register-knopf=""
-                  className={PILLE}
-                >
-                  <TerpenIcon name={terpen.icon} className="size-6" />
-                  {terpen.name}
-                  <span
-                    aria-hidden="true"
-                    className="numeric text-small text-text-muted group-aria-pressed:text-accent-fg"
-                  >
-                    {terpen.sorten}
-                  </span>
-                  <span className="sr-only">, {terpen.sortenKurz}</span>
-                </button>
-              </li>
-            ))}
-          </ul>
-        </div>
-        <div role="group" aria-labelledby="register-geschmaecker" className="grid gap-4">
-          <h3 id="register-geschmaecker" className="text-small font-medium text-text-muted max-md:px-4 sm:max-md:px-8">
-            {texte.geschmaecker}
-          </h3>
-          <ul
-            className="flex gap-2 max-md:snap-x max-md:overflow-x-auto max-md:px-4 max-md:py-2 sm:max-md:px-8 md:flex-wrap"
-          >
-            {ansicht.noten.map((note) => (
-              <li key={note.anker} className="shrink-0 snap-start">
-                <button
-                  type="button"
-                  aria-pressed={aktiv === note.anker}
-                  aria-controls={note.anker}
-                  onClick={() => tippe(note.anker)}
-                  {...pille(note.anker)}
-                  data-register-knopf=""
-                  className={PILLE}
-                >
-                  <GeschmackIcon geschmack={note.geschmack} className="size-6" />
-                  {note.label}
-                  <Farbpunkt geschmack={note.geschmack} />
-                </button>
-              </li>
-            ))}
-          </ul>
-        </div>
+    <div ref={flaeche} className="register-raster relative isolate mt-16 grid gap-12 md:gap-16">
+      {/* Linien vom Terpen hinunter zum Geschmack (Nutzer 2026-09-30): dieselben Bögen und derselbe
+          Lichtfluss wie in der Aroma-Karte, in der Farbe der Geschmacksrichtung. Die Beschreibung in
+          der Mitte liegt auf Papier darüber und deckt sie ab. */}
+      {groesse ? (
+        <svg
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 -z-10 size-full overflow-visible"
+          viewBox={`0 0 ${groesse.b} ${groesse.h}`}
+        >
+          {linien.map((linie, index) => {
+            const an = quelle === linie.terpen || quelle === linie.note;
+            const farbe = linienFarbe(linie.geschmack);
+            return (
+              <Fragment key={`${linie.terpen}-${linie.note}`}>
+                <path
+                  d={linie.pfad}
+                  fill="none"
+                  stroke={an ? farbe : "var(--color-border-strong)"}
+                  strokeLinecap="round"
+                  opacity={an ? 0.95 : quelle ? 0.15 : 0.35}
+                  style={{ strokeWidth: an ? 2 : 1 }}
+                  className="transition-[opacity,stroke] duration-normal"
+                />
+                {an ? (
+                  <path
+                    d={linie.pfad}
+                    pathLength={100}
+                    fill="none"
+                    stroke={farbe}
+                    strokeLinecap="round"
+                    strokeDasharray="16 184"
+                    className="bogen-fluss"
+                    style={
+                      {
+                        strokeWidth: 4,
+                        opacity: 0.85,
+                        animationDelay: `${-((index * 0.37) % 1) * 2.4}s`,
+                        "--fluss-dauer": "2.4s",
+                        "--fluss-strich": 16,
+                      } as CSSProperties
+                    }
+                  />
+                ) : null}
+              </Fragment>
+            );
+          })}
+        </svg>
+      ) : null}
+
+      <div role="group" aria-labelledby="register-terpene" className="register-knoepfe grid gap-4">
+        <h3 id="register-terpene" className="text-small font-medium text-text-muted">
+          {texte.terpene}
+        </h3>
+        <ul className="flex flex-wrap justify-between gap-x-4 gap-y-2">
+          {ansicht.terpene.map((terpen) => (
+            <li key={terpen.anker}>
+              <button
+                type="button"
+                aria-pressed={aktiv === terpen.anker}
+                aria-controls={terpen.anker}
+                onClick={() => tippe(terpen.anker)}
+                {...pille(terpen.anker)}
+                data-register-knopf=""
+                className={EINTRAG}
+              >
+                <TerpenIcon name={terpen.icon} className="size-8" />
+                <span className="text-small">{terpen.name}</span>
+                <span aria-hidden="true" className="numeric text-caption text-text-muted">
+                  {terpen.sorten}
+                </span>
+                <span className="sr-only">, {terpen.sortenKurz}</span>
+              </button>
+            </li>
+          ))}
+        </ul>
       </div>
 
-      <div className="register-tafeln grid content-start gap-8 md:sticky md:top-32 md:self-start">
+      <div className="register-tafeln mx-auto grid w-full max-w-3xl content-start">
         {ansicht.terpene.map((terpen) => (
           <Tafel
             key={terpen.anker}
@@ -352,6 +415,31 @@ export function RegisterAuswahl({ ansicht, start, texte }: { ansicht: RegisterAn
             ) : null}
           </Tafel>
         ))}
+      </div>
+
+      <div role="group" aria-labelledby="register-geschmaecker" className="register-knoepfe grid gap-4">
+        <ul className="flex flex-wrap justify-between gap-x-4 gap-y-2">
+          {ansicht.noten.map((note) => (
+            <li key={note.anker}>
+              <button
+                type="button"
+                aria-pressed={aktiv === note.anker}
+                aria-controls={note.anker}
+                onClick={() => tippe(note.anker)}
+                {...pille(note.anker)}
+                data-register-knopf=""
+                className={EINTRAG}
+              >
+                <GeschmackIcon geschmack={note.geschmack} className="size-8" />
+                <span className="text-small">{note.label}</span>
+                <Farbpunkt geschmack={note.geschmack} />
+              </button>
+            </li>
+          ))}
+        </ul>
+        <h3 id="register-geschmaecker" className="text-small font-medium text-text-muted">
+          {texte.geschmaecker}
+        </h3>
       </div>
     </div>
   );

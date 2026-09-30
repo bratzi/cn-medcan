@@ -465,12 +465,6 @@ export function AromaKarte({
                 {sollSerie.name}
               </li>
             ) : null}
-            {angegebene.length > 0 ? (
-              <li className="inline-flex items-center gap-2">
-                <LegendenMuster art="streifen" />
-                {kt.streifen}
-              </li>
-            ) : null}
           </>
         )}
       </ul>
@@ -1293,9 +1287,8 @@ function tragendeStoffe(
 /** Reihenfolge der Ebenen in der Legende. */
 const EBENEN: readonly TerpenEbene[] = ["hersteller", "ergaenzt", "geist"];
 
-/** Strichmuster einer Ebene in der Legende, wie die Bögen gezeichnet (Herstellerangabe seit T5b als Streifen). */
+/** Strichmuster einer Ebene in der Legende, wie die Bögen gezeichnet (seit 2026-09-30 ohne Herstellerstreifen). */
 function EbenenMuster({ ebene }: { ebene: TerpenEbene }) {
-  if (ebene === "hersteller") return <LegendenMuster art="streifen" />;
   return (
     <svg aria-hidden="true" viewBox="0 0 24 8" className="h-2 w-6 shrink-0 overflow-visible text-text">
       <line

@@ -8,13 +8,13 @@ import type { AromaTexte } from "@/lib/i18n/typen";
 
 /**
  * Mitlaufendes Fazit beim Bewerten (T16, Nutzer 2026-09-30). EIN Fazit im DOM, per
- * Layout platziert: ab `xl` steht es als sticky Spalte rechts neben den drei Schritten
+ * Layout platziert: ab 118rem steht es sticky im rechten Seitenrand neben den drei Schritten
  * (unter dem festen Kopf, `--kopf-h` aus KopfZustand); darunter ist dasselbe Element ein
  * Sheet von unten, geöffnet über eine einklappbare Leiste mit dem Kurz-Fazit (eigene
  * Sortennote bzw. Community-Wert, dazu das Delta mit Pfeil und Vorzeichen). Die Leiste
  * steht nur, solange die Erkundung im Viewport ist (IntersectionObserver).
- * Zweispaltig erst ab `xl`: ab `lg` blieben neben 18rem Fazit keine 64rem für die
- * Karte nebeneinander (AromaKarte, NEBENEINANDER), sie bräche um.
+ * Außen neben dem Arbeitsbereich erst ab 118rem (Nutzer 2026-09-30): dort reicht der Seitenrand neben max-w-360 für 14rem Fazit, die Regler behalten ihre volle Breite.
+ * Darunter gilt die Leiste.
  */
 export function FazitLauf({
   id,
@@ -92,10 +92,10 @@ export function FazitLauf({
   return (
     <>
       {/* Platz unter der Erkundung, solange die Leiste steht: sie verdeckt nichts. */}
-      <div aria-hidden="true" className={sichtbar ? "h-[calc(3.5rem+env(safe-area-inset-bottom))] xl:hidden" : "hidden"} />
+      <div aria-hidden="true" className={sichtbar ? "h-[calc(3.5rem+env(safe-area-inset-bottom))] min-[118rem]:hidden" : "hidden"} />
 
       {offen ? (
-        <div aria-hidden="true" data-fazit-hintergrund="" onClick={() => setOffen(false)} className="fazit-lauf-bewegt fixed inset-0 z-40 bg-surface-sunken opacity-80 xl:hidden starting:opacity-0 transition-opacity duration-normal ease-out" />
+        <div aria-hidden="true" data-fazit-hintergrund="" onClick={() => setOffen(false)} className="fazit-lauf-bewegt fixed inset-0 z-40 bg-surface-sunken opacity-80 min-[118rem]:hidden starting:opacity-0 transition-opacity duration-normal ease-out" />
       ) : null}
 
       <aside
@@ -104,14 +104,14 @@ export function FazitLauf({
         aria-label={texte.aroma.fazitLauf.titel}
         {...(offen ? { role: "dialog", "aria-modal": true } : {})}
         className={
-          "xl:sticky xl:top-[calc(var(--kopf-h,4rem)+2rem)] xl:block xl:self-start " +
+          "min-[118rem]:absolute min-[118rem]:inset-y-0 min-[118rem]:left-full min-[118rem]:ml-8 min-[118rem]:block min-[118rem]:w-56 " +
           (offen
-            ? "fazit-lauf-bewegt fixed inset-x-0 bottom-0 z-50 max-h-[85svh] overflow-y-auto rounded-t-lg border-t border-border bg-surface px-4 pt-4 pb-[calc(2rem+env(safe-area-inset-bottom))] overscroll-contain shadow-lg transition-transform duration-normal ease-out starting:translate-y-full xl:static xl:z-auto xl:max-h-none xl:overflow-visible xl:rounded-none xl:border-0 xl:bg-transparent xl:p-0 xl:shadow-none"
+            ? "fazit-lauf-bewegt fixed inset-x-0 bottom-0 z-50 max-h-[85svh] overflow-y-auto rounded-t-lg border-t border-border bg-surface px-4 pt-4 pb-[calc(2rem+env(safe-area-inset-bottom))] overscroll-contain shadow-lg transition-transform duration-normal ease-out starting:translate-y-full min-[118rem]:z-auto min-[118rem]:max-h-none min-[118rem]:overflow-visible min-[118rem]:rounded-none min-[118rem]:border-0 min-[118rem]:bg-transparent min-[118rem]:p-0 min-[118rem]:shadow-none"
             : "hidden")
         }
       >
         {offen ? (
-          <div className="flex justify-end xl:hidden">
+          <div className="flex justify-end min-[118rem]:hidden">
             <button
               ref={schliessen}
               type="button"
@@ -124,7 +124,7 @@ export function FazitLauf({
             </button>
           </div>
         ) : null}
-        {children}
+        <div className="min-[118rem]:sticky min-[118rem]:top-[calc(var(--kopf-h,4rem)+2rem)]">{children}</div>
       </aside>
 
       <button
@@ -135,7 +135,7 @@ export function FazitLauf({
         aria-expanded={offen}
         onClick={() => setOffen(true)}
         className={
-          "fazit-lauf-bewegt fixed inset-x-0 bottom-0 z-30 flex min-h-14 items-center justify-between gap-4 border-t border-border bg-surface px-4 pb-[env(safe-area-inset-bottom)] text-left shadow-lg transition-[translate,visibility] duration-normal ease-out xl:hidden " +
+          "fazit-lauf-bewegt fixed inset-x-0 bottom-0 z-30 flex min-h-14 items-center justify-between gap-4 border-t border-border bg-surface px-4 pb-[env(safe-area-inset-bottom)] text-left shadow-lg transition-[translate,visibility] duration-normal ease-out min-[118rem]:hidden " +
           (sichtbar && !offen ? "visible translate-y-0" : "invisible translate-y-full")
         }
       >

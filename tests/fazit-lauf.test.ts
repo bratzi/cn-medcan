@@ -29,14 +29,16 @@ function erkundung(mitEigen: boolean) {
 
 const anzahl = (html: string, teil: string) => html.split(teil).length - 1;
 
-test("Fazit steht genau einmal im Markup, in der sticky Spalte ab xl", () => {
+test("Fazit steht genau einmal im Markup, ab 118rem sticky außen im Seitenrand", () => {
   const html = erkundung(true);
   assert.equal(anzahl(html, `>${de.aroma.erkundung.communityFazit}</dt>`), 1);
   assert.equal(anzahl(html, "<aside"), 1);
   const aside = /<aside[^>]*>/.exec(html)![0];
-  assert.match(aside, /xl:sticky/);
-  assert.match(aside, /xl:top-\[calc\(var\(--kopf-h,4rem\)\+2rem\)\]/);
-  assert.match(html, /xl:grid-cols-\[minmax\(0,1fr\)_18rem\]/);
+  assert.match(aside, /min-\[118rem\]:absolute/);
+  assert.match(aside, /min-\[118rem\]:left-full/);
+  assert.match(html, /min-\[118rem\]:sticky min-\[118rem\]:top-\[calc\(var\(--kopf-h,4rem\)\+2rem\)\]/);
+  // Die Regler behalten ihre Breite: kein Raster mit Fazitspalte mehr (Nutzer 2026-09-30).
+  assert.doesNotMatch(html, /grid-cols-\[minmax\(0,1fr\)_18rem\]/);
 });
 
 test("Mobile Leiste: aria-expanded/aria-controls aufs Fazit und die Kurzwerte samt Delta", () => {
@@ -45,7 +47,7 @@ test("Mobile Leiste: aria-expanded/aria-controls aufs Fazit und die Kurzwerte sa
   const id = /<aside[^>]*id="([^"]+)"/.exec(html)![1];
   assert.match(leiste, /aria-expanded="false"/);
   assert.match(leiste, new RegExp(`aria-controls="${id}"`));
-  assert.match(leiste, /xl:hidden/);
+  assert.match(leiste, /min-\[118rem\]:hidden/);
   assert.match(leiste, new RegExp(de.aroma.erkundung.deinFazit));
   assert.match(leiste, /Pkt\./);
   assert.match(leiste, /Prozentpunkte (über|unter) dem Community-Fazit|gleich dem Community-Fazit/);
@@ -57,11 +59,11 @@ test("Ohne eigene Werte zeigt die Leiste den Community-Wert, ohne Delta", () => 
   assert.doesNotMatch(leiste, /Pkt\./);
 });
 
-test("Handschrift-Zahl des Sortenfazits bleibt in der 18rem-Spalte ab xl bei 4rem (Fix I1)", () => {
+test("Handschrift-Zahl des Sortenfazits bleibt im Seitenrand ab 118rem bei 4rem (Fix I1)", () => {
   const html = erkundung(true);
   const zahlen = html.match(/class="[^"]*text-umschlag[^"]*"/g) ?? [];
   assert.ok(zahlen.length >= 2);
-  for (const klasse of zahlen) assert.match(klasse, /xl:text-\[4rem\]/);
+  for (const klasse of zahlen) assert.match(klasse, /min-\[118rem\]:text-\[4rem\]/);
 });
 
 test("Sheet hält den Fokus: Tab-Falle im Quelltext von FazitLauf (Fix I2)", async () => {

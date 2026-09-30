@@ -242,8 +242,8 @@ export function AromaErkundung({
         : texte.aroma.erkundung.chargenFazit;
 
   return (
-    // Ab xl zwei Spalten: links die Schritte, rechts das mitlaufende Fazit (T16).
-    <div ref={wurzel} className="flex flex-col gap-16 md:gap-24 xl:grid xl:grid-cols-[minmax(0,1fr)_18rem] xl:gap-x-16">
+    // Die Schritte in voller Breite; das Fazit läuft ab 118rem außen im Seitenrand mit (T16).
+    <div ref={wurzel} className="relative flex flex-col gap-16 md:gap-24">
       {eingabe ? (
         // Werte der Regler fürs umschließende Formular: Noten nur, wenn gesetzt (Start bei 0 =
         // keine Note, T5c; Pflicht, der Server meldet eine fehlende Note, statt 0 zu speichern),
@@ -269,7 +269,7 @@ export function AromaErkundung({
         </div>
       ) : null}
       {/* Sortenkopf ganz oben (Nutzer 2026-09-25): erst sieht man, was bewertet wurde. */}
-      {bild ? <div className="xl:col-span-2">{bild}</div> : null}
+      {bild ? <div>{bild}</div> : null}
 
       <div className="flex min-w-0 flex-col gap-16 md:gap-24">
 
@@ -438,11 +438,11 @@ export function AromaErkundung({
                         wie die Wortmarke im Hero, dazu ein ruhiges Pulsieren. In der 18rem-Spalte ab xl fest
                           4rem (T16-Fix I1): text-umschlag wüchse dort bis 16rem und bräche um. */}
                     {["marke-kontur-1", "marke-kontur-2", "marke-kontur-3", "marke-kontur-4"].map((klasse) => (
-                      <span key={klasse} aria-hidden="true" className={`marke-kontur ${klasse} font-hand text-umschlag leading-none xl:text-[4rem]`}>
+                      <span key={klasse} aria-hidden="true" className={`marke-kontur ${klasse} font-hand text-umschlag leading-none min-[118rem]:text-[4rem]`}>
                         <span>{prozent(sortenFazitWert, texte.sprache)}</span>
                       </span>
                     ))}
-                    <span className="fazit-puls farbverlauf font-hand text-umschlag leading-none xl:text-[4rem]">
+                    <span className="fazit-puls farbverlauf font-hand text-umschlag leading-none min-[118rem]:text-[4rem]">
                       {prozent(sortenFazitWert, texte.sprache)}
                     </span>
                   </dd>

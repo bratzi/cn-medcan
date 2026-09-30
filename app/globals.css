@@ -1787,3 +1787,44 @@ html.joint-cursor :is(input:not([type="range"]):not([type="radio"]):not([type="c
     rotate: 4deg;
   }
 }
+
+/* Terpen-Band zwischen Hero und Story (Nutzer 2026-09-30, TerpenBand.tsx): läuft
+   endlos nach links, die doppelte Liste macht den Lauf nahtlos. Hover und
+   Tastaturfokus halten es an. Reduzierte Bewegung und Sparmodus: die Icons
+   stehen umbrochen und zentriert, die stumme Kopie entfällt. */
+.terpen-band-spur > [aria-hidden] {
+  display: none;
+}
+
+.terpen-band-spur,
+.terpen-band-liste {
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  :root:not([data-sparmodus]) .terpen-band-spur {
+    flex-wrap: nowrap;
+    width: max-content;
+    animation: terpen-band 60s linear infinite;
+  }
+
+  :root:not([data-sparmodus]) .terpen-band-liste {
+    flex-wrap: nowrap;
+  }
+
+  :root:not([data-sparmodus]) .terpen-band-spur > [aria-hidden] {
+    display: flex;
+  }
+
+  .terpen-band:hover .terpen-band-spur,
+  .terpen-band:focus-within .terpen-band-spur {
+    animation-play-state: paused;
+  }
+}
+
+@keyframes terpen-band {
+  to {
+    translate: -50% 0;
+  }
+}

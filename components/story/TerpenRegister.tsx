@@ -17,7 +17,7 @@ type Stofftext = { duft: string; vorkommen: string };
  * Texte und Anteile, damit die Client-Insel kein Wörterbuch braucht. Terpene
  * ohne eigenen Text zeigen im Deutschen das Aromaprofil aus der Datenbank.
  */
-function baueAnsicht(katalog: readonly RegisterKatalogTerpen[], w: Woerterbuch, sprache: Sprache): RegisterAnsicht {
+export function baueAnsicht(katalog: readonly RegisterKatalogTerpen[], w: Woerterbuch, sprache: Sprache): RegisterAnsicht {
   const texte = w.start.register;
   const stoffe = texte.stoffe as Record<string, Stofftext | undefined>;
   const saetze = w.aroma.satz as Record<string, string | undefined>;
