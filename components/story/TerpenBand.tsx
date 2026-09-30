@@ -15,6 +15,9 @@ import { sicher } from "@/lib/sicher";
  * Lauf nahtlos ist; die zweite ist für Screenreader und Tastatur stumm.
  * Bewegung allein per CSS (globals.css, .terpen-band); bei reduzierter
  * Bewegung und im Sparmodus stehen die Icons umbrochen.
+ * Optik wie eine Randleiste im Buch: 24-px-Icons gedämpft in text-muted, erst
+ * bei Hover oder Fokus in text; Trefferfläche bleibt 44 px. Bandhöhe 78 px
+ * (py-4, 44 px Fläche, Haarlinien), das Skelett steht mit h-20 auf dem Raster.
  */
 async function Inhalt() {
   const [katalog, w, sprache] = await Promise.all([
@@ -27,15 +30,15 @@ async function Inhalt() {
   const texte = w.start.register;
 
   const liste = (stumm: boolean) => (
-    <ul aria-hidden={stumm || undefined} className="terpen-band-liste flex shrink-0 items-center gap-12 pr-12 sm:gap-16 sm:pr-16">
+    <ul aria-hidden={stumm || undefined} className="terpen-band-liste flex shrink-0 items-center gap-8 pr-8 sm:gap-12 sm:pr-12">
       {terpene.map((terpen) => (
         <li key={terpen.anker} className="group relative">
           <span
             tabIndex={stumm ? undefined : 0}
             aria-describedby={stumm ? undefined : `band-${terpen.anker}`}
-            className="grid size-14 place-items-center rounded-full text-text transition-colors duration-fast ease-standard group-hover:text-accent focus-visible:text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+            className="grid size-11 place-items-center rounded-full text-text-muted transition-colors duration-fast ease-standard group-hover:text-text focus-visible:text-text focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
           >
-            <TerpenIcon name={terpen.icon} className="size-10" />
+            <TerpenIcon name={terpen.icon} className="size-6" />
             <span className="sr-only">{terpen.name}</span>
           </span>
           <span
@@ -79,7 +82,7 @@ async function Inhalt() {
   );
 
   return (
-    <section aria-label={texte.terpene} className="terpen-band relative z-20 overflow-x-clip border-y border-border bg-surface py-6">
+    <section aria-label={texte.terpene} className="terpen-band relative z-20 overflow-x-clip border-y border-border bg-surface py-4">
       <div className="terpen-band-spur flex">
         {liste(false)}
         {liste(true)}
@@ -90,7 +93,7 @@ async function Inhalt() {
 
 export function TerpenBand() {
   return (
-    <Suspense fallback={<div className="h-26 border-y border-border bg-surface" data-skelett="" />}>
+    <Suspense fallback={<div className="h-20 border-y border-border bg-surface" data-skelett="" />}>
       <Inhalt />
     </Suspense>
   );
