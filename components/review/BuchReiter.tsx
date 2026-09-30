@@ -1,19 +1,29 @@
 "use client";
 
-import { useEffect, useId, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useId, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
 
 import { cn } from "@/lib/cn";
 
 export type BuchReiterEintrag = {
   schluessel: string;
   titel: string;
+  inhalt: ReactNode;
   /**
-   * Inhalt der Tafel. Als Funktion setzt die Tafel die Reiterleiste selbst
-   * (die Aroma-Karte stellt sie in ihre Kopfzeile neben Karte/Netz und spart so
-   * eine Zeile); sonst steht die Leiste über dem Inhalt.
+   * Die Tafel setzt die Reiterleiste selbst über `<ReiterLeiste />` (die
+   * Aroma-Karte stellt sie in ihre Kopfzeile neben Karte/Netz und spart so eine
+   * Zeile); sonst steht die Leiste über dem Inhalt. Kein Render-Prop: die
+   * Einträge kommen aus einer Server-Komponente, Funktionen überqueren die
+   * Grenze nicht.
    */
-  inhalt: ReactNode | ((leiste: ReactNode) => ReactNode);
+  eigeneLeiste?: boolean;
 };
+
+const LeisteKontext = createContext<ReactNode>(null);
+
+/** Platzhalter für die Reiterleiste in einer Tafel mit `eigeneLeiste`. */
+export function ReiterLeiste() {
+  return <>{useContext(LeisteKontext)}</>;
+}
 
 /**
  * Die Werte der rechten Buchseite als Reiter (T7b, Nutzer 2026-09-30): ab lg
@@ -95,7 +105,7 @@ export function BuchReiter({ bezeichnung, reiter }: { bezeichnung: string; reite
     <div className="flex min-h-0 flex-1 flex-col gap-8">
       {reiter.map((eintrag, i) => {
         const offen = i === index;
-        const eigeneLeiste = typeof eintrag.inhalt === "function";
+        const eigeneLeiste = eintrag.eigeneLeiste === true;
         return (
           <div
             key={eintrag.schluessel}
@@ -106,7 +116,11 @@ export function BuchReiter({ bezeichnung, reiter }: { bezeichnung: string; reite
             className={cn("flex min-h-0 flex-col gap-4", offen ? "lg:flex-1" : "lg:hidden")}
           >
             {offen && !eigeneLeiste ? leiste : null}
-            {typeof eintrag.inhalt === "function" ? eintrag.inhalt(offen ? leiste : null) : eintrag.inhalt}
+            {eigeneLeiste ? (
+              <LeisteKontext.Provider value={offen ? leiste : null}>{eintrag.inhalt}</LeisteKontext.Provider>
+            ) : (
+              eintrag.inhalt
+            )}
           </div>
         );
       })}

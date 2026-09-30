@@ -282,3 +282,20 @@ test("Buchfalz ab lg: je Seite ein leiser Verlauf von 2rem an der Mitte, die Sei
   // Die Seiten haben ab sm 3rem Innenabstand: der Falz (2rem) reicht nicht unter Bild oder Text.
   assert.equal(html.match(/relative flex min-w-0 flex-col gap-8 bg-surface-raised p-6 sm:p-12/g)?.length, 2);
 });
+
+test("Buch-Reiter bekommen nur serialisierbare Props (Server→Client, sonst Fehlerseite live)", async () => {
+  const { BuchReiter } = await import("@/components/review/BuchReiter");
+  const baum = Doppelseite({ eintrag: eintrag({ beschaffenheit: { dichte: 3 } as EintragDaten["beschaffenheit"] }), umfang: "voll", ueberschrift: "h3", w: de, sprache: "de" });
+  const funde: unknown[] = [];
+  const suche = (knoten: unknown): void => {
+    if (Array.isArray(knoten)) return knoten.forEach(suche);
+    if (!knoten || typeof knoten !== "object" || !("props" in knoten)) return;
+    const el = knoten as { type: unknown; props: Record<string, unknown> };
+    if (el.type === BuchReiter) funde.push(el.props);
+    suche(el.props.children);
+  };
+  suche(baum);
+  assert.equal(funde.length, 1, "genau ein BuchReiter im Baum");
+  const reiter = (funde[0] as { reiter: { schluessel: string; inhalt: unknown }[] }).reiter;
+  for (const r of reiter) assert.notEqual(typeof r.inhalt, "function", `Reiter ${r.schluessel} reicht eine Funktion`);
+});

@@ -6,7 +6,7 @@ import { AromaKarte, type AromaSerie } from "@/components/review/AromaKarte";
 import { BeschaffenheitsLeiste } from "@/components/review/BeschaffenheitsLeiste";
 import { BlattAnzeige } from "@/components/review/BlattAnzeige";
 import { BuchNotiz } from "@/components/review/BuchNotiz";
-import { BuchReiter, type BuchReiterEintrag } from "@/components/review/BuchReiter";
+import { BuchReiter, ReiterLeiste, type BuchReiterEintrag } from "@/components/review/BuchReiter";
 import { NurAufgeschlagen } from "@/components/review/NurAufgeschlagen";
 import { KartenBild } from "@/components/review/SortenKopf";
 import { herstellerProfil } from "@/lib/aromakarte";
@@ -162,7 +162,7 @@ export function Doppelseite({ eintrag, umfang, ueberschrift: Ueberschrift, story
     <AromaKarte terpene={eintrag.terpene} serien={aromaSerien(eintrag, w)} texte={texte} kompakt={voll} kopf={kopf} />
   );
   // Sweet Spot entfällt im Buch (Nutzer 2026-09-30: „Sweetspot raus bei den terpenen“).
-  const reiter: BuchReiterEintrag[] = [{ schluessel: "karte", titel: w.buch.reiterKarte, inhalt: karte }];
+  const reiter: BuchReiterEintrag[] = [{ schluessel: "karte", titel: w.buch.reiterKarte, inhalt: karte(<ReiterLeiste />), eigeneLeiste: true }];
   if (Object.keys(eintrag.beschaffenheit).length > 0) {
     reiter.push({
       schluessel: "beschaffenheit",
