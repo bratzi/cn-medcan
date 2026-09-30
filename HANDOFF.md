@@ -3,7 +3,7 @@
 > Übergabemedium zwischen Sessions. Wird nach jedem Arbeitsblock aktualisiert und committet.
 > Wer hier weiterarbeitet, liest diese Datei zuerst und braucht den Chatverlauf nicht.
 
-**Letzte Aktualisierung:** 2026-09-30 vormittags (Session 32, Sicherung zum Clear)
+**Letzte Aktualisierung:** 2026-09-30 mittags (Session 33)
 **Repo:** https://github.com/bratzi/cn-medcan (public)
 **Branch:** `main` (Makeover „Grünes Buch“ Teilprojekt 1 ist seit 2026-09-24 auf `main`)
 
@@ -27,6 +27,19 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 ---
 
 ## ⇢ Hier geht es weiter
+
+### ⇢ SESSION 33 (2026-09-30 mittags): T7b, T15, T13, T14, T12 fertig und gepusht (`00baffc`)
+
+**Stand:** Alle fünf reviewt (sauber), nach main übernommen, `npm test` 477/477, tsc sauber, gepusht. Live NOCH NICHT
+geprüft (Prüflisten `task-7b/12/13/14-report.md` im Ledger-Ordner; T15 Kopf-Kontrast hell/dunkel; T12 gefilterter
+`_count` gegen D1; T13 Bong-Optik).
+- **T14 Impressum:** Betreiberdaten aus Secret `IMPRESSUM_JSON` (Nutzer setzt selbst:
+  `npx.cmd wrangler secret put IMPRESSUM_JSON`, eine Zeile JSON mit name, strasse, ort, land, email, telefon ohne
+  „(0)“, bundesland). Ohne Secret: sichtbare Platzhalter, kein 500. Privatperson, verantwortlich = Betreiber,
+  Cloudflare über DPF + DPA.
+- **Offen:** T5d (Brief `task-5d-brief.md`, im Hauptbaum), danach Final-Review (opus, Minors aus Ledger),
+  Live-Prüfung, Worktrees C:\cn-t12 / C:\cn-t13 kann der Nutzer entfernen (`git worktree remove`).
+- Caveman-Modus bei Sessionstart laden (Memory `caveman-immer`).
 
 ### ⇢ SESSION 32 (2026-09-30 vormittags): T11+T5c live, T7b/T15 auf WIP-Branches, Sicherung zum Clear
 
