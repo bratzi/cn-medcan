@@ -216,3 +216,35 @@ von dir ergänzt.“ / en sinngemäß).
 - Tests zum TerpenRegler (`tests/aroma-ebenen.test.ts`) auf die Karten-Regler umschreiben:
   Maske rendert je Terpen einen Range-Input im Terpen-fieldset; Anzeige ohne Maske rendert keinen;
   `kartenHoeheMitReglern` (z. B. 3 Einträge → Mindesthöhe, 30 Einträge → 48 + 48 + 29·44 = 1372).
+
+---
+
+## Task 4: Register-Beschreibung im Violett-Glas-Look
+
+**Dateien:** `components/story/RegisterAuswahl.tsx` (Komponente `Tafel`), `app/globals.css`.
+
+Nutzer 2026-09-30: „Die Box in ‚Terpene und ihre Geschmäcker‘ bitte mehr im Violett-Glas-Look wie
+bei den Elementen hinter den Videos des Storytellings.“
+
+Heute ist die Tafel in der Mitte des Registers (`<article data-register-tafel>`) schlicht
+`bg-surface px-4 py-8 sm:px-10` und deckt die Linien darunter ab. Vorbild ist die Glasmaske hinter
+den Story-Videos: `app/globals.css`, Abschnitt „Glasmaske“ (`.glas-maske`, `.glas-lila` mit
+`--glas: var(--color-kopierstift)`; getönter Verlauf `linear-gradient(160deg, …42 %…, …14 %…)`,
+Innenschatten, weicher farbiger Außenschatten), genutzt in `components/medien/GlasMaske.tsx` und
+`components/story/TransparentMachen.tsx`.
+
+Ziel:
+- Neue Klasse (z. B. `.glas-tafel` in `app/globals.css`, neben der Glasmaske), die denselben
+  Violett-Glas-Look als rechteckige Tafel liefert: gleicher Verlauf und dieselben Schatten mit
+  `--glas: var(--color-kopierstift)`, abgerundete Ecken (`rounded-lg`-Token), dazu
+  `backdrop-filter: blur(…)` damit die Linien dahinter weich durchscheinen statt hart verdeckt.
+  **Ohne** die Blob-Form und **ohne** das Schwingen (keine Animation).
+- Lesbarkeit: Texte der Tafel müssen in hell und dunkel mindestens WCAG AA erreichen; falls der
+  Verlauf allein zu durchsichtig ist, eine Papier-Grundschicht darunter legen
+  (`color-mix(in oklab, var(--color-surface) …%, transparent)`).
+- Ohne Unterstützung für `backdrop-filter` bleibt die Tafel lesbar (Fallback mit höherer Deckkraft).
+- Die Tafel hebt sich weiterhin über die Linien (`isolate`/z-Ebene wie heute).
+- Sonst an Register-Layout, Linien und Einträgen nichts ändern.
+
+Test: bestehende Tests grün; ein kleiner Test, dass die Tafel die neue Klasse trägt und
+`globals.css` die Klasse mit `--color-kopierstift` definiert.
