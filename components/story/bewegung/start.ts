@@ -109,6 +109,22 @@ export async function starteBuehne(): Promise<() => void> {
     if (!beendet) neuMessen();
   });
   window.addEventListener("load", neuMessen);
+  // Wächst oder schrumpft der Inhalt später (Buch blättert, Karten, Bilder laden nach),
+  // stimmen die Pin-Abstände nicht mehr, und man kommt nicht bis ganz nach unten
+  // (Nutzer 2026-09-30). Entprellt neu messen; eigene Refreshs lösen keinen weiteren aus.
+  let hoehe = document.body.scrollHeight;
+  let hoeheZeit = 0;
+  const hoeheBeobachter = new ResizeObserver(() => {
+    window.clearTimeout(hoeheZeit);
+    hoeheZeit = window.setTimeout(() => {
+      const neu = document.body.scrollHeight;
+      if (beendet || Math.abs(neu - hoehe) < 2) return;
+      ScrollTrigger.refresh();
+      lenis?.resize();
+      hoehe = document.body.scrollHeight;
+    }, 250);
+  });
+  hoeheBeobachter.observe(document.body);
   const loops = beobachteLoops();
   // Video-Blobs im Storytelling folgen dem Zeiger und bewegen sich sonst selbst (siehe punkte.ts).
   const punkteStopp = beobachtePunkte();
@@ -122,6 +138,8 @@ export async function starteBuehne(): Promise<() => void> {
     punkteStopp();
     ruheStopp();
     window.removeEventListener("load", neuMessen);
+    hoeheBeobachter.disconnect();
+    window.clearTimeout(hoeheZeit);
     for (const aufraeumen of aufraeumer.splice(0)) aufraeumen();
     mm.revert();
     ctx.revert();

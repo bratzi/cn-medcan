@@ -972,6 +972,21 @@ html.joint-cursor :is(input:not([type="range"]):not([type="radio"]):not([type="c
   -webkit-backdrop-filter: blur(12px) saturate(1.2);
 }
 
+/* Hell-Modus: schon oben im Hero ein Streifen Papier, nicht erst beim Scrollen
+   (Nutzer 2026-09-30: wirkte über dem hellen Hero transparent). KopfZustand
+   setzt dort keine dunklen Bühnen-Tokens mehr. */
+:root[data-theme="light"] .kopf {
+  background: color-mix(in oklab, var(--color-surface) 94%, transparent);
+  border-bottom-color: var(--color-border);
+}
+
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) .kopf {
+    background: color-mix(in oklab, var(--color-surface) 94%, transparent);
+    border-bottom-color: var(--color-border);
+  }
+}
+
 /* Kapitel-Nummer von Hand, im Verlauf. */
 .kapitel-nummer {
   background-image: linear-gradient(90deg, var(--color-accent), var(--color-kopierstift));

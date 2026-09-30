@@ -30,7 +30,11 @@ export function KopfZustand() {
       // liegt sie schon unter dem Kopf, schwebt er über Papier, nicht über der Bühne.
       const seite = document.querySelector<HTMLElement>("[data-umschlag-seite]");
       const seiteDarueber = !!seite && seite.getBoundingClientRect().top <= kopfH;
-      const ueberBuehne = !!buehne && buehne.getBoundingClientRect().bottom > kopfH && !seiteDarueber;
+      // Hell-Modus: der Kopf ist von Anfang an Papier (globals.css), auch über dem hellen
+      // Hero; die dunklen Bühnen-Tokens nur im dunklen Thema (Nutzer 2026-09-30).
+      const thema = wurzel.dataset.theme;
+      const dunkel = thema === "dark" || (thema !== "light" && window.matchMedia("(prefers-color-scheme: dark)").matches);
+      const ueberBuehne = dunkel && !!buehne && buehne.getBoundingClientRect().bottom > kopfH && !seiteDarueber;
       // Auch gescrollt dunkel, solange die Bühne unter dem Kopf liegt: sonst stünde im
       // Hell-Modus ein heller Papierstreifen über dem schwarzen Film.
       kopf.classList.toggle("buehne-dunkel", ueberBuehne);
