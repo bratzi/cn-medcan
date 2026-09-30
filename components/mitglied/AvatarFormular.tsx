@@ -44,38 +44,48 @@ export function AvatarFormular({ name, avatarId, texte, meldungen }: Props) {
     setFehler(null);
     setStatus(null);
 
-    const klein = await bildVerkleinern(datei, { seite: AVATAR_SEITE, maxBytes: AVATAR_MAX_BYTES });
-    if (!klein.ok) {
+    // Wirft etwas (Netz, Worker-Limit), duerfen die Knoepfe nicht gesperrt bleiben.
+    try {
+      const klein = await bildVerkleinern(datei, { seite: AVATAR_SEITE, maxBytes: AVATAR_MAX_BYTES });
+      if (!klein.ok) {
+        melden(klein.fehler);
+        return;
+      }
+      const daten = new FormData();
+      daten.set("bild", new File([klein.blob], "avatar.webp", { type: "image/webp" }));
+      const ergebnis = await avatarSpeichern(daten);
+      if (!ergebnis.ok) {
+        setFehler(ergebnis.fehler);
+        return;
+      }
+      setStatus(texte.gespeichert);
+      zaehlerZuruecksetzen();
+      router.refresh();
+    } catch {
+      setFehler(texte.unterbrochen);
+    } finally {
       setLaeuft(false);
-      melden(klein.fehler);
-      return;
     }
-    const daten = new FormData();
-    daten.set("bild", new File([klein.blob], "avatar.webp", { type: "image/webp" }));
-    const ergebnis = await avatarSpeichern(daten);
-    setLaeuft(false);
-    if (!ergebnis.ok) {
-      setFehler(ergebnis.fehler);
-      return;
-    }
-    setStatus(texte.gespeichert);
-    zaehlerZuruecksetzen();
-    router.refresh();
   }
 
   async function entfernen() {
     setLaeuft(true);
     setFehler(null);
     setStatus(null);
-    const ergebnis = await avatarEntfernen();
-    setLaeuft(false);
-    if (!ergebnis.ok) {
-      setFehler(ergebnis.fehler);
-      return;
+    try {
+      const ergebnis = await avatarEntfernen();
+      if (!ergebnis.ok) {
+        setFehler(ergebnis.fehler);
+        return;
+      }
+      setStatus(texte.entfernt);
+      zaehlerZuruecksetzen();
+      router.refresh();
+    } catch {
+      setFehler(texte.unterbrochen);
+    } finally {
+      setLaeuft(false);
     }
-    setStatus(texte.entfernt);
-    zaehlerZuruecksetzen();
-    router.refresh();
   }
 
   return (

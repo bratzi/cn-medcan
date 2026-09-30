@@ -769,6 +769,7 @@ export const en: Woerterbuch = {
       gespeichert: "Profile picture saved.",
       entfernt: "Profile picture removed.",
       fehler: "Error:",
+      unterbrochen: "That did not work. Check your connection and try again.",
       ohneBild: "No profile picture yet, your initials are shown.",
     },
   },

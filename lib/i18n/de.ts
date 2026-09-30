@@ -776,6 +776,7 @@ export const de = {
       gespeichert: "Profilbild gespeichert.",
       entfernt: "Profilbild entfernt.",
       fehler: "Fehler:",
+      unterbrochen: "Das hat nicht geklappt. Prüfe die Verbindung und versuch es noch einmal.",
       ohneBild: "Noch kein Profilbild, es erscheinen deine Initialen.",
     },
   },
