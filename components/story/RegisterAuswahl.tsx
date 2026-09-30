@@ -126,7 +126,7 @@ function Tafel({
       tabIndex={-1}
       data-register-tafel=""
       data-aktiv={aktiv ? "" : undefined}
-      className="bg-surface px-4 py-8 sm:px-10"
+      className="glas-tafel px-4 py-8 sm:px-10"
     >
       <p data-register-zeile="" className="text-small text-text-muted">
         {art}
@@ -261,7 +261,7 @@ export function RegisterAuswahl({ ansicht, start, texte }: { ansicht: RegisterAn
     <div ref={flaeche} className="register-raster relative isolate mt-16 grid gap-12 md:gap-16">
       {/* Linien vom Terpen hinunter zum Geschmack (Nutzer 2026-09-30): dieselben Bögen und derselbe
           Lichtfluss wie in der Aroma-Karte, in der Farbe der Geschmacksrichtung. Die Beschreibung in
-          der Mitte liegt auf Papier darüber und deckt sie ab. */}
+          der Mitte liegt als Violett-Glas (.glas-tafel) darüber: die Linien scheinen weich durch. */}
       {groesse ? (
         <svg
           aria-hidden="true"
