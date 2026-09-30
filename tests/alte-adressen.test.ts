@@ -59,7 +59,7 @@ test("nur die alten Adressen werden umgeleitet", () => {
   assert.equal(weiterleiten("/blueten/nebelharz-22"), null);
   assert.equal(weiterleiten("/produkte-archiv"), null);
   assert.equal(weiterleiten("/produkte/a/b"), null);
-  });
+});
 
 test("Ziel existiert als Route, die alte Route ist weg, next.config nutzt die Regeln", () => {
   const wurzel = process.cwd();
