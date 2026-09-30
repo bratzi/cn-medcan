@@ -89,6 +89,7 @@ export function BlueteVorschlagFormular({ terpene, nameVorbelegt, texte, typen, 
       if (ergebnis.ok) {
         formular.reset();
         setBilder([]);
+        setBildFehler([]);
         router.refresh();
       }
     } catch {

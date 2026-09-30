@@ -7,7 +7,7 @@ import { getPrisma } from "@/lib/prisma";
 import { istEindeutigkeitsfehler } from "@/lib/prisma-fehler";
 import { blueteVorhanden, terpenNamen } from "@/lib/query/vorschlaege";
 import { MAX_OFFENE_VORSCHLAEGE, blueteVorschlagPruefen } from "@/lib/vorschlag-eingabe";
-import { vorschlagBilderPruefen } from "@/lib/vorschlag-bilder";
+import { bilderZugelassen, vorschlagBilderPruefen } from "@/lib/vorschlag-bilder";
 import { holeWoerterbuch } from "@/lib/i18n";
 import { meldungText } from "@/lib/i18n/text";
 
@@ -37,6 +37,8 @@ export async function blueteVorschlagen(formData: FormData): Promise<VorschlagEr
   // Bilder (freiwillig): der Server prueft sie erneut, der Browser hat nur verkleinert.
   const bilder = await vorschlagBilderPruefen(formData.getAll("bild"));
   if (!bilder.ok) return { ok: false, fehler: meldungText(wb, bilder.fehler) };
+  const gesperrt = bilderZugelassen(bilder.wert.length, mitglied.freigegeben);
+  if (gesperrt) return { ok: false, fehler: meldungText(wb, gesperrt) };
 
   // Eine inaktive Bluete steht nicht im Katalog: kein Link ins Leere, der
   // Vorschlag geht durch, und die Freigabe schaltet sie wieder an.

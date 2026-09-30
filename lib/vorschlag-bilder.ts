@@ -7,6 +7,7 @@
  */
 import { bildPruefen } from "@/lib/bild-pruefen";
 import { BUDPIC_MAX_BYTES, BUDPIC_MAX_KANTE } from "@/lib/budpics";
+import type { Meldung } from "@/lib/i18n/typen";
 import type { PruefMeldung } from "@/lib/vorschlag-eingabe";
 
 /** Bilder je Vorschlag; bei 5 offenen Vorschlaegen ergibt das hoechstens 15 Zeilen je Mitglied. */
@@ -32,4 +33,9 @@ export async function vorschlagBilderPruefen(roh: readonly unknown[]): Promise<P
     bilder.push({ daten, breite: e.breite, hoehe: e.hoehe });
   }
   return { ok: true, wert: bilder };
+}
+
+/** Bilder duerfen nur freigegebene Mitglieder beitragen (wie bei den Budpics); Vorschlaege ohne Bild bleiben fuer alle offen. */
+export function bilderZugelassen(anzahl: number, freigegeben: boolean): Meldung | null {
+  return anzahl > 0 && !freigegeben ? { schluessel: "budpic.nurFreigeschaltet" } : null;
 }

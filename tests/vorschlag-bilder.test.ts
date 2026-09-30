@@ -2,7 +2,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 
 import { BUDPIC_MAX_BYTES } from "@/lib/budpics";
-import { VORSCHLAG_MAX_BILDER, vorschlagBilderPruefen } from "@/lib/vorschlag-bilder";
+import { VORSCHLAG_MAX_BILDER, bilderZugelassen, vorschlagBilderPruefen } from "@/lib/vorschlag-bilder";
 
 function webp(breite: number, hoehe: number, laenge = 64): Uint8Array {
   const b = new Uint8Array(laenge);
@@ -50,4 +50,10 @@ test("Nicht-Bild und zu grosse Datei werden vom Server abgelehnt", async () => {
   assert.deepEqual(gross, { ok: false, fehler: { schluessel: "bild.zuGross", parameter: { max: BUDPIC_MAX_BYTES / 1024 } } });
   const breit = await vorschlagBilderPruefen([datei(webp(1281, 100))]);
   assert.equal(breit.ok, false);
+});
+
+test("Bilder nur von freigegebenen Mitgliedern; ohne Bild darf jedes Mitglied vorschlagen", () => {
+  assert.equal(bilderZugelassen(0, false), null);
+  assert.equal(bilderZugelassen(2, true), null);
+  assert.deepEqual(bilderZugelassen(1, false), { schluessel: "budpic.nurFreigeschaltet" });
 });
