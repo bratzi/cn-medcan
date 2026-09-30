@@ -4,6 +4,8 @@ import { Suspense } from "react";
 
 import { AktiveFilter } from "@/components/produkt/AktiveFilter";
 import { FilterLeiste } from "@/components/produkt/FilterLeiste";
+import { alsDiashow } from "@/lib/budpic-anzeige";
+import { budpicZugang, ladeFreieBudpics } from "@/lib/query/budpics";
 import { ProduktCard } from "@/components/produkt/ProduktCard";
 import { EmptyState, Spinner, buttonKlassen, textLinkKlassen } from "@/components/ui";
 import { parseStrainFilter, serialisiereFilter } from "@/lib/query/filter";
@@ -69,10 +71,13 @@ async function Ergebnisbereich({ filter, w, sprache }: { filter: StrainFilter; w
   const texte = w.katalog;
   const fachkreis = await istFachkreis();
   // Zwei parallele Abfragen: Liste und Facetten blockieren sich nicht.
-  const [liste, facetten] = await Promise.all([
+  const [liste, facetten, zugang] = await Promise.all([
     ladeStrainListe(filter, fachkreis),
     ladeFilterFacetten(fachkreis),
+    budpicZugang(),
   ]);
+  // Budpics (T9): eine Abfrage fuer alle Karten der Seite, danach je Sorte gezeigt.
+  const budpics = await ladeFreieBudpics(liste.eintraege.map((e) => e.id));
 
   const apothekenNamen = new Map(
     facetten.apotheken.map((apotheke) => [apotheke.slug, apotheke.name]),
@@ -119,7 +124,14 @@ async function Ergebnisbereich({ filter, w, sprache }: { filter: StrainFilter; w
           <ul className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
             {liste.eintraege.map((strain) => (
               <li key={strain.id} className="flex">
-                <ProduktCard strain={strain} w={w} sprache={sprache} className="w-full" />
+                <ProduktCard
+                  strain={strain}
+                  w={w}
+                  sprache={sprache}
+                  className="w-full"
+                  budpics={alsDiashow(budpics.get(strain.id) ?? [], w, sprache)}
+                  zugang={zugang}
+                />
               </li>
             ))}
           </ul>

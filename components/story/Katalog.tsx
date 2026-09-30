@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { Suspense } from "react";
 
+import { alsDiashow } from "@/lib/budpic-anzeige";
+import { budpicZugang, ladeFreieBudpics } from "@/lib/query/budpics";
 import { ProduktCard } from "@/components/produkt/ProduktCard";
 import { KatalogSkelett } from "@/components/story/Skelette";
 import { EmptyState, buttonKlassen } from "@/components/ui";
@@ -36,6 +38,11 @@ async function Reihe() {
   }
   // Bewusst in TypeScript zugeschnitten statt mit einer eigenen Abfrage.
   const eintraege = liste.eintraege.slice(0, ANZAHL);
+  // Budpics (T9): fehlt die Abfrage, bleiben die Karten mit Musterbild stehen.
+  const [budpics, zugang] = await Promise.all([
+    sicher(() => ladeFreieBudpics(eintraege.map((e) => e.id)), new Map(), "Katalog-Budpics"),
+    sicher(() => budpicZugang(), "gast" as const, "Katalog-Zugang"),
+  ]);
 
   if (eintraege.length === 0) {
     return (
@@ -55,7 +62,14 @@ async function Reihe() {
     >
       {eintraege.map((strain) => (
         <li key={strain.id} className="flex w-72 shrink-0 snap-start sm:w-88">
-          <ProduktCard strain={strain} w={w} sprache={sprache} className="w-full" />
+          <ProduktCard
+            strain={strain}
+            w={w}
+            sprache={sprache}
+            className="w-full"
+            budpics={alsDiashow(budpics.get(strain.id) ?? [], w, sprache)}
+            zugang={zugang}
+          />
         </li>
       ))}
     </ul>

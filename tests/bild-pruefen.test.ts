@@ -4,9 +4,10 @@ import assert from "node:assert/strict";
 import { bildPruefen, bildTyp } from "@/lib/bild-pruefen";
 
 /** Kleinste gueltige Kopfzeilen; die Pruefung liest nur Kennung und Masse. */
-function webpLossy(breite: number, hoehe: number, laenge = 64): Uint8Array {
+function webpLossy(breite: number, hoehe: number, laenge = 64, riffLaenge = laenge - 8): Uint8Array {
   const b = new Uint8Array(laenge);
   b.set([0x52, 0x49, 0x46, 0x46], 0); // RIFF
+  new DataView(b.buffer).setUint32(4, riffLaenge, true);
   b.set([0x57, 0x45, 0x42, 0x50], 8); // WEBP
   b.set([0x56, 0x50, 0x38, 0x20], 12); // "VP8 "
   b.set([0x9d, 0x01, 0x2a], 23);
@@ -68,4 +69,22 @@ test("falsche Masse werden abgelehnt", () => {
 test("PNG ist nur zugelassen, wenn der Aufrufer es erlaubt", () => {
   const erg = bildPruefen(png(64, 32), { maxBytes: 1024, erlaubt: ["webp", "png"] });
   assert.deepEqual(erg, { ok: true, typ: "png", breite: 64, hoehe: 32 });
+});
+
+test("stimmt die RIFF-Laenge nicht mit der Dateilaenge, ist das Bild abgeschnitten oder gefaelscht", () => {
+  for (const riff of [10, 1000]) {
+    const erg = bildPruefen(webpLossy(128, 128, 64, riff), { maxBytes: 1024 });
+    assert.equal(erg.ok, false, `RIFF-Laenge ${riff}`);
+    if (!erg.ok) assert.equal(erg.fehler.schluessel, "bild.keinBild");
+  }
+});
+
+test("hoechstens-Masse: 1280 x 960 ist erlaubt, 1281 breit oder 1281 hoch nicht", () => {
+  const opt = { maxBytes: 150 * 1024, maxBreite: 1280, maxHoehe: 1280 };
+  assert.equal(bildPruefen(webpLossy(1280, 960), opt).ok, true);
+  for (const [b, h] of [[1281, 100], [100, 1281]]) {
+    const erg = bildPruefen(webpLossy(b, h), opt);
+    assert.equal(erg.ok, false);
+    if (!erg.ok) assert.equal(erg.fehler.schluessel, "bild.masse");
+  }
 });

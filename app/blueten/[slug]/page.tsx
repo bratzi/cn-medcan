@@ -8,6 +8,9 @@ import { CannabinoidBar } from "@/components/produkt/CannabinoidBar";
 import { TerpenChips } from "@/components/produkt/TerpenChips";
 import { Titelblatt } from "@/components/produkt/Titelblatt";
 import { blueteBild } from "@/lib/medien";
+import { alsDiashow } from "@/lib/budpic-anzeige";
+import { musterBildId } from "@/lib/budpics";
+import { ladeFreieBudpics } from "@/lib/query/budpics";
 import { Aufklaerung } from "@/components/review/Aufklaerung";
 import { AromaErkundung } from "@/components/review/AromaErkundung";
 import { BewertungsFormular } from "@/components/review/BewertungsFormular";
@@ -166,6 +169,7 @@ async function ProduktInhalt({ slug, w, sprache }: { slug: string; w: Woerterbuc
     aktuellesMitglied(),
   ]);
   if (!strain) notFound();
+  const budpics = (await ladeFreieBudpics([strain.id])).get(strain.id) ?? [];
 
   const { eigene, community, meineNote } = teileBewertungen(strain.reviews);
   const neuesteEigene = eigene[0];
@@ -190,7 +194,13 @@ async function ProduktInhalt({ slug, w, sprache }: { slug: string; w: Woerterbuc
         thcMax={strain.thcMaxProzent}
         cbdMin={strain.cbdMinProzent}
         cbdMax={strain.cbdMaxProzent}
-        bild={blueteBild(strain.herstellerBildPfad)}
+        bild={blueteBild(strain.herstellerBildPfad) ?? musterBildId(strain.slug)}
+        budpic={{
+          strainId: strain.id,
+          slug: strain.slug,
+          bilder: alsDiashow(budpics, w, sprache),
+          zugang: !mitglied ? "gast" : mitglied.freigegeben ? "freigegeben" : "mitglied",
+        }}
         w={w}
         sprache={sprache}
         meineBewertung={

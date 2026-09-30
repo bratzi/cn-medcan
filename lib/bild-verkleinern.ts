@@ -4,6 +4,7 @@
  * Browser aufrufen. Der Server prueft das Ergebnis trotzdem erneut
  * (lib/bild-pruefen.ts): dieser Schritt spart nur Uebertragung und Speicher.
  */
+import { skalierteMasse } from "@/lib/budpics";
 import type { Meldung } from "@/lib/i18n/typen";
 
 /** Groesser lesen wir nichts ein (Kameradateien); ein 12-MB-Foto wird abgelehnt. */
@@ -33,15 +34,27 @@ export function eingabeDateiPruefen(datei: { type: string; size: number }): Meld
   return null;
 }
 
-export type VerkleinernErgebnis = { ok: true; blob: Blob } | { ok: false; fehler: Meldung };
+export type VerkleinernErgebnis = { ok: true; blob: Blob; breite: number; hoehe: number } | { ok: false; fehler: Meldung };
+
+/** Kodiert die Zeichenflaeche als WebP; die Qualitaet sinkt, bis das Ergebnis hoechstens `maxBytes` hat. */
+async function alsWebp(canvas: HTMLCanvasElement, maxBytes: number): Promise<{ ok: true; blob: Blob } | { ok: false; fehler: Meldung }> {
+  for (const qualitaet of qualitaetsStufen()) {
+    const blob = await new Promise<Blob | null>((fertig) => canvas.toBlob(fertig, "image/webp", qualitaet));
+    // Ein Browser ohne WebP-Kodierer liefert PNG; das lehnen wir hier schon ab.
+    if (!blob || blob.type !== "image/webp") return { ok: false, fehler: { schluessel: "bild.format" } };
+    if (blob.size <= maxBytes) return { ok: true, blob };
+  }
+  return { ok: false, fehler: { schluessel: "bild.zuGross", parameter: { max: Math.round(maxBytes / 1024) } } };
+}
 
 /**
- * Schneidet mittig quadratisch zu, skaliert auf `seite` x `seite` und kodiert
- * als WebP; die Qualitaet sinkt, bis das Ergebnis hoechstens `maxBytes` hat.
+ * Liest die Datei, zeichnet sie in eine Flaeche der Masse, die `masse` aus der
+ * Bildgroesse bestimmt, und kodiert sie.
  */
-export async function bildVerkleinern(
+async function verkleinern(
   datei: File,
-  optionen: { seite: number; maxBytes: number },
+  maxBytes: number,
+  plan: (b: number, h: number) => { breite: number; hoehe: number; ausschnitt: ZuschnittRahmen | null },
 ): Promise<VerkleinernErgebnis> {
   const vorab = eingabeDateiPruefen(datei);
   if (vorab) return { ok: false, fehler: vorab };
@@ -55,23 +68,36 @@ export async function bildVerkleinern(
   }
 
   try {
+    const p = plan(bitmap.width, bitmap.height);
     const canvas = document.createElement("canvas");
-    canvas.width = optionen.seite;
-    canvas.height = optionen.seite;
+    canvas.width = p.breite;
+    canvas.height = p.hoehe;
     const ctx = canvas.getContext("2d");
     if (!ctx) return { ok: false, fehler: { schluessel: "bild.format" } };
-    const z = zuschnitt(bitmap.width, bitmap.height);
     ctx.imageSmoothingQuality = "high";
-    ctx.drawImage(bitmap, z.x, z.y, z.seite, z.seite, 0, 0, optionen.seite, optionen.seite);
-
-    for (const qualitaet of qualitaetsStufen()) {
-      const blob = await new Promise<Blob | null>((fertig) => canvas.toBlob(fertig, "image/webp", qualitaet));
-      // Ein Browser ohne WebP-Kodierer liefert PNG; das lehnen wir hier schon ab.
-      if (!blob || blob.type !== "image/webp") return { ok: false, fehler: { schluessel: "bild.format" } };
-      if (blob.size <= optionen.maxBytes) return { ok: true, blob };
+    if (p.ausschnitt) {
+      const z = p.ausschnitt;
+      ctx.drawImage(bitmap, z.x, z.y, z.seite, z.seite, 0, 0, p.breite, p.hoehe);
+    } else {
+      ctx.drawImage(bitmap, 0, 0, p.breite, p.hoehe);
     }
-    return { ok: false, fehler: { schluessel: "bild.zuGross", parameter: { max: Math.round(optionen.maxBytes / 1024) } } };
+    const kodiert = await alsWebp(canvas, maxBytes);
+    return kodiert.ok ? { ok: true, blob: kodiert.blob, breite: p.breite, hoehe: p.hoehe } : kodiert;
   } finally {
     bitmap.close();
   }
+}
+
+/** Schneidet mittig quadratisch zu, skaliert auf `seite` x `seite` und kodiert als WebP (Avatar). */
+export function bildVerkleinern(datei: File, optionen: { seite: number; maxBytes: number }): Promise<VerkleinernErgebnis> {
+  return verkleinern(datei, optionen.maxBytes, (b, h) => ({
+    breite: optionen.seite,
+    hoehe: optionen.seite,
+    ausschnitt: zuschnitt(b, h),
+  }));
+}
+
+/** Behaelt das Seitenverhaeltnis, lange Kante hoechstens `maxKante` (Budpics), kein Zuschnitt. */
+export function bildVerkleinernFrei(datei: File, optionen: { maxKante: number; maxBytes: number }): Promise<VerkleinernErgebnis> {
+  return verkleinern(datei, optionen.maxBytes, (b, h) => ({ ...skalierteMasse(b, h, optionen.maxKante), ausschnitt: null }));
 }

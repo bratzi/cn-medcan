@@ -2,26 +2,36 @@ import { getPrisma } from "@/lib/prisma";
 
 /**
  * Bild-Route (T8, Ruling R4, Nutzer 2026-09-29): liefert ein Bild aus D1.
- * Heute nur Avatare (NutzerAvatar); T9 (Budpics) ergaenzt seine Tabelle in
- * `bildLaden`, die Route bleibt.
+ * Avatare (NutzerAvatar) und freigegebene Budpics (T9). Offene oder abgelehnte
+ * Budpics liefert diese Route nie (404); die Vorschau fuer den Betreiber steht
+ * in /api/bild/offen/<id>, hinter der Anmeldung und ohne Cache.
  *
  * Die id ist eine Zufalls-UUID und wechselt bei jedem neuen Upload. Deshalb
  * darf die Antwort ein Jahr unveraenderlich gecacht werden (Cloudflare und
  * Browser); ein ersetztes Bild hat schlicht eine andere URL. Eine geloeschte
  * id liefert 404, das sich nicht lange festsetzt.
  *
+ * Budpics duerfen weniger lange stehen (eine Stunde): ein spaeter geloeschtes
+ * oder abgelehntes Bild soll nicht ein Jahr im Cache bleiben. Ihre id
+ * wechselt nie, darum ist `immutable` dort falsch.
+ *
  * Kein Sitzungszugriff: die Route ist oeffentlich und deshalb cachebar. Der
  * Inhalt wurde beim Speichern per Magic Bytes geprueft (lib/bild-pruefen.ts);
  * `nosniff` und der feste Typ verhindern trotzdem jede Umdeutung.
  */
 
+const CACHE_JAHR = "public, max-age=31536000, immutable";
+const CACHE_STUNDE = "public, max-age=3600";
+
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 /** Bild-Bytes zur id, oder null. Neue Bildarten hier ergaenzen. */
-async function bildLaden(id: string): Promise<{ bytes: Uint8Array; typ: string } | null> {
+async function bildLaden(id: string): Promise<{ bytes: Uint8Array; typ: string; cache: string } | null> {
   const prisma = await getPrisma();
   const avatar = await prisma.nutzerAvatar.findUnique({ where: { id }, select: { bild: true } });
-  if (avatar) return { bytes: avatar.bild, typ: "image/webp" };
+  if (avatar) return { bytes: avatar.bild, typ: "image/webp", cache: CACHE_JAHR };
+  const budpic = await prisma.budpic.findFirst({ where: { id, status: "FREIGEGEBEN" }, select: { daten: true } });
+  if (budpic) return { bytes: budpic.daten, typ: "image/webp", cache: CACHE_STUNDE };
   return null;
 }
 
@@ -34,7 +44,7 @@ export async function GET(_anfrage: Request, ctx: { params: Promise<{ id: string
   return new Response(bild.bytes as BodyInit, {
     headers: {
       "Content-Type": bild.typ,
-      "Cache-Control": "public, max-age=31536000, immutable",
+      "Cache-Control": bild.cache,
       "X-Content-Type-Options": "nosniff",
     },
   });

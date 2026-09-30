@@ -115,6 +115,7 @@ model Strain {
   chargen   Charge[]
   reviews   Review[]
   kennwerte SortenKennwerte?
+  budpics   Budpic[]
 
   umfrageVorschlaege UmfrageVorschlag[]
   umfrageOptionen    UmfrageOption[]
@@ -418,6 +419,7 @@ model Mitglied {
   sortenVorschlaege  SortenVorschlag[]
   benachrichtigungen Benachrichtigung[]
   avatar             NutzerAvatar?
+  budpics            Budpic[]
 
   @@index([freigegeben])
   @@map("mitglied")
@@ -638,4 +640,27 @@ model NutzerAvatar {
   erstelltAm DateTime @default(now()) @map("erstellt_am")
 
   @@map("nutzer_avatar")
+}
+
+/// Bluetenbild eines Mitglieds (T9, Budpics): WebP, lange Kante hoechstens
+/// 1280 px, hoechstens 150 KB, als BLOB in D1 (nie R2). `status` nach
+/// BUDPIC_STATUS in lib/budpics.ts (OFFEN, FREIGEGEBEN, ABGELEHNT), geprueft per
+/// CHECK in der Migration. Oeffentlich ausgeliefert wird nur FREIGEGEBEN.
+/// Abfragen waehlen `daten` nie mit; das Bild kommt ueber /api/bild/<id>.
+model Budpic {
+  id         String   @id @default(uuid())
+  strainId   String   @map("strain_id")
+  strain     Strain   @relation(fields: [strainId], references: [id], onDelete: Cascade)
+  mitgliedId String   @map("mitglied_id")
+  mitglied   Mitglied @relation(fields: [mitgliedId], references: [id], onDelete: Cascade)
+  daten      Bytes
+  breite     Int
+  hoehe      Int
+  status     String   @default("OFFEN")
+  erstelltAm DateTime @default(now()) @map("erstellt_am")
+
+  @@index([strainId, status])
+  @@index([status, erstelltAm])
+  @@index([mitgliedId, status])
+  @@map("budpics")
 }

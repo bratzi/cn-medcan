@@ -54,3 +54,39 @@ export function NutzerBild({ id, seite, className }: { id: string; seite: number
     />
   );
 }
+
+/**
+ * Freigegebenes Budpic aus D1 (T9, Nutzer 2026-09-29): kommt von
+ * /api/bild/<id> mit den echten Massen (kein Springen beim Laden). Der Alt-Text
+ * beschreibt die Sorte; wer das Bild eingereicht hat, steht in der Bildunterschrift.
+ */
+export function BudpicBild({
+  id,
+  breite,
+  hoehe,
+  alt,
+  lazy = true,
+  offen = false,
+  className,
+}: {
+  id: string;
+  breite: number;
+  hoehe: number;
+  alt: string;
+  lazy?: boolean;
+  /** Vorschau eines noch nicht freigegebenen Bildes (nur Betreiber, /api/bild/offen/<id>, ohne Cache). */
+  offen?: boolean;
+  className?: string;
+}) {
+  return (
+    <img
+      src={offen ? `/api/bild/offen/${id}` : `/api/bild/${id}`}
+      width={breite}
+      height={hoehe}
+      alt={alt}
+      loading={lazy ? "lazy" : "eager"}
+      decoding="async"
+      className={className}
+    />
+  );
+}

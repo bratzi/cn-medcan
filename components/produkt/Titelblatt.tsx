@@ -1,12 +1,15 @@
 import Link from "next/link";
 
 import { Bild } from "@/components/medien/Bild";
+import { BudpicBeitragen, type BudpicZugang } from "@/components/produkt/BudpicBeitragen";
+import { BudpicDiashow, type DiashowBild } from "@/components/produkt/BudpicDiashow";
 import { Badge } from "@/components/ui";
 import { einzelLinkKlassen } from "@/components/ui/textlink";
 import type { Darreichungsform, KultivarTyp } from "@/db/enums";
 import { formatiereDatum, formatiereProzentSpanne, formatiereZahl } from "@/lib/format";
 import type { Sprache } from "@/lib/i18n/sprache-kern";
 import type { Woerterbuch } from "@/lib/i18n/typen";
+import { budpicMeldungen } from "@/lib/budpic-anzeige";
 import { t } from "@/lib/i18n/text";
 
 export type MeineBewertung = { note: number; erstelltAm: Date; chargenNr: string | null };
@@ -25,6 +28,8 @@ export type TitelblattProps = {
   meineBewertung: MeineBewertung | null;
   /** Referenzbild (Medien-Id) oder null; ein Symbolbild, nicht die echte Sorte. */
   bild?: string | null;
+  /** Budpics der Community (T9): Diashow statt Musterbild, dazu "Bild beitragen". */
+  budpic?: { strainId: string; slug: string; bilder: readonly DiashowBild[]; zugang: BudpicZugang };
   w: Woerterbuch;
   sprache: Sprache;
 };
@@ -63,14 +68,35 @@ export function Titelblatt(props: TitelblattProps) {
           <span className="whitespace-nowrap">{`CBD ${formatiereProzentSpanne(props.cbdMin, props.cbdMax, 1, props.sprache)}`}</span>
         </p>
       </div>
-      {props.bild ? (
-        <figure className="flex w-full max-w-xs flex-col items-end gap-2 justify-self-center lg:w-72">
+      {props.budpic && props.budpic.bilder.length > 0 ? (
+        <div className="flex w-full max-w-xs flex-col items-end gap-2 justify-self-center lg:w-72">
+          <BudpicDiashow bilder={props.budpic.bilder} name={props.handelsname} texte={props.w.budpic} />
+          <BudpicBeitragenLeiste props={props} />
+        </div>
+      ) : props.bild ? (
+        <figure title={props.w.budpic.muster} className="flex w-full max-w-xs flex-col items-end gap-2 justify-self-center lg:w-72">
           <Bild id={props.bild} dekorativ sizes="(min-width: 1024px) 288px, 80vw" className="h-auto w-full" />
           <figcaption className="text-caption text-text-muted">{props.w.bluete.titelblatt.symbolbild}</figcaption>
+          <BudpicBeitragenLeiste props={props} />
         </figure>
       ) : null}
       <MeineNote bewertung={props.meineBewertung} w={props.w} sprache={props.sprache} />
     </section>
+  );
+}
+
+/** "Bild beitragen" unter dem Bild; ohne Budpic-Angaben (Tests, Vorschau) entfaellt es. */
+function BudpicBeitragenLeiste({ props }: { props: TitelblattProps }) {
+  if (!props.budpic) return null;
+  return (
+    <BudpicBeitragen
+      zugang={props.budpic.zugang}
+      strainId={props.budpic.strainId}
+      slug={props.budpic.slug}
+      sprache={props.sprache}
+      texte={props.w.budpic}
+      meldungen={budpicMeldungen(props.w)}
+    />
   );
 }
 

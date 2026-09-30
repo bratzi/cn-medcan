@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 
+import { BudpicFreigabe } from "@/components/admin/BudpicFreigabe";
 import { BewertungFreigabe } from "@/components/admin/BewertungFreigabe";
 import { ErgebnisListe } from "@/components/admin/ErgebnisListe";
 import { MitgliedAktionen } from "@/components/admin/MitgliedAktionen";
@@ -29,6 +30,7 @@ import type { SelectOption } from "@/components/ui";
 import { formatiereDatum } from "@/lib/format";
 import { offeneBewertungen, reviewAuswahlFuerStrains } from "@/lib/query/reviews";
 import { notizKuerzen } from "@/lib/admin-eingabe";
+import { ladeOffeneBudpics } from "@/lib/query/budpics";
 import { ladeStrainAuswahl } from "@/lib/query/strains";
 import {
   aktiveUmfrage,
@@ -397,6 +399,56 @@ async function VorschlaegeKarte() {
   );
 }
 
+/**
+ * Offene Budpics (T9): Bilder von Mitgliedern, die erst nach der Freigabe
+ * oeffentlich erscheinen. Vorschau ohne Cache, dazu Sorte, Einreicher und Datum.
+ */
+async function BudpicBereich() {
+  const { eintraege, gesamt } = await ladeOffeneBudpics();
+  return (
+    <section aria-labelledby="budpic-titel">
+      <Card>
+        <CardHeader className="flex flex-wrap items-center justify-between gap-4">
+          <h2 id="budpic-titel" className="text-h3 text-text">
+            Budpics
+          </h2>
+          {gesamt > 0 ? (
+            <Badge variante="warning">
+              {gesamt} {gesamt === 1 ? "Bild wartet" : "Bilder warten"}
+            </Badge>
+          ) : (
+            <Badge variante="success">Keine offene Freigabe</Badge>
+          )}
+        </CardHeader>
+        <CardBody>
+          {eintraege.length === 0 ? (
+            <p className="text-body text-text-muted">Kein Bild wartet auf Prüfung.</p>
+          ) : (
+            <ul className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
+              {eintraege.map((b) => (
+                <li key={b.id} className="flex flex-col gap-2">
+                  <p className="text-body text-text">
+                    <Link href={`/blueten/${b.strainSlug}`} className="font-medium underline underline-offset-4">
+                      {b.handelsname}
+                    </Link>
+                  </p>
+                  <p className="text-small text-text-muted">
+                    von {b.nutzer}, {DATUM.format(b.erstelltAm)}, <span className="numeric">{b.breite} × {b.hoehe}</span> px
+                  </p>
+                  <BudpicFreigabe id={b.id} breite={b.breite} hoehe={b.hoehe} handelsname={b.handelsname} />
+                </li>
+              ))}
+            </ul>
+          )}
+          {gesamt > eintraege.length ? (
+            <p className="mt-4 text-small text-text-muted">Gezeigt werden die ältesten {eintraege.length}.</p>
+          ) : null}
+        </CardBody>
+      </Card>
+    </section>
+  );
+}
+
 export default async function AdminPage() {
   const mitglied = await aktuellesMitglied();
   if (!mitglied) redirect("/anmelden?weiter=%2Fadmin");
@@ -428,6 +480,10 @@ export default async function AdminPage() {
 
         <Suspense fallback={<Spinner text="Ergebnisse werden geladen" />}>
           <ErgebnisBereich />
+        </Suspense>
+
+        <Suspense fallback={<Spinner text="Budpics werden geladen" />}>
+          <BudpicBereich />
         </Suspense>
 
         <Suspense fallback={<Spinner text="Bewertungen werden geladen" />}>

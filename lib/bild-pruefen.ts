@@ -23,11 +23,27 @@ export type BildPruefOptionen = {
   /** Genau diese Masse verlangen. */
   breite?: number;
   hoehe?: number;
+  /** Hoechstens diese Masse (Budpics: lange Kante 1280 px). */
+  maxBreite?: number;
+  maxHoehe?: number;
 };
 
 export type BildPruefErgebnis =
   | { ok: true; typ: BildTyp; breite: number; hoehe: number }
   | { ok: false; fehler: Meldung };
+
+/**
+ * Die RIFF-Laenge (Bytes 4 bis 7, klein-endig) muss die Datei genau umfassen:
+ * eine abgeschnittene oder mit Anhang versehene Datei ist kein Bild, das wir
+ * speichern (T9, Review T8). Gilt nur fuer WebP; PNG und JPEG kennen keine
+ * Gesamtlaenge im Kopf. Beide sind nur auf ausdruecklichen Wunsch des
+ * Aufrufers erlaubt (`erlaubt`), heute nutzt niemand das.
+ */
+function riffLaengeStimmt(b: Uint8Array): boolean {
+  if (b.length < 12) return false;
+  const laenge = new DataView(b.buffer, b.byteOffset, b.byteLength).getUint32(4, true);
+  return laenge + 8 === b.length;
+}
 
 const ASCII = (bytes: Uint8Array, von: number, text: string): boolean =>
   text.length + von <= bytes.length && [...text].every((z, i) => bytes[von + i] === z.charCodeAt(0));
@@ -98,9 +114,13 @@ export function bildPruefen(bytes: Uint8Array, optionen: BildPruefOptionen): Bil
   if (!typ || !(optionen.erlaubt ?? ["webp"]).includes(typ)) {
     return { ok: false, fehler: { schluessel: "bild.keinBild" } };
   }
+  if (typ === "webp" && !riffLaengeStimmt(bytes)) return { ok: false, fehler: { schluessel: "bild.keinBild" } };
   const masse = typ === "webp" ? webpMasse(bytes) : typ === "png" ? pngMasse(bytes) : jpegMasse(bytes);
   if (!masse || masse.breite < 1 || masse.hoehe < 1) return { ok: false, fehler: { schluessel: "bild.keinBild" } };
   if ((optionen.breite && masse.breite !== optionen.breite) || (optionen.hoehe && masse.hoehe !== optionen.hoehe)) {
+    return { ok: false, fehler: { schluessel: "bild.masse" } };
+  }
+  if ((optionen.maxBreite && masse.breite > optionen.maxBreite) || (optionen.maxHoehe && masse.hoehe > optionen.maxHoehe)) {
     return { ok: false, fehler: { schluessel: "bild.masse" } };
   }
   return { ok: true, typ, breite: masse.breite, hoehe: masse.hoehe };

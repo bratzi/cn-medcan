@@ -41,6 +41,11 @@ import {
  *   höchstens 30 KB), app/mitglied/aktionen.ts (setzen und löschen nur für das
  *   eigene Mitglied), app/api/bild/[id]/route.ts (öffentlich abrufbar per
  *   Zufalls-ID); Cascade beim Löschen des Mitglieds.
+ * - Budpics (Blütenbilder): prisma/schema.prisma (Budpic, BLOB in D1, WebP, lange
+ *   Kante höchstens 1280 px, höchstens 150 KB), app/blueten/[slug]/budpic-aktionen.ts
+ *   (nur freigegebene Mitglieder), app/admin/budpic-aktionen.ts (Freigabe, Ablehnung,
+ *   Löschen nur Betreiber), app/api/bild/[id]/route.ts (nur freigegebene, öffentlich);
+ *   Cascade beim Löschen des Mitglieds oder der Sorte.
  * - Löschen: User -> Mitglied, Sitzungen, Konto per Cascade; Stimmen,
  *   Vorschläge, Blütenvorschläge, Benachrichtigungen per Cascade;
  *   Bewertungen per SetNull (bleiben ohne Autor). Kein Selbstlöschen im
@@ -208,9 +213,20 @@ export default async function DatenschutzPage() {
               verschwindet es mit.
             </p>
             <p className="text-pretty">
+              Freigeschaltete Mitglieder können Bilder von Blüten beitragen („Budpics“). Dein
+              Browser verkleinert jedes Bild auf höchstens 1280 Pixel und 150 KB, bevor es
+              hochgeladen wird; wir speichern nur dieses Bild, nie das Original, in unserer
+              Datenbank (Cloudflare D1, EU), zusammen mit deinem Konto und dem Datum. Ein neues
+              Bild ist zunächst nur für uns sichtbar. Erst nach unserer Freigabe erscheint es bei
+              der Blüte, mit deinem Anzeigenamen und dem Datum, und ist über seine Adresse
+              abrufbar. Wir können Bilder ablehnen oder löschen. Beim Löschen deines Kontos
+              verschwinden auch deine Bilder. Achte darauf, dass auf dem Bild keine Personen und
+              keine persönlichen Angaben zu sehen sind.
+            </p>
+            <p className="text-pretty">
               Rechtsgrundlage ist die Mitgliedschaft, die du mit der Registrierung eingehst (Art. 6
-              Abs. 1 lit. b DSGVO), beim Profilbild deine Einwilligung durch das Hochladen (Art. 6
-              Abs. 1 lit. a DSGVO).
+              Abs. 1 lit. b DSGVO), beim Profilbild und bei Budpics deine Einwilligung durch das
+              Hochladen (Art. 6 Abs. 1 lit. a DSGVO).
             </p>
           </Abschnitt>
 
