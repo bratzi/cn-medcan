@@ -34,7 +34,23 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 nach Wert, Funken über Median; Fix: „Weitere Terpene“ klappt beim Zurückziehen nicht zu) `cd30d5a`. Final-Review:
 keine Integrationsbefunde, ein Fix (Profilbild-Knöpfe nach Netzfehler nicht gesperrt) `443a1fa`, ~30 Minors verworfen.
 `npm test` 483/483, tsc sauber. Impressum/Datenschutz live geprüft: Nutzerdaten da, BayLDA.
-**ALS ERSTES:** Live-Prüfung (Browser 1). Prüfliste:
+**NEUE TODOS (Nutzer 2026-09-30, nach Live-Prüfung abarbeiten, per SDD mit Brief je Task):**
+- **T16 Fazit mitlaufend:** Das Fazit (Sorte/Charge, heute unter der Bewertung angehängt, siehe
+  `components/review/AromaErkundung.tsx`, `BewertungsFormular.tsx`) soll interaktiv rechts im Leerraum neben den
+  3 Bewertungsschritten mitlaufen (sticky), damit der Einfluss der eigenen Bewertung auf einen Blick sichtbar ist
+  (live aktualisiert beim Regeln). **Mobil offen:** Platz ist knapp, Lösung muss erst erarbeitet werden. Beim
+  Sessionstart per Brainstorming 2–3 Varianten vorschlagen (z. B. einklappbare Leiste unten mit Kurz-Fazit, Chip mit
+  Delta, das beim Tippen aufgeht) und Nutzer in EINER Frage wählen lassen.
+- **T17 Register „Terpene und ihre Geschmäcker“ aufwerten** (T12, `components/story/TerpenRegister.tsx`,
+  `lib/terpen-register.ts`, `components/story/bewegung/register.ts`, globals.css): große Terpen-Icons bei den Texten;
+  die Terpen-Farben und -Animationen aus Aroma-Karte/Regler übernehmen; Verbindung Terpen↔Geschmack hochwertig
+  sichtbar machen (Linien zwischen verbundenen Einträgen und/oder Highlighting beim Hover/Fokus, Touch-Äquivalent).
+  Skills: ui-design-engine, animate, emil-design-eng.
+- **T18 Bug Hintergrundtext abgeschnitten:** Der große Hintergrundtext der Register-Section (T12) wird von der
+  Section darüber halb verdeckt und ist nicht lesbar. Überlappung/z-index/Abstand prüfen, live in hell und dunkel,
+  Desktop und 390 px. Kann mit T17 zusammen laufen (gleiche Dateien, dann ein Implementer).
+
+**ALS ERSTES:** Mobil-Frage zu T16 (siehe oben) stellen, dann Live-Prüfung (Browser 1). Prüfliste:
 - T5d: Zusatzterpen hochziehen und zurück auf 0, Abschnitt bleibt offen; Funken-Optik; `opacity-70` Kontrast.
 - `/bewerten/x?a=1` springt zu `#bewerten`; Median-Ring vs. Hersteller-Serie unterscheidbar (Nutzer fragen).
 - Sparmodus: `.delta-puls` fast unsichtbar? Buch: Layout-Sprung rechte Hälfte, Pause bei Play-Hover.
