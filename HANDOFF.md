@@ -28,6 +28,16 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 
 ## ⇢ Hier geht es weiter
 
+### ⇢ SESSION 35 (2026-09-30 abends): Blütenseiten-Crash behoben (`3354a65`), live geprüft
+
+- **Bug:** Jede Blütenseite mit Betreiber-Review zeigte „Diese Seite lässt sich gerade nicht laden“ (React #441).
+  Ursache laut `wrangler tail`: Doppelseite (Server) gab BuchReiter (Client) die Karte als Funktion. Fix: Context-Slot
+  `<ReiterLeiste />`, Regressionstest in `tests/doppelseite.test.ts`. 484/484, tsc sauber, live wieder da.
+- **T16 Mobil entschieden:** einklappbare Leiste unten mit Kurz-Fazit (Note + Delta), Tippen öffnet Sheet.
+- **Neu gesehen, offen:** `/bewerten/x?a=1` leitet auf `/blueten/x#bewerten?a=1` (Query landet im Hash, Anker greift
+  nicht; `lib/alte-adressen.ts:19`). Blütenseite Desktop zeigt horizontale Scrollleiste (Überbreite, Ursache offen).
+- Rest der Live-Prüfliste aus Session 34 noch offen, danach T16–T18.
+
 ### ⇢ SESSION 34 (2026-09-30 nachmittags): T5d + Final-Review fertig, gepusht (`443a1fa`)
 
 **Stand:** Paket Buch-Bewertung v2 komplett auf main und gepusht. T5d (Terpen-Regler statt Sweet Spot, Lichtstrich
