@@ -3,7 +3,7 @@
 > Übergabemedium zwischen Sessions. Wird nach jedem Arbeitsblock aktualisiert und committet.
 > Wer hier weiterarbeitet, liest diese Datei zuerst und braucht den Chatverlauf nicht.
 
-**Letzte Aktualisierung:** 2026-09-30 mittags (Session 33)
+**Letzte Aktualisierung:** 2026-09-30 nachmittags (Session 34)
 **Repo:** https://github.com/bratzi/cn-medcan (public)
 **Branch:** `main` (Makeover „Grünes Buch“ Teilprojekt 1 ist seit 2026-09-24 auf `main`)
 
@@ -27,6 +27,22 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 ---
 
 ## ⇢ Hier geht es weiter
+
+### ⇢ SESSION 34 (2026-09-30 nachmittags): T5d + Final-Review fertig, gepusht (`443a1fa`)
+
+**Stand:** Paket Buch-Bewertung v2 komplett auf main und gepusht. T5d (Terpen-Regler statt Sweet Spot, Lichtstrich
+nach Wert, Funken über Median; Fix: „Weitere Terpene“ klappt beim Zurückziehen nicht zu) `cd30d5a`. Final-Review:
+keine Integrationsbefunde, ein Fix (Profilbild-Knöpfe nach Netzfehler nicht gesperrt) `443a1fa`, ~30 Minors verworfen.
+`npm test` 483/483, tsc sauber. Impressum/Datenschutz live geprüft: Nutzerdaten da, BayLDA.
+**ALS ERSTES:** Live-Prüfung (Browser 1). Prüfliste:
+- T5d: Zusatzterpen hochziehen und zurück auf 0, Abschnitt bleibt offen; Funken-Optik; `opacity-70` Kontrast.
+- `/bewerten/x?a=1` springt zu `#bewerten`; Median-Ring vs. Hersteller-Serie unterscheidbar (Nutzer fragen).
+- Sparmodus: `.delta-puls` fast unsichtbar? Buch: Layout-Sprung rechte Hälfte, Pause bei Play-Hover.
+- Notiz-Blatt: verdeckte Links per Tab erreichbar? (`Buch.tsx:460` inert). Tabpanel-Rollen mobil.
+- Budpics Diashow mit 3 Bildern; Kontraste Kopf 88/97 % (T15), Bong (T13); T12 Tafel + gefilterter `_count`.
+- Gesamtnote unberührt „0 von 5“ ohne Hinweis (T5c); Regler PageUp/Home/End.
+- CPU-Zeit Blütenseite im Workers-Dashboard.
+- Worktrees C:\cn-t12, C:\cn-t13 kann der Nutzer entfernen; Branches t5d-wip/t7b-wip/t15-wip/t11-wip löschbar.
 
 ### ⇢ SESSION 33 (2026-09-30 mittags): T7b, T15, T13, T14, T12 fertig und gepusht (`00baffc`)
 
