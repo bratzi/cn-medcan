@@ -3,7 +3,7 @@
 > Übergabemedium zwischen Sessions. Wird nach jedem Arbeitsblock aktualisiert und committet.
 > Wer hier weiterarbeitet, liest diese Datei zuerst und braucht den Chatverlauf nicht.
 
-**Letzte Aktualisierung:** 2026-09-29 abends (Session 29, T4+T5 per Subagenten, Zwischensicherung)
+**Letzte Aktualisierung:** 2026-09-30 nachts (Session 31, Sicherung zum Clear)
 **Repo:** https://github.com/bratzi/cn-medcan (public)
 **Branch:** `main` (Makeover „Grünes Buch“ Teilprojekt 1 ist seit 2026-09-24 auf `main`)
 
@@ -28,24 +28,37 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 
 ## ⇢ Hier geht es weiter
 
-### ⇢ SESSION 30 (2026-09-29 spät): Zwischensicherung zum Clear
+### ⇢ SESSION 31 (2026-09-30 nachts): T5b–T10 fertig und live, T11 halb, Sicherung zum Clear
 
 **Wiedereinstieg (ohne Rückfrage):** Skill `superpowers:subagent-driven-development` laden, Ledger
-`.superpowers/sdd/2026-09-29-buch-bewertung-v2-master/progress.md` lesen (Rulings R1–R14, Stand je Task).
-- **T6 ERLEDIGT** (Review + Fix-Runde, sauber), live gepusht 23:03 zusammen mit Menüknopf-Fix `71fae10`
-  (Knopf ab 64rem verborgen; unlayered display:grid schlug lg:hidden). **Live noch NICHT geprüft** (Desktop: kein
-  Menüknopf hinter dem Logo; mobil Knopf da).
-- **T7 implementiert, lokal `77d43cc`, NICHT gepusht.** Review 1 fertig: 5 Important in `task-7-findings-r1.md` → Fix-Runde 1 (frischer Implementer opus, FIX_BASE 77d43cc), dann Re-Review. Altes Paket:
-  Paket `review-98651d7..d882697.diff` (Inhalt = 77d43cc), Brief/Report task-7-*.md, opus. Offene Nutzerfrage:
-  Autorname im Buch öffentlich, auch Betreibername auf Startseite/reviews statt „wir“ – gewollt?
-- **T5b NEU (Nutzer, Entwurf freigegeben):** Aromakarte v2, Brief `task-5b-brief.md`. Lief im Worktree
-  `C:\cn-t5b` (Branch `t5b-karte`, Junctions node_modules/lib/generated, .next/types kopiert); Agent am Ausgabelimit abgebrochen (unkommittete Teiländerungen: AromaErkundung, AromaKarte, lib/aromakarte.ts, de/en, tests/aromakarte-v2.test.ts; CSS fehlt noch)
-  abgebrochen. Erst `git -C C:\cn-t5b status`/`log` prüfen: Commit da → Review; nur Teiländerungen → neuen
-  Implementer (opus) mit Brief + Report-Pfad dort weitermachen lassen. Danach cherry-pick nach main, Worktree
-  entfernen (`git worktree remove`, Junctions vorher mit `cmd /c rmdir` lösen, NICHT rekursiv löschen!).
-- Danach T8–T13, Final-Review, Migrationen durch Nutzer, Push, Live-Prüfung. T14 Impressum-Fragen offen.
-- **Nutzer muss noch ausführen:** `npx.cmd wrangler d1 execute cn-medcan-db --remote --file migrations/0010_kennwerte_nachtragen.sql`
-- Overall-Noten starten weiter beim Community-Mittel (R13), Frage an Nutzer unbeantwortet.
+`.superpowers/sdd/2026-09-29-buch-bewertung-v2-master/progress.md` lesen (Rulings R1–R16, Stand je Task,
+zurückgestellte Minors für den Final-Review).
+- **ERLEDIGT, geprüft (Review sauber) und live seit Push 02:32 (`3a34ab8`):** T6 Fazit getrennt, T5b Aromakarte v2
+  (Regler starten bei 0, Hersteller als stiller Streifen, nur eigene Bewertung animiert, Balken grün/lila gegen
+  Median), T7 Buch zum Blättern (+5 Fixes), T8 Avatare, T9 Budpics (+Moderation freigegebener), T10 THC/CBD ein Wert
+  + Bilder beim Vorschlagen (nur freigegebene Mitglieder). Nutzer-Fixes: Menüknopf ab lg verborgen (`71fae10`),
+  Kopf im Hell-Modus schon im Hero Papier + Scroll-Bug (Pins nach Höhenänderung neu messen, ResizeObserver in
+  `components/story/bewegung/start.ts`) (`37d264e`).
+- **Migrationen 0010–0013 remote eingespielt** (24 Tabellen). Nutzer hat eine Bash-Regel ergänzt: Claude darf
+  selbst einspielen, aber NUR exakt `npx wrangler d1 execute cn-medcan-db --remote --file migrations/00NN_x.sql`
+  (ohne `cd … &&`-Präfix, sonst sperrt die Auto-Mode-Prüfung). DB liegt in EEUR, jurisdiction eu (geprüft).
+- **Live geprüft:** nur neuer Build ausgeliefert (neue CSS-Regel da) und Menüknopf bei 1143 px verborgen.
+  **NICHT live geprüft:** Kopf hell im Hero (Screenshot hing), Scroll bis ganz unten auf der Startseite, und die
+  Live-Prüflisten in `task-5b/7/8/9/10-report.md` (Desktop + 390 px, hell/dunkel). Browser: Browser 1
+  (deviceId 89686582-…) per list_connected_browsers + select_browser.
+- **T11 Empfehlungen HALB, gestoppt:** unfertig und ungeprüft auf lokalem Branch `t11-wip` (`54b3a35`, enthält
+  `migrations/0014_nutzer_empfehlungen.sql`, lib/empfehlung*.ts, components/empfehlung, tests). Nächster Schritt:
+  frischen Implementer (opus) mit `task-11-brief.md` + Report-Pfad auf `t11-wip` weitermachen lassen (oder
+  cherry-pick nach main und dort fertig), dann Review, 0014 einspielen, erst dann nach main. `lib/generated` enthält
+  evtl. den T11-Prisma-Client: vor tsc auf main `npx prisma generate`.
+- **Danach:** T12, T13, Final-Review (opus, Minors aus dem Ledger triagieren), Push, Live-Prüfung. T14 Impressum:
+  Fragen an den Nutzer offen (siehe Session 29).
+- **Offene Nutzerfragen:** (1) Im Buch steht der Autorname öffentlich, auch der Betreibername auf Startseite und
+  /reviews statt „wir“ – gewollt? (Doppelseite.tsx, eine Zeile) (2) Karte ohne Login: Balken auch dort gegen den
+  Median, Hersteller-Soll-Strich weg? (T5b, eine Zeile) (3) Overall-Noten starten beim Community-Mittel (R13) –
+  auch auf 0?
+- Cloudflare-MCP meldet Authentication error: Nutzer kann per `/mcp` neu anmelden. Leerer Ordner `C:\cn-t5b`
+  bleibt (geschützter Pfad), Nutzer kann ihn löschen.
 
 
 ### ⇢ SESSION 29 (2026-09-29 abends): T4–T14 per Subagenten (SDD), Zwischensicherung
