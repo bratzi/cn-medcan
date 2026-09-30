@@ -248,3 +248,50 @@ Ziel:
 
 Test: bestehende Tests grün; ein kleiner Test, dass die Tafel die neue Klasse trägt und
 `globals.css` die Klasse mit `--color-kopierstift` definiert.
+
+---
+
+## Task 5: Blatt-Note (Gesamtnote) auf der Startseite, Blätter feiner zeichnen
+
+**Dateien:** `components/review/BlattAnzeige.tsx` (Zeichnung `BlattGlyphe`, Pfade `LINKS`, `RECHTS`,
+`KONTUR`), `components/review/BlattNote.tsx`, `components/story/AromaSektion.tsx`, ggf.
+`components/review/AromaErkundung.tsx`, Tests.
+
+Nutzer 2026-09-30: „Ebenfalls fehlt die Bewertung der fünf Sterne mit den Gras-Icons auf der
+Bewertung der Startseite, die schon in der Blütenbewertung enthalten sind. Die bitte auch auf die
+Startseite bauen und für beide die Icons überarbeiten und ein bisschen feiner zeichnen. Die müssen
+besser ins Overall-Design einpassen.“
+
+### 5a. Startseite
+
+In der Blütenbewertung steht `BlattNote` (fünf Cannabisblätter, 0,5 bis 5 in halben Schritten)
+über der `AromaErkundung` (`components/review/BewertungsFormular.tsx`). Die Startseite zeigt in
+`components/story/AromaSektion.tsx` dieselbe Erkundung als Vorführung („Hier wird nichts
+gespeichert“), aber ohne Blätter.
+- `BlattNote` an derselben Stelle wie in der Blütenbewertung in die Startseiten-Sektion setzen
+  (über der Erkundung bzw. an der entsprechenden Stelle im Ablauf), bedienbar, nichts wird
+  gespeichert. Start leer (`start={null}`), wie die übrigen Regler der Vorführung.
+- Die gewählte Note fließt wie in der Blütenbewertung ins „Dein Fazit“ (`eigeneGesamtnote` an
+  `AromaErkundung`). Da `AromaSektion` eine Server-Komponente ist, eine kleine Client-Hülle bauen
+  (oder eine vorhandene nutzen), die `BlattNote` und `AromaErkundung` verbindet; Server-Kinder
+  weiterreichen, keine Funktionen von Server an Client übergeben (war Ursache eines Crashs in
+  Session 35).
+- Texte kommen aus demselben Wörterbuch (`w.bewerten`, `BlattNoteTexte`).
+- Die Radios heißen `gesamtnote`; auf der Startseite gibt es kein Formular, das stört nicht.
+
+### 5b. Blätter feiner zeichnen (beide Orte)
+
+`BlattGlyphe` zeichnet das Blatt heute als 24er-viewBox mit Kontur `strokeWidth 1`, Stiel und
+gefüllten Hälften in `text-accent`. Überarbeiten im Stil des Designs „Buch und Handschrift“
+(Skill `ui-design-engine`, Marke `docs/brand/gruenes-buch.md`):
+- feinere, ruhigere Linienführung: schlankere Fiederblätter (typisches Cannabisblatt mit
+  5 bis 7 Fingern, gezackte Ränder nur angedeutet), dünnere Kontur (etwa 0,75 bis 1 bei 24er
+  viewBox, `vectorEffect="non-scaling-stroke"` erlaubt), feiner Stiel, runde Linienenden.
+- Leere Blätter: nur Kontur in gedämpfter Farbe (`text-text-muted`/`border-strong`-Ton), volle
+  in Akzent; halbe Blätter weiter links gefüllt, rechts leer (Pfade `LINKS`/`RECHTS` müssen
+  zusammen genau die Blattfläche ergeben, die Mittellinie bei x = 12).
+- Größe und Trefferflächen der Eingabe unverändert (Touch ≥ 44 px, siehe Kommentar in `BlattNote`).
+- `BlattAnzeige` (Anzeige, z. B. Titelblatt/Buch) nutzt dieselbe Glyphe und wird dadurch mit feiner.
+
+Test: bestehende Tests grün; neuer Test, dass die Startseiten-Sektion die Blatt-Note rendert
+(Radios `gesamtnote`, zehn Stück) und dass die Glyphe weiterhin je Hälfte einen Pfad hat.
