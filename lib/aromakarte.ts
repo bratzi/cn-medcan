@@ -305,21 +305,21 @@ export function ergaenztesTerpen(name: string, geschmack: GeschmacksKategorie): 
 }
 
 /**
- * Herstellertreue: wie nah ein geschmecktes Profil an dem liegt, was die
- * Herstellerangaben erwarten lassen. Summe der Minima durch Summe der Maxima
- * über alle Achsen (gewichtete Jaccard-Ähnlichkeit), 0 bis 1. Ein leeres
- * Profil ergibt null.
+ * Herstellertreue: wie gut ein geschmecktes Profil zu dem passt, was die
+ * Herstellerangaben erwarten lassen. Seit Session 36 sind Geschmackswerte
+ * Sweet-Spot-Werte (0 zu wenig, 2,5 genau richtig, 5 zu viel), keine Stärke
+ * mehr (Nutzer 2026-10-01). Gezählt wird jede Achse, die der Hersteller
+ * erwartet oder die bewertet wurde, mit qualitaetsScore (1 bei 2,5, 0 an den
+ * Rändern); eine erwartete, aber nicht bewertete Achse zählt als "zu wenig".
+ * Mittel 0 bis 1. Ein leeres Profil ergibt null.
  */
 export function herstellerTreue(hersteller: GeschmacksMatrix, profil: GeschmacksMatrix): number | null {
-  let minima = 0;
-  let maxima = 0;
-  for (const achse of Object.keys(hersteller) as (keyof GeschmacksMatrix)[]) {
-    minima += Math.min(hersteller[achse], profil[achse]);
-    maxima += Math.max(hersteller[achse], profil[achse]);
-  }
   const summeProfil = Object.values(profil).reduce((a, b) => a + b, 0);
-  if (maxima <= 0 || summeProfil <= 0) return null;
-  return minima / maxima;
+  if (summeProfil <= 0) return null;
+  const scores = (Object.keys(hersteller) as (keyof GeschmacksMatrix)[])
+    .filter((achse) => hersteller[achse] > 0 || profil[achse] > 0)
+    .map((achse) => qualitaetsScore(profil[achse]));
+  return scores.length ? scores.reduce((a, b) => a + b, 0) / scores.length : null;
 }
 
 export type Treue = { wert: number; anzahl: number };
