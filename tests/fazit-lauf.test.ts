@@ -4,6 +4,12 @@ import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 
 import { AromaErkundung } from "@/components/review/AromaErkundung";
+import { KarteSofortKontext } from "@/components/review/AromaKarte";
+
+/** Karte sofort zeichnen: im Server-HTML steht sonst nur der Platzhalter (CPU-Limit, Fehler 1102). */
+function mitKarte(element: ReturnType<typeof createElement>): string {
+  return renderToStaticMarkup(createElement(KarteSofortKontext.Provider, { value: true }, element));
+}
 import type { KartenTerpen } from "@/lib/aromakarte";
 import { de } from "@/lib/i18n/de";
 import { aromaTexte } from "@/lib/i18n/typen";
@@ -12,7 +18,7 @@ import { aromaTexte } from "@/lib/i18n/typen";
 const TERPENE: KartenTerpen[] = [{ name: "Myrcen", geschmack: "ERDIG", konzentrationProzent: 0.8, rang: 1 }];
 
 function erkundung(mitEigen: boolean) {
-  return renderToStaticMarkup(
+  return mitKarte(
     createElement(AromaErkundung, {
       titel: "Nebelharz 22 (fiktiv)",
       terpene: TERPENE,

@@ -4,6 +4,7 @@ import assert from "node:assert/strict";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 
+import { KarteSofortKontext } from "@/components/review/AromaKarte";
 import { Doppelseite, type DoppelseiteProps } from "@/components/review/Doppelseite";
 import { alsEintrag, eintragHref, type EintragDaten } from "@/components/review/eintrag";
 import { leereGeschmacksMatrix } from "@/lib/query/bewertung";
@@ -38,7 +39,10 @@ function eintrag(teil: Partial<EintragDaten> = {}): EintragDaten {
 }
 
 const zeige = (props: Omit<DoppelseiteProps, "w" | "sprache">) =>
-  renderToStaticMarkup(createElement(Doppelseite, { ...props, w: de, sprache: "de" }));
+  // Karte sofort zeichnen: im Server-HTML steht sonst nur ihr Platzhalter (CPU-Limit, Fehler 1102).
+  renderToStaticMarkup(
+    createElement(KarteSofortKontext.Provider, { value: true }, createElement(Doppelseite, { ...props, w: de, sprache: "de" })),
+  );
 
 /** Die zwei Seiten einer Doppelseite getrennt: alles vor der rechten Seite ist die linke. */
 function seiten(html: string) {

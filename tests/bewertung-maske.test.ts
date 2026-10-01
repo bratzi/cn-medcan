@@ -4,6 +4,12 @@ import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 
 import { AromaErkundung } from "@/components/review/AromaErkundung";
+import { KarteSofortKontext } from "@/components/review/AromaKarte";
+
+/** Karte sofort zeichnen: im Server-HTML steht sonst nur der Platzhalter (CPU-Limit, Fehler 1102). */
+function mitKarte(element: ReturnType<typeof createElement>): string {
+  return renderToStaticMarkup(createElement(KarteSofortKontext.Provider, { value: true }, element));
+}
 import { bewertungPruefen } from "@/lib/bewertung-eingabe";
 import { vorbelegungAus } from "@/lib/bewertung-vorbelegung";
 import { de } from "@/lib/i18n/de";
@@ -34,7 +40,7 @@ const VORBELEGUNG = vorbelegungAus({
 });
 
 function maske(vorbelegung = VORBELEGUNG, istBetreiber = false) {
-  return renderToStaticMarkup(
+  return mitKarte(
     createElement(AromaErkundung, {
       titel: "Nebelharz 22 (fiktiv)",
       terpene: TERPENE,
@@ -102,7 +108,7 @@ test("Maske: „Dein Fazit“ rechnet mit der eigenen Gesamtnote, nie mit dem Co
   const eigenerAnteil = formatiereAnteil((5 - 0.5) / 4.5, 0, "de");
   const communityAnteil = formatiereAnteil((1 - 0.5) / 4.5, 0, "de");
   assert.notEqual(eigenerAnteil, communityAnteil);
-  const html = renderToStaticMarkup(
+  const html = mitKarte(
     createElement(AromaErkundung, {
       titel: "Nebelharz 22 (fiktiv)",
       terpene: [],
@@ -123,7 +129,7 @@ test("Maske: „Dein Fazit“ rechnet mit der eigenen Gesamtnote, nie mit dem Co
 });
 
 test("Maske: ohne eigene Gesamtnote fällt die Stufe im eigenen Fazit heraus, nie eine geborgte Zahl", () => {
-  const html = renderToStaticMarkup(
+  const html = mitKarte(
     createElement(AromaErkundung, {
       titel: "Nebelharz 22 (fiktiv)",
       terpene: [],
@@ -149,7 +155,7 @@ test("Maske: der Qualitätsschritt heißt „Diese Charge“ und zeigt den Sweet
 });
 
 test("Anzeige ohne Eingabe bleibt „Qualität“ ohne Chargen-Satz", () => {
-  const html = renderToStaticMarkup(
+  const html = mitKarte(
     createElement(AromaErkundung, {
       titel: "Nebelharz 22 (fiktiv)",
       terpene: TERPENE,

@@ -1,6 +1,6 @@
 "use client";
 
-import { Fragment, useEffect, useId, useRef, useState } from "react";
+import { createContext, Fragment, useContext, useEffect, useId, useRef, useState } from "react";
 
 import {
   achsenImKarte,
@@ -218,6 +218,12 @@ function einordnung(wert: number, texte: AromaTexte): string {
  * bei reduzierter Bewegung springt er. Die Werte stehen zusätzlich als
  * Tabelle für Screenreader, das SVG ist aria-hidden.
  */
+/**
+ * Karte sofort zeichnen statt erst nach dem Hydrieren. Nur für Tests, die das
+ * vollständige SVG im Server-HTML prüfen; die App lässt den Standard (false).
+ */
+export const KarteSofortKontext = createContext(false);
+
 export function AromaKarte({
   terpene: ungeordnet,
   serien: roheSerien,
@@ -249,6 +255,11 @@ export function AromaKarte({
   const achsenName = (index: number) => texte.geschmack[GESCHMACKS_ACHSEN[index].enumWert];
   const satz = (name: string) => (texte.aroma.satz as Record<string, string>)[name.trim().toLowerCase()] ?? null;
   const terpene = ungeordnet;
+  // Karte erst nach dem Hydrieren (CPU-Limit der Startseite, Fehler 1102): Server und erster
+  // Client-Render tragen nur das leere SVG mit derselben viewBox als Platzhalter fester Höhe,
+  // ohne Bögen, Balken und Beschriftungen. Tabelle und Regler (sr-only) bleiben im Server-HTML.
+  const [montiert, setMontiert] = useState(useContext(KarteSofortKontext));
+  useEffect(() => setMontiert(true), []);
   const svgRef = useRef<SVGSVGElement>(null);
   const spurId = `spur-${useId().replace(/:/g, "")}`;
   // Beim Ziehen folgen die Balken dem Griff sofort, sonst gleiten sie.
@@ -546,6 +557,8 @@ export function AromaKarte({
         <svg ref={svgRef} viewBox={`0 0 ${aktBreite} ${aktHoehe}`}
           aria-hidden="true"
           className={cn("block w-full text-text", kompakt && "lg:absolute lg:inset-0 lg:h-full")}>
+          {montiert ? (
+          <>
           <defs>
             {/* Sweet-Spot-Stil der Regler-Spur (Nutzer 2026-09-30): symmetrisch, an beiden Rändern
                 (zu wenig rechts, zu viel links; Balken wachsen nach links) grau, in der Mitte Blattgrün. */}
@@ -1176,7 +1189,11 @@ export function AromaKarte({
               fill="currentColor"
             />
           ))}
+          </>
+        ) : null}
         </svg>
+        {montiert ? (
+          <>
 
         {/* Beschriftung als HTML in fester Größe; zugleich die Ziele fürs Hervorheben. In der
             Karte steht sie über dem Balken, sonst streicht ein gefüllter Balken sie durch. */}
@@ -1260,6 +1277,8 @@ export function AromaKarte({
             {aktBreite >= 480 ? <span className="text-caption font-normal">{(texte.aroma.begleitHinweis as Record<string, string>)[begleiter[index].name] ?? begleiter[index].hinweis}</span> : null}
           </button>
         ))}
+          </>
+        ) : null}
       </div>
 
       {/* Infotext unter der Karte (Nutzer 2026-09-26, 2026-09-27): zentriert wie eine Legende im Buch.

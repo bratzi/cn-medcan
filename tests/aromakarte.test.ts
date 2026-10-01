@@ -129,20 +129,41 @@ import { join } from "node:path";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 
-import { AromaKarte, naechsteAnsicht } from "@/components/review/AromaKarte";
+import { AromaKarte, naechsteAnsicht, KarteSofortKontext } from "@/components/review/AromaKarte";
+
+/** Karte sofort zeichnen: im Server-HTML steht sonst nur der Platzhalter (CPU-Limit, Fehler 1102). */
+function mitKarte(element: ReturnType<typeof createElement>): string {
+  return renderToStaticMarkup(createElement(KarteSofortKontext.Provider, { value: true }, element));
+}
 import { de } from "@/lib/i18n/de";
 import { aromaTexte } from "@/lib/i18n/typen";
 import { leereGeschmacksMatrix } from "@/lib/query/bewertung";
 
 const LIMONEN = { name: "Limonen", geschmack: "ZITRUS" as const, konzentrationProzent: null, rang: 1 };
 const karte = () =>
-  renderToStaticMarkup(
+  mitKarte(
     createElement(AromaKarte, {
       terpene: [LIMONEN],
       serien: [{ name: "Laut Hersteller", ton: "gruen", matrix: { ...leereGeschmacksMatrix(), zitrus: 5 } }],
       texte: aromaTexte(de, "de"),
     }),
   );
+
+test("Server-HTML: Karte nur als Platzhalter fester Höhe, Tabelle für Screenreader bleibt (CPU-Limit, Fehler 1102)", () => {
+  const html = renderToStaticMarkup(
+    createElement(AromaKarte, {
+      terpene: [LIMONEN],
+      serien: [{ name: "Laut Hersteller", ton: "gruen", matrix: { ...leereGeschmacksMatrix(), zitrus: 5 } }],
+      texte: aromaTexte(de, "de"),
+    }),
+  );
+  // Leeres SVG mit viewBox hält die Höhe, ohne Bögen, Balken und Beschriftungen.
+  assert.match(html, /<svg viewBox="0 0 \d+ \d+" aria-hidden="true" class="[^"]*w-full[^"]*"><\/svg>/);
+  assert.doesNotMatch(html, /<path|<circle|<text/);
+  assert.match(html, /<div class="sr-only"><table>/);
+  // Mit sofort gezeichneter Karte steht das volle SVG da.
+  assert.match(karte(), /<svg viewBox[^>]*>.*<path/s);
+});
 
 test("Ansichts-Schalter ist eine Radiogroup mit einem Tabstopp und Druck-Rückmeldung", () => {
   const html = karte();
@@ -353,7 +374,7 @@ test("Geometrie mit eigener Höhe (Buch, T7b): Spalten und Netz passen in die H�
 });
 
 test("Versteckte Regler-Gruppe macht die Seite nicht breiter (fieldset min-content hebelt sr-only aus)", () => {
-  const html = renderToStaticMarkup(
+  const html = mitKarte(
     createElement(AromaKarte, {
       terpene: [LIMONEN],
       serien: [],

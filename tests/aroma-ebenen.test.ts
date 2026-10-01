@@ -4,7 +4,12 @@ import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 
 import { AromaErkundung } from "@/components/review/AromaErkundung";
-import { AromaKarte } from "@/components/review/AromaKarte";
+import { AromaKarte, KarteSofortKontext } from "@/components/review/AromaKarte";
+
+/** Karte sofort zeichnen: im Server-HTML steht sonst nur der Platzhalter (CPU-Limit, Fehler 1102). */
+function mitKarte(element: ReturnType<typeof createElement>): string {
+  return renderToStaticMarkup(createElement(KarteSofortKontext.Provider, { value: true }, element));
+}
 import { HOEHE, kartenHoeheMitReglern, REIHE, type KartenTerpen } from "@/lib/aromakarte";
 import { vorbelegungAus } from "@/lib/bewertung-vorbelegung";
 import { de } from "@/lib/i18n/de";
@@ -25,7 +30,7 @@ const HERSTELLER = { name: "Laut Hersteller", ton: "gruen" as const, matrix: VOL
 
 const BEWERTUNG = { name: "Diese Bewertung", ton: "lila" as const, matrix: VOLL };
 const karte = (props: Partial<Parameters<typeof AromaKarte>[0]>) =>
-  renderToStaticMarkup(createElement(AromaKarte, { terpene: [TERPINOLEN], serien: [HERSTELLER, BEWERTUNG], texte, ...props }));
+  mitKarte(createElement(AromaKarte, { terpene: [TERPINOLEN], serien: [HERSTELLER, BEWERTUNG], texte, ...props }));
 
 test("Geist: ein Geschmack allein zündet kein Terpen, blasser Bogen ohne Puls und ohne Lichtpunkt", () => {
   // Selbst mit Kraft (wie früher über den Geschmack) bleibt ein Geist ein Geist: die Ebene entscheidet.
@@ -127,7 +132,7 @@ function vorbelegung(terpenIntensitaet: Record<string, number>) {
 }
 
 const erkundung = (props: Partial<Parameters<typeof AromaErkundung>[0]>) =>
-  renderToStaticMarkup(
+  mitKarte(
     createElement(AromaErkundung, {
       titel: "Nebelharz 22 (fiktiv)",
       terpene: TERPENE,

@@ -149,6 +149,12 @@ test("/umfragen: Community-Überschriften von Hand, ohne Nebel und ohne Drehung"
 });
 
 import { AromaErkundung } from "@/components/review/AromaErkundung";
+import { KarteSofortKontext } from "@/components/review/AromaKarte";
+
+/** Karte sofort zeichnen: im Server-HTML steht sonst nur der Platzhalter (CPU-Limit, Fehler 1102). */
+function mitKarte(element: ReturnType<typeof createElement>): string {
+  return renderToStaticMarkup(createElement(KarteSofortKontext.Provider, { value: true }, element));
+}
 import { SortenKopf } from "@/components/review/SortenKopf";
 import { de } from "@/lib/i18n/de";
 import { aromaTexte } from "@/lib/i18n/typen";
@@ -179,7 +185,7 @@ test("Sortenkopf: Handelsname in Logoschrift (Nutzerausnahme zu Leitplanke 4), V
 });
 
 test("Fazit-Zahlen in Handschrift stehen tabellarisch", () => {
-  const html = renderToStaticMarkup(
+  const html = mitKarte(
     createElement(AromaErkundung, {
       titel: "Nebelharz 22 (fiktiv)",
       terpene: [],

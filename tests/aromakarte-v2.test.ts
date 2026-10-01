@@ -112,7 +112,12 @@ import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 
 import { AromaErkundung } from "@/components/review/AromaErkundung";
-import { AromaKarte, type AromaSerie } from "@/components/review/AromaKarte";
+import { AromaKarte, type AromaSerie, KarteSofortKontext } from "@/components/review/AromaKarte";
+
+/** Karte sofort zeichnen: im Server-HTML steht sonst nur der Platzhalter (CPU-Limit, Fehler 1102). */
+function mitKarte(element: ReturnType<typeof createElement>): string {
+  return renderToStaticMarkup(createElement(KarteSofortKontext.Provider, { value: true }, element));
+}
 import { vorbelegungAus } from "@/lib/bewertung-vorbelegung";
 import { de } from "@/lib/i18n/de";
 import { aromaTexte } from "@/lib/i18n/typen";
@@ -132,7 +137,7 @@ function schicht(html: string, name: string): string[] {
 const sichtbareBalken = (html: string) => schicht(html, "balken").filter((tag) => !/opacity="0"/.test(tag));
 
 const karte = (serien: AromaSerie[]) =>
-  renderToStaticMarkup(createElement(AromaKarte, { terpene: [LIMONEN], serien, texte }));
+  mitKarte(createElement(AromaKarte, { terpene: [LIMONEN], serien, texte }));
 
 test("Anzeige: keine Herstellerstreifen (Nutzer 2026-09-30), kein Puls, kein Filter; ohne lila Serie keine Linie", () => {
   const html = karte([gruen({ zitrus: 5 })]);
@@ -172,7 +177,7 @@ test("Anzeige: „zu viel“ (5) wie „zu wenig“ dünn, langsam und mit kurze
 
 const REGLER_AUS = { aendern: () => {} };
 const mitRegler = (werte: Partial<GeschmacksMatrix>, vergleich?: Partial<GeschmacksMatrix>) =>
-  renderToStaticMarkup(
+  mitKarte(
     createElement(AromaKarte, {
       terpene: [LIMONEN],
       serien: [lila(werte)],
@@ -300,7 +305,7 @@ const VORBELEGUNG = vorbelegungAus({
 });
 
 const maske = (props: Partial<Parameters<typeof AromaErkundung>[0]>) =>
-  renderToStaticMarkup(
+  mitKarte(
     createElement(AromaErkundung, {
       titel: "Nebelharz 22 (fiktiv)",
       terpene: TERPENE,
