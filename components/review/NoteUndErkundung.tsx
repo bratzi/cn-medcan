@@ -1,0 +1,32 @@
+"use client";
+
+import { useState, type ComponentProps } from "react";
+
+import { AromaErkundung } from "@/components/review/AromaErkundung";
+import { BlattNote, type BlattNoteTexte } from "@/components/review/BlattNote";
+import type { Sprache } from "@/lib/i18n/sprache-kern";
+
+/**
+ * Blatt-Note über der Aroma-Erkundung als Vorführung der Startseite (Nutzer 2026-09-30: die
+ * Blätter wie in der Blütenbewertung auch auf der Startseite). Start leer, nichts wird
+ * gespeichert; die gewählte Note fließt wie im Formular ins „Dein Fazit“ (`eigeneGesamtnote`).
+ * Client-Hülle, weil `AromaSektion` Server-Komponente ist: sie hält den Zustand selbst, vom
+ * Server kommen nur Daten und fertige Elemente, keine Funktionen (Crash Session 35).
+ */
+export function NoteUndErkundung({
+  blattTexte,
+  sprache,
+  ...erkundung
+}: Omit<ComponentProps<typeof AromaErkundung>, "eigeneGesamtnote" | "eingabe" | "vorbelegung"> & {
+  blattTexte: BlattNoteTexte;
+  sprache: Sprache;
+}) {
+  const [note, setNote] = useState<number | null>(null);
+  return (
+    // Abstand wie im Bewertungsformular zwischen Blatt-Note und Erkundung.
+    <div className="flex flex-col gap-16 md:gap-24">
+      <BlattNote start={null} texte={blattTexte} sprache={sprache} onChange={setNote} />
+      <AromaErkundung {...erkundung} eigeneGesamtnote={note} />
+    </div>
+  );
+}
