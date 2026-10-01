@@ -46,8 +46,6 @@ export async function getPrisma(): Promise<PrismaClient> {
     return globalerCache.prismaClient;
   }
 
-  // Messung 2026-10-01 (1102): zeigt, ob der Client je Anfrage neu entsteht.
-  console.log("prisma-client neu", { hattenClient: Boolean(globalerCache.prismaClient) });
   const client = new PrismaClient({ adapter: new PrismaD1(binding) });
   globalerCache.prismaClient = client;
   globalerCache.prismaBinding = binding;
