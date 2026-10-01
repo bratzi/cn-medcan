@@ -104,6 +104,8 @@ export async function getAuth(): Promise<AuthInstanz> {
   // OAuth-Rueckleitungen auf den falschen Host.
   const baseURL = process.env.BETTER_AUTH_URL ?? env.BETTER_AUTH_URL;
 
+  // Messung 2026-10-01 (1102): zeigt, ob Better Auth je Anfrage neu entsteht.
+  console.log("auth-instanz neu", { hattenInstanz: Boolean(globalerCache.authInstanz) });
   const instanz = erzeugen(prisma, secret, baseURL);
   globalerCache.authInstanz = instanz;
   globalerCache.authPrisma = prisma;
