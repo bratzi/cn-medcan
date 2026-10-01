@@ -3,7 +3,7 @@
 > Übergabemedium zwischen Sessions. Wird nach jedem Arbeitsblock aktualisiert und committet.
 > Wer hier weiterarbeitet, liest diese Datei zuerst und braucht den Chatverlauf nicht.
 
-**Letzte Aktualisierung:** 2026-09-30 nachmittags (Session 34)
+**Letzte Aktualisierung:** 2026-10-01 (Session 36)
 **Repo:** https://github.com/bratzi/cn-medcan (public)
 **Branch:** `main` (Makeover „Grünes Buch“ Teilprojekt 1 ist seit 2026-09-24 auf `main`)
 
@@ -27,6 +27,19 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 ---
 
 ## ⇢ Hier geht es weiter
+
+### ⇢ SESSION 36 (2026-09-30/10-01): Register, Band, Sweet Spot, Terpen-Regler in der Karte, CPU-Fix – alles live (`2c7be45`)
+
+**ALS ERSTES (Sessionstart):** Live-Prüfung (Browser), Nutzer nichts fragen außer der offenen Frage unten:
+- 390 px und hell: Blatt-Note Startseite, feinere Blätter (Blüten + Startseite), Glas-Tafel im Register (Linien sichtbar? sonst `--tafel-papier` 78 % → ~60 %), Sweet-Spot-Skala (Randwörter, Kontrast ~0,42 Deckkraft unter AA → anheben).
+- Handy: rechte Kartenspalte ist `touch-none` (Terpen-Regler) – lässt sich noch senkrecht scrollen?
+- Cloudflare-Logs: Startseite CPU kalt (zuletzt 698 ms ok; 1832 ms führte zu 1102 für alle Anfragen).
+- **Offene Nutzerfrage:** Fazit-Berechnung (Herstellertreue/Terpen-Abgleich) liest Geschmackswerte noch als Stärke, seit heute sind es Sweet-Spot-Werte (0 zu wenig, 2,5 genau richtig, 5 zu viel). Auf Sweet-Spot-Score umstellen?
+
+- **Erledigt:** Fazit ab 118rem außen im Seitenrand; Register frei (Terpene oben, Glas-Tafel Mitte, Geschmäcker unten, farbige Linien mit Lichtfluss); Terpen-Band zwischen Hero und Story (dezent, Hover hält an, Tooltip); Herstellerstreifen raus; Sweet-Spot-Skala der Geschmäcker (Linien/Tempo/Puls am stärksten bei 2,5, Funken nur exakt 2,5, grün); Terpen-Regler-Box entfällt, Regler rechts in der Karte (>0 bei nicht angegebenem = ergänzt); Blatt-Note auf der Startseite; Blätter feiner.
+- **1102-Ursache:** Startseite zu viel Server-CPU. Fix: Band-Liste nur einmal (Kopie im Client), Register nur Starttafel serverseitig, Karten-SVG erst nach Hydrieren. Seite 17 → 5 ms lokal, HTML 476 → 179 KB. Bericht: Scratchpad `cpu-report.md`/`cpu-fix-report.md` (Session-temporär).
+- Plan + Ledger: `docs/superpowers/plans/2026-09-30-sweet-spot-karte.md`, Ledger `C:\cn-t14\.superpowers\sdd\…\progress.md` (Minors dort). Task 5 und CPU-Fix ohne Task-Review live; Final-Review des Pakets steht aus.
+- Worktrees C:\cn-t14 (sweet-spot), C:\cn-t15 (cpu-start) gemergt, kann der Nutzer entfernen.
 
 ### ⇢ SESSION 35 (2026-09-30 abends): Crash-Fix, T16–T20 per SDD parallel, alles gepusht (`91adcc1`) und live geprüft
 
