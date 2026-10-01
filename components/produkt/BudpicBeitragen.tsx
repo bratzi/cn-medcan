@@ -44,7 +44,7 @@ export function BudpicBeitragen({ zugang, strainId, slug, sprache, texte, meldun
 
   if (zugang === "gast") {
     return (
-      <Link href={`/anmelden?weiter=${encodeURIComponent(`/blueten/${slug}`)}`} className={einzelLinkKlassen()}>
+      <Link prefetch={false} href={`/anmelden?weiter=${encodeURIComponent(`/blueten/${slug}`)}`} className={einzelLinkKlassen()}>
         {texte.anmelden}
       </Link>
     );

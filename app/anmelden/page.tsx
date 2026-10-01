@@ -37,7 +37,7 @@ export default async function AnmeldenPage({ searchParams }: Props) {
 
       <p className="mt-8 text-small text-text-muted">
         {w.auth.anmelden.keinKonto}{" "}
-        <Link
+        <Link prefetch={false}
           href={`/registrieren?weiter=${encodeURIComponent(ziel)}`}
           className="rounded-sm text-accent underline underline-offset-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring"
         >

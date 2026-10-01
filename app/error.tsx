@@ -60,7 +60,7 @@ export default function Fehler({
       />
       <div className={cn(seitenRahmen(), "flex flex-wrap items-center gap-8 pt-8 pb-24")}>
         <Button onClick={() => retry()}>{texte.erneut}</Button>
-        <Link href="/" className={einzelLinkKlassen()}>
+        <Link prefetch={false} href="/" className={einzelLinkKlassen()}>
           {texte.start}
         </Link>
       </div>

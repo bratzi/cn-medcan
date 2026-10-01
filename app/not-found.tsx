@@ -15,10 +15,10 @@ export default async function NotFound() {
       </p>
 
       <div className="mt-8 flex flex-wrap gap-4">
-        <Link href="/" className={buttonKlassen("primary", "md")}>
+        <Link prefetch={false} href="/" className={buttonKlassen("primary", "md")}>
           {w.fehlerseite.zurStartseite}
         </Link>
-        <Link href="/blueten" className={buttonKlassen("secondary", "md")}>
+        <Link prefetch={false} href="/blueten" className={buttonKlassen("secondary", "md")}>
           {w.fehlerseite.zumKatalog}
         </Link>
       </div>

@@ -110,7 +110,7 @@ export default async function MitgliedPage() {
                       {!n.gelesen ? <Badge variante="accent">{texte.neu}</Badge> : null}
                     </span>
                     {n.link ? (
-                      <Link href={n.link} className={textLinkKlassen()}>
+                      <Link prefetch={false} href={n.link} className={textLinkKlassen()}>
                         {benachrichtigungSatz(w.benachrichtigung, n)}
                       </Link>
                     ) : (
@@ -170,7 +170,7 @@ export default async function MitgliedPage() {
                   <li key={v.id} className="flex flex-col gap-2">
                     <span className="flex flex-wrap items-center gap-2">
                       {v.strainSlug ? (
-                        <Link href={`/blueten/${v.strainSlug}`} className={textLinkKlassen()}>
+                        <Link prefetch={false} href={`/blueten/${v.strainSlug}`} className={textLinkKlassen()}>
                           {v.handelsname}
                         </Link>
                       ) : (
@@ -185,7 +185,7 @@ export default async function MitgliedPage() {
                 ))}
               </ul>
             )}
-            <Link href="/vorschlagen" className={buttonKlassen("secondary")}>
+            <Link prefetch={false} href="/vorschlagen" className={buttonKlassen("secondary")}>
               {texte.vorschlagen}
             </Link>
           </CardBody>
@@ -207,7 +207,7 @@ export default async function MitgliedPage() {
               <p className="max-w-[68ch] text-body text-text-muted">
                 {texte.verwaltungText}
               </p>
-              <Link href="/admin" className={buttonKlassen("secondary")}>
+              <Link prefetch={false} href="/admin" className={buttonKlassen("secondary")}>
                 {texte.zurVerwaltung}
               </Link>
             </CardBody>

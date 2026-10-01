@@ -53,7 +53,7 @@ async function Inhalt() {
         // Zwischen Qualität und Fazit, eins höher als zuvor am Sektionsende (Nutzer 2026-09-26).
         zwischenruf={<Schlagwort satz={w.start.aroma.zwischenruf} ton="gruen" oben="top-0 -translate-y-1/2" />}
       >
-        <Link href={`/blueten/${sorte.slug}`} className={buttonKlassen("secondary", "md")}>
+        <Link prefetch={false} href={`/blueten/${sorte.slug}`} className={buttonKlassen("secondary", "md")}>
           {w.start.aroma.zurSorte}
         </Link>
       </NoteUndErkundung>

@@ -139,7 +139,7 @@ export function Doppelseite({ eintrag, umfang, ueberschrift: Ueberschrift, story
         ) : null}
         {voll ? null : (
           <p>
-            <Link href={eintragHref(eintrag.slug, eintrag.id)} className={buttonKlassen("secondary", "md")}>
+            <Link prefetch={false} href={eintragHref(eintrag.slug, eintrag.id)} className={buttonKlassen("secondary", "md")}>
               {w.review.ganzerEintrag}
             </Link>
           </p>

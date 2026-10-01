@@ -108,7 +108,7 @@ export function RundeSteuerung({ umfrage, strains }: Props) {
                 {umfrage.optionen.map((option) => (
                   <TableRow key={option.id}>
                     <TableCell>
-                      <Link
+                      <Link prefetch={false}
                         href={`/blueten/${option.slug}`}
                         className="font-medium text-text underline underline-offset-2"
                         title={option.handelsname}

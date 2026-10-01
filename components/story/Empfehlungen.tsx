@@ -23,7 +23,7 @@ async function EmpfehlungenInhalt() {
     return (
       <div className="flex flex-col items-start gap-6">
         <p className="max-w-[48ch] text-body text-text-muted text-pretty">{texte.startSatzGast}</p>
-        <Link href="/anmelden?weiter=%2F%23empfehlungen" className={buttonKlassen("primary", "md")}>
+        <Link prefetch={false} href="/anmelden?weiter=%2F%23empfehlungen" className={buttonKlassen("primary", "md")}>
           {texte.anmelden}
         </Link>
         <p className="text-caption text-text-muted">{texte.hinweis}</p>
@@ -44,7 +44,7 @@ async function EmpfehlungenInhalt() {
     return (
       <div className="flex flex-col items-start gap-6">
         <p className="max-w-[48ch] text-body text-text-muted text-pretty">{texte.leer}</p>
-        <Link href="/blueten" className={buttonKlassen("secondary", "md")}>
+        <Link prefetch={false} href="/blueten" className={buttonKlassen("secondary", "md")}>
           {texte.zuDenBlueten}
         </Link>
       </div>
@@ -59,7 +59,7 @@ async function EmpfehlungenInhalt() {
       />
       <p className="flex flex-wrap items-center gap-x-8 gap-y-2">
         <span className="text-caption text-text-muted">{texte.hinweis}</span>
-        <Link href="/mitglied" className={einzelLinkKlassen()}>
+        <Link prefetch={false} href="/mitglied" className={einzelLinkKlassen()}>
           {w.kopf.navigation.konto}
         </Link>
       </p>

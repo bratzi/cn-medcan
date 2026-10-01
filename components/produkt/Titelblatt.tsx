@@ -107,7 +107,7 @@ function MeineNote({ bewertung, w, sprache }: { bewertung: MeineBewertung | null
     return (
       <div className="flex flex-col gap-2 lg:items-end lg:text-right">
         <p className="text-h3 font-normal text-text">{texte.nichtGetestet}</p>
-        <Link href="/umfragen" className={einzelLinkKlassen()}>
+        <Link prefetch={false} href="/umfragen" className={einzelLinkKlassen()}>
           {texte.zurAbstimmung}
         </Link>
       </div>

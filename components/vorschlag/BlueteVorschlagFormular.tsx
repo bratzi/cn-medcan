@@ -204,7 +204,7 @@ export function BlueteVorschlagFormular({ terpene, nameVorbelegt, texte, typen, 
           {antwort.vorhanden ? (
             <>
               {" "}
-              <Link href={`/blueten/${antwort.vorhanden.slug}`} className={textLinkKlassen()}>
+              <Link prefetch={false} href={`/blueten/${antwort.vorhanden.slug}`} className={textLinkKlassen()}>
                 {t(texte.zuBluete, { name: antwort.vorhanden.handelsname })}
               </Link>
             </>
@@ -212,7 +212,7 @@ export function BlueteVorschlagFormular({ terpene, nameVorbelegt, texte, typen, 
           {antwort.schonVorgeschlagen ? (
             <>
               {" "}
-              <Link href="/mitglied" className={textLinkKlassen()}>
+              <Link prefetch={false} href="/mitglied" className={textLinkKlassen()}>
                 {texte.zuKonto}
               </Link>
             </>

@@ -46,7 +46,7 @@ function RundenZeile({ runde, w, sprache }: { runde: UmfrageUebersicht; w: Woert
             {runde.gewinner.map((gewinner, index) => (
               <span key={gewinner.slug}>
                 {index > 0 ? ", " : null}
-                <Link href={`/blueten/${gewinner.slug}`} className={textLinkKlassen()}>
+                <Link prefetch={false} href={`/blueten/${gewinner.slug}`} className={textLinkKlassen()}>
                   {gewinner.handelsname}
                 </Link>
               </span>
@@ -130,7 +130,7 @@ async function UmfragenInhalt({ w, sprache }: { w: Woerterbuch; sprache: Sprache
               <p className="text-body text-text-muted">
                 {texte.vorschlagenAnonym}
               </p>
-              <Link href="/anmelden?weiter=%2Fumfragen" className={buttonKlassen("primary")}>
+              <Link prefetch={false} href="/anmelden?weiter=%2Fumfragen" className={buttonKlassen("primary")}>
                 {texte.anmelden}
               </Link>
             </div>
@@ -147,7 +147,7 @@ async function UmfragenInhalt({ w, sprache }: { w: Woerterbuch; sprache: Sprache
               {vorschlaege.map((vorschlag) => (
                 <li key={vorschlag.id} className="flex flex-col gap-2 py-6">
                   <div className="flex flex-wrap items-baseline justify-between gap-4 max-md:justify-center">
-                    <Link
+                    <Link prefetch={false}
                       href={`/blueten/${vorschlag.slug}`}
                       className={namenLinkKlassen("min-w-0 font-buch text-h2 font-medium wrap-break-word")}
                     >

@@ -45,7 +45,7 @@ export async function GemeinsamLernen() {
           <p className="max-w-[56ch] text-body text-text-muted text-pretty">
             {texte.absatz2}
           </p>
-          <Link href="/blueten" className={buttonKlassen("secondary", "md")}>
+          <Link prefetch={false} href="/blueten" className={buttonKlassen("secondary", "md")}>
             {texte.zuDenBlueten}
           </Link>
           {/* Pause fuer das Video (WCAG 2.2.2). Sichtbar erst, wenn die StoryBuehne

@@ -40,7 +40,7 @@ async function ApothekenListe({ w, sprache }: { w: Woerterbuch; sprache: Sprache
             <CardBody className="flex flex-col gap-4">
               <div className="flex items-start justify-between gap-4">
                 <h2 className="min-w-0 text-h3 text-text">
-                  <Link
+                  <Link prefetch={false}
                     href={`/apotheken/${apotheke.slug}`}
                     className="rounded-sm transition-opacity duration-150 ease-standard hover:opacity-70 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring"
                   >

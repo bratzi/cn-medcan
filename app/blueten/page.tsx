@@ -111,10 +111,10 @@ async function Ergebnisbereich({ filter, w, sprache }: { filter: StrainFilter; w
             beschreibung={texte.leerText}
             aktion={
               <div className="flex flex-wrap gap-4">
-                <Link href="/blueten" className={buttonKlassen("secondary")}>
+                <Link prefetch={false} href="/blueten" className={buttonKlassen("secondary")}>
                   {texte.zuruecksetzen}
                 </Link>
-                <Link href={vorschlagLink(filter.q)} className={buttonKlassen("secondary")}>
+                <Link prefetch={false} href={vorschlagLink(filter.q)} className={buttonKlassen("secondary")}>
                   {texte.vorschlagen}
                 </Link>
               </div>
@@ -141,7 +141,7 @@ async function Ergebnisbereich({ filter, w, sprache }: { filter: StrainFilter; w
         {liste.eintraege.length > 0 ? (
           <p className="text-small text-text-muted">
             {texte.fehlt}{" "}
-            <Link href={vorschlagLink(filter.q)} className={textLinkKlassen()}>
+            <Link prefetch={false} href={vorschlagLink(filter.q)} className={textLinkKlassen()}>
               {texte.schlagVor}
             </Link>
           </p>
@@ -153,7 +153,7 @@ async function Ergebnisbereich({ filter, w, sprache }: { filter: StrainFilter; w
             className="flex flex-wrap items-center justify-between gap-4 border-t border-border pt-6"
           >
             {liste.seite > 1 ? (
-              <Link
+              <Link prefetch={false}
                 href={`/blueten?${serialisiereFilter({ ...filter, seite: liste.seite - 1 }).toString()}`}
                 className={buttonKlassen("secondary")}
                 rel="prev"
@@ -169,7 +169,7 @@ async function Ergebnisbereich({ filter, w, sprache }: { filter: StrainFilter; w
             </p>
 
             {liste.seite < liste.seitenAnzahl ? (
-              <Link
+              <Link prefetch={false}
                 href={`/blueten?${serialisiereFilter({ ...filter, seite: liste.seite + 1 }).toString()}`}
                 className={buttonKlassen("secondary")}
                 rel="next"

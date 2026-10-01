@@ -98,7 +98,7 @@ export async function Auftakt() {
           "Mein Konto", folgt dem Zeiger wie die Storytelling-Videos (Nutzer 2026-09-25). */}
       <div className="flex flex-1 items-center justify-center px-4 py-8">
         <div data-punkt="" className="p-6">
-          <Link
+          <Link prefetch={false}
             href="/blueten"
             data-punkt-tiefe="1"
             className="konto-pille inline-flex h-14 items-center justify-center rounded-full px-8 text-center whitespace-nowrap sm:px-10 font-sans text-small font-medium uppercase tracking-gesperrt text-text"

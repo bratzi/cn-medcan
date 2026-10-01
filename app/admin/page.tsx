@@ -390,7 +390,7 @@ async function VorschlaegeKarte() {
             <span className="numeric">{offen}</span> {offen === 1 ? "Vorschlag wartet" : "Vorschläge warten"} auf
             Prüfung.
           </p>
-          <Link href="/admin/vorschlaege" className={buttonKlassen(offen > 0 ? "primary" : "secondary")}>
+          <Link prefetch={false} href="/admin/vorschlaege" className={buttonKlassen(offen > 0 ? "primary" : "secondary")}>
             Zur Prüfung
           </Link>
         </CardBody>
@@ -437,7 +437,7 @@ async function BudpicListe({ status }: { status: "OFFEN" | "FREIGEGEBEN" }) {
               {eintraege.map((b) => (
                 <li key={b.id} className="flex flex-col gap-2">
                   <p className="text-body text-text">
-                    <Link href={`/blueten/${b.strainSlug}`} className="font-medium underline underline-offset-4">
+                    <Link prefetch={false} href={`/blueten/${b.strainSlug}`} className="font-medium underline underline-offset-4">
                       {b.handelsname}
                     </Link>
                   </p>

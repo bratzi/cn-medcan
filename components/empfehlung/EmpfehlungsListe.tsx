@@ -24,7 +24,7 @@ export function EmpfehlungsListe({
     <ol className={cn("grid grid-cols-1 gap-x-8 gap-y-6 sm:grid-cols-2", !schmal && "lg:grid-cols-3", className)}>
       {eintraege.map((e) => (
         <li key={e.slug} className="flex flex-col gap-2 border-t border-border pt-4">
-          <Link
+          <Link prefetch={false}
             href={`/blueten/${e.slug}`}
             className={namenLinkKlassen("inline-flex min-h-11 items-center font-buch text-h3 wrap-break-word")}
           >

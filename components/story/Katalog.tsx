@@ -92,7 +92,7 @@ export async function Katalog() {
               {texte.text}
             </p>
           </div>
-          <Link href="/blueten" className={buttonKlassen("secondary", "md")}>
+          <Link prefetch={false} href="/blueten" className={buttonKlassen("secondary", "md")}>
             {texte.ganzerKatalog}
           </Link>
         </div>
@@ -100,7 +100,7 @@ export async function Katalog() {
         <ul aria-label={texte.einstiege} className="flex flex-wrap gap-2 max-md:justify-center">
           {EINSTIEGE.map((eintrag) => (
             <li key={eintrag.href}>
-              <Link href={eintrag.href} className={buttonKlassen("secondary", "sm")}>
+              <Link prefetch={false} href={eintrag.href} className={buttonKlassen("secondary", "sm")}>
                 {eintrag.text(w)}
               </Link>
             </li>

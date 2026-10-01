@@ -49,7 +49,7 @@ export function Kandidat({ option, gesamt, gewaehlt, zeigeStimmen, texte, sprach
               x
             </span>
           ) : null}
-          <Link
+          <Link prefetch={false}
             href={`/blueten/${option.slug}`}
             className={namenLinkKlassen("min-w-0 font-buch text-h3 font-medium wrap-break-word")}
             title={option.handelsname}

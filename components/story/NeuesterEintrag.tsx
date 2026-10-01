@@ -32,7 +32,7 @@ async function EintragInhalt() {
         <p className="max-w-[48ch] text-body text-text-muted">
           {w.start.eintrag.leerText}
         </p>
-        <Link href="#abstimmung" className={buttonKlassen("secondary", "md")}>
+        <Link prefetch={false} href="#abstimmung" className={buttonKlassen("secondary", "md")}>
           {w.start.eintrag.zurAbstimmung}
         </Link>
       </div>

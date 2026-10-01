@@ -68,7 +68,7 @@ export function VorschlagFormular({ umfrageId, strains, texte }: Props & { texte
       />
       <p className="-mt-4 text-small text-text-muted">
         {texte.nurKatalog}{" "}
-        <Link href="/vorschlagen" className={textLinkKlassen()}>
+        <Link prefetch={false} href="/vorschlagen" className={textLinkKlassen()}>
           {texte.schlagSieVor}
         </Link>
       </p>

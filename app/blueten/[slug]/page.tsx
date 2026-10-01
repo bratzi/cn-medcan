@@ -313,7 +313,7 @@ async function ProduktInhalt({ slug, w, sprache }: { slug: string; w: Woerterbuc
               ) : (
                 <>
                   <p className="max-w-[60ch] text-body text-text">{w.bewerten.anmeldenHinweis}</p>
-                  <Link href={anmelden} className={buttonKlassen("primary", "md")}>
+                  <Link prefetch={false} href={anmelden} className={buttonKlassen("primary", "md")}>
                     {w.bewerten.anmelden}
                   </Link>
                 </>
@@ -409,7 +409,7 @@ export default async function ProduktDetailPage({ params }: PageProps<"/blueten/
   return (
     <div className={cn(seitenRahmen(), "pt-16 pb-24 sm:pt-24")}>
       <p className="mb-8">
-        <Link href="/blueten" className={einzelLinkKlassen()}>
+        <Link prefetch={false} href="/blueten" className={einzelLinkKlassen()}>
           {w.bluete.alleBlueten}
         </Link>
       </p>

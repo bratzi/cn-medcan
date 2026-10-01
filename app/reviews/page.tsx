@@ -31,7 +31,7 @@ async function ReviewsInhalt() {
         titel={w.reviews.leerTitel}
         beschreibung={w.reviews.leerText}
         aktion={
-          <Link href="/umfragen" className={buttonKlassen("secondary")}>
+          <Link prefetch={false} href="/umfragen" className={buttonKlassen("secondary")}>
             {w.reviews.zurAbstimmung}
           </Link>
         }

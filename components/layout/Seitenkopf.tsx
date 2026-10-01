@@ -32,7 +32,7 @@ export function Seitenkopf({ titel, satz, zurueck, schmal = false, children }: S
     <header className={cn(seitenRahmen(schmal), "pt-16 max-md:text-center sm:pt-24")}>
       {zurueck ? (
         <p className="mb-8">
-          <Link href={zurueck.href} className={einzelLinkKlassen()}>
+          <Link prefetch={false} href={zurueck.href} className={einzelLinkKlassen()}>
             {zurueck.text}
           </Link>
         </p>

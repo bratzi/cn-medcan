@@ -69,7 +69,7 @@ export function ErgebnisListe({ runden, reviewsJeStrain }: Props) {
                       className="border-t border-border py-4 first:border-t-0 first:pt-0"
                     >
                       <div className="flex flex-wrap items-center gap-2">
-                        <Link
+                        <Link prefetch={false}
                           href={`/blueten/${platz.slug}`}
                           className="text-body font-medium text-text underline underline-offset-2"
                           title={platz.handelsname}

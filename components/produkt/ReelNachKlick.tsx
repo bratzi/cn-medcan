@@ -71,7 +71,7 @@ export function ReelNachKlick({ embedUrl, titel, className, texte }: ReelNachKli
       </button>
       <p className="text-caption text-pretty text-text">
         {texte.datenschutz}{" "}
-        <Link href="/datenschutz#ds-instagram" className={textLinkKlassen()}>
+        <Link prefetch={false} href="/datenschutz#ds-instagram" className={textLinkKlassen()}>
           {texte.mehr}
         </Link>
       </p>

@@ -72,7 +72,7 @@ function Aktionsbereich({
         <p className="text-small text-text-muted">
           {texte.vorschlagsphase}
         </p>
-        <Link href={ZIELE[ort].vorschlagen} className={buttonKlassen("secondary", "md")}>
+        <Link prefetch={false} href={ZIELE[ort].vorschlagen} className={buttonKlassen("secondary", "md")}>
           {texte.sorteVorschlagen}
         </Link>
       </div>
@@ -86,7 +86,7 @@ function Aktionsbereich({
         <p className="text-small text-text-muted">
           {texte.anonym}
         </p>
-        <Link href={ZIELE[ort].anmelden} className={buttonKlassen("primary", "md")}>
+        <Link prefetch={false} href={ZIELE[ort].anmelden} className={buttonKlassen("primary", "md")}>
           {w.umfrage.anmelden}
         </Link>
       </div>

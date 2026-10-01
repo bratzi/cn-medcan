@@ -24,7 +24,7 @@ export default async function VorschlaegePage() {
 
   return (
     <div className="mx-auto w-full max-w-320 px-4 py-16 sm:px-8">
-      <Link href="/admin" className={einzelLinkKlassen()}>
+      <Link prefetch={false} href="/admin" className={einzelLinkKlassen()}>
         Zur Verwaltung
       </Link>
       <h1 className="mt-4 text-h1 text-text">Vorgeschlagene Blüten</h1>

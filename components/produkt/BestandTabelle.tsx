@@ -83,7 +83,7 @@ export function BestandTabelle({ bestaende, fachkreis }: BestandTabelleProps) {
             return (
               <TableRow key={bestand.id}>
                 <TableCell>
-                  <Link
+                  <Link prefetch={false}
                     href={`/apotheken/${bestand.apotheke.slug}`}
                     className={textLinkKlassen()}
                   >

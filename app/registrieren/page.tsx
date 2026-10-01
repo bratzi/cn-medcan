@@ -36,7 +36,7 @@ export default async function RegistrierenPage({ searchParams }: Props) {
 
       <p className="mt-8 text-small text-text-muted">
         {w.auth.registrieren.schonKonto}{" "}
-        <Link
+        <Link prefetch={false}
           href={`/anmelden?weiter=${encodeURIComponent(ziel)}`}
           className="rounded-sm text-accent underline underline-offset-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring"
         >

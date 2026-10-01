@@ -27,7 +27,7 @@ export function Inhaltsverzeichnis({
       {eintraege.map((eintrag) => (
         <li key={eintrag.id} className="relative py-4">
           <div className="flex items-baseline gap-4">
-            <Link
+            <Link prefetch={false}
               href={eintragHref(eintrag.slug, eintrag.id)}
               className={namenLinkKlassen(
                 "min-w-0 font-buch text-h2 font-medium wrap-break-word after:absolute after:inset-0",
