@@ -10,25 +10,19 @@ export function blattFuellungen(note: number | null): Fuellung[] {
 }
 
 /*
- * Fächerblatt mit sieben schlanken Fingern im 24er-Raster, spiegelgleich zur
- * Mittelachse x = 12, alle aus dem Ansatz (12, 17). Feiner gezeichnet als zuvor
- * (Nutzer 2026-09-30: „ein bisschen feiner, besser ins Overall-Design“): schmale
- * Linsen statt breiter Finger, Kontur 0,75, runde Enden. Die zwei Hälften sind
- * eigene Flächen (der Mittelfinger längs auf x = 12 geteilt), so füllt sich ein
- * halbes Blatt ohne clipPath und ohne ids im Dokument; LINKS und RECHTS ergeben
- * zusammen genau die Fläche der KONTUR.
+ * Fächerblatt mit sieben Fingern im 24er-Raster, spiegelgleich zur Mittelachse
+ * x = 12. Die zwei Hälften sind eigene Flächen (der Mittelfinger längs geteilt),
+ * so füllt sich ein halbes Blatt ohne clipPath und ohne ids im Dokument.
  */
-const LINKS =
-  "M12 17Q10.4 9.5 12 2ZM12 17Q9.9 10.5 5.2 5.6Q7.3 12.1 12 17ZM12 17Q7.87 13.26 2.5 11.8Q6.63 15.54 12 17ZM12 17Q9.6 18.84 6.6 19.2Q9 17.36 12 17Z";
-const RECHTS =
-  "M12 17Q13.6 9.5 12 2ZM12 17Q14.1 10.5 18.8 5.6Q16.7 12.1 12 17ZM12 17Q16.13 13.26 21.5 11.8Q17.37 15.54 12 17ZM12 17Q14.4 18.84 17.4 19.2Q15 17.36 12 17Z";
 const KONTUR =
-  "M12 17Q10.4 9.5 12 2Q13.6 9.5 12 17ZM12 17Q9.9 10.5 5.2 5.6Q7.3 12.1 12 17ZM12 17Q7.87 13.26 2.5 11.8Q6.63 15.54 12 17ZM12 17Q9.6 18.84 6.6 19.2Q9 17.36 12 17ZM12 17Q14.1 10.5 18.8 5.6Q16.7 12.1 12 17ZM12 17Q16.13 13.26 21.5 11.8Q17.37 15.54 12 17ZM12 17Q14.4 18.84 17.4 19.2Q15 17.36 12 17Z";
-const STRICH = 0.75;
+  "M12 16.5Q9 9 12 1.5Q15 9 12 16.5ZM12 16.5Q10.4 9.9 4.7 6.4Q6.2 13 12 16.5ZM12 16.5Q8 12.5 2.3 12.6Q6.3 16.6 12 16.5ZM12 16.5Q8.7 15.8 6.2 18.2Q9.6 18.9 12 16.5ZM12 16.5Q17.8 13 19.3 6.4Q13.6 9.9 12 16.5ZM12 16.5Q17.7 16.6 21.7 12.6Q16 12.5 12 16.5ZM12 16.5Q14.4 18.9 17.8 18.2Q15.3 15.8 12 16.5Z";
+const LINKS =
+  "M12 16.5Q9 9 12 1.5ZM12 16.5Q10.4 9.9 4.7 6.4Q6.2 13 12 16.5ZM12 16.5Q8 12.5 2.3 12.6Q6.3 16.6 12 16.5ZM12 16.5Q8.7 15.8 6.2 18.2Q9.6 18.9 12 16.5Z";
+const RECHTS =
+  "M12 16.5Q15 9 12 1.5ZM12 16.5Q17.8 13 19.3 6.4Q13.6 9.9 12 16.5ZM12 16.5Q17.7 16.6 21.7 12.6Q16 12.5 12 16.5ZM12 16.5Q14.4 18.9 17.8 18.2Q15.3 15.8 12 16.5Z";
 
 /**
- * Ein Blatt, rein dekorativ: gefüllt in `accent`, leer nur die Kontur in
- * gedämpftem `text-muted` (Nutzer 2026-09-30: ruhiger, feiner). Die
+ * Ein Blatt, rein dekorativ: gefüllt in `accent`, leer nur die Kontur. Die
  * Vorschau unter dem Zeiger füllt in `accent-hover` (Hover über das eigene
  * Token, nicht über Deckkraft). Bewegung nur Farbe und Deckkraft, kurz; bei
  * reduzierter Bewegung (globale Regel) und im Sparmodus (globals.css,
@@ -43,18 +37,11 @@ export function BlattGlyphe({ fuellung, vorschau }: { fuellung: Fuellung; vorsch
       an ? "opacity-100" : "opacity-0",
     );
   return (
-    <svg
-      aria-hidden="true"
-      viewBox="0 0 24 24"
-      className={cn(
-        "pointer-events-none absolute inset-0 size-full transition-colors duration-fast ease-standard",
-        fuellung === "leer" ? "text-text-muted" : "text-accent",
-      )}
-    >
+    <svg aria-hidden="true" viewBox="0 0 24 24" className="pointer-events-none absolute inset-0 size-full text-accent">
       <path d={LINKS} className={flaeche(fuellung !== "leer")} />
       <path d={RECHTS} className={flaeche(fuellung === "voll")} />
-      <path d={KONTUR} fill="none" stroke="currentColor" strokeWidth={STRICH} strokeLinejoin="round" strokeLinecap="round" />
-      <path d="M12 17v4.5" fill="none" stroke="currentColor" strokeWidth={STRICH} strokeLinecap="round" />
+      <path d={KONTUR} fill="none" stroke="currentColor" strokeWidth={1} strokeLinejoin="round" />
+      <path d="M12 16.5v5.5" fill="none" stroke="currentColor" strokeWidth={1} strokeLinecap="round" />
     </svg>
   );
 }

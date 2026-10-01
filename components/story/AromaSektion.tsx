@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { Suspense } from "react";
 
+import { AromaErkundung } from "@/components/review/AromaErkundung";
 import { erkundungsDaten } from "@/components/review/erkundung-daten";
-import { NoteUndErkundung } from "@/components/review/NoteUndErkundung";
 import { SortenKopf } from "@/components/review/SortenKopf";
 import { Schlagwort } from "@/components/story/Schlagwort";
 import { UeberlaufWort, ueberlaufPlatz } from "@/components/story/UeberlaufWort";
@@ -24,10 +24,7 @@ async function Inhalt() {
 
   return (
     <div className="mt-16">
-      {/* Blatt-Note wie in der Blütenbewertung über der Erkundung (Nutzer 2026-09-30). */}
-      <NoteUndErkundung
-        blattTexte={w.bewerten}
-        sprache={sprache}
+      <AromaErkundung
         titel={sorte.handelsname}
         bild={
           <SortenKopf
@@ -56,7 +53,7 @@ async function Inhalt() {
         <Link href={`/blueten/${sorte.slug}`} className={buttonKlassen("secondary", "md")}>
           {w.start.aroma.zurSorte}
         </Link>
-      </NoteUndErkundung>
+      </AromaErkundung>
     </div>
   );
 }

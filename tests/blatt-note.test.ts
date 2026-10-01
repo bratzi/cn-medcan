@@ -112,36 +112,3 @@ test("BlattNote: der Hinweis nennt je Zeiger die passende Bedienung", () => {
   assert.match(html, new RegExp(`<span class="pointer-coarse:hidden">${de.bewerten.gesamtnoteHinweis}</span>`));
   assert.match(html, new RegExp(`<span class="hidden pointer-coarse:inline">${de.bewerten.gesamtnoteHinweisTouch}</span>`));
 });
-
-// Startseite (Nutzer 2026-09-30): Blatt-Note über der Erkundung, leer, Note fließt ins Fazit.
-test("Startseite: NoteUndErkundung zeigt die Blatt-Note mit zehn leeren Radios gesamtnote", async () => {
-  const { NoteUndErkundung } = await import("@/components/review/NoteUndErkundung");
-  const { aromaTexte } = await import("@/lib/i18n/typen");
-  const html = renderToStaticMarkup(
-    createElement(NoteUndErkundung, {
-      blattTexte: de.bewerten,
-      sprache: "de",
-      titel: "Nebelharz 22 (fiktiv)",
-      terpene: [],
-      serien: [],
-      zeilen: [],
-      texte: aromaTexte(de, "de"),
-    }),
-  );
-  const liste = radios(html).filter((radio) => radio.name === "gesamtnote");
-  assert.equal(liste.length, 10);
-  assert.ok(liste.every((radio) => !radio.gewaehlt));
-  assert.match(html, new RegExp(de.bewerten.gesamtnote));
-});
-
-test("BlattGlyphe: je Hälfte ein Pfad, halbes Blatt links gefüllt, leeres Blatt gedämpft", async () => {
-  const { BlattGlyphe } = await import("@/components/review/BlattAnzeige");
-  const pfade = (html: string) => [...html.matchAll(/<path[^>]*>/g)].map(([tag]) => tag);
-  const halb = renderToStaticMarkup(createElement(BlattGlyphe, { fuellung: "halb", vorschau: false }));
-  const [links, rechts] = pfade(halb);
-  assert.equal(pfade(halb).length, 4);
-  assert.match(links, /opacity-100/);
-  assert.match(rechts, /opacity-0/);
-  assert.match(halb, /text-accent/);
-  assert.match(renderToStaticMarkup(createElement(BlattGlyphe, { fuellung: "leer", vorschau: false })), /text-text-muted/);
-});
