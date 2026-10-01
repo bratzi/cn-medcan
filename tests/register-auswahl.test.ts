@@ -9,7 +9,9 @@ import { RegisterAuswahl, type RegisterAnsicht, type RegisterTexte } from "@/com
 
 /**
  * Register aufgewertet (T17, Nutzer 2026-09-30): Icons, Farben und die
- * Verbindung Terpen und Geschmack stehen im Server-HTML.
+ * Verbindung Terpen und Geschmack stehen im Server-HTML. Seit dem CPU-Limit
+ * (Fehler 1102) trägt das Server-HTML nur die Starttafel plus beide
+ * Pillenreihen; die übrigen Tafeln folgen nach dem Hydrieren.
  */
 const ANSICHT: RegisterAnsicht = {
   terpene: [
@@ -79,9 +81,20 @@ test("RegisterAuswahl: die gewählte Pille ist Quelle, ihre Gegenseite verbunden
   assert.doesNotMatch(knopf("register-note-zitrus"), /data-gedimmt=""/);
 });
 
-test("RegisterAuswahl: große Icons an den Tafeln, farbige Balken je Geschmack", () => {
-  // Ein Icon je Tafel (vier Tafeln), jeweils ein SVG darin.
-  assert.equal(html.match(/data-register-icon=""/g)?.length, 4);
+test("RegisterAuswahl: Server-HTML trägt nur die Starttafel, aber alle Pillen", () => {
+  const tafeln = html.match(/<article[^>]*data-register-tafel[^>]*>/g) ?? [];
+  assert.equal(tafeln.length, 1);
+  assert.match(tafeln[0], /id="register-terpen-limonen"/);
+  assert.match(tafeln[0], /data-aktiv=""/);
+  assert.equal(html.match(/data-register-knopf=""/g)?.length, 4);
+  const andere = renderToStaticMarkup(createElement(RegisterAuswahl, { ansicht: ANSICHT, start: "register-note-erdig", texte: TEXTE }));
+  assert.match(andere, /<article[^>]*id="register-note-erdig"[^>]*data-aktiv=""/);
+  assert.doesNotMatch(andere, /<article[^>]*id="register-terpen-limonen"/);
+});
+
+test("RegisterAuswahl: großes Icon an der Tafel, farbige Balken je Geschmack", () => {
+  // Ein Icon an der Starttafel, ein SVG darin.
+  assert.equal(html.match(/data-register-icon=""/g)?.length, 1);
   assert.match(html, /data-register-icon=""[^>]*><svg/);
   assert.match(html, /data-register-balken=""[^>]*data-geschmack="ZITRUS"[^>]*style="[^"]*background:#f2d129/);
   assert.match(html, /class="bogen-fluss"/);
@@ -96,7 +109,7 @@ const tafelRegel = css.match(/\.glas-tafel \{([^}]*)\}/)?.[1] ?? "";
 
 test("RegisterAuswahl: jede Tafel trägt .glas-tafel statt des vollen Papiers", () => {
   const tafeln = html.match(/<article[^>]*data-register-tafel[^>]*>/g) ?? [];
-  assert.equal(tafeln.length, 4);
+  assert.equal(tafeln.length, 1);
   for (const tafel of tafeln) {
     assert.match(tafel, /class="[^"]*\bglas-tafel\b/);
     assert.doesNotMatch(tafel, /\bbg-surface\b/);

@@ -160,9 +160,11 @@ function Eintrag({ begriff, children }: { begriff: string; children: ReactNode }
 
 /**
  * Das Register "Terpene und Geschmäcker" (T12, Nutzer 2026-09-29): echte
- * Buttons mit aria-pressed und aria-controls wählen genau eine Tafel. Alle
- * Tafeln (article, keine Landmarken) stehen im Server-HTML; `data-aktiv` zeigt die gewählte, ohne
- * JavaScript stehen alle untereinander (globals.css). Ein Querverweis in einer
+ * Buttons mit aria-pressed und aria-controls wählen genau eine Tafel. Im
+ * Server-HTML steht nur die Starttafel (article, keine Landmarke) mit beiden
+ * Pillenreihen (CPU-Limit der Startseite, Fehler 1102); die übrigen Tafeln
+ * rendert die Insel nach dem Hydrieren aus ihren Props nach. `data-aktiv` zeigt
+ * die gewählte, ohne JavaScript steht nur die Starttafel (globals.css). Ein Querverweis in einer
  * Tafel wechselt die Tafel und setzt den Fokus auf die neue, damit er nicht in
  * einer ausgeblendeten Tafel verloren geht.
  *
@@ -172,6 +174,10 @@ function Eintrag({ begriff, children }: { begriff: string; children: ReactNode }
  */
 export function RegisterAuswahl({ ansicht, start, texte }: { ansicht: RegisterAnsicht; start: string; texte: RegisterTexte }) {
   const [aktiv, setAktiv] = useState(start);
+  // Erst nach dem Hydrieren alle Tafeln; Server und erster Client-Render zeigen nur die gewählte.
+  const [montiert, setMontiert] = useState(false);
+  useEffect(() => setMontiert(true), []);
+  const zeige = (anker: string) => montiert || anker === aktiv;
   // Verbindung (T17): Maus-Hover und Tastaturfokus heben vorübergehend hervor; ohne beides gilt
   // die gewählte Pille, außer sie wurde durch erneutes Tippen gelöst.
   const [hervor, setHervor] = useState<string | null>(null);
@@ -337,7 +343,7 @@ export function RegisterAuswahl({ ansicht, start, texte }: { ansicht: RegisterAn
       </div>
 
       <div className="register-tafeln mx-auto grid w-full max-w-3xl content-start">
-        {ansicht.terpene.map((terpen) => (
+        {ansicht.terpene.filter((terpen) => zeige(terpen.anker)).map((terpen) => (
           <Tafel
             key={terpen.anker}
             anker={terpen.anker}
@@ -369,7 +375,7 @@ export function RegisterAuswahl({ ansicht, start, texte }: { ansicht: RegisterAn
             </Eintrag>
           </Tafel>
         ))}
-        {ansicht.noten.map((note) => (
+        {ansicht.noten.filter((note) => zeige(note.anker)).map((note) => (
           <Tafel
             key={note.anker}
             anker={note.anker}

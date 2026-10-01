@@ -24,7 +24,9 @@ export const register: Choreografie = ({ gsap }) => {
   if (erste) eintritt.from(erste, { autoAlpha: 0, y: 24, duration: 0.7, ease: "power3.out", clearProps: "all" }, 0.15);
 
   // Tafelwechsel: RegisterAuswahl setzt data-aktiv; wir reagieren auf das Attribut,
-  // damit die Insel selbst kein GSAP kennt.
+  // damit die Insel selbst kein GSAP kennt. Beobachtet wird die ganze Sektion, weil
+  // die Insel die übrigen Tafeln erst nach dem Hydrieren einhängt (nur die Starttafel
+  // steht im Server-HTML).
   const laufend = new Set<gsap.core.Tween>();
   const aufbauen = (tafel: HTMLElement) => {
     const zeilen = tafel.querySelectorAll<HTMLElement>("[data-register-zeile]");
@@ -43,10 +45,10 @@ export const register: Choreografie = ({ gsap }) => {
   const beobachter = new MutationObserver((wechsel) => {
     for (const eintrag of wechsel) {
       const tafel = eintrag.target as HTMLElement;
-      if (tafel.hasAttribute("data-aktiv")) aufbauen(tafel);
+      if (tafel.hasAttribute("data-register-tafel") && tafel.hasAttribute("data-aktiv")) aufbauen(tafel);
     }
   });
-  for (const tafel of tafeln) beobachter.observe(tafel, { attributes: true, attributeFilter: ["data-aktiv"] });
+  beobachter.observe(sektion, { attributes: true, attributeFilter: ["data-aktiv"], subtree: true });
 
   return () => {
     beobachter.disconnect();

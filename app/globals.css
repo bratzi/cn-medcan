@@ -1354,8 +1354,9 @@ html.joint-cursor :is(input:not([type="range"]):not([type="radio"]):not([type="c
 }
 
 /* Register "Terpene und Geschmäcker" (T12, Nutzer 2026-09-29): mit JavaScript zeigt
-   nur die gewählte Tafel (data-aktiv, RegisterAuswahl.tsx). Ohne stehen alle Tafeln
-   untereinander über die volle Breite, die wirkungslosen Knöpfe entfallen. */
+   nur die gewählte Tafel (data-aktiv, RegisterAuswahl.tsx). Das Server-HTML trägt
+   nur die Starttafel (CPU-Limit, Fehler 1102); ohne JavaScript steht sie allein über
+   die volle Breite, die wirkungslosen Knöpfe entfallen. */
 @media (scripting: enabled) {
   [data-register-tafel]:not([data-aktiv]) {
     display: none;
