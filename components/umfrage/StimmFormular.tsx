@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
-import { stimmeAbgeben } from "@/app/umfragen/aktionen";
+import { stimmeAbgeben } from "@/app/[lang]/umfragen/aktionen";
 import { Button } from "@/components/ui";
 import { useHydriert } from "@/components/ui/useHydriert";
 import type { Woerterbuch } from "@/lib/i18n/typen";

@@ -43,7 +43,7 @@ test("Umschalten wechselt zwischen hell und dunkel", () => {
 });
 
 test("Layout: startet hell, Skript im head, DOM gewinnt beim Hydrieren", () => {
-  const layout = lies("app/layout.tsx");
+  const layout = lies("app/[lang]/layout.tsx");
   assert.match(layout, /data-theme=\{THEMA_STANDARD\}/);
   assert.match(layout, /suppressHydrationWarning/);
   assert.match(
@@ -65,5 +65,5 @@ test("Schalter: eine Lampe, der zugängliche Name nennt das Ziel, per CSS ohne A
 test("Schalter sitzt in der Leiste unten rechts, nicht mehr im Kopf (Nutzer 2026-09-29)", () => {
   assert.doesNotMatch(lies("components/layout/Kopf.tsx"), /ThemaSchalter|SprachSchalter/);
   assert.match(lies("components/layout/SchalterLeiste.tsx"), /<ThemaSchalter texte=\{w\.kopf\.thema\} \/>/);
-  assert.match(lies("app/layout.tsx"), /<SchalterLeiste sprache=\{sprache\} w=\{w\} \/>/);
+  assert.match(lies("app/[lang]/layout.tsx"), /<SchalterLeiste sprache=\{sprache\} w=\{w\} \/>/);
 });

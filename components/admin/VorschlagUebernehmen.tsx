@@ -1,6 +1,6 @@
 "use client";
 
-import { vorschlagUebernehmen } from "@/app/admin/umfrage-aktionen";
+import { vorschlagUebernehmen } from "@/app/[lang]/admin/umfrage-aktionen";
 import { useAktion } from "@/components/admin/useAktion";
 import { Button, Meldung } from "@/components/ui";
 

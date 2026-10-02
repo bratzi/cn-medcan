@@ -45,11 +45,11 @@ test("Wörterbücher: budpic in de und en gleich aufgebaut, Meldungen vorhanden"
 });
 
 test("Server-Aktionen: Upload verlangt Freigabe, Admin-Aktionen den Betreiber, beide pruefen serverseitig", () => {
-  const up = readFileSync("app/blueten/[slug]/budpic-aktionen.ts", "utf8");
+  const up = readFileSync("app/[lang]/blueten/[slug]/budpic-aktionen.ts", "utf8");
   assert.match(up, /freigabeErforderlich\(\)/);
   assert.match(up, /bildPruefen\(/);
   assert.doesNotMatch(up, /\$transaction/);
-  const ad = readFileSync("app/admin/budpic-aktionen.ts", "utf8");
+  const ad = readFileSync("app/[lang]/admin/budpic-aktionen.ts", "utf8");
   assert.match(ad, /adminErforderlich\(\)/);
 });
 
@@ -75,10 +75,10 @@ test("Diashow rendert nur aktuelles, naechstes und (zum Ueberblenden) vorheriges
 });
 
 test("Ablehnen leert den BLOB, Freigegebene lassen sich in /admin zurueckziehen und loeschen", () => {
-  const ad = readFileSync("app/admin/budpic-aktionen.ts", "utf8");
+  const ad = readFileSync("app/[lang]/admin/budpic-aktionen.ts", "utf8");
   assert.match(ad, /status: was, daten: new Uint8Array\(0\)/);
   assert.match(ad, /budpic\.delete/);
-  const seite = readFileSync("app/admin/page.tsx", "utf8");
+  const seite = readFileSync("app/[lang]/admin/page.tsx", "utf8");
   assert.match(seite, /<BudpicListe status="FREIGEGEBEN"/);
   assert.match(readFileSync("components/admin/BudpicFreigabe.tsx", "utf8"), /budpicLoeschen/);
 });

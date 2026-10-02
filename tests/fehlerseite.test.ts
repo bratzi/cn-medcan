@@ -4,7 +4,7 @@ import assert from "node:assert/strict";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 
-import Fehler from "@/app/error";
+import Fehler from "@/app/[lang]/error";
 
 test("Fehlerseite: Titel, Ausweg, Knopf und Rückweg", () => {
   const html = renderToStaticMarkup(createElement(Fehler, { error: new Error("x"), retry: () => {} }));

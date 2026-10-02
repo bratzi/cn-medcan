@@ -26,7 +26,7 @@ export type Aktion = {
 /**
  * Eine Admin-Aktion mit Zustand, Fehlertext und Neuladen.
  *
- * Die Aktionen in `app/admin/*.ts` pruefen ihre Berechtigung selbst und
+ * Die Aktionen in `app/[lang]/admin/*.ts` pruefen ihre Berechtigung selbst und
  * geben Fehler als Text zurueck. Hier steht nur, was die Oberflaeche daraus
  * macht - und der `catch`: `adminErforderlich()` wirft, wenn die Sitzung
  * abgelaufen ist, und ein geworfener Serverfehler kommt im Client als

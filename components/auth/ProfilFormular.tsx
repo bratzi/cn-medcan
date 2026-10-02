@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
-import { profilSpeichern } from "@/app/mitglied/aktionen";
+import { profilSpeichern } from "@/app/[lang]/mitglied/aktionen";
 import { zaehlerZuruecksetzen } from "@/components/layout/konto-zaehler-speicher";
 import { Button, Input, useHydriert } from "@/components/ui";
 import type { Woerterbuch } from "@/lib/i18n/typen";

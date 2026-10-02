@@ -50,7 +50,7 @@ test("Runde anlegen: Formular hat das Feld, die Aktion schreibt es", () => {
   assert.match(formular, /name="vorschlagBisAm"/);
   assert.match(formular, /type="date"/);
 
-  const aktion = quelle("app/admin/umfrage-aktionen.ts");
+  const aktion = quelle("app/[lang]/admin/umfrage-aktionen.ts");
   assert.match(aktion, /vorschlagFristPruefen\(/);
   assert.match(aktion, /vorschlagBisAm:/);
 });

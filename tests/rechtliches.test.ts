@@ -13,23 +13,35 @@ import {
   platzhalter,
   RECHTLICHE_LINKS,
 } from "../lib/rechtliches";
+import { istOhneGate } from "../lib/proxy-regeln";
 
 const lesen = (datei: string) => readFileSync(join(process.cwd(), datei), "utf8");
 
 /** Das Matcher-Muster aus proxy.ts, so wie Next es statisch liest. */
-function gateMuster(): RegExp {
+function proxyMuster(): RegExp {
   const treffer = lesen("proxy.ts").match(/matcher:\s*\[[\s\S]*?"(\/\(\(\?![^"]+)"/);
   assert.ok(treffer, "Matcher in proxy.ts nicht gefunden");
   return new RegExp(`^${treffer[1].replace(/\\\\/g, "\\")}$`);
 }
 
 test("Impressum und Datenschutz sind vom Passwort-Gate ausgenommen", () => {
-  const muster = gateMuster();
   for (const pfad of ["/impressum", "/datenschutz", "/zugang", "/api/sprache"]) {
-    assert.equal(muster.test(pfad), false, `${pfad} liegt hinter dem Gate`);
+    assert.equal(istOhneGate(pfad), true, `${pfad} liegt hinter dem Gate`);
   }
   for (const pfad of ["/", "/reviews", "/mitglied", "/umfragen", "/admin"]) {
-    assert.equal(muster.test(pfad), true, `${pfad} ist nicht mehr geschützt`);
+    assert.equal(istOhneGate(pfad), false, `${pfad} ist nicht mehr geschützt`);
+  }
+});
+
+// Seit 2026-10-01 laufen auch Rechtsseiten (Sprach-Rewrite) und Pfade mit Punkt
+// (Scanner sollen am Gate enden, nicht im Cache) durch den Proxy.
+test("Der Proxy läuft für alle Seiten, auch Rechtsseiten und Pfade mit Punkt", () => {
+  const muster = proxyMuster();
+  for (const pfad of ["/", "/reviews", "/impressum", "/datenschutz", "/zugang", "/wp-login.php", "/api/benachrichtigungen"]) {
+    assert.equal(muster.test(pfad), true, `${pfad} läuft am Proxy vorbei`);
+  }
+  for (const pfad of ["/_next/static/chunks/a.js", "/_next/image", "/favicon.ico", "/icon.png", "/apple-icon.png"]) {
+    assert.equal(muster.test(pfad), false, `${pfad} läuft durch den Proxy`);
   }
 });
 
@@ -38,7 +50,7 @@ test("Fuß und Zugangsseite verlinken beide Seiten", () => {
     RECHTLICHE_LINKS.map((l) => l.href),
     ["/impressum", "/datenschutz"],
   );
-  for (const datei of ["components/layout/Fuss.tsx", "app/zugang/page.tsx"]) {
+  for (const datei of ["components/layout/Fuss.tsx", "app/[lang]/zugang/page.tsx"]) {
     assert.match(lesen(datei), /RECHTLICHE_LINKS\.map/, datei);
   }
 });
@@ -128,13 +140,13 @@ test("ladeRechtliches liest IMPRESSUM_JSON und stürzt ohne Secret nicht ab", as
 });
 
 test("Rechtsseiten ohne Geviertstrich und ohne Gedankenstrich als Trenner", () => {
-  for (const datei of ["app/impressum/page.tsx", "app/datenschutz/page.tsx", "lib/rechtliches.ts"]) {
+  for (const datei of ["app/[lang]/impressum/page.tsx", "app/[lang]/datenschutz/page.tsx", "lib/rechtliches.ts"]) {
     assert.doesNotMatch(lesen(datei), /—|\s–\s/, datei);
   }
 });
 
 test("Datenschutzerklärung nennt alle Cookies und Speicher, die der Code setzt", () => {
-  const text = lesen("app/datenschutz/page.tsx");
+  const text = lesen("app/[lang]/datenschutz/page.tsx");
   const gate = lesen("lib/gate.ts").match(/COOKIE_NAME = "([^"]+)"/)?.[1];
   const thema = lesen("lib/thema.ts").match(/THEMA_SCHLUESSEL = "([^"]+)"/)?.[1];
   const zaehler = lesen("components/layout/konto-zaehler-speicher.ts").match(/ZAEHLER_SPEICHER = "([^"]+)"/)?.[1];
@@ -144,7 +156,7 @@ test("Datenschutzerklärung nennt alle Cookies und Speicher, die der Code setzt"
 });
 
 test("Datenschutz beschreibt Instagram als Zwei-Klick-Lösung mit Einwilligung", () => {
-  const text = lesen("app/datenschutz/page.tsx");
+  const text = lesen("app/[lang]/datenschutz/page.tsx");
   assert.match(text, /Reel von Instagram laden/);
   assert.match(text, /Art\. 6 Abs\. 1 lit\. a DSGVO/);
   assert.match(text, /§ 25 Abs\. 1 TDDDG/);

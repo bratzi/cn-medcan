@@ -15,12 +15,12 @@ const ORDNER = [
   "components/ui",
 ];
 const DATEIEN = [
-  "app/page.tsx",
-  "app/layout.tsx",
-  "app/error.tsx",
-  "app/reviews/page.tsx",
-  "app/umfragen/page.tsx",
-  "app/blueten/[slug]/page.tsx",
+  "app/[lang]/page.tsx",
+  "app/[lang]/layout.tsx",
+  "app/[lang]/error.tsx",
+  "app/[lang]/reviews/page.tsx",
+  "app/[lang]/umfragen/page.tsx",
+  "app/[lang]/blueten/[slug]/page.tsx",
   "components/produkt/Titelblatt.tsx",
   "components/produkt/CannabinoidBar.tsx",
   "components/produkt/TerpenChips.tsx",

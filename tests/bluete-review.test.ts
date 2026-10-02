@@ -17,7 +17,7 @@ test("terpeneNachtragen: neu angelegt oder gleiche Id ohne Terpene, sonst nicht"
 });
 
 test("Freigabe nutzt terpeneNachtragen ausserhalb des Anlegen-Zweigs", () => {
-  const quelle = lies("app/admin/vorschlag-aktionen.ts");
+  const quelle = lies("app/[lang]/admin/vorschlag-aktionen.ts");
   assert.match(quelle, /terpeneNachtragen\(/);
   assert.match(quelle, /strainTerpen\.count\(/);
 });

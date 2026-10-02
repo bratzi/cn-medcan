@@ -64,7 +64,7 @@ import { aktuellesMitglied } from "@/lib/session";
  */
 export const dynamic = "force-dynamic";
 
-export async function generateMetadata({ params }: PageProps<"/blueten/[slug]">): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
   const [handelsname, w] = await Promise.all([ladeStrainTitel(slug), holeWoerterbuch()]);
   if (!handelsname) return { title: w.bluete.nichtGefunden };
@@ -403,7 +403,7 @@ async function ProduktInhalt({ slug, w, sprache }: { slug: string; w: Woerterbuc
   );
 }
 
-export default async function ProduktDetailPage({ params }: PageProps<"/blueten/[slug]">) {
+export default async function ProduktDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const [w, sprache] = await Promise.all([holeWoerterbuch(), holeSprache()]);
   return (

@@ -2,7 +2,7 @@
 
 import type { FormEvent } from "react";
 
-import { umfrageAnlegen } from "@/app/admin/umfrage-aktionen";
+import { umfrageAnlegen } from "@/app/[lang]/admin/umfrage-aktionen";
 import { useAktion } from "@/components/admin/useAktion";
 import { Button, Field, Input, Meldung } from "@/components/ui";
 import { BESCHREIBUNG_MAXLAENGE, TITEL_MAXLAENGE } from "@/lib/umfrage-eingabe";

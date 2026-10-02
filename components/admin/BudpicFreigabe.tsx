@@ -1,6 +1,6 @@
 "use client";
 
-import { budpicAblehnen, budpicFreigeben, budpicLoeschen } from "@/app/admin/budpic-aktionen";
+import { budpicAblehnen, budpicFreigeben, budpicLoeschen } from "@/app/[lang]/admin/budpic-aktionen";
 import { useAktion } from "@/components/admin/useAktion";
 import { BudpicBild } from "@/components/medien/Bild";
 import { Button, Meldung } from "@/components/ui";

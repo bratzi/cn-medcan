@@ -28,7 +28,7 @@ test("inHaeppchen: D1 erlaubt ~100 Bind-Werte, Haeppchen bleiben bei 90", () => 
 });
 
 test("Vorschlaege werden in Haeppchen geschlossen, nie mit allen Ids auf einmal", () => {
-  const quelle = lies("app/admin/vorschlag-aktionen.ts");
+  const quelle = lies("app/[lang]/admin/vorschlag-aktionen.ts");
   assert.match(quelle, /for \(const teil of inHaeppchen\(/);
   assert.match(quelle, /id: \{ in: teil \}/);
   assert.doesNotMatch(quelle, /id: \{ in: offene\.map/);
@@ -44,10 +44,10 @@ test("gelesenIdsPruefen: nur Texte, ohne Doppelte, hoechstens so viele wie angez
 });
 
 test("Gelesen gilt nur fuer die angezeigten Benachrichtigungen", () => {
-  const aktion = lies("app/mitglied/aktionen.ts");
+  const aktion = lies("app/[lang]/mitglied/aktionen.ts");
   assert.match(aktion, /export async function benachrichtigungenGelesen\(roh: unknown\)/);
   assert.match(aktion, /id: \{ in: ids \}, mitgliedId: mitglied\.mitgliedId, gelesenAm: null/);
-  const seite = lies("app/mitglied/page.tsx");
+  const seite = lies("app/[lang]/mitglied/page.tsx");
   assert.match(seite, /<GelesenMarkieren ids=\{ungelesen\} \/>/);
   assert.match(lies("lib/query/benachrichtigungen.ts"), /take: MAX_BENACHRICHTIGUNGEN/);
 });
@@ -67,7 +67,7 @@ test("herstellerRolleNachFreigabe: Importeur wird BEIDES, sonst bleibt die Rolle
 });
 
 test("Freigabe hebt einen gefundenen Importeur auf BEIDES", () => {
-  const quelle = lies("app/admin/vorschlag-aktionen.ts");
+  const quelle = lies("app/[lang]/admin/vorschlag-aktionen.ts");
   assert.match(quelle, /herstellerRolleNachFreigabe\(vorhanden\.rolle\)/);
   assert.match(quelle, /unternehmen\.update\(/);
 });
@@ -87,37 +87,37 @@ test("freigabeKonflikt: gleiche Id mit anderem Namen ist ein Konflikt (Korrektur
 });
 
 test("Freigabe: P2002 beim Anlegen nur hinnehmen, wenn die Bluete mit dieser Id wirklich steht", () => {
-  const quelle = lies("app/admin/vorschlag-aktionen.ts");
+  const quelle = lies("app/[lang]/admin/vorschlag-aktionen.ts");
   assert.match(quelle, /let angelegt = false;/);
   assert.match(quelle, /neuAngelegt: angelegt/);
   assert.match(quelle, /strain\.findUnique\(\{ where: \{ id: strainId \}/);
 });
 
 test("Freigabe aus zwei Tabs: doppelte Terpen-Zeilen werfen nicht", () => {
-  const quelle = lies("app/admin/vorschlag-aktionen.ts");
+  const quelle = lies("app/[lang]/admin/vorschlag-aktionen.ts");
   assert.match(quelle, /strainTerpen\.createMany\([\s\S]*?\}\);\s*\} catch \(fehler\) \{\s*(\/\/[^\n]*\n\s*)?if \(!istEindeutigkeitsfehler\(fehler\)\) throw fehler;/);
 });
 
 test("Inaktive Blueten: kein Link ins Leere, Freigabe schaltet sie wieder an", () => {
   assert.match(lies("lib/query/vorschlaege.ts"), /select: \{ id: true, slug: true, handelsname: true, aktiv: true \}/);
-  assert.match(lies("app/vorschlagen/aktionen.ts"), /if \(vorhanden\?\.aktiv\)/);
-  assert.match(lies("app/admin/vorschlag-aktionen.ts"), /data: \{ aktiv: true \}/);
+  assert.match(lies("app/[lang]/vorschlagen/aktionen.ts"), /if \(vorhanden\?\.aktiv\)/);
+  assert.match(lies("app/[lang]/admin/vorschlag-aktionen.ts"), /data: \{ aktiv: true \}/);
 });
 
 test("Doppelvorschlag verlinkt auf Mein Konto", () => {
-  assert.match(lies("app/vorschlagen/aktionen.ts"), /schonVorgeschlagen: true/);
+  assert.match(lies("app/[lang]/vorschlagen/aktionen.ts"), /schonVorgeschlagen: true/);
   assert.match(lies("components/vorschlag/BlueteVorschlagFormular.tsx"), /href="\/mitglied"/);
 });
 
 test("vorschlagPfad: Suchbegriff bleibt erhalten, auch ueber die Anmeldung", () => {
   assert.equal(vorschlagPfad(""), "/vorschlagen");
   assert.equal(vorschlagPfad("Apples & Bananas"), "/vorschlagen?name=Apples%20%26%20Bananas");
-  const seite = lies("app/vorschlagen/page.tsx");
+  const seite = lies("app/[lang]/vorschlagen/page.tsx");
   assert.match(seite, /redirect\(`\/anmelden\?weiter=\$\{encodeURIComponent\(vorschlagPfad\(nameVorbelegt\)\)\}`\)/);
 });
 
 test("Leeres Suchergebnis zeigt nur einen Vorschlags-Einstieg", () => {
-  const katalog = lies("app/blueten/page.tsx");
+  const katalog = lies("app/[lang]/blueten/page.tsx");
   assert.match(katalog, /liste\.eintraege\.length > 0 \? \(\s*<p className="text-small text-text-muted">\s*\{texte\.fehlt\}/);
 });
 

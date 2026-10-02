@@ -3,7 +3,7 @@
 import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 
-import { avatarEntfernen, avatarSpeichern } from "@/app/mitglied/aktionen";
+import { avatarEntfernen, avatarSpeichern } from "@/app/[lang]/mitglied/aktionen";
 import { zaehlerZuruecksetzen } from "@/components/layout/konto-zaehler-speicher";
 import { Avatar, Button, useHydriert } from "@/components/ui";
 import { AVATAR_MAX_BYTES, AVATAR_SEITE } from "@/lib/avatar";

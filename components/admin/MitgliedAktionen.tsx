@@ -1,6 +1,6 @@
 "use client";
 
-import { freigabeSetzen, rolleSetzen } from "@/app/admin/aktionen";
+import { freigabeSetzen, rolleSetzen } from "@/app/[lang]/admin/aktionen";
 import { useAktion } from "@/components/admin/useAktion";
 import { Button, Meldung, Select } from "@/components/ui";
 import { MITGLIED_ROLLEN, type MitgliedRolle } from "@/db/enums";

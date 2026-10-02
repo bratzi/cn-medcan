@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
-import { bewertungSpeichern } from "@/app/blueten/[slug]/aktionen";
+import { bewertungSpeichern } from "@/app/[lang]/blueten/[slug]/aktionen";
 import { AromaErkundung } from "@/components/review/AromaErkundung";
 import type { AromaSerie } from "@/components/review/AromaKarte";
 import type { BeschaffenheitsWerte } from "@/components/review/BeschaffenheitsLeiste";

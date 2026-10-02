@@ -2,7 +2,7 @@
 
 import type { FormEvent } from "react";
 
-import { blueteAblehnen, blueteFreigeben, blueteZuordnen } from "@/app/admin/vorschlag-aktionen";
+import { blueteAblehnen, blueteFreigeben, blueteZuordnen } from "@/app/[lang]/admin/vorschlag-aktionen";
 import type { Aktion } from "@/components/admin/useAktion";
 import { useAktion } from "@/components/admin/useAktion";
 import { Button, Input, Meldung, Select } from "@/components/ui";

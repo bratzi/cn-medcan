@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 
-import { blueteVorschlagen, type VorschlagErgebnis } from "@/app/vorschlagen/aktionen";
+import { blueteVorschlagen, type VorschlagErgebnis } from "@/app/[lang]/vorschlagen/aktionen";
 import { Button, Field, Input, Meldung, Select, textLinkKlassen } from "@/components/ui";
 import { useHydriert } from "@/components/ui/useHydriert";
 import type { SelectOption } from "@/components/ui";

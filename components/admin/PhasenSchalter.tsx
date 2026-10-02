@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-import { phaseWeiterschalten } from "@/app/admin/umfrage-aktionen";
+import { phaseWeiterschalten } from "@/app/[lang]/admin/umfrage-aktionen";
 import { useAktion } from "@/components/admin/useAktion";
 import { Button, Meldung } from "@/components/ui";
 import type { UmfragePhase } from "@/db/enums";

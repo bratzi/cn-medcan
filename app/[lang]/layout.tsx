@@ -1,13 +1,17 @@
 import type { Metadata } from "next";
 import { Inspiration, Newsreader } from "next/font/google";
+import { notFound } from "next/navigation";
+import { lang } from "next/root-params";
+import type { ReactNode } from "react";
 import { JointCursor } from "@/components/layout/JointCursor";
 import { SchalterLeiste } from "@/components/layout/SchalterLeiste";
 import { Fuss } from "@/components/layout/Fuss";
 import { Kopf } from "@/components/layout/Kopf";
 import { holeSprache, holeWoerterbuch } from "@/lib/i18n";
+import { istSprache } from "@/lib/i18n/sprache-kern";
 import { EINSTELLUNG_SKRIPT } from "@/lib/einstellungen";
 import { THEMA_SKRIPT, THEMA_STANDARD } from "@/lib/thema";
-import "./globals.css";
+import "../globals.css";
 
 /**
  * Eine von zwei Familien (Spec Redesign 11): Newsreader trägt alles Gedruckte,
@@ -40,7 +44,14 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-export default async function RootLayout({ children }: LayoutProps<"/">) {
+/**
+ * Root-Layout im internen Sprachsegment (Spec 2026-10-01, statische Seiten,
+ * 4.1): Der Proxy schreibt /x auf /de/x oder /en/x um; die Sprache steht damit
+ * im Pfad, und das Layout liest keine Anfrage mehr. Andere Werte erreichen es
+ * nur an Proxy und Rewrite vorbei.
+ */
+export default async function RootLayout({ children }: { children: ReactNode }) {
+  if (!istSprache(await lang())) notFound();
   const [sprache, w] = await Promise.all([holeSprache(), holeWoerterbuch()]);
 
   return (

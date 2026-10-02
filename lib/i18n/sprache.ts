@@ -1,17 +1,19 @@
 import "server-only";
 
-import { cache } from "react";
-import { cookies, headers } from "next/headers";
+import { lang } from "next/root-params";
 
-import { I18N_OEFFENTLICH } from "./schalter";
-import { bestimmeSprache, SPRACH_COOKIE, type Sprache } from "./sprache-kern";
+import { istSprache, type Sprache } from "./sprache-kern";
 
-/** Einmal je Anfrage (React cache). cookies()/headers() machen die Route dynamisch. */
-export const holeSprache = cache(async (): Promise<Sprache> => {
-  const [cookieSpeicher, anfrageHeader] = await Promise.all([cookies(), headers()]);
-  return bestimmeSprache({
-    cookie: cookieSpeicher.get(SPRACH_COOKIE)?.value,
-    acceptLanguage: anfrageHeader.get("accept-language"),
-    erkennungAktiv: I18N_OEFFENTLICH,
-  });
-});
+/**
+ * Sprache der gerenderten Seite (Spec 2026-10-01, statische Seiten, 4.2): aus
+ * dem internen Segment app/[lang], das der Proxy setzt. Server Components
+ * lesen damit keine Anfrage mehr, und Seiten ohne Nutzerdaten können statisch
+ * werden.
+ *
+ * Nicht in Server Actions und Route Handlern: dort wirft next/root-params. Die
+ * nehmen holeSpracheAusAnfrage() aus lib/i18n/anfrage.ts.
+ */
+export async function holeSprache(): Promise<Sprache> {
+  const wert = await lang();
+  return istSprache(wert) ? wert : "de";
+}

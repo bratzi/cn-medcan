@@ -6,6 +6,7 @@ import type { ReactNode } from "react";
 
 import { cn } from "@/lib/cn";
 import { istAktiv } from "@/lib/navigation";
+import { ohneSprachPraefix } from "@/lib/proxy-regeln";
 
 type Props = {
   href: string;
@@ -20,7 +21,10 @@ type Props = {
  * Kopf selbst bleibt Server Component und liest keine Sitzung.
  */
 export function NavLink({ href, className, aktivKlasse, children }: Props) {
-  const aktiv = istAktiv(usePathname() ?? "", href);
+  // Der Server rendert unter dem internen Pfad (/de/reviews), der Browser kennt
+  // den sichtbaren (/reviews): ohne Präfix vergleichen, sonst weicht das
+  // Hydrieren ab (Spec 2026-10-01, statische Seiten, 4.2).
+  const aktiv = istAktiv(ohneSprachPraefix(usePathname() ?? ""), href);
   return (
     <Link href={href} prefetch={false} aria-current={aktiv ? "page" : undefined} className={cn(className, aktiv && aktivKlasse)}>
       {children}

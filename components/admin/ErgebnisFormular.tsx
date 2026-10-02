@@ -2,7 +2,7 @@
 
 import type { FormEvent } from "react";
 
-import { ergebnisVerknuepfen } from "@/app/admin/umfrage-aktionen";
+import { ergebnisVerknuepfen } from "@/app/[lang]/admin/umfrage-aktionen";
 import { useAktion } from "@/components/admin/useAktion";
 import { Button, Meldung, Select } from "@/components/ui";
 import type { SelectOption } from "@/components/ui";

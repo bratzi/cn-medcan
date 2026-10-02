@@ -10,7 +10,7 @@ import { join } from "node:path";
  * Sprung auf #eintrag-… findet sein Ziel nicht (Spec 13.7), und ein
  * unbekanntes Produkt antwortet mit 200 statt 404 (Spec 9.3).
  */
-const SEITEN = ["app/reviews/page.tsx", "app/umfragen/page.tsx", "app/blueten/[slug]/page.tsx"];
+const SEITEN = ["app/[lang]/reviews/page.tsx", "app/[lang]/umfragen/page.tsx", "app/[lang]/blueten/[slug]/page.tsx"];
 
 test("Unterseiten ohne Suspense-Grenze um den Inhalt", () => {
   const treffer = SEITEN.filter((datei) => /<Suspense\b/.test(readFileSync(join(process.cwd(), datei), "utf8")));

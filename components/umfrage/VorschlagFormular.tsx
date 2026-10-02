@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
-import { vorschlagEinreichen } from "@/app/umfragen/aktionen";
+import { vorschlagEinreichen } from "@/app/[lang]/umfragen/aktionen";
 import { Button, Field, Select, textLinkKlassen } from "@/components/ui";
 import { useHydriert } from "@/components/ui/useHydriert";
 import type { SelectOption } from "@/components/ui";

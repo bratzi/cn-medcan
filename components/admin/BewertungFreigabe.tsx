@@ -1,6 +1,6 @@
 "use client";
 
-import { bewertungFreigeben, bewertungVerwerfen } from "@/app/admin/aktionen";
+import { bewertungFreigeben, bewertungVerwerfen } from "@/app/[lang]/admin/aktionen";
 import { useAktion } from "@/components/admin/useAktion";
 import { Button, Meldung } from "@/components/ui";
 

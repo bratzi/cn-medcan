@@ -3,7 +3,7 @@
 import { useRef, useState } from "react";
 import Link from "next/link";
 
-import { budpicHochladen } from "@/app/blueten/[slug]/budpic-aktionen";
+import { budpicHochladen } from "@/app/[lang]/blueten/[slug]/budpic-aktionen";
 import { Button, einzelLinkKlassen, useHydriert } from "@/components/ui";
 import { BUDPIC_MAX_BYTES, BUDPIC_MAX_DATEIEN, BUDPIC_MAX_KANTE } from "@/lib/budpics";
 import { bildVerkleinernFrei } from "@/lib/bild-verkleinern";

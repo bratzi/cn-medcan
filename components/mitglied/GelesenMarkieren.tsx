@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 
-import { benachrichtigungenGelesen } from "@/app/mitglied/aktionen";
+import { benachrichtigungenGelesen } from "@/app/[lang]/mitglied/aktionen";
 import { zaehlerZuruecksetzen } from "@/components/layout/konto-zaehler-speicher";
 
 /**

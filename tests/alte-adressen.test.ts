@@ -63,11 +63,11 @@ test("nur die alten Adressen werden umgeleitet", () => {
 
 test("Ziel existiert als Route, die alte Route ist weg, next.config nutzt die Regeln", () => {
   const wurzel = process.cwd();
-  assert.ok(existsSync(join(wurzel, "app/blueten/page.tsx")));
-  assert.ok(existsSync(join(wurzel, "app/blueten/[slug]/page.tsx")));
-  assert.ok(!existsSync(join(wurzel, "app/produkte")));
-  assert.ok(!existsSync(join(wurzel, "app/bewerten")));
-  assert.ok(existsSync(join(wurzel, "app/blueten/[slug]/aktionen.ts")));
+  assert.ok(existsSync(join(wurzel, "app/[lang]/blueten/page.tsx")));
+  assert.ok(existsSync(join(wurzel, "app/[lang]/blueten/[slug]/page.tsx")));
+  assert.ok(!existsSync(join(wurzel, "app/[lang]/produkte")));
+  assert.ok(!existsSync(join(wurzel, "app/[lang]/bewerten")));
+  assert.ok(existsSync(join(wurzel, "app/[lang]/blueten/[slug]/aktionen.ts")));
   const config = readFileSync(join(wurzel, "next.config.ts"), "utf8");
   assert.match(config, /redirects\(\)\s*\{\s*return \[\.\.\.ALTE_KATALOG_WEITERLEITUNGEN\]/);
 });

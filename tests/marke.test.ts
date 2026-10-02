@@ -58,7 +58,7 @@ test("Handschrift: Inspiration mit Rückfall, nur 400, keine synthetischen Schni
   }
   assert.match(css, /\.font-hand\s*\{[^}]*font-synthesis:\s*none/);
   assert.match(
-    lies("app/layout.tsx"),
+    lies("app/[lang]/layout.tsx"),
     /Inspiration\(\{[\s\S]*?variable: "--font-inspiration"[\s\S]*?weight: "400"[\s\S]*?adjustFontFallback: true/,
   );
 });

@@ -53,7 +53,7 @@ function statusVariante(status: string): BadgeVariante {
 
 export async function generateMetadata({
   params,
-}: PageProps<"/apotheken/[slug]">): Promise<Metadata> {
+}: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
   const [apotheke, w] = await Promise.all([ladeApothekeDetail(slug, false), holeWoerterbuch()]);
 
@@ -283,7 +283,7 @@ async function ApothekeInhalt({ slug, w, sprache }: { slug: string; w: Woerterbu
 
 export default async function ApothekeDetailPage({
   params,
-}: PageProps<"/apotheken/[slug]">) {
+}: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const [w, sprache] = await Promise.all([holeWoerterbuch(), holeSprache()]);
 
