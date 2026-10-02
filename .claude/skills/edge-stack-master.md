@@ -174,9 +174,9 @@ Nicht cachen: nutzerbezogene Antworten (§5), alles hinter Auth, alles mit `Set-
 
 **Wenn ISR genutzt wird, braucht OpenNext eigene Infrastruktur** (Quelle: https://opennext.js.org/cloudflare/caching):
 - **Kein R2** (Nutzer 2026-09-25: Projekt strikt kostenfrei, R2 rechnet über dem Free-Tier ab). Incremental
-  Cache stattdessen **KV** (Binding `NEXT_INC_CACHE_KV`) hinter dem **Regional Cache** (Cache API, spart
-  KV-Lesezugriffe); Free-Plan-Grenzen sind hart (Fehler statt Rechnung), Revalidate-Intervalle so wählen,
-  dass 1000 KV-Schreibvorgänge/Tag nie erreicht werden. Tag-Cache über **D1** (`NEXT_TAG_CACHE_D1`),
+  Cache stattdessen **KV** (Binding `NEXT_INC_CACHE_KV`) direkt, ohne Regional Cache (die Cache API wirkt
+  nur auf Custom Domains, Entscheid 2026-10-01); Free-Plan-Grenzen sind hart (Fehler statt Rechnung), Revalidate-Intervalle so wählen,
+  dass 1000 KV-Schreibvorgänge/Tag nie erreicht werden. Tag-Cache über **D1** (`NEXT_TAG_CACHE_D1`, derzeit nicht eingerichtet),
 - ein **Service-Binding `WORKER_SELF_REFERENCE`**, das auf den eigenen Worker (`cn-medcan`) zeigt,
 - für zeitbasierte Revalidation die **memoryQueue** über dieses Service-Binding (Entscheid 2026-10-01:
   keine Durable Objects; bei unserer Last reicht die Entdoppelung je Isolate), für On-Demand-Revalidation
