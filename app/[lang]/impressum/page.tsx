@@ -7,6 +7,14 @@ import { cn } from "@/lib/cn";
 import { holeSprache, holeWoerterbuch } from "@/lib/i18n";
 import { istPlatzhalter, ladeRechtliches } from "@/lib/rechtliches";
 
+/**
+ * Statisch je Sprache, täglich neu (Spec 2026-10-01, statische Seiten, 4.3).
+ * Eine Änderung an IMPRESSUM_JSON greift spätestens nach einem Tag, sofort mit
+ * dem nächsten Push (neuer Build, neuer Cache).
+ */
+export const dynamic = "force-static";
+export const revalidate = 86400;
+
 /*
  * VORLAGE, vor dem öffentlichen Start rechtlich prüfen lassen.
  * Grundlage: § 5 DDG (Anbieterkennzeichnung) und § 18 Abs. 2 MStV
@@ -14,7 +22,7 @@ import { istPlatzhalter, ladeRechtliches } from "@/lib/rechtliches";
  * redaktionellen Bewertungen). Alle Betreiberdaten kommen zur Laufzeit aus
  * dem Secret IMPRESSUM_JSON (lib/rechtliches.ts); fehlende stehen dort als
  * sichtbarer Platzhalter.
- * Die Seite ist vom Passwort-Gate ausgenommen (proxy.ts), weil das
+ * Die Seite ist vom Passwort-Gate ausgenommen (lib/proxy-regeln.ts), weil das
  * Impressum ohne Hürde erreichbar sein muss.
  */
 

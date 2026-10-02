@@ -6,6 +6,14 @@ import { ZugangFelder } from "@/components/zugang/ZugangFelder";
 import { holeWoerterbuch } from "@/lib/i18n";
 import { RECHTLICHE_LINKS } from "@/lib/rechtliches";
 
+/**
+ * Statisch je Sprache, ohne Ablauf (Spec 2026-10-01, statische Seiten, 4.3):
+ * Der Text kommt nur aus dem Wörterbuch, `weiter` und `fehler` liest
+ * ZugangFelder im Browser.
+ */
+export const dynamic = "force-static";
+export const revalidate = false;
+
 export async function generateMetadata(): Promise<Metadata> {
   const w = await holeWoerterbuch();
   return { title: w.zugang.titel, robots: { index: false, follow: false } };

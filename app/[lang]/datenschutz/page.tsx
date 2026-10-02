@@ -8,6 +8,14 @@ import { cn } from "@/lib/cn";
 import { holeSprache, holeWoerterbuch } from "@/lib/i18n";
 import { DATENSCHUTZ_STAND, HOSTING_GRUNDLAGE, istPlatzhalter, ladeRechtliches } from "@/lib/rechtliches";
 
+/**
+ * Statisch je Sprache, täglich neu (Spec 2026-10-01, statische Seiten, 4.3).
+ * Eine Änderung an IMPRESSUM_JSON greift spätestens nach einem Tag, sofort mit
+ * dem nächsten Push (neuer Build, neuer Cache).
+ */
+export const dynamic = "force-static";
+export const revalidate = 86400;
+
 /*
  * VORLAGE, vor dem öffentlichen Start rechtlich prüfen lassen (Art. 13 DSGVO).
  *
