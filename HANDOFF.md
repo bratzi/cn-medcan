@@ -28,34 +28,34 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 
 ## ⇢ Hier geht es weiter
 
-### ⇢ SESSION 37 (2026-10-01/02): Statische Seiten gegen 1102, per SDD, Stand bei Task 10 von 11
+### ⇢ SESSION 37 (2026-10-01/02): Statische Seiten gegen 1102, Plan vollständig umgesetzt und live (`d83a644..88d8342`)
 
-**ALS ERSTES (ohne Rückfrage):** Skill `superpowers:subagent-driven-development` laden, Ledger
-`.superpowers/sdd/2026-10-01-statische-seiten/progress.md` lesen (Rulings R1–R8, Minors, Stand), weiter mit
-**Task 10 Steps 5–8** (Build-Log, Live-Prüfung, CPU-Vergleich – Controller-Arbeit), danach Task 11.
-Briefs per `scripts/task-brief`. Plan `docs/superpowers/plans/2026-10-01-statische-seiten.md`, Spec
-`docs/superpowers/specs/2026-10-01-statische-seiten-sprache-in-url-design.md`.
-- **Tasks 1–9 fertig und reviewt, Task 10 Steps 1–3 fertig und reviewt; alles gepusht (`d83a644..88d8342`).**
-  Startseite und `/reviews` sind `force-static` mit `revalidate = 300`; Impressum, Datenschutz, Zugang statisch (○).
-- **Neu in dieser Session:** `GET /api/startseite` liefert die Teile mit Sitzung (`Cache-Control: private, no-store`);
-  `StartSitzung`/`useStartSitzung` holen sie im Browser; Stimmzettel, Empfehlungen und „Bild beitragen“ rendern
-  clientseitig aus diesem Stand, mit Zuständen `laedt`/`fehler`/`veraltet` (veraltete Runde zeigt Link `/umfragen`).
-- **Neue Dauerregel (Nutzer 2026-10-02):** Pläne künftig von Anfang an in parallel ausführbare Stränge schneiden —
-  keine gemeinsamen Dateien, keine Typen, die ein Strang erst für den anderen erzeugt; je Strang ein Worktree,
-  Implementer parallel, am Ende ein Merge und ein Review. Push-Prüfpunkte bleiben seriell (nur ein `main` geht live).
-  Gemeinsam genutzte Testdateien zählen als Abhängigkeit. Gilt ab dem nächsten Plan, nicht rückwirkend für diesen.
-- **Live noch offen (Task 10 Steps 5–8):** Build-Log prüfen (Routen nicht `ƒ`, KV-Befüllung), abgemeldet 307 auf
-  `/zugang`, angemeldet Startseite und `/reviews` in beiden Sprachen, Cache-HIT beim zweiten Aufruf, CPU-Vergleich.
-  Nicht abstimmen (nicht umkehrbar), nur `/api/startseite` per `fetch` vergleichen.
-- **Tasks 1–6 (Vorsession) gepusht und live geprüft (`d83a644..b4314e2`).** `/impressum` HIT 5 ms CPU statt ~40 ms,
-  Sprachwechsel live ok (303 auf gleiche URL).
-- Offen für T10-Livecheck: ein `exception` bei `/blueten/thc-akut-25-rs11` im Worker-Log (Ursache unbekannt).
-- Browser 1 läuft als Hintergrund-Tab: Screenshots und Formular-Submit hängen dort, Prüfung per JS/`fetch`/curl.
-- Inhalt bisher: KV-Cache (Namespace `501e88b46f8344ff85f88eb24dcea156`, ohne Regional Cache, R8), memoryQueue,
-  Cache-Interception; Proxy-Regeln; Actions lesen Sprache aus der Anfrage; Sprachwechsel `POST /api/sprache`;
-  alle Seiten unter `app/[lang]`, Proxy schreibt `/x` intern auf `/de/x`/`/en/x` um, `holeSprache` über `next/root-params`.
-- Vorher (Session 36/37): Herstellertreue auf Sweet-Spot-Score (`5c9a1fe`), Prefetches aus + robots.txt statisch (`c033a5f`), live.
-- Nutzerwunsch: bei SDD öfter Safe 4 clear (alle 2–3 Tasks, vor jedem Push).
+Plan `docs/superpowers/plans/2026-10-01-statische-seiten.md` (11 Tasks) ist fertig, Verlauf und Rulings R1 bis R9 in
+`.superpowers/sdd/2026-10-01-statische-seiten/progress.md`. Spec `docs/superpowers/specs/2026-10-01-statische-seiten-sprache-in-url-design.md`.
+- **Live seit Push `d83a644..88d8342` auf main.** Statisch je Sprache: `/` und `/reviews` revalidate 300 s, `/impressum`
+  und `/datenschutz` 86400 s, `/zugang` revalidate false. Die Sprache steht als internes Segment `app/[lang]` im Rewrite,
+  NICHT in der sichtbaren URL (`/english/reviews` ist deshalb korrekt 404).
+- **Cache-Aufbau:** KV als Incremental Cache direkt (Namespace `501e88b46f8344ff85f88eb24dcea156`), kein Regional Cache
+  (Cache API wirkt nur auf Custom Domains, die Seite läuft auf `*.workers.dev`, R8), memoryQueue, Cache-Interception.
+- **Neu:** `GET /api/startseite` liefert die Teile mit Sitzung (`Cache-Control: private, no-store`); Stimmzettel,
+  Empfehlungen und „Bild beitragen“ rendern im Browser aus diesem Stand (`laedt`/`fehler`/`veraltet`).
+- **Build 2026-10-02 (`88d8342`) erfolgreich:** `/[lang]`, `/[lang]/reviews`, `/[lang]/impressum`, `/[lang]/datenschutz`,
+  `/[lang]/zugang` als ○ statisch, der Rest ƒ; KV-Cache mit 5 Einträgen befüllt.
+- **Abgemeldet geprüft:** `/`, `/reviews`, `/api/startseite` je 307 auf `/zugang`; `/impressum` 200, erster Abruf MISS, zweiter HIT.
+- **Angemeldet geprüft:** Startseite mit Empfehlungen, Stimmzettel („Deine Stimme ist gezählt“), „Bild beitragen“;
+  `/reviews` deutsch und englisch über den Sprachknopf auf derselben URL; `/umfragen`, `/mitglied`, Blütenseite unverändert dynamisch.
+- **CPU über 60 min (Cloudflare Observability):** `/` n=17 p50=14 ms max=598; `/reviews` n=13 p50=28 max=243;
+  `/impressum` n=9 p50=37 max=277; `/umfragen` p50=29; `/mitglied` p50=37; `/blueten/:slug` p50=53;
+  exceededCpu=0 auf allen Pfaden. Kein outcome außer `ok` (das offene „exception“ aus Session 36 ist erledigt).
+- **Offen für die nächste Session:**
+  - 24-h-Vergleich der Logs gegen den Befund vom 2026-10-01 (Startseite kalt 400 bis 1832 ms, 62× exceededCpu in 24 h).
+  - Abstimmen auf der Startseite live mit dem Nutzer prüfen (eine echte Stimme ist nicht umkehrbar, bisher nicht getestet).
+  - Live-Prüfliste aus Session 36 (siehe unten).
+- **Prüfgrenze:** `fetch()` aus dem Browser-MCP-JS-Kontext erreicht die Seite nicht (bleibt pending); Cache-Header angemeldet
+  daher nicht direkt messbar, Beleg über Resource-Timing und Observability (R9).
+- **Dauerregel (Nutzer 2026-10-02):** Pläne künftig von Anfang an in parallel ausführbare Stränge schneiden, je Strang ein
+  Worktree, Implementer parallel, am Ende ein Merge und ein Review. Push-Prüfpunkte bleiben seriell.
+- Browser 1 läuft als Hintergrund-Tab: Screenshots und Formular-Submit hängen dort, Prüfung per JS/curl.
 
 ### ⇢ SESSION 36 (2026-09-30/10-01): Register, Band, Sweet Spot, Terpen-Regler in der Karte, CPU-Fix – alles live (`2c7be45`)
 

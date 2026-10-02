@@ -178,8 +178,13 @@ Nicht cachen: nutzerbezogene Antworten (§5), alles hinter Auth, alles mit `Set-
   KV-Lesezugriffe); Free-Plan-Grenzen sind hart (Fehler statt Rechnung), Revalidate-Intervalle so wählen,
   dass 1000 KV-Schreibvorgänge/Tag nie erreicht werden. Tag-Cache über **D1** (`NEXT_TAG_CACHE_D1`),
 - ein **Service-Binding `WORKER_SELF_REFERENCE`**, das auf den eigenen Worker (`cn-medcan`) zeigt,
-- für zeitbasierte Revalidation zusätzlich eine Durable-Object-Queue (`NEXT_CACHE_DO_QUEUE`), für
-  On-Demand-Revalidation zusätzlich ein Tag-Cache-Binding,
+- für zeitbasierte Revalidation die **memoryQueue** über dieses Service-Binding (Entscheid 2026-10-01:
+  keine Durable Objects; bei unserer Last reicht die Entdoppelung je Isolate), für On-Demand-Revalidation
+  zusätzlich ein Tag-Cache-Binding (derzeit keins: `revalidatePath` wirkt nicht auf den Cache),
+- **so umgesetzt seit 2026-10-01**: `open-next.config.ts` (KV als Incremental Cache direkt, kein Regional Cache:
+  die Cache API wirkt nur auf Custom Domains, siehe Entscheid 2026-10-01; memoryQueue, Cache-Interception),
+  Seiten schalten je Seite per `dynamic = "force-static"` plus `revalidate` um, die Sprache steht im internen
+  Segment `app/[lang]` (Spec `docs/superpowers/specs/2026-10-01-statische-seiten-sprache-in-url-design.md`),
 - KV ist laut OpenNext wegen eventual consistency nur zweite Wahl; wir nehmen es bewusst in Kauf (Minuten alte
   Katalogdaten sind vertretbar, Preise/Fachkreis und eigene Stimmen bleiben dynamisch).
 
@@ -241,7 +246,7 @@ Vor dem Fertigmelden einer Edge-Aufgabe jeden Punkt tatsächlich prüfen — nic
 - [ ] Nach einer Migration `db/constraints.sql` erneut ausgeführt (SQLite verwirft Trigger beim Tabellenumbau).
 - [ ] Jede neue Listenabfrage hat `take` und gezieltes `select`; keine Query in einer Schleife.
 - [ ] Sichtbarkeitsgrenze über die Helfer in `lib/query/`, nicht über ein handgeschriebenes `where` daneben; Rolle nur aus dem signierten Gate-Token.
-- [ ] Caching auf der obersten passenden Stufe; wenn ISR neu genutzt wird, sind `NEXT_INC_CACHE_R2_BUCKET` und `WORKER_SELF_REFERENCE` konfiguriert.
+- [ ] Caching auf der obersten passenden Stufe; wenn ISR neu genutzt wird, sind `NEXT_INC_CACHE_KV` und `WORKER_SELF_REFERENCE` konfiguriert.
 - [ ] Keine Secrets in `wrangler.jsonc`; nichts Geheimes unter `NEXT_PUBLIC_*`.
 - [ ] Nach Binding-Änderung `npm run cf-typegen` gelaufen.
 - [ ] `npm run typecheck` grün.

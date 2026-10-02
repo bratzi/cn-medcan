@@ -1,6 +1,6 @@
 # Statische Seiten: Sprache als internes Pfadsegment, ISR über KV
 
-**Stand:** freigegeben 2026-10-01 (Nutzer: „jo“), überarbeitet beim Planen am selben Tag (siehe 8.).
+**Stand:** umgesetzt 2026-10-01 (Plan docs/superpowers/plans/2026-10-01-statische-seiten.md), live seit dem Push aus Task 10.
 **Anlass:** Fehler 1102 (exceededCpu) auf dem Workers-Free-Plan.
 
 ## 1. Ziel und Erfolg
