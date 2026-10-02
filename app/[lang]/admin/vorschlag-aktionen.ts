@@ -1,7 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
-
+import { revalidiereSprachen } from "@/lib/i18n/revalidiere";
 import { adminErforderlich } from "@/lib/session";
 import { getPrisma } from "@/lib/prisma";
 import { istEindeutigkeitsfehler } from "@/lib/prisma-fehler";
@@ -109,11 +108,11 @@ async function herstellerSichern(name: string): Promise<string | null> {
 }
 
 function neuLaden(slug?: string) {
-  revalidatePath("/admin");
-  revalidatePath("/admin/vorschlaege");
-  revalidatePath("/mitglied");
-  revalidatePath("/blueten");
-  if (slug) revalidatePath(`/blueten/${slug}`);
+  revalidiereSprachen("/admin");
+  revalidiereSprachen("/admin/vorschlaege");
+  revalidiereSprachen("/mitglied");
+  revalidiereSprachen("/blueten");
+  if (slug) revalidiereSprachen(`/blueten/${slug}`);
 }
 
 export async function blueteFreigeben(formData: FormData): Promise<AdminVorschlagErgebnis> {
