@@ -28,6 +28,28 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 
 ## ⇢ Hier geht es weiter
 
+### ⇢ SESSION 38 (2026-10-02, Sessionstart): Sweet-Spot-Score im Fazit, Nutzer hat JA gesagt
+
+**ALS ERSTES, ohne Rückfrage:** Der Nutzer hat am 2026-10-02 die offene Frage aus Session 36 mit JA beantwortet:
+Die Fazit-Berechnung soll Geschmackswerte als Sweet-Spot-Werte lesen (0 zu wenig, 2,5 genau richtig, 5 zu viel),
+nicht mehr als Stärke.
+
+Erster Blick vor dem Clear ergab: in `lib/aromakarte.ts:317` (`herstellerTreue`) läuft das bereits über
+`qualitaetsScore`, der Kommentar dort nennt genau diesen Nutzerentscheid vom 2026-10-01. Auch das Chargenfazit
+(`lib/fazit.ts:63`) nutzt `qualitaetsScore`. Die Frage im Abschnitt Session 36 ist also womöglich schon erledigt
+und nur nie abgehakt worden.
+
+Deshalb der Auftrag in dieser Reihenfolge:
+1. Nachweisen statt vermuten: jeden Weg prüfen, auf dem Geschmackswerte in ein Fazit einfließen
+   (`lib/fazit.ts`, `lib/aromakarte.ts`, `lib/query/bewertung.ts`, `lib/query/strains.ts`, Community-Werte in
+   `lib/query/community.ts`). Gesucht ist jede Stelle, die einen Geschmackswert noch als „mehr ist besser“ liest.
+2. Gibt es eine solche Stelle, auf `qualitaetsScore` umstellen, per Test zuerst (der Test muss rot sein, bevor der
+   Code sich ändert).
+3. Ist alles schon umgestellt, nichts anfassen, nur die offene Frage im Abschnitt Session 36 als erledigt
+   markieren und hier vermerken, mit den Fundstellen als Beleg.
+4. Achtung Abgrenzung: Overall (Aussehen, Geruch, Geschmack, Konsistenz, je 1 bis 5) bleibt bewusst „mehr ist
+   besser“ und ist NICHT gemeint. Gemeint sind die Achsen der Geschmacksmatrix.
+
 ### ⇢ SESSION 37 (2026-10-01/02): Statische Seiten gegen 1102, Plan vollständig umgesetzt und live (`d83a644..21a9f45`)
 
 Plan `docs/superpowers/plans/2026-10-01-statische-seiten.md` (11 Tasks) ist fertig, Verlauf und Rulings R1 bis R11 in
