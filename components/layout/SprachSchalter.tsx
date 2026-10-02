@@ -41,7 +41,7 @@ export function SprachSchalter({ aktuell, gruppe }: Props) {
   if (!I18N_OEFFENTLICH) return null;
   const ziel = SPRACHEN.find((sprache) => sprache !== aktuell) ?? aktuell;
   return (
-    <form method="post" action="/api/sprache"aria-label={gruppe}>
+    <form method="post" action="/api/sprache" aria-label={gruppe}>
       <button type="submit" name="sprache" value={ziel} className="schalter-knopf" title={SPRACH_NAMEN[ziel]}>
         <Flagge sprache={aktuell} />
         <span className="sr-only" lang={ziel}>

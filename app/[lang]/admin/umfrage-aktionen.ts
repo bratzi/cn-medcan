@@ -2,6 +2,8 @@
 
 import { revalidatePath } from "next/cache";
 
+import { SPRACHEN } from "@/lib/i18n/sprache-kern";
+
 import { adminErforderlich } from "@/lib/session";
 import { getPrisma } from "@/lib/prisma";
 import { istEindeutigkeitsfehler } from "@/lib/prisma-fehler";
@@ -241,7 +243,8 @@ export async function phaseWeiterschalten(
     });
     revalidatePath("/admin");
     revalidatePath("/umfragen");
-    revalidatePath("/");
+    // Ohne Tag-Cache trifft das derzeit nur den Router-Cache; die KV-Einträge laufen zeitbasiert ab.
+    for (const sprache of SPRACHEN) revalidatePath(`/${sprache}`);
     return { ok: true };
   }
 
@@ -278,7 +281,8 @@ export async function phaseWeiterschalten(
 
   revalidatePath("/admin");
   revalidatePath("/umfragen");
-  revalidatePath("/");
+  // Ohne Tag-Cache trifft das derzeit nur den Router-Cache; die KV-Einträge laufen zeitbasiert ab.
+  for (const sprache of SPRACHEN) revalidatePath(`/${sprache}`);
   return { ok: true };
 }
 

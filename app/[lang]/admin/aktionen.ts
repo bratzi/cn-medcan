@@ -2,6 +2,8 @@
 
 import { revalidatePath } from "next/cache";
 
+import { SPRACHEN } from "@/lib/i18n/sprache-kern";
+
 import { adminErforderlich } from "@/lib/session";
 import { kennwerteFortschreiben } from "@/lib/kennwerte";
 import { getPrisma } from "@/lib/prisma";
@@ -78,7 +80,8 @@ async function reviewSlug(reviewId: string): Promise<string | null> {
 
 function bewertungPfadeNeuLaden(slug: string) {
   revalidatePath("/admin");
-  revalidatePath("/");
+  // Ohne Tag-Cache trifft das derzeit nur den Router-Cache; die KV-Einträge laufen zeitbasiert ab.
+  for (const sprache of SPRACHEN) revalidatePath(`/${sprache}`);
   revalidatePath(`/blueten/${slug}`);
 }
 

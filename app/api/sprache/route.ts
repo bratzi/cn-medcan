@@ -13,6 +13,12 @@ const EIN_JAHR_SEKUNDEN = 365 * 24 * 60 * 60;
  * Schalter auch auf /zugang und den Rechtsseiten steht. Geht ohne JavaScript.
  */
 export async function POST(anfrage: NextRequest) {
+  // Schlanker CSRF-Schutz (vorher übernahm das die Origin-Prüfung der Server Action):
+  // fremde Herkunft abweisen, fehlen beide Header (ältere Clients), durchlassen.
+  const herkunft = anfrage.headers.get("origin");
+  if (anfrage.headers.get("sec-fetch-site") === "cross-site" || (herkunft && herkunft !== anfrage.nextUrl.origin)) {
+    return new NextResponse(null, { status: 403 });
+  }
   const daten = await anfrage.formData().catch(() => null);
   const wahl = daten?.get("sprache");
   const ziel = zielNachSprachwechsel(anfrage.headers.get("referer"), anfrage.nextUrl.origin);

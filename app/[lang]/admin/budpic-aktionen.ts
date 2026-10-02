@@ -2,6 +2,8 @@
 
 import { revalidatePath } from "next/cache";
 
+import { SPRACHEN } from "@/lib/i18n/sprache-kern";
+
 import { istBudpicId } from "@/lib/budpics";
 import { getPrisma } from "@/lib/prisma";
 import { adminErforderlich } from "@/lib/session";
@@ -12,7 +14,8 @@ export type BudpicAdminErgebnis = { ok: true } | { ok: false; fehler: string };
 function neuLaden(slug: string | null) {
   revalidatePath("/admin");
   revalidatePath("/blueten");
-  revalidatePath("/");
+  // Ohne Tag-Cache trifft das derzeit nur den Router-Cache; die KV-Einträge laufen zeitbasiert ab.
+  for (const sprache of SPRACHEN) revalidatePath(`/${sprache}`);
   if (slug) revalidatePath(`/blueten/${slug}`);
 }
 

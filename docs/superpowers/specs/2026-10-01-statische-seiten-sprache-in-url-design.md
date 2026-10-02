@@ -87,6 +87,11 @@ Der Worker soll seltener am CPU-Limit von 10 ms je Anfrage scheitern.
   `*.workers.dev` nicht, der Wrapper kostete dort je Treffer nur CPU), `queue: memoryQueue`,
   `enableCacheInterception: true`. Kein Tag-Cache, weil nur zeitbasiert revalidiert wird (`revalidatePath` bleibt
   wirkungslos für den Cache).
+- **Vorbedingung der Domain-Umstellung:** OpenNext setzt bei Cache-Treffern `s-maxage=…, stale-while-revalidate=…` ohne
+  `private`. `/` und `/reviews` liegen hinter dem Passwort-Gate. Auf `*.workers.dev` ist das wirkungslos, mit eigener
+  Domain plus einer Cache-Regel für HTML könnte der Cloudflare-Edge gatedte Seiten ausliefern, ohne dass der Worker und
+  damit das Gate läuft. Vor der Umstellung klären: keine HTML-Cache-Regel für diese Pfade (Bypass) oder die Header
+  auf `private` bzw. `no-store` setzen.
 - Cache-Interception liefert Treffer, ohne den Next-Server zu laden. Der Proxy (Gate) läuft vorher, im
   OpenNext-Quelltext geprüft (`core/routingHandler.js`).
 - `wrangler.jsonc`: KV-Namespace `NEXT_INC_CACHE_KV`, Service-Binding `WORKER_SELF_REFERENCE` auf `cn-medcan`.

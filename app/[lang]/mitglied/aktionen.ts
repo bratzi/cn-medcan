@@ -31,7 +31,7 @@ export async function profilSpeichern(formData: FormData): Promise<ProfilErgebni
     String(formData.get("anzeigename") ?? ""),
     String(formData.get("instagramHandle") ?? ""),
   );
-  if (!geprueft.ok) return { ok: false, fehler: meldungText(await holeWoerterbuchAusAnfrage(),geprueft.fehler) };
+  if (!geprueft.ok) return { ok: false, fehler: meldungText(await holeWoerterbuchAusAnfrage(), geprueft.fehler) };
 
   const prisma = await getPrisma();
   await prisma.mitglied.update({

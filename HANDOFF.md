@@ -51,6 +51,8 @@ Plan `docs/superpowers/plans/2026-10-01-statische-seiten.md` (11 Tasks) ist fert
   - 24-h-Vergleich der Logs gegen den Befund vom 2026-10-01 (Startseite kalt 400 bis 1832 ms, 62× exceededCpu in 24 h).
   - Abstimmen auf der Startseite live mit dem Nutzer prüfen (eine echte Stimme ist nicht umkehrbar, bisher nicht getestet).
   - Live-Prüfliste aus Session 36 (siehe unten).
+  - Vorbedingung Domain-Umstellung: OpenNext setzt `s-maxage` ohne `private`; mit eigener Domain und HTML-Cache-Regel
+    könnte der Edge gatedte Seiten (`/`, `/reviews`) ohne Gate ausliefern. Vorher Bypass oder `private` sicherstellen (Spec 4.4).
 - **Prüfgrenze:** `fetch()` aus dem Browser-MCP-JS-Kontext erreicht die Seite nicht (bleibt pending); Cache-Header angemeldet
   daher nicht direkt messbar, Beleg über Resource-Timing und Observability (R9).
 - **Dauerregel (Nutzer 2026-10-02):** Pläne künftig von Anfang an in parallel ausführbare Stränge schneiden, je Strang ein
