@@ -11,6 +11,7 @@ const lies = (datei: string) => readFileSync(datei, "utf8");
  */
 const STATISCH: Record<string, string> = {
   "app/[lang]/page.tsx": "300",
+  "app/[lang]/reviews/page.tsx": "300",
   "app/[lang]/impressum/page.tsx": "86400",
   "app/[lang]/datenschutz/page.tsx": "86400",
   "app/[lang]/zugang/page.tsx": "false",

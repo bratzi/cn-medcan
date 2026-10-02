@@ -10,11 +10,12 @@ import { redaktionelleReviews } from "@/lib/query/reviews";
 import { holeSprache, holeWoerterbuch } from "@/lib/i18n";
 
 /**
- * Kein Prerender zur Buildzeit: es gibt derzeit keine erreichbare Datenbank.
- * Anders als `/` und `/umfragen` ist diese Seite nicht nutzerbezogen - sie
- * ist der erste Kandidat fuer ISR, sobald die Cache-Bindings (KV, D1-Tags) stehen.
+ * Statisch je Sprache, alle 300 s neu (Spec 2026-10-01, statische Seiten,
+ * 4.3). Gerendert beim ersten Aufruf, nicht im Build: dort gibt es keine
+ * erreichbare Datenbank. Die Seite ist nicht nutzerbezogen.
  */
-export const dynamic = "force-dynamic";
+export const dynamic = "force-static";
+export const revalidate = 300;
 
 export async function generateMetadata(): Promise<Metadata> {
   const w = await holeWoerterbuch();
