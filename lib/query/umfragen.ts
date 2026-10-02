@@ -52,19 +52,25 @@ export type UmfrageAnsicht = {
 };
 
 /**
- * Die laufende Umfrage, oder null.
+ * Die Id der laufenden Umfrage, oder null (eine Zeile, ein Feld; für
+ * /api/startseite).
  *
  * "Laufend" heisst `aktiv = 'AKTIV'`. Dass es davon hoechstens eine gibt,
  * sichert der Unique-Index auf der Spalte - nicht diese Funktion.
  */
-export async function aktiveUmfrage(): Promise<UmfrageAnsicht | null> {
+export async function aktiveUmfrageId(): Promise<string | null> {
   const prisma = await getPrisma();
   const satz = await prisma.umfrage.findUnique({
     where: { aktiv: "AKTIV" },
     select: { id: true },
   });
-  if (!satz) return null;
-  return umfrageLaden(satz.id);
+  return satz?.id ?? null;
+}
+
+/** Die laufende Umfrage mit Kandidaten und Stimmen, oder null. */
+export async function aktiveUmfrage(): Promise<UmfrageAnsicht | null> {
+  const id = await aktiveUmfrageId();
+  return id ? umfrageLaden(id) : null;
 }
 
 /** Eine bestimmte Umfrage mit Kandidaten und Stimmen. */
