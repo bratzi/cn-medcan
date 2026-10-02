@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidiereSprachen } from "@/lib/i18n/revalidiere";
 
 import { BUDPIC_MAX_BYTES, BUDPIC_MAX_KANTE, BUDPIC_MAX_OFFEN } from "@/lib/budpics";
 import { bildPruefen } from "@/lib/bild-pruefen";
@@ -63,6 +63,6 @@ export async function budpicHochladen(formData: FormData): Promise<BudpicErgebni
       hoehe: geprueft.hoehe,
     },
   });
-  revalidatePath("/admin");
+  revalidiereSprachen("/admin");
   return { ok: true };
 }

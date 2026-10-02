@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidiereSprachen } from "@/lib/i18n/revalidiere";
 
 import { freigabeErforderlich } from "@/lib/session";
 import { getPrisma } from "@/lib/prisma";
@@ -68,7 +68,7 @@ export async function vorschlagEinreichen(formData: FormData): Promise<UmfrageEr
     throw fehler;
   }
 
-  revalidatePath("/umfragen");
+  revalidiereSprachen("/umfragen");
   return { ok: true };
 }
 
@@ -124,7 +124,7 @@ export async function stimmeAbgeben(formData: FormData): Promise<UmfrageErgebnis
     throw fehler;
   }
 
-  revalidatePath("/umfragen");
-  revalidatePath("/");
+  revalidiereSprachen("/umfragen");
+  revalidiereSprachen("/");
   return { ok: true };
 }

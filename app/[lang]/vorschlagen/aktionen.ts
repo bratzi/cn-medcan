@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidiereSprachen } from "@/lib/i18n/revalidiere";
 
 import { mitgliedErforderlich } from "@/lib/session";
 import { getPrisma } from "@/lib/prisma";
@@ -99,8 +99,8 @@ export async function blueteVorschlagen(formData: FormData): Promise<VorschlagEr
     throw fehler;
   }
 
-  revalidatePath("/mitglied");
-  revalidatePath("/admin");
-  revalidatePath("/admin/vorschlaege");
+  revalidiereSprachen("/mitglied");
+  revalidiereSprachen("/admin");
+  revalidiereSprachen("/admin/vorschlaege");
   return { ok: true };
 }

@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidiereSprachen } from "@/lib/i18n/revalidiere";
 
 import { mitgliedErforderlich } from "@/lib/session";
 import { gelesenIdsPruefen } from "@/lib/benachrichtigung";
@@ -39,7 +39,7 @@ export async function profilSpeichern(formData: FormData): Promise<ProfilErgebni
     data: geprueft.wert,
   });
 
-  revalidatePath("/mitglied");
+  revalidiereSprachen("/mitglied");
   return { ok: true };
 }
 
@@ -91,7 +91,7 @@ export async function avatarSpeichern(formData: FormData): Promise<ProfilErgebni
     prisma.nutzerAvatar.create({ data: { mitgliedId: mitglied.mitgliedId, bild: bytes } }),
   ]);
 
-  revalidatePath("/mitglied");
+  revalidiereSprachen("/mitglied");
   return { ok: true };
 }
 
@@ -100,6 +100,6 @@ export async function avatarEntfernen(): Promise<ProfilErgebnis> {
   const mitglied = await mitgliedErforderlich();
   const prisma = await getPrisma();
   await prisma.nutzerAvatar.deleteMany({ where: { mitgliedId: mitglied.mitgliedId } });
-  revalidatePath("/mitglied");
+  revalidiereSprachen("/mitglied");
   return { ok: true };
 }

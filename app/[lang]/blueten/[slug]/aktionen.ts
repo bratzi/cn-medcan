@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidiereSprachen } from "@/lib/i18n/revalidiere";
 
 import { bewertungPruefen } from "@/lib/bewertung-eingabe";
 import { kennwerteFortschreiben } from "@/lib/kennwerte";
@@ -112,9 +112,9 @@ export async function bewertungSpeichern(formData: FormData): Promise<BewertungE
     console.error("empfehlungenFortschreiben fehlgeschlagen", fehler);
   }
 
-  revalidatePath(`/blueten/${strain.slug}`);
-  revalidatePath("/");
-  revalidatePath("/admin");
-  revalidatePath("/mitglied");
+  revalidiereSprachen(`/blueten/${strain.slug}`);
+  revalidiereSprachen("/");
+  revalidiereSprachen("/admin");
+  revalidiereSprachen("/mitglied");
   return { ok: true, sofortSichtbar: istBetreiber, slug: strain.slug };
 }
