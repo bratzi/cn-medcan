@@ -25,7 +25,7 @@ function gateMuster(): RegExp {
 
 test("Impressum und Datenschutz sind vom Passwort-Gate ausgenommen", () => {
   const muster = gateMuster();
-  for (const pfad of ["/impressum", "/datenschutz", "/zugang"]) {
+  for (const pfad of ["/impressum", "/datenschutz", "/zugang", "/api/sprache"]) {
     assert.equal(muster.test(pfad), false, `${pfad} liegt hinter dem Gate`);
   }
   for (const pfad of ["/", "/reviews", "/mitglied", "/umfragen", "/admin"]) {

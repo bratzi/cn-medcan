@@ -1,4 +1,3 @@
-import { spracheSetzen } from "@/lib/i18n/aktionen";
 import { I18N_OEFFENTLICH } from "@/lib/i18n/schalter";
 import { SPRACH_NAMEN, SPRACHEN, type Sprache } from "@/lib/i18n/sprache-kern";
 
@@ -33,15 +32,16 @@ function Flagge({ sprache }: { sprache: Sprache }) {
 /**
  * Sprache in der Schalterleiste (T2, Nutzer 2026-09-29): ein Knopf, der die
  * Flagge der aktiven Sprache zeigt und zur anderen wechselt. Der zugängliche
- * Name ist das Ziel, in seiner eigenen Sprache (lang). Formular statt onClick:
- * geht ohne JS und vor dem Hydrieren.
+ * Name ist das Ziel, in seiner eigenen Sprache (lang). Ein normales Formular
+ * an /api/sprache (Spec 2026-10-01, statische Seiten, 4.1): geht ohne JS und vor
+ * dem Hydrieren und lädt die Seite in der neuen Sprache neu.
  * Sichtbar, solange I18N_OEFFENTLICH gilt (lib/i18n/schalter.ts).
  */
 export function SprachSchalter({ aktuell, gruppe }: Props) {
   if (!I18N_OEFFENTLICH) return null;
   const ziel = SPRACHEN.find((sprache) => sprache !== aktuell) ?? aktuell;
   return (
-    <form action={spracheSetzen} aria-label={gruppe}>
+    <form method="post" action="/api/sprache"aria-label={gruppe}>
       <button type="submit" name="sprache" value={ziel} className="schalter-knopf" title={SPRACH_NAMEN[ziel]}>
         <Flagge sprache={aktuell} />
         <span className="sr-only" lang={ziel}>

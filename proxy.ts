@@ -41,6 +41,6 @@ export const config = {
     // jeden nicht leeren Pfad passen - die Negation haette also ALLES ausser
     // "/" vom Gate ausgenommen. Genau dieser Fehler war hier schon drin, und
     // er faellt nicht auf: die Seite funktioniert, sie ist nur offen.
-    "/((?!zugang|api/zugang|impressum|datenschutz|_next/static|_next/image|favicon\\.ico|.*\\.).*)",
+    "/((?!zugang|api/zugang|api/sprache|impressum|datenschutz|_next/static|_next/image|favicon\\.ico|.*\\.).*)",
   ],
 };
