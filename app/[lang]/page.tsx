@@ -19,10 +19,14 @@ import { WissenBuendeln } from "@/components/story/WissenBuendeln";
  * noch fehl am Platz, nur in Aussicht). Jede Datensektion hat ihre eigene Suspense-Grenze; Bewegung kommt
  * allein aus der StoryBuehne am Ende.
  *
- * force-dynamic: die Seite ist nutzerbezogen (eigene Stimme, Preise nur mit
- * Freigabe) und darf nie als Ganzes gecacht werden.
+ * Statisch je Sprache, alle 300 s neu (Spec 2026-10-01, statische Seiten,
+ * 4.3): Was vom Betrachter abhängt (Stimmzettel, Empfehlungen, Budpic-Zugang),
+ * holt StartSitzung im Browser. force-static macht cookies und headers
+ * leer: eine vergessene Sitzungsabfrage zeigt hier die Gastansicht, statt die
+ * Seite dynamisch zu machen.
  */
-export const dynamic = "force-dynamic";
+export const dynamic = "force-static";
+export const revalidate = 300;
 
 export default function StartPage() {
   return (

@@ -25,6 +25,8 @@ type Props = {
   kompakt?: boolean;
 };
 
+export type BudpicBeitragenProps = Props;
+
 /**
  * "Bild beitragen" an jeder Stelle, an der ein Bluetenbild steht (T9, Nutzer
  * 2026-09-29). Gaeste bekommen einen Anmelde-Link, angemeldete aber noch nicht

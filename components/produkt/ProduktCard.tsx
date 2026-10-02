@@ -8,6 +8,7 @@ import { cn } from "@/lib/cn";
 import type { Sprache } from "@/lib/i18n/sprache-kern";
 import type { Woerterbuch } from "@/lib/i18n/typen";
 import { BudpicBeitragen, type BudpicZugang } from "@/components/produkt/BudpicBeitragen";
+import { BudpicBeitragenImBrowser } from "@/components/produkt/BudpicBeitragenImBrowser";
 import { BudpicDiashow, type DiashowBild } from "@/components/produkt/BudpicDiashow";
 import { budpicMeldungen } from "@/lib/budpic-anzeige";
 import { musterBildId } from "@/lib/budpics";
@@ -21,8 +22,8 @@ type Props = {
   className?: string;
   /** Freigegebene Budpics dieser Sorte (fertig fuer die Diashow); leer: Musterbild. */
   budpics?: readonly DiashowBild[];
-  /** Wer schaut, fuer "Bild beitragen". */
-  zugang?: BudpicZugang;
+  /** Wer schaut, fuer "Bild beitragen". "im-browser": statische Startseite, aus /api/startseite. */
+  zugang?: BudpicZugang | "im-browser";
 };
 
 /**
@@ -100,15 +101,26 @@ export function ProduktCard({ strain, w, sprache, className, budpics = [], zugan
         <span className="text-small text-text-muted">
           {strain.herstellerName ?? w.katalog.karte.herstellerUnbekannt}
         </span>
-        <BudpicBeitragen
-          zugang={zugang}
-          strainId={strain.id}
-          slug={strain.slug}
-          sprache={sprache}
-          texte={w.budpic}
-          meldungen={budpicMeldungen(w)}
-          kompakt
-        />
+        {zugang === "im-browser" ? (
+          <BudpicBeitragenImBrowser
+            strainId={strain.id}
+            slug={strain.slug}
+            sprache={sprache}
+            texte={w.budpic}
+            meldungen={budpicMeldungen(w)}
+            kompakt
+          />
+        ) : (
+          <BudpicBeitragen
+            zugang={zugang}
+            strainId={strain.id}
+            slug={strain.slug}
+            sprache={sprache}
+            texte={w.budpic}
+            meldungen={budpicMeldungen(w)}
+            kompakt
+          />
+        )}
       </CardFooter>
     </Card>
   );

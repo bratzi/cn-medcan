@@ -27,3 +27,14 @@ test("Zustände des Browser-Stimmzettels: laedt, fehler, veraltet", () => {
   assert.match(karte, /veraltet:\s*\(\s*<Link[^>]*href="\/umfragen"[^>]*>\s*\{w\.reviews\.zurAbstimmung\}\s*<\/Link>/);
   assert.match(lies("components/umfrage/StimmzettelImBrowser.tsx"), /varianten\[sitzung \? stimmzettelAnzeige\(sitzung\.stand, umfrageId\) : "laedt"\]/);
 });
+
+test("Empfehlungen und Katalog der Startseite lesen keine Sitzung und keinen Fachkreis", () => {
+  for (const datei of ["components/story/Empfehlungen.tsx", "components/story/Katalog.tsx"]) {
+    assert.doesNotMatch(lies(datei), /lib\/session|aktuellesMitglied|budpicZugang\(|istFachkreis|ladeEmpfehlungen/, datei);
+  }
+  assert.match(lies("components/story/Katalog.tsx"), /ladeStrainListe\(leererFilter\(\), false\)/);
+  assert.match(lies("components/story/Katalog.tsx"), /zugang="im-browser"/);
+  for (const datei of ["components/empfehlung/EmpfehlungenImBrowser.tsx", "components/produkt/BudpicBeitragenImBrowser.tsx"]) {
+    assert.doesNotMatch(lies(datei), /fetch\(/, datei);
+  }
+});

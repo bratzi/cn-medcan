@@ -1,71 +1,10 @@
 import Link from "next/link";
-import { unstable_rethrow } from "next/navigation";
-import { Suspense } from "react";
 
-import { EmpfehlungsListe } from "@/components/empfehlung/EmpfehlungsListe";
+import { EmpfehlungenImBrowser } from "@/components/empfehlung/EmpfehlungenImBrowser";
 import { Schlagwort } from "@/components/story/Schlagwort";
 import { SKELETT_FLAECHE, SkelettAnsage } from "@/components/story/Skelette";
-import { buttonKlassen, einzelLinkKlassen } from "@/components/ui";
-import { begruendungText } from "@/lib/empfehlung-text";
-import { holeSprache, holeWoerterbuch } from "@/lib/i18n";
-import { ladeEmpfehlungen, type GespeicherteEmpfehlung } from "@/lib/query/empfehlungen";
-import { aktuellesMitglied } from "@/lib/session";
-
-/**
- * Liste oder Teaser: Angemeldete sehen ihre vorberechnete Liste (eine Abfrage,
- * keine Rechnung je Aufruf), Gäste die Erklärung mit Anmelde-Aufruf.
- */
-async function EmpfehlungenInhalt() {
-  const [w, sprache, mitglied] = await Promise.all([holeWoerterbuch(), holeSprache(), aktuellesMitglied()]);
-  const texte = w.empfehlung;
-
-  if (!mitglied) {
-    return (
-      <div className="flex flex-col items-start gap-6">
-        <p className="max-w-[48ch] text-body text-text-muted text-pretty">{texte.startSatzGast}</p>
-        <Link prefetch={false} href="/anmelden?weiter=%2F%23empfehlungen" className={buttonKlassen("primary", "md")}>
-          {texte.anmelden}
-        </Link>
-        <p className="text-caption text-text-muted">{texte.hinweis}</p>
-      </div>
-    );
-  }
-
-  let liste: GespeicherteEmpfehlung[];
-  try {
-    liste = await ladeEmpfehlungen(mitglied.mitgliedId);
-  } catch (fehler) {
-    unstable_rethrow(fehler);
-    console.error("ladeEmpfehlungen fehlgeschlagen", fehler);
-    return <p className="border border-border bg-surface-raised p-8 text-body text-text">{texte.fehler}</p>;
-  }
-
-  if (liste.length === 0) {
-    return (
-      <div className="flex flex-col items-start gap-6">
-        <p className="max-w-[48ch] text-body text-text-muted text-pretty">{texte.leer}</p>
-        <Link prefetch={false} href="/blueten" className={buttonKlassen("secondary", "md")}>
-          {texte.zuDenBlueten}
-        </Link>
-      </div>
-    );
-  }
-
-  return (
-    <div className="flex flex-col gap-8">
-      <p className="max-w-[48ch] text-body text-text-muted text-pretty">{texte.startSatz}</p>
-      <EmpfehlungsListe
-        eintraege={liste.map((e) => ({ slug: e.slug, handelsname: e.handelsname, begruendung: begruendungText(e, w, sprache) }))}
-      />
-      <p className="flex flex-wrap items-center gap-x-8 gap-y-2">
-        <span className="text-caption text-text-muted">{texte.hinweis}</span>
-        <Link prefetch={false} href="/mitglied" className={einzelLinkKlassen()}>
-          {w.kopf.navigation.konto}
-        </Link>
-      </p>
-    </div>
-  );
-}
+import { buttonKlassen } from "@/components/ui";
+import { holeWoerterbuch } from "@/lib/i18n";
 
 function EmpfehlungenSkelett({ ansage }: { ansage: string }) {
   return (
@@ -97,9 +36,31 @@ export async function Empfehlungen() {
         <h2 id="empfehlungen-titel" className="font-buch text-kapitel text-text text-balance max-md:text-center">
           {texte.startVor} <em className="farbverlauf hand-betont">{texte.startBetont}</em> {texte.startNach}
         </h2>
-        <Suspense fallback={<EmpfehlungenSkelett ansage={texte.laden} />}>
-          <EmpfehlungenInhalt />
-        </Suspense>
+        {/* Statische Seite (Spec 2026-10-01, statische Seiten, 4.3): die Liste holt der Browser. */}
+        <EmpfehlungenImBrowser
+          texte={{ startSatz: texte.startSatz, hinweis: texte.hinweis, konto: w.kopf.navigation.konto }}
+          varianten={{
+            laedt: <EmpfehlungenSkelett ansage={texte.laden} />,
+            fehler: <p className="border border-border bg-surface-raised p-8 text-body text-text">{texte.fehler}</p>,
+            gast: (
+              <div className="flex flex-col items-start gap-6">
+                <p className="max-w-[48ch] text-body text-text-muted text-pretty">{texte.startSatzGast}</p>
+                <Link prefetch={false} href="/anmelden?weiter=%2F%23empfehlungen" className={buttonKlassen("primary", "md")}>
+                  {texte.anmelden}
+                </Link>
+                <p className="text-caption text-text-muted">{texte.hinweis}</p>
+              </div>
+            ),
+            leer: (
+              <div className="flex flex-col items-start gap-6">
+                <p className="max-w-[48ch] text-body text-text-muted text-pretty">{texte.leer}</p>
+                <Link prefetch={false} href="/blueten" className={buttonKlassen("secondary", "md")}>
+                  {texte.zuDenBlueten}
+                </Link>
+              </div>
+            ),
+          }}
+        />
       </div>
     </section>
   );

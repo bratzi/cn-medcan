@@ -2,12 +2,11 @@ import Link from "next/link";
 import { Suspense } from "react";
 
 import { alsDiashow } from "@/lib/budpic-anzeige";
-import { budpicZugang, ladeFreieBudpics } from "@/lib/query/budpics";
+import { ladeFreieBudpics } from "@/lib/query/budpics";
 import { ProduktCard } from "@/components/produkt/ProduktCard";
 import { KatalogSkelett } from "@/components/story/Skelette";
 import { EmptyState, buttonKlassen } from "@/components/ui";
 import { leererFilter } from "@/lib/query/filter";
-import { istFachkreis } from "@/lib/query/fachkreis";
 import { ladeStrainListe } from "@/lib/query/strains";
 import { sicher } from "@/lib/sicher";
 import { holeSprache, holeWoerterbuch, type Woerterbuch } from "@/lib/i18n";
@@ -21,11 +20,15 @@ const EINSTIEGE = [
   { href: "/blueten?nurVerfuegbar=1", text: (w: Woerterbuch) => w.start.katalog.nurVerfuegbar },
 ] as const;
 
-/** Sechs Produkte als wischbare Reihe. Preise nur mit Freigabe (bestehende Logik). */
+/**
+ * Sechs Produkte als wischbare Reihe. Die Startseite ist statisch und für alle
+ * gleich (Spec 2026-10-01, statische Seiten, 4.3): ohne Fachkreis-Sicht, die
+ * bleibt auf /blueten. „Bild beitragen“ klärt der Browser.
+ */
 async function Reihe() {
   const [w, sprache] = await Promise.all([holeWoerterbuch(), holeSprache()]);
   const liste = await sicher(
-    async () => ladeStrainListe(leererFilter(), await istFachkreis()),
+    async () => ladeStrainListe(leererFilter(), false),
     null,
     "Katalog-Reihe",
   );
@@ -39,10 +42,7 @@ async function Reihe() {
   // Bewusst in TypeScript zugeschnitten statt mit einer eigenen Abfrage.
   const eintraege = liste.eintraege.slice(0, ANZAHL);
   // Budpics (T9): fehlt die Abfrage, bleiben die Karten mit Musterbild stehen.
-  const [budpics, zugang] = await Promise.all([
-    sicher(() => ladeFreieBudpics(eintraege.map((e) => e.id)), new Map(), "Katalog-Budpics"),
-    sicher(() => budpicZugang(), "gast" as const, "Katalog-Zugang"),
-  ]);
+  const budpics = await sicher(() => ladeFreieBudpics(eintraege.map((e) => e.id)), new Map(), "Katalog-Budpics");
 
   if (eintraege.length === 0) {
     return (
@@ -68,7 +68,7 @@ async function Reihe() {
             sprache={sprache}
             className="w-full"
             budpics={alsDiashow(budpics.get(strain.id) ?? [], w, sprache)}
-            zugang={zugang}
+            zugang="im-browser"
           />
         </li>
       ))}
