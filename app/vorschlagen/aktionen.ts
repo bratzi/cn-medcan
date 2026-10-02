@@ -8,7 +8,7 @@ import { istEindeutigkeitsfehler } from "@/lib/prisma-fehler";
 import { blueteVorhanden, terpenNamen } from "@/lib/query/vorschlaege";
 import { MAX_OFFENE_VORSCHLAEGE, blueteVorschlagPruefen } from "@/lib/vorschlag-eingabe";
 import { bilderZugelassen, vorschlagBilderPruefen } from "@/lib/vorschlag-bilder";
-import { holeWoerterbuch } from "@/lib/i18n";
+import { holeWoerterbuchAusAnfrage } from "@/lib/i18n/anfrage";
 import { meldungText } from "@/lib/i18n/text";
 
 export type VorschlagErgebnis =
@@ -28,7 +28,7 @@ export type VorschlagErgebnis =
  */
 export async function blueteVorschlagen(formData: FormData): Promise<VorschlagErgebnis> {
   const mitglied = await mitgliedErforderlich();
-  const wb = await holeWoerterbuch();
+  const wb = await holeWoerterbuchAusAnfrage();
 
   const geprueft = blueteVorschlagPruefen(formData, await terpenNamen());
   if (!geprueft.ok) return { ok: false, fehler: meldungText(wb, geprueft.fehler) };

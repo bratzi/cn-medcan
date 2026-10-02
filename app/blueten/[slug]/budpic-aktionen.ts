@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 
 import { BUDPIC_MAX_BYTES, BUDPIC_MAX_KANTE, BUDPIC_MAX_OFFEN } from "@/lib/budpics";
 import { bildPruefen } from "@/lib/bild-pruefen";
-import { holeWoerterbuch } from "@/lib/i18n";
+import { holeWoerterbuchAusAnfrage } from "@/lib/i18n/anfrage";
 import { meldungText } from "@/lib/i18n/text";
 import { getPrisma } from "@/lib/prisma";
 import { freigabeErforderlich } from "@/lib/session";
@@ -24,7 +24,7 @@ export type BudpicErgebnis = { ok: true } | { ok: false; fehler: string };
  * INSERT, also atomar; ein Loeschen-und-Anlegen kaeme nicht vor.
  */
 export async function budpicHochladen(formData: FormData): Promise<BudpicErgebnis> {
-  const w = await holeWoerterbuch();
+  const w = await holeWoerterbuchAusAnfrage();
   const fehler = (schluessel: Parameters<typeof meldungText>[1]): BudpicErgebnis => ({ ok: false, fehler: meldungText(w, schluessel) });
 
   let mitglied;

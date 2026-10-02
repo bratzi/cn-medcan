@@ -1,12 +1,11 @@
 import "server-only";
 
-import { de } from "./de";
-import { en } from "./en";
 import { holeSprache } from "./sprache";
 import type { Sprache } from "./sprache-kern";
 import type { Woerterbuch } from "./typen";
+import { WOERTERBUECHER } from "./woerterbuecher";
 
-export const WOERTERBUECHER: Record<Sprache, Woerterbuch> = { de, en };
+export { WOERTERBUECHER };
 
 export async function holeWoerterbuch(): Promise<Woerterbuch> {
   return WOERTERBUECHER[await holeSprache()];

@@ -7,10 +7,11 @@ import { kennwerteFortschreiben } from "@/lib/kennwerte";
 import { empfehlungenFortschreiben } from "@/lib/query/empfehlungen";
 import { getPrisma } from "@/lib/prisma";
 import { freigabeErforderlich } from "@/lib/session";
-import { holeSprache, holeWoerterbuch, type Sprache, type Woerterbuch } from "@/lib/i18n";
+import { holeSpracheAusAnfrage, holeWoerterbuchAusAnfrage } from "@/lib/i18n/anfrage";
+import type { Sprache } from "@/lib/i18n/sprache-kern";
 import { terpenAnzeige } from "@/lib/i18n/terpen";
 import { meldungText } from "@/lib/i18n/text";
-import type { Meldung } from "@/lib/i18n/typen";
+import type { Meldung, Woerterbuch } from "@/lib/i18n/typen";
 import type { BeschaffenheitsKey } from "@/lib/query/bewertung";
 import type { GeschmacksKategorie } from "@/db/enums";
 
@@ -45,7 +46,7 @@ function text(w: Woerterbuch, sprache: Sprache, meldung: Meldung): string {
 }
 
 export async function bewertungSpeichern(formData: FormData): Promise<BewertungErgebnis> {
-  const [w, sprache] = await Promise.all([holeWoerterbuch(), holeSprache()]);
+  const [w, sprache] = await Promise.all([holeWoerterbuchAusAnfrage(), holeSpracheAusAnfrage()]);
   let mitglied;
   try {
     mitglied = await freigabeErforderlich();

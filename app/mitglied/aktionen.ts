@@ -8,7 +8,7 @@ import { getPrisma } from "@/lib/prisma";
 import { profilEingabePruefen } from "@/lib/mitglied-eingabe";
 import { AVATAR_MAX_BYTES, AVATAR_SEITE } from "@/lib/avatar";
 import { bildPruefen } from "@/lib/bild-pruefen";
-import { holeWoerterbuch } from "@/lib/i18n";
+import { holeWoerterbuchAusAnfrage } from "@/lib/i18n/anfrage";
 import { meldungText } from "@/lib/i18n/text";
 
 export type ProfilErgebnis = { ok: true } | { ok: false; fehler: string };
@@ -31,7 +31,7 @@ export async function profilSpeichern(formData: FormData): Promise<ProfilErgebni
     String(formData.get("anzeigename") ?? ""),
     String(formData.get("instagramHandle") ?? ""),
   );
-  if (!geprueft.ok) return { ok: false, fehler: meldungText(await holeWoerterbuch(), geprueft.fehler) };
+  if (!geprueft.ok) return { ok: false, fehler: meldungText(await holeWoerterbuchAusAnfrage(),geprueft.fehler) };
 
   const prisma = await getPrisma();
   await prisma.mitglied.update({
@@ -71,7 +71,7 @@ export async function benachrichtigungenGelesen(roh: unknown): Promise<void> {
  */
 export async function avatarSpeichern(formData: FormData): Promise<ProfilErgebnis> {
   const mitglied = await mitgliedErforderlich();
-  const w = await holeWoerterbuch();
+  const w = await holeWoerterbuchAusAnfrage();
 
   const datei = formData.get("bild");
   if (!(datei instanceof File) || datei.size === 0) {

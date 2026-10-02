@@ -60,7 +60,7 @@ function dateien(ordner: string): string[] {
 }
 
 test("keine Client-Datei importiert ein Woerterbuch als Wert", () => {
-  const verboten = /^import\s+(?!type\b)[^;]*from\s+"@\/lib\/i18n(\/(de|en|index))?"/m;
+  const verboten = /^import\s+(?!type\b)[^;]*from\s+"@\/lib\/i18n(\/(de|en|index|woerterbuecher))?"/m;
   const verstoesse = ["app", "components", "lib"]
     .flatMap(dateien)
     .filter((pfad) => {

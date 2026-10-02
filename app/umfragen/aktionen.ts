@@ -6,7 +6,7 @@ import { freigabeErforderlich } from "@/lib/session";
 import { getPrisma } from "@/lib/prisma";
 import { istEindeutigkeitsfehler } from "@/lib/prisma-fehler";
 import { nimmtVorschlaegeAn, stimmeEingabePruefen, vorschlagEingabePruefen } from "@/lib/umfrage-eingabe";
-import { holeWoerterbuch } from "@/lib/i18n";
+import { holeWoerterbuchAusAnfrage } from "@/lib/i18n/anfrage";
 import { meldungText } from "@/lib/i18n/text";
 
 export type UmfrageErgebnis = { ok: true } | { ok: false; fehler: string };
@@ -26,7 +26,7 @@ export type UmfrageErgebnis = { ok: true } | { ok: false; fehler: string };
 /** Einen Strain fuer die laufende Runde vorschlagen. */
 export async function vorschlagEinreichen(formData: FormData): Promise<UmfrageErgebnis> {
   const mitglied = await freigabeErforderlich();
-  const w = await holeWoerterbuch();
+  const w = await holeWoerterbuchAusAnfrage();
 
   const geprueft = vorschlagEingabePruefen(
     String(formData.get("umfrageId") ?? ""),
@@ -84,7 +84,7 @@ export async function vorschlagEinreichen(formData: FormData): Promise<UmfrageEr
  */
 export async function stimmeAbgeben(formData: FormData): Promise<UmfrageErgebnis> {
   const mitglied = await freigabeErforderlich();
-  const w = await holeWoerterbuch();
+  const w = await holeWoerterbuchAusAnfrage();
 
   const geprueft = stimmeEingabePruefen(
     String(formData.get("umfrageId") ?? ""),
