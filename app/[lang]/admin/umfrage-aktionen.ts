@@ -1,8 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
-
-import { SPRACHEN } from "@/lib/i18n/sprache-kern";
+import { revalidiereSprachen } from "@/lib/i18n/revalidiere";
 
 import { adminErforderlich } from "@/lib/session";
 import { getPrisma } from "@/lib/prisma";
@@ -68,8 +66,8 @@ export async function umfrageAnlegen(formData: FormData): Promise<AdminUmfrageEr
     throw fehler;
   }
 
-  revalidatePath("/admin");
-  revalidatePath("/umfragen");
+  revalidiereSprachen("/admin");
+  revalidiereSprachen("/umfragen");
   return { ok: true };
 }
 
@@ -130,8 +128,8 @@ export async function gesetztenPlatzVergeben(
     throw fehler;
   }
 
-  revalidatePath("/admin");
-  revalidatePath("/umfragen");
+  revalidiereSprachen("/admin");
+  revalidiereSprachen("/umfragen");
   return { ok: true };
 }
 
@@ -188,8 +186,8 @@ export async function vorschlagUebernehmen(
     data: { uebernommen: true },
   });
 
-  revalidatePath("/admin");
-  revalidatePath("/umfragen");
+  revalidiereSprachen("/admin");
+  revalidiereSprachen("/umfragen");
   return { ok: true };
 }
 
@@ -241,10 +239,9 @@ export async function phaseWeiterschalten(
       where: { id: umfrageId },
       data: { phase: "ABSTIMMUNG" },
     });
-    revalidatePath("/admin");
-    revalidatePath("/umfragen");
-    // Ohne Tag-Cache trifft das derzeit nur den Router-Cache; die KV-Einträge laufen zeitbasiert ab.
-    for (const sprache of SPRACHEN) revalidatePath(`/${sprache}`);
+    revalidiereSprachen("/admin");
+    revalidiereSprachen("/umfragen");
+    revalidiereSprachen("/");
     return { ok: true };
   }
 
@@ -279,10 +276,9 @@ export async function phaseWeiterschalten(
     data: { phase: "BEENDET", aktiv: null, endetAm: new Date() },
   });
 
-  revalidatePath("/admin");
-  revalidatePath("/umfragen");
-  // Ohne Tag-Cache trifft das derzeit nur den Router-Cache; die KV-Einträge laufen zeitbasiert ab.
-  for (const sprache of SPRACHEN) revalidatePath(`/${sprache}`);
+  revalidiereSprachen("/admin");
+  revalidiereSprachen("/umfragen");
+  revalidiereSprachen("/");
   return { ok: true };
 }
 
@@ -314,8 +310,8 @@ export async function ergebnisVerknuepfen(
       where: { id: optionId },
       data: { ergebnisReviewId: null },
     });
-    revalidatePath("/admin");
-    revalidatePath("/umfragen");
+    revalidiereSprachen("/admin");
+    revalidiereSprachen("/umfragen");
     return { ok: true };
   }
 
@@ -335,7 +331,7 @@ export async function ergebnisVerknuepfen(
     data: { ergebnisReviewId: reviewIdRoh },
   });
 
-  revalidatePath("/admin");
-  revalidatePath("/umfragen");
+  revalidiereSprachen("/admin");
+  revalidiereSprachen("/umfragen");
   return { ok: true };
 }

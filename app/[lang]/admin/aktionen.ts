@@ -1,8 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
-
-import { SPRACHEN } from "@/lib/i18n/sprache-kern";
+import { revalidiereSprachen } from "@/lib/i18n/revalidiere";
 
 import { adminErforderlich } from "@/lib/session";
 import { kennwerteFortschreiben } from "@/lib/kennwerte";
@@ -43,7 +41,7 @@ export async function freigabeSetzen(formData: FormData): Promise<AdminErgebnis>
     },
   });
 
-  revalidatePath("/admin");
+  revalidiereSprachen("/admin");
   return { ok: true };
 }
 
@@ -64,7 +62,7 @@ export async function rolleSetzen(formData: FormData): Promise<AdminErgebnis> {
     data: { rolle: geprueft.wert.rolle },
   });
 
-  revalidatePath("/admin");
+  revalidiereSprachen("/admin");
   return { ok: true };
 }
 
@@ -79,10 +77,9 @@ async function reviewSlug(reviewId: string): Promise<string | null> {
 }
 
 function bewertungPfadeNeuLaden(slug: string) {
-  revalidatePath("/admin");
-  // Ohne Tag-Cache trifft das derzeit nur den Router-Cache; die KV-Einträge laufen zeitbasiert ab.
-  for (const sprache of SPRACHEN) revalidatePath(`/${sprache}`);
-  revalidatePath(`/blueten/${slug}`);
+  revalidiereSprachen("/admin");
+  revalidiereSprachen("/");
+  revalidiereSprachen(`/blueten/${slug}`);
 }
 
 /** Community-Bewertung freigeben - danach ist sie oeffentlich sichtbar. */

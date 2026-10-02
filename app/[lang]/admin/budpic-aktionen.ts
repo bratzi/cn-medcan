@@ -1,8 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
-
-import { SPRACHEN } from "@/lib/i18n/sprache-kern";
+import { revalidiereSprachen } from "@/lib/i18n/revalidiere";
 
 import { istBudpicId } from "@/lib/budpics";
 import { getPrisma } from "@/lib/prisma";
@@ -12,11 +10,10 @@ export type BudpicAdminErgebnis = { ok: true } | { ok: false; fehler: string };
 
 /** Nach jeder Aenderung: die Sorte (Blueten-Seite), der Katalog, die Startseite und /admin. */
 function neuLaden(slug: string | null) {
-  revalidatePath("/admin");
-  revalidatePath("/blueten");
-  // Ohne Tag-Cache trifft das derzeit nur den Router-Cache; die KV-Einträge laufen zeitbasiert ab.
-  for (const sprache of SPRACHEN) revalidatePath(`/${sprache}`);
-  if (slug) revalidatePath(`/blueten/${slug}`);
+  revalidiereSprachen("/admin");
+  revalidiereSprachen("/blueten");
+  revalidiereSprachen("/");
+  if (slug) revalidiereSprachen(`/blueten/${slug}`);
 }
 
 async function slugVon(id: string): Promise<{ slug: string } | null> {
