@@ -28,9 +28,9 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 
 ## ⇢ Hier geht es weiter
 
-### ⇢ SESSION 37 (2026-10-01/02): Statische Seiten gegen 1102, Plan vollständig umgesetzt und live (`d83a644..88d8342`)
+### ⇢ SESSION 37 (2026-10-01/02): Statische Seiten gegen 1102, Plan vollständig umgesetzt und live (`d83a644..21a9f45`)
 
-Plan `docs/superpowers/plans/2026-10-01-statische-seiten.md` (11 Tasks) ist fertig, Verlauf und Rulings R1 bis R9 in
+Plan `docs/superpowers/plans/2026-10-01-statische-seiten.md` (11 Tasks) ist fertig, Verlauf und Rulings R1 bis R11 in
 `.superpowers/sdd/2026-10-01-statische-seiten/progress.md`. Spec `docs/superpowers/specs/2026-10-01-statische-seiten-sprache-in-url-design.md`.
 - **Live seit Push `d83a644..88d8342` auf main.** Statisch je Sprache: `/` und `/reviews` revalidate 300 s, `/impressum`
   und `/datenschutz` 86400 s, `/zugang` revalidate false. Die Sprache steht als internes Segment `app/[lang]` im Rewrite,
@@ -53,6 +53,13 @@ Plan `docs/superpowers/plans/2026-10-01-statische-seiten.md` (11 Tasks) ist fert
   - Live-Prüfliste aus Session 36 (siehe unten).
   - Vorbedingung Domain-Umstellung: OpenNext setzt `s-maxage` ohne `private`; mit eigener Domain und HTML-Cache-Regel
     könnte der Edge gatedte Seiten (`/`, `/reviews`) ohne Gate ausliefern. Vorher Bypass oder `private` sicherstellen (Spec 4.4).
+- **Abschluss-Review und Fixwelle (`56d9601..21a9f45`, live geprüft):** keine Critical; das Gate läuft nachweislich vor der
+  Cache-Interception, kein Cross-User-Leak. Behoben: alle `revalidatePath`-Aufrufe laufen jetzt über
+  `revalidiereSprachen` aus `lib/i18n/revalidiere.ts` und treffen beide Sprachen (vorher zeigten sie auf Pfade ohne
+  Sprachsegment); `POST /api/sprache` weist fremden Origin und `Sec-Fetch-Site: cross-site` mit 403 ab (live bestätigt);
+  `tests/statische-seiten.test.ts` prüft jetzt den ganzen Importbaum der statischen Seiten auf Sitzungszugriffe statt nur
+  die fünf Seitendateien. Zurückgestellt (im Ledger als Parked mit Begründung): leerer `Origin`-String gilt als fehlend,
+  die Testausnahme für `lib/query/budpics.ts`, fehlende `.gitattributes` bei gemischten Zeilenenden.
 - **Prüfgrenze:** `fetch()` aus dem Browser-MCP-JS-Kontext erreicht die Seite nicht (bleibt pending); Cache-Header angemeldet
   daher nicht direkt messbar, Beleg über Resource-Timing und Observability (R9).
 - **Dauerregel (Nutzer 2026-10-02):** Pläne künftig von Anfang an in parallel ausführbare Stränge schneiden, je Strang ein
