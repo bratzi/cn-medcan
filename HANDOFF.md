@@ -28,14 +28,27 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 
 ## ⇢ Hier geht es weiter
 
-### ⇢ SESSION 37 (2026-10-01/02): Statische Seiten gegen 1102, per SDD, Stand nach Task 6 von 11
+### ⇢ SESSION 37 (2026-10-01/02): Statische Seiten gegen 1102, per SDD, Stand bei Task 10 von 11
 
 **ALS ERSTES (ohne Rückfrage):** Skill `superpowers:subagent-driven-development` laden, Ledger
-`.superpowers/sdd/2026-10-01-statische-seiten/progress.md` lesen (Rulings R1–R8, Minors, Stand), weiter mit **Task 7**
-(Brief per `scripts/task-brief`). Plan `docs/superpowers/plans/2026-10-01-statische-seiten.md`, Spec
+`.superpowers/sdd/2026-10-01-statische-seiten/progress.md` lesen (Rulings R1–R8, Minors, Stand), weiter mit
+**Task 10 Steps 5–8** (Build-Log, Live-Prüfung, CPU-Vergleich – Controller-Arbeit), danach Task 11.
+Briefs per `scripts/task-brief`. Plan `docs/superpowers/plans/2026-10-01-statische-seiten.md`, Spec
 `docs/superpowers/specs/2026-10-01-statische-seiten-sprache-in-url-design.md`.
-- **Tasks 1–6 fertig, reviewt, gepusht und live geprüft (`d83a644..b4314e2`).** Impressum, Datenschutz, Zugang
-  statisch (○), KV befüllt; `/impressum` HIT 5 ms CPU statt ~40 ms. Sprachwechsel live ok (303 auf gleiche URL).
+- **Tasks 1–9 fertig und reviewt, Task 10 Steps 1–3 fertig und reviewt; alles gepusht (`d83a644..88d8342`).**
+  Startseite und `/reviews` sind `force-static` mit `revalidate = 300`; Impressum, Datenschutz, Zugang statisch (○).
+- **Neu in dieser Session:** `GET /api/startseite` liefert die Teile mit Sitzung (`Cache-Control: private, no-store`);
+  `StartSitzung`/`useStartSitzung` holen sie im Browser; Stimmzettel, Empfehlungen und „Bild beitragen“ rendern
+  clientseitig aus diesem Stand, mit Zuständen `laedt`/`fehler`/`veraltet` (veraltete Runde zeigt Link `/umfragen`).
+- **Neue Dauerregel (Nutzer 2026-10-02):** Pläne künftig von Anfang an in parallel ausführbare Stränge schneiden —
+  keine gemeinsamen Dateien, keine Typen, die ein Strang erst für den anderen erzeugt; je Strang ein Worktree,
+  Implementer parallel, am Ende ein Merge und ein Review. Push-Prüfpunkte bleiben seriell (nur ein `main` geht live).
+  Gemeinsam genutzte Testdateien zählen als Abhängigkeit. Gilt ab dem nächsten Plan, nicht rückwirkend für diesen.
+- **Live noch offen (Task 10 Steps 5–8):** Build-Log prüfen (Routen nicht `ƒ`, KV-Befüllung), abgemeldet 307 auf
+  `/zugang`, angemeldet Startseite und `/reviews` in beiden Sprachen, Cache-HIT beim zweiten Aufruf, CPU-Vergleich.
+  Nicht abstimmen (nicht umkehrbar), nur `/api/startseite` per `fetch` vergleichen.
+- **Tasks 1–6 (Vorsession) gepusht und live geprüft (`d83a644..b4314e2`).** `/impressum` HIT 5 ms CPU statt ~40 ms,
+  Sprachwechsel live ok (303 auf gleiche URL).
 - Offen für T10-Livecheck: ein `exception` bei `/blueten/thc-akut-25-rs11` im Worker-Log (Ursache unbekannt).
 - Browser 1 läuft als Hintergrund-Tab: Screenshots und Formular-Submit hängen dort, Prüfung per JS/`fetch`/curl.
 - Inhalt bisher: KV-Cache (Namespace `501e88b46f8344ff85f88eb24dcea156`, ohne Regional Cache, R8), memoryQueue,
