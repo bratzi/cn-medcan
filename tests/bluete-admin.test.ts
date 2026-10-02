@@ -30,5 +30,5 @@ test("Vorschlaege stehen auf /admin/vorschlaege, /admin zaehlt nur", () => {
   const eigene = lies("app/[lang]/admin/vorschlaege/page.tsx");
   assert.match(eigene, /<BlueteVorschlaege \/>/);
   assert.match(eigene, /notFound\(\)/);
-  assert.match(lies("app/[lang]/admin/vorschlag-aktionen.ts"), /revalidatePath\("\/admin\/vorschlaege"\)/);
+  assert.match(lies("app/[lang]/admin/vorschlag-aktionen.ts"), /revalidiereSprachen\("\/admin\/vorschlaege"\)/);
 });
