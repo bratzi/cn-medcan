@@ -28,14 +28,16 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 
 ## ⇢ Hier geht es weiter
 
-### ⇢ SESSION 37 (2026-10-01/02): Statische Seiten gegen 1102, per SDD, Stand nach Task 5 von 11
+### ⇢ SESSION 37 (2026-10-01/02): Statische Seiten gegen 1102, per SDD, Stand nach Task 6 von 11
 
 **ALS ERSTES (ohne Rückfrage):** Skill `superpowers:subagent-driven-development` laden, Ledger
-`.superpowers/sdd/2026-10-01-statische-seiten/progress.md` lesen (Rulings R1–R8, Minors, Stand), weiter mit **Task 6**
+`.superpowers/sdd/2026-10-01-statische-seiten/progress.md` lesen (Rulings R1–R8, Minors, Stand), weiter mit **Task 7**
 (Brief per `scripts/task-brief`). Plan `docs/superpowers/plans/2026-10-01-statische-seiten.md`, Spec
 `docs/superpowers/specs/2026-10-01-statische-seiten-sprache-in-url-design.md`.
-- **Tasks 1–5 fertig und reviewt, nur LOKAL committet (`6d430c7..f6c87cc`), NICHT gepusht.** Erster Push erst in Task 6
-  (Rechtsseiten/Zugang statisch), danach Live-Prüfung durch den Controller (Task 6 Steps 5–10, Ruling R4).
+- **Tasks 1–6 fertig, reviewt, gepusht und live geprüft (`d83a644..b4314e2`).** Impressum, Datenschutz, Zugang
+  statisch (○), KV befüllt; `/impressum` HIT 5 ms CPU statt ~40 ms. Sprachwechsel live ok (303 auf gleiche URL).
+- Offen für T10-Livecheck: ein `exception` bei `/blueten/thc-akut-25-rs11` im Worker-Log (Ursache unbekannt).
+- Browser 1 läuft als Hintergrund-Tab: Screenshots und Formular-Submit hängen dort, Prüfung per JS/`fetch`/curl.
 - Inhalt bisher: KV-Cache (Namespace `501e88b46f8344ff85f88eb24dcea156`, ohne Regional Cache, R8), memoryQueue,
   Cache-Interception; Proxy-Regeln; Actions lesen Sprache aus der Anfrage; Sprachwechsel `POST /api/sprache`;
   alle Seiten unter `app/[lang]`, Proxy schreibt `/x` intern auf `/de/x`/`/en/x` um, `holeSprache` über `next/root-params`.
