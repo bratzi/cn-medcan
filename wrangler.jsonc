@@ -35,6 +35,25 @@
 			"preview_database_id": "PLATZHALTER-wrangler-d1-create-ausfuehren",
 			"migrations_dir": "migrations"
 		}
+	],
+
+	// Cache fuer statische Seiten (ISR, Spec 2026-10-01): OpenNext legt gerenderte
+	// Seiten in KV ab. Free-Plan: 1000 Schreibvorgaenge am Tag, hart begrenzt, keine
+	// Kosten. Die ID ist kein Geheimnis. Angelegt per Cloudflare-API am 2026-10-01.
+	"kv_namespaces": [
+		{
+			"binding": "NEXT_INC_CACHE_KV",
+			"id": "501e88b46f8344ff85f88eb24dcea156"
+		}
+	],
+
+	// Zeitbasierte Revalidierung: OpenNexts memoryQueue ruft den eigenen Worker
+	// ueber dieses Service-Binding auf (Spec 2026-10-01, 4.4). Kostenlos.
+	"services": [
+		{
+			"binding": "WORKER_SELF_REFERENCE",
+			"service": "cn-medcan"
+		}
 	]
 
 	// Secrets werden NICHT hier gesetzt, sondern mit `wrangler secret put <NAME>`.

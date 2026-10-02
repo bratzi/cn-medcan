@@ -10,6 +10,8 @@ interface __BaseEnv_CloudflareEnv {
 	SITE_SESSION_SECRET: string;
 	NEXT_PUBLIC_INSTAGRAM_REEL_URL: string;
 	BETTER_AUTH_SECRET: string;
+	NEXT_INC_CACHE_KV: KVNamespace;
+	WORKER_SELF_REFERENCE: Fetcher;
 }
 declare namespace Cloudflare {
 	interface Env extends __BaseEnv_CloudflareEnv {}

@@ -33,6 +33,8 @@ const nextConfig: NextConfig = {
 
 export default nextConfig;
 
-// Bindings (IMAGES, Secrets, ...) auch in `next dev` verfuegbar machen.
+// Bindings (IMAGES, Secrets, ...) auch in `next dev` verfuegbar machen. Nur dort:
+// `next typegen` und `next build` laden diese Datei ebenfalls und sollen kein
+// lokales workerd starten (Plan 2026-10-01, statische Seiten).
 import { initOpenNextCloudflareForDev } from "@opennextjs/cloudflare";
-void initOpenNextCloudflareForDev();
+if (process.env.NODE_ENV === "development") void initOpenNextCloudflareForDev();
