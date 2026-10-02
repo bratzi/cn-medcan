@@ -137,7 +137,12 @@ test("Ohne eigene Stimme kein x", () => {
 test("Das x hängt an derselben Bedingung wie die Zähler: nie in der Vorschlagsphase", () => {
   assert.match(
     lies("components/umfrage/UmfrageKarte.tsx"),
-    /const gewaehlteOption = zeigeStimmen && zustand\.art === "ABGESTIMMT" \? zustand\.optionId : null;/,
+    /const gewaehlteOption =\s*zustand !== "im-browser" && zeigeStimmen && zustand\.art === "ABGESTIMMT" \? zustand\.optionId : null;/,
+  );
+  // Im Browser-Zustand (statische Startseite) gilt dieselbe Bedingung für EigeneStimme.
+  assert.match(
+    lies("components/umfrage/UmfrageKarte.tsx"),
+    /zustand === "im-browser" \? zeigeStimmen && \{ umfrageId: umfrage\.id \}/,
   );
 });
 

@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { stimmeAbgeben } from "@/app/[lang]/umfragen/aktionen";
+import { useStartSitzung } from "@/components/story/StartSitzung";
 import { Button } from "@/components/ui";
 import { useHydriert } from "@/components/ui/useHydriert";
 import type { Woerterbuch } from "@/lib/i18n/typen";
@@ -29,6 +30,7 @@ type Props = {
 
 export function StimmFormular({ umfrageId, optionen, texte }: Props) {
   const router = useRouter();
+  const sitzung = useStartSitzung();
   const hydriert = useHydriert();
   const [laeuft, setLaeuft] = useState(false);
   const [fehler, setFehler] = useState<string | null>(null);
@@ -47,7 +49,10 @@ export function StimmFormular({ umfrageId, optionen, texte }: Props) {
       return;
     }
 
-    router.refresh();
+    // Auf der statischen Startseite holt die Insel ihren Zustand neu; refresh()
+    // brächte dort nur die gecachte Seite (Spec 2026-10-01, statische Seiten, 4.3).
+    if (sitzung) sitzung.neuLaden();
+    else router.refresh();
   }
 
   return (

@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Badge, buttonKlassen } from "@/components/ui";
 import { Kandidat } from "@/components/umfrage/Kandidat";
 import { StimmFormular } from "@/components/umfrage/StimmFormular";
+import { StimmzettelAktion } from "@/components/umfrage/StimmzettelImBrowser";
 import { phasenLabel } from "@/components/umfrage/phasen";
 import { cn } from "@/lib/cn";
 import { formatiereDatum, formatiereRelativ } from "@/lib/format";
@@ -35,7 +36,8 @@ const ZIELE: Record<StimmzettelOrt, { anmelden: string; vorschlagen: string }> =
 
 type Props = {
   umfrage: UmfrageAnsicht;
-  zustand: StimmZustand;
+  /** "im-browser": statische Startseite, der Zustand kommt aus /api/startseite (StimmzettelAktion). */
+  zustand: StimmZustand | "im-browser";
   className?: string;
   ort?: StimmzettelOrt;
   w: Woerterbuch;
@@ -132,7 +134,8 @@ export function UmfrageKarte({ umfrage, zustand, className, ort = "startseite", 
   // Die eigene Stimme haengt an derselben Bedingung wie die Zaehler: in der
   // Vorschlagsphase gibt es fachlich keine Stimmen, also darf dort auch kein
   // "Deine Stimme" stehen.
-  const gewaehlteOption = zeigeStimmen && zustand.art === "ABGESTIMMT" ? zustand.optionId : null;
+  const gewaehlteOption =
+    zustand !== "im-browser" && zeigeStimmen && zustand.art === "ABGESTIMMT" ? zustand.optionId : null;
 
   const frist = umfrage.phase === "VORSCHLAG" ? umfrage.vorschlagBisAm : umfrage.endetAm;
   const fristLabel = umfrage.phase === "VORSCHLAG" ? texte.fristVorschlag : texte.fristAbstimmung;
@@ -164,7 +167,7 @@ export function UmfrageKarte({ umfrage, zustand, className, ort = "startseite", 
               key={option.id}
               option={option}
               gesamt={umfrage.stimmenGesamt}
-              gewaehlt={option.id === gewaehlteOption}
+              gewaehlt={zustand === "im-browser" ? zeigeStimmen && { umfrageId: umfrage.id } : option.id === gewaehlteOption}
               zeigeStimmen={zeigeStimmen}
               texte={w.umfrage.kandidat}
               sprache={sprache}
@@ -180,7 +183,30 @@ export function UmfrageKarte({ umfrage, zustand, className, ort = "startseite", 
       </div>
 
       <div className="border-t border-border bg-surface-raised px-6 py-4">
-        <Aktionsbereich umfrage={umfrage} zustand={zustand} ort={ort} w={w} />
+        {zustand === "im-browser" && umfrage.phase === "ABSTIMMUNG" ? (
+          <StimmzettelAktion
+            umfrageId={umfrage.id}
+            varianten={{
+              laedt: (
+                <p aria-busy="true" className="min-h-11 text-small text-text-muted">
+                  <span className="sr-only">{w.start.skelett.abstimmung}</span>
+                </p>
+              ),
+              fehler: <p className="text-small text-text-muted">{w.start.abstimmung.fehler}</p>,
+              veraltet: (
+                <Link prefetch={false} href="/umfragen" className={buttonKlassen("secondary", "md")}>
+                  {w.reviews.zurAbstimmung}
+                </Link>
+              ),
+              ANONYM: <Aktionsbereich umfrage={umfrage} zustand={{ art: "ANONYM" }} ort={ort} w={w} />,
+              FREIGABE_OFFEN: <Aktionsbereich umfrage={umfrage} zustand={{ art: "FREIGABE_OFFEN" }} ort={ort} w={w} />,
+              STIMMBERECHTIGT: <Aktionsbereich umfrage={umfrage} zustand={{ art: "STIMMBERECHTIGT" }} ort={ort} w={w} />,
+              ABGESTIMMT: <Aktionsbereich umfrage={umfrage} zustand={{ art: "ABGESTIMMT", optionId: "" }} ort={ort} w={w} />,
+            }}
+          />
+        ) : (
+          <Aktionsbereich umfrage={umfrage} zustand={zustand === "im-browser" ? { art: "ANONYM" } : zustand} ort={ort} w={w} />
+        )}
       </div>
     </div>
   );

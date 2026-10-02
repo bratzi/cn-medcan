@@ -6,6 +6,7 @@ import { FeldbuchRaster } from "@/components/story/FeldbuchRaster";
 import { GemeinsamLernen } from "@/components/story/GemeinsamLernen";
 import { Katalog } from "@/components/story/Katalog";
 import { NeuesterEintrag } from "@/components/story/NeuesterEintrag";
+import { StartSitzung } from "@/components/story/StartSitzung";
 import { StoryBuehne } from "@/components/story/StoryBuehne";
 import { TerpenBand } from "@/components/story/TerpenBand";
 import { TerpenRegister } from "@/components/story/TerpenRegister";
@@ -25,22 +26,24 @@ export const dynamic = "force-dynamic";
 
 export default function StartPage() {
   return (
-    <div className="relative isolate bg-surface">
-      <FeldbuchRaster />
-      <Auftakt />
-      {/* Band der Terpene zwischen Hero und Story (Nutzer 2026-09-30). */}
-      <TerpenBand />
-      <TransparentMachen />
-      {/* T12: Register der Terpene und Geschmäcker, vor der Aroma-Karte (Nutzer 2026-09-29). */}
-      <TerpenRegister />
-      <AromaSektion />
-      <WissenBuendeln />
-      <GemeinsamLernen />
-      <NeuesterEintrag />
-      <Empfehlungen />
-      <Abstimmung />
-      <Katalog />
-      <StoryBuehne />
-    </div>
+    <StartSitzung>
+      <div className="relative isolate bg-surface">
+        <FeldbuchRaster />
+        <Auftakt />
+        {/* Band der Terpene zwischen Hero und Story (Nutzer 2026-09-30). */}
+        <TerpenBand />
+        <TransparentMachen />
+        {/* T12: Register der Terpene und Geschmäcker, vor der Aroma-Karte (Nutzer 2026-09-29). */}
+        <TerpenRegister />
+        <AromaSektion />
+        <WissenBuendeln />
+        <GemeinsamLernen />
+        <NeuesterEintrag />
+        <Empfehlungen />
+        <Abstimmung />
+        <Katalog />
+        <StoryBuehne />
+      </div>
+    </StartSitzung>
   );
 }

@@ -1,7 +1,9 @@
 import Link from "next/link";
+import type { ReactNode } from "react";
 
 import { Badge } from "@/components/ui";
 import { namenLinkKlassen } from "@/components/ui/textlink";
+import { EigeneStimme } from "@/components/umfrage/StimmzettelImBrowser";
 import type { UmfrageOptionAnsicht } from "@/lib/query/umfragen";
 import { formatiereZahl } from "@/lib/format";
 import type { Sprache } from "@/lib/i18n/sprache-kern";
@@ -14,7 +16,11 @@ const VERMERK = "font-hand text-vermerk text-kopierstift";
 export type KandidatProps = {
   option: UmfrageOptionAnsicht;
   gesamt: number;
-  gewaehlt: boolean;
+  /**
+   * Liegt die eigene Stimme hier? true/false weiß der Server (/umfragen). Mit
+   * { umfrageId } entscheidet der Browser (statische Startseite, EigeneStimme).
+   */
+  gewaehlt: boolean | { umfrageId: string };
   zeigeStimmen: boolean;
   texte: Woerterbuch["umfrage"]["kandidat"];
   sprache: Sprache;
@@ -27,6 +33,25 @@ export function stimmenAnteil(option: UmfrageOptionAnsicht, gesamt: number): num
 
 function stimmenText(stimmen: number, texte: KandidatProps["texte"], sprache: Sprache): string {
   return `${formatiereZahl(stimmen, 0, sprache)} ${mehrzahl(sprache, texte.stimmen, stimmen)}`;
+}
+
+/** Zeigt den Inhalt nur bei der eigenen Stimme, auch wenn erst der Browser sie kennt. */
+function BeiEigenerStimme({
+  gewaehlt,
+  optionId,
+  children,
+}: {
+  gewaehlt: KandidatProps["gewaehlt"];
+  optionId: string;
+  children: ReactNode;
+}) {
+  if (gewaehlt === true) return children;
+  if (gewaehlt === false) return null;
+  return (
+    <EigeneStimme umfrageId={gewaehlt.umfrageId} optionId={optionId}>
+      {children}
+    </EigeneStimme>
+  );
 }
 
 /**
@@ -44,11 +69,11 @@ export function Kandidat({ option, gesamt, gewaehlt, zeigeStimmen, texte, sprach
     <li className="border-t border-border py-4 first:border-t-0 first:pt-0">
       <div className="flex flex-wrap items-baseline justify-between gap-2 max-md:justify-center">
         <span className="flex min-w-0 items-baseline gap-2">
-          {gewaehlt ? (
+          <BeiEigenerStimme gewaehlt={gewaehlt} optionId={option.id}>
             <span aria-hidden="true" data-story="vermerk" className={VERMERK}>
               x
             </span>
-          ) : null}
+          </BeiEigenerStimme>
           <Link prefetch={false}
             href={`/blueten/${option.slug}`}
             className={namenLinkKlassen("min-w-0 font-buch text-h3 font-medium wrap-break-word")}
@@ -65,7 +90,9 @@ export function Kandidat({ option, gesamt, gewaehlt, zeigeStimmen, texte, sprach
             </span>
           ) : null}
           {option.istGewinner ? <Badge variante="success">{texte.gewinner}</Badge> : null}
-          {gewaehlt ? <Badge variante="accent">{texte.deineStimme}</Badge> : null}
+          <BeiEigenerStimme gewaehlt={gewaehlt} optionId={option.id}>
+            <Badge variante="accent">{texte.deineStimme}</Badge>
+          </BeiEigenerStimme>
           {zeigeStimmen && option.stimmen !== null ? (
             <span className="numeric text-small text-text">
               {/* Die Zahl zählt auf der Startseite hoch (bewegung/abstimmung.ts): sichtbar

@@ -2,30 +2,19 @@ import { Suspense } from "react";
 
 import { StimmzettelSkelett } from "@/components/story/Skelette";
 import { UmfrageKarte } from "@/components/umfrage/UmfrageKarte";
-import { stimmZustand } from "@/components/umfrage/stimmzustand";
-import { aktiveUmfrage, eigeneStimme } from "@/lib/query/umfragen";
-import { aktuellesMitglied } from "@/lib/session";
+import { aktiveUmfrage } from "@/lib/query/umfragen";
 import { sicher } from "@/lib/sicher";
 import { holeSprache, holeWoerterbuch } from "@/lib/i18n";
 
 /**
- * Der Stimmzettel. Der Zustand entsteht hier und nur hier; die Karte zeigt
- * ihn an, und über das Schreiben entscheidet die Server Action erneut.
- * Umfrage und Sitzung laden parallel; die eigene Stimme nur für freigegebene
- * Mitglieder.
+ * Der Stimmzettel. Die Seite ist statisch (Spec 2026-10-01, statische Seiten,
+ * 4.3): hier lädt nur die Runde; wer schaut und ob er schon gestimmt hat,
+ * klärt der Browser über /api/startseite (StimmzettelAktion). Über das
+ * Schreiben entscheidet die Server Action.
  */
 async function Stimmzettel() {
   const [w, sprache] = await Promise.all([holeWoerterbuch(), holeSprache()]);
-  const geladen = await sicher(
-    async () => {
-      const [umfrage, mitglied] = await Promise.all([aktiveUmfrage(), aktuellesMitglied()]);
-      const optionId =
-        umfrage && mitglied?.freigegeben ? await eigeneStimme(umfrage.id, mitglied.mitgliedId) : null;
-      return { umfrage, mitglied, optionId };
-    },
-    null,
-    "Stimmzettel",
-  );
+  const geladen = await sicher(async () => ({ umfrage: await aktiveUmfrage() }), null, "Stimmzettel");
   if (!geladen) {
     return (
       <p className="max-w-[48ch] border border-border-strong bg-surface-raised p-8 text-body text-text">
@@ -34,7 +23,7 @@ async function Stimmzettel() {
     );
   }
 
-  const { umfrage, mitglied, optionId } = geladen;
+  const { umfrage } = geladen;
   if (!umfrage) {
     return (
       <p className="max-w-[48ch] border border-border-strong bg-surface-raised p-8 text-body text-text">
@@ -43,7 +32,7 @@ async function Stimmzettel() {
     );
   }
 
-  return <UmfrageKarte umfrage={umfrage} zustand={stimmZustand(mitglied, optionId)} w={w} sprache={sprache} />;
+  return <UmfrageKarte umfrage={umfrage} zustand="im-browser"w={w} sprache={sprache} />;
 }
 
 /**
