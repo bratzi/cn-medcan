@@ -19,3 +19,11 @@ test("Ein Abruf für alle Inseln, nur in StartSitzung", () => {
 test("Abstimmen auf der Startseite lädt den Zustand neu statt der gecachten Seite", () => {
   assert.match(lies("components/umfrage/StimmFormular.tsx"), /if \(sitzung\) sitzung\.neuLaden\(\);\s*else router\.refresh\(\);/);
 });
+
+test("Zustände des Browser-Stimmzettels: laedt, fehler, veraltet", () => {
+  const karte = lies("components/umfrage/UmfrageKarte.tsx");
+  assert.match(karte, /laedt:\s*\(\s*<p aria-busy="true"[^>]*>\s*<span className="sr-only">\{w\.start\.skelett\.abstimmung\}<\/span>/);
+  assert.match(karte, /fehler:\s*<p[^>]*>\{w\.start\.abstimmung\.fehler\}<\/p>/);
+  assert.match(karte, /veraltet:\s*\(\s*<Link[^>]*href="\/umfragen"[^>]*>\s*\{w\.reviews\.zurAbstimmung\}\s*<\/Link>/);
+  assert.match(lies("components/umfrage/StimmzettelImBrowser.tsx"), /varianten\[sitzung \? stimmzettelAnzeige\(sitzung\.stand, umfrageId\) : "laedt"\]/);
+});

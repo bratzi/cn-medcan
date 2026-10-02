@@ -32,7 +32,7 @@ async function Stimmzettel() {
     );
   }
 
-  return <UmfrageKarte umfrage={umfrage} zustand="im-browser"w={w} sprache={sprache} />;
+  return <UmfrageKarte umfrage={umfrage} zustand="im-browser" w={w} sprache={sprache} />;
 }
 
 /**
