@@ -83,9 +83,10 @@ Der Worker soll seltener am CPU-Limit von 10 ms je Anfrage scheitern.
 
 ### 4.4 Cache (OpenNext)
 
-- `open-next.config.ts`: `incrementalCache: withRegionalCache(kvIncrementalCache, { mode: "long-lived",
-  shouldLazilyUpdateOnCacheHit: false })`, `queue: memoryQueue`, `enableCacheInterception: true`. Kein
-  Tag-Cache, weil nur zeitbasiert revalidiert wird (`revalidatePath` bleibt wirkungslos für den Cache).
+- `open-next.config.ts`: `incrementalCache: kvIncrementalCache` (ohne Regional Cache: die Cache API wirkt auf
+  `*.workers.dev` nicht, der Wrapper kostete dort je Treffer nur CPU), `queue: memoryQueue`,
+  `enableCacheInterception: true`. Kein Tag-Cache, weil nur zeitbasiert revalidiert wird (`revalidatePath` bleibt
+  wirkungslos für den Cache).
 - Cache-Interception liefert Treffer, ohne den Next-Server zu laden. Der Proxy (Gate) läuft vorher, im
   OpenNext-Quelltext geprüft (`core/routingHandler.js`).
 - `wrangler.jsonc`: KV-Namespace `NEXT_INC_CACHE_KV`, Service-Binding `WORKER_SELF_REFERENCE` auf `cn-medcan`.

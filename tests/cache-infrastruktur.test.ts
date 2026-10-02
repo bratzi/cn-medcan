@@ -14,8 +14,8 @@ test("ISR-Infrastruktur: KV, Service-Binding und OpenNext-Konfiguration gehören
   assert.doesNotMatch(wrangler, /r2_buckets|durable_objects/);
 
   const config = lies("open-next.config.ts");
-  assert.match(config, /withRegionalCache\(kvIncrementalCache/);
-  assert.match(config, /shouldLazilyUpdateOnCacheHit: false/);
+  assert.match(config, /incrementalCache: kvIncrementalCache,/);
+  assert.doesNotMatch(config, /withRegionalCache/);
   assert.match(config, /queue: memoryQueue/);
   assert.match(config, /enableCacheInterception: true/);
   assert.doesNotMatch(config, /r2IncrementalCache|doQueue|tagCache/);
