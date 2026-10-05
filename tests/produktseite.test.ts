@@ -22,3 +22,14 @@ test("Produktseite: die Bewertungsmaske sitzt am Anker #bewerten, kein Link füh
 test("Produktseite: keine Hilfszeile, die auf nicht gezeigte Ränge verweist", () => {
   assert.doesNotMatch(QUELLE, /Rang 1 ist das dominante Terpen/);
 });
+
+test("Angaben zur Blüte stehen im Sortenkopf, nicht nach dem Rating (Nutzer 2026-10-03)", () => {
+  const kopf = readFileSync(join(process.cwd(), "components/review/SortenKopf.tsx"), "utf8");
+  assert.match(kopf, /angaben\?: React\.ReactNode/);
+  // Die Angaben gehen in den Kopf hinein; die eigene Sektion nach dem Rating entfällt.
+  assert.match(QUELLE, /angaben=\{/);
+  const nachErkundung = QUELLE.slice(QUELLE.indexOf("<AromaErkundung"));
+  assert.doesNotMatch(nachErkundung, /texte\.angaben/);
+  // Terpen-Chips entfallen dort: der Sortenkopf zeigt das Profil schon mit Anteilsbalken.
+  assert.doesNotMatch(QUELLE, /<TerpenChips/);
+});

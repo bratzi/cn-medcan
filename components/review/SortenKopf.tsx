@@ -20,6 +20,12 @@ export type SortenKopfProps = {
   cbdMin: number;
   cbdMax: number;
   terpene: readonly { name: string; konzentrationProzent: number | null; rang: number; aromaProfil?: string | null }[];
+  /**
+   * Angaben zur Blüte (Fakten und Wirkstoffspannen). Standen bis 2026-10-03 als eigene Sektion
+   * nach der Erkundung; sie gehören direkt unter Bild und Sortennamen (Nutzer). Die Startseite
+   * reicht hier nichts herein und bleibt unverändert.
+   */
+  angaben?: React.ReactNode;
   w: Woerterbuch;
   sprache: Sprache;
 };
@@ -120,6 +126,10 @@ export function SortenKopf(props: SortenKopfProps) {
               })}
             </ul>
           </div>
+        ) : null}
+
+        {props.angaben ? (
+          <div className="flex flex-col gap-8 border-t border-border pt-6">{props.angaben}</div>
         ) : null}
       </div>
     </section>

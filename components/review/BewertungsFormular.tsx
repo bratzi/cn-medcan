@@ -20,6 +20,8 @@ import { t } from "@/lib/i18n/text";
 type Props = {
   strainId: string;
   handelsname: string;
+  /** Sortenkopf samt Angaben zur Blüte über der Karte, als Server-Teil hereingereicht. */
+  bild?: React.ReactNode;
   terpene: readonly KartenTerpen[];
   chargen: readonly string[];
   istBetreiber: boolean;
@@ -55,6 +57,7 @@ type Props = {
 export function BewertungsFormular({
   strainId,
   handelsname,
+  bild,
   terpene,
   chargen,
   istBetreiber,
@@ -113,6 +116,7 @@ export function BewertungsFormular({
       <AromaErkundung
         key={`erkundung-${stand}`}
         titel={handelsname}
+        bild={bild}
         terpene={terpene}
         katalog={katalog}
         modus="maske"

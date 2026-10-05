@@ -365,7 +365,7 @@ export function AromaErkundung({
             </p>
           ) : null}
           <p className="max-w-[60ch] text-small text-text-muted text-pretty">
-            {texte.aroma.erkundung.anleitung}{eingabe ? "" : ` ${texte.aroma.erkundung.nichtsGespeichert}`}
+            {texte.aroma.erkundung.anleitung}{modus === "maske" ? "" : ` ${texte.aroma.erkundung.nichtsGespeichert}`}
           </p>
           <div className="w-full min-w-0">
             <AromaKarte

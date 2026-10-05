@@ -5,7 +5,7 @@ import { notFound, unstable_rethrow } from "next/navigation";
 
 import { ABSCHNITT_TITEL, seitenRahmen } from "@/components/layout/Seitenkopf";
 import { CannabinoidBar } from "@/components/produkt/CannabinoidBar";
-import { TerpenChips } from "@/components/produkt/TerpenChips";
+import { SortenKopf } from "@/components/review/SortenKopf";
 import { Titelblatt } from "@/components/produkt/Titelblatt";
 import { blueteBild } from "@/lib/medien";
 import { alsDiashow } from "@/lib/budpic-anzeige";
@@ -194,6 +194,54 @@ async function ProduktInhalt({ slug, w, sprache }: { slug: string; w: Woerterbuc
   // Die eigene Bewertung (auch unfreigegeben) belegt die Maske vor; nur wer bewerten darf, braucht sie.
   const eigeneBewertung = mitglied?.freigegeben ? await ladeEigeneBewertung(mitglied.mitgliedId, strain.id) : null;
   const vorbelegung = eigeneBewertung ? vorbelegungAus(eigeneBewertung) : null;
+  /**
+   * Angaben zur Blüte (Nutzer 2026-10-03): standen bis dahin als eigene Sektion nach der
+   * Erkundung, jetzt im Sortenkopf direkt unter Bild und Sortennamen. Die Terpen-Chips
+   * entfallen dabei, weil der Sortenkopf das Terpenprofil schon mit Anteilsbalken zeigt.
+   */
+  const angabenZurBluete = (
+    <div className="flex flex-col gap-8">
+      <h3 className="sr-only">{texte.angaben}</h3>
+      <Faktenliste zeilen={produktFakten(strain, w)} />
+      <div>
+        <h4 className="text-h3 text-text">{texte.wirkstoffspannen}</h4>
+        <CannabinoidBar
+          className="mt-4"
+          thcMin={strain.thcMinProzent}
+          thcMax={strain.thcMaxProzent}
+          cbdMin={strain.cbdMinProzent}
+          cbdMax={strain.cbdMaxProzent}
+          w={w}
+          sprache={sprache}
+        />
+        <p className="mt-4 text-caption text-text-muted">
+          {t(texte.herstellerangabe, {
+            thc: formatiereProzentSpanne(strain.thcMinProzent, strain.thcMaxProzent, 1, sprache),
+            cbd: formatiereProzentSpanne(strain.cbdMinProzent, strain.cbdMaxProzent, 1, sprache),
+          })}
+        </p>
+      </div>
+    </div>
+  );
+  // Sortenkopf der Erkundung trägt die Angaben; derselbe Knoten für Maske und Vorführung.
+  const sortenKopf = (
+    <SortenKopf
+      handelsname={strain.handelsname}
+      bildPfad={strain.herstellerBildPfad}
+      kultivarName={strain.kultivarName}
+      kultivarTyp={strain.kultivarTyp}
+      genetik={strain.genetik}
+      herstellerName={strain.hersteller?.name ?? null}
+      thcMin={strain.thcMinProzent}
+      thcMax={strain.thcMaxProzent}
+      cbdMin={strain.cbdMinProzent}
+      cbdMax={strain.cbdMaxProzent}
+      terpene={strain.terpene}
+      angaben={angabenZurBluete}
+      w={w}
+      sprache={sprache}
+    />
+  );
   // Nach dem Anmelden zurück an die Maske; das Fragment kodiert, sonst gehört es zu /anmelden.
   const anmelden = `/anmelden?weiter=${encodeURIComponent(`/blueten/${strain.slug}#bewerten`)}`;
 
@@ -276,6 +324,7 @@ async function ProduktInhalt({ slug, w, sprache }: { slug: string; w: Woerterbuc
               <BewertungsFormular
                 strainId={strain.id}
                 handelsname={strain.handelsname}
+                bild={sortenKopf}
                 terpene={strain.terpene}
                 chargen={strain.chargen.map((charge) => charge.chargenNr)}
                 istBetreiber={mitglied.rolle === "ADMIN"}
@@ -299,6 +348,7 @@ async function ProduktInhalt({ slug, w, sprache }: { slug: string; w: Woerterbuc
                 <div className="mt-4">
                   <AromaErkundung
                     titel={strain.handelsname}
+                    bild={sortenKopf}
                     terpene={strain.terpene}
                     katalog={katalog}
                     texte={aromaTexte(w, sprache)}
@@ -322,39 +372,6 @@ async function ProduktInhalt({ slug, w, sprache }: { slug: string; w: Woerterbuc
           </>
         )}
         {erkundung.serien.length > 0 ? <Aufklaerung texte={w.aroma.aufklaerung} /> : null}
-      </section>
-
-      <section aria-labelledby="daten-titel" className={ABSTAND}>
-        <h2 id="daten-titel" className={ABSCHNITT_TITEL}>
-          {texte.angaben}
-        </h2>
-        <div className="mt-8 grid grid-cols-1 gap-12 lg:grid-cols-2">
-          <Faktenliste zeilen={produktFakten(strain, w)} />
-          <div className="flex flex-col gap-12">
-            <div>
-              <h3 className="text-h3 text-text">{texte.wirkstoffspannen}</h3>
-              <CannabinoidBar
-                className="mt-4"
-                thcMin={strain.thcMinProzent}
-                thcMax={strain.thcMaxProzent}
-                cbdMin={strain.cbdMinProzent}
-                cbdMax={strain.cbdMaxProzent}
-                w={w}
-                sprache={sprache}
-              />
-              <p className="mt-4 text-caption text-text-muted">
-                {t(texte.herstellerangabe, {
-                  thc: formatiereProzentSpanne(strain.thcMinProzent, strain.thcMaxProzent, 1, sprache),
-                  cbd: formatiereProzentSpanne(strain.cbdMinProzent, strain.cbdMaxProzent, 1, sprache),
-                })}
-              </p>
-            </div>
-            <div>
-              <h3 className="text-h3 text-text">{texte.terpenprofil}</h3>
-              <TerpenChips className="mt-4" terpene={strain.terpene} w={w} sprache={sprache} />
-            </div>
-          </div>
-        </div>
       </section>
 
       {aehnliche.length > 0 ? (
