@@ -1198,4 +1198,42 @@ Live prüfen bei 320, 360, 390 und 430 px: links und rechts sichtbarer Abstand, 
 
 ## Befunde
 
-Hier tragen Task A0 und Task E0 ihre Live-Beobachtungen ein, mit Datum.
+### Befund A0 — 2026-10-05, live auf https://cn-medcan.w-helwich.workers.dev/
+
+Gemessen im Browser bei 1714 px und bei 878 px Fensterbreite, hinter dem Seitenpasswort.
+
+1. **Der Soll-Strich ist da.** Die Karte der Startseite trägt `data-schicht`-Elemente in drei
+   Schichten: `linie` 7, `balken` 10, **`soll` 10**. Punkt 1 der Spec ist damit belegt: je
+   Geschmacksachse ein Strich der Herstellerangabe.
+2. **Die Infotafel steht im Fluss.** Ihr Container trägt `grid min-h-80 justify-items-center
+   sm:min-h-56`, `position: static`, und reserviert gemessene **224 px**. Bei 1714 px überlagert
+   sie bereits (der `lg:`-Zweig greift), dort springt nichts — der Sprung betrifft Breiten unter
+   1024 px, wo der reservierte Platz im Fluss liegt und der Inhalt darüber hinauswächst.
+3. **Die Treffflächen sind ungleich verteilt.** In der Anzeige gibt es rechts nur **2** echte
+   Schaltflächen (die zwei Terpene der Sorte), links für die zehn Geschmacksachsen gar keine
+   HTML-Fläche, sondern nur SVG-`rect`s. Der Hover auf eine Achse wechselt die Tafel
+   (gelesen: „Geschmacksrichtung Süß, Laut Hersteller 3,4, Laut Community 4,5"), der Hover
+   neben die schmale Terpenzeile nicht. Punkt 9 der Spec ist damit belegt: die Flächen hängen
+   an `regler` und `terpenRegler` und fehlen dort, wo keine Maske läuft.
+
+### Befund E0 — 2026-10-05, live auf derselben Seite
+
+1. **Die Lücke ist eine Rechenlücke.** Fensterbreite **1714 px**, eine Kachel des Bands
+   **1012 px**, zwei Kacheln zusammen 2024 px, Animation `terpen-band` über 60 s mit
+   `translate: -50%`. Die Verschiebung um 1012 px ist für sich korrekt, aber die Kachel ist
+   schmaler als das Fenster: nach ihr klaffen **1714 − 1012 = 702 px Leere**. Nahtlos wird der
+   Lauf erst, wenn eine Kachel mindestens so breit ist wie das Fenster.
+2. **Der Hover zeigt nichts, weil er die stumme Kopie trifft.** Beim Überfahren eines Icons
+   meldet die Seite `spurGehovert: true` und genau ein gehovertes `li` — dieses `li` liegt aber
+   in der Klon-Kachel (`aria-hidden="true"`), und `TerpenBandKopie` entfernt beim Klonen
+   `[role="tooltip"]`. Gemessen: `gehovertTooltip: "keiner"`. Die Originalkachel läuft nach
+   links aus dem Bild, im sichtbaren Fenster steht über weite Strecken nur die tooltip-freie
+   Kopie. Der Tooltip der Originalzeile existiert (288 px breit), bleibt aber `visibility:
+   hidden`, weil nie ihr `li` gehovert wird.
+3. **Der Klick ist nicht vorgesehen.** Es öffnen nur `:hover` und `:focus-within`, und
+   `tabIndex={0}` auf einem `span` bekommt beim Mausklick keinen Fokus.
+
+**Folge für den Plan:** Die neue Form aus Punkt 8 der Spec — die Infos stehen im Band statt in
+einer Tafel — behebt 2 und 3 an der Wurzel, weil die Infos dann Teil des geklonten Inhalts
+sind. Wichtig dabei: `TerpenBandKopie` darf die Infospalte **nicht** mit entfernen, anders als
+heute den Tooltip. Nur `id`, `tabindex` und `aria-describedby` dürfen weiter fallen.
