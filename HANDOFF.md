@@ -85,16 +85,26 @@ Vorrendern blockieren und steht dann fest im HTML. Dazu zieht ein ResizeObserver
 **Lehre: die erste Suspense-Grenze der statischen Startseite bekam ihr Reveal nicht. Wer dort eine
 neue Grenze einzieht, prüft das live.** Weitere Grenzen auf der Seite (S:1 bis S:6) sind in Ordnung.
 
-**Noch nicht live geprüft (das ist der nächste Schritt):**
-- **Strang E, nach dem Build von `59054e9`:** steht das Band jetzt sichtbar (192 px ab `sm`), trägt
-  es seine Infos gedämpft, betont der Hover sie, läuft es ohne Lücken, und setzt
-  `--band-kachel` einen Wert? Beim letzten Blick lief noch der Stand davor.
-- Mobil 390 px: Band unverändert schmal (78 px, nur Icons).
-- Ein eindeutiger Geschmack über Null, der sein Terpen selbst anschaltet (geprüft wurde nur der
+**Strang E ist live bestätigt (nach dem Build von `59054e9`):**
+- Desktop bei 1478 px Fenster: Band 192 px hoch, nicht mehr verborgen, kein Skelett mehr im DOM.
+  `--band-kachel` steht auf 4004 px, beide Kacheln sind 4004 px breit, Animation `terpen-band`
+  läuft. Eine Kachel überragt das Fenster also deutlich, der Lauf ist damit nahtlos.
+- Die Infos stehen im Band: Name, Sortenzahl, Duft und drei Geschmacksnoten mit Farbbalken je
+  Eintrag, Balken mit Deckkraft 0,6 gedämpft. Kein `role="tooltip"` und kein Tabstopp mehr im
+  Band. Ein Eintrag ist 316 px breit.
+- Mobil bei 494 px: Band 78 px hoch, die Infospalte steht auf `display: none`, Kachel 836 px und
+  damit breiter als das Fenster, kein waagrechter Scroll. Der ResizeObserver hat die Kachelbreite
+  beim Verkleinern von 4004 auf 836 px nachgezogen.
+- Die Startseite läuft als Example: 20 Regler, alle auf 0, der Hinweis „Hier wird nichts
+  gespeichert." steht da, und es gibt kein einziges verstecktes Formularfeld.
+
+**Damit ist der Plan `2026-10-03-kartengraph-ueberarbeitung.md` vollständig umgesetzt und live
+geprüft.** Offen bleibt nur Kleinzeug:
+- Ein eindeutiger Geschmack über Null, der sein Terpen selbst anschaltet (geprüft wurde der
   mehrdeutige Fall mit drei Kandidaten).
-- Startseite als Example mit Reglern bei 0.
-- Strang E und F erneut bei echten Telefonbreiten, falls ein Gerät oder ein schmaleres Fenster
-  zur Hand ist.
+- Die Hover-Betonung im Band ist nur im Markup und im Test belegt, nicht gemessen: ein per
+  JavaScript gesendetes Zeigerereignis löst `:hover` im Browser nicht aus.
+- Echte Telefonbreiten unter 494 px.
 
 **Entscheidung des Nutzers vom 2026-10-05 zur Blütenseite (`80c407e`):** die Angaben stehen nicht
 doppelt. Der Sortenkopf der Erkundung bleibt der Startseite, weil er auf der Blütenseite das
