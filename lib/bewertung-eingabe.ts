@@ -38,7 +38,11 @@ type Lesbar = { get(name: string): unknown };
 
 const text = (roh: unknown) => (typeof roh === "string" ? roh.trim() : "");
 
-const note = z.coerce.number().int().min(1).max(5);
+/**
+ * Overall-Noten 1 bis 5 in Zehntelschritten (Nutzer 2026-10-03: dieselbe Granularitaet wie
+ * "Diese Charge"). 0 heisst weiterhin "keine Note" und faellt vorher heraus.
+ */
+const note = z.coerce.number().min(1).max(5).multipleOf(0.1);
 const achse = z.coerce.number().min(0).max(5).multipleOf(0.5);
 /**
  * Terpene sind seit 2026-10-03 an oder aus (Nutzer: die Staerkeregler waren zu komplex).
@@ -52,7 +56,7 @@ const REEL = /^https:\/\/(www\.)?instagram\.com\/(reel|p)\/[A-Za-z0-9_-]+\/?(\?.
 
 /**
  * Liest ein Formular. Erwartete Felder: strainId, chargenNr, note-<achse>
- * (1-5), feuchtigkeit (Prozent, optional), geschmack-<achse> (0-5 in
+ * (1-5 in Zehntelschritten), feuchtigkeit (Prozent, optional), geschmack-<achse> (0-5 in
  * halben Schritten), terpen-<Name> (0 oder 1, 0 = nicht geschmeckt, nur fuer uebergebene Terpene),
  * notiz, instagramReelUrl.
  */

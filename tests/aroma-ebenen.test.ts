@@ -301,3 +301,38 @@ test("Kandidaten pulsieren in Kopierstift-Violett, bei reduzierter Bewegung ruhi
   assert.ok(erlaubt.some((block) => /\.terpen-kandidat \{[^}]*animation: terpen-kandidat/.test(block)));
   assert.match(css, /@keyframes terpen-kandidat/);
 });
+
+test("Overall-Regler hat dieselbe Granularität wie Diese Charge (Nutzer 2026-10-03)", () => {
+  const overall = readFileSync(join(process.cwd(), "components/review/GesamteindruckLeiste.tsx"), "utf8");
+  const charge = readFileSync(join(process.cwd(), "components/review/BeschaffenheitsLeiste.tsx"), "utf8");
+  assert.match(overall, /schritt=\{0\.1\}/);
+  assert.doesNotMatch(overall, /schritt=\{1\}/);
+  assert.match(charge, /schritt=\{0\.1\}/);
+  // Der gezogene Wert geht genau so ins Formular, nicht auf eine ganze Stufe gerundet.
+  const erkundung = readFileSync(join(process.cwd(), "components/review/AromaErkundung.tsx"), "utf8");
+  assert.match(erkundung, /name=\{`note-\$\{key\}`\} value=\{Math\.round\(eigeneNoten\[key\]! \* 10\) \/ 10\}/);
+});
+
+test("Noten liegen als Float im Schema, die Migration baut die Tabelle um (Nutzer 2026-10-03)", () => {
+  const schema = readFileSync(join(process.cwd(), "prisma/schema.prisma"), "utf8");
+  for (const spalte of ["aussehen", "geruch", "geschmack", "wirkung", "konsistenz"]) {
+    assert.match(schema, new RegExp(spalte + "\\s+Float"), spalte);
+  }
+  const migration = readFileSync(join(process.cwd(), "migrations/0015_noten_als_float.sql"), "utf8");
+  // SQLite kennt kein ALTER COLUMN TYPE: Tabellenkopie wie in 0003.
+  assert.match(migration, /CREATE TABLE "new_reviews"/);
+  assert.match(migration, /"aussehen" REAL NOT NULL/);
+  assert.match(migration, /ALTER TABLE "new_reviews" RENAME TO "reviews"/);
+  // Alle fünf Indizes kommen zurück, sonst wäre die Tabelle nach dem Umbau ungeschützt.
+  for (const index of [
+    "reviews_strain_id_freigegeben_idx",
+    "reviews_charge_id_idx",
+    "reviews_autor_id_idx",
+    "reviews_ist_redaktionell_erstellt_am_idx",
+    "reviews_autor_id_strain_id_key",
+  ]) {
+    assert.ok(migration.includes(index), index);
+  }
+  // Die Trigger hängen an der Tabelle und fallen mit ihr: der Hinweis muss in der Datei stehen.
+  assert.match(migration, /db\/constraints\.sql/);
+});

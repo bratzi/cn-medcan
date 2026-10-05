@@ -298,7 +298,7 @@ export function AromaErkundung({
         <div hidden>
           {BEWERTUNGS_ACHSEN.map(({ key }) =>
             (eigeneNoten[key] ?? 0) >= 1 ? (
-              <input key={key} type="hidden" name={`note-${key}`} value={Math.round(eigeneNoten[key]!)} />
+              <input key={key} type="hidden" name={`note-${key}`} value={Math.round(eigeneNoten[key]! * 10) / 10} />
             ) : null,
           )}
           {GESCHMACKS_ACHSEN.map(({ key }) => (

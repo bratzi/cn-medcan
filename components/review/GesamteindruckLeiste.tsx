@@ -98,7 +98,10 @@ export function GesamteindruckLeiste({
                 label={t(texte.aroma.skala, { label: texte.schema.noten[achse.key].label, von: abNull ? 0 : 1, bis: 5 })}
                 wert={wert - versatz}
                 max={5 - versatz}
-                schritt={1}
+                // Zehntelschritte wie "Diese Charge" (Nutzer 2026-10-03: beide Regler sollen sich
+                // gleich anfuehlen). Vorher ganze Stufen; die Spalten liegen seit Migration 0015
+                // als REAL in der Datenbank, der gezogene Wert wird also genau so gespeichert.
+                schritt={0.1}
                 ring={bedienung && mittel !== undefined ? mittel - versatz : undefined}
                 aendern={bedienung ? (neu) => bedienung.aendern(achse.key, neu + versatz) : undefined}
                 wertText={wertText}

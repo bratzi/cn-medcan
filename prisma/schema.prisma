@@ -246,12 +246,14 @@ model Review {
   /// Bewertungen stehen als Zweitstimme darunter, nicht gleichrangig.
   istRedaktionell Boolean @default(false) @map("ist_redaktionell")
 
-  /// Festes Bewertungsschema, jeweils 1-5.
-  aussehen   Int
-  geruch     Int
-  geschmack  Int
-  wirkung    Int
-  konsistenz Int
+  /// Festes Bewertungsschema, jeweils 1-5 in Zehntelschritten (Nutzer 2026-10-03: dieselbe
+  /// Granularitaet wie "Diese Charge"). Vorher Int; Migration 0015 baut die Spalten auf REAL um,
+  /// weil SQLite sonst 3,7 beim Schreiben auf 4 gerundet haette.
+  aussehen   Float
+  geruch     Float
+  geschmack  Float
+  wirkung    Float
+  konsistenz Float
 
   /// Restfeuchte in Prozent. Unter 8 Prozent zu trocken, ueber 13 Prozent
   /// Schimmelrisiko - deshalb als eigener Messwert, nicht als Note.
