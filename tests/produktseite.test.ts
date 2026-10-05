@@ -23,13 +23,15 @@ test("Produktseite: keine Hilfszeile, die auf nicht gezeigte Ränge verweist", (
   assert.doesNotMatch(QUELLE, /Rang 1 ist das dominante Terpen/);
 });
 
-test("Angaben zur Blüte stehen im Sortenkopf, nicht nach dem Rating (Nutzer 2026-10-03)", () => {
-  const kopf = readFileSync(join(process.cwd(), "components/review/SortenKopf.tsx"), "utf8");
-  assert.match(kopf, /angaben\?: React\.ReactNode/);
-  // Die Angaben gehen in den Kopf hinein; die eigene Sektion nach dem Rating entfällt.
-  assert.match(QUELLE, /angaben=\{/);
-  const nachErkundung = QUELLE.slice(QUELLE.indexOf("<AromaErkundung"));
-  assert.doesNotMatch(nachErkundung, /texte\.angaben/);
-  // Terpen-Chips entfallen dort: der Sortenkopf zeigt das Profil schon mit Anteilsbalken.
+test("Angaben zur Blüte stehen oben, als ein Block mit dem Terpenprofil (Nutzer 2026-10-05)", () => {
+  // Ein Block, nicht gesplittet: Fakten, Wirkstoffspannen und Profil gehören zusammen.
+  assert.match(QUELLE, /<TerpenProfil/);
+  // Terpen-Chips entfallen: dieselbe Information nicht zweimal in zwei Formen.
   assert.doesNotMatch(QUELLE, /<TerpenChips/);
+  // Nicht doppelt: der Sortenkopf der Erkundung wiederholt hier das Titelblatt, also nur
+  // auf der Startseite.
+  assert.doesNotMatch(QUELLE, /<SortenKopf/);
+  // Der Block steht vor dem Bewertungsbuch und damit weit vor dem Rating.
+  assert.ok(QUELLE.indexOf("{angabenZurBluete}") < QUELLE.indexOf("<BewertungsBuch"));
+  assert.ok(QUELLE.indexOf("{angabenZurBluete}") < QUELLE.indexOf("<AromaErkundung"));
 });

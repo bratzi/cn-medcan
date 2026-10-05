@@ -20,12 +20,6 @@ export type SortenKopfProps = {
   cbdMin: number;
   cbdMax: number;
   terpene: readonly { name: string; konzentrationProzent: number | null; rang: number; aromaProfil?: string | null }[];
-  /**
-   * Angaben zur Blüte (Fakten und Wirkstoffspannen). Standen bis 2026-10-03 als eigene Sektion
-   * nach der Erkundung; sie gehören direkt unter Bild und Sortennamen (Nutzer). Die Startseite
-   * reicht hier nichts herein und bleibt unverändert.
-   */
-  angaben?: React.ReactNode;
   w: Woerterbuch;
   sprache: Sprache;
 };
@@ -38,7 +32,6 @@ export type SortenKopfProps = {
  */
 export function SortenKopf(props: SortenKopfProps) {
   const bildId = blueteBild(props.bildPfad);
-  const hoechster = Math.max(0, ...props.terpene.map((terpen) => terpen.konzentrationProzent ?? 0));
   const texte = props.w.aroma.sortenKopf;
   const fakten = [
     { label: texte.hersteller, wert: props.herstellerName },
@@ -94,45 +87,60 @@ export function SortenKopf(props: SortenKopfProps) {
         </div>
 
         {props.terpene.length > 0 ? (
-          <div className="flex flex-col gap-4">
-            <p className="text-small uppercase tracking-wide text-text-muted">{texte.terpeneLautHersteller}</p>
-            <ul className="flex flex-col gap-4">
-              {props.terpene.map((terpen) => {
-                const anteil =
-                  terpen.konzentrationProzent !== null && hoechster > 0
-                    ? terpen.konzentrationProzent / hoechster
-                    : Math.max(0.2, 1 - (terpen.rang - 1) * 0.2);
-                return (
-                  <li key={terpen.name} className="flex flex-col gap-1.5">
-                    <div className="flex flex-wrap items-baseline justify-between gap-x-4">
-                      <span className="text-body font-medium text-text">
-                        {terpenAnzeige(terpen.name, props.sprache)}
-                        {/* Stammdaten-Stichworte sind deutsch; im Englischen entfallen sie. */}
-                        {terpen.aromaProfil && props.sprache === "de" ? (
-                          <span className="ml-2 text-small font-normal text-text-muted">{terpen.aromaProfil}</span>
-                        ) : null}
-                      </span>
-                      <span className="numeric text-small text-text">
-                        {terpen.konzentrationProzent !== null
-                          ? formatiereAnteil(terpen.konzentrationProzent / 100, 2, props.sprache)
-                          : t(texte.rang, { rang: terpen.rang })}
-                      </span>
-                    </div>
-                    <div aria-hidden="true" className="h-2 rounded-full bg-border">
-                      <div className="h-full rounded-full bg-accent" style={{ width: `${Math.round(anteil * 100)}%` }} />
-                    </div>
-                  </li>
-                );
-              })}
-            </ul>
-          </div>
-        ) : null}
-
-        {props.angaben ? (
-          <div className="flex flex-col gap-8 border-t border-border pt-6">{props.angaben}</div>
+          <TerpenProfil terpene={props.terpene} w={props.w} sprache={props.sprache} />
         ) : null}
       </div>
     </section>
+  );
+}
+
+/**
+ * Terpenprofil laut Hersteller mit Anteilsbalken. Steht im Sortenkopf der Startseite und seit
+ * 2026-10-05 (Nutzer) auch oben auf der Blütenseite, dort anstelle der alten Terpen-Chips:
+ * dieselbe Information soll nicht in zwei Formen auf einer Seite stehen, und das Profil gehört
+ * nach oben zu den übrigen Angaben, nicht in einen eigenen Abschnitt weiter unten.
+ */
+export function TerpenProfil({
+  terpene,
+  w,
+  sprache,
+  className,
+}: Pick<SortenKopfProps, "terpene" | "w" | "sprache"> & { className?: string }) {
+  const hoechster = Math.max(0, ...terpene.map((terpen) => terpen.konzentrationProzent ?? 0));
+  const texte = w.aroma.sortenKopf;
+  return (
+    <div className={className ? `flex flex-col gap-4 ${className}` : "flex flex-col gap-4"}>
+      <p className="text-small uppercase tracking-wide text-text-muted">{texte.terpeneLautHersteller}</p>
+      <ul className="flex flex-col gap-4">
+        {terpene.map((terpen) => {
+          const anteil =
+            terpen.konzentrationProzent !== null && hoechster > 0
+              ? terpen.konzentrationProzent / hoechster
+              : Math.max(0.2, 1 - (terpen.rang - 1) * 0.2);
+          return (
+            <li key={terpen.name} className="flex flex-col gap-1.5">
+              <div className="flex flex-wrap items-baseline justify-between gap-x-4">
+                <span className="text-body font-medium text-text">
+                  {terpenAnzeige(terpen.name, sprache)}
+                  {/* Stammdaten-Stichworte sind deutsch; im Englischen entfallen sie. */}
+                  {terpen.aromaProfil && sprache === "de" ? (
+                    <span className="ml-2 text-small font-normal text-text-muted">{terpen.aromaProfil}</span>
+                  ) : null}
+                </span>
+                <span className="numeric text-small text-text">
+                  {terpen.konzentrationProzent !== null
+                    ? formatiereAnteil(terpen.konzentrationProzent / 100, 2, sprache)
+                    : t(texte.rang, { rang: terpen.rang })}
+                </span>
+              </div>
+              <div aria-hidden="true" className="h-2 rounded-full bg-border">
+                <div className="h-full rounded-full bg-accent" style={{ width: `${Math.round(anteil * 100)}%` }} />
+              </div>
+            </li>
+          );
+        })}
+      </ul>
+    </div>
   );
 }
 
