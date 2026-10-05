@@ -81,3 +81,14 @@ test("Terpen-Band läuft nahtlos: genug Kacheln und Verschiebung um eine Kachel 
   assert.match(css, /--band-kachel/);
   assert.doesNotMatch(css, /@keyframes terpen-band\s*\{\s*to\s*\{\s*translate: -50% 0;/);
 });
+
+test("Terpen-Band trägt seine Infos im Band, ausgegraut, ohne Tooltip (Nutzer 2026-10-03)", () => {
+  const band = readFileSync(join(process.cwd(), "components/story/TerpenBand.tsx"), "utf8");
+  // Kein aufklappender Tooltip mehr: die Infos sind sichtbarer Inhalt.
+  assert.doesNotMatch(band, /role="tooltip"/);
+  assert.doesNotMatch(band, /aria-describedby/);
+  // Im Ruhezustand gedämpft, beim Überfahren in voller Lesbarkeit.
+  assert.match(band, /text-text-muted[\s\S]{0,200}group-hover:text-text/);
+  // Nur Web: mobil bleibt das schmale Icon-Band.
+  assert.match(band, /max-sm:hidden/);
+});
