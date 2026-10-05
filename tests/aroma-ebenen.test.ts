@@ -1,9 +1,12 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 
 import { AromaErkundung } from "@/components/review/AromaErkundung";
+import { erkundungsDaten } from "@/components/review/erkundung-daten";
 import { AromaKarte, KarteSofortKontext } from "@/components/review/AromaKarte";
 
 /** Karte sofort zeichnen: im Server-HTML steht sonst nur der Platzhalter (CPU-Limit, Fehler 1102). */
@@ -285,4 +288,53 @@ test("Kartenhöhe mit Terpen-Reglern: 44 je Zeile, nie niedriger als die normale
   // Viele Einträge: Rand oben und unten plus 44 je Abstand.
   assert.equal(kartenHoeheMitReglern(30, HOEHE), 48 + 48 + 29 * 44);
   assert.equal(kartenHoeheMitReglern(30, HOEHE), 1372);
+});
+
+/**
+ * Überarbeitung des Kartengraphs (Nutzer 2026-10-03): die Herstellerangaben sagen nichts über
+ * die Geschmacksintensität, also verschwinden sie als Serie und als Soll-Strich. Die Infotafel
+ * überlagert, statt Höhe zu reservieren, und jede Achse wie jedes Terpen hat eine Trefffläche,
+ * damit die Box im Web schon beim Überfahren wechselt.
+ */
+const quelleKarte = () => readFileSync(join(process.cwd(), "components/review/AromaKarte.tsx"), "utf8");
+
+test("Erkundungsdaten tragen keine grüne Herstellerserie mehr (Nutzer 2026-10-03)", () => {
+  const terpene: KartenTerpen[] = [{ name: "Myrcen", geschmack: "ERDIG", konzentrationProzent: 0.8, rang: 1 }];
+  const daten = erkundungsDaten(terpene, [], { hersteller: "Laut Hersteller", community: "Laut Community" }, null);
+  assert.deepEqual(daten.serien, []);
+});
+
+test("Karte zeichnet keinen Soll-Strich und kennt kein bezug mehr (Nutzer 2026-10-03)", () => {
+  const quelle = quelleKarte();
+  assert.doesNotMatch(quelle, /data-schicht="soll"/);
+  assert.doesNotMatch(quelle, /sollSerie/);
+  assert.doesNotMatch(quelle, /bezug\?: "median" \| "serie"/);
+  assert.doesNotMatch(quelle, /art="soll"/);
+});
+
+test("Ein Geschmackswert über Null macht die Achse aktiv (Nutzer 2026-10-03)", () => {
+  const quelle = quelleKarte();
+  assert.match(quelle, /const achseFarbig = \(index: number\) => \(aktiv === null \? wertAuf\(index\) > 0 :/);
+  assert.doesNotMatch(quelle, /wertAuf\(index\) > SPUERBAR/);
+});
+
+test("Infotafel überlagert bei jeder Breite und hält keine Höhe frei (Nutzer 2026-10-03)", () => {
+  const quelle = quelleKarte();
+  assert.doesNotMatch(quelle, /min-h-80/);
+  assert.doesNotMatch(quelle, /sm:min-h-56/);
+  assert.match(quelle, /"pointer-events-none absolute inset-x-0 bottom-0 z-10 grid justify-items-center"/);
+  // Langer Text scrollt in der Tafel, statt die Sektion zu dehnen.
+  assert.match(quelle, /\*:max-h-64 \*:overflow-y-auto/);
+});
+
+test("Jede Achse und jedes Terpen hat eine Trefffläche, auch ohne Regler (Nutzer 2026-10-03)", () => {
+  const quelle = quelleKarte();
+  assert.match(quelle, /data-treffer="achse"/);
+  assert.match(quelle, /data-treffer="terpen"/);
+  // Die Flächen hängen nicht an der Maske: ihr Block prüft nur die Sichtbarkeit der Karte.
+  const vorTreffer = quelle.slice(quelle.indexOf('data-treffer="achse"') - 700, quelle.indexOf('data-treffer="achse"'));
+  assert.match(vorTreffer, /\{kartenSichtbar > 0\.5 \? \(/);
+  assert.doesNotMatch(vorTreffer, /\{regler &&/);
+  // Fingertipp bleibt unverändert: mobil gibt es kein Überfahren.
+  assert.match(quelle, /e\.pointerType !== "touch"/);
 });

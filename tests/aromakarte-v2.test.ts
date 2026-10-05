@@ -182,7 +182,6 @@ const mitRegler = (werte: Partial<GeschmacksMatrix>, vergleich?: Partial<Geschma
       terpene: [LIMONEN],
       serien: [lila(werte)],
       texte,
-      bezug: "median",
       regler: { ...REGLER_AUS, werte: matrix(werte), vergleich: vergleich ? matrix(vergleich) : undefined },
     }),
   );
@@ -261,22 +260,31 @@ test("Regler: Titel der Skala, Spur im Sweet-Spot-Stil und Vorlesetext mit Zone"
   assert.equal(vorgelesen[4], "zu viel, 3,0 von 5");
 });
 
-test("Anzeige: Balken lila über der grünen Serie mit pulsierendem Überstand, darunter grün mit Fehlstück", () => {
-  const ueber = karte([gruen({ zitrus: 2 }), lila({ zitrus: 4 })]);
+test("Balken über dem Community-Median pulsiert im Überstand, darunter grün mit Fehlstück", () => {
+  // Bezug ist seit 2026-10-03 immer der Community-Median (Nutzer): die Herstellerangabe ist
+  // keine Serie der Karte mehr und zeichnet keinen Soll-Strich.
+  const ueber = mitRegler({ zitrus: 4 }, { zitrus: 2 });
   const [balken] = sichtbareBalken(ueber);
   assert.match(balken, /stroke="var\(--color-kopierstift\)"/);
   assert.match(ueber, /class="delta-puls"[^>]*data-delta="ueber"/);
-  // Die grüne Serie ist der Bezug: eine grüne Soll-Marke statt eines eigenen Balkens.
   assert.equal(sichtbareBalken(ueber).length, 1);
-  assert.ok(schicht(ueber, "soll").some((tag) => /stroke="var\(--color-accent\)"/.test(tag)));
 
-  const unter = karte([gruen({ zitrus: 4 }), lila({ zitrus: 1 })]);
+  const unter = mitRegler({ zitrus: 1 }, { zitrus: 4 });
   assert.match(sichtbareBalken(unter)[0], /stroke="var\(--color-accent\)"/);
   assert.match(unter, /data-delta="fehlt"/);
 
-  const gleich = karte([gruen({ zitrus: 3 }), lila({ zitrus: 3 })]);
+  const gleich = mitRegler({ zitrus: 3 }, { zitrus: 3 });
   assert.match(sichtbareBalken(gleich)[0], /stroke="var\(--color-accent\)"/);
   assert.doesNotMatch(gleich, /delta-puls/);
+});
+
+test("Ohne Community-Median färbt kein Balken ein und es gibt keinen Soll-Strich (Nutzer 2026-10-03)", () => {
+  // Eine Sorte, die noch niemand bewertet hat: ohne Median gibt es keinen Bezug. Der Balken
+  // bleibt dann ganz lila statt als "zu wenig" grün einzufärben.
+  const ohne = karte([gruen({ zitrus: 2 }), lila({ zitrus: 4 })]);
+  assert.equal(schicht(ohne, "soll").length, 0);
+  assert.match(sichtbareBalken(ohne)[0], /stroke="var\(--color-kopierstift\)"/);
+  assert.doesNotMatch(ohne, /data-delta="fehlt"/);
 });
 
 const TERPENE: KartenTerpen[] = [
@@ -376,12 +384,14 @@ test("Legende der Maske: Deine Bewertung und Community-Median, kein Herstellerst
   assert.doesNotMatch(html, new RegExp(de.aroma.serien.community));
 });
 
-test("Anzeige ohne Maske: Regler starten beim Community-Wert, Bezug ist die grüne Serie", () => {
+test("Anzeige ohne Maske: keine Formularfelder, keine Herstellerserie, kein Soll-Strich", () => {
   const html = maske({ eingabe: false });
   assert.equal(Object.keys(geschmacksFelder(html)).length, 0);
-  assert.ok(schicht(html, "soll").length > 0);
   assert.ok(schicht(html, "linie").length > 0);
-  assert.match(html, new RegExp(`>${de.aroma.serien.hersteller}<`));
+  // Seit 2026-10-03 (Nutzer): die Herstellerangabe ist keine Serie der Karte mehr, weil der
+  // Betreiber ihre Geschmacksintensität nicht kennt. Nur der Community-Median bleibt.
+  assert.equal(schicht(html, "soll").length, 0);
+  assert.doesNotMatch(html, new RegExp(`>${de.aroma.serien.hersteller}<`));
 });
 
 test("CSS: Fluss-Tempo per Variable, kein Puls der Bögen mehr, Sparmodus und reduzierte Bewegung stehen still", () => {

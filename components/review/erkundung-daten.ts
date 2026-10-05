@@ -38,19 +38,24 @@ type RoheKennwerte = { terpenMedian: unknown; geschmackMedian: unknown; gesamtno
 export function erkundungsDaten(
   terpene: readonly KartenTerpen[],
   reviews: readonly Bewertung[],
-  /** Legendennamen der Serien in der Sprache der Seite (w.aroma.serien). */
+  /**
+   * Legendennamen der Serien in der Sprache der Seite (w.aroma.serien). `hersteller` wird
+   * seit 2026-10-03 nicht mehr gelesen; der Schlüssel bleibt, damit die Aufrufer und das
+   * Wörterbuch unverändert bleiben.
+   */
   namen: { hersteller: string; community: string },
   kennwerte: RoheKennwerte | null = null,
 ) {
   const hersteller = herstellerProfil(terpene);
   const community = verdichteGeschmacksMatrix(reviews);
   const median = communityMedian(kennwerte);
-  const serien: AromaSerie[] = [
-    ...(hersteller ? [{ name: namen.hersteller, ton: "gruen" as const, matrix: hersteller }] : []),
-    ...(community.anzahlBewertungen > 0
-      ? [{ name: namen.community, ton: "lila" as const, matrix: median?.geschmack ?? community.matrix }]
-      : []),
-  ];
+  // Nur die Community-Reihe (Nutzer 2026-10-03): die Herstellerangabe ist keine Serie der Karte
+  // mehr. Der Betreiber kennt die Geschmacksintensität der Herstellerangaben nicht, jede
+  // Darstellung davon wäre erfunden. Was der Hersteller nennt, steht weiterhin in den Ebenen
+  // (hersteller, ergaenzt, geist). Das ist eine Enthalten-Aussage, keine Intensitäts-Aussage.
+  const serien: AromaSerie[] = community.anzahlBewertungen > 0
+    ? [{ name: namen.community, ton: "lila" as const, matrix: median?.geschmack ?? community.matrix }]
+    : [];
   const intensitaet = mittleTerpenIntensitaet(reviews.map((review) => parseTerpenIntensitaet(review.terpenIntensitaet)));
   return {
     serien,

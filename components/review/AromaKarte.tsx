@@ -92,13 +92,6 @@ type Props = {
     median?: Readonly<Record<string, number>>;
     aendern: (terpen: string, wert: number) => void;
   };
-  /**
-   * Woran sich die Farbe des Bewertungsbalkens misst (T5b, Nutzer 2026-09-29):
-   * "median" in der Maske (der grüne Ring am Regler, der grüne Herstellerbalken
-   * entfällt), "serie" in der Anzeige (die grüne Serie als Soll-Strich). Bewegt
-   * wird nur die lila Serie, die angezeigte Bewertung.
-   */
-  bezug?: "median" | "serie";
   /** Alle bekannten Terpene: zeigt zur aktiven Geschmacksrichtung, welche Terpene sie tragen. */
   lernen?: readonly { name: string; geschmack: KartenTerpen["geschmack"] }[];
   /**
@@ -234,7 +227,6 @@ export function AromaKarte({
   ebenen,
   regler,
   terpenRegler,
-  bezug = "serie",
   lernen,
   kompakt = false,
   kopf,
@@ -343,13 +335,22 @@ export function AromaKarte({
   // am Community-Median (Ring), in der Anzeige an der grünen Serie (Soll-Strich).
   const bewertung = serien.find((serie) => serie.ton === "lila") ?? null;
   const bewertungZiel = roheSerien.find((serie) => serie.ton === "lila") ?? null;
-  const sollSerie = bezug === "serie" ? (serien.find((serie) => serie.ton === "gruen") ?? null) : null;
-  const bezugMatrix = bezug === "median" ? (regler?.vergleich ?? null) : (sollSerie?.matrix ?? null);
+  // Bezug des Balkens ist seit 2026-10-03 immer der Community-Median (Nutzer): der grüne Ring
+  // am Regler. Vorher stand in der Anzeige die grüne Herstellerserie als Soll-Strich auf der
+  // Achse. Sie ist weggefallen, weil der Betreiber die Geschmacksintensität der
+  // Herstellerangaben nicht kennt und jede Darstellung davon erfunden wäre.
+  const bezugMatrix = regler?.vergleich ?? null;
   /** Wert der Bewertung auf einer Achse (gleitend), 0 ohne Bewertung. */
   const wertAuf = (achse: number) => bewertung?.matrix[GESCHMACKS_ACHSEN[achse].key] ?? 0;
   const vergleich = (achse: number) => balkenVergleich(wertAuf(achse), bezugMatrix?.[GESCHMACKS_ACHSEN[achse].key]);
   /** Farbig ist nur, was gerade aktiv ist: die hervorgehobene Achse, sonst jede Achse mit Wert. */
-  const achseFarbig = (index: number) => (aktiv === null ? wertAuf(index) > SPUERBAR : aktiv === index);
+  /**
+   * Farbig ist nur, was gerade aktiv ist: die hervorgehobene Achse, sonst jede Achse mit einem
+   * Wert über 0. Seit 2026-10-03 ist das die ausdrückliche Funktionsweise der Karte (Nutzer):
+   * sobald ein Regler über Null geht, ist der Geschmack aktiv und sichtbar, auch wenn der
+   * Hersteller ihn nicht nennt. Vorher musste der Wert erst die Spürbarkeitsschwelle nehmen.
+   */
+  const achseFarbig = (index: number) => (aktiv === null ? wertAuf(index) > 0 : aktiv === index);
   // Welche Richtungen ein Terpen oder Begleitstoff spürbar trägt (Anteil ab 20 %, stärkste zuerst):
   // verbindet beim Überfahren beide Seiten der Karte.
   const traeger = new Map<string, { achse: number; anteil: number }[]>([
@@ -452,7 +453,9 @@ export function AromaKarte({
       : null;
 
   return (
-    <figure aria-label={titel} className={cn("flex flex-col gap-6", kompakt && "lg:relative lg:min-h-0 lg:flex-1 lg:gap-4")}>
+    // relative ohne Breakpoint: die Infotafel überlagert seit 2026-10-03 bei jeder Breite den
+    // unteren Rand der Karte (Nutzer: die Sektion sprang beim Überfahren).
+    <figure aria-label={titel} className={cn("relative flex flex-col gap-6", kompakt && "lg:min-h-0 lg:flex-1 lg:gap-4")}>
       {/* Kopf der Karte: links der Name in Logoschrift mit Verlauf und, mit Reglern, die Skala;
           rechts Ansicht und Legende. */}
       <div
@@ -516,8 +519,9 @@ export function AromaKarte({
 
 
       {/* Legende: im Netz die Serien wie bisher. In der Karte (T5b) der Balken der Bewertung
-          (grün bis zum Bezug, lila darüber), der Soll-Strich der grünen Serie und der stille
-          Streifen der Herstellerangabe; der Ring des Community-Medians steht links bei der Skala. */}
+          (grün bis zum Bezug, lila darüber) und der stille Streifen der Herstellerangabe; der
+          Ring des Community-Medians steht links bei der Skala. Der Soll-Strich der grünen Serie
+          ist am 2026-10-03 entfallen (Nutzer). */}
       <ul className={cn("flex flex-wrap justify-end gap-x-6 gap-y-2 text-small text-text", kompakt && "lg:basis-full")}>
         {ansicht === "netz" ? (
           serien.map((serie) => (
@@ -532,12 +536,6 @@ export function AromaKarte({
               <li className="inline-flex items-center gap-2">
                 <LegendenMuster art={bezugMatrix ? "balken" : "balkenLila"} />
                 {bewertung.name}
-              </li>
-            ) : null}
-            {sollSerie ? (
-              <li className="inline-flex items-center gap-2">
-                <LegendenMuster art="soll" />
-                {sollSerie.name}
               </li>
             ) : null}
           </>
@@ -876,29 +874,47 @@ export function AromaKarte({
               })
             : null}
 
-          {/* Soll-Strich (T5b): in der Anzeige ist die grüne Serie der Bezug. Sie steht als
-              ruhiger grüner Strich auf der Achse statt als eigener Balken, mit Saum in
-              Papierfarbe wie der Ring. */}
-          {sollSerie && kartenSichtbar > 0.5 ? (
-            <g opacity={kartenSichtbar} pointerEvents="none">
-              {karte.map((knoten, index) => {
-                const x = balkenEnde(knoten, sollSerie.matrix[GESCHMACKS_ACHSEN[index].key], 0, balken).x;
-                return (
-                  <Fragment key={`soll-${GESCHMACKS_ACHSEN[index].key}`}>
-                    <line x1={x} y1={knoten.y - 9} x2={x} y2={knoten.y + 9} stroke="var(--color-surface)" strokeWidth={6} strokeLinecap="round" />
-                    <line
-                      data-schicht="soll"
-                      x1={x}
-                      y1={knoten.y - 9}
-                      x2={x}
-                      y2={knoten.y + 9}
-                      stroke={FARBE.gruen}
-                      strokeWidth={2.5}
-                      strokeLinecap="round"
-                    />
-                  </Fragment>
-                );
-              })}
+          {/* Treffflächen (Nutzer 2026-10-03): die Infobox wechselt im Web schon beim Überfahren,
+              nicht erst beim Klick. Vorher hingen die Flächen an `regler` und `terpenRegler` und
+              fehlten damit überall, wo keine Bewertungsmaske läuft. Live gemessen am 2026-10-05:
+              in der Anzeige gab es rechts nur zwei Schaltflächen und links für zehn Achsen keine
+              einzige HTML-Fläche. Diese Rechtecke stehen deshalb immer im Markup, transparent und
+              ohne Bedeutung für Screenreader (die Werte stehen in der Tabelle darunter). `touch`
+              ist ausgenommen: mobil gibt es kein Überfahren, und dort bleibt alles wie bisher. */}
+          {kartenSichtbar > 0.5 ? (
+            <g opacity={0}>
+              {karte.map((knoten, index) => (
+                <rect
+                  key={`treffer-achse-${GESCHMACKS_ACHSEN[index].key}`}
+                  data-treffer="achse"
+                  aria-hidden="true"
+                  x={balkenEnde(knoten, MAX, 0, balken).x - 14}
+                  y={knoten.y - 22}
+                  width={balken + 46}
+                  height={44}
+                  fill="transparent"
+                  style={{ pointerEvents: "all" }}
+                  onPointerEnter={(e) => {
+                    if (e.pointerType !== "touch") achseUeberfahren(index);
+                  }}
+                />
+              ))}
+              {terpenKnoten.map((punkt, index) => (
+                <rect
+                  key={`treffer-terpen-${terpene[index].name}`}
+                  data-treffer="terpen"
+                  aria-hidden="true"
+                  x={punkt.x - 14}
+                  y={punkt.y - 22}
+                  width={aktBreite - punkt.x + 14}
+                  height={44}
+                  fill="transparent"
+                  style={{ pointerEvents: "all" }}
+                  onPointerEnter={(e) => {
+                    if (e.pointerType !== "touch") terpenUeberfahren(terpene[index].name);
+                  }}
+                />
+              ))}
             </g>
           ) : null}
 
@@ -1282,16 +1298,17 @@ export function AromaKarte({
       </div>
 
       {/* Infotext unter der Karte (Nutzer 2026-09-26, 2026-09-27): zentriert wie eine Legende im Buch.
-          Die Höhe ist fest reserviert, damit die Sektion beim Überfahren nicht springt; der Inhalt
-          blendet beim Wechsel nur über (Deckkraft). */}
+          Seit 2026-10-03 überlagert die Tafel bei jeder Breite den unteren Rand der Karte und hält
+          im Fluss keine Höhe frei. Vorher reservierte sie 224 px fester Mindesthöhe und wuchs
+          unter lg darüber hinaus, und die ganze Sektion sprang, je nachdem welches Terpen man überfuhr
+          (Nutzer 2026-10-03). Sie fängt keine Zeiger (auch die Tafel nicht, pointer-events erbt),
+          damit das Überfahren der Karte darunter weiterläuft; langer Text scrollt in ihr, statt die
+          Sektion zu dehnen. Der Inhalt blendet beim Wechsel nur über (Deckkraft). */}
       <div
         aria-live="polite"
         className={cn(
-          "grid min-h-80 justify-items-center sm:min-h-56",
-          // Dicht: über dem unteren Rand der Karte, ohne eigene Höhe. Fängt keine Zeiger (auch die
-          // Tafel nicht, pointer-events erbt), damit das Überfahren der Karte darunter weiterläuft.
-          kompakt &&
-            "lg:pointer-events-none lg:absolute lg:inset-x-0 lg:bottom-0 lg:z-10 lg:min-h-0 lg:*:rounded-lg lg:*:border lg:*:border-border lg:*:bg-surface-raised lg:*:p-4 lg:*:shadow-md",
+          "pointer-events-none absolute inset-x-0 bottom-0 z-10 grid justify-items-center",
+          "*:max-h-64 *:overflow-y-auto *:rounded-lg *:border *:border-border *:bg-surface-raised *:p-4 *:shadow-md",
         )}
       >
         {aktiveAchse ? (
@@ -1589,16 +1606,14 @@ function EbenenMuster({ ebene }: { ebene: TerpenEbene }) {
 
 /**
  * Muster in der Legende der Karte (T5b): der Balken der Bewertung halb grün, halb lila
- * (grün bis zum Bezug, lila darüber; ohne Bezug nur lila), der grüne Soll-Strich und der
- * breite, blasse Streifen der Herstellerangabe. Form und Farbe wie in der Karte.
+ * (grün bis zum Bezug, lila darüber; ohne Bezug nur lila) und der breite, blasse Streifen
+ * der Herstellerangabe. Form und Farbe wie in der Karte.
  */
-function LegendenMuster({ art }: { art: "balken" | "balkenLila" | "soll" | "streifen" }) {
+function LegendenMuster({ art }: { art: "balken" | "balkenLila" | "streifen" }) {
   return (
     <svg aria-hidden="true" viewBox="0 0 24 8" className="h-2 w-6 shrink-0 overflow-visible text-text">
       {art === "streifen" ? (
         <line x1={4} y1={4} x2={20} y2={4} stroke="currentColor" strokeOpacity={0.25} strokeWidth={8} strokeLinecap="round" />
-      ) : art === "soll" ? (
-        <line x1={12} y1={-1} x2={12} y2={9} stroke={FARBE.gruen} strokeWidth={2.5} strokeLinecap="round" />
       ) : art === "balken" ? (
         <>
           <line x1={2} y1={4} x2={12} y2={4} stroke={FARBE.gruen} strokeWidth={4} strokeLinecap="round" />

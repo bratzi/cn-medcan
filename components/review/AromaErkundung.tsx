@@ -184,12 +184,15 @@ export function AromaErkundung({
   // In der Maske ist die eigene Bewertung immer die lila Reihe, auch bei 0 (dann zeigt die
   // Karte nur Streifen); die Community steht dort als Ring am Regler (T5b). In der Anzeige
   // ersetzt der eigene Eindruck die Community erst, wenn man etwas bewegt.
-  const gruen = serien.filter((serie) => serie.ton === "gruen");
+  // Grüne Serien gehen seit 2026-10-03 nicht mehr in die Karte (Nutzer): die Herstellerangabe
+  // sagt nichts über die Geschmacksintensität, also stünde dort eine erfundene Zahl. Was der
+  // Hersteller nennt, bleibt in den Ebenen und im Streifen hinter den Bögen sichtbar.
+  const lilaSerien = serien.filter((serie) => serie.ton === "lila");
   const alleSerien: AromaSerie[] = eingabe
-    ? [...gruen, { name: texte.aroma.serien.bewertung, ton: "lila", matrix: werte }]
+    ? [{ name: texte.aroma.serien.bewertung, ton: "lila", matrix: werte }]
     : eigen
-      ? [...gruen, { name: texte.aroma.serien.eigen, ton: "lila", matrix: eigen }]
-      : [...serien];
+      ? [{ name: texte.aroma.serien.eigen, ton: "lila", matrix: eigen }]
+      : lilaSerien;
 
   // Sortenfazit aus Overall, Terpen-Abgleich und Gesamtnote-Median (T6); "Dein Fazit" setzt
   // die eigenen Regler über die Community-Werte, sobald etwas bewegt wurde. Das Chargenfazit
@@ -316,8 +319,6 @@ export function AromaErkundung({
               serien={alleSerien}
               staerken={staerken}
               ebenen={ebenen}
-              // Balkenfarbe (T5b): in der Maske gegen den Community-Median, in der Anzeige gegen die Herstellerangabe.
-              bezug={eingabe ? "median" : "serie"}
               regler={{
                 werte,
                 // Grüner Regler auf dem Community-Median (T5, zuvor die Herstellerangabe).
