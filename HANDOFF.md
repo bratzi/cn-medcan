@@ -40,7 +40,21 @@ Der Plan trägt unten die Live-Befunde A0 und E0 mit Zahlen.
 - Terpene sind künftig nur an oder aus; die Stärkeregler entfallen.
 - Die Startseite läuft als Example mit denselben Reglern wie die Maske, Startwert 0.
 
-**Fertig und auf `main` (`48e395e`): Strang A.**
+**Fertig und auf `main`: Strang A (`48e395e`, Nachbesserung `375bbc6`) und Strang B (`1799c70`).**
+
+Strang B: Terpene sind an oder aus, der Name rechts in der Karte ist die Schaltfläche. Ein
+Geschmack über Null schaltet sein eindeutiges Terpen selbst an; tragen mehrere die Richtung,
+pulsieren die Kandidaten in Kopierstift-Violett, bis der Nutzer eines wählt. Gespeichert werden
+0 und 1; `terpenAnAus` in `lib/query/bewertung.ts` deutet alte Stufen bis 5 beim Lesen als an,
+deshalb braucht es keine Datenmigration. Terpen-Raster, zusätzliche Kartenhöhe und die Tests der
+entfernten Mechanik sind weg.
+
+Nachbesserung an Strang A (`375bbc6`): die Infotafel überlagerte die Karte und verdeckte live die
+untere Hälfte der Achsen. Sie steht jetzt wieder unter der Karte, aber mit fester Höhe statt
+Mindesthöhe. Der Sprung ist damit weg, ohne etwas zu verdecken. **Lehre: die Überlagerung sah im
+Code richtig aus und war erst live als Fehler zu sehen.**
+
+**Alter Stand von Strang A:**
 Herstellerserie und Soll-Strich sind aus der Karte entfernt, der Bezug ist überall der
 Community-Median, ein Wert über Null macht die Achse aktiv, die Infotafel überlagert und die
 Sektion springt nicht mehr, und jede Achse wie jedes Terpen hat eine Trefffläche für den Hover.
@@ -48,8 +62,6 @@ Sektion springt nicht mehr, und jede Achse wie jedes Terpen hat eine Trefffläch
 bestanden schon vorher und gehören nicht zu dieser Arbeit.
 
 **Noch offen, in dieser Reihenfolge:**
-- **Strang B:** Terpene per Klick statt Stärkeregler, Automatik bei eindeutigem Geschmack,
-  violettes Pulsieren bei mehreren Kandidaten.
 - **Strang C:** Overall in Zehntelschritten samt Migration `0015_noten_als_float.sql`.
   **Diese Migration spielt der Nutzer selbst remote ein**, mit
   `npx wrangler d1 execute cn-medcan-db --remote --file migrations/0015_noten_als_float.sql`.
@@ -59,10 +71,17 @@ bestanden schon vorher und gehören nicht zu dieser Arbeit.
   Kachel landet, aus der `TerpenBandKopie` die Tooltips entfernt.
 - **Strang F:** Wortmarke im Hero mobil, `--text-plakat` hat eine zu hohe Untergrenze.
 
-**Live-Prüfung Strang A steht noch aus.** Der Push ist erfolgt, die Cloudflare-Build braucht
-noch Zeit; unmittelbar nach dem Push stand live weiterhin der alte Stand (zehn Soll-Striche,
-keine Treffflächen). Beim nächsten Durchgang zuerst live nachsehen, ob `data-schicht="soll"`
-auf 0 steht und `data-treffer` vorhanden ist.
+**Live geprüft am 2026-10-05 (Strang A):** keine Soll-Striche mehr, 10 Achsen- und 11
+Terpen-Treffflächen, die Infotafel wechselt beim Überfahren und nennt nur noch „Laut Community".
+Dabei fiel die Verdeckung auf, die `375bbc6` behebt.
+
+**Noch nicht live geprüft:** Strang B und die Nachbesserung `375bbc6`. Die Cloudflare-Build
+braucht nach dem Push einige Minuten. Prüfpunkte: Terpennamen rechts sind anklickbar
+(`aria-pressed`), ein eindeutiger Geschmack über Null schaltet sein Terpen, mehrere Kandidaten
+pulsieren, und die Sektionshöhe bleibt beim Überfahren konstant, ohne dass die Tafel die Achsen
+verdeckt.
+
+**Zugang zur Live-Seite:** Seitenpasswort aus `SITE_PASSWORD` in `.env.local`.
 
 
 ### ⇢ SESSION 38 (2026-10-02, Sessionstart): Sweet-Spot-Score im Fazit, Nutzer hat JA gesagt
