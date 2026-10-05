@@ -58,23 +58,49 @@ und beim Überfahren voll lesbar; `role="tooltip"` und `aria-describedby` sind w
 Tabstopp auf dem nicht bedienbaren Icon. Das Band ist ab `sm` 192 px hoch (`h-48`), das Skelett
 genauso. Mobil bleibt das schmale Icon-Band, dort trägt der `sr-only`-Name die Information.
 
-**Noch nicht live geprüft (das ist der nächste Schritt):**
-- Strang B und die Nachbesserung `375bbc6` (Terpennamen rechts anklickbar mit `aria-pressed`,
-  ein eindeutiger Geschmack über Null schaltet sein Terpen, mehrere Kandidaten pulsieren,
-  Sektionshöhe bleibt beim Überfahren konstant ohne Verdeckung der Achsen).
-- Strang C: Overall-Noten in Zehntelschritten, Anzeige einheitlich formatiert.
-- Strang D: Blütenseite auf Mobil und Desktop (Angaben unter Bild und Sortennamen, keine
-  Doppelsektion mehr), Startseite als Example mit Reglern bei 0.
-  **Offener Punkt für die Live-Prüfung:** der Sortenkopf auf der Blütenseite wiederholt Dinge,
-  die das `Titelblatt` oben schon zeigt (Handelsname, Kultivar, THC/CBD). Die Spec schreibt
-  genau diesen Weg vor (Punkt 5: Angaben in den `bild`-Slot, zusammen mit dem Sortenkopf).
-  Live ansehen und den Nutzer fragen, ob der Sortenkopf dort bleiben soll oder nur die Angaben.
-- Strang E: Startseite auf dem Desktop (Band 192 px hoch, Infos gedämpft, Hover betont sie, Lauf
-  ohne Lücken, auch nach Größenänderung des Fensters) und auf 390 px Breite (unverändert schmal).
-- Strang F: 320, 360, 390 und 430 px Breite (links und rechts Abstand, Wortmarke einzeilig).
+**Live geprüft am 2026-10-05 (Browser 1, 1500 px Fenster, hinter dem Seitenpasswort):**
+- **Strang A:** keine Soll-Striche mehr in der Karte (`data-schicht="soll"` gibt 0 Treffer,
+  `balken` 40). Die Sektionshöhe bleibt beim Überfahren konstant (829 px vor und nach dem Hover).
+- **Strang B:** 11 Terpen-Schaltflächen mit `aria-pressed`, alle auf `false`. Den Geschmack
+  „Zitrus" auf 3 gestellt: drei Kandidaten pulsieren (`Limonen`, `Nerolidol`, `Terpinolen`),
+  keiner schaltet sich selbst an, weil die Richtung nicht eindeutig ist. Genau so vorgesehen.
+- **Strang C:** die Overall-Regler stehen auf `min 0`, `max 5`, `step="any"`, also Zehntelschritte.
+- **Strang D:** „Angaben zur Blüte" steht als `h2` bei y 811, direkt hinter dem Titelblatt (`h1`
+  bei y 381), mit Faktenliste, Wirkstoffspannen und dem Terpenprofil in einem Block (754 px hoch).
+  Kein Sortenkopf und keine Terpen-Chips mehr auf der Blütenseite, der Handelsname steht genau
+  einmal als Überschrift.
+- **Strang F:** bei 494 px Viewport ist die Wortmarke 360 px breit, links 59 und rechts 75 px
+  Abstand, Schriftgröße 90 px (der mittlere clamp-Term greift, nicht die Untergrenze), kein
+  waagrechter Scroll. **Grenze der Messung:** das Chrome-Fenster ließ sich nicht unter 494 px
+  Viewport bringen, 320, 360 und 390 px sind deshalb nicht direkt gemessen. Rechnerisch greift die
+  neue Untergrenze von 3.5rem erst unter etwa 267 px Fensterbreite.
 
-**Browser-MCP war in dieser Session nicht verbunden** (`list_connected_browsers` lieferte eine
-leere Liste), deshalb steht die Live-Prüfung aus. Zuerst Browser verbinden lassen.
+**Befund 2026-10-05: das Terpen-Band hing live hinter seinem Skelett (behoben mit `59054e9`).**
+Der Band-Inhalt stand als `<div hidden id="S:0">` mit elf Einträgen im HTML, aber das Reveal-Skript
+`$RC("B:0","S:0")` fehlte, während `$RC("B:1","S:1")` bis `$RC("B:6","S:6")` da waren. Sichtbar
+blieb dauerhaft das Skelett (jetzt 192 px hoch). Keine Konsolenfehler. Deshalb rendert `TerpenBand`
+jetzt ohne Suspense: die Startseite ist statisch (`revalidate = 300`), das Band darf beim
+Vorrendern blockieren und steht dann fest im HTML. Dazu zieht ein ResizeObserver in
+`TerpenBandKopie` die Kachelbreite nach, sobald das Band Platz hat.
+**Lehre: die erste Suspense-Grenze der statischen Startseite bekam ihr Reveal nicht. Wer dort eine
+neue Grenze einzieht, prüft das live.** Weitere Grenzen auf der Seite (S:1 bis S:6) sind in Ordnung.
+
+**Noch nicht live geprüft (das ist der nächste Schritt):**
+- **Strang E, nach dem Build von `59054e9`:** steht das Band jetzt sichtbar (192 px ab `sm`), trägt
+  es seine Infos gedämpft, betont der Hover sie, läuft es ohne Lücken, und setzt
+  `--band-kachel` einen Wert? Beim letzten Blick lief noch der Stand davor.
+- Mobil 390 px: Band unverändert schmal (78 px, nur Icons).
+- Ein eindeutiger Geschmack über Null, der sein Terpen selbst anschaltet (geprüft wurde nur der
+  mehrdeutige Fall mit drei Kandidaten).
+- Startseite als Example mit Reglern bei 0.
+- Strang E und F erneut bei echten Telefonbreiten, falls ein Gerät oder ein schmaleres Fenster
+  zur Hand ist.
+
+**Entscheidung des Nutzers vom 2026-10-05 zur Blütenseite (`80c407e`):** die Angaben stehen nicht
+doppelt. Der Sortenkopf der Erkundung bleibt der Startseite, weil er auf der Blütenseite das
+Titelblatt wiederholt. Die Angaben zur Blüte stehen als ein Block oben hinter dem Titelblatt und
+tragen das Terpenprofil mit; `TerpenProfil` ist dafür aus `SortenKopf` herausgezogen, die alten
+Terpen-Chips sind weg. Nicht splitten, Profil oben.
 
 **Zugang zur Live-Seite:** Seitenpasswort aus `SITE_PASSWORD` in `.env.local`.
 
