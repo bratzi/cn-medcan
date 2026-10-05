@@ -431,8 +431,6 @@ export function AromaKarte({
       : null;
 
   return (
-    // relative ohne Breakpoint: die Infotafel überlagert seit 2026-10-03 bei jeder Breite den
-    // unteren Rand der Karte (Nutzer: die Sektion sprang beim Überfahren).
     <figure aria-label={titel} className={cn("relative flex flex-col gap-6", kompakt && "lg:min-h-0 lg:flex-1 lg:gap-4")}>
       {/* Kopf der Karte: links der Name in Logoschrift mit Verlauf und, mit Reglern, die Skala;
           rechts Ansicht und Legende. */}
@@ -1180,17 +1178,18 @@ export function AromaKarte({
       </div>
 
       {/* Infotext unter der Karte (Nutzer 2026-09-26, 2026-09-27): zentriert wie eine Legende im Buch.
-          Seit 2026-10-03 überlagert die Tafel bei jeder Breite den unteren Rand der Karte und hält
-          im Fluss keine Höhe frei. Vorher reservierte sie 224 px fester Mindesthöhe und wuchs
-          unter lg darüber hinaus, und die ganze Sektion sprang, je nachdem welches Terpen man überfuhr
-          (Nutzer 2026-10-03). Sie fängt keine Zeiger (auch die Tafel nicht, pointer-events erbt),
-          damit das Überfahren der Karte darunter weiterläuft; langer Text scrollt in ihr, statt die
-          Sektion zu dehnen. Der Inhalt blendet beim Wechsel nur über (Deckkraft). */}
+          Die Tafel steht unter der Karte und bekommt seit 2026-10-03 eine feste Höhe statt einer
+          Mindesthöhe (Nutzer: die Sektion sprang beim Überfahren). Vorher reservierte sie 224 px
+          als Mindestmaß und wuchs mit einem langen Terpentext darüber hinaus, wodurch die ganze
+          Sektion ihre Höhe änderte. Jetzt ist der Platz fest und der Text scrollt in der Tafel.
+          Eine Überlagerung der Karte wäre der falsche Weg: sie verdeckte live die untere Hälfte
+          der Achsen. Sie fängt keine Zeiger (pointer-events erbt), damit das Überfahren der Karte
+          weiterläuft; der Inhalt blendet beim Wechsel nur über (Deckkraft). */}
       <div
         aria-live="polite"
         className={cn(
-          "pointer-events-none absolute inset-x-0 bottom-0 z-10 grid justify-items-center",
-          "*:max-h-64 *:overflow-y-auto *:rounded-lg *:border *:border-border *:bg-surface-raised *:p-4 *:shadow-md",
+          "pointer-events-none grid h-56 justify-items-center overflow-hidden",
+          "*:max-h-56 *:overflow-y-auto",
         )}
       >
         {aktiveAchse ? (

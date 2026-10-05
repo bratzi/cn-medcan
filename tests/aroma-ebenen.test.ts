@@ -214,13 +214,15 @@ test("Ein Geschmackswert über Null macht die Achse aktiv (Nutzer 2026-10-03)", 
   assert.doesNotMatch(quelle, /wertAuf\(index\) > SPUERBAR/);
 });
 
-test("Infotafel überlagert bei jeder Breite und hält keine Höhe frei (Nutzer 2026-10-03)", () => {
+test("Infotafel hat feste Höhe, die Sektion springt nicht und die Karte bleibt frei (Nutzer 2026-10-03)", () => {
   const quelle = quelleKarte();
+  // Keine Mindesthöhe mehr, die ein langer Terpentext überschreiten könnte.
   assert.doesNotMatch(quelle, /min-h-80/);
   assert.doesNotMatch(quelle, /sm:min-h-56/);
-  assert.match(quelle, /"pointer-events-none absolute inset-x-0 bottom-0 z-10 grid justify-items-center"/);
+  // Feste Höhe statt Mindesthöhe: der Platz ändert sich nie.
+  assert.match(quelle, /"pointer-events-none grid h-56 justify-items-center overflow-hidden"/);
   // Langer Text scrollt in der Tafel, statt die Sektion zu dehnen.
-  assert.match(quelle, /\*:max-h-64 \*:overflow-y-auto/);
+  assert.match(quelle, /\*:max-h-56 \*:overflow-y-auto/);
 });
 
 test("Jede Achse und jedes Terpen hat eine Trefffläche, auch ohne Regler (Nutzer 2026-10-03)", () => {
