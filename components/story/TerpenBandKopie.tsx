@@ -39,6 +39,9 @@ export function TerpenBandKopie() {
       return kopie;
     };
 
+    let letzteKachel = 0;
+    let letzteKacheln = 0;
+
     const aufbauen = () => {
       const eintraege = Array.from(quelle.children);
       if (eintraege.length === 0) return;
@@ -52,16 +55,27 @@ export function TerpenBandKopie() {
         (summe, eintrag) => summe + eintrag.getBoundingClientRect().width + abstand,
         0,
       );
+      // Breite 0 heißt: das Band ist noch nicht sichtbar. Dann nichts bauen, der Beobachter
+      // unten ruft erneut, sobald es Platz hat.
       if (kachel <= 0) return;
-      spur?.style.setProperty("--band-kachel", `${Math.round(kachel)}px`);
-      // So viele Kacheln in der Kopie, dass hinter der Quelle kein Loch bleibt.
       const kacheln = Math.max(1, Math.ceil(window.innerWidth / kachel));
+      if (Math.round(kachel) === letzteKachel && kacheln === letzteKacheln) return;
+      letzteKachel = Math.round(kachel);
+      letzteKacheln = kacheln;
+      spur?.style.setProperty("--band-kachel", `${letzteKachel}px`);
+      // So viele Kacheln in der Kopie, dass hinter der Quelle kein Loch bleibt.
       ziel.replaceChildren(...Array.from({ length: kacheln }, () => eintraege.map(klon)).flat());
     };
 
     aufbauen();
+    // Der Beobachter deckt zwei Fälle: das Band wird erst später sichtbar, und die Einträge
+    // ändern ihre Breite (andere Schrift, anderer Umbruch). Das Fenster deckt er nicht ab,
+    // denn die Zahl der Kacheln hängt an der Fensterbreite, nicht an der Quellbreite.
+    const beobachter = new ResizeObserver(aufbauen);
+    beobachter.observe(quelle);
     window.addEventListener("resize", aufbauen);
     return () => {
+      beobachter.disconnect();
       window.removeEventListener("resize", aufbauen);
       spur?.style.removeProperty("--band-kachel");
       ziel.replaceChildren();

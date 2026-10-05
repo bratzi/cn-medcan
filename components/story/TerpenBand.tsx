@@ -1,5 +1,3 @@
-import { Suspense } from "react";
-
 import { GeschmackIcon, TerpenIcon } from "@/components/review/AromaIcon";
 import { baueAnsicht } from "@/components/story/TerpenRegister";
 import { holeSprache, holeWoerterbuch } from "@/lib/i18n";
@@ -90,10 +88,14 @@ async function Inhalt() {
   );
 }
 
+/**
+ * Ohne Suspense (Befund 2026-10-05, live): auf der statischen Startseite wurde die erste
+ * Suspense-Grenze nie enthüllt. Ihr Inhalt stand als `<div hidden id="S:0">` im HTML, aber
+ * das zugehörige `$RC("B:0","S:0")` fehlte, während die Grenzen S:1 bis S:6 ihr Reveal
+ * bekamen. Sichtbar blieb deshalb dauerhaft das Skelett. Die Seite ist statisch
+ * (`revalidate = 300`), also darf das Band beim Vorrendern blockieren: dann steht es fest im
+ * HTML und hängt an keinem Reveal.
+ */
 export function TerpenBand() {
-  return (
-    <Suspense fallback={<div className="h-20 border-y border-border bg-surface sm:h-48" data-skelett="" />}>
-      <Inhalt />
-    </Suspense>
-  );
+  return <Inhalt />;
 }
