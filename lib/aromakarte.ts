@@ -589,6 +589,30 @@ export function leuchtendeTerpene(
     .map((terpen) => terpen.name);
 }
 
+/**
+ * Terpene, die eine Geschmacksrichtung spürbar tragen (Anteil ab 20 Prozent), stärkste zuerst
+ * (Nutzer 2026-10-03). Grundlage der Automatik in der Karte: zieht man einen Geschmack über
+ * Null und ist genau ein Terpen zuständig, schaltet es sich selbst an. Sind es mehrere,
+ * schaltet sich keines, und die Karte lässt die Kandidaten pulsieren, bis der Nutzer eines
+ * wählt. Ein leeres Ergebnis heißt: diese Richtung trägt kein Terpen der Sorte.
+ *
+ * Anders als `leuchtendeTerpene` bleiben Geister hier drin. Ein Geist ist genau das Terpen,
+ * das der Hersteller nicht nennt und das man trotzdem aktivieren können soll.
+ */
+export function terpenKandidaten(
+  achse: number,
+  terpene: readonly KartenTerpen[],
+  _ebenen?: Readonly<Record<string, TerpenEbene>>,
+): string[] {
+  return terpene
+    .flatMap((terpen) => {
+      const bogen = terpenBoegen(terpen).find((b) => b.achse === achse && b.anteil >= 0.2);
+      return bogen ? [{ name: terpen.name, anteil: bogen.anteil }] : [];
+    })
+    .sort((a, b) => b.anteil - a.anteil || a.name.localeCompare(b.name, "de"))
+    .map((eintrag) => eintrag.name);
+}
+
 /** Community-Median einer Sorte aus `sorten_kennwerte` (T3), beim Speichern vorberechnet. */
 export type CommunityMedian = {
   /** Median je Geschmacksrichtung; null, wenn die Spalte unbrauchbar ist. */

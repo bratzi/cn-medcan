@@ -13,7 +13,7 @@ import { AromaKarte, KarteSofortKontext } from "@/components/review/AromaKarte";
 function mitKarte(element: ReturnType<typeof createElement>): string {
   return renderToStaticMarkup(createElement(KarteSofortKontext.Provider, { value: true }, element));
 }
-import { HOEHE, kartenHoeheMitReglern, REIHE, type KartenTerpen } from "@/lib/aromakarte";
+import { achsenIndex, HOEHE, kartenHoeheMitReglern, REIHE, terpenKandidaten, type KartenTerpen } from "@/lib/aromakarte";
 import { vorbelegungAus } from "@/lib/bewertung-vorbelegung";
 import { de } from "@/lib/i18n/de";
 import { aromaTexte } from "@/lib/i18n/typen";
@@ -337,4 +337,26 @@ test("Jede Achse und jedes Terpen hat eine Trefffläche, auch ohne Regler (Nutze
   assert.doesNotMatch(vorTreffer, /\{regler &&/);
   // Fingertipp bleibt unverändert: mobil gibt es kein Überfahren.
   assert.match(quelle, /e\.pointerType !== "touch"/);
+});
+
+/**
+ * Terpene per Klick (Nutzer 2026-10-03): die Stärkeregler sind zu komplex. Zieht man einen
+ * Geschmack über Null, schaltet sich das eindeutig zuständige Terpen selbst an; tragen mehrere
+ * die Richtung, wählt der Nutzer im nächsten Schritt.
+ */
+test("Terpen-Kandidaten einer Achse: keiner, genau einer, mehrere (Nutzer 2026-10-03)", () => {
+  const erdig = achsenIndex("ERDIG");
+  const myrcen: KartenTerpen = { name: "Myrcen", geschmack: "ERDIG", konzentrationProzent: 0.9, rang: 1 };
+  const limonen: KartenTerpen = { name: "Limonen", geschmack: "ZITRUS", konzentrationProzent: 0.4, rang: 2 };
+  const humulen: KartenTerpen = { name: "Humulen", geschmack: "ERDIG", konzentrationProzent: 0.2, rang: 3 };
+
+  // Keiner: die Achse trägt kein Terpen der Sorte. Nichts darf pulsieren.
+  assert.deepEqual(terpenKandidaten(achsenIndex("SUESS"), [myrcen]), []);
+  // Genau einer: eindeutig zuzuordnen, die Automatik darf schalten.
+  assert.deepEqual(terpenKandidaten(erdig, [myrcen, limonen]), ["Myrcen"]);
+  // Mehrere: der Nutzer wählt, nichts schaltet sich selbst.
+  const mehrere = terpenKandidaten(erdig, [myrcen, limonen, humulen]);
+  assert.deepEqual(new Set(mehrere), new Set(["Myrcen", "Humulen"]));
+  // Geister zählen mit: genau sie soll man aktivieren können.
+  assert.deepEqual(terpenKandidaten(erdig, [myrcen], { Myrcen: "geist" }), ["Myrcen"]);
 });
