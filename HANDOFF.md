@@ -3,7 +3,7 @@
 > Übergabemedium zwischen Sessions. Wird nach jedem Arbeitsblock aktualisiert und committet.
 > Wer hier weiterarbeitet, liest diese Datei zuerst und braucht den Chatverlauf nicht.
 
-**Letzte Aktualisierung:** 2026-10-02 (Session 37)
+**Letzte Aktualisierung:** 2026-10-05 (Session 39)
 **Repo:** https://github.com/bratzi/cn-medcan (public)
 **Branch:** `main` (Makeover „Grünes Buch“ Teilprojekt 1 ist seit 2026-09-24 auf `main`)
 
@@ -28,7 +28,57 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 
 ## ⇢ Hier geht es weiter
 
-### ⇢ SESSION 39 (2026-10-05): Kartengraph-Überarbeitung, Strang A ist gepusht
+### ⇢ SESSION 39 (2026-10-05): Kartengraph-Überarbeitung, alle sechs Stränge sind gepusht
+
+**Stand: A bis F sind umgesetzt und auf `main` (`dcb849b`, `298584d`, `aa36b8c`, `7fee152`,
+`0f456dc`). Offen ist allein die Live-Prüfung.** 570 Tests grün, Typen sauber, `npm run farben`
+grün; die zwei Lint-Fehler in `BuchReiter.tsx` und `RegisterAuswahl.tsx` bestanden schon vorher.
+
+**Arbeitsweise in dieser Session (Nutzer 2026-10-05):** keine Subagents, wegen der Credits.
+Erst drei parallele Implementer gestartet, auf Zuruf des Nutzers sofort gestoppt und alles
+selbst seriell gebaut. Für die nächste Zeit gilt: regulär arbeiten, nicht delegieren.
+
+**Strang F (`dcb849b`):** `--text-plakat` hat die Untergrenze 3.5rem statt 6rem, die
+Wortmarken-Gruppe im Auftakt hält mobil 24 statt 16 px Seitenrand. Der mittlere Term ergibt bei
+390 px rund 74 px, die alte Untergrenze griff also auf jedem Telefon.
+
+**Strang D (`298584d`, `aa36b8c`):** `AromaErkundung` kennt `modus` mit "anzeige", "example" und
+"maske"; `eingabe` ist daraus abgeleitet, die versteckten Formularfelder hängen allein an
+"maske". Die Startseite läuft über `NoteUndErkundung` als `modus="example"`. Der Hinweis
+„Hier wird nichts gespeichert." hängt jetzt ebenfalls an "maske" und steht damit auch im
+Example. `SortenKopf` hat den Slot `angaben`; die Blütenseite reicht den Sortenkopf samt
+Faktenliste und Wirkstoffspannen in den `bild`-Slot von `BewertungsFormular` und
+`AromaErkundung`, die alte Sektion nach dem Rating und die `TerpenChips` dort sind weg.
+
+**Strang E (`7fee152`, `0f456dc`):** `TerpenBandKopie` setzt so viele Kacheln, dass die Kopie
+mindestens die Fensterbreite erreicht, und schreibt die gerechnete Kachelbreite nach
+`--band-kachel`; die Animation verschiebt um genau diese Breite statt um 50 % der Spur. Die
+Infos stehen jetzt im Band selbst (Name, Duft, drei Geschmacksnoten mit Farbbalken), gedämpft
+und beim Überfahren voll lesbar; `role="tooltip"` und `aria-describedby` sind weg, ebenso der
+Tabstopp auf dem nicht bedienbaren Icon. Das Band ist ab `sm` 192 px hoch (`h-48`), das Skelett
+genauso. Mobil bleibt das schmale Icon-Band, dort trägt der `sr-only`-Name die Information.
+
+**Noch nicht live geprüft (das ist der nächste Schritt):**
+- Strang B und die Nachbesserung `375bbc6` (Terpennamen rechts anklickbar mit `aria-pressed`,
+  ein eindeutiger Geschmack über Null schaltet sein Terpen, mehrere Kandidaten pulsieren,
+  Sektionshöhe bleibt beim Überfahren konstant ohne Verdeckung der Achsen).
+- Strang C: Overall-Noten in Zehntelschritten, Anzeige einheitlich formatiert.
+- Strang D: Blütenseite auf Mobil und Desktop (Angaben unter Bild und Sortennamen, keine
+  Doppelsektion mehr), Startseite als Example mit Reglern bei 0.
+  **Offener Punkt für die Live-Prüfung:** der Sortenkopf auf der Blütenseite wiederholt Dinge,
+  die das `Titelblatt` oben schon zeigt (Handelsname, Kultivar, THC/CBD). Die Spec schreibt
+  genau diesen Weg vor (Punkt 5: Angaben in den `bild`-Slot, zusammen mit dem Sortenkopf).
+  Live ansehen und den Nutzer fragen, ob der Sortenkopf dort bleiben soll oder nur die Angaben.
+- Strang E: Startseite auf dem Desktop (Band 192 px hoch, Infos gedämpft, Hover betont sie, Lauf
+  ohne Lücken, auch nach Größenänderung des Fensters) und auf 390 px Breite (unverändert schmal).
+- Strang F: 320, 360, 390 und 430 px Breite (links und rechts Abstand, Wortmarke einzeilig).
+
+**Browser-MCP war in dieser Session nicht verbunden** (`list_connected_browsers` lieferte eine
+leere Liste), deshalb steht die Live-Prüfung aus. Zuerst Browser verbinden lassen.
+
+**Zugang zur Live-Seite:** Seitenpasswort aus `SITE_PASSWORD` in `.env.local`.
+
+### ⇢ SESSION 39 (früherer Stand): Strang A ist gepusht
 
 Auftrag des Nutzers vom 2026-10-03, zehn Punkte. Spec:
 `docs/superpowers/specs/2026-10-03-kartengraph-ueberarbeitung-design.md`,
