@@ -26,6 +26,7 @@ async function Inhalt() {
     <div className="mt-16">
       {/* Blatt-Note wie in der Blütenbewertung über der Erkundung (Nutzer 2026-09-30). */}
       <NoteUndErkundung
+        modus="example"
         blattTexte={w.bewerten}
         sprache={sprache}
         titel={sorte.handelsname}

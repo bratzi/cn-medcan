@@ -66,7 +66,15 @@ export function AromaErkundung({
   gesamteindruck,
   gesamtnoteMedian = null,
   eigeneGesamtnote = null,
-  eingabe = false,
+  /**
+   * Wie die Erkundung bedient wird (Nutzer 2026-10-03, vorher das boolesche `eingabe`):
+   * - "maske": die Bewertungsmaske. Regler sind die Eingabe, versteckte Felder gehen ins Formular.
+   * - "example": dieselbe Maske und dieselbe Optik auf der Startseite, aber ohne Formularfelder
+   *   und ohne Speichern. Regler starten bei 0 wie in der echten Maske; nichts wird gespeichert.
+   * - "anzeige": nur lesen, wie auf der Buchseite (Doppelseite.tsx).
+   * Es gibt bewusst nur einen Komponentenbaum: derselbe Code, eine Abweichung.
+   */
+  modus = "anzeige",
   vorbelegung = null,
   istBetreiber = false,
   zwischenruf,
@@ -107,11 +115,11 @@ export function AromaErkundung({
    */
   eigeneGesamtnote?: number | null;
   /**
-   * Bewertungsmaske (Nutzer 2026-09-25: sieht exakt aus wie die Startseite):
-   * die Regler sind die Eingabe, ihre Werte gehen als versteckte Felder ins
-   * umschließende Formular (Feldnamen wie lib/bewertung-eingabe.ts).
+   * Bedienmodus (Nutzer 2026-09-25: die Maske sieht exakt aus wie die Startseite). In "maske"
+   * gehen die Reglerwerte als versteckte Felder ins umschließende Formular (Feldnamen wie
+   * lib/bewertung-eingabe.ts); in "example" sind die Regler bedienbar, speichern aber nichts.
    */
-  eingabe?: boolean;
+  modus?: "anzeige" | "example" | "maske";
   /**
    * Eigene gespeicherte Bewertung als Start der Regler (Masterplan Bewertung
    * v2, T4): „Dein Fazit“ steht sofort, „Zurücksetzen“ kehrt zu ihr zurück.
@@ -127,6 +135,8 @@ export function AromaErkundung({
   zwischenruf?: React.ReactNode;
   children?: React.ReactNode;
 }) {
+  // Regler bedienbar in Maske und Example, nur lesend in der Anzeige.
+  const eingabe = modus !== "anzeige";
   // Start der eigenen Regler: leer oder die gespeicherte Bewertung. Die Startobjekte
   // bleiben als Referenz stehen: jede Änderung ersetzt sie, „Zurücksetzen“ setzt genau
   // sie wieder ein. So heißt „geändert“ einfach: nicht mehr dasselbe Objekt.
@@ -291,7 +301,7 @@ export function AromaErkundung({
   return (
     // Die Schritte in voller Breite; das Fazit läuft ab 118rem außen im Seitenrand mit (T16).
     <div ref={wurzel} className="relative flex flex-col gap-16 md:gap-24">
-      {eingabe ? (
+      {modus === "maske" ? (
         // Werte der Regler fürs umschließende Formular: Noten nur, wenn gesetzt (Start bei 0 =
         // keine Note, T5c; Pflicht, der Server meldet eine fehlende Note, statt 0 zu speichern),
         // Geschmack immer, Beschaffenheit und Restfeuchte nur, was bewegt wurde (optional).

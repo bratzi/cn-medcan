@@ -320,7 +320,7 @@ const maske = (props: Partial<Parameters<typeof AromaErkundung>[0]>) =>
       serien: [HERSTELLER, COMMUNITY],
       zeilen: [{ terpen: "Myrcen", wert: 3, anzahl: 3 }],
       median: MEDIAN,
-      eingabe: true,
+      modus: "maske",
       texte,
       ...props,
     }),
@@ -385,7 +385,7 @@ test("Legende der Maske: Deine Bewertung und Community-Median, kein Herstellerst
 });
 
 test("Anzeige ohne Maske: keine Formularfelder, keine Herstellerserie, kein Soll-Strich", () => {
-  const html = maske({ eingabe: false });
+  const html = maske({ modus: "anzeige" });
   assert.equal(Object.keys(geschmacksFelder(html)).length, 0);
   assert.ok(schicht(html, "linie").length > 0);
   // Seit 2026-10-03 (Nutzer): die Herstellerangabe ist keine Serie der Karte mehr, weil der

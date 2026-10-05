@@ -156,7 +156,7 @@ const erkundung = (props: Partial<Parameters<typeof AromaErkundung>[0]>) =>
   );
 
 test("Ohne Median oder ohne eigene Terpenwerte keine Abweichungszeile", () => {
-  assert.doesNotMatch(erkundung({ eingabe: true, vorbelegung: vorbelegung({ Myrcen: 2 }) }), new RegExp(de.aroma.karte.nase));
+  assert.doesNotMatch(erkundung({ modus: "maske", vorbelegung: vorbelegung({ Myrcen: 2 }) }), new RegExp(de.aroma.karte.nase));
   assert.doesNotMatch(erkundung({ median: MEDIAN }), new RegExp(de.aroma.karte.nase));
 });
 

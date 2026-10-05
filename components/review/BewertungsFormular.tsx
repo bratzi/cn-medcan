@@ -115,7 +115,7 @@ export function BewertungsFormular({
         titel={handelsname}
         terpene={terpene}
         katalog={katalog}
-        eingabe
+        modus="maske"
         vorbelegung={vorbelegung}
         eigeneGesamtnote={eigeneGesamtnote}
         istBetreiber={istBetreiber}

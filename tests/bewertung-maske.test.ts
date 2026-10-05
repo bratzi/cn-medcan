@@ -49,7 +49,7 @@ function maske(vorbelegung = VORBELEGUNG, istBetreiber = false) {
       zeilen: [{ terpen: "Myrcen", wert: 3, anzahl: 2 }],
       gesamteindruck: { werte: { aussehen: 2, geruch: 2, geschmack: 2, konsistenz: 2 }, anzahl: 2 },
       beschaffenheit: { werte: { chlorophyll: 1, trichomFarbe: 1 }, feuchte: 9, anzahl: 2 },
-      eingabe: true,
+      modus: "maske",
       vorbelegung,
       istBetreiber,
       texte: aromaTexte(de, "de"),

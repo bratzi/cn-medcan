@@ -17,7 +17,7 @@ export function NoteUndErkundung({
   blattTexte,
   sprache,
   ...erkundung
-}: Omit<ComponentProps<typeof AromaErkundung>, "eigeneGesamtnote" | "eingabe" | "vorbelegung"> & {
+}: Omit<ComponentProps<typeof AromaErkundung>, "eigeneGesamtnote" | "vorbelegung"> & {
   blattTexte: BlattNoteTexte;
   sprache: Sprache;
 }) {

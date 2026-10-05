@@ -38,3 +38,14 @@ test("Empfehlungen und Katalog der Startseite lesen keine Sitzung und keinen Fac
     assert.doesNotMatch(lies(datei), /fetch\(/, datei);
   }
 });
+
+test("Startseite nutzt den Rating-Code als Example, nicht als Anzeige (Nutzer 2026-10-03)", () => {
+  const sektion = lies("components/story/AromaSektion.tsx");
+  const erkundung = lies("components/review/AromaErkundung.tsx");
+  assert.match(sektion, /modus="example"/);
+  // Ein Baum, kein zweiter: der Modus steuert nur die versteckten Felder.
+  assert.match(erkundung, /modus\?: "anzeige" \| "example" \| "maske"/);
+  assert.match(erkundung, /const eingabe = modus !== "anzeige"/);
+  assert.match(erkundung, /modus === "maske"/);
+  assert.doesNotMatch(erkundung, /eingabe\?: boolean/);
+});
