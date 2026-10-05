@@ -28,6 +28,43 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 
 ## ⇢ Hier geht es weiter
 
+### ⇢ SESSION 39 (2026-10-05): Kartengraph-Überarbeitung, Strang A ist gepusht
+
+Auftrag des Nutzers vom 2026-10-03, zehn Punkte. Spec:
+`docs/superpowers/specs/2026-10-03-kartengraph-ueberarbeitung-design.md`,
+Plan mit sechs Strängen A bis F: `docs/superpowers/plans/2026-10-03-kartengraph-ueberarbeitung.md`.
+Der Plan trägt unten die Live-Befunde A0 und E0 mit Zahlen.
+
+**Entscheidungen des Nutzers vom 2026-10-03 (bereits getroffen, nicht neu fragen):**
+- Overall-Noten werden von `Int` auf `Float` migriert, damit der Regler Zehntelschritte kann.
+- Terpene sind künftig nur an oder aus; die Stärkeregler entfallen.
+- Die Startseite läuft als Example mit denselben Reglern wie die Maske, Startwert 0.
+
+**Fertig und auf `main` (`48e395e`): Strang A.**
+Herstellerserie und Soll-Strich sind aus der Karte entfernt, der Bezug ist überall der
+Community-Median, ein Wert über Null macht die Achse aktiv, die Infotafel überlagert und die
+Sektion springt nicht mehr, und jede Achse wie jedes Terpen hat eine Trefffläche für den Hover.
+567 Tests grün, Typen sauber. Die zwei Lint-Fehler in `BuchReiter.tsx` und `RegisterAuswahl.tsx`
+bestanden schon vorher und gehören nicht zu dieser Arbeit.
+
+**Noch offen, in dieser Reihenfolge:**
+- **Strang B:** Terpene per Klick statt Stärkeregler, Automatik bei eindeutigem Geschmack,
+  violettes Pulsieren bei mehreren Kandidaten.
+- **Strang C:** Overall in Zehntelschritten samt Migration `0015_noten_als_float.sql`.
+  **Diese Migration spielt der Nutzer selbst remote ein**, mit
+  `npx wrangler d1 execute cn-medcan-db --remote --file migrations/0015_noten_als_float.sql`.
+- **Strang D:** Angaben zur Blüte in den Sortenkopf, Startseite als Example.
+- **Strang E:** Terpen-Band. Der Befund steht: eine Kachel ist 1012 px breit, das Fenster
+  1714 px, daher 702 px Lücke; der Hover zeigt nichts, weil der Zeiger auf der geklonten
+  Kachel landet, aus der `TerpenBandKopie` die Tooltips entfernt.
+- **Strang F:** Wortmarke im Hero mobil, `--text-plakat` hat eine zu hohe Untergrenze.
+
+**Live-Prüfung Strang A steht noch aus.** Der Push ist erfolgt, die Cloudflare-Build braucht
+noch Zeit; unmittelbar nach dem Push stand live weiterhin der alte Stand (zehn Soll-Striche,
+keine Treffflächen). Beim nächsten Durchgang zuerst live nachsehen, ob `data-schicht="soll"`
+auf 0 steht und `data-treffer` vorhanden ist.
+
+
 ### ⇢ SESSION 38 (2026-10-02, Sessionstart): Sweet-Spot-Score im Fazit, Nutzer hat JA gesagt
 
 **ALS ERSTES, ohne Rückfrage:** Der Nutzer hat am 2026-10-02 die offene Frage aus Session 36 mit JA beantwortet:
