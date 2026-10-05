@@ -75,13 +75,6 @@ export const RADIUS = 180;
  */
 export const REIHE = 44;
 
-/**
- * Höhe der Karte mit Terpen-Reglern: so hoch, dass jede Zeile der rechten Spalte
- * (`anzahl` inklusive Begleitstoffe) ihre REIHE bekommt, nie niedriger als `hoehe`.
- */
-export function kartenHoeheMitReglern(anzahl: number, hoehe: number): number {
-  return Math.max(hoehe, OBEN + RAND_UNTEN + (anzahl - 1) * REIHE);
-}
 
 /**
  * Netzradius: RADIUS, auf schmalen Karten so klein, dass die Achsennamen am Rand
@@ -599,11 +592,7 @@ export function leuchtendeTerpene(
  * Anders als `leuchtendeTerpene` bleiben Geister hier drin. Ein Geist ist genau das Terpen,
  * das der Hersteller nicht nennt und das man trotzdem aktivieren können soll.
  */
-export function terpenKandidaten(
-  achse: number,
-  terpene: readonly KartenTerpen[],
-  _ebenen?: Readonly<Record<string, TerpenEbene>>,
-): string[] {
+export function terpenKandidaten(achse: number, terpene: readonly KartenTerpen[]): string[] {
   return terpene
     .flatMap((terpen) => {
       const bogen = terpenBoegen(terpen).find((b) => b.achse === achse && b.anteil >= 0.2);
@@ -617,7 +606,7 @@ export function terpenKandidaten(
 export type CommunityMedian = {
   /** Median je Geschmacksrichtung; null, wenn die Spalte unbrauchbar ist. */
   geschmack: GeschmacksMatrix | null;
-  /** Median der Terpen-Intensität je Terpen (0 bis 5, auch halbe Werte). */
+  /** Je Terpen 0 oder 1: ob die Community es für diese Sorte geschmeckt hat (Nutzer 2026-10-03). */
   terpene: Record<string, number>;
   anzahl: number;
 };
@@ -642,13 +631,18 @@ export function communityMedian(
   if (!roh || !(roh.anzahl > 0)) return null;
   const matrix = geschmacksMatrixSchema.safeParse(alsObjekt(roh.geschmackMedian));
   const terpenRoh = alsObjekt(roh.terpenMedian);
+  // Terpene sind seit 2026-10-03 an oder aus (Nutzer). Der vorberechnete Median kann aus der
+  // Zeit der Stärkeregler noch Stufen bis 5 tragen; jede Stufe über 0 heißt "an" und wird
+  // deshalb auf 1 gelesen, wie in parseTerpenIntensitaet.
   const terpene =
     terpenRoh && typeof terpenRoh === "object" && !Array.isArray(terpenRoh)
       ? Object.fromEntries(
-          Object.entries(terpenRoh).filter(
-            (eintrag): eintrag is [string, number] =>
-              typeof eintrag[1] === "number" && Number.isFinite(eintrag[1]) && eintrag[1] >= 0 && eintrag[1] <= MAX,
-          ),
+          Object.entries(terpenRoh)
+            .filter(
+              (eintrag): eintrag is [string, number] =>
+                typeof eintrag[1] === "number" && Number.isFinite(eintrag[1]) && eintrag[1] >= 0 && eintrag[1] <= MAX,
+            )
+            .map(([name, wert]) => [name, wert > 0 ? 1 : 0]),
         )
       : {};
   const geschmack = matrix.success ? matrix.data : null;

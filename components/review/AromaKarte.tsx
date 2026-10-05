@@ -21,7 +21,6 @@ import {
   flussStrich,
   herstellerKraft,
   imSweetSpot,
-  kartenHoeheMitReglern,
   leuchtendeTerpene,
   linienBreite,
   MIN_BREITE,
@@ -42,11 +41,11 @@ import {
 import { QUALITAET_MITTE } from "@/lib/bewertung-v2";
 import { cn } from "@/lib/cn";
 import { LINIEN_FARBE, VERLAUF } from "@/lib/aroma-farben";
-import { GESCHMACKS_ACHSEN, INTENSITAETS_STUFEN, type GeschmacksMatrix } from "@/lib/query/bewertung";
+import { GESCHMACKS_ACHSEN, type GeschmacksMatrix } from "@/lib/query/bewertung";
 import { GeschmackIcon, TerpenIcon } from "@/components/review/AromaIcon";
 import { BEGLEITSTOFFE } from "@/lib/terpen-aromen";
-import { formatiereWert, formatiereZahl } from "@/lib/format";
-import { rasten, tasteZuWert, TERPEN_STUFEN_MAX, terpenTaste, terpenZeiger } from "@/lib/regler-raster";
+import { formatiereZahl } from "@/lib/format";
+import { rasten, tasteZuWert } from "@/lib/regler-raster";
 import { terpenAnzeige } from "@/lib/i18n/terpen";
 import { t as text } from "@/lib/i18n/text";
 import type { AromaTexte } from "@/lib/i18n/typen";
@@ -82,15 +81,16 @@ type Props = {
     aendern: (key: keyof GeschmacksMatrix, wert: number) => void;
   };
   /**
-   * Terpen-Regler in der rechten Spalte (Nutzer 2026-09-30: keine eigene Box, die Regler
-   * gehören in die Karte), spiegelbildlich zu den Geschmacksbalken: je Terpen eine Spur
-   * 0 bis 5 in ganzen Stufen rechts vom Knoten. `median` nur für Terpene mit mindestens
-   * einer Bewertung (grüner Ring). Begleitstoffe bekommen keinen Regler. Nur in der Maske.
+   * Terpene an- und abschalten (Nutzer 2026-10-03, vorher Stärkeregler 0 bis 5: zu komplex).
+   * `an` sind die aktiven Terpene, `anteil` je Terpen der Anteil der Bewertenden, die es
+   * aktiviert haben (der grüne Ring), `pulsierend` die Kandidaten, unter denen der Nutzer
+   * gerade wählen soll. Begleitstoffe sind keine Terpene und bekommen keinen Schalter.
    */
-  terpenRegler?: {
-    werte: Readonly<Record<string, number>>;
-    median?: Readonly<Record<string, number>>;
-    aendern: (terpen: string, wert: number) => void;
+  terpenSchalter?: {
+    an: ReadonlySet<string>;
+    anteil?: Readonly<Record<string, number>>;
+    pulsierend?: ReadonlySet<string>;
+    umschalten: (terpen: string) => void;
   };
   /** Alle bekannten Terpene: zeigt zur aktiven Geschmacksrichtung, welche Terpene sie tragen. */
   lernen?: readonly { name: string; geschmack: KartenTerpen["geschmack"] }[];
@@ -186,21 +186,6 @@ function balkenEnde(knoten: Punkt, wert: number, versatz: number, laenge = 110):
   return { x: knoten.x - 16 - (wert / MAX) * laenge, y: knoten.y + versatz };
 }
 
-/**
- * Spur eines Terpen-Reglers (Nutzer 2026-09-30), spiegelbildlich zum Geschmacksbalken:
- * rechts vom Knoten, 16 Abstand wie links, bis 14 vor den rechten Rand (Platz für den Griff
- * bei 5), knapp unter dem Namen.
- */
-function terpenSpur(knoten: Punkt, breite: number): { von: number; bis: number; y: number } {
-  return { von: knoten.x + 16, bis: breite - 14, y: knoten.y + 8 };
-}
-
-/** Stufenname eines Terpenwerts für Vorleser (wie zuvor im TerpenRegler); unter 0,5 nicht geschmeckt. */
-function einordnung(wert: number, texte: AromaTexte): string {
-  if (wert < 0.5) return texte.schema.nichtGeschmeckt;
-  const naechste = INTENSITAETS_STUFEN.reduce((a, b) => (Math.abs(b.wert - wert) < Math.abs(a.wert - wert) ? b : a));
-  return texte.schema.intensitaet[naechste.wert];
-}
 
 /**
  * Aroma-Karte (Spec Redesign 14): das optische Kernstück der Auswertung.
@@ -226,7 +211,7 @@ export function AromaKarte({
   staerken,
   ebenen,
   regler,
-  terpenRegler,
+  terpenSchalter,
   lernen,
   kompakt = false,
   kopf,
@@ -240,10 +225,6 @@ export function AromaKarte({
   /** Vorlesetext eines Geschmacksreglers: Zone der Sweet-Spot-Skala vorn, dann „x von 5“. */
   const reglerText = (wert: number) =>
     `${kt.sweetSkala[sweetSpotZone(wert)]}, ${text(texte.aroma.vonFuenf, { wert: WERT.format(wert) })}`;
-  /** Vorlesetext eines Terpen-Reglers wie zuvor in der Box: Stufenname, „x von 5“, mit Median dieser dazu. */
-  const terpenText = (wert: number, median: number | undefined) =>
-    `${einordnung(wert, texte)}, ${text(texte.aroma.vonFuenf, { wert: formatiereWert(wert, sprache) })}` +
-    (median === undefined ? "" : ` · ${text(texte.aroma.terpenRegler.community, { wert: formatiereWert(median, sprache) })}`);
   const achsenName = (index: number) => texte.geschmack[GESCHMACKS_ACHSEN[index].enumWert];
   const satz = (name: string) => (texte.aroma.satz as Record<string, string>)[name.trim().toLowerCase()] ?? null;
   const terpene = ungeordnet;
@@ -273,8 +254,6 @@ export function AromaKarte({
   // Achse, deren Regler per Tastatur fokussiert ist (nur :focus-visible): zeichnet
   // einen Fokusring am Griff, getrennt vom Hervorheben beim Überfahren.
   const [tastatur, setTastatur] = useState<number | null>(null);
-  // Ebenso für die Terpen-Regler rechts: Name des per Tastatur fokussierten Terpens.
-  const [terpenTastatur, setTerpenTastatur] = useState<string | null>(null);
   const aktiv = hervorheben ?? ueberfahren;
   const tRef = useRef(0);
   // Misst die tatsächliche Breite der Karte: null vor der ersten Messung
@@ -404,15 +383,14 @@ export function AromaKarte({
     ...terpene.map((terpen, index) => ({ schluessel: `t-${index}`, lage: achsenLage(terpenBoegen(terpen)), name: terpen.name })),
     ...begleiter.map((stoff, index) => ({ schluessel: `b-${index}`, lage: achsenLage(stoff.boegen), name: stoff.name })),
   ].sort((a, b) => a.lage - b.lage || a.name.localeCompare(b.name, "de"));
-  // Mit Terpen-Reglern (Nutzer 2026-09-30) braucht jede Zeile rechts Platz für Name und Spur:
-  // die Karte wird so hoch wie nötig, die Terpene verteilen sich über die ganze Höhe, die
-  // Geschmacksachsen behalten ihren Abstand und stehen mittig. Netz mittig, Radius wie ohne.
-  const aktHoehe = terpenRegler ? kartenHoeheMitReglern(reihe.length, grundHoehe) : grundHoehe;
-  const versatz = (aktHoehe - grundHoehe) / 2;
+  // Seit dem Wegfall der Terpen-Stärkeregler (Nutzer 2026-10-03) braucht die rechte Spalte
+  // keine zusätzliche Höhe mehr: ein Terpen ist an oder aus, dafür reicht sein Name als
+  // Schalter. Die Karte hat damit wieder ihre Grundhöhe.
+  const aktHoehe = grundHoehe;
   const mitte = mitteVon(aktBreite, aktHoehe);
   const radius = radiusVon(aktBreite, grundHoehe);
   const schmal = aktBreite < BREITE;
-  const karte = achsenImKarte(aktBreite, grundHoehe).map((punkt) => ({ x: punkt.x, y: punkt.y + versatz }));
+  const karte = achsenImKarte(aktBreite, grundHoehe);
   const balken = balkenLaenge(aktBreite);
   // Skala über den Balken: über der Beschriftung der ersten Achse (die seit 2026-09-27 über ihrem
   // Balken steht), die Linien reichen bis knapp unter die letzte Achse.
@@ -875,7 +853,7 @@ export function AromaKarte({
             : null}
 
           {/* Treffflächen (Nutzer 2026-10-03): die Infobox wechselt im Web schon beim Überfahren,
-              nicht erst beim Klick. Vorher hingen die Flächen an `regler` und `terpenRegler` und
+              nicht erst beim Klick. Vorher hingen die Flächen an den Reglern der Maske und
               fehlten damit überall, wo keine Bewertungsmaske läuft. Live gemessen am 2026-10-05:
               in der Anzeige gab es rechts nur zwei Schaltflächen und links für zehn Achsen keine
               einzige HTML-Fläche. Diese Rechtecke stehen deshalb immer im Markup, transparent und
@@ -996,119 +974,6 @@ export function AromaKarte({
                       }}
                     />
                   </g>
-                );
-              })
-            : null}
-
-          {/* Terpen-Regler rechts (Nutzer 2026-09-30, zuvor eine eigene Box unter der Karte):
-              spiegelbildlich zu den Geschmacksbalken wächst die lila Füllung vom Knoten nach
-              rechts, 0 bis 5 in ganzen Stufen. Grüner Ring am Community-Median, Saum in
-              Papierfarbe wie links. Auf 0 bleibt der Griff blass am Knoten stehen: man sieht,
-              wo man anfasst. Begleitstoffe sind keine Terpene und bekommen keinen Regler. */}
-          {terpenRegler && kartenSichtbar > 0.5
-            ? terpenKnoten.map((punkt, index) => {
-                const name = terpene[index].name;
-                const wert = terpenRegler.werte[name] ?? 0;
-                const median = terpenRegler.median?.[name];
-                const { von, bis, y } = terpenSpur(punkt, aktBreite);
-                const xVon = (stufe: number) => von + (stufe / TERPEN_STUFEN_MAX) * (bis - von);
-                const ueber = terpenAktiv === name;
-                const wertAus = (clientX: number, clientY: number) => {
-                  const ctm = svgRef.current?.getScreenCTM();
-                  if (!ctm) return wert;
-                  const p = new DOMPoint(clientX, clientY).matrixTransform(ctm.inverse());
-                  // Ganze Stufen wie gespeichert, kein Einrasten auf den Median (T20).
-                  return terpenZeiger(((p.x - von) / (bis - von)) * TERPEN_STUFEN_MAX);
-                };
-                return (
-                  <g key={`tr-${name}`} opacity={kartenSichtbar}>
-                    <rect
-                      x={von}
-                      y={y - 2}
-                      width={bis - von}
-                      height={4}
-                      rx={2}
-                      fill={GRAU}
-                      opacity={ueber ? 0.9 : 0.35}
-                      className="transition-opacity duration-fast"
-                    />
-                    {wert > 0 ? (
-                      <line
-                        data-terpen-fuellung={name}
-                        x1={von}
-                        y1={y}
-                        x2={xVon(wert)}
-                        y2={y}
-                        stroke={FARBE.lila}
-                        strokeWidth={4}
-                        strokeLinecap="round"
-                      />
-                    ) : null}
-                    {median !== undefined ? (
-                      <>
-                        <circle cx={xVon(median)} cy={y} r={9} fill="none" stroke="var(--color-surface)" strokeWidth={5} />
-                        <circle cx={xVon(median)} cy={y} r={9} fill="none" stroke={FARBE.gruen} strokeWidth={2} />
-                      </>
-                    ) : null}
-                    <circle
-                      data-terpen-griff={name}
-                      cx={xVon(wert)}
-                      cy={y}
-                      r={ueber ? 8 : 7}
-                      fill={FARBE.lila}
-                      stroke="var(--color-surface)"
-                      strokeWidth={2}
-                      opacity={wert > 0 ? 1 : 0.6}
-                      style={{ filter: "drop-shadow(0 1px 2px rgb(0 0 0 / 0.3))" }}
-                    />
-                    {/* Trefferfläche 44 hoch über die ganze Zeile bis zum rechten Rand: Ziehen setzt
-                        den Wert, Überfahren hebt das Terpen hervor wie früher sein Name. Tastatur
-                        über die Regler unter der Karte. */}
-                    <rect
-                      x={punkt.x + 4}
-                      y={punkt.y - 22}
-                      width={Math.max(0, aktBreite - punkt.x - 4)}
-                      height={44}
-                      fill="transparent"
-                      className="cursor-grab touch-none active:cursor-grabbing"
-                      style={{ pointerEvents: "all" }}
-                      onPointerEnter={() => terpenUeberfahren(name)}
-                      onPointerDown={(e) => {
-                        e.currentTarget.setPointerCapture(e.pointerId);
-                        terpenUeberfahren(name);
-                        terpenRegler.aendern(name, wertAus(e.clientX, e.clientY));
-                      }}
-                      onPointerMove={(e) => {
-                        if (!e.currentTarget.hasPointerCapture(e.pointerId)) return;
-                        terpenRegler.aendern(name, wertAus(e.clientX, e.clientY));
-                      }}
-                    />
-                  </g>
-                );
-              })
-            : null}
-
-          {/* Tastaturfokus eines Terpen-Reglers: derselbe Ring im Fokus-Token um den Griff. */}
-          {terpenRegler && terpenTastatur !== null && kartenSichtbar > 0.5
-            ? terpenKnoten.map((punkt, index) => {
-                const name = terpene[index].name;
-                if (name !== terpenTastatur) return null;
-                const { von, bis, y } = terpenSpur(punkt, aktBreite);
-                const wert = terpenRegler.werte[name] ?? 0;
-                return (
-                  <circle
-                    key={`tf-${name}`}
-                    cx={von + (wert / TERPEN_STUFEN_MAX) * (bis - von)}
-                    cy={y}
-                    r={12}
-                    fill="none"
-                    stroke="var(--color-focus-ring)"
-                    strokeWidth={2}
-                    opacity={kartenSichtbar}
-                    vectorEffect="non-scaling-stroke"
-                    pointerEvents="none"
-                    className="forced-colors:stroke-[color:Highlight]"
-                  />
                 );
               })
             : null}
@@ -1241,32 +1106,49 @@ export function AromaKarte({
             2026-09-26): ihre Bögen leuchten, die getragenen Richtungen links werden betont. */}
         {terpenKnoten.map((punkt, index) => {
           const name = terpene[index].name;
+          const an = terpenSchalter?.an.has(name) ?? false;
+          const pulsiert = terpenSchalter?.pulsierend?.has(name) ?? false;
           return (
             <button
               key={name}
               type="button"
-              tabIndex={-1}
-              aria-hidden="true"
+              // Mit Schaltern ist der Name die Schaltfläche und muss erreichbar sein; ohne sie
+              // bleibt er wie bisher ein stummes Ziel fürs Hervorheben (der Wert steht in der
+              // Tabelle für Screenreader).
+              tabIndex={terpenSchalter ? undefined : -1}
+              aria-hidden={terpenSchalter ? undefined : true}
+              aria-pressed={terpenSchalter ? an : undefined}
+              onClick={terpenSchalter ? () => terpenSchalter.umschalten(name) : undefined}
               onMouseEnter={() => terpenUeberfahren(name)}
               onFocus={() => terpenUeberfahren(name)}
               className={cn(
                 "absolute inline-flex -translate-y-1/2 items-center gap-1.5 pl-4 font-buch font-medium whitespace-nowrap transition-colors duration-normal",
-                // Mit Reglern steht der Name über der Spur und lässt den Zeiger zur Trefferfläche durch.
-                terpenRegler ? "pointer-events-none text-small" : terpene.length > 6 || schmal ? "text-small" : "text-h3",
-                (etwasUeberfahren ? terpenBetont(name) : (staerke[name] ?? 0) > 0) ? "text-text" : "text-text-muted",
+                terpene.length > 6 || schmal ? "text-small" : "text-h3",
+                terpenSchalter && "cursor-pointer rounded-full outline-offset-2 outline-focus-ring focus-visible:outline-2",
+                // Ein ausgeschaltetes Terpen steht blass da, ein eingeschaltetes in voller Schrift.
+                terpenSchalter
+                  ? an
+                    ? "text-text"
+                    : "text-text-muted"
+                  : (etwasUeberfahren ? terpenBetont(name) : (staerke[name] ?? 0) > 0)
+                    ? "text-text"
+                    : "text-text-muted",
+                // Kandidat: der Geschmack steht über Null, aber mehrere Terpene tragen ihn. Die
+                // Karte fordert zur Wahl auf, bis eines an ist (Nutzer 2026-10-03).
+                pulsiert && "terpen-kandidat",
               )}
               style={{
                 left: `${(punkt.x / aktBreite) * 100}%`,
-                top: `${((terpenRegler ? punkt.y - 10 : punkt.y) / aktHoehe) * 100}%`,
+                top: `${(punkt.y / aktHoehe) * 100}%`,
                 opacity: kartenSichtbar,
-                // Bis zum rechten Rand. Schmal ohne Regler: lange Namen (beta-Caryophyllen) brechen am
-                // Bindestrich um statt hinauszuragen; mit Regler bleibt die Zeile einzeilig, mit Ellipse.
-                maxWidth: terpenRegler || schmal ? `${aktBreite - punkt.x}px` : undefined,
-                whiteSpace: schmal && !terpenRegler ? "normal" : undefined,
+                // Bis zum rechten Rand. Schmal brechen lange Namen (beta-Caryophyllen) am
+                // Bindestrich um, statt hinauszuragen.
+                maxWidth: schmal ? `${aktBreite - punkt.x}px` : undefined,
+                whiteSpace: schmal ? "normal" : undefined,
               }}
             >
               <TerpenIcon name={name} />
-              {terpenRegler ? <span className="min-w-0 truncate">{terpenAnzeige(name, sprache)}</span> : terpenAnzeige(name, sprache)}
+              {terpenAnzeige(name, sprache)}
             </button>
           );
         })}
@@ -1362,7 +1244,7 @@ export function AromaKarte({
             <p className="max-w-md text-center font-buch text-body text-text-muted italic text-balance">
               {regler ? kt.hinweisRegler : kt.hinweisErkunden}
               {/* Nur mit Terpen-Reglern (Maske): der Satz zur rechten Seite. */}
-              {terpenRegler ? ` ${kt.hinweisTerpenRegler}` : null}
+              {terpenSchalter ? ` ${kt.hinweisTerpenRegler}` : null}
             </p>
             {/* Legende der Ebenen (T5), nur wenn es mehr gibt als die Herstellerangabe: Strich,
                 Strichelung und Farbe wie die Bögen, damit die Ebene nicht nur an der Farbe hängt. */}
@@ -1419,43 +1301,24 @@ export function AromaKarte({
         </fieldset>
       ) : null}
 
-      {/* Terpen-Regler für Tastatur und Vorleser, in der Reihenfolge der Spalte. Fokus per
-          Tastatur hebt das Terpen hervor und zeichnet den Fokusring um seinen Griff. */}
-      {terpenRegler ? (
+      {/* Terpen-Schalter für Tastatur und Vorleser, in der Reihenfolge der Spalte (Nutzer
+          2026-10-03, vorher Regler 0 bis 5). Ein Terpen ist an oder aus; der Fokus hebt es in
+          der Karte hervor. Der sichtbare Schalter ist der Name rechts in der Karte. */}
+      {terpenSchalter ? (
         <fieldset className="sr-only min-w-0">
           <legend>{kt.terpenLegende}</legend>
-          {terpenFolge.map(({ name }) => {
-            const wert = terpenRegler.werte[name] ?? 0;
-            return (
-              <label key={name}>
-                {text(texte.aroma.terpenRegler.intensitaetVon, { terpen: terpenAnzeige(name, sprache) })}
-                <input
-                  type="range"
-                  min={0}
-                  max={TERPEN_STUFEN_MAX}
-                  // Ganze Stufen wie gespeichert (T20); eigene Tasten, damit Pos1/Ende/Bild-Tasten stimmen.
-                  step={1}
-                  value={wert}
-                  aria-valuetext={terpenText(wert, terpenRegler.median?.[name])}
-                  onKeyDown={(e) => {
-                    const neu = terpenTaste(e.key, wert);
-                    if (neu === null) return;
-                    e.preventDefault();
-                    terpenRegler.aendern(name, neu);
-                  }}
-                  onFocus={(e) => {
-                    terpenUeberfahren(name);
-                    setTerpenTastatur(e.currentTarget.matches(":focus-visible") ? name : null);
-                  }}
-                  onBlur={() => {
-                    setTerpenAktiv(null);
-                    setTerpenTastatur(null);
-                  }}
-                  onChange={(e) => terpenRegler.aendern(name, Number(e.target.value))}
-                />
-              </label>
-            );
-          })}
+          {terpenFolge.map(({ name }) => (
+            <label key={name}>
+              {terpenAnzeige(name, sprache)}
+              <input
+                type="checkbox"
+                checked={terpenSchalter.an.has(name)}
+                onChange={() => terpenSchalter.umschalten(name)}
+                onFocus={() => terpenUeberfahren(name)}
+                onBlur={() => setTerpenAktiv(null)}
+              />
+            </label>
+          ))}
         </fieldset>
       ) : null}
 

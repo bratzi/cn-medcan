@@ -1874,3 +1874,26 @@ html.joint-cursor :is(input:not([type="range"]):not([type="radio"]):not([type="c
     translate: -50% 0;
   }
 }
+
+/* Kandidaten-Terpene (Nutzer 2026-10-03): zieht man einen Geschmack über Null und tragen
+   mehrere Terpene ihn, pulsieren sie in Kopierstift-Violett, bis der Nutzer eines wählt.
+   Bei reduzierter Bewegung bleibt der ruhige violette Ton ohne Puls. */
+.terpen-kandidat {
+  color: var(--color-kopierstift);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  :root:not([data-sparmodus]) .terpen-kandidat {
+    animation: terpen-kandidat 1.6s ease-in-out infinite;
+  }
+}
+
+@keyframes terpen-kandidat {
+  0%,
+  100% {
+    opacity: 0.45;
+  }
+  50% {
+    opacity: 1;
+  }
+}

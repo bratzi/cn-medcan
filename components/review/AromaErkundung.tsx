@@ -18,13 +18,20 @@ import {
   herstellerTreue,
   nasenAbweichung,
   terpenEbenen,
+  terpenKandidaten,
   type CommunityMedian,
   type KartenTerpen,
   type KatalogEintrag,
   type TerpenZeile,
   type Treue,
 } from "@/lib/aromakarte";
-import { BEWERTUNGS_ACHSEN, GESCHMACKS_ACHSEN, leereGeschmacksMatrix, type GeschmacksMatrix } from "@/lib/query/bewertung";
+import {
+  BEWERTUNGS_ACHSEN,
+  GESCHMACKS_ACHSEN,
+  leereGeschmacksMatrix,
+  terpenAnAus,
+  type GeschmacksMatrix,
+} from "@/lib/query/bewertung";
 import type { Vorbelegung } from "@/lib/bewertung-vorbelegung";
 import { chargenFazit, sortenFazit } from "@/lib/fazit";
 import { fazitDelta } from "@/lib/fazit-delta";
@@ -134,7 +141,13 @@ export function AromaErkundung({
   const [eigen, setEigen] = useState<GeschmacksMatrix | null>(anfang.geschmack);
   const [eigeneBeschaffenheit, setEigeneBeschaffenheit] = useState(anfang.beschaffenheit);
   const [eigeneNoten, setEigeneNoten] = useState(anfang.noten);
+  // Terpene sind seit 2026-10-03 an oder aus (Nutzer: die Stärkeregler waren zu komplex). Der
+  // Startwert kommt aus der eigenen gespeicherten Bewertung; alles über 0 gilt dort als an.
   const [eigeneIntensitaet, setEigeneIntensitaet] = useState<Record<string, number>>(anfang.intensitaet);
+  const aktiveTerpene = new Set(Object.entries(eigeneIntensitaet).flatMap(([name, wert]) => (wert > 0 ? [name] : [])));
+  // Kandidaten, unter denen der Nutzer gerade wählen soll: gesetzt, wenn ein Geschmack über Null
+  // steht und mehrere Terpene ihn tragen. Sie pulsieren in der Karte, bis eines an ist.
+  const [pulsierend, setPulsierend] = useState<ReadonlySet<string>>(new Set());
   const geaendert =
     eigen !== anfang.geschmack ||
     eigeneBeschaffenheit !== anfang.beschaffenheit ||
@@ -229,6 +242,39 @@ export function AromaErkundung({
   const eigenerChargenFazit = chargeBewegt ? chargenFazit({ ...(beschaffenheit?.werte ?? {}), ...eigeneAchsen }) : null;
   const anzahlBewertungen = Math.max(treue?.anzahl ?? 0, gesamteindruck?.anzahl ?? 0, beschaffenheit?.anzahl ?? 0);
 
+  /**
+   * Ein Terpen an- oder abschalten (Nutzer 2026-10-03). Schaltet man eines der Kandidaten an,
+   * endet das Pulsieren: die Wahl ist getroffen.
+   */
+  const terpenUmschalten = (terpen: string) => {
+    setEigeneIntensitaet((alt) => ({ ...alt, [terpen]: (alt[terpen] ?? 0) > 0 ? 0 : 1 }));
+    setPulsierend((alt) => (alt.has(terpen) ? new Set() : alt));
+  };
+
+  /**
+   * Einen Geschmacksregler bewegen (Nutzer 2026-10-03): sobald der Wert über Null geht, ist der
+   * Geschmack aktiv. Trägt ihn genau ein Terpen der Sorte, schaltet es sich selbst an. Tragen
+   * ihn mehrere, schaltet sich keines, und die Kandidaten pulsieren, bis der Nutzer wählt.
+   * Zieht man den Regler zurück auf 0, bleibt ein einmal aktiviertes Terpen an: es wieder
+   * abzuschalten ist eine eigene Entscheidung, kein Nebeneffekt.
+   */
+  const geschmackAendern = (key: keyof GeschmacksMatrix, wert: number) => {
+    setEigen((alt) => ({ ...(alt ?? start), [key]: wert }));
+    if (!eingabe) return;
+    if (wert <= 0) {
+      setPulsierend(new Set());
+      return;
+    }
+    const achse = GESCHMACKS_ACHSEN.findIndex((eintrag) => eintrag.key === key);
+    const offen = terpenKandidaten(achse, kartenTerpene).filter((name) => !aktiveTerpene.has(name));
+    if (offen.length === 1) {
+      setEigeneIntensitaet((alt) => ({ ...alt, [offen[0]]: 1 }));
+      setPulsierend(new Set());
+    } else {
+      setPulsierend(new Set(offen));
+    }
+  };
+
   const hatFazit = sortenFazitWert !== null || chargenFazitWert !== null;
   // Kurz-Fazit der mobilen Leiste (T16): eigene Sortennote, solange nichts bewegt wurde die der
   // Community; das Delta erst, wenn beide Werte stehen.
@@ -265,7 +311,7 @@ export function AromaErkundung({
           {/* Herstellerterpene auf 0 heißen „nicht geschmeckt“ und zählen; ein ergänztes auf 0
               ist nicht ergänzt und geht nicht in den Median (T5, lib/aromakarte.ts). */}
           {Object.entries(gezaehlteTerpene(eigeneIntensitaet, herstellerNamen)).map(([terpen, wert]) => (
-            <input key={terpen} type="hidden" name={`terpen-${terpen}`} value={wert} />
+            <input key={terpen} type="hidden" name={`terpen-${terpen}`} value={terpenAnAus(wert)} />
           ))}
         </div>
       ) : null}
@@ -323,18 +369,17 @@ export function AromaErkundung({
                 werte,
                 // Grüner Regler auf dem Community-Median (T5, zuvor die Herstellerangabe).
                 vergleich: median?.geschmack ?? undefined,
-                aendern: (key, wert) =>
-                  setEigen((alt) => ({ ...(alt ?? start), [key]: wert })),
+                aendern: geschmackAendern,
               }}
-              // Terpen-Regler rechts in der Karte (Nutzer 2026-09-30, zuvor eine eigene Box), nur in der
-              // Maske. Ergänzt ist, was über 0 steht (terpenEbenen oben).
-              terpenRegler={
+              // Terpen-Schalter rechts in der Karte (Nutzer 2026-10-03, zuvor Stärkeregler 0 bis 5),
+              // nur in der Maske. Ergänzt ist, was an ist (terpenEbenen oben).
+              terpenSchalter={
                 eingabe
                   ? {
-                      werte: eigeneIntensitaet,
-                      median: terpenMedian,
-                      // Ganze Stufen, wie die Server Action sie annimmt (lib/bewertung-eingabe.ts).
-                      aendern: (terpen, wert) => setEigeneIntensitaet((alt) => ({ ...alt, [terpen]: Math.round(wert) })),
+                      an: aktiveTerpene,
+                      anteil: terpenMedian,
+                      pulsierend,
+                      umschalten: terpenUmschalten,
                     }
                   : undefined
               }

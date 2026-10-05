@@ -75,7 +75,12 @@ test("Maske: die gespeicherte Bewertung kommt unverändert wieder beim Server an
   assert.ok(geprueft.ok, JSON.stringify(geprueft));
   assert.deepEqual(geprueft.wert.noten, VORBELEGUNG.noten);
   assert.deepEqual(geprueft.wert.geschmacksMatrix, VORBELEGUNG.geschmack);
-  assert.deepEqual(geprueft.wert.terpenIntensitaet, VORBELEGUNG.intensitaet);
+  // Terpene sind seit 2026-10-03 an oder aus (Nutzer). Eine gespeicherte Bewertung aus der Zeit
+  // der Stärkeregler kommt deshalb als an/aus zurück: die Stufen 2 und 5 heißen beide "an".
+  assert.deepEqual(
+    geprueft.wert.terpenIntensitaet,
+    Object.fromEntries(Object.entries(VORBELEGUNG.intensitaet).map(([name, wert]) => [name, wert > 0 ? 1 : 0])),
+  );
   assert.deepEqual(geprueft.wert.beschaffenheit, { chlorophyll: 2.5, trichomFarbe: 4 });
   assert.equal(geprueft.wert.feuchtigkeitProzent, 11.2);
 });

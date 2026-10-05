@@ -23,7 +23,8 @@ test("gültige Eingabe: Noten, Matrix mit Nullen, nur bekannte Terpene", () => {
   assert.equal(e.wert.noten.geruch, 5);
   assert.equal(e.wert.geschmacksMatrix.zitrus, 3.5);
   assert.equal(e.wert.geschmacksMatrix.diesel, 0);
-  assert.deepEqual(e.wert.terpenIntensitaet, { Myrcen: 3 });
+  // Terpene sind seit 2026-10-03 an oder aus (Nutzer): die eingegebene Stufe 3 heißt "an".
+  assert.deepEqual(e.wert.terpenIntensitaet, { Myrcen: 1 });
   assert.equal(e.wert.feuchtigkeitProzent, 10.5);
 });
 
@@ -65,4 +66,22 @@ test("jede Ablehnung nennt einen Meldungsschluessel, den das Woerterbuch kennt",
     assert.ok(e.fehler.schluessel in de.meldung, e.fehler.schluessel);
     assert.ok(e.fehler.schluessel in en.meldung, e.fehler.schluessel);
   }
+});
+
+test("Terpene werden als an oder aus angenommen; alte Stufen gelten als an (Nutzer 2026-10-03)", () => {
+  const felder = new Map<string, unknown>([
+    ["strainId", "s1"],
+    ["note-aussehen", "4"],
+    ["note-geruch", "4"],
+    ["note-geschmack", "4"],
+    ["note-wirkung", "4"],
+    ["note-konsistenz", "4"],
+    ["terpen-Myrcen", "1"],
+    ["terpen-Limonen", "0"],
+    ["terpen-Humulen", "3"],
+  ]);
+  const ergebnis = bewertungPruefen({ get: (name) => felder.get(name) ?? null }, ["Myrcen", "Limonen", "Humulen"]);
+  assert.equal(ergebnis.ok, true);
+  if (!ergebnis.ok) return;
+  assert.deepEqual(ergebnis.wert.terpenIntensitaet, { Myrcen: 1, Limonen: 0, Humulen: 1 });
 });

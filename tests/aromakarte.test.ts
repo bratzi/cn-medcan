@@ -102,14 +102,16 @@ test("Das Netz bleibt bei jeder Breite gleich groß (RADIUS) und zentriert (mitt
 
 import { mittleTerpenIntensitaet, parseTerpenIntensitaet } from "@/lib/query/bewertung";
 
-test("Terpen-Intensität: kaputt oder leer wird {}, Werte außerhalb 1-5 fallen durch, Mittel je Terpen", () => {
+test("Terpen-Intensität: kaputt oder leer wird {}, Werte außerhalb 1-5 fallen durch, Anteil je Terpen", () => {
   assert.deepEqual(parseTerpenIntensitaet(null), {});
   assert.deepEqual(parseTerpenIntensitaet("kaputt"), {});
   assert.deepEqual(parseTerpenIntensitaet('{"Myrcen":7}'), {});
   assert.deepEqual(parseTerpenIntensitaet('{"Myrcen":3}'), { Myrcen: 3 });
-  assert.deepEqual(mittleTerpenIntensitaet([{ Myrcen: 3 }, { Myrcen: 4, Limonen: 2 }]), {
-    Myrcen: { mittel: 3.5, anzahl: 2 },
-    Limonen: { mittel: 2, anzahl: 1 },
+  // Terpene sind seit 2026-10-03 an oder aus (Nutzer): das Mittel ist der Anteil der
+  // Bewertenden, die das Terpen aktiviert haben. Alte Stufen zählen dabei als an.
+  assert.deepEqual(mittleTerpenIntensitaet([{ Myrcen: 3 }, { Myrcen: 4, Limonen: 0 }]), {
+    Myrcen: { mittel: 1, anzahl: 2 },
+    Limonen: { mittel: 0, anzahl: 1 },
   });
 });
 
@@ -286,13 +288,15 @@ test("Community-Median aus sorten_kennwerte: ohne Zeile oder ohne Bewertung null
   assert.equal(communityMedian(null), null);
   assert.equal(communityMedian(undefined), null);
   assert.equal(communityMedian({ terpenMedian: "{}", geschmackMedian: "{}", anzahl: 0 }), null);
+  // Terpene sind seit 2026-10-03 an oder aus (Nutzer): ein vorberechneter Median aus der Zeit
+  // der Stärkeregler trägt noch Stufen bis 5, jede Stufe über 0 heißt "an".
   assert.deepEqual(
     communityMedian({ terpenMedian: '{"Myrcen":2.5,"Limonen":4}', geschmackMedian: JSON.stringify(MATRIX), anzahl: 3 }),
-    { geschmack: MATRIX, terpene: { Myrcen: 2.5, Limonen: 4 }, anzahl: 3 },
+    { geschmack: MATRIX, terpene: { Myrcen: 1, Limonen: 1 }, anzahl: 3 },
   );
   assert.deepEqual(
     communityMedian({ terpenMedian: '{"Myrcen":7,"Limonen":"x","Linalool":3}', geschmackMedian: "kaputt", anzahl: 2 }),
-    { geschmack: null, terpene: { Linalool: 3 }, anzahl: 2 },
+    { geschmack: null, terpene: { Linalool: 1 }, anzahl: 2 },
   );
   // Nichts Brauchbares: wie kein Median (Review Focus 1, nie 0 oder NaN).
   assert.equal(communityMedian({ terpenMedian: "{}", geschmackMedian: "{}", anzahl: 2 }), null);
@@ -339,10 +343,11 @@ test("Erkundungsdaten: der Community-Median aus sorten_kennwerte trägt Reihe, S
     anzahl: 3,
   };
   const daten = erkundungsDaten([MYRCEN], reviews, NAMEN, kennwerte);
-  assert.deepEqual(daten.median, { geschmack: { ...MATRIX, erdig: 2 }, terpene: { Myrcen: 2 }, anzahl: 3 });
+  // Terpene sind seit 2026-10-03 an oder aus (Nutzer): der gespeicherte Median 2 heißt "an".
+  assert.deepEqual(daten.median, { geschmack: { ...MATRIX, erdig: 2 }, terpene: { Myrcen: 1 }, anzahl: 3 });
   // Eine Community-Stimme auf der Karte: die lila Reihe steht auf dem Median, nicht auf dem Mittel (2,7).
   assert.equal(daten.serien.find((serie) => serie.ton === "lila")?.matrix.erdig, 2);
-  assert.deepEqual(daten.zeilen, [{ terpen: "Myrcen", wert: 2, anzahl: 3 }]);
+  assert.deepEqual(daten.zeilen, [{ terpen: "Myrcen", wert: 1, anzahl: 3 }]);
   // Median der Gesamtnote reicht bis in die Erkundung (T6, Sortenfazit).
   assert.equal(daten.gesamtnoteMedian, 4);
 });

@@ -305,20 +305,36 @@ export function parseBeschaffenheit(roh: unknown): Beschaffenheit {
   return Object.fromEntries(Object.entries(ergebnis.data).filter(([key]) => bekannt.has(key))) as Beschaffenheit;
 }
 
-/** Liest die JSON-Spalte; leer, fehlend oder kaputt ergibt ein leeres Objekt. */
+/** Liest die JSON-Spalte roh; leer, fehlend oder kaputt ergibt ein leeres Objekt. */
 export function parseTerpenIntensitaet(roh: unknown): TerpenIntensitaet {
   if (roh === null || roh === undefined) return {};
   const ergebnis = terpenIntensitaetSchema.safeParse(entpacke(roh));
   return ergebnis.success ? ergebnis.data : {};
 }
 
-/** Mittel je Terpen über mehrere Bewertungen, eine Nachkommastelle. */
+/**
+ * Ein Terpen ist seit 2026-10-03 an oder aus (Nutzer: die Stärkeregler waren zu komplex).
+ * Gespeichert werden 0 und 1. Bewertungen und vorberechnete Mediane von vor der Umstellung
+ * tragen Stufen bis 5; jede Stufe über 0 bedeutet "an". Ohne diese Umdeutung zählte eine alte
+ * Bewertung mit Stufe 3 dreifach gegen eine neue mit 1.
+ *
+ * Die Umdeutung geschieht beim Lesen, nicht in der Datenbank: die Zeilen bleiben, wie sie
+ * geschrieben wurden, und brauchen keine Datenmigration.
+ */
+export function terpenAnAus(wert: number): number {
+  return wert > 0 ? 1 : 0;
+}
+
+/**
+ * Anteil je Terpen über mehrere Bewertungen, eine Nachkommastelle: wie viele Bewertende das
+ * Terpen aktiviert haben (0 bis 1). Alte Stufen zählen als an (terpenAnAus).
+ */
 export function mittleTerpenIntensitaet(alle: readonly TerpenIntensitaet[]): Record<string, { mittel: number; anzahl: number }> {
   const summen = new Map<string, { summe: number; anzahl: number }>();
   for (const eintrag of alle) {
     for (const [name, wert] of Object.entries(eintrag)) {
       const bisher = summen.get(name) ?? { summe: 0, anzahl: 0 };
-      summen.set(name, { summe: bisher.summe + wert, anzahl: bisher.anzahl + 1 });
+      summen.set(name, { summe: bisher.summe + terpenAnAus(wert), anzahl: bisher.anzahl + 1 });
     }
   }
   return Object.fromEntries(

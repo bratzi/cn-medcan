@@ -40,7 +40,12 @@ const text = (roh: unknown) => (typeof roh === "string" ? roh.trim() : "");
 
 const note = z.coerce.number().int().min(1).max(5);
 const achse = z.coerce.number().min(0).max(5).multipleOf(0.5);
-const intensitaet = z.coerce.number().int().min(0).max(5);
+/**
+ * Terpene sind seit 2026-10-03 an oder aus (Nutzer: die Staerkeregler waren zu komplex).
+ * Gespeichert werden 0 und 1. Aeltere Formulare und Bewertungen tragen Stufen bis 5; jede
+ * Stufe ueber 0 bedeutet "an" und wird deshalb auf 1 gelesen.
+ */
+const intensitaet = z.coerce.number().int().min(0).max(5).transform((wert) => (wert > 0 ? 1 : 0));
 
 /** Reel nur als oeffentliche Instagram-URL. */
 const REEL = /^https:\/\/(www\.)?instagram\.com\/(reel|p)\/[A-Za-z0-9_-]+\/?(\?.*)?$/;
@@ -48,7 +53,7 @@ const REEL = /^https:\/\/(www\.)?instagram\.com\/(reel|p)\/[A-Za-z0-9_-]+\/?(\?.
 /**
  * Liest ein Formular. Erwartete Felder: strainId, chargenNr, note-<achse>
  * (1-5), feuchtigkeit (Prozent, optional), geschmack-<achse> (0-5 in
- * halben Schritten), terpen-<Name> (0-5, 0 = nicht geschmeckt, nur fuer uebergebene Terpene),
+ * halben Schritten), terpen-<Name> (0 oder 1, 0 = nicht geschmeckt, nur fuer uebergebene Terpene),
  * notiz, instagramReelUrl.
  */
 export function bewertungPruefen(formular: Lesbar, terpenNamen: readonly string[]): Pruefung {
