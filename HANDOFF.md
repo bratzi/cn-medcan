@@ -61,10 +61,20 @@ Sektion springt nicht mehr, und jede Achse wie jedes Terpen hat eine Trefffläch
 567 Tests grün, Typen sauber. Die zwei Lint-Fehler in `BuchReiter.tsx` und `RegisterAuswahl.tsx`
 bestanden schon vorher und gehören nicht zu dieser Arbeit.
 
+**Fertig und auf `main`: Strang C (`4dbdee7`).**
+Overall laeuft in Zehntelschritten wie "Diese Charge". Migration `0015_noten_als_float.sql` hat die
+fuenf Notenspalten von INTEGER auf REAL umgebaut (Tabellenkopie im Muster von 0003, alle fuenf
+Indizes zurueck). **Migration und `db/constraints.sql` sind remote eingespielt** (242 Zeilen
+umgeschrieben, 50 Trigger-Anweisungen), vor dem Push. Die Trigger haengen an der Tabelle und
+fallen bei jedem solchen Umbau mit ihr: nach einer Tabellenkopie immer `db/constraints.sql`
+hinterher.
+
+**Wichtige Korrektur zur Arbeitsweise:** Claude darf Remote-Migrationen SELBST einspielen, exakt als
+`npx wrangler d1 execute cn-medcan-db --remote --file migrations/00NN_x.sql`. Die Memory hiess
+irrefuehrend `d1-remote-nur-nutzer`; "nur Nutzer" meint die Ausnahme bei `Authentication error
+[code: 10000]`, nicht die Regel. Die Memory ist am 2026-10-05 korrigiert worden.
+
 **Noch offen, in dieser Reihenfolge:**
-- **Strang C:** Overall in Zehntelschritten samt Migration `0015_noten_als_float.sql`.
-  **Diese Migration spielt der Nutzer selbst remote ein**, mit
-  `npx wrangler d1 execute cn-medcan-db --remote --file migrations/0015_noten_als_float.sql`.
 - **Strang D:** Angaben zur Blüte in den Sortenkopf, Startseite als Example.
 - **Strang E:** Terpen-Band. Der Befund steht: eine Kachel ist 1012 px breit, das Fenster
   1714 px, daher 702 px Lücke; der Hover zeigt nichts, weil der Zeiger auf der geklonten
