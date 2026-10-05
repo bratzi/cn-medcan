@@ -172,3 +172,16 @@ test("Handschrift nur in den Handschrift-Graden: nie unter 32 px (Spec TP3 15.3)
     );
   assert.deepEqual(treffer, []);
 });
+
+test("Plakatschrift skaliert auf Telefonen mit, statt an der Untergrenze zu kleben (Nutzer 2026-10-03)", () => {
+  // Bei 360 px Breite muss die Wortmarke samt Seitenrand in die Zeile passen.
+  const treffer = css.match(/--text-plakat:\s*clamp\((\d+(?:\.\d+)?)rem,/);
+  assert.ok(treffer, "clamp für --text-plakat gefunden");
+  assert.ok(Number(treffer![1]) <= 4, `Untergrenze ${treffer![1]}rem ist für 360 px zu groß`);
+});
+
+test("Der Hero hält mobil Abstand zum Displayrand", () => {
+  const auftakt = lies("components/story/Auftakt.tsx");
+  assert.doesNotMatch(auftakt, /flex-\[2\] flex-col items-center justify-center gap-4 px-4 /);
+  assert.match(auftakt, /px-6 /);
+});

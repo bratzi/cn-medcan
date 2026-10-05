@@ -87,7 +87,10 @@
   /* Redesign 7 (Referenz choreograffiti): Handschrift riesig von Rand zu Rand.
      plakat: die Wortmarke als Titel im Auftakt. kulisse: Buzz-Sätze blass
      hinter den Sektionen. Beide nie unter 32 px. */
-  --text-plakat: clamp(6rem, 1rem + 15vw, 22rem);
+  /* Untergrenze seit 2026-10-03 kleiner (Nutzer: die Wortmarke klebte mobil am Displayrand).
+     Bei 390 px Breite ergab 1rem + 15vw rund 74 px, die alte Untergrenze von 6rem griff
+     also auf jedem Telefon und machte die Schrift breiter als den Platz. */
+  --text-plakat: clamp(3.5rem, 1rem + 15vw, 22rem);
   --text-plakat--line-height: 0.9;
   --text-plakat--font-weight: 400;
 

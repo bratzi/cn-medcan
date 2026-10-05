@@ -55,7 +55,7 @@ export async function Auftakt() {
       {/* Wortmarke und Unterzeile als eine Gruppe auf gemeinsamer Achse: die
           Unterzeile in derselben aufrechten Druckschrift wie das Storytelling,
           leicht und deutlich kleiner, damit die Handschrift allein führt. */}
-      <div className="flex flex-[2] flex-col items-center justify-center gap-4 px-4 py-8 sm:gap-6 sm:px-8">
+      <div className="flex flex-[2] flex-col items-center justify-center gap-4 px-6 py-8 sm:gap-6 sm:px-8">
         {/* Konturen der Wortmarke dahinter: reine Dekoration, deshalb neben der h1;
             die h1 bleibt genau die Wortmarke. */}
         <div data-story="titel" data-punkt="" className="relative flex justify-center">
