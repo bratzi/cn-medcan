@@ -28,7 +28,28 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 
 ## ⇢ Hier geht es weiter
 
-### ⇢ SESSION 39 (2026-10-05): Kartengraph-Überarbeitung, alle sechs Stränge sind gepusht
+### ⇢ SESSION 40 (Sessionstart): Erst diese Fragen, dann die Reste
+
+**Als erstes den Nutzer in EINER Nachricht fragen:**
+1. **Wie weiter?** Der Plan `2026-10-03-kartengraph-ueberarbeitung.md` ist vollständig umgesetzt
+   und live geprüft. Es liegt kein offener Auftrag mehr an. Gibt es ein neues Thema, oder sollen
+   die drei Reste unten nachgezogen werden?
+2. **Vier alte Worktrees** liegen noch da: `C:\cn-t12` (t17-register), `C:\cn-t13` (t16-fazit),
+   `C:\cn-t14` (sweet-spot), `C:\cn-t15` (cpu-start). Alle sind gemergt. Sollen sie weg?
+
+**Reste aus Session 39, klein und nicht blockierend:**
+- Ein *eindeutiger* Geschmack über Null, der sein Terpen selbst anschaltet. Geprüft ist nur der
+  mehrdeutige Fall: „Zitrus" auf 3 ließ Limonen, Nerolidol und Terpinolen pulsieren, ohne Automatik.
+- Die Hover-Betonung im Terpen-Band ist nur im Markup und im Test belegt. Ein per JavaScript
+  gesendetes Zeigerereignis löst `:hover` im Browser nicht aus; dafür braucht es einen echten
+  Zeiger oder einen Screenshot.
+- Echte Telefonbreiten unter 494 px für Wortmarke und Band. Das Chrome-Fenster ließ sich nicht
+  schmaler stellen als 494 px Viewport.
+
+**Arbeitsweise, Stand 2026-10-05:** keine Subagents, wegen der Credits. Regulär und seriell
+arbeiten, bis der Nutzer etwas anderes sagt.
+
+### ⇢ SESSION 39 (2026-10-05): Kartengraph-Überarbeitung, alle sechs Stränge sind gepusht und live
 
 **Stand: A bis F sind umgesetzt und auf `main` (`dcb849b`, `298584d`, `aa36b8c`, `7fee152`,
 `0f456dc`). Offen ist allein die Live-Prüfung.** 570 Tests grün, Typen sauber, `npm run farben`
