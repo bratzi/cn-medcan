@@ -1872,9 +1872,13 @@ html.joint-cursor :is(input:not([type="range"]):not([type="radio"]):not([type="c
   }
 }
 
+/* Verschiebung um genau eine Kachel. `--band-kachel` setzt TerpenBandKopie nach dem
+   Messen; -50 % war nur nahtlos, wenn genau zwei gleich breite Kacheln standen und eine
+   das Fenster überragte. Bei schmalem Katalog lief sichtbar Leere durch (Nutzer
+   2026-10-03, Befund E0: Kachel 1012 px, Fenster 1714 px, also 702 px Lücke). */
 @keyframes terpen-band {
   to {
-    translate: -50% 0;
+    translate: calc(-1 * var(--band-kachel, 50%)) 0;
   }
 }
 

@@ -1,5 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 
 import { baueTerpenRegister } from "@/lib/terpen-register";
 
@@ -68,4 +70,14 @@ test("baueTerpenRegister: leerer Katalog ergibt keine Terpene, nur die Noten der
   const { terpene, noten } = baueTerpenRegister([]);
   assert.deepEqual(terpene, []);
   assert.deepEqual(noten.map((n) => n.geschmack), ["DIESEL", "SUESS", "FRUCHTIG"]);
+});
+
+test("Terpen-Band läuft nahtlos: genug Kacheln und Verschiebung um eine Kachel (Nutzer 2026-10-03)", () => {
+  const kopie = readFileSync(join(process.cwd(), "components/story/TerpenBandKopie.tsx"), "utf8");
+  const css = readFileSync(join(process.cwd(), "app/globals.css"), "utf8");
+  // So viele Kopien, dass eine Kachel das Fenster überragt; vorher war es genau eine.
+  assert.match(kopie, /kacheln|while \(/);
+  // Die Verschiebung hängt an der gemessenen Kachelbreite, nicht an 50 % der Spur.
+  assert.match(css, /--band-kachel/);
+  assert.doesNotMatch(css, /@keyframes terpen-band\s*\{\s*to\s*\{\s*translate: -50% 0;/);
 });
