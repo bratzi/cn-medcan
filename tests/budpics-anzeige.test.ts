@@ -5,7 +5,7 @@ import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 
 import { BudpicDiashow } from "@/components/produkt/BudpicDiashow";
-import { alsDiashow, budpicMeldungen } from "@/lib/budpic-anzeige";
+import { alsBuchBilder, alsDiashow, budpicMeldungen } from "@/lib/budpic-anzeige";
 import { de } from "@/lib/i18n/de";
 import { en } from "@/lib/i18n/en";
 
@@ -81,4 +81,10 @@ test("Ablehnen leert den BLOB, Freigegebene lassen sich in /admin zurueckziehen 
   const seite = readFileSync("app/[lang]/admin/page.tsx", "utf8");
   assert.match(seite, /<BudpicListe status="FREIGEGEBEN"/);
   assert.match(readFileSync("components/admin/BudpicFreigabe.tsx", "utf8"), /budpicLoeschen/);
+});
+
+test("alsBuchBilder: nur das Datum, der Name steht schon im Kopf der Seite", () => {
+  const bilder = alsBuchBilder([{ id: liste[0].id, breite: 1280, hoehe: 960, erstelltAm: TAG }], "de");
+  assert.deepEqual(bilder, [{ id: liste[0].id, breite: 1280, hoehe: 960, beschriftung: "12.09.2026" }]);
+  assert.deepEqual(alsBuchBilder([], "en"), []);
 });

@@ -83,3 +83,10 @@ test("Abfrage: die Sortenabfrage lädt die Autor-Id, die Zahlen kommen getrennt,
   assert.match(autoren, /freigegeben: true/);
   assert.doesNotMatch(autoren, /strainId/, "die Zahl zählt über alle Sorten");
 });
+
+test("alsEintrag reicht die Bilder der Bewertung durch, ohne Bilder leer", () => {
+  const produkt = { handelsname: "Nebelharz 22 (fiktiv)", slug: "nebelharz-22" };
+  const bilder = [{ id: "3f2b8c1e-0a4d-4e6b-9c1a-2d5e7f809abc", breite: 800, hoehe: 600, erstelltAm: new Date("2026-10-01T10:00:00Z") }];
+  assert.deepEqual(alsEintrag({ ...REVIEW, bilder }, produkt).bilder, bilder);
+  assert.deepEqual(alsEintrag(REVIEW, produkt).bilder, []);
+});

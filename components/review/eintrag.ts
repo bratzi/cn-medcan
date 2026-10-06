@@ -7,7 +7,7 @@ import {
   type TerpenIntensitaet,
 } from "@/lib/query/bewertung";
 import type { KartenTerpen } from "@/lib/aromakarte";
-import type { ReviewEintrag } from "@/lib/query/strains";
+import type { ReviewBild, ReviewEintrag } from "@/lib/query/strains";
 
 /** Was die Doppelseite braucht: eine Bewertung samt Produktname, Matrix geprueft. */
 export type EintragDaten = {
@@ -42,6 +42,8 @@ export type EintragDaten = {
   beschaffenheit: Beschaffenheit;
   /** Herstellerbild der Sorte (Symbolbild), wie in der Blütenübersicht. */
   bildPfad?: string | null;
+  /** Freigegebene Bilder zur Bewertung (Spec 2026-10-06); leer: Ersatzbild ab lg. */
+  bilder?: ReviewBild[];
 };
 
 /** Sprungziel des vollstaendigen Eintrags auf der Produktseite. */
@@ -85,5 +87,6 @@ export function alsEintrag(
     terpenIntensitaet: parseTerpenIntensitaet(review.terpenIntensitaet),
     beschaffenheit: parseBeschaffenheit(review.beschaffenheit),
     bildPfad: produkt.bildPfad ?? null,
+    bilder: review.bilder ?? [],
   };
 }

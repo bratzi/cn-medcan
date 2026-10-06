@@ -166,6 +166,9 @@ export type ChargeEintrag = {
   verfallsdatum: Date | null;
 };
 
+/** Ein freigegebenes Bild zu einer Bewertung (Spec 2026-10-06), ohne BLOB. */
+export type ReviewBild = { id: string; breite: number; hoehe: number; erstelltAm: Date };
+
 export type ReviewEintrag = {
   id: string;
   /** true = Bewertung des Betreibers, false = Community (Zweitstimme). */
@@ -194,6 +197,8 @@ export type ReviewEintrag = {
   instagramReelUrl: string | null;
   chargenNr: string | null;
   erstelltAm: Date;
+  /** Freigegebene Bilder der Bewertung, älteste zuerst, höchstens drei; fehlt außerhalb der Blütenseite. */
+  bilder?: ReviewBild[];
 };
 
 export type UnternehmenEintrag = {
@@ -618,6 +623,13 @@ export async function ladeStrainDetail(
           charge: { select: { chargenNr: true } },
           // Der Name steht Ã¶ffentlich im Buch (Profil: "Unter diesem Namen erscheinen deine Bewertungen").
           autor: { select: { anzeigename: true, avatar: { select: { id: true } } } },
+          // Nur freigegebene, nie mit BLOB; Prisma lädt sie in einer Abfrage mit IN über höchstens 20 Ids.
+          bilder: {
+            where: { status: "FREIGEGEBEN" },
+            select: { id: true, breite: true, hoehe: true, erstelltAm: true },
+            orderBy: { erstelltAm: "asc" },
+            take: 3,
+          },
         },
       },
       kennwerte: KENNWERTE_SELECT,
@@ -710,6 +722,7 @@ export async function ladeStrainDetail(
       instagramReelUrl: review.instagramReelUrl,
       chargenNr: review.charge?.chargenNr ?? null,
       erstelltAm: review.erstelltAm,
+      bilder: review.bilder,
     })),
     kennwerte: zeile.kennwerte,
     aktualisiertAm: zeile.aktualisiertAm,
