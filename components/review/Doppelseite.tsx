@@ -2,15 +2,16 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 
 import { InstagramEmbed, baueEmbedUrl } from "@/components/produkt/InstagramEmbed";
-import { AromaKarte, type AromaSerie } from "@/components/review/AromaKarte";
+import { AromaKarte } from "@/components/review/AromaKarte";
+import { aromaSerien } from "@/components/review/aroma-serien";
 import { BeschaffenheitsLeiste } from "@/components/review/BeschaffenheitsLeiste";
 import { BlattAnzeige } from "@/components/review/BlattAnzeige";
 import { BuchNotiz } from "@/components/review/BuchNotiz";
 import { BuchReiter, ReiterLeiste, type BuchReiterEintrag } from "@/components/review/BuchReiter";
 import { NurAufgeschlagen } from "@/components/review/NurAufgeschlagen";
 import { KartenBild } from "@/components/review/SortenKopf";
-import { herstellerProfil } from "@/lib/aromakarte";
 import { eintragAnker, eintragHref, type EintragDaten } from "@/components/review/eintrag";
+import { FALZ_LINKS, FALZ_RECHTS } from "@/components/review/falz";
 import { Avatar, Badge, buttonKlassen, type BadgeVariante } from "@/components/ui";
 import { cn } from "@/lib/cn";
 import { formatiereDatum, formatiereProzent, formatiereWert, formatiereZahl } from "@/lib/format";
@@ -52,10 +53,6 @@ const FEUCHTE_HINWEIS = {
  * sm 3rem Innenabstand, der Falz reicht also nie unter Bild oder Text.
  */
 const SEITE = "relative flex min-w-0 flex-col gap-8 bg-surface-raised p-6 sm:p-12";
-const FALZ_LINKS =
-  "lg:border-r lg:border-border lg:bg-[linear-gradient(to_left,color-mix(in_oklab,var(--color-text)_7%,transparent),transparent_2rem)]";
-const FALZ_RECHTS =
-  "lg:bg-[linear-gradient(to_right,color-mix(in_oklab,var(--color-text)_7%,transparent),transparent_2rem)]";
 
 export type DoppelseiteProps = {
   eintrag: EintragDaten;
@@ -67,15 +64,6 @@ export type DoppelseiteProps = {
   w: Woerterbuch;
   sprache: Sprache;
 };
-
-/** Zwei Serien: was die Herstellerangaben erwarten lassen und was diese Bewertung gefunden hat. */
-function aromaSerien(eintrag: EintragDaten, w: Woerterbuch): AromaSerie[] {
-  const hersteller = herstellerProfil(eintrag.terpene);
-  const serien: AromaSerie[] = [];
-  if (hersteller) serien.push({ name: w.aroma.serien.hersteller, ton: "gruen", matrix: hersteller });
-  serien.push({ name: w.review.dieseBewertung, ton: "lila", matrix: eintrag.geschmacksMatrix });
-  return serien;
-}
 
 /**
  * Eine Bewertung als aufgeschlagene Doppelseite (Spec TP2 4.3, seit T7,
