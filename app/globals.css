@@ -1940,22 +1940,31 @@ html.joint-cursor :is(input:not([type="range"]):not([type="radio"]):not([type="c
     display: flex;
   }
 
-  /* Feste Höhe, Beschnitt und Ruhe-Versatz der Einträge nur im Laufmodus ab sm: Im Fallback
-     (reduzierte Bewegung, Sparmodus, ohne JavaScript) umbricht die Liste in mehrere Zeilen,
-     das Band wächst mit (min-h-48) und nichts wird abgeschnitten oder verschoben. */
+  /* Feste Höhe, Beschnitt, Infos unter dem Namen und Hochrücken beim Überfahren nur im
+     Laufmodus ab sm: Im Fallback (reduzierte Bewegung, Sparmodus, ohne JavaScript) umbricht
+     die Liste in mehrere Zeilen, das Band wächst mit (min-h-48) und nichts wird abgeschnitten,
+     verschoben oder überlagert. Die Bedingung "Kopie gefüllt" steht ohne verschachteltes
+     :has(), das CSS verwirft (Befund 2026-10-07, die Regel galt live nicht). */
   @media (min-width: 40rem) {
-    :root:not([data-sparmodus]) .terpen-band:has(.terpen-band-spur:not(:has(> [aria-hidden]:empty))) {
+    :root:not([data-sparmodus]) .terpen-band:has(> .terpen-band-spur > [aria-hidden]:not(:empty)) {
       height: 12rem;
       padding-block: 0;
       overflow-y: clip;
     }
 
-    :root:not([data-sparmodus]) .terpen-band:has(.terpen-band-spur:not(:has(> [aria-hidden]:empty))) .terpen-band-eintrag {
-      translate: 0 3rem;
+    :root:not([data-sparmodus]) .terpen-band:has(> .terpen-band-spur > [aria-hidden]:not(:empty)) .terpen-band-info {
+      position: absolute;
+      inset-inline: 0;
+      top: 100%;
+      margin-top: 0.5rem;
     }
 
-    :root:not([data-sparmodus]) .terpen-band:is(:hover, :focus-within):has(.terpen-band-spur:not(:has(> [aria-hidden]:empty))) .terpen-band-eintrag {
+    :root:not([data-sparmodus]) .terpen-band:has(> .terpen-band-spur > [aria-hidden]:not(:empty)) .terpen-band-eintrag {
       translate: 0 0;
+    }
+
+    :root:not([data-sparmodus]) .terpen-band:has(> .terpen-band-spur > [aria-hidden]:not(:empty)):is(:hover, :focus-within) .terpen-band-eintrag {
+      translate: 0 -3rem;
     }
   }
 

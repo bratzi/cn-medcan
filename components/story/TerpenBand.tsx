@@ -42,21 +42,19 @@ async function Inhalt() {
             <TerpenIcon name={terpen.icon} className="size-6" />
             <span className="sr-only">{terpen.name}</span>
           </span>
-          {/* Ruhezustand ab sm: Icon und Name (Nutzer 2026-10-06). Die Zusatzinfos stehen
-              im Fluss, damit die Breite des Eintrags fix bleibt (w-64, sonst ruckt der Lauf
-              und --band-kachel stimmt nicht), und blenden nur per Deckkraft ein, wenn der
-              Zeiger auf dem Band liegt oder ein Eintrag den Fokus trägt. Im Laufmodus (globals.css) hat das Band 192 px Höhe, der Eintrag sitzt in
-              Ruhe 48 px tiefer, damit der Name mittig steht, und rückt beim Überfahren
-              hoch, damit alles passt. Im Fallback (umbrochen) wächst das Band mit. Mobil bleibt das schmale
-              Icon-Band, dort trägt der sr-only-Name die Information. */}
-          <span
-            aria-hidden="true"
-            className="grid w-64 gap-2 max-sm:hidden"
-          >
-            <span className="font-buch text-h2 font-medium leading-tight text-text text-pretty wrap-break-word">
+          {/* Ruhezustand ab sm: Icon und Name (Nutzer 2026-10-06), beide in einer 44-px-Zeile,
+              damit das Icon auf der Mittellinie des Namens steht. Die Zusatzinfos blenden nur
+              per Deckkraft ein, wenn der Zeiger auf dem Band liegt oder ein Eintrag den Fokus
+              trägt. Im Laufmodus (globals.css) hängen sie absolut unter dem Namen: die Höhe
+              eines Eintrags hängt dann nicht von der Zahl der Noten ab, alle Namen stehen auf
+              einer Höhe, und die Breite bleibt fix (w-64, sonst ruckt der Lauf und
+              --band-kachel stimmt nicht). Im Fallback (umbrochen) stehen die Infos im Fluss.
+              Mobil bleibt das schmale Icon-Band, dort trägt der sr-only-Name die Information. */}
+          <span aria-hidden="true" className="relative grid w-64 gap-2 max-sm:hidden">
+            <span className="flex min-h-11 items-center font-buch text-h2 font-medium leading-tight text-text text-pretty wrap-break-word">
               {terpen.name}
             </span>
-            <span className="grid gap-2 opacity-0 transition-opacity duration-normal ease-standard group-hover/band:opacity-100 group-focus-within/band:opacity-100">
+            <span className="terpen-band-info grid gap-2 opacity-0 transition-opacity duration-normal ease-standard group-hover/band:opacity-100 group-focus-within/band:opacity-100">
               <span className="flex items-baseline gap-2 text-caption text-text-muted transition-colors duration-fast ease-standard group-hover:text-text">
                 {terpen.duft ? <span className="truncate">{terpen.duft}</span> : null}
                 <span className="shrink-0">{terpen.sortenText}</span>

@@ -109,16 +109,38 @@ test("Terpen-Band hält beim Überfahren und bei Fokus an: Pause trägt denselbe
   );
 });
 
-test("Terpen-Band: Fallback schneidet nichts ab, feste Höhe und Ruhe-Versatz nur im Laufmodus (Review 2026-10-06)", () => {
+test("Terpen-Band: Fallback schneidet nichts ab, Höhe, Infos unter dem Namen und Hochrücken nur im Laufmodus (Review 2026-10-07)", () => {
   const band = readFileSync(join(process.cwd(), "components/story/TerpenBand.tsx"), "utf8");
   const css = readFileSync(join(process.cwd(), "app/globals.css"), "utf8");
   // Grundzustand (Fallback, umbrochen): Mindesthöhe statt fester Höhe, nur waagrechter Beschnitt, kein Versatz.
   assert.match(band, /sm:min-h-48/);
   assert.doesNotMatch(band, /sm:h-48/);
   assert.doesNotMatch(band, /overflow-clip/);
-  assert.doesNotMatch(band, /translate-y-12/);
-  // Höhe, senkrechter Beschnitt und Versatz hängen am Laufmodus.
-  const lauf = ":root:not([data-sparmodus]) .terpen-band:has(.terpen-band-spur:not(:has(> [aria-hidden]:empty)))";
-  assert.ok(css.includes(`${lauf} {\r\n      height: 12rem;`) || css.includes(`${lauf} {\n      height: 12rem;`));
-  assert.match(css, /\.terpen-band-eintrag \{\s*translate: 0 3rem;/);
+  assert.doesNotMatch(band, /translate-y-/);
+  // Name und Icon in einer 44-px-Zeile, Infos als eigene Klasse, die nur im Laufmodus absolut steht.
+  assert.match(band, /min-h-11[^"]*font-buch/);
+  assert.match(band, /terpen-band-info/);
+  assert.doesNotMatch(band, /\babsolute\b/);
+  const lauf = ":root:not([data-sparmodus]) .terpen-band:has(> .terpen-band-spur > [aria-hidden]:not(:empty))";
+  assert.match(css, new RegExp(`${lauf.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")} \\{\\s*height: 12rem;`));
+  assert.match(css, /\.terpen-band-info \{\s*position: absolute;/);
+  assert.match(css, /:is\(:hover, :focus-within\) \.terpen-band-eintrag \{\s*translate: 0 -3rem;/);
+});
+
+test("Terpen-Band-CSS: kein :has() innerhalb eines :has(), der Browser verwirft die Regel sonst (Befund 2026-10-07)", () => {
+  const css = readFileSync(join(process.cwd(), "app/globals.css"), "utf8");
+  const start = css.indexOf("/* Terpen-Band zwischen Hero und Story");
+  const ende = css.indexOf("@keyframes terpen-band");
+  const abschnitt = css.slice(start, ende);
+  // Klammertiefe verfolgen: nach `:has(` darf bis zur schließenden Klammer kein weiteres `:has(` stehen.
+  for (const treffer of abschnitt.matchAll(/:has\(/g)) {
+    let tiefe = 1;
+    let i = (treffer.index ?? 0) + treffer[0].length;
+    while (i < abschnitt.length && tiefe > 0) {
+      if (abschnitt.startsWith(":has(", i)) assert.fail("verschachteltes :has( im Terpen-Band-CSS");
+      if (abschnitt[i] === "(") tiefe += 1;
+      if (abschnitt[i] === ")") tiefe -= 1;
+      i += 1;
+    }
+  }
 });
