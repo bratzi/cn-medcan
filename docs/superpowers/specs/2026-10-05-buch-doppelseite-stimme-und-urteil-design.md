@@ -87,7 +87,7 @@ neuen Platz. Das streicht die `hidden lg:contents`-Paare aus `Doppelseite.tsx`.
 - **Kopf:** Avatar in `lg` (128 px, unter `sm` 80 px) mit feinem Ring (`ring-1`,
   `ring-offset-4`, 4 px als optische Korrektur, im Code begründet). Daneben der Name als `h3` in
   `font-buch text-h1 font-medium`, höchstens zwei Zeilen, ganzer Name im `title`. Die Überschrift
-  trägt für Vorleser den Satz "Bewertung von {name}" (Präfix `sr-only`). Darunter die Marke
+  trägt für Vorleser den Satz "Bewertung von {name}" (als `aria-label`, der sichtbare Name steht darin). Darunter die Marke
   `Betreiber` oder `Community` (Pille, wie heute). Ohne Autor und ohne Betreiber (Seed, gelöschtes
   Mitglied) kein Avatar, wie heute.
 - **Randnotiz nur bei Community:** "von euch" in Handschrift (`font-hand text-vermerk
@@ -156,12 +156,12 @@ begründet:
 ## 5. Höhe und Fluss
 
 - `lg:h-(--buch-h)` wird `lg:min-h-(--buch-h)`: der Rahmen wächst mit dem Inhalt, nichts läuft
-  mehr über den Rand. `--buch-h` bekommt Untergrenze 49 rem (heute 31,5 rem) und Obergrenze 54 rem
+  mehr über den Rand. `--buch-h` bekommt Untergrenze 51 rem (heute 31,5 rem) und Obergrenze 54 rem
   (heute 46 rem): auf großen Bildschirmen wird das Buch größer und die Karte mit ihm.
 - Der Textbereich links hat `flex: 1 1 0` und `min-h-0` (`basis-0`), trägt also nicht zur Höhe der
   Zeile bei: die rechte Seite gibt die Höhe vor, links wird gemessen, wie viele Zeilen passen. Fällt
   diese Eigenschaft in einem Browser aus, wächst die Seite mit langem Text, läuft aber nie über.
-- Auf 762 px Viewport-Höhe steht das Buch damit rund 780 px hoch und wird um etwa 100 px
+- Auf 762 px Viewport-Höhe steht das Buch damit rund 810 px hoch und wird um etwa 130 px
   gescrollt. Das ist gewollt: lieber ein vollständiger Rahmen als ein abgeschnittener Inhalt.
 
 ## 6. Daten
@@ -192,7 +192,7 @@ selbst (Geometrie, Hover, Lichtfluss), Auszug auf Startseite und `/reviews`, Abs
 ## 9. Entscheidungen von mir, bitte kippen, was nicht passt
 
 1. Restfeuchte wandert in den Kolophon links (sie ist eine Eigenschaft der Charge).
-2. Beschaffenheit und Reel bleiben Reiter in der Einlage, nur kleiner gesetzt.
+2. Beschaffenheit und Reel bleiben Reiter in der Einlage, die Leiste bleibt unverändert.
 3. Die Zahl "Bewertungen" zählt alle freigegebenen Bewertungen des Mitglieds, nicht nur diese Sorte.
 4. "von euch" in Handschrift nur bei Community-Einträgen.
 5. Der Reiter heißt "Terpenbewertung" statt "Aroma-Karte" (dein Wort). Die Karte selbst und das
