@@ -39,7 +39,7 @@ async function EintragInhalt() {
     );
   }
 
-  return <Doppelseite eintrag={review} umfang="auszug" ueberschrift="h3" story w={w} sprache={sprache} />;
+  return <Doppelseite eintrag={review} ueberschrift="h3" story w={w} sprache={sprache} />;
 }
 
 /** Sektion 5 (Spec 5.1): der Höhepunkt der Story. */

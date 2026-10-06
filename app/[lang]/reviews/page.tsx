@@ -46,7 +46,7 @@ async function ReviewsInhalt() {
         <h2 id="neueste-titel" className={ABSCHNITT_TITEL}>
           {w.reviews.neuester}
         </h2>
-        <Doppelseite eintrag={reviews[0]} umfang="auszug" ueberschrift="h3" w={w} sprache={sprache} />
+        <Doppelseite eintrag={reviews[0]} ueberschrift="h3" w={w} sprache={sprache} />
       </section>
 
       {reviews.length > 1 ? (
