@@ -48,6 +48,8 @@ export const revalidate = 86400;
  *   (nur freigegebene Mitglieder), app/admin/budpic-aktionen.ts (Freigabe, Ablehnung,
  *   Löschen nur Betreiber), app/api/bild/[id]/route.ts (nur freigegebene, öffentlich);
  *   Cascade beim Löschen des Mitglieds oder der Sorte.
+ *   Bilder zur Bewertung: app/blueten/[slug]/bewertungsbild-aktionen.ts (Bilder zur Bewertung,
+ *   review_id an budpics, Spec 2026-10-06).
  * - Löschen: User -> Mitglied, Sitzungen, Konto per Cascade; Stimmen,
  *   Vorschläge, Blütenvorschläge, Benachrichtigungen per Cascade;
  *   Bewertungen per SetNull (bleiben ohne Autor). Kein Selbstlöschen im
@@ -221,7 +223,11 @@ export default async function DatenschutzPage() {
               Datenbank (Cloudflare D1, EU), zusammen mit deinem Konto und dem Datum. Ein neues
               Bild ist zunächst nur für uns sichtbar. Erst nach unserer Freigabe erscheint es bei
               der Blüte, mit deinem Anzeigenamen und dem Datum, und ist über seine Adresse
-              abrufbar. Wir können Bilder ablehnen oder löschen. Beim Löschen deines Kontos
+              abrufbar. Bilder, die du zu deiner Bewertung hochlädst, speichern wir genauso; nach
+              der Freigabe erscheinen sie bei deiner Bewertung und in den Bildern der Blüte. Löschst
+              du ein solches Bild oder verwerfen wir die Bewertung, verschwindet es an beiden
+              Stellen. Beim Verkleinern im Browser fallen eingebettete Angaben wie der Aufnahmeort
+              weg. Wir können Bilder ablehnen oder löschen. Beim Löschen deines Kontos
               verschwinden auch deine Bilder. Achte darauf, dass auf dem Bild keine Personen und
               keine persönlichen Angaben zu sehen sind.
             </p>

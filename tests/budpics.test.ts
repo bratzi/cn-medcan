@@ -2,7 +2,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 
 import { MEDIEN } from "@/lib/medien";
-import { BUDPIC_MAX_BYTES, istBudpicId, musterBildId, skalierteMasse, slugHash } from "@/lib/budpics";
+import { BUDPIC_MAX_BYTES, budpicAusBewertung, istBudpicId, musterBildId, skalierteMasse, slugHash } from "@/lib/budpics";
 
 test("musterBildId ist je Slug stabil und zeigt auf ein vorhandenes Foto", () => {
   const ids = new Set(MEDIEN.filter((m) => m.art === "foto").map((m) => m.id));
@@ -38,4 +38,9 @@ test("istBudpicId nimmt nur UUIDs", () => {
   assert.equal(istBudpicId("3f2b8c1e-0a4d-4e6b-9c1a-2d5e7f809abc"), true);
   assert.equal(istBudpicId("../etc"), false);
   assert.equal(istBudpicId(42), false);
+});
+
+test("budpicAusBewertung: nur mit Review-Id", () => {
+  assert.equal(budpicAusBewertung("3f2b8c1e-0a4d-4e6b-9c1a-2d5e7f809abc"), true);
+  assert.equal(budpicAusBewertung(null), false);
 });

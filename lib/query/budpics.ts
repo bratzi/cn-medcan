@@ -1,4 +1,4 @@
-import { BUDPIC_MAX_ANZEIGE } from "@/lib/budpics";
+import { BUDPIC_MAX_ANZEIGE, budpicAusBewertung } from "@/lib/budpics";
 import { getPrisma } from "@/lib/prisma";
 import { aktuellesMitglied } from "@/lib/session";
 
@@ -33,7 +33,7 @@ export async function ladeFreieBudpics(strainIds: readonly string[]): Promise<Ma
   return ergebnis;
 }
 
-export type OffenesBudpic = { id: string; strainSlug: string; handelsname: string; nutzer: string; erstelltAm: Date; breite: number; hoehe: number};
+export type OffenesBudpic = { id: string; strainSlug: string; handelsname: string; nutzer: string; erstelltAm: Date; breite: number; hoehe: number; ausBewertung: boolean };
 
 /**
  * Budpics eines Status fuer /admin; ohne `daten`. Offene aelteste zuerst
@@ -49,6 +49,7 @@ export async function ladeBudpicsNachStatus(status: "OFFEN" | "FREIGEGEBEN"): Pr
         erstelltAm: true,
         breite: true,
         hoehe: true,
+        reviewId: true,
         strain: { select: { slug: true, handelsname: true } },
         mitglied: { select: { anzeigename: true } },
       },
@@ -67,6 +68,7 @@ export async function ladeBudpicsNachStatus(status: "OFFEN" | "FREIGEGEBEN"): Pr
       erstelltAm: z.erstelltAm,
       breite: z.breite,
       hoehe: z.hoehe,
+      ausBewertung: budpicAusBewertung(z.reviewId),
     })),
   };
 }
