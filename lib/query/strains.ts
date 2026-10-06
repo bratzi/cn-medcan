@@ -15,6 +15,7 @@ import {
 import type { GespeicherteBewertung } from "@/lib/bewertung-vorbelegung";
 import { getPrisma } from "@/lib/prisma";
 
+import { ladeAutorZahlen } from "./autoren";
 import { TREFFER_PRO_SEITE, type StrainFilter } from "./filter";
 
 /**
@@ -173,6 +174,8 @@ export type ReviewEintrag = {
   autorName: string | null;
   /** Bild-Id des Profilbilds (T8), nie das BLOB. */
   autorAvatarId?: string | null;
+  /** Freigegebene Bewertungen des Autors über alle Sorten (Buch, Spec 2026-10-05); null ohne Autor oder ohne Zahl. */
+  autorBewertungen?: number | null;
   /** Gesamtnote in Blättern (T4); null bei Altbewertungen. */
   gesamtnote: number | null;
   aussehen: number;
@@ -598,6 +601,7 @@ export async function ladeStrainDetail(
         select: {
           id: true,
           istRedaktionell: true,
+          autorId: true,
           aussehen: true,
           geruch: true,
           geschmack: true,
@@ -621,6 +625,10 @@ export async function ladeStrainDetail(
   });
 
   if (!zeile) return null;
+
+  const autorZahlen = await ladeAutorZahlen(
+    zeile.reviews.flatMap((review) => (review.autorId ? [review.autorId] : [])),
+  );
 
   const { guenstigsterPreisCent, anzahlApothekenVerfuegbar } =
     verdichteBestaende(
@@ -687,6 +695,7 @@ export async function ladeStrainDetail(
       istRedaktionell: review.istRedaktionell,
       autorName: review.autor?.anzeigename ?? null,
       autorAvatarId: review.autor?.avatar?.id ?? null,
+      autorBewertungen: review.autorId ? (autorZahlen.get(review.autorId) ?? null) : null,
       gesamtnote: zuZahl(review.gesamtnote),
       aussehen: review.aussehen,
       geruch: review.geruch,

@@ -31,6 +31,8 @@ export type EintragDaten = {
   autorName: string | null;
   /** Bild-Id des Profilbilds des Autors (T8); null oder fehlend ergibt Initialen. */
   autorAvatarId?: string | null;
+  /** Freigegebene Bewertungen des Autors über alle Sorten; null oder fehlend ohne Zahl. */
+  autorBewertungen?: number | null;
   /** Gesamtnote 0,5 bis 5 in Blättern (T4); null bei Altbewertungen. */
   gesamtnote: number | null;
   /** Terpene der Sorte für die Aroma-Karte (Bögen, Herstellerprofil). */
@@ -77,6 +79,7 @@ export function alsEintrag(
     istBetreiber: review.istRedaktionell,
     autorName: review.autorName,
     autorAvatarId: review.autorAvatarId ?? null,
+    autorBewertungen: review.autorBewertungen ?? null,
     gesamtnote: review.gesamtnote,
     terpene: produkt.terpene ?? [],
     terpenIntensitaet: parseTerpenIntensitaet(review.terpenIntensitaet),
