@@ -150,7 +150,7 @@ test("Buch (voll, T7b): ab lg links Kopf, Name, Blätter, Noten, Restfeuchte, Te
   assert.doesNotMatch(links, /<figure/);
   assert.match(rechts, /<figure/);
   assert.match(rechts, /role="tablist"/);
-  assert.match(rechts, /role="tab"[^>]*aria-selected="true"[^>]*>Aroma-Karte</);
+  assert.match(rechts, /role="tab"[^>]*aria-selected="true"[^>]*>Terpenbewertung</);
   assert.doesNotMatch(rechts, /Sehr dichte Blüten./);
 });
 
