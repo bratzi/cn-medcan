@@ -27,16 +27,17 @@ const karte = (kompakt: boolean) =>
     ),
   );
 
-test("Dicht: Legende und Ansichtsschalter stehen mit der Reiterleiste in einer Zeile", () => {
+test("Dicht: Reiterleiste und Ansichtsschalter stehen in einer Zeile, die Legende fällt ab lg weg", () => {
+  // Live 2026-10-06 bei 1143 px: Reiterleiste, Legende und Schalter passten nicht in eine Zeile.
   const html = karte(true);
-  assert.match(html, /<ul class="[^"]*\blg:order-2\b[^"]*\blg:ml-auto\b/);
+  assert.match(html, /<ul class="[^"]*\blg:hidden\b/);
   assert.doesNotMatch(html, /\blg:basis-full\b/);
-  assert.match(html, /<div class="flex flex-wrap items-center justify-end gap-4 lg:order-3">/);
+  assert.match(html, /<div class="flex flex-wrap items-center justify-end gap-4 lg:order-3 lg:ml-auto">/);
 });
 
 test("Nicht dicht: Formular und Startseite behalten ihre Kopfzeile", () => {
   const html = karte(false);
-  assert.doesNotMatch(html, /\blg:order-[23]\b|\blg:ml-auto\b|\blg:h-32\b/);
+  assert.doesNotMatch(html, /\blg:order-3\b|\blg:ml-auto\b|\blg:h-32\b|<ul class="[^"]*\blg:hidden\b/);
   assert.match(html, /<div class="flex flex-wrap items-center justify-end gap-4">/);
 });
 

@@ -29,6 +29,11 @@ test("Blatturteil: fünf große Blätter, die Zahl in der Buchschrift, der Wert 
   assert.match(html, /<span class="sr-only">3,5 von 5 Blättern<\/span>/);
 });
 
+test("Blatturteil: zwischen lg und xl schmaler, damit die Zahl neben den Blättern bleibt", () => {
+  // Live 2026-10-06 bei 1143 px: 256 px Blätter plus Zahl passten nicht in die Seite, die Zahl brach um.
+  assert.match(blatt(4), /<span aria-hidden="true" class="flex w-56 shrink-0 sm:w-64 lg:w-48 xl:w-64">/);
+});
+
 test("Blatturteil: die Blätter wachsen nacheinander, die Zahl kommt danach", () => {
   const html = blatt(4);
   assert.deepEqual([...html.matchAll(/data-eintritt="blatt" style="--i:(\d)"/g)].map((m) => Number(m[1])), [0, 1, 2, 3, 4]);

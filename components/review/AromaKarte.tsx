@@ -462,7 +462,7 @@ export function AromaKarte({
         </div>
       ) : null}
       <div className={cn("flex flex-col items-end gap-6", kompakt && "lg:contents")}>
-      <div className={cn("flex flex-wrap items-center justify-end gap-4", kompakt && "lg:order-3")}>
+      <div className={cn("flex flex-wrap items-center justify-end gap-4", kompakt && "lg:order-3 lg:ml-auto")}>
         {/* Ansichts-Schalter als Radiogroup (APG): ein Tabstopp, Pfeiltasten wählen.
             Druck-Rückmeldung per scale 0.97, nur ohne reduzierte Bewegung. */}
         <div role="radiogroup" aria-label={kt.ansicht} className="inline-flex rounded-full border border-border-strong p-1">
@@ -498,7 +498,7 @@ export function AromaKarte({
           (grün bis zum Bezug, lila darüber) und der stille Streifen der Herstellerangabe; der
           Ring des Community-Medians steht links bei der Skala. Der Soll-Strich der grünen Serie
           ist am 2026-10-03 entfallen (Nutzer). */}
-      <ul className={cn("flex flex-wrap justify-end gap-x-6 gap-y-2 text-small text-text", kompakt && "lg:order-2 lg:ml-auto")}>
+      <ul className={cn("flex flex-wrap justify-end gap-x-6 gap-y-2 text-small text-text", kompakt && "lg:hidden")}>
         {ansicht === "netz" ? (
           serien.map((serie) => (
             <li key={serie.name} className="inline-flex items-center gap-2">
