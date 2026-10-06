@@ -16,6 +16,7 @@ import type { Sprache } from "@/lib/i18n/sprache-kern";
 export function NoteUndErkundung({
   blattTexte,
   sprache,
+  bild,
   ...erkundung
 }: Omit<ComponentProps<typeof AromaErkundung>, "eigeneGesamtnote" | "vorbelegung"> & {
   blattTexte: BlattNoteTexte;
@@ -25,6 +26,9 @@ export function NoteUndErkundung({
   return (
     // Abstand wie im Bewertungsformular zwischen Blatt-Note und Erkundung.
     <div className="flex flex-col gap-16 md:gap-24">
+      {/* Reihenfolge der Startseite (Nutzer 2026-10-06): Strainname im Sortenkopf, darunter die
+          Gesamtnote, dann Overall. Der Sortenkopf steht deshalb hier und nicht in der Erkundung. */}
+      {bild ? <div>{bild}</div> : null}
       <BlattNote start={null} texte={blattTexte} sprache={sprache} onChange={setNote} />
       <AromaErkundung {...erkundung} eigeneGesamtnote={note} />
     </div>
