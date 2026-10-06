@@ -577,10 +577,12 @@ function Schritt({
           {nummer}
         </text>
       </svg>
-      {/* Links in Logoschrift und Farbverlauf wie die Schlagworte (Nutzer 2026-09-25). */}
+      {/* Links in Logoschrift und Farbverlauf wie die Schlagworte (Nutzer 2026-09-25).
+          Rechter Ausgleich 0.25em statt 0.3em: bei 16 px Seitenrand ragte die Malfläche
+          sonst mobil 1 px über die Seite (live 2026-10-06, 494 px). */}
       <h3
         className="farbverlauf border-t border-border pt-8 font-hand text-erzaehlung leading-[0.9]"
-        style={{ fontSize: "calc(var(--text-kapitel) * 1.35)" }}
+        style={{ fontSize: "calc(var(--text-kapitel) * 1.35)", marginRight: "-0.25em", paddingRight: "0.25em" }}
       >
         {titel}
       </h3>
