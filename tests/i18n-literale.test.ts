@@ -53,6 +53,8 @@ const UMGESTELLT: string[] = [
   "components/review/BlattUrteil.tsx",
   "components/review/NotenLeiste.tsx",
   "components/review/BuchKolophon.tsx",
+  "components/review/BuchNotiz.tsx",
+  "components/review/BuchReiter.tsx",
   "components/review/erkundung-daten.ts",
   // Welle 3: Reviews und Bewerten
   "app/[lang]/reviews/page.tsx",

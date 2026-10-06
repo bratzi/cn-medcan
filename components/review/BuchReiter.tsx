@@ -20,9 +20,13 @@ export type BuchReiterEintrag = {
 
 const LeisteKontext = createContext<ReactNode>(null);
 
-/** Platzhalter für die Reiterleiste in einer Tafel mit `eigeneLeiste`. */
-export function ReiterLeiste() {
-  return <>{useContext(LeisteKontext)}</>;
+/**
+ * Platzhalter für die Reiterleiste in einer Tafel mit `eigeneLeiste`. Wo es keine Leiste gibt
+ * (nur eine Tafel), steht an ihrer Stelle der Titel der Tafel.
+ */
+export function ReiterLeiste({ titel }: { titel: string }) {
+  const leiste = useContext(LeisteKontext);
+  return leiste ?? <p className="text-small font-medium text-text">{titel}</p>;
 }
 
 /**

@@ -150,7 +150,7 @@ export function Doppelseite({ eintrag, umfang, ueberschrift: Ueberschrift, story
     <AromaKarte terpene={eintrag.terpene} serien={aromaSerien(eintrag, w)} texte={texte} kompakt={voll} kopf={kopf} />
   );
   // Sweet Spot entfällt im Buch (Nutzer 2026-09-30: „Sweetspot raus bei den terpenen“).
-  const reiter: BuchReiterEintrag[] = [{ schluessel: "karte", titel: w.buch.reiterKarte, inhalt: karte(<ReiterLeiste />), eigeneLeiste: true }];
+  const reiter: BuchReiterEintrag[] = [{ schluessel: "karte", titel: w.buch.reiterKarte, inhalt: karte(<ReiterLeiste titel={w.buch.reiterKarte} />), eigeneLeiste: true }];
   if (Object.keys(eintrag.beschaffenheit).length > 0) {
     reiter.push({
       schluessel: "beschaffenheit",

@@ -2,13 +2,14 @@
 
 import { useEffect, useId, useRef, useState, type CSSProperties } from "react";
 
+import { ablauf } from "@/components/review/eintritt";
 import { buttonKlassen } from "@/components/ui";
 import { cn } from "@/lib/cn";
 
 /** Ohne Messung (Server, erster Frame): ab dieser Länge kann der Text über sechs Zeilen hinausgehen. */
 export const NOTIZ_KURZ = 280;
-/** Zeilenhöhe von text-body (1.5rem) und Platz für den Knopf (h-9 + gap-2). */
-const ZEILE = 24;
+/** Zeilenhöhe von text-h3 (1.75rem, ab sm) und Platz für den Knopf (h-9 + gap-2). */
+const ZEILE = 28;
 const KNOPF_PLATZ = 44;
 const NEBENEINANDER = "(min-width: 64rem)";
 
@@ -58,6 +59,8 @@ export function BuchNotiz({ text, weiterlesen, schliessen }: { text: string; wei
   return (
     <div
       ref={flaeche}
+      data-eintritt="auf"
+      style={ablauf(2)}
       data-buch-eigen={offen ? "" : undefined}
       onKeyDown={
         offen
@@ -69,7 +72,8 @@ export function BuchNotiz({ text, weiterlesen, schliessen }: { text: string; wei
           : undefined
       }
       className={cn(
-        "flex flex-col items-start gap-2 lg:min-h-0 lg:flex-1",
+        // flex-basis 0: der Text trägt nicht zur Höhe der Zeile bei, die rechte Seite gibt sie vor.
+        "flex flex-col items-start gap-2 lg:min-h-0 lg:flex-[1_1_0px]",
         offen && "lg:absolute lg:inset-0 lg:z-10 lg:gap-4 lg:overflow-y-auto lg:bg-surface-raised lg:px-6 lg:py-4",
       )}
     >
@@ -78,7 +82,7 @@ export function BuchNotiz({ text, weiterlesen, schliessen }: { text: string; wei
         id={id}
         style={stil}
         className={cn(
-          "max-w-[56ch] text-body text-pretty text-text",
+          "max-w-[52ch] text-body text-pretty text-text sm:text-h3 sm:font-normal",
           offen || zeilen === 0 ? null : zeilen === null ? "lg:line-clamp-6" : "lg:line-clamp-(--notiz-zeilen)",
         )}
       >
