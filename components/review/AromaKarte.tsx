@@ -462,7 +462,7 @@ export function AromaKarte({
         </div>
       ) : null}
       <div className={cn("flex flex-col items-end gap-6", kompakt && "lg:contents")}>
-      <div className="flex flex-wrap items-center justify-end gap-4">
+      <div className={cn("flex flex-wrap items-center justify-end gap-4", kompakt && "lg:order-3")}>
         {/* Ansichts-Schalter als Radiogroup (APG): ein Tabstopp, Pfeiltasten wählen.
             Druck-Rückmeldung per scale 0.97, nur ohne reduzierte Bewegung. */}
         <div role="radiogroup" aria-label={kt.ansicht} className="inline-flex rounded-full border border-border-strong p-1">
@@ -498,7 +498,7 @@ export function AromaKarte({
           (grün bis zum Bezug, lila darüber) und der stille Streifen der Herstellerangabe; der
           Ring des Community-Medians steht links bei der Skala. Der Soll-Strich der grünen Serie
           ist am 2026-10-03 entfallen (Nutzer). */}
-      <ul className={cn("flex flex-wrap justify-end gap-x-6 gap-y-2 text-small text-text", kompakt && "lg:basis-full")}>
+      <ul className={cn("flex flex-wrap justify-end gap-x-6 gap-y-2 text-small text-text", kompakt && "lg:order-2 lg:ml-auto")}>
         {ansicht === "netz" ? (
           serien.map((serie) => (
             <li key={serie.name} className="inline-flex items-center gap-2">
@@ -1190,11 +1190,14 @@ export function AromaKarte({
         className={cn(
           "pointer-events-none grid h-56 justify-items-center overflow-hidden",
           "*:max-h-56 *:overflow-y-auto",
+          // Dicht im Buch ab lg (Spec 2026-10-05): der feste Platz bleibt, ist aber kleiner.
+          kompakt && "lg:h-32 lg:*:max-h-32",
         )}
       >
         {aktiveAchse ? (
           <InfoTafel
             key={`achse-${aktiveAchse.key}`}
+            kompakt={kompakt}
             art={kt.geschmacksrichtung}
             icon={<GeschmackIcon geschmack={aktiveAchse.enumWert} className={ICON_TITEL} />}
             titel={texte.geschmack[aktiveAchse.enumWert]}
@@ -1218,6 +1221,7 @@ export function AromaKarte({
         ) : terpenAktiv !== null ? (
           <InfoTafel
             key={`terpen-${terpenAktiv}`}
+            kompakt={kompakt}
             art={BEGLEITSTOFFE.some((stoff) => stoff.name === terpenAktiv) ? kt.begleitstoff : kt.terpen}
             icon={<TerpenIcon name={terpenAktiv} className={ICON_TITEL} />}
             titel={terpenAnzeige(terpenAktiv, sprache)}
@@ -1366,6 +1370,7 @@ function InfoTafel({
   hinweis,
   bezugTitel,
   bezug,
+  kompakt = false,
   children,
 }: {
   art: string;
@@ -1375,23 +1380,30 @@ function InfoTafel({
   hinweis?: string;
   bezugTitel?: string;
   bezug: readonly React.ReactNode[];
+  /** Dicht im Buch ab lg: ohne Kopfzeile, ein Satz in zwei Zeilen, eine Zeile Pillen. */
+  kompakt?: boolean;
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex w-full max-w-xl flex-col items-center gap-2 text-center transition-opacity duration-normal ease-out starting:opacity-0">
-      <p className="text-caption tracking-wide text-text-muted uppercase">{art}</p>
+    // gap-1 = 4px dicht: die Zeilen der Tafel sind ein zusammengehöriger Block in 128 px.
+    <div className={cn("flex w-full max-w-xl flex-col items-center gap-2 text-center transition-opacity duration-normal ease-out starting:opacity-0", kompakt && "lg:gap-1")}>
+      <p className={cn("text-caption tracking-wide text-text-muted uppercase", kompakt && "lg:hidden")}>{art}</p>
       <p className="inline-flex items-center gap-2 font-buch text-h3 text-text">
         <span aria-hidden="true" className="flex">
           {icon}
         </span>
         {titel}
       </p>
-      {hinweis ? <p className="text-caption text-text-muted text-pretty">{hinweis}</p> : null}
-      {children ? <p className="max-w-md font-buch text-body text-text-muted italic text-pretty">{children}</p> : null}
+      {hinweis ? <p className={cn("text-caption text-text-muted text-pretty", kompakt && "lg:hidden")}>{hinweis}</p> : null}
+      {children ? (
+        <p className={cn("max-w-md font-buch text-body text-text-muted italic text-pretty", kompakt && "lg:line-clamp-2 lg:text-small")}>
+          {children}
+        </p>
+      ) : null}
       {bezug.length > 0 ? (
-        <div className="mt-2 flex flex-col items-center gap-2">
-          {bezugTitel ? <p className="text-caption tracking-wide text-text-muted uppercase">{bezugTitel}</p> : null}
-          <ul className="flex flex-wrap justify-center gap-2">{bezug}</ul>
+        <div className={cn("mt-2 flex flex-col items-center gap-2", kompakt && "lg:mt-0")}>
+          {bezugTitel ? <p className={cn("text-caption tracking-wide text-text-muted uppercase", kompakt && "lg:hidden")}>{bezugTitel}</p> : null}
+          <ul className={cn("flex flex-wrap justify-center gap-2", kompakt && "lg:max-h-8 lg:overflow-hidden")}>{bezug}</ul>
         </div>
       ) : null}
     </div>
