@@ -53,6 +53,7 @@ const UMGESTELLT: string[] = [
   "components/review/BlattUrteil.tsx",
   "components/review/NotenLeiste.tsx",
   "components/review/BuchKolophon.tsx",
+  "components/review/BuchDoppelseite.tsx",
   "components/review/BuchNotiz.tsx",
   "components/review/BuchReiter.tsx",
   "components/review/erkundung-daten.ts",

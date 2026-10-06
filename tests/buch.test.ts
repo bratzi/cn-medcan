@@ -43,8 +43,8 @@ const reihenfolge = (html: string) => [...html.matchAll(/<article id="eintrag-([
 test("Eine Doppelseite für alle: Betreiber zuerst, dann die Community, je neueste zuerst", () => {
   const html = zeige([bewertung("c-alt", false, 2), bewertung("b", true, 1), bewertung("c-neu", false, 9)]);
   assert.deepEqual(reihenfolge(html), ["b", "c-neu", "c-alt"]);
-  // Jede Seite ist eine Doppelseite im vollen Umfang: fünf Noten, seit T7b zweimal (ab lg links, mobil rechts).
-  assert.equal(html.match(/<dt/g)?.length, 30);
+  // Jede Seite ist eine Doppelseite im vollen Umfang: fünf Noten (einmal, rechts) plus Datum und Charge im Kolophon.
+  assert.equal(html.match(/<dt/g)?.length, 21);
 });
 
 test("Nur die erste Seite ist aufgeschlagen, die übrigen liegen gestapelt im DOM", () => {
@@ -128,7 +128,7 @@ test("CPU-Budget: die rechte Hälfte rendert der Server nur für die offene Seit
   assert.equal(html.match(/<article /g)?.length, 5);
   const seiten = html.split('<div class="buch-seite"').slice(1);
   for (const [i, seite] of seiten.entries()) assert.match(seite, new RegExp(`Text ${5 - i}\.`));
-  // Seit T7b stehen die Noten links (billig, immer im Server-HTML); die Karte rechts nur nah.
+  // Noten (rechts oben) und Kolophon (links) sind billig und stehen immer im Server-HTML; die Einlage mit der Karte nur nah.
   assert.deepEqual(
     seiten.map((seite) => [seite.includes("<dt"), seite.includes("<figure")]),
     [[true, true], [true, true], [true, false], [true, false], [true, true]],

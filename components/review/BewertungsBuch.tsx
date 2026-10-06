@@ -1,6 +1,6 @@
 import { ABSCHNITT_TITEL } from "@/components/layout/Seitenkopf";
 import { Buch } from "@/components/review/Buch";
-import { Doppelseite } from "@/components/review/Doppelseite";
+import { BuchDoppelseite } from "@/components/review/BuchDoppelseite";
 import { alsEintrag, eintragAnker } from "@/components/review/eintrag";
 import { buttonKlassen } from "@/components/ui";
 import type { KartenTerpen } from "@/lib/aromakarte";
@@ -74,7 +74,7 @@ export function BewertungsBuch({
           seiten={seiten.map((review) => ({
             anker: eintragAnker(review.id),
             inhalt: (
-              <Doppelseite eintrag={alsEintrag(review, produkt)} umfang="voll" ueberschrift="h3" w={w} sprache={sprache} />
+              <BuchDoppelseite eintrag={alsEintrag(review, produkt)} ueberschrift="h3" w={w} sprache={sprache} />
             ),
           }))}
         />
