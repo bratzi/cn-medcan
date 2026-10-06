@@ -82,13 +82,29 @@ test("Terpen-Band läuft nahtlos: genug Kacheln und Verschiebung um eine Kachel 
   assert.doesNotMatch(css, /@keyframes terpen-band\s*\{\s*to\s*\{\s*translate: -50% 0;/);
 });
 
-test("Terpen-Band trägt seine Infos im Band, ausgegraut, ohne Tooltip (Nutzer 2026-10-03)", () => {
+test("Terpen-Band: Ruhezustand nur Icon und Name, Infos erscheinen beim Überfahren (Nutzer 2026-10-06)", () => {
   const band = readFileSync(join(process.cwd(), "components/story/TerpenBand.tsx"), "utf8");
-  // Kein aufklappender Tooltip mehr: die Infos sind sichtbarer Inhalt.
+  // Kein aufklappender Tooltip: die Infos sind sichtbarer Inhalt.
   assert.doesNotMatch(band, /role="tooltip"/);
   assert.doesNotMatch(band, /aria-describedby/);
-  // Im Ruhezustand gedämpft, beim Überfahren in voller Lesbarkeit.
-  assert.match(band, /text-text-muted[\s\S]{0,200}group-hover:text-text/);
+  // Das Band ist die Gruppe, über die die Infos erscheinen.
+  assert.match(band, /group\/band/);
+  // Name größer als body und im Buch-Display.
+  assert.match(band, /font-buch[^"]*text-h2|text-h2[^"]*font-buch/);
+  // Infos in Ruhe unsichtbar, beim Überfahren und bei Tastaturfokus sichtbar.
+  assert.match(band, /opacity-0[^"]*group-hover\/band:opacity-100/);
+  assert.match(band, /group-focus-within\/band:opacity-100/);
   // Nur Web: mobil bleibt das schmale Icon-Band.
   assert.match(band, /max-sm:hidden/);
+  // Die Breite eines Eintrags ist fix, sonst ruckt der Lauf und --band-kachel stimmt nicht.
+  assert.match(band, /w-64/);
+});
+
+test("Terpen-Band hält beim Überfahren und bei Fokus an: Pause trägt denselben Selektorkopf wie der Lauf (Nutzer 2026-10-06)", () => {
+  const css = readFileSync(join(process.cwd(), "app/globals.css"), "utf8");
+  // Der Lauf (0,5,0) setzt animation-play-state per Kurzschrift; eine schwächere Pause verliert.
+  assert.match(
+    css,
+    /:root:not\(\[data-sparmodus\]\) \.terpen-band:is\(:hover, :focus-within\) \.terpen-band-spur:not\(:has\(> \[aria-hidden\]:empty\)\) \{\s*animation-play-state: paused;/,
+  );
 });

@@ -1940,8 +1940,10 @@ html.joint-cursor :is(input:not([type="range"]):not([type="radio"]):not([type="c
     display: flex;
   }
 
-  .terpen-band:hover .terpen-band-spur,
-  .terpen-band:focus-within .terpen-band-spur {
+  /* Dieselbe Spezifität wie der Lauf oben (0,5,0): die animation-Kurzschrift setzt
+     animation-play-state auf running, eine schwächere Pause-Regel verlöre (Befund
+     2026-10-06, das Band blieb beim Überfahren nicht stehen). */
+  :root:not([data-sparmodus]) .terpen-band:is(:hover, :focus-within) .terpen-band-spur:not(:has(> [aria-hidden]:empty)) {
     animation-play-state: paused;
   }
 }

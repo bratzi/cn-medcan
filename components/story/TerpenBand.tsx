@@ -10,9 +10,10 @@ import { TerpenBandKopie } from "@/components/story/TerpenBandKopie";
  * Band zwischen Hero und Story (Nutzer 2026-09-30): die Terpene des Katalogs
  * laufen waagrecht durch. Seit 2026-10-03 steht neben jedem Icon im Band selbst,
  * was das Terpen riecht und welche Geschmacksnoten es trägt, mit Farbbalken wie
- * im Register; im Ruhezustand gedämpft, beim Überfahren voll lesbar. Der alte
+ * im Register; seit 2026-10-06 stehen im Ruhezustand nur Icon und Name (text-h2),
+ * die Infos blenden beim Überfahren des Bands per Deckkraft ein. Der alte
  * Tooltip ist weg, er erschien nie (Befund E0: der Zeiger landete auf der
- * stummen Kopie). Hover hält das Band an. Der Server rendert die Liste nur einmal
+ * stummen Kopie). Hover und Fokus halten das Band an (globals.css). Der Server rendert die Liste nur einmal
  * (CPU-Limit, Fehler 1102); die zweite Kopie für den nahtlosen Lauf klont
  * TerpenBandKopie im Browser, ohne Tooltips und für Screenreader und Tastatur
  * stumm.
@@ -34,43 +35,47 @@ async function Inhalt() {
   const texte = w.start.register;
 
   const liste = (
-    <ul className="terpen-band-liste flex shrink-0 items-center gap-8 pr-8 sm:gap-12 sm:pr-12">
+    <ul className="terpen-band-liste flex shrink-0 items-center gap-8 pr-8 sm:gap-16 sm:pr-16">
       {terpene.map((terpen) => (
-        <li key={terpen.anker} className="group flex items-center gap-4">
+        <li key={terpen.anker} className="group flex items-start gap-6 transition-transform duration-normal ease-standard sm:translate-y-12 sm:group-hover/band:translate-y-0 sm:group-focus-within/band:translate-y-0">
           <span className="grid size-11 shrink-0 place-items-center rounded-full text-text-muted transition-colors duration-fast ease-standard group-hover:text-text">
             <TerpenIcon name={terpen.icon} className="size-6" />
             <span className="sr-only">{terpen.name}</span>
           </span>
-          {/* Die Infos stehen seit 2026-10-03 im Band statt in einer Tafel (Nutzer): der
-              Tooltip erschien nie, weil der Zeiger auf der stummen Kopie landete (Befund
-              E0). Im Ruhezustand gedämpft, beim Überfahren voll lesbar. Mobil bleibt das
-              schmale Icon-Band, dort trägt der sr-only-Name die Information. */}
-          <span aria-hidden="true" className="grid w-64 gap-1 max-sm:hidden">
-            <span className="flex items-baseline gap-2">
-              <span className="font-buch text-body font-medium leading-tight text-text-muted transition-colors duration-fast ease-standard group-hover:text-text">
-                {terpen.name}
-              </span>
-              <span className="text-caption text-text-muted">{terpen.sortenText}</span>
+          {/* Ruhezustand ab sm: Icon und Name (Nutzer 2026-10-06). Die Zusatzinfos stehen
+              im Fluss, damit die Breite des Eintrags fix bleibt (w-64, sonst ruckt der Lauf
+              und --band-kachel stimmt nicht), und blenden nur per Deckkraft ein, wenn der
+              Zeiger auf dem Band liegt oder ein Eintrag den Fokus trägt. Der Eintrag sitzt in
+              Ruhe 48 px tiefer, damit der Name mittig im Band steht, und rückt beim
+              Überfahren hoch, damit alles in die 192 px passt. Mobil bleibt das schmale
+              Icon-Band, dort trägt der sr-only-Name die Information. */}
+          <span
+            aria-hidden="true"
+            className="grid w-64 gap-2 max-sm:hidden"
+          >
+            <span className="font-buch text-h2 font-medium leading-tight text-text text-pretty wrap-break-word">
+              {terpen.name}
             </span>
-            {terpen.duft ? (
-              <span className="block truncate text-caption text-text-muted transition-colors duration-fast ease-standard group-hover:text-text">
-                {terpen.duft}
+            <span className="grid gap-2 opacity-0 transition-opacity duration-normal ease-standard group-hover/band:opacity-100 group-focus-within/band:opacity-100">
+              <span className="flex items-baseline gap-2 text-caption text-text-muted transition-colors duration-fast ease-standard group-hover:text-text">
+                {terpen.duft ? <span className="truncate">{terpen.duft}</span> : null}
+                <span className="shrink-0">{terpen.sortenText}</span>
               </span>
-            ) : null}
-            <span className="mt-1 grid gap-1">
               {/* Drei Noten: mehr sprengt die Bandhöhe, die wegen des Skeletts fest ist. */}
-              {terpen.noten.slice(0, 3).map((note) => (
-                <span key={note.anker} className="grid grid-cols-[minmax(0,5rem)_minmax(0,1fr)] items-center gap-2">
-                  <span className="inline-flex items-center gap-2 text-caption text-text-muted transition-colors duration-fast ease-standard group-hover:text-text">
-                    <GeschmackIcon geschmack={note.geschmack} className="size-4 shrink-0" />
-                    <span className="truncate">{note.label}</span>
+              <span className="grid gap-1">
+                {terpen.noten.slice(0, 3).map((note) => (
+                  <span key={note.anker} className="grid grid-cols-[minmax(0,5rem)_minmax(0,1fr)] items-center gap-2">
+                    <span className="inline-flex items-center gap-2 text-caption text-text-muted transition-colors duration-fast ease-standard group-hover:text-text">
+                      <GeschmackIcon geschmack={note.geschmack} className="size-4 shrink-0" />
+                      <span className="truncate">{note.label}</span>
+                    </span>
+                    <span
+                      className="block h-1.5 rounded-full opacity-60 transition-opacity duration-fast ease-standard group-hover:opacity-100"
+                      style={{ width: `${Math.round(Math.min(1, Math.max(0, note.anteil)) * 100)}%`, background: farbFlaeche(note.geschmack) }}
+                    />
                   </span>
-                  <span
-                    className="block h-1.5 rounded-full opacity-60 transition-opacity duration-fast ease-standard group-hover:opacity-100"
-                    style={{ width: `${Math.round(Math.min(1, Math.max(0, note.anteil)) * 100)}%`, background: farbFlaeche(note.geschmack) }}
-                  />
-                </span>
-              ))}
+                ))}
+              </span>
             </span>
           </span>
         </li>
@@ -79,7 +84,7 @@ async function Inhalt() {
   );
 
   return (
-    <section aria-label={texte.terpene} className="terpen-band relative z-20 flex items-center overflow-x-clip border-y border-border bg-surface py-4 sm:h-48 sm:py-0">
+    <section aria-label={texte.terpene} className="terpen-band group/band relative z-20 flex items-center overflow-clip border-y border-border bg-surface py-4 sm:h-48 sm:py-0">
       <div className="terpen-band-spur flex">
         {liste}
         <TerpenBandKopie />
