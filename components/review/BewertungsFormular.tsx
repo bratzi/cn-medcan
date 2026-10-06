@@ -101,7 +101,7 @@ export function BewertungsFormular({
       <input type="hidden" name="strainId" value={strainId} />
 
       {/* Gleiche Reihenfolge wie die Startseite (Nutzer 2026-10-06): Sortenkopf, Gesamtnote, Overall,
-          Terpz. Die Note h‰lt der gemeinsame Baustein selbst und reicht sie ans eigene Sortenfazit
+          Terpz. Die Note h√§lt der gemeinsame Baustein selbst und reicht sie ans eigene Sortenfazit
           weiter (lib/fazit.ts, T6, Review-Befund T6-R1: nie den Community-Median unterschieben). */}
       <NoteUndErkundung
         key={`erkundung-${stand}`}

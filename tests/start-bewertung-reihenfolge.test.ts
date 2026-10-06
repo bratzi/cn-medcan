@@ -46,7 +46,7 @@ test("Startseite: Strainname, dann Gesamtnote (BlÃ¤tter), dann Overall, dann Ter
   assert.equal(html.split("STRAINNAME-MARKER").length - 1, 1);
 });
 
-test("Blütenseite (Formular-Modus maske): gleiche Reihenfolge, Note vorbelegt, Sortenkopf einmal", () => {
+test("BlÃ¼tenseite (Formular-Modus maske): gleiche Reihenfolge, Note vorbelegt, Sortenkopf einmal", () => {
   const html = renderToStaticMarkup(
     createElement(
       KarteSofortKontext.Provider,
@@ -74,6 +74,11 @@ test("Blütenseite (Formular-Modus maske): gleiche Reihenfolge, Note vorbelegt, S
   assert.ok(name >= 0 && note >= 0 && overall >= 0 && terpz >= 0, JSON.stringify({ name, note, overall, terpz }));
   assert.ok(name < note && note < overall && overall < terpz);
   assert.equal(html.split("STRAINNAME-MARKER").length - 1, 1);
+  // Vorbelegung: genau das Radio mit dem Wert 4 ist angewÃ¤hlt.
+  const radios = html.match(/<input[^>]*name="gesamtnote"[^>]*>/g) ?? [];
+  const angewaehlt = radios.filter((tag) => /checked=/.test(tag));
+  assert.equal(angewaehlt.length, 1, JSON.stringify(radios));
+  assert.match(angewaehlt[0], /value="4"/);
 });
 
 test("Bewertungsformular nutzt den gemeinsamen Baustein statt BlattNote und Erkundung getrennt", () => {
