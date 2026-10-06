@@ -273,6 +273,8 @@ export function Buch({ seiten, bezeichnung, texte }: { seiten: readonly BuchSeit
   const [zeiger, setZeiger] = useState(false);
   const [fokus, setFokus] = useState(false);
   const [imBild, setImBild] = useState(false);
+  // Der Einzug der Seite (globals.css, data-im-bild) startet einmal, sobald das Buch zu sehen ist, und bleibt.
+  const [eingezogen, setEingezogen] = useState(false);
   const ruhe = useSyncExternalStore(abonniereRuhe, istRuhe, ruheAufDemServer);
   const verborgen = useSyncExternalStore(abonniereSichtbarkeit, istVerborgen, nieVerborgen);
 
@@ -345,13 +347,28 @@ export function Buch({ seiten, bezeichnung, texte }: { seiten: readonly BuchSeit
     };
   }, [stand]);
 
-  // Im Bild: das Autoplay blättert nur dann weiter (sonst käme man irgendwo heraus), und der Einzug der
-  // Seite (globals.css, data-im-bild) beginnt erst, wenn man das Buch sieht. Gilt auch für eine einzelne Seite.
+  // Autoplay nur im Bild: außerhalb soll das Buch nicht weiterblättern, man käme sonst irgendwo heraus.
+  useEffect(() => {
+    const element = huelle.current;
+    if (!element || !mehrere) return;
+    const beobachter = new IntersectionObserver(([eintrag]) => setImBild(eintrag.isIntersecting), {
+      rootMargin: "-20% 0px",
+    });
+    beobachter.observe(element);
+    return () => beobachter.disconnect();
+  }, [mehrere]);
+
+  // Einzug: einmal, sobald irgendein Teil des Buchs sichtbar ist (Review 2026-10-06). An der 80-%-Linie
+  // stünde der Kopf schon fertig da und blitzte beim Start aus; bei jedem Hineinscrollen neu wäre Unruhe.
+  // Beim Umblättern beginnt er trotzdem neu, das hängt an data-aktiv. Gilt auch für eine einzelne Seite.
   useEffect(() => {
     const element = huelle.current;
     if (!element) return;
-    const beobachter = new IntersectionObserver(([eintrag]) => setImBild(eintrag.isIntersecting), {
-      rootMargin: "-20% 0px",
+    const beobachter = new IntersectionObserver(([eintrag]) => {
+      if (eintrag.isIntersecting) {
+        setEingezogen(true);
+        beobachter.disconnect();
+      }
     });
     beobachter.observe(element);
     return () => beobachter.disconnect();
@@ -429,7 +446,7 @@ export function Buch({ seiten, bezeichnung, texte }: { seiten: readonly BuchSeit
     >
       <div
         ref={buehne}
-        data-im-bild={imBild ? "" : undefined}
+        data-im-bild={eingezogen ? "" : undefined}
         // Waagerecht wischt das Buch, senkrecht scrollt und zoomt weiter der Browser.
         className={cn("buch-stapel", mehrere && "scroll-mt-[calc(var(--kopf-h,4rem)+1rem)] touch-pan-y touch-pinch-zoom")}
         {...(mehrere

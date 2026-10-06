@@ -176,6 +176,16 @@ test("Einzug: ohne Skript, mit reduzierter Bewegung oder im Sparmodus bleibt all
 
 test("Einzug: das Buch meldet sich im Bild, auch mit nur einer Seite", () => {
   const quelle = readFileSync(join(process.cwd(), "components/review/Buch.tsx"), "utf8");
-  assert.match(quelle, /data-im-bild=\{imBild \? "" : undefined\}/);
+  assert.match(quelle, /data-im-bild=\{eingezogen \? "" : undefined\}/);
   assert.match(quelle, /const element = huelle\.current;\s*if \(!element\) return;/);
+});
+
+test("Einzug: einmal pro Besuch, nicht bei jedem Hineinscrollen (Review Important 1)", () => {
+  const quelle = readFileSync(join(process.cwd(), "components/review/Buch.tsx"), "utf8");
+  // Das Attribut hängt an einem eigenen Zustand, der einmal kippt und bleibt; das Autoplay behält imBild.
+  assert.match(quelle, /data-im-bild=\{eingezogen \? "" : undefined\}/);
+  assert.match(quelle, /if \(eintrag\.isIntersecting\) \{\s*setEingezogen\(true\);\s*beobachter\.disconnect\(\);/);
+  // Sobald irgendein Teil des Buchs sichtbar ist, nicht erst ab der 80-%-Linie: sonst blitzt der Kopf auf und verschwindet.
+  const einzug = quelle.slice(quelle.indexOf("setEingezogen(true)") - 400, quelle.indexOf("setEingezogen(true)"));
+  assert.doesNotMatch(einzug, /-20%/);
 });
