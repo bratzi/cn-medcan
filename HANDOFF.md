@@ -3,7 +3,7 @@
 > Übergabemedium zwischen Sessions. Wird nach jedem Arbeitsblock aktualisiert und committet.
 > Wer hier weiterarbeitet, liest diese Datei zuerst und braucht den Chatverlauf nicht.
 
-**Letzte Aktualisierung:** 2026-10-05 (Session 39)
+**Letzte Aktualisierung:** 2026-10-06 (Session 40)
 **Repo:** https://github.com/bratzi/cn-medcan (public)
 **Branch:** `main` (Makeover „Grünes Buch“ Teilprojekt 1 ist seit 2026-09-24 auf `main`)
 
@@ -27,6 +27,35 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 ---
 
 ## ⇢ Hier geht es weiter
+
+### ⇢ SESSION 41 (Sessionstart): Buch-Doppelseite ist live, offene Reste
+
+**Stand 2026-10-06:** Das Buch auf der Blütenseite ist neu gebaut nach Spec
+`docs/superpowers/specs/2026-10-05-buch-doppelseite-stimme-und-urteil-design.md` und Plan
+`docs/superpowers/plans/2026-10-05-buch-doppelseite-stimme-und-urteil.md`. Links die Person (Avatar 128 px,
+Name, Text, Kolophon mit Datum, Charge, Bewertungen insgesamt, Restfeuchte; bei Community "von euch" in
+Handschrift), rechts das Urteil (Blätter mit Zahl, fünf Noten mit Tintenstrich, Terpenbewertung als
+Einlage bis an den Rand). Neue Bausteine `BuchDoppelseite`, `BlattUrteil`, `NotenLeiste`, `BuchKolophon`;
+`Doppelseite` zeigt nur noch den Auszug (Startseite, /reviews), per Golden Master unverändert.
+617 Tests grün, Lint nur die zwei alten Fehler (AromaKarte setMontiert, RegisterAuswahl:179).
+
+**Live geprüft (Browser 1, 1143 und 1418 px, hell und dunkel):** nichts läuft mehr über den Rahmen
+(vorher 722 px Inhalt in 605 px Rahmen), die Einlage sitzt bündig rechts und unten. Bei 1143 px brach
+die Zahl unter die Blätter und der Kartenschalter in eine zweite Zeile: behoben mit `09386c7`, live noch
+zu bestätigen. Community-Zustände sind nur durch Tests belegt (live gibt es nur den Betreiber-Eintrag).
+
+**Abschlussreview (frischer Reviewer):** ein Important behoben (`a84cda2`, Einzug einmal statt bei jedem
+Hineinscrollen). Zurückgestellte Minors, auf Zuruf angehen:
+1. Einzug startet nach 280 ms, die Drehung dauert 500 ms; Kommentar in globals.css stimmt nicht.
+2. Autor-Zahlen: ab rund 99 Autoren je Sorte über die D1-Parametergrenze, die Zahl fehlt dann still.
+3. Überschrift trägt aria-label und title, Vorleser sagen den Namen doppelt.
+4. Kolophon: gap-1 ohne 4-px-Begründung im Code.
+5. Mobil mit mehreren Reitern kein Titel "Terpenbewertung" über der Karte.
+6. Leere div.contents-Hüllen im Auszug.
+7. Mobile Ansicht unter 640 px noch nicht live angesehen.
+
+**Arbeitsweise:** Subagents sind wieder erlaubt (Nutzer 2026-10-06). Lokale Tags `archiv/*` sichern
+die gelöschten alten Branches.
 
 ### ⇢ SESSION 40 (Sessionstart): Erst diese Fragen, dann die Reste
 
