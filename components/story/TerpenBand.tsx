@@ -37,7 +37,7 @@ async function Inhalt() {
   const liste = (
     <ul className="terpen-band-liste flex shrink-0 items-center gap-8 pr-8 sm:gap-16 sm:pr-16">
       {terpene.map((terpen) => (
-        <li key={terpen.anker} className="group flex items-start gap-6 transition-transform duration-normal ease-standard sm:translate-y-12 sm:group-hover/band:translate-y-0 sm:group-focus-within/band:translate-y-0">
+        <li key={terpen.anker} className="terpen-band-eintrag group flex items-start gap-6 transition-transform duration-normal ease-standard">
           <span className="grid size-11 shrink-0 place-items-center rounded-full text-text-muted transition-colors duration-fast ease-standard group-hover:text-text">
             <TerpenIcon name={terpen.icon} className="size-6" />
             <span className="sr-only">{terpen.name}</span>
@@ -45,9 +45,9 @@ async function Inhalt() {
           {/* Ruhezustand ab sm: Icon und Name (Nutzer 2026-10-06). Die Zusatzinfos stehen
               im Fluss, damit die Breite des Eintrags fix bleibt (w-64, sonst ruckt der Lauf
               und --band-kachel stimmt nicht), und blenden nur per Deckkraft ein, wenn der
-              Zeiger auf dem Band liegt oder ein Eintrag den Fokus trägt. Der Eintrag sitzt in
-              Ruhe 48 px tiefer, damit der Name mittig im Band steht, und rückt beim
-              Überfahren hoch, damit alles in die 192 px passt. Mobil bleibt das schmale
+              Zeiger auf dem Band liegt oder ein Eintrag den Fokus trägt. Im Laufmodus (globals.css) hat das Band 192 px Höhe, der Eintrag sitzt in
+              Ruhe 48 px tiefer, damit der Name mittig steht, und rückt beim Überfahren
+              hoch, damit alles passt. Im Fallback (umbrochen) wächst das Band mit. Mobil bleibt das schmale
               Icon-Band, dort trägt der sr-only-Name die Information. */}
           <span
             aria-hidden="true"
@@ -84,7 +84,7 @@ async function Inhalt() {
   );
 
   return (
-    <section aria-label={texte.terpene} className="terpen-band group/band relative z-20 flex items-center overflow-clip border-y border-border bg-surface py-4 sm:h-48 sm:py-0">
+    <section aria-label={texte.terpene} className="terpen-band group/band relative z-20 flex items-center overflow-x-clip border-y border-border bg-surface py-4 sm:min-h-48 sm:py-8">
       <div className="terpen-band-spur flex">
         {liste}
         <TerpenBandKopie />

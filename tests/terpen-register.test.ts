@@ -108,3 +108,17 @@ test("Terpen-Band hält beim Überfahren und bei Fokus an: Pause trägt denselbe
     /:root:not\(\[data-sparmodus\]\) \.terpen-band:is\(:hover, :focus-within\) \.terpen-band-spur:not\(:has\(> \[aria-hidden\]:empty\)\) \{\s*animation-play-state: paused;/,
   );
 });
+
+test("Terpen-Band: Fallback schneidet nichts ab, feste Höhe und Ruhe-Versatz nur im Laufmodus (Review 2026-10-06)", () => {
+  const band = readFileSync(join(process.cwd(), "components/story/TerpenBand.tsx"), "utf8");
+  const css = readFileSync(join(process.cwd(), "app/globals.css"), "utf8");
+  // Grundzustand (Fallback, umbrochen): Mindesthöhe statt fester Höhe, nur waagrechter Beschnitt, kein Versatz.
+  assert.match(band, /sm:min-h-48/);
+  assert.doesNotMatch(band, /sm:h-48/);
+  assert.doesNotMatch(band, /overflow-clip/);
+  assert.doesNotMatch(band, /translate-y-12/);
+  // Höhe, senkrechter Beschnitt und Versatz hängen am Laufmodus.
+  const lauf = ":root:not([data-sparmodus]) .terpen-band:has(.terpen-band-spur:not(:has(> [aria-hidden]:empty)))";
+  assert.ok(css.includes(`${lauf} {\r\n      height: 12rem;`) || css.includes(`${lauf} {\n      height: 12rem;`));
+  assert.match(css, /\.terpen-band-eintrag \{\s*translate: 0 3rem;/);
+});

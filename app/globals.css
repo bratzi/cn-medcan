@@ -1940,6 +1940,25 @@ html.joint-cursor :is(input:not([type="range"]):not([type="radio"]):not([type="c
     display: flex;
   }
 
+  /* Feste Höhe, Beschnitt und Ruhe-Versatz der Einträge nur im Laufmodus ab sm: Im Fallback
+     (reduzierte Bewegung, Sparmodus, ohne JavaScript) umbricht die Liste in mehrere Zeilen,
+     das Band wächst mit (min-h-48) und nichts wird abgeschnitten oder verschoben. */
+  @media (min-width: 40rem) {
+    :root:not([data-sparmodus]) .terpen-band:has(.terpen-band-spur:not(:has(> [aria-hidden]:empty))) {
+      height: 12rem;
+      padding-block: 0;
+      overflow-y: clip;
+    }
+
+    :root:not([data-sparmodus]) .terpen-band:has(.terpen-band-spur:not(:has(> [aria-hidden]:empty))) .terpen-band-eintrag {
+      translate: 0 3rem;
+    }
+
+    :root:not([data-sparmodus]) .terpen-band:is(:hover, :focus-within):has(.terpen-band-spur:not(:has(> [aria-hidden]:empty))) .terpen-band-eintrag {
+      translate: 0 0;
+    }
+  }
+
   /* Dieselbe Spezifität wie der Lauf oben (0,5,0): die animation-Kurzschrift setzt
      animation-play-state auf running, eine schwächere Pause-Regel verlöre (Befund
      2026-10-06, das Band blieb beim Überfahren nicht stehen). */
