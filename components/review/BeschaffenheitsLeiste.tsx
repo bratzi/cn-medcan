@@ -164,6 +164,7 @@ export function BeschaffenheitsLeiste({
   anzahl,
   titel,
   className,
+  titelKlasse,
   bedienung,
   ohneTitel = false,
   sweetSpot = false,
@@ -171,6 +172,8 @@ export function BeschaffenheitsLeiste({
 }: BeschaffenheitsWerte & {
   titel?: string;
   className?: string;
+  /** Zusatzklassen der Überschrift, etwa `lg:sr-only`, wo ein Reiter sie schon sichtbar nennt. */
+  titelKlasse?: string;
   bedienung?: BeschaffenheitsBedienung;
   /**
    * Bewertung v2 (Masterplan T4): Qualität der Charge mit Sweet Spot in der
@@ -197,7 +200,7 @@ export function BeschaffenheitsLeiste({
           </p>
         ) : null
       ) : (
-        <h3 className="font-buch text-h3 font-medium text-text">
+        <h3 className={cn("font-buch text-h3 font-medium text-text", titelKlasse)}>
           {titel ?? texte.aroma.beschaffenheit.titel}
           {anzahl ? (
             <span className="ml-2 text-caption font-normal text-text-muted">

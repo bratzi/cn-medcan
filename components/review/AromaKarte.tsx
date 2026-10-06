@@ -438,8 +438,9 @@ export function AromaKarte({
         className={cn(
           "flex flex-wrap items-start gap-8",
           ohneTitel && !regler ? "justify-end" : "justify-between",
-          // Dicht: Zeile 1 Reiterleiste des Buchs und Ansicht, Zeile 2 die Legende über die volle Breite.
-          kompakt && "lg:items-center lg:gap-x-4 lg:gap-y-2",
+          // Dicht: Register des Buchs und Ansicht in einer Zeile, unten bündig: die Haarlinie des
+          // Registers läuft bis an den Schalter und trägt ihn (2026-10-06). Die Legende entfällt ab lg.
+          kompakt && "lg:items-end lg:gap-x-6 lg:gap-y-2",
         )}
       >
       {kopf}

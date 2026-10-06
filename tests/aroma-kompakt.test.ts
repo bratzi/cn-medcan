@@ -35,6 +35,13 @@ test("Dicht: Reiterleiste und Ansichtsschalter stehen in einer Zeile, die Legend
   assert.match(html, /<div class="flex flex-wrap items-center justify-end gap-4 lg:order-3 lg:ml-auto">/);
 });
 
+test("Dicht: die Kopfzeile steht auf der Linie des Registers, Reiter und Schalter enden unten bündig", () => {
+  // 2026-10-06: Die Reiter des Buchs sind ein Register auf einer Haarlinie; der Ansichtsschalter
+  // schließt die Linie rechts ab, beide stehen auf derselben Grundlinie.
+  assert.match(karte(true), /<div class="[^"]*\blg:items-end\b[^"]*\blg:gap-x-6\b/);
+  assert.doesNotMatch(karte(true), /\blg:items-center lg:gap-x-4\b/);
+});
+
 test("Nicht dicht: Formular und Startseite behalten ihre Kopfzeile", () => {
   const html = karte(false);
   assert.doesNotMatch(html, /\blg:order-3\b|\blg:ml-auto\b|\blg:h-32\b|<ul class="[^"]*\blg:hidden\b/);

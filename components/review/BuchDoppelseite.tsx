@@ -39,8 +39,12 @@ export type BuchDoppelseiteProps = {
 /**
  * Eine Bewertung als aufgeschlagene Doppelseite im Buch (Spec 2026-10-05, Nutzer): links die Person
  * mit Avatar, Name und dem Text der Bewertung, unten das Kolophon; rechts das Urteil mit Blättern
- * und den fünf Noten, darunter die Terpenbewertung als Karteneinlage, die ab lg rechts und unten
- * bis an den Rand der Seite läuft.
+ * und den fünf Noten, darunter Terpenbewertung, Beschaffenheit und Reel als Register.
+ *
+ * Das Register steht auf dem Papier der Seite (Nutzer 2026-10-06): kein eigener Grund, kein Rand,
+ * kein Anschnitt; die dunkle Einlage wirkte wie ein Fremdkörper im Buch. Ab lg trennt die Haarlinie
+ * des Registers (BuchReiter.tsx) Urteil und Werte, mobil, wo die Reiter verborgen sind, eine
+ * Haarlinie über den Werten. So bleibt das Buch hell wie dunkel aus einem Papier.
  *
  * Die Höhe wächst mit dem Inhalt (`lg:min-h-(--buch-h)`, globals.css): nichts läuft über den
  * Rahmen. Der Text links trägt nicht zur Höhe bei, die rechte Seite gibt sie vor. Id und
@@ -76,7 +80,8 @@ export function BuchDoppelseite({ eintrag, ueberschrift: Ueberschrift, w, sprach
     reiter.push({
       schluessel: "beschaffenheit",
       titel: w.buch.reiterBeschaffenheit,
-      inhalt: <BeschaffenheitsLeiste werte={eintrag.beschaffenheit} feuchte={null} texte={texte} />,
+      // Ab lg nennt der Reiter die Tafel; die Überschrift bleibt für Screenreader und mobil sichtbar.
+      inhalt: <BeschaffenheitsLeiste werte={eintrag.beschaffenheit} feuchte={null} texte={texte} titelKlasse="lg:sr-only" />,
     });
   }
   if (reel) {
@@ -154,7 +159,7 @@ export function BuchDoppelseite({ eintrag, ueberschrift: Ueberschrift, w, sprach
           <div
             data-eintritt="einlage"
             style={ablauf(1)}
-            className="flex min-h-0 flex-1 flex-col border border-border bg-surface p-4 lg:-mr-10 lg:-mb-8 lg:border-r-0 lg:border-b-0 lg:p-6"
+            className="flex min-h-0 flex-1 flex-col pt-2 max-lg:border-t max-lg:border-border max-lg:pt-6"
           >
             <BuchReiter bezeichnung={w.buch.reiter} reiter={reiter} />
           </div>

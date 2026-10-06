@@ -132,14 +132,26 @@ test("Ohne Gesamtnote (Altbewertung) keine Blätter und keine leere Zahl", () =>
   assert.equal(html.match(/>Aussehen</g)?.length, 1);
 });
 
-test("Die Einlage läuft ab lg rechts und unten bis an den Rand der Seite", () => {
-  const { rechts } = seiten(zeige());
-  assert.match(rechts, /<div data-eintritt="einlage" style="--i:1" class="[^"]*\bbg-surface p-4\b[^"]*\blg:-mr-10\b[^"]*\blg:-mb-8\b[^"]*\blg:border-r-0\b[^"]*\blg:border-b-0\b/);
+test("Kein Kasten im Buch: Terpenbewertung und Beschaffenheit stehen auf dem Papier der Seite", () => {
+  // Nutzer 2026-10-06: die dunkle Einlage mit Rand wirkte wie ein Fremdkörper im Buch.
+  const { rechts } = seiten(zeige({ beschaffenheit: { budDichte: 3 } as EintragDaten["beschaffenheit"] }));
+  const einlage = /<div data-eintritt="einlage" style="--i:1" class="([^"]*)"/.exec(rechts);
+  assert.ok(einlage, "Einlage fehlt");
+  assert.doesNotMatch(einlage[1], /\bbg-|(^| )(border|border-border|lg:border)( |$)|-m[rb]-/);
+  assert.match(einlage[1], /\bflex-1\b/);
+  // Mobil ohne Reiterleiste trennt eine Haarlinie Urteil und Werte, ab lg die Linie des Registers.
+  assert.match(einlage[1], /\bmax-lg:border-t\b/);
+  assert.match(rechts, /role="tablist"[^>]*class="[^"]*\bborder-b border-border\b/);
+});
+
+test("Beschaffenheit im Buch: die Überschrift steht mobil sichtbar, ab lg nennt sie der Reiter", () => {
+  const { rechts } = seiten(zeige({ beschaffenheit: { budDichte: 3 } as EintragDaten["beschaffenheit"] }));
+  assert.match(rechts, /<h3 class="[^"]*\blg:sr-only\b[^"]*">Beschaffenheit/);
 });
 
 test("Reiter: Terpenbewertung zuerst, Beschaffenheit nur mit Werten, Reel erst nach dem Klick", () => {
   assert.doesNotMatch(zeige(), /role="tablist"/);
-  assert.match(zeige(), /<p class="text-small font-medium text-text">Terpenbewertung<\/p>/);
+  assert.match(zeige(), /<p data-register="titel"[^>]*><span[^>]*>Terpenbewertung<\/span><\/p>/);
   const mit = zeige({ beschaffenheit: { budDichte: 3 } as EintragDaten["beschaffenheit"] });
   assert.match(mit, /role="tab"[^>]*aria-selected="true"[^>]*>Terpenbewertung</);
   assert.match(mit, /role="tab"[^>]*>Beschaffenheit</);

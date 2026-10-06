@@ -21,12 +21,27 @@ export type BuchReiterEintrag = {
 const LeisteKontext = createContext<ReactNode>(null);
 
 /**
- * Platzhalter für die Reiterleiste in einer Tafel mit `eigeneLeiste`. Wo es keine Leiste gibt
- * (nur eine Tafel), steht an ihrer Stelle der Titel der Tafel.
+ * Ein Reiter des Registers (Nutzer 2026-10-06: statt Pillen in einem dunklen Kasten): gedrucktes
+ * Wort auf der Haarlinie, der Strich darunter liegt mit `-mb-px` genau auf ihr. 44 px hoch, auch mit
+ * der Maus, damit Register und Titel gleich hoch stehen.
+ */
+const REITER = "-mb-px inline-flex h-11 items-center border-b-2 text-small font-medium";
+
+/**
+ * Platzhalter für die Reiterleiste in einer Tafel mit `eigeneLeiste`. Er steht in einer Kopfzeile
+ * neben dem Ansichtsschalter und nimmt dort den freien Platz, damit die Haarlinie des Registers bis
+ * an den Schalter läuft (ohne `min-w-0`: wird es eng, bricht die Zeile, statt dass Reiter überlaufen).
+ * Wo es keine Leiste gibt (nur eine Tafel), steht an ihrer Stelle der Titel der Tafel, gedruckt wie
+ * ein offener Reiter, mit Tintenstrich statt des grünen Bedienstrichs: man kann ihn nicht wählen.
  */
 export function ReiterLeiste({ titel }: { titel: string }) {
   const leiste = useContext(LeisteKontext);
-  return leiste ?? <p className="text-small font-medium text-text">{titel}</p>;
+  if (leiste) return <div className="flex-1 max-lg:hidden">{leiste}</div>;
+  return (
+    <p data-register="titel" className="flex flex-1 border-b border-border">
+      <span className={cn(REITER, "border-text text-text")}>{titel}</span>
+    </p>
+  );
 }
 
 /**
@@ -34,7 +49,10 @@ export function ReiterLeiste({ titel }: { titel: string }) {
  * passt die ganze Doppelseite auf einen Bildschirm, Aroma-Karte,
  * Beschaffenheit und Reel stehen dort nacheinander statt untereinander.
  * Unter lg (mobil zurückgestellt) bleibt alles untereinander wie bisher: die
- * Reiterleiste ist verborgen, alle Tafeln sichtbar. Tabs nach APG (ein
+ * Reiterleiste ist verborgen, alle Tafeln sichtbar. Seit 2026-10-06 ein Register
+ * wie im gedruckten Buch: Wörter auf einer Haarlinie, kein Kasten, keine Pille;
+ * der offene Reiter trägt den grünen Strich (aktiver Zustand, Bedienakzent).
+ * Tabs nach APG (ein
  * Tabstopp, Pfeiltasten, Pos1/Ende); das Buch blättert in einer `tablist`
  * nicht um.
  */
@@ -80,7 +98,7 @@ export function BuchReiter({ bezeichnung, reiter }: { bezeichnung: string; reite
       role="tablist"
       aria-label={bezeichnung}
       onKeyDown={beiTaste}
-      className="inline-flex shrink-0 self-start rounded-full border border-border-strong p-1 max-lg:hidden"
+      className="flex items-end gap-6 border-b border-border max-lg:hidden"
     >
       {reiter.map((eintrag, i) => (
         <button
@@ -93,10 +111,9 @@ export function BuchReiter({ bezeichnung, reiter }: { bezeichnung: string; reite
           tabIndex={i === index ? 0 : -1}
           onClick={() => waehle(i, false)}
           className={cn(
-            // Wie der Ansicht-Schalter der Karte: 36 px mit Maus, 44 px auf Touch.
-            "inline-flex h-9 items-center rounded-full px-4 text-small font-medium pointer-coarse:h-11",
+            REITER,
             "transition-colors duration-fast ease-standard",
-            i === index ? "bg-accent text-accent-fg" : "text-text hover:text-accent-hover",
+            i === index ? "border-accent text-text" : "border-transparent text-text-muted hover:text-accent-hover",
           )}
         >
           {eintrag.titel}
