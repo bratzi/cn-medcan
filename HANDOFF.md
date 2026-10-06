@@ -28,6 +28,15 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 
 ## ⇢ Hier geht es weiter
 
+### ⇢ ALS ERSTES: diese Fragen in EINER AskUserQuestion stellen
+
+1. **Live-Bestätigung:** Build von `07a5c2f` (Feinschliff 1143 px) prüfen lassen? Vorschlag: ja, bei 1143 px
+   Zahl neben den Blättern und Kopfzeile der Karte einzeilig messen, dazu die mobile Ansicht unter 640 px
+   (dafür muss das Chrome-Fenster schmal gestellt werden oder ein neuer Tab mit 494 px genutzt werden).
+2. **Leere Fläche links bei kurzen Texten:** so lassen, Text größer setzen, oder Kolophon direkt unter den
+   Text statt an den Seitenfuß?
+3. **Zurückgestellte Minors aus dem Review** (Liste im Abschnitt darunter): welche jetzt angehen?
+
 ### ⇢ SESSION 41 (Sessionstart): Buch-Doppelseite ist live, offene Reste
 
 **Stand 2026-10-06:** Das Buch auf der Blütenseite ist neu gebaut nach Spec
