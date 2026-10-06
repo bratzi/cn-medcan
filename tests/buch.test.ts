@@ -143,3 +143,39 @@ test("Abfrage: Bewertungen des Betreibers zuerst, damit er bei mehr als 20 nicht
   assert.ok(reviews, "Abfrage der Bewertungen nicht gefunden");
   assert.equal(reviews[1], '[{ istRedaktionell: "desc" }, { erstelltAm: "desc" }]');
 });
+test("Höhe: der Rahmen wächst mit dem Inhalt, Untergrenze 51rem, Obergrenze 54rem", () => {
+  assert.match(css, /--buch-h:\s*clamp\(51rem,\s*calc\(100svh - var\(--kopf-h, 4rem\) - 5rem\),\s*54rem\);/);
+});
+
+test("Einzug: nur mit Bewegung und ohne Sparmodus, nach data-im-bild, an der aufgeschlagenen Seite", () => {
+  const block = /@media \(prefers-reduced-motion: no-preference\)\s*\{\s*:root:not\(\[data-sparmodus\]\) \.buch-stapel\[data-im-bild\] > \.buch-seite\[data-aktiv\] \[data-eintritt\][\s\S]*?\n\}/.exec(css);
+  assert.ok(block, "Block für den Einzug fehlt");
+  for (const name of ["buch-auf", "buch-blatt", "buch-strich", "buch-einlage", "schreiben"]) {
+    assert.match(block[0], new RegExp(`animation-name:\\s*${name};`), name);
+  }
+  assert.match(block[0], /animation-fill-mode:\s*backwards;/);
+  assert.match(block[0], /animation-delay:\s*calc\(280ms \+ var\(--i, 0\) \* 70ms\);/);
+});
+
+test("Einzug: nur transform, opacity und clip-path, nie Layout", () => {
+  for (const name of ["buch-auf", "buch-blatt", "buch-strich", "buch-einlage"]) {
+    const keyframes = new RegExp(`@keyframes ${name} \\{([\\s\\S]*?)\\n\\}`).exec(css);
+    assert.ok(keyframes, name);
+    assert.doesNotMatch(keyframes[1], /\b(width|height|top|left|margin|padding)\b/, name);
+  }
+});
+
+test("Einzug: ohne Skript, mit reduzierter Bewegung oder im Sparmodus bleibt alles sichtbar", () => {
+  // Der Ausgangszustand ist nie versteckt: die Animationen hängen nur an der Bedingung oben,
+  // `from` ohne `to`, der Endzustand ist der Stil des Elements selbst.
+  const block = /@keyframes buch-auf \{([\s\S]*?)\n\}/.exec(css);
+  assert.ok(block);
+  assert.doesNotMatch(block[1], /\bto\b/);
+  assert.doesNotMatch(css, /\[data-eintritt\][^{]*\{[^}]*\b(opacity: 0|visibility: hidden|display: none)/);
+});
+
+test("Einzug: das Buch meldet sich im Bild, auch mit nur einer Seite", () => {
+  const quelle = readFileSync(join(process.cwd(), "components/review/Buch.tsx"), "utf8");
+  assert.match(quelle, /data-im-bild=\{imBild \? "" : undefined\}/);
+  assert.match(quelle, /const element = huelle\.current;\s*if \(!element\) return;/);
+});

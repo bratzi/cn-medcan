@@ -1303,13 +1303,13 @@ html.joint-cursor :is(input:not([type="range"]):not([type="radio"]):not([type="c
   gap: 2rem;
   /* Schatten am Falz, Farbton wie die Ebenen-Schatten; dunkel tiefer. */
   --buch-schatten: oklch(0.2 0.009 165 / 0.22);
-  /* Feste Höhe der Doppelseite ab lg (Doppelseite.tsx, T7b, Nutzer 2026-09-30):
-     Bildschirm minus fester Kopf, minus 5rem = 1rem Luft über dem Buch (sein
-     scroll-mt) + 1rem Abstand + 44px Steuerung + 4px Rest. So passt die ganze
-     Doppelseite samt Blättern auf einen Bildschirm, ohne Scrollen. Untergrenze
-     31.5rem: darunter hätte die Aroma-Karte (mindestens 360px, AromaKarte.tsx)
-     mit Kopfzeile keinen Platz mehr; nach oben bleibt sie bei 46rem. */
-  --buch-h: clamp(31.5rem, calc(100svh - var(--kopf-h, 4rem) - 5rem), 46rem);
+  /* Mindesthöhe der Doppelseite ab lg (BuchDoppelseite.tsx, Spec 2026-10-05): Bildschirm minus
+     fester Kopf, minus 5rem = 1rem Luft über dem Buch (sein scroll-mt) + 1rem Abstand + 44px
+     Steuerung + 4px Rest. Der Rahmen wächst mit dem Inhalt (min-h, nicht h), nichts läuft über den
+     Rand. Untergrenze 51rem: Blatturteil, Noten und die Einlage mit der Karte (mindestens 360px,
+     AromaKarte.tsx) brauchen rund 810px. Auf kleinen Bildschirmen steht das Buch deshalb höher als
+     der Schirm, auf großen wächst es bis 54rem und die Karte mit ihm. */
+  --buch-h: clamp(51rem, calc(100svh - var(--kopf-h, 4rem) - 5rem), 54rem);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -1423,6 +1423,80 @@ html.joint-cursor :is(input:not([type="range"]):not([type="radio"]):not([type="c
   .buch-stapel[data-zurueck] > .buch-seite[data-aktiv] [data-buchseite="links"]:hover::before,
   .buch-stapel[data-weiter] > .buch-seite[data-aktiv] [data-buchseite="rechts"]:hover::before {
     opacity: 1;
+  }
+}
+
+/* Einzug der Doppelseite im Buch (BuchDoppelseite.tsx, Spec 2026-10-05). Alles einmal, nur transform,
+   opacity und clip-path. Es startet, sobald das Buch im Bild ist (`data-im-bild`, Buch.tsx) und die Seite
+   aufgeschlagen ist; beim Umblättern beginnt es neu, nach der Drehung (280 ms). `--i` ist der Platz in
+   der Staffel (components/review/eintritt.ts). Jede Bewegung hat einen Grund: Blätter und Zahl zeigen das
+   Urteil zuerst, die Striche machen den Wert lesbar, die Einlage deckt sich in Leserichtung der Karte auf
+   (Geschmack, dann Terpene), die Handschrift wird geschrieben. Nur mit Bewegung und ohne Sparmodus; sonst,
+   und ohne Skript, steht der Endzustand sofort da. Die Keyframes tragen nur `from`: der Endzustand ist
+   der Stil des Elements selbst. */
+@keyframes buch-auf {
+  from {
+    opacity: 0;
+    transform: translateY(0.5rem);
+  }
+}
+
+@keyframes buch-blatt {
+  from {
+    opacity: 0;
+    transform: scale(0.6) translateY(0.5rem);
+  }
+}
+
+@keyframes buch-strich {
+  from {
+    transform: scaleX(0);
+  }
+}
+
+@keyframes buch-einlage {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  :root:not([data-sparmodus]) .buch-stapel[data-im-bild] > .buch-seite[data-aktiv] [data-eintritt] {
+    animation-duration: 520ms;
+    animation-timing-function: var(--ease-out);
+    animation-fill-mode: backwards;
+    animation-delay: calc(280ms + var(--i, 0) * 70ms);
+  }
+
+  :root:not([data-sparmodus]) .buch-stapel[data-im-bild] > .buch-seite[data-aktiv] [data-eintritt="auf"] {
+    animation-name: buch-auf;
+  }
+
+  :root:not([data-sparmodus]) .buch-stapel[data-im-bild] > .buch-seite[data-aktiv] [data-eintritt="blatt"] {
+    animation-name: buch-blatt;
+    animation-duration: 420ms;
+    transform-origin: 50% 100%;
+  }
+
+  :root:not([data-sparmodus]) .buch-stapel[data-im-bild] > .buch-seite[data-aktiv] [data-eintritt="strich"] {
+    animation-name: buch-strich;
+    animation-duration: 600ms;
+  }
+
+  :root:not([data-sparmodus]) .buch-stapel[data-im-bild] > .buch-seite[data-aktiv] [data-eintritt="einlage"] {
+    animation-name: buch-einlage;
+    animation-duration: 800ms;
+    animation-timing-function: var(--ease-standard);
+  }
+
+  :root:not([data-sparmodus]) .buch-stapel[data-im-bild] > .buch-seite[data-aktiv] [data-eintritt="schreiben"] {
+    animation-name: schreiben;
+    animation-duration: 800ms;
+    animation-timing-function: var(--ease-standard);
   }
 }
 
