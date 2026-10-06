@@ -1,7 +1,7 @@
 # Bilder zur Bewertung — Design
 
 **Datum:** 2026-10-06
-**Status:** Entwurf zur Freigabe durch den Nutzer
+**Status:** vom Nutzer freigegeben (2026-10-06)
 **Bezug:** Budpics (T9, Migration 0012), Buch-Doppelseite (Spec 2026-10-05)
 
 ---
@@ -10,7 +10,8 @@
 
 Wer eine Sorte bewertet, kann bis zu drei Bilder zu seiner Bewertung abgeben. Im Buch stehen sie auf
 der linken Seite unter dem Text als ein ruhiges Bildfeld mit Diashow und füllen den Leerraum, der
-bei kurzen Texten heute leer bleibt. Ohne eigenes Bild steht dort das Musterbild der Sorte. Ein
+bei kurzen Texten heute leer bleibt. Ohne eigenes Bild steht dort ab `lg` das Herstellerbild oder
+sonst das Musterbild der Sorte. Ein
 freigegebenes Bewertungsbild ist zugleich ein Budpic der Sorte: ein Bild, zwei Orte.
 
 Nutzerzitat: „Es soll ermöglicht werden, Bilder und Videos bei der Bewertung abzugeben. Diese sollen
@@ -26,9 +27,13 @@ nichts hochgeladen wurde, soll das Musterbild gefüllt sein.“
 3. Höchstens drei Bilder je Bewertung. Im Buch links ein einziges Bildfeld **unter** dem Text, mit
    Diashow wie bei den Budpics. Es füllt den Leerraum; die Höhe gibt ab `lg` die rechte Seite vor.
 4. Freigegebene Bewertungsbilder zählen zusätzlich als Budpics der Sorte, ohne doppelte Ablage.
-5. Ohne freigegebenes Bild: das Musterbild der Sorte (`musterBildId(slug)` aus `lib/budpics.ts`).
+5. Ohne freigegebenes Bild: ein Ersatzbild wie in der Produktkarte, zuerst das Herstellerbild
+   (`blueteBild(bildPfad)`), sonst das Musterbild (`musterBildId(slug)` aus `lib/budpics.ts`).
+   Unter `lg` kein Ersatzbild.
 6. Komplett kostenfrei: kein R2, nur Dienste mit harter Free-Grenze. Bilder als WebP-BLOB in D1 wie
    die Budpics: höchstens 150 KB, lange Kante höchstens 1280 px, im Browser verkleinert.
+7. Bild und Bewertung werden getrennt freigegeben; die Freigabe einer Bewertung gibt ihre Bilder
+   nicht mit frei.
 
 ## 3. Bestand, auf dem aufgebaut wird
 
@@ -102,7 +107,7 @@ model Review {
   Bilder bleiben also an der Bewertung hängen. Entfernen ist ein eigener Schritt (Abschnitt 5).
 - **`mitglied_id` bleibt Pflicht** und wird wie bisher aus der Sitzung gesetzt. Wird ein Mitglied
   gelöscht, gehen seine Bilder wie heute mit (Budpic-Cascade); die Bewertung selbst bleibt
-  (`SetNull` am Autor) und zeigt dann das Musterbild.
+  (`SetNull` am Autor) und zeigt dann das Ersatzbild.
 - **Reihenfolge:** `erstellt_am` aufsteigend, also in der Reihenfolge des Hochladens. Keine eigene
   Positionsspalte; Umsortieren ist kein Ziel.
 - **Zählen bis drei:** es zählen die Zeilen der Bewertung mit Status `OFFEN` oder `FREIGEGEBEN`.
@@ -192,67 +197,83 @@ Bild gehört (`mitgliedId` gleich der Sitzung). Alle anderen bekommen weiter 404
 
 ### Daten
 
-- `EintragDaten` (`components/review/eintrag.ts`) bekommt `bilder?: DiashowBild[]`.
-- Die Abfrage, die die Einträge baut (`lib/query/strains.ts`, dort wo `autorAvatarId` gesetzt wird),
-  lädt die freigegebenen Bilder aller Bewertungen der Seite in **einer** zusätzlichen Abfrage:
-  `budpic.findMany({ where: { reviewId: { in: ids }, status: "FREIGEGEBEN" }, select: { id, reviewId, breite, hoehe, erstelltAm }, orderBy: { erstelltAm: "asc" }, take: ids.length * 3 })`,
-  nie mit `daten`. Die `in`-Liste bleibt unter dem D1-Limit von 100 gebundenen Werten (höchstens
-  die Bewertungen einer Sorte; die bestehende Obergrenze der Bewertungsabfrage gilt).
+- `ReviewEintrag` (`lib/query/strains.ts`) bekommt `bilder: { id: string; breite: number; hoehe: number; erstelltAm: Date }[]`.
+  Die bestehende Abfrage der Bewertungen einer Sorte (`reviews: { …, take: 20, select: {…} }`)
+  wählt dazu die Relation mit:
+  `bilder: { where: { status: "FREIGEGEBEN" }, select: { id: true, breite: true, hoehe: true, erstelltAm: true }, orderBy: { erstelltAm: "asc" }, take: 3 }`,
+  nie mit `daten`. Prisma löst das in eine zusätzliche Abfrage mit `IN` über höchstens 20
+  Review-Ids auf, weit unter dem D1-Limit von 100 gebundenen Werten.
+- `EintragDaten` (`components/review/eintrag.ts`) bekommt `bilder?: EintragBild[]` mit
+  `EintragBild = { id: string; breite: number; hoehe: number; erstelltAm: Date }`; `alsEintrag`
+  reicht `review.bilder` durch. `bildPfad` (Herstellerbild) und `slug` liegen dort schon.
 - Die Beschriftung im Buch ist nur das Datum des Bildes (neue Funktion `alsBuchBilder` in
-  `lib/budpic-anzeige.ts`); der Name steht schon im Kopf der Seite. In der Sortendiashow bleibt
-  `alsDiashow` mit „Von Name, Datum“.
+  `lib/budpic-anzeige.ts`, Ergebnis `DiashowBild[]` mit `beschriftung = formatiereDatum(erstelltAm, sprache)`);
+  der Name steht schon im Kopf der Seite. In der Sortendiashow bleibt `alsDiashow` mit „Von Name, Datum“.
 
 ### Aufbau der linken Seite
 
-Reihenfolge von oben nach unten: Kopf (Avatar, Name, Badge) — Text (`BuchNotiz`) — **Bildfeld** —
-Kolophon.
+Reihenfolge von oben nach unten: Kopf (Avatar, Name, Badge) — Text — **Bildfeld** — Kolophon.
 
-- **Bildfeld:** ein `figure` mit feinem Rahmen (`border border-border`, `bg-surface-sunken`), Bild
-  mit `object-cover`. Bei mehreren Bildern `BudpicDiashow` mit allen Regeln dort (5 s, Überblenden
-  nur über `opacity`, Halt bei Hover, Fokus, verborgenem Tab, Sparmodus und
-  `prefers-reduced-motion`, Pausenknopf). Bei genau einem Bild `BudpicBild` statisch, ohne Diashow.
-  Die Bildunterschrift ist `text-caption text-text-muted` und einzeilig: das Datum, beim Musterbild
-  „Symbolbild“.
+- **Bildfeld** (neue Server-Komponente `components/review/BuchBildfeld.tsx`): ein `figure` mit feinem
+  Rahmen (`border border-border`, `bg-surface-sunken`), Bild mit `object-cover`. Bei mehreren
+  Bildern `BudpicDiashow` mit allen Regeln dort (5 s, Überblenden nur über `opacity`, Halt bei
+  Hover, Fokus, verborgenem Tab, Sparmodus und `prefers-reduced-motion`, Pausenknopf). Bei genau
+  einem Bild `BudpicBild` statisch, ohne Diashow. Die Bildunterschrift ist
+  `text-caption text-text-muted` und einzeilig: das Datum, beim Ersatzbild „Symbolbild“.
 - **Dezent:** keine Überlagerung auf dem Bild, kein Schatten, keine Rundung über das Raster hinaus;
   das Bild ordnet sich dem Text unter. Der Text bleibt der Hauptinhalt der Seite.
-- **`BudpicDiashow`** bekommt eine Prop `className` für das äußere `figure`, damit es im Buch
-  `h-full min-h-0` sein kann; der bestehende `rahmen` wird im Buch `min-h-0 flex-1`. Bestehende
-  Aufrufer ändern sich nicht (Standardwerte wie heute).
+- **`BudpicDiashow`** bekommt eine Prop `className` für das äußere `figure` (Standard wie heute
+  `"flex w-full flex-col gap-2"`), damit es im Buch `h-full min-h-0` sein kann; `rahmen` wird im
+  Buch `"min-h-0 w-full flex-1"`. Bestehende Aufrufer ändern sich nicht.
 
 ### Höhe und Leerraum ab `lg`
 
-- Die rechte Seite gibt die Höhe vor (Spec 2026-10-05). Das Bildfeld darf zur Höhe **nichts**
-  beitragen: es ist `lg:min-h-0 lg:flex-1`, das Bild darin `absolute inset-0`. So füllt es genau den
-  Raum zwischen Text und Kolophon.
-- Untergrenze: `lg:min-h-48` (192 px). `BuchNotiz` berechnet heute ihre Zeilenzahl
-  (`--notiz-zeilen`) aus dem verfügbaren Platz; diese Rechnung zieht künftig die Untergrenze des
-  Bildfelds und den Abstand (`gap-6`) ab. Ein langer Text wird dadurch früher mit „Weiterlesen“
-  gekürzt, statt das Bild zu verdrängen. Beim Aufklappen des Textes (Weiterlesen) bleibt das
-  bestehende Verhalten von `BuchNotiz`; das Bildfeld bekommt dann seine Untergrenze.
-- Ohne Text (`keinText`) verliert der Platzhaltertext sein `lg:flex-1`; das Bildfeld nimmt den Raum.
+Die rechte Seite gibt die Höhe vor (Spec 2026-10-05). Der Text (`BuchNotiz`) ist heute
+`lg:flex-[1_1_0px]` und misst seine eigene Fläche, um die Zeilenzahl zu bestimmen; er trägt nichts
+zur Höhe bei. Das Bildfeld gehört deshalb **in dieselbe Fläche**, unter den Absatz:
+
+- `BuchNotiz` bekommt eine optionale Prop `bild?: ReactNode`. Sie steht im selben Container unter
+  Absatz und Knopf, in einem Wrapper `relative mt-2 w-full lg:min-h-48 lg:flex-1`; das Bild darin
+  ist ab `lg` `absolute inset-0`. Der Absatz bleibt `flex-none`.
+- Die Messung zieht den Platz des Bildes ab: neue Konstante `BILD_PLATZ = 208` (192 px
+  Untergrenze `min-h-48` plus 16 px Abstand aus `gap-2` und `mt-2`), nur wenn `bild` gesetzt ist.
+  Passt der Text in `platz − BILD_PLATZ`, steht er ganz und das Bild bekommt den ganzen Rest. Sonst
+  `zeilen = max(1, floor((platz − BILD_PLATZ − KNOPF_PLATZ) / ZEILE))`, der Text endet mit
+  „Weiterlesen“, das Bild hat seine Untergrenze. Weil die gemessene Fläche von der Seite und nicht
+  vom Inhalt kommt, bleibt die Messung stabil.
+- Offen („Weiterlesen“) legt sich der Text wie heute als Blatt über die linke Seite; das Bildfeld
+  ist dann `lg:hidden`.
+- Ohne Text (`keinText`) verliert der Platzhaltertext sein `lg:flex-1`; das Bildfeld steht danach
+  als eigener Block mit `lg:min-h-48 lg:flex-[1_1_0px]` und füllt den Raum bis zum Kolophon.
 
 ### Unterhalb `lg` (mobil und Tablet)
 
-- Die Seiten stehen untereinander; Höhe ergibt sich aus dem Inhalt. Das Bildfeld hat dort ein festes
-  Seitenverhältnis `aspect-[4/3] w-full` mit `max-h-[60svh]`, damit ein Hochformatfoto nicht den
-  Bildschirm füllt.
-- Ohne eigenes Bild wird unterhalb `lg` **kein** Musterbild gezeigt: dort gibt es keinen Leerraum
-  zu füllen, und ein Symbolbild würde nur die Seite verlängern.
+- Die Seiten stehen untereinander; die Höhe ergibt sich aus dem Inhalt. Ein eigenes Bild hat dort
+  ein festes Seitenverhältnis `aspect-[4/3] w-full` mit `max-h-[60svh]`, damit ein Hochformatfoto
+  nicht den Bildschirm füllt.
+- Ohne eigenes Bild wird unterhalb `lg` **kein** Ersatzbild gezeigt (Nutzer 2026-10-06): dort gibt es
+  keinen Leerraum zu füllen. Das Ersatzbild trägt `max-lg:hidden`.
 
-### Musterbild
+### Ersatzbild ohne eigenes Bild
 
-- Ohne freigegebenes Bewertungsbild (auch wenn Bilder noch `OFFEN` sind): ab `lg`
-  `Bild id={musterBildId(eintrag.slug)}` mit `object-contain`, `dekorativ`, Beschriftung
-  `w.katalog.karte.symbolbild` wie in der Produktkarte, damit klar ist, dass es nicht die echte
-  Blüte zeigt.
-- Dieselbe Sorte zeigt auf jeder Doppelseite dasselbe Musterbild (stabil über den Slug).
+Ohne freigegebenes Bewertungsbild (auch wenn Bilder noch `OFFEN` sind) steht ab `lg` ein Ersatzbild,
+in derselben Reihenfolge wie in der Produktkarte (Nutzer 2026-10-06):
+
+1. das Herstellerbild der Sorte, `blueteBild(eintrag.bildPfad)` aus `lib/medien.ts`;
+2. sonst das Musterbild `musterBildId(eintrag.slug)` aus `lib/budpics.ts`.
+
+Gezeigt mit `Bild id={…} dekorativ` und `object-contain`. Die Beschriftung übernimmt die
+Produktkarte (`components/produkt/ProduktCard.tsx`): sie kennzeichnet Herstellerbild **und**
+Musterbild gleich, mit `title={w.budpic.muster}` am `figure` und der Bildunterschrift
+`w.katalog.karte.symbolbild` („Symbolbild“), weil beide nicht die bewertete Blüte zeigen.
+Dieselbe Sorte zeigt auf jeder Doppelseite dasselbe Ersatzbild.
 
 ### CPU-Grenze
 
 Die Diashow ist eine Client-Komponente. Wie die rechte Seite wird sie nur auf nahen Seiten gerendert
-(`NurAufgeschlagen`); ferne Seiten zeigen nur das erste Bild statisch als `BudpicBild` (bzw. das
-Musterbild). Damit kommt je Doppelseite höchstens ein `img` dazu; das Server-Rendern bleibt im
-10-ms-Budget (Abschnitt 9).
+(`NurAufgeschlagen` bekommt dafür eine optionale Prop `ersatz?: ReactNode`, die auf fernen Seiten
+statt `null` steht); ferne Seiten zeigen nur das erste Bild statisch als `BudpicBild`. Damit kommt je
+Doppelseite höchstens ein `img` dazu; das Server-Rendern bleibt im 10-ms-Budget (Abschnitt 9).
 
 ## 8. Kopplung an die Budpics der Sorte
 
@@ -327,7 +348,8 @@ Testdateien:
 - `tests/buch-doppelseite.test.ts` (erweitert, Markup):
   - mit einem Bild: statisches Bild, keine Diashow-Knöpfe;
   - mit drei Bildern: Diashow mit „1 / 3“;
-  - ohne Bild: Musterbild `musterBildId(slug)` mit Beschriftung „Symbolbild“, nur ab `lg` sichtbar;
+  - ohne Bild mit Herstellerbild: dessen Medien-Id, Beschriftung „Symbolbild“, `max-lg:hidden`;
+  - ohne Bild und ohne Herstellerbild: `musterBildId(slug)`, Beschriftung „Symbolbild“;
   - Reihenfolge links: Kopf, Text, Bildfeld, Kolophon.
 - `tests/budpics-anzeige.test.ts` (erweitert): Beschriftung im Buch nur mit Datum.
 - Server-Actions, Bild-Route und `ladeFreieBudpics` mit Bewertungsbildern werden live geprüft
