@@ -289,6 +289,9 @@ model Review {
   /// Runden folgen (dieselbe Sorte gewinnt erneut), deshalb eine Liste.
   umfrageOptionen UmfrageOption[]
 
+  /// Bilder zur Bewertung (Spec 2026-10-06), hoechstens drei belegte.
+  bilder Budpic[]
+
   @@index([strainId, freigegeben])
   @@index([chargeId])
   @@index([autorId])
@@ -685,9 +688,15 @@ model Budpic {
   status     String   @default("OFFEN")
   erstelltAm DateTime @default(now()) @map("erstellt_am")
 
+  /// Bewertung, zu der das Bild gehoert (Spec 2026-10-06); null = freies Budpic.
+  /// Geht mit der Bewertung (Verwerfen in /admin loescht sie).
+  reviewId   String?  @map("review_id")
+  review     Review?  @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+
   @@index([strainId, status])
   @@index([status, erstelltAm])
   @@index([mitgliedId, status])
+  @@index([reviewId, status])
   @@map("budpics")
 }
 

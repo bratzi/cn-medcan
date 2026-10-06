@@ -14,6 +14,8 @@ declare module "better-sqlite3" {
   export default class Database {
     constructor(pfad: string);
     exec(sql: string): this;
+    /** Migration 0016: PRAGMA foreign_keys = ON wie in D1. */
+    pragma(anweisung: string): unknown;
     prepare(sql: string): Anweisung;
     /** T11: bildet die atomare D1-batch im Test nach. */
     transaction<A extends unknown[]>(fn: (...args: A) => void): (...args: A) => void;
