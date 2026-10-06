@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 
 import { InstagramEmbed, baueEmbedUrl } from "@/components/produkt/InstagramEmbed";
 import { AromaKarte } from "@/components/review/AromaKarte";
-import { aromaSerien, terpenWahlStaerken } from "@/components/review/aroma-serien";
+import { aromaSerien, buchKarte } from "@/components/review/aroma-serien";
 import { BeschaffenheitsLeiste } from "@/components/review/BeschaffenheitsLeiste";
 import { BlattUrteil } from "@/components/review/BlattUrteil";
 import { BuchKolophon } from "@/components/review/BuchKolophon";
@@ -18,6 +18,7 @@ import { cn } from "@/lib/cn";
 import type { Sprache } from "@/lib/i18n/sprache-kern";
 import { t } from "@/lib/i18n/text";
 import { aromaTexte, type Woerterbuch } from "@/lib/i18n/typen";
+import type { KatalogTerpen } from "@/lib/query/strains";
 
 /**
  * Eine Seite des Buchs. Deckend (eigene Fläche) und `relative`, weil das Buch (Buch.tsx) die zwei
@@ -31,6 +32,8 @@ export type BuchDoppelseiteProps = {
   ueberschrift: "h2" | "h3";
   w: Woerterbuch;
   sprache: Sprache;
+  /** Terpenkatalog, damit die Karte vom Bewertenden ergänzte Terpene zeigen kann. */
+  katalog?: readonly KatalogTerpen[];
 };
 
 /**
@@ -44,7 +47,7 @@ export type BuchDoppelseiteProps = {
  * Überschrift sind je Eintrag eindeutig, damit mehrere Doppelseiten gestapelt stehen können und
  * der Sprung auf #eintrag-… die richtige trifft.
  */
-export function BuchDoppelseite({ eintrag, ueberschrift: Ueberschrift, w, sprache }: BuchDoppelseiteProps) {
+export function BuchDoppelseite({ eintrag, ueberschrift: Ueberschrift, w, sprache, katalog = [] }: BuchDoppelseiteProps) {
   const texte = aromaTexte(w, sprache);
   const anker = eintragAnker(eintrag.id);
   const titelId = `${anker}-titel`;
@@ -54,11 +57,13 @@ export function BuchDoppelseite({ eintrag, ueberschrift: Ueberschrift, w, sprach
   // Kein Ersatz aus der Umgebung: nur eine gültige eigene URL ergibt ein Reel.
   const reel = baueEmbedUrl(eintrag.instagramReelUrl) ? eintrag.instagramReelUrl : null;
 
+  const kartenWahl = buchKarte(eintrag.terpene, katalog, eintrag.terpenIntensitaet);
   const karte = (kopf: ReactNode) => (
     <AromaKarte
-      terpene={eintrag.terpene}
+      terpene={kartenWahl.terpene}
       serien={aromaSerien(eintrag, w)}
-      staerken={terpenWahlStaerken(eintrag.terpene, eintrag.terpenIntensitaet)}
+      staerken={kartenWahl.staerken}
+      ebenen={kartenWahl.ebenen}
       texte={texte}
       kompakt
       kopf={kopf}

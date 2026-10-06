@@ -357,7 +357,7 @@ export function terpenEbenen(
 }
 
 /** Ergänzte Terpene leuchten höchstens so stark (Stufe 5), damit die Herstellerangabe führt. */
-const ERGAENZT_HOECHSTENS = 0.6;
+export const ERGAENZT_HOECHSTENS = 0.6;
 
 /**
  * Leuchtkraft je Terpen, 0 bis 1: Herstellerterpene wie `terpenStaerken`, aber

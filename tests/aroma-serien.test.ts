@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 
-import { aromaSerien, terpenWahlStaerken } from "@/components/review/aroma-serien";
+import { aromaSerien, buchKarte, terpenWahlStaerken } from "@/components/review/aroma-serien";
 import type { KartenTerpen } from "@/lib/aromakarte";
 import { de } from "@/lib/i18n/de";
 import { eintrag } from "./hilfen/eintrag";
@@ -33,4 +33,28 @@ test("aromaSerien: Herstellerserie nur mit Terpenangaben, die Bewertung immer in
   assert.deepEqual(mit.map((serie) => [serie.name, serie.ton]), [["Laut Hersteller", "gruen"], ["Diese Bewertung", "lila"]]);
   const ohne = aromaSerien(eintrag({ terpene: [] }), de);
   assert.deepEqual(ohne.map((serie) => [serie.name, serie.ton]), [["Diese Bewertung", "lila"]]);
+});
+
+const KATALOG = [
+  { name: "Limonen", geschmack: "ZITRUS" as const },
+  { name: "Myrcen", geschmack: "ERDIG" as const },
+  { name: "Pinen", geschmack: "HOLZIG" as const },
+  { name: "Linalool", geschmack: "BLUMIG" as const },
+];
+
+test("Buchkarte: ergänzte Terpene der Bewertung stehen in der Karte, gestrichelt als ergänzt", () => {
+  // Live 2026-10-06 (RS11, Betreiber): im Buch fehlten die selbst ergänzten Terpene.
+  const karte = buchKarte(TERPENE, KATALOG, { Myrcen: 1, Pinen: 1 });
+  assert.deepEqual(karte.terpene.map((terpen) => terpen.name), ["Myrcen", "Limonen", "Pinen"]);
+  assert.deepEqual(karte.ebenen, { Myrcen: "hersteller", Limonen: "hersteller", Pinen: "ergaenzt" });
+  assert.equal(karte.staerken?.Myrcen, 1);
+  assert.equal(karte.staerken?.Limonen, 0);
+  assert.ok((karte.staerken?.Pinen ?? 0) > 0);
+});
+
+test("Buchkarte: ohne Ergänzung bleibt die Karte wie bisher, ohne Ebenen", () => {
+  const karte = buchKarte(TERPENE, KATALOG, { Myrcen: 1 });
+  assert.deepEqual(karte.terpene, TERPENE);
+  assert.equal(karte.ebenen, undefined);
+  assert.deepEqual(karte.staerken, { Myrcen: 1, Limonen: 0 });
 });

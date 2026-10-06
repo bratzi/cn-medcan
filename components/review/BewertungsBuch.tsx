@@ -10,7 +10,7 @@ import type { Sprache } from "@/lib/i18n/sprache-kern";
 import { mehrzahl, t } from "@/lib/i18n/text";
 import type { Woerterbuch } from "@/lib/i18n/typen";
 import { teileBewertungen } from "@/lib/query/bewertung";
-import type { KennwerteZeile, ReviewEintrag } from "@/lib/query/strains";
+import type { KatalogTerpen, KennwerteZeile, ReviewEintrag } from "@/lib/query/strains";
 
 /**
  * Die Bewertungen einer Sorte als Buch (Masterplan Bewertung v2, T7, Nutzer
@@ -26,12 +26,14 @@ export function BewertungsBuch({
   produkt,
   w,
   sprache,
+  katalog,
 }: {
   reviews: readonly ReviewEintrag[];
   kennwerte: Pick<KennwerteZeile, "gesamtnoteMedian" | "anzahl"> | null;
   produkt: { handelsname: string; slug: string; terpene?: KartenTerpen[]; bildPfad?: string | null };
   w: Woerterbuch;
   sprache: Sprache;
+  katalog?: readonly KatalogTerpen[];
 }) {
   const { community } = teileBewertungen(reviews);
   const median = kennwerte?.gesamtnoteMedian ?? null;
@@ -74,7 +76,7 @@ export function BewertungsBuch({
           seiten={seiten.map((review) => ({
             anker: eintragAnker(review.id),
             inhalt: (
-              <BuchDoppelseite eintrag={alsEintrag(review, produkt)} ueberschrift="h3" w={w} sprache={sprache} />
+              <BuchDoppelseite eintrag={alsEintrag(review, produkt)} ueberschrift="h3" w={w} sprache={sprache} katalog={katalog} />
             ),
           }))}
         />
