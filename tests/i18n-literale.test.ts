@@ -50,6 +50,9 @@ const UMGESTELLT: string[] = [
   "lib/buch.ts",
   "components/review/Inhaltsverzeichnis.tsx",
   "components/review/Doppelseite.tsx",
+  "components/review/BlattUrteil.tsx",
+  "components/review/NotenLeiste.tsx",
+  "components/review/BuchKolophon.tsx",
   "components/review/erkundung-daten.ts",
   // Welle 3: Reviews und Bewerten
   "app/[lang]/reviews/page.tsx",
