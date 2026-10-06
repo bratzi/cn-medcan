@@ -3,7 +3,7 @@
 > Übergabemedium zwischen Sessions. Wird nach jedem Arbeitsblock aktualisiert und committet.
 > Wer hier weiterarbeitet, liest diese Datei zuerst und braucht den Chatverlauf nicht.
 
-**Letzte Aktualisierung:** 2026-10-06 (Session 40)
+**Letzte Aktualisierung:** 2026-10-07 (Session 41)
 **Repo:** https://github.com/bratzi/cn-medcan (public)
 **Branch:** `main` (Makeover „Grünes Buch“ Teilprojekt 1 ist seit 2026-09-24 auf `main`)
 
@@ -30,12 +30,49 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 
 ### ⇢ ALS ERSTES: diese Fragen in EINER AskUserQuestion stellen
 
-1. **Live-Bestätigung:** Build von `07a5c2f` (Feinschliff 1143 px) prüfen lassen? Vorschlag: ja, bei 1143 px
-   Zahl neben den Blättern und Kopfzeile der Karte einzeilig messen, dazu die mobile Ansicht unter 640 px
-   (dafür muss das Chrome-Fenster schmal gestellt werden oder ein neuer Tab mit 494 px genutzt werden).
-2. **Leere Fläche links bei kurzen Texten:** so lassen, Text größer setzen, oder Kolophon direkt unter den
-   Text statt an den Seitenfuß?
-3. **Zurückgestellte Minors aus dem Review** (Liste im Abschnitt darunter): welche jetzt angehen?
+1. **Terpen-Band Fixrunde 2:** Branch `wip/terpen-band-fix2` (Commit `6e79baa`) ist umgesetzt, aber weder
+   reviewt noch live. Vorschlag: Re-Review (Paket liegt unter
+   `.superpowers/sdd/2026-10-06-band-buchseite-startbewertung/review-b281cf5..6e79baa.diff`), dann auf main,
+   dann live prüfen (Name in Ruhe mittig, alle Namen auf einer Höhe, beim Überfahren Infos darunter).
+   Weiter so?
+2. **Bewertungsbilder:** Plan `docs/superpowers/plans/2026-10-06-bewertungsbilder.md` ist freigegeben
+   (Nutzer 2026-10-07: „Ja, parallel umsetzen“), Umsetzung aber noch nicht begonnen. Jetzt mit Task 1 starten?
+3. **Legende im Buch:** die Karte im Buch sagt bei ergänzten Terpenen „Von dir ergänzt“, auch bei fremden
+   Bewertungen. Umformulieren zu „Vom Bewertenden ergänzt“ (bzw. „ergänzt“)?
+
+### ⇢ SESSION 42 (Sessionstart): Stand nach Session 41
+
+**Live und auf `main` (alles geprüft, 628 Tests grün):**
+- `db22b31` Überschrift „Overall“/„Terpz“ ragte mobil 1 px über (waagerechter Scrollbalken bei 494 px). Live bestätigt.
+- `3ccc51a` Buch-Karte zeigt vom Bewertenden ergänzte Terpene (`buchKarte` in `aroma-serien.ts`, Katalog
+  von der Seite durchgereicht). Live bestätigt: RS11 zeigt Linalool gestrichelt.
+- `09386c7` (Session 40) bei 1138 px live bestätigt: Zahl neben Blättern, Schalter in der Reiterzeile.
+- T2 `a4a5b29` rechte Buchseite: kein schwarzer Kasten mehr, Reiter als Register auf Haarlinie, offener
+  Reiter mit grünem Strich. Live bestätigt (2296 px), Ankersprung `#eintrag-…` ok.
+- T3 `d91895c` Startseite: Strainname → Gesamtnote → Overall → Terpz. Live bestätigt.
+- T5 `8f3f462`, `e745189` Blütenseite (Maske für Mitglieder) in derselben Reihenfolge über
+  gemeinsamen Baustein `NoteUndErkundung`. Live **nicht** als Mitglied geprüft (#bewerten, Vorbelegung, Speichern).
+- T1 `f53b831`, `b281cf5` Terpen-Band: Pause beim Überfahren und Infos nur beim Überfahren sind live ok.
+  **Live-Fehler:** verschachteltes `:has` machte die Laufmodus-Regel ungültig (Ruhe-Versatz greift nicht,
+  Name im oberen Drittel), Bisabolol 13 px tiefer. Fix liegt auf `wip/terpen-band-fix2`, siehe Frage 1.
+
+**Plan-Ledger:** `.superpowers/sdd/2026-10-06-band-buchseite-startbewertung/progress.md` (gitignored, lokal)
+mit allen Rulings und zurückgestellten Minors. Wichtigste Minors: mobil doppelte Haarlinie bei nur Karte
+(BuchReiter:218/BuchDoppelseite:174), `focus-within` im Band ohne fokussierbares Element, Layoutsprung des
+Bands vor Hydration, Nicht-Mitglieder-Zweig der Blütenseite ohne Note (unverändert).
+
+**Bewertungsbilder:** Spec `docs/superpowers/specs/2026-10-06-bewertungsbilder-design.md`, Plan mit 7 Tasks
+(T1 allein: Migration 0016 `budpics.review_id`; dann parallel A: T2→T3 Upload+Formular, B: T4→T5 Buch-Bildfeld,
+C: T6 Admin+Datenschutz; T7 Controller: Merge, `npx wrangler d1 execute cn-medcan-db --remote --file
+migrations/0016_bewertungsbilder.sql`, Push, live). Briefs liegen unter `.superpowers/sdd/2026-10-06-bewertungsbilder/`.
+Entscheidungen: nur Bilder (Video später), bis 3 je Bewertung, Diashow links unter dem Text, Betreiber sofort
+frei, Community OFFEN bis Freigabe je Bild, zählen als Budpics, Ersatz: Herstellerbild, sonst Musterbild,
+beide „Symbolbild“, mobil kein Ersatzbild.
+
+**Arbeitsweise:** Nutzer will alle To-dos parallel per Subagent-Driven Development (je Strang ein Worktree).
+Agents dürfen nicht außerhalb ihres Worktrees schreiben (Report notfalls in der Antwort); Worktrees haben
+keinen Prisma-Client (`lib/generated` kopieren oder `npx prisma generate`). Vor jedem Push: Testausgabe auf
+`fail 0` prüfen, nicht nur grep-Erfolg. Remote-D1-Lesen scheiterte an Auth 7403 (nur Lesebefehl, nicht wiederholt).
 
 ### ⇢ SESSION 41 (Sessionstart): Buch-Doppelseite ist live, offene Reste
 
