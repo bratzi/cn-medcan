@@ -215,11 +215,11 @@ export const de = {
       streifen: "Herstellerangabe",
       ebenen: {
         hersteller: "Laut Hersteller enthalten",
-        ergaenzt: "Von dir ergänzt",
+        ergaenzt: "Ergänzt",
         geist: "Nur über den Geschmack verbunden",
       },
       geistHinweis: "Passt zum Geschmack, laut Hersteller nicht enthalten.",
-      ergaenztHinweis: "Von dir ergänzt, laut Hersteller nicht enthalten.",
+      ergaenztHinweis: "Ergänzt, laut Hersteller nicht enthalten.",
       nase: "Deine Nase vs. Community:",
       delta: "Ø Δ {wert}",
       deltaVorgelesen: "mittlere Abweichung {wert}",

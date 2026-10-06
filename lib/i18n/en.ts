@@ -209,11 +209,11 @@ export const en: Woerterbuch = {
       streifen: "Producer information",
       ebenen: {
         hersteller: "Stated by the producer",
-        ergaenzt: "Added by you",
+        ergaenzt: "Added",
         geist: "Linked by flavour only",
       },
       geistHinweis: "Fits the flavour, not included according to the producer.",
-      ergaenztHinweis: "Added by you, not included according to the producer.",
+      ergaenztHinweis: "Added, not included according to the producer.",
       nase: "Your nose vs. the community:",
       delta: "Ø Δ {wert}",
       deltaVorgelesen: "average deviation {wert}",
