@@ -280,7 +280,7 @@ test("Buch-Texte: neue Schlüssel in de und en, ohne Geviert- und Gedankenstrich
     for (const schluessel of NEU) {
       const text = woerterbuch.buch[schluessel];
       assert.ok(text.length > 0, schluessel);
-      assert.doesNotMatch(text, /[–—]/, schluessel);
+      assert.doesNotMatch(text, /[\u2013\u2014]/, schluessel);
     }
   }
   assert.equal(de.buch.bewertungVon, "Bewertung von {name}");
