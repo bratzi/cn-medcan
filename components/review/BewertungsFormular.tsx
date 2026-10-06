@@ -4,11 +4,10 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { bewertungSpeichern } from "@/app/[lang]/blueten/[slug]/aktionen";
-import { AromaErkundung } from "@/components/review/AromaErkundung";
 import type { AromaSerie } from "@/components/review/AromaKarte";
 import type { BeschaffenheitsWerte } from "@/components/review/BeschaffenheitsLeiste";
-import { BlattNote } from "@/components/review/BlattNote";
 import type { Gesamteindruck } from "@/components/review/GesamteindruckLeiste";
+import { NoteUndErkundung } from "@/components/review/NoteUndErkundung";
 import { Button, Field, Input, Meldung } from "@/components/ui";
 import { useHydriert } from "@/components/ui/useHydriert";
 import type { CommunityMedian, KartenTerpen, KatalogEintrag, TerpenZeile, Treue } from "@/lib/aromakarte";
@@ -78,10 +77,6 @@ export function BewertungsFormular({
   // Neuer Stand nach dem Speichern: Blätter und Regler beginnen neu mit den gespeicherten
   // Werten, damit „Zurücksetzen“ zu ihnen zurückkehrt.
   const stand = vorbelegung?.stand ?? "neu";
-  // Eigene Gesamtnote aus BlattNote, für das eigene Sortenfazit in der Erkundung (lib/fazit.ts, T6,
-  // Review-Befund T6-R1): Startwert die vorbelegte eigene Bewertung, danach jede Änderung über den
-  // Rückruf von BlattNote. Nie den Community-Median unterschieben, wenn keine eigene Note gesetzt ist.
-  const [eigeneGesamtnote, setEigeneGesamtnote] = useState<number | null>(vorbelegung?.gesamtnote ?? null);
 
   async function absenden(ereignis: React.FormEvent<HTMLFormElement>) {
     ereignis.preventDefault();
@@ -105,23 +100,20 @@ export function BewertungsFormular({
     <form onSubmit={absenden} className="flex flex-col gap-16 md:gap-24">
       <input type="hidden" name="strainId" value={strainId} />
 
-      <BlattNote
-        key={`note-${stand}`}
-        start={vorbelegung?.gesamtnote ?? null}
-        texte={texte}
-        sprache={aromaTexte.sprache}
-        onChange={setEigeneGesamtnote}
-      />
-
-      <AromaErkundung
+      {/* Gleiche Reihenfolge wie die Startseite (Nutzer 2026-10-06): Sortenkopf, Gesamtnote, Overall,
+          Terpz. Die Note h�lt der gemeinsame Baustein selbst und reicht sie ans eigene Sortenfazit
+          weiter (lib/fazit.ts, T6, Review-Befund T6-R1: nie den Community-Median unterschieben). */}
+      <NoteUndErkundung
         key={`erkundung-${stand}`}
+        blattTexte={texte}
+        sprache={aromaTexte.sprache}
+        noteStart={vorbelegung?.gesamtnote ?? null}
         titel={handelsname}
         bild={bild}
         terpene={terpene}
         katalog={katalog}
         modus="maske"
         vorbelegung={vorbelegung}
-        eigeneGesamtnote={eigeneGesamtnote}
         istBetreiber={istBetreiber}
         texte={aromaTexte}
         {...daten}
