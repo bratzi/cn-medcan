@@ -3,7 +3,7 @@
 > Übergabemedium zwischen Sessions. Wird nach jedem Arbeitsblock aktualisiert und committet.
 > Wer hier weiterarbeitet, liest diese Datei zuerst und braucht den Chatverlauf nicht.
 
-**Letzte Aktualisierung:** 2026-10-07 (Session 41)
+**Letzte Aktualisierung:** 2026-10-07 (Session 42)
 **Repo:** https://github.com/bratzi/cn-medcan (public)
 **Branch:** `main` (Makeover „Grünes Buch“ Teilprojekt 1 ist seit 2026-09-24 auf `main`)
 
@@ -30,15 +30,54 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 
 ### ⇢ ALS ERSTES: diese Fragen in EINER AskUserQuestion stellen
 
-1. **Terpen-Band Fixrunde 2:** Branch `wip/terpen-band-fix2` (Commit `6e79baa`) ist umgesetzt, aber weder
-   reviewt noch live. Vorschlag: Re-Review (Paket liegt unter
-   `.superpowers/sdd/2026-10-06-band-buchseite-startbewertung/review-b281cf5..6e79baa.diff`), dann auf main,
-   dann live prüfen (Name in Ruhe mittig, alle Namen auf einer Höhe, beim Überfahren Infos darunter).
-   Weiter so?
-2. **Bewertungsbilder:** Plan `docs/superpowers/plans/2026-10-06-bewertungsbilder.md` ist freigegeben
-   (Nutzer 2026-10-07: „Ja, parallel umsetzen“), Umsetzung aber noch nicht begonnen. Jetzt mit Task 1 starten?
-3. **Legende im Buch:** die Karte im Buch sagt bei ergänzten Terpenen „Von dir ergänzt“, auch bei fremden
-   Bewertungen. Umformulieren zu „Vom Bewertenden ergänzt“ (bzw. „ergänzt“)?
+1. **Terpen-Band v3 (Startseite):** live seit Session 42 (`9da27cc`): Marke mit Icon in Leitnotenfarbe
+   zentriert, Name kleiner darunter, Infos nur beim überfahrenen Eintrag. Gefällt dir das so, oder andere
+   Farbidee (z. B. alle Icons einfarbig in Grün/Lila statt je Leitnote)?
+2. **Bewertungsbilder live ausprobieren:** Funktion ist komplett live, aber noch nie mit echtem Bild getestet.
+   Soll Claude als angemeldetes Mitglied/Betreiber ein Testbild hochladen (Upload, Diashow im Buch, Freigabe
+   in /admin) und es danach wieder löschen, oder machst du den ersten Upload selbst?
+3. **Wie weiter?** Kein offener Plan mehr. Neues Thema, oder zurückgestellte Minors angehen (Liste unten)?
+
+### ⇢ SESSION 43 (Sessionstart): Stand nach Session 42
+
+**Live und auf `main` (673 Tests grün, alles reviewt):**
+- Terpen-Band Fixrunde 2 (`478456c`), live bestätigt bei 2296 px: alle Namen mittig auf einer Höhe.
+- Legende „Ergänzt“/„Added“ statt „Von dir ergänzt“ (`6d245b7`).
+- **Bewertungsbilder komplett** (Plan `docs/superpowers/plans/2026-10-06-bewertungsbilder.md`, Tasks 1–6,
+  Abschlussreview, Fixwelle `bb6aa46`, Restpunkte `21bbc46`). Migration 0016 ist remote eingespielt.
+  Live geprüft: 1122 px Symbolbild links unter dem Text (Community-Eintrag), mobil 494 px ausgeblendet.
+  **Nicht geprüft:** echter Upload, Diashow mit eigenen Bildern, Freigabe in /admin, Review Focus 1
+  (langer Text + 3 Bilder bei 1143 px).
+- Restpunkte nach Live-Prüfung: mobiler Überlauf im Mitglieder-Formular (scrollWidth 750 bei 478) kam von
+  `sr-only`-Fieldsets in der AromaKarte, deren `<legend>` dem Clip entkam; jetzt in `div.sr-only` gehüllt.
+  Breitenmessung der Karte per Callback-Ref (misst sofort). Aria-live-Fortschritt sr-only (kein 16-px-Loch),
+  Prüfhinweis nur bei gesendetem Bild, Datenschutz um Bewertungsbilder ergänzt.
+- **Terpen-Band v3** (`9da27cc`, Brief war in `.superpowers/sdd/` (gelöscht, Inhalt steht hier)): Spalte w-40,
+  Marke 56 px mit 32-px-Icon in Leitnotenfarbe (`leitFarbe`, 50 % mit Text gemischt; Kontrast hell min
+  4,31:1 Zitrus, dunkel min 7,81:1), Name `text-body` gedämpft, max. 2 Zeilen; Hover nur am Eintrag
+  (`group/eintrag`), überfahrener Eintrag rückt 40 px hoch, Infos 6–186 px im 192-px-Band.
+
+**Lehre Live-Prüfung:** Ist der Browser-Tab verborgen (`document.visibilityState === "hidden"`), feuern
+ResizeObserver nicht: Karten messen dann nie, viewBox bleibt 640. Vor Messungen einen Screenshot machen
+(erzwingt Rendering) und `visibilityState` prüfen, sonst Fehlbefunde.
+
+**Lehre Agents:** Subagents schreiben unter Windows mit Python leicht Latin-1 (cp1252). Nach jedem
+Implementer-Commit alle geänderten Dateien auf UTF-8 prüfen. Agent-Worktrees starten teils auf altem
+Commit: im Auftrag `git merge --ff-only main` voranstellen.
+
+**Rulings Session 42 (Kosten, falls falsch):**
+- Bilder gehen nacheinander raus, weil die Grenze von 3 Bildern serverseitig nicht atomar ist (gezieltes
+  Parallel-Senden ergibt höchstens ein 4. Bild an der eigenen Bewertung).
+- Admin-Vermerk „aus einer Bewertung“ bleibt Literal (/admin hat kein Wörterbuch).
+- Diashow-Fläche bei Mindestplatz ~140 px bleibt (Spec verlangt 192 px Bildfeld, erfüllt).
+- Diashow-Uhr läuft auf nahen Nachbarseiten weiter (Stopp würde BudpicDiashow ans Buch koppeln).
+- Band v3: Icon-Farbe = Leitnote (erste Note), Name `text-body`, Spalte 160 px (Nutzer „spiel mit den Farben“).
+
+**Zurückgestellte Minors (auf Zuruf):** Regex-Quelltexttests statt Verhaltenstests (Aktionen, Formular,
+Band); Fortschritt doppelt (Knopf + sr-only); Kommentar „IN über höchstens 20 Ids“; einzelnes sehr langes
+Wort im Band-Namen könnte 160 px sprengen; aus Session 41: mobil doppelte Haarlinie bei nur Karte
+(BuchReiter/BuchDoppelseite), Layoutsprung des Bands vor Hydration, Nicht-Mitglieder-Zweig der Blütenseite
+ohne Note.
 
 ### ⇢ SESSION 42 (Sessionstart): Stand nach Session 41
 
