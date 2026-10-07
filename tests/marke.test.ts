@@ -75,14 +75,26 @@ test("Logo: Pinselschrift aus zwei Masken, Farben aus Tokens, ein Bild mit Namen
   const html = renderToStaticMarkup(createElement(Logo, { className: "w-18" }));
   assert.match(html, /^<span role="img" aria-label="Book of Terpz" class="marke-pinsel w-18"><\/span>$/);
   // Schrift in accent, "of" in kopierstift; Formen als Masken, nie Primitives oder Hex.
-  // Die letzte Regel je Pseudo-Element: die erste ist die gemeinsame für ::before und ::after.
-  const regel = (sel: string) => [...css.matchAll(new RegExp(String.raw`\.marke-pinsel::${sel}\s*\{[^}]*\}`, "g"))].at(-1)?.[0] ?? "";
+  // Die Regel je Pseudo-Element, die die Form (Maske) setzt.
+  const regel = (sel: string) =>
+    [...css.matchAll(new RegExp(String.raw`\.marke-pinsel::${sel}\s*\{[^}]*\}`, "g"))].find((t) => t[0].includes("--marke-maske: url"))?.[0] ?? "";
   assert.match(regel("before"), /marke\/pinsel\.webp/);
-  assert.match(regel("before"), /background:\s*var\(--color-accent\)/);
+  assert.match(regel("before"), /linear-gradient\(var\(--color-accent\), var\(--color-accent\)\)/);
   assert.match(regel("after"), /marke\/pinsel-of\.webp/);
-  assert.match(regel("after"), /background:\s*var\(--color-kopierstift\)/);
+  assert.match(regel("after"), /linear-gradient\(var\(--color-kopierstift\), var\(--color-kopierstift\)\)/);
   for (const datei of ["public/marke/pinsel.webp", "public/marke/pinsel-of.webp"]) assert.ok(statSync(datei).size > 0, datei);
   assert.match(lies("components/layout/Kopf.tsx"), /<Logo className="w-18" \/>/);
+});
+
+test("Logo glänzt endlos überall, nur bei erlaubter Bewegung, Sparmodus hält an (Nutzer 2026-10-07)", () => {
+  const bloecke = [...css.matchAll(/@media \(prefers-reduced-motion: no-preference\) \{([\s\S]*?)\n\}/g)].map((t) => t[1]);
+  assert.ok(
+    bloecke.some((b) => /\.marke-pinsel::before,\s*\.marke-pinsel::after\s*\{\s*animation:\s*marke-glanz [^;]*infinite;/.test(b)),
+    "Glanz fehlt oder läuft ohne Bewegungsschutz",
+  );
+  assert.match(css, /:root\[data-sparmodus\] \.marke-pinsel::before,\s*:root\[data-sparmodus\] \.marke-pinsel::after\s*\{\s*animation-play-state:\s*paused;/);
+  // Ruhestand: der Streifen steht außerhalb (130 %), ohne Bewegung ist das Logo einfach farbig.
+  assert.match(css, /\.marke-pinsel::before,\s*\.marke-pinsel::after\s*\{\s*background-size:\s*250% 100%, 100% 100%;\s*background-position:\s*130% 0, 0 0;/);
 });
 
 test("Logo deckend wie die Vorlage, auch im Auftakt; keine Glas- oder Durchsichtig-Reste (Nutzer 2026-10-07)", () => {

@@ -871,14 +871,47 @@ html.joint-cursor :is(input:not([type="range"]):not([type="radio"]):not([type="c
   mask: var(--marke-maske) center / contain no-repeat;
 }
 
+/* Glanz wie früher die Wortmarke (Nutzer 2026-10-07): ein Lichtstreifen über der
+   Farbe, beide Ebenen gleich groß und gleich getaktet, so zieht er in einem Zug
+   über Schrift und "of". Endlos überall (Kopf, Auftakt, Fuß), siehe unten. */
 .marke-pinsel::before {
   --marke-maske: url("/marke/pinsel.webp");
-  background: var(--color-accent);
+  background: linear-gradient(
+      105deg,
+      transparent 35%,
+      color-mix(in oklab, white 75%, transparent) 50%,
+      transparent 65%
+    ), linear-gradient(var(--color-accent), var(--color-accent));
 }
 
 .marke-pinsel::after {
   --marke-maske: url("/marke/pinsel-of.webp");
-  background: var(--color-kopierstift);
+  background: linear-gradient(
+      105deg,
+      transparent 35%,
+      color-mix(in oklab, white 75%, transparent) 50%,
+      transparent 65%
+    ), linear-gradient(var(--color-kopierstift), var(--color-kopierstift));
+}
+
+.marke-pinsel::before,
+.marke-pinsel::after {
+  background-size: 250% 100%, 100% 100%;
+  background-position: 130% 0, 0 0;
+  background-repeat: no-repeat;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .marke-pinsel::before,
+  .marke-pinsel::after {
+    animation: marke-glanz 3.5s var(--ease-standard) 2s infinite;
+  }
+}
+
+/* Sparmodus (T2): der Glanz steht wie alle Endlosschleifen. */
+:root[data-sparmodus] .marke-pinsel::before,
+:root[data-sparmodus] .marke-pinsel::after {
+  animation-play-state: paused;
 }
 
 /* Konturen hinter der Wortmarke im Auftakt (Auftakt.tsx): dieselbe Schrift,
