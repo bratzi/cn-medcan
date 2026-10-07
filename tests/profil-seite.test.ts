@@ -19,13 +19,21 @@ test("/profil: nur angemeldet, nicht im Index, rechnet nur bei veraltetem Stand"
   assert.match(query, /await profilFortschreiben\(/);
 });
 
-test("/profil: Reihenfolge Netz, Vorschläge, Top/Flop, Community, Schnitte; kein Apothekenlink", () => {
+test("/profil: Reihenfolge Netz, Vorschläge, Top/Flop, Lieblingshersteller, Community, Schnitte, Verlauf; kein Apothekenlink", () => {
   const q = seite();
-  const reihe = ["<ProfilNetz", "<EmpfehlungsListe", "<TopFlop", "<CommunityVergleich", "<Schnitte"].map((s) => q.indexOf(s));
+  const reihe = ["<ProfilNetz", "<EmpfehlungsListe", "<TopFlop", "<Lieblingshersteller", "<CommunityVergleich", "<Schnitte", "<NetzVerlauf"].map((s) => q.indexOf(s));
   assert.ok(reihe.every((i) => i > 0));
   assert.deepEqual([...reihe].sort((a, b) => a - b), reihe);
   assert.doesNotMatch(q, /apotheke/i);
   assert.match(q, /<ProfilReiter\s+aktiv="profil"/);
+});
+
+test("/profil: Kontur aus dem vorletzten Verlaufsschritt, nie auf dem öffentlichen Profil", () => {
+  const q = seite();
+  assert.match(q, /verlauf\.at\(-2\)/);
+  assert.match(q, /vorher=\{/);
+  const oeffentlich = readFileSync("app/[lang]/profil/[kurzId]/page.tsx", "utf8");
+  assert.doesNotMatch(oeffentlich, /vorher=|NetzVerlauf|Lieblingshersteller/);
 });
 
 test("/mitglied: Überschrift ist der Reiter Konto, nicht Mein Profil", () => {
