@@ -65,3 +65,15 @@ test("Vorbelegung: kaputte JSON-Spalten zerstören die Maske nicht", () => {
   assert.deepEqual(v.intensitaet, {});
   assert.deepEqual(v.beschaffenheit, { feuchte: 11.2 });
 });
+
+test("vorbelegungAus: Bilder der eigenen Bewertung mit Status, ohne Angabe leer", () => {
+  assert.deepEqual(vorbelegungAus(gespeichert()).bilder, []);
+  const bilder = [
+    { id: "3f2b8c1e-0a4d-4e6b-9c1a-2d5e7f809abc", breite: 800, hoehe: 600, status: "OFFEN" },
+    { id: "4f2b8c1e-0a4d-4e6b-9c1a-2d5e7f809abc", breite: 600, hoehe: 800, status: "unsinn" },
+  ];
+  assert.deepEqual(vorbelegungAus(gespeichert({ bilder })).bilder, [
+    { id: "3f2b8c1e-0a4d-4e6b-9c1a-2d5e7f809abc", breite: 800, hoehe: 600, status: "OFFEN" },
+    { id: "4f2b8c1e-0a4d-4e6b-9c1a-2d5e7f809abc", breite: 600, hoehe: 800, status: "ABGELEHNT" },
+  ]);
+});

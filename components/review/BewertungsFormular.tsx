@@ -4,15 +4,18 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { bewertungSpeichern } from "@/app/[lang]/blueten/[slug]/aktionen";
+import { bewertungsbildHochladen } from "@/app/[lang]/blueten/[slug]/bewertungsbild-aktionen";
 import type { AromaSerie } from "@/components/review/AromaKarte";
 import type { BeschaffenheitsWerte } from "@/components/review/BeschaffenheitsLeiste";
 import type { Gesamteindruck } from "@/components/review/GesamteindruckLeiste";
+import { BewertungsBilder } from "@/components/review/BewertungsBilder";
 import { NoteUndErkundung } from "@/components/review/NoteUndErkundung";
 import { Button, Field, Input, Meldung } from "@/components/ui";
 import { useHydriert } from "@/components/ui/useHydriert";
 import type { CommunityMedian, KartenTerpen, KatalogEintrag, TerpenZeile, Treue } from "@/lib/aromakarte";
 import { MAX_NOTIZ } from "@/lib/bewertung-eingabe";
 import type { Vorbelegung } from "@/lib/bewertung-vorbelegung";
+import { bilderSenden, type VorgemerktesBild } from "@/lib/bewertungsbilder-senden";
 import type { AromaTexte, Woerterbuch } from "@/lib/i18n/typen";
 import { t } from "@/lib/i18n/text";
 
@@ -41,6 +44,8 @@ type Props = {
   /** Texte der Aroma-Bausteine (lib/i18n/typen.ts, aromaTexte). */
   aromaTexte: AromaTexte;
   texte: Woerterbuch["bewerten"];
+  /** budpicMeldungen(w): Fehlertexte für das Verkleinern der Bilder im Browser. */
+  bildMeldungen: Record<string, string>;
 };
 
 /**
@@ -64,11 +69,14 @@ export function BewertungsFormular({
   vorbelegung,
   aromaTexte,
   texte,
+  bildMeldungen,
   ...daten
 }: Props) {
   const router = useRouter();
   const hydriert = useHydriert();
   const [laeuft, setLaeuft] = useState(false);
+  const [vorgemerkt, setVorgemerkt] = useState<VorgemerktesBild[]>([]);
+  const [bildLauf, setBildLauf] = useState<{ nr: number; gesamt: number } | null>(null);
   const [fehler, setFehler] = useState<string | null>(null);
   const [erfolg, setErfolg] = useState<string | null>(null);
   // Nach dem ersten Speichern gibt es die Bewertung, auch bevor die Seite neu vom Server kommt.
@@ -85,14 +93,31 @@ export function BewertungsFormular({
     setFehler(null);
     setErfolg(null);
     const ergebnis = await bewertungSpeichern(formular);
-    setLaeuft(false);
     if (!ergebnis.ok) {
+      setLaeuft(false);
       setFehler(ergebnis.fehler);
       return;
     }
+    // Die Bewertung steht; erst jetzt die Bilder, eines nach dem anderen (Spec 2026-10-06).
+    const mitBildern = vorgemerkt.length > 0;
+    let bildFehler: string[] = [];
+    if (mitBildern) {
+      const lauf = await bilderSenden(vorgemerkt, strainId, bewertungsbildHochladen, {
+        fortschritt: (nr, gesamt) => setBildLauf({ nr, gesamt }),
+        fehlgeschlagen: bildMeldungen["budpic.fehlgeschlagen"],
+        dateiFehler: texte.bildFehler,
+      });
+      for (const bild of vorgemerkt) if (!lauf.uebrig.includes(bild)) URL.revokeObjectURL(bild.vorschau);
+      setVorgemerkt(lauf.uebrig);
+      bildFehler = lauf.fehler;
+      setBildLauf(null);
+    }
+    setLaeuft(false);
     setGespeichert(true);
-    setErfolg(ergebnis.sofortSichtbar ? texte.gespeichert : texte.eingegangen);
-    // Community-Werte und Vorbelegung neu vom Server; die Maske bleibt stehen.
+    const basis = ergebnis.sofortSichtbar ? texte.gespeichert : texte.eingegangen;
+    setErfolg(mitBildern && !istBetreiber ? `${basis} ${texte.bilderPruefung}` : basis);
+    if (bildFehler.length > 0) setFehler(bildFehler.join(" "));
+    // Community-Werte, Vorbelegung und Bilder neu vom Server; die Maske bleibt stehen.
     router.refresh();
   }
 
@@ -148,6 +173,16 @@ export function BewertungsFormular({
             />
           )}
         </Field>
+        <BewertungsBilder
+          vorhanden={vorbelegung?.bilder ?? []}
+          vorgemerkt={vorgemerkt}
+          setVorgemerkt={setVorgemerkt}
+          istBetreiber={istBetreiber}
+          gesperrt={laeuft}
+          meldungen={bildMeldungen}
+          texte={texte}
+          onGeaendert={() => router.refresh()}
+        />
         {istBetreiber ? (
           <Input
             id="bewertung-reel"
@@ -165,7 +200,9 @@ export function BewertungsFormular({
           Knopf nach dem Klick nicht wegrutscht. */}
       <div className="flex flex-col items-start gap-4">
         <Button type="submit" disabled={!hydriert || laeuft}>
-          {laeuft
+          {bildLauf
+            ? t(texte.bildLaeuft, bildLauf)
+            : laeuft
             ? texte.speichert
             : vorhanden
               ? texte.aktualisieren

@@ -1210,6 +1210,7 @@ export async function ladeEigeneBewertung(autorId: string, strainId: string): Pr
       instagramReelUrl: true,
       aktualisiertAm: true,
       charge: { select: { chargenNr: true } },
+      bilder: { select: { id: true, breite: true, hoehe: true, status: true }, orderBy: { erstelltAm: "asc" }, take: 10 },
     },
   });
   if (!zeile) return null;

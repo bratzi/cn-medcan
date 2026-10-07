@@ -28,7 +28,7 @@ function neuLaden(slug: string, oeffentlich: boolean) {
  * budpicHochladen: der Browser hat sie schon verkleinert, der Server prüft
  * trotzdem Größe (vor dem Lesen), Typ und Maße. Mitglied und Bewertung kommen
  * aus der Sitzung, nie aus dem Formular. Der Betreiber zeigt sofort, alle
- * anderen warten auf die Freigabe in /admin. Ein einziges INSERT, also atomar.
+ * anderen warten auf die Freigabe in /admin. Nur das INSERT ist atomar, die Grenze nicht: der Client sendet strikt nacheinander.
  */
 export async function bewertungsbildHochladen(formData: FormData): Promise<BewertungsbildErgebnis> {
   const w = await holeWoerterbuchAusAnfrage();

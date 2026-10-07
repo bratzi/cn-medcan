@@ -7,6 +7,7 @@
  * gelesen, kaputte Zeilen ergeben leere Startwerte statt eines Fehlers.
  */
 import { gesamtnoteGueltig } from "@/lib/bewertung-v2";
+import { BUDPIC_STATUS, type BudpicStatus } from "@/lib/budpics";
 import {
   parseBeschaffenheit,
   parseGeschmacksMatrix,
@@ -28,8 +29,12 @@ export type GespeicherteBewertung = {
   notiz: string | null;
   instagramReelUrl: string | null;
   charge: { chargenNr: string } | null;
+  /** Bilder der eigenen Bewertung (Spec 2026-10-06), ohne BLOB; fehlt bei Altaufrufen. */
+  bilder?: { id: string; breite: number; hoehe: number; status: string }[];
   aktualisiertAm: Date;
 };
+
+export type VorbelegtesBild = { id: string; breite: number; hoehe: number; status: BudpicStatus };
 
 export type Vorbelegung = {
   /** Zeitpunkt des letzten Speicherns; wechselt er, beginnt die Maske mit den neuen Werten. */
@@ -43,6 +48,8 @@ export type Vorbelegung = {
   chargenNr: string | null;
   notiz: string | null;
   instagramReelUrl: string | null;
+  /** Eigene Bilder zur Bewertung mit Status; leer ohne Bilder. */
+  bilder: VorbelegtesBild[];
 };
 
 export function vorbelegungAus(review: GespeicherteBewertung): Vorbelegung {
@@ -65,5 +72,12 @@ export function vorbelegungAus(review: GespeicherteBewertung): Vorbelegung {
     chargenNr: review.charge?.chargenNr ?? null,
     notiz: review.notiz,
     instagramReelUrl: review.instagramReelUrl,
+    // Unbekannter Status zählt als abgelehnt: dann wird nichts angezeigt und der Platz bleibt frei.
+    bilder: (review.bilder ?? []).map((b) => ({
+      id: b.id,
+      breite: b.breite,
+      hoehe: b.hoehe,
+      status: (BUDPIC_STATUS as readonly string[]).includes(b.status) ? (b.status as BudpicStatus) : "ABGELEHNT",
+    })),
   };
 }
