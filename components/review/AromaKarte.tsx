@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, Fragment, useContext, useEffect, useId, useRef, useState } from "react";
+import { createContext, Fragment, useCallback, useContext, useEffect, useId, useRef, useState } from "react";
 
 import {
   achsenImKarte,
@@ -260,26 +260,36 @@ export function AromaKarte({
   // (SSR/erster Frame), danach die viewBox-Breite bei gleichem Maßstab wie
   // früher (1,2), damit Striche, Schrift und Knoten fein bleiben und die
   // Karte nur länger wird, nicht größer.
-  const messRef = useRef<HTMLDivElement>(null);
   const [breite, setBreite] = useState<number | null>(null);
   // Dicht im Buch ab lg (T7b, Nutzer 2026-09-30): die Höhe gibt die feste Seite vor
   // (Fläche flex-1, SVG absolut darin); sie wird gemessen und ergibt die viewBox-Höhe,
   // die Karte rückt also enger zusammen, statt verkleinert zu werden. Schrift bleibt groß.
   const [hoehe, setHoehe] = useState<number | null>(null);
 
-  useEffect(() => {
-    const element = messRef.current;
-    if (!element) return;
-    const beobachter = new ResizeObserver((eintraege) => {
-      const rahmen = eintraege[0]?.contentRect;
-      if (!rahmen?.width) return;
-      setBreite(Math.max(MIN_BREITE, Math.round(rahmen.width)));
-      const dicht = kompakt && window.matchMedia(NEBENEINANDER).matches && rahmen.height > 0;
-      setHoehe(dicht ? Math.max(MIN_HOEHE, Math.round(rahmen.height)) : null);
-    });
-    beobachter.observe(element);
-    return () => beobachter.disconnect();
-  }, [kompakt]);
+  // Callback-Ref statt Effekt auf einem Ref-Objekt: der Beobachter hängt an dem Element, das
+  // tatsächlich montiert ist, auch wenn es erst nach dem ersten Effekt kommt oder ersetzt wird
+  // (live im Formular blieb die Breite null, die Karte war für 640 px gelegt). Gemessen wird
+  // zusätzlich sofort, damit die Karte nicht auf den ersten Beobachter-Aufruf warten muss.
+  const messRef = useCallback(
+    (element: HTMLDivElement | null) => {
+      if (!element) return;
+      const messen = (breiteNeu: number, hoeheNeu: number) => {
+        if (!breiteNeu) return;
+        setBreite(Math.max(MIN_BREITE, Math.round(breiteNeu)));
+        const dicht = kompakt && window.matchMedia(NEBENEINANDER).matches && hoeheNeu > 0;
+        setHoehe(dicht ? Math.max(MIN_HOEHE, Math.round(hoeheNeu)) : null);
+      };
+      const erst = element.getBoundingClientRect();
+      messen(erst.width, erst.height);
+      const beobachter = new ResizeObserver((eintraege) => {
+        const rahmen = eintraege[0]?.contentRect;
+        if (rahmen) messen(rahmen.width, rahmen.height);
+      });
+      beobachter.observe(element);
+      return () => beobachter.disconnect();
+    },
+    [kompakt],
+  );
 
   useEffect(() => {
     const ziel = ansicht === "netz" ? 1 : 0;

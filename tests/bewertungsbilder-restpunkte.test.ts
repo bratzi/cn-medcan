@@ -26,6 +26,14 @@ test("Aroma-Karte: Fieldsets stecken in sr-only-Hüllen, Begleitstoffe brechen s
   assert.match(KARTE, /maxWidth: schmal \? `\$\{aktBreite - punkt\.x\}px` : undefined,\s*whiteSpace: schmal \? "normal" : undefined,\s*\}\}\s*>\s*\{\/\* Hinweis in eigener/);
 });
 
+test("Aroma-Karte: Messung hängt per Callback-Ref am montierten Element, nicht per Effekt", () => {
+  assert.match(KARTE, /const messRef = useCallback\(\s*\(element: HTMLDivElement \| null\) => \{/);
+  assert.match(KARTE, /new ResizeObserver\(/);
+  assert.match(KARTE, /return \(\) => beobachter\.disconnect\(\);\s*\},\s*\[kompakt\],\s*\);/);
+  assert.doesNotMatch(KARTE, /const messRef = useRef/);
+  assert.match(KARTE, /ref=\{messRef\}/);
+});
+
 test("BuchNotiz: Effekt hängt an mitBild statt am ReactNode", () => {
   assert.match(NOTIZ, /const mitBild = Boolean\(bild\)/);
   assert.match(NOTIZ, /\[offen, text, mitBild\]/);
