@@ -430,6 +430,7 @@ model Mitglied {
   avatar             NutzerAvatar?
   budpics            Budpic[]
   empfehlungen       NutzerEmpfehlung[]
+  profil             NutzerProfil?
 
   @@index([freigegeben])
   @@map("mitglied")
@@ -714,11 +715,28 @@ model NutzerEmpfehlung {
   bezugStrainId String   @map("bezug_strain_id")
   bezug         Strain   @relation("BezugSorte", fields: [bezugStrainId], references: [id], onDelete: Cascade)
   gemeinsam     String
+  /// Mindestens 2 freigegebene Bewertungen mit Median ab 3,5 (Spec Profil 4.3).
+  bestaetigt    Boolean  @default(false)
   erstelltAm    DateTime @default(now()) @map("erstellt_am")
 
   @@id([mitgliedId, strainId])
   @@index([mitgliedId, rang])
   @@map("nutzer_empfehlungen")
+}
+
+/// Profilwerte eines Mitglieds (Spec Profil 4.1), beim Speichern einer
+/// Bewertung vorberechnet. `geschmack` ist JSON {KATEGORIE: -1..1},
+/// `terpene` JSON [{name, wert}]. Gelesen ueber profilAusDaten() in lib/profil.ts.
+model NutzerProfil {
+  mitgliedId  String   @id @map("mitglied_id")
+  mitglied    Mitglied @relation(fields: [mitgliedId], references: [id], onDelete: Cascade)
+  geschmack   String
+  terpene     String
+  anzahl      Int
+  gewichtet   Int
+  berechnetAm DateTime @map("berechnet_am")
+
+  @@map("nutzer_profil")
 }
 
 /// „Ähnlich im Aroma“ je Sorte (Review T11), höchstens einmal je Woche in D1

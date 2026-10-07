@@ -15,7 +15,7 @@ test("Kern zuerst: Bewertungen, Abstimmung, Blüten; Apotheken nur in Aussicht",
     ["Bewertungen", "Abstimmung", "Blüten"],
   );
   assert.deepEqual(KONTO_LINK, { href: "/mitglied", schluessel: "konto" });
-  assert.equal(de.kopf.navigation.konto, "Mein Konto");
+  assert.equal(de.kopf.navigation.konto, "Mein Profil");
   assert.equal(en.kopf.navigation.bewertungen, "Reviews");
 });
 
@@ -41,7 +41,7 @@ test("Kopf: Leiste erst ab lg, darunter Menüknopf mit Popover und Konto als Sym
   assert.match(html, /<button type="button" popoverTarget="kopf-menue" class="kopf-menue-knopf [^"]*lg:hidden">/i);
   assert.match(html, /<div id="kopf-menue" popover="auto"/);
   assert.match(html, /Menü öffnen/);
-  assert.match(html, /class="max-lg:sr-only">Mein Konto/);
+  assert.match(html, /class="max-lg:sr-only">Mein Profil/);
 });
 
 test("Kopf: Menüknopf ist ab lg per CSS verborgen, nicht nur per Utility", async () => {
