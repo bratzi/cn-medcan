@@ -72,7 +72,7 @@ export function vorbelegungAus(review: GespeicherteBewertung): Vorbelegung {
     chargenNr: review.charge?.chargenNr ?? null,
     notiz: review.notiz,
     instagramReelUrl: review.instagramReelUrl,
-    // Unbekannter Status zählt als abgelehnt: dann wird nichts angezeigt und der Platz bleibt frei.
+    // Unbekannter Status zÃ¤hlt als abgelehnt: dann wird nichts angezeigt und der Platz bleibt frei.
     bilder: (review.bilder ?? []).map((b) => ({
       id: b.id,
       breite: b.breite,

@@ -44,7 +44,7 @@ type Props = {
   /** Texte der Aroma-Bausteine (lib/i18n/typen.ts, aromaTexte). */
   aromaTexte: AromaTexte;
   texte: Woerterbuch["bewerten"];
-  /** budpicMeldungen(w): Fehlertexte für das Verkleinern der Bilder im Browser. */
+  /** budpicMeldungen(w): Fehlertexte fÃ¼r das Verkleinern der Bilder im Browser. */
   bildMeldungen: Record<string, string>;
 };
 
