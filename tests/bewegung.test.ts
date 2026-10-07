@@ -146,3 +146,9 @@ test("Stimmabgabe: Auswahl tritt während des Sendens zurück, reduziert ohne Sk
   assert.match(css, /\.stimm-auswahl\[data-wartet\]\s*\{\s*opacity: 0\.6;\s*scale: 0\.98;/);
   assert.match(css, /@media \(prefers-reduced-motion: reduce\) \{\s*\/\*[^*]*\*\/\s*\.stimm-auswahl\[data-wartet\]\s*\{\s*scale: none;/);
 });
+
+test("Auftakt beim Hinausscrollen: das Logo wächst an seinem Platz statt nach oben zu gleiten (Nutzer 2026-10-07)", () => {
+  const quelle = readFileSync("components/story/bewegung/auftakt.ts", "utf8");
+  assert.match(quelle, /gsap\.fromTo\('\[data-story="titel"\]', \{ scale: 1 \}, \{ scale: 1\.15,/);
+  assert.doesNotMatch(quelle, /yPercent: -30/);
+});

@@ -1961,25 +1961,29 @@ html.joint-cursor :is(input:not([type="range"]):not([type="radio"]):not([type="c
       overflow-y: clip;
     }
 
+    /* Infos über der Marke (Nutzer 2026-10-07: beim Überfahren nach unten, nicht nach oben).
+       Bezug ist der ganze Eintrag, nicht der Namensblock, sonst lägen sie über der Marke. */
     :root:not([data-sparmodus]) .terpen-band:has(> .terpen-band-spur > [aria-hidden]:not(:empty)) .terpen-band-info {
       position: absolute;
       inset-inline: 0;
-      top: 100%;
-      /* 4 px Abstand zum Namen als Innenabstand statt Außenabstand: Innenabstand zählt zur
-         Trefferfläche, so liegt zwischen Eintrag und Infos keine tote Zone, die beim Hochrücken
+      bottom: 100%;
+      /* 4 px Abstand zur Marke als Innenabstand statt Außenabstand: Innenabstand zählt zur
+         Trefferfläche, so liegt zwischen Eintrag und Infos keine tote Zone, die beim Verrücken
          den Hover verlöre (Review 2026-10-07). */
-      padding-top: 0.25rem;
+      padding-bottom: 0.25rem;
     }
-
     :root:not([data-sparmodus]) .terpen-band:has(> .terpen-band-spur > [aria-hidden]:not(:empty)) .terpen-band-eintrag {
+      position: relative;
       translate: 0 0;
     }
-
-    /* Nur der Eintrag unter dem Zeiger rückt hoch (Nutzer 2026-10-07). Maße: Marke 56 + 4 +
-       Name 40 + 4 + Infos 76 = 180 px; ruhend sitzt der Eintrag (100 px) mittig bei 46 px,
-       um 2.5rem (40 px) hochgerückt füllt er 6 bis 186 px der 192 px. */
+    :root:not([data-sparmodus]) .terpen-band:has(> .terpen-band-spur > [aria-hidden]:not(:empty)) .terpen-band-eintrag > span[aria-hidden] {
+      position: static;
+    }
+    /* Nur der Eintrag unter dem Zeiger rückt nach unten (Nutzer 2026-10-07). Maße: Infos 76 +
+       4 + Marke 56 + 4 + Name 40 = 180 px; ruhend sitzt der Eintrag (100 px) mittig bei 46 px,
+       um 2.5rem (40 px) nach unten gerückt liegt er bei 86 bis 186 px, die Infos darüber ab 6 px. */
     :root:not([data-sparmodus]) .terpen-band:has(> .terpen-band-spur > [aria-hidden]:not(:empty)) .terpen-band-eintrag:is(:hover, :focus-within) {
-      translate: 0 -2.5rem;
+      translate: 0 2.5rem;
     }
   }
 

@@ -78,7 +78,7 @@ export const auftakt: Choreografie = ({ gsap }) => {
 
 /**
  * Sektion 1 (Spec Redesign 8): beim Hinausscrollen zoomt der Film langsam
- * heran, die Wortmarke gleitet nach oben weg. Nur transform, scrub.
+ * heran, das Logo wächst an seinem Platz. Nur transform, scrub.
  */
 export const auftaktFilm: Choreografie = ({ gsap }) => {
   const film = document.querySelector<HTMLElement>('[data-story="auftakt-film"]');
@@ -87,7 +87,9 @@ export const auftaktFilm: Choreografie = ({ gsap }) => {
   const scrub = { trigger: buehne, start: "top top", end: "bottom top", scrub: true };
   // 1.05 statt 1.15 (Nutzer 2026-09-26: zu stark eingezoomt).
   gsap.fromTo(film, { scale: 1 }, { scale: 1.05, ease: "none", scrollTrigger: scrub });
-  gsap.fromTo('[data-story="titel"]', { yPercent: 0 }, { yPercent: -30, ease: "none", scrollTrigger: { ...scrub } });
+  // Das Logo bleibt stehen und wächst (Nutzer 2026-10-07): nach oben geschoben hing es zu
+  // nah am Rand. Das ruhige Pulsieren (marke-puls an der h1) läuft dabei weiter.
+  gsap.fromTo('[data-story="titel"]', { scale: 1 }, { scale: 1.15, ease: "none", scrollTrigger: { ...scrub } });
 };
 
 /** "Umschlag wird Seite" abschalten: auf false, dann scrollt der Auftakt wie jede Sektion weg. */
