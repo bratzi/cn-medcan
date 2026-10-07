@@ -9,6 +9,7 @@ import type { AromaSerie } from "@/components/review/AromaKarte";
 import type { BeschaffenheitsWerte } from "@/components/review/BeschaffenheitsLeiste";
 import type { Gesamteindruck } from "@/components/review/GesamteindruckLeiste";
 import { BewertungsBilder } from "@/components/review/BewertungsBilder";
+import { MiniNetz } from "@/components/review/MiniNetz";
 import { NoteUndErkundung } from "@/components/review/NoteUndErkundung";
 import { Button, Field, Input, Meldung } from "@/components/ui";
 import { useHydriert } from "@/components/ui/useHydriert";
@@ -18,6 +19,7 @@ import type { Vorbelegung } from "@/lib/bewertung-vorbelegung";
 import { bilderSenden, type VorgemerktesBild } from "@/lib/bewertungsbilder-senden";
 import type { AromaTexte, Woerterbuch } from "@/lib/i18n/typen";
 import { t } from "@/lib/i18n/text";
+import type { Geschmack } from "@/lib/profil-typen";
 
 type Props = {
   strainId: string;
@@ -46,6 +48,8 @@ type Props = {
   texte: Woerterbuch["bewerten"];
   /** budpicMeldungen(w): Fehlertexte für das Verkleinern der Bilder im Browser. */
   bildMeldungen: Record<string, string>;
+  /** Achsennamen für die Änderungszeile des Mini-Netzes (w.label.geschmack). */
+  achsen: Woerterbuch["label"]["geschmack"];
 };
 
 /**
@@ -70,6 +74,7 @@ export function BewertungsFormular({
   aromaTexte,
   texte,
   bildMeldungen,
+  achsen,
   ...daten
 }: Props) {
   const router = useRouter();
@@ -80,6 +85,7 @@ export function BewertungsFormular({
   const [bildLauf, setBildLauf] = useState<{ nr: number; gesamt: number } | null>(null);
   const [fehler, setFehler] = useState<string | null>(null);
   const [erfolg, setErfolg] = useState<string | null>(null);
+  const [netz, setNetz] = useState<{ vorher: Geschmack | null; nachher: Geschmack } | null>(null);
   // Nach dem ersten Speichern gibt es die Bewertung, auch bevor die Seite neu vom Server kommt.
   const [gespeichert, setGespeichert] = useState(false);
   const vorhanden = vorbelegung !== null || gespeichert;
@@ -100,6 +106,7 @@ export function BewertungsFormular({
     setLaeuft(true);
     setFehler(null);
     setErfolg(null);
+    setNetz(null);
     const ergebnis = await bewertungSpeichern(formular);
     if (!ergebnis.ok) {
       setLaeuft(false);
@@ -126,6 +133,7 @@ export function BewertungsFormular({
     setGespeichert(true);
     const basis = ergebnis.sofortSichtbar ? texte.gespeichert : texte.eingegangen;
     setErfolg(bilderGesendet > 0 && !istBetreiber ? `${basis} ${texte.bilderPruefung}` : basis);
+    setNetz(ergebnis.netz);
     if (bildFehler.length > 0) setFehler(bildFehler.join(" "));
     // Community-Werte, Vorbelegung und Bilder neu vom Server; die Maske bleibt stehen.
     router.refresh();
@@ -228,6 +236,7 @@ export function BewertungsFormular({
         </p>
         {fehler ? <Meldung art="fehler">{fehler}</Meldung> : null}
         {erfolg ? <Meldung art="erfolg">{erfolg}</Meldung> : null}
+        {netz ? <MiniNetz vorher={netz.vorher} nachher={netz.nachher} texte={texte} achsen={achsen} /> : null}
       </div>
     </form>
   );

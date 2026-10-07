@@ -4,7 +4,8 @@ import { revalidiereSprachen } from "@/lib/i18n/revalidiere";
 
 import { bewertungPruefen } from "@/lib/bewertung-eingabe";
 import { kennwerteFortschreiben } from "@/lib/kennwerte";
-import { profilFortschreiben } from "@/lib/query/profil";
+import { ladeProfil, profilFortschreiben } from "@/lib/query/profil";
+import type { Geschmack } from "@/lib/profil-typen";
 import { getPrisma } from "@/lib/prisma";
 import { freigabeErforderlich } from "@/lib/session";
 import { holeSpracheAusAnfrage, holeWoerterbuchAusAnfrage } from "@/lib/i18n/anfrage";
@@ -15,7 +16,9 @@ import type { Meldung, Woerterbuch } from "@/lib/i18n/typen";
 import type { BeschaffenheitsKey } from "@/lib/query/bewertung";
 import type { GeschmacksKategorie } from "@/db/enums";
 
-export type BewertungErgebnis = { ok: true; sofortSichtbar: boolean; slug: string } | { ok: false; fehler: string };
+export type BewertungErgebnis =
+  | { ok: true; sofortSichtbar: boolean; slug: string; netz: { vorher: Geschmack | null; nachher: Geschmack } | null }
+  | { ok: false; fehler: string };
 
 /**
  * Speichert eine Bewertung (Spec Redesign 17).
@@ -98,6 +101,9 @@ export async function bewertungSpeichern(formData: FormData): Promise<BewertungE
     notiz: e.notiz,
     instagramReelUrl: istBetreiber ? e.instagramReelUrl : null,
   };
+  // Mini-Netz (Spec Profil 2.12): der echte Stand vor dem Speichern, auch wenn eine
+  // ältere Bewertung bearbeitet wird. Ohne Stand wächst das Netz aus der Mitte.
+  const vorher = await ladeProfil(mitglied.mitgliedId).catch(() => null);
   await prisma.review.upsert({
     where: { autorId_strainId: { autorId: mitglied.mitgliedId, strainId: strain.id } },
     create: { strainId: strain.id, autorId: mitglied.mitgliedId, ...daten },
@@ -106,8 +112,11 @@ export async function bewertungSpeichern(formData: FormData): Promise<BewertungE
   await kennwerteFortschreiben(strain.id);
   // Empfehlungen und Profil (T11, Spec Profil 4.4) hier vorberechnen, nie je Seitenaufruf.
   // Ein Fehler darin soll die gespeicherte Bewertung nicht als gescheitert melden.
+  let netz: { vorher: Geschmack | null; nachher: Geschmack } | null = null;
   try {
     await profilFortschreiben(mitglied.mitgliedId);
+    const nachher = await ladeProfil(mitglied.mitgliedId);
+    if (nachher) netz = { vorher: vorher?.werte.geschmack ?? null, nachher: nachher.werte.geschmack };
   } catch (fehler) {
     console.error("profilFortschreiben fehlgeschlagen", fehler);
   }
@@ -117,5 +126,5 @@ export async function bewertungSpeichern(formData: FormData): Promise<BewertungE
   revalidiereSprachen("/admin");
   revalidiereSprachen("/mitglied");
   revalidiereSprachen("/profil");
-  return { ok: true, sofortSichtbar: istBetreiber, slug: strain.slug };
+  return { ok: true, sofortSichtbar: istBetreiber, slug: strain.slug, netz };
 }
