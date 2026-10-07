@@ -11,12 +11,12 @@ import { HAUPTNAVIGATION, KONTO_LINK } from "@/lib/navigation";
 
 /**
  * Hauptnavigation, Kern zuerst (Spec TP2 3.1). Seit 2026-09-25 ohne Kapitelnummern
- * (Nutzer). "Mein Konto" steht abgesetzt als Pille.
+ * (Nutzer). "Mein Profil" steht abgesetzt als Pille.
  * Die aktive Seite markiert NavLink: aria-current plus Unterstrich in Tinte.
  *
- * Bewusst ein fester Link "Mein Konto" statt "Anmelden"/"Mein Konto" je nach
+ * Bewusst ein fester Link "Mein Profil" statt "Anmelden"/"Mein Profil" je nach
  * Sitzung: das Layout müsste dafür die Sitzung lesen und wäre auf jeder
- * Seite dynamisch. /mitglied leitet ohne Anmeldung selbst auf /anmelden weiter.
+ * Seite dynamisch. /profil leitet ohne Anmeldung selbst auf /anmelden weiter.
  *
  * Bis lg (Nutzer 2026-09-27, vorher eine wischbare Leiste): eine Zeile mit
  * Menüknopf links, Logo mittig und Konto als Symbol rechts; Navigation, Zelt und Sprache

@@ -18,7 +18,7 @@ type Props = {
 
 export default async function RegistrierenPage({ searchParams }: Props) {
   const { weiter } = await searchParams;
-  const ziel = sicheresZiel(weiter, "/mitglied");
+  const ziel = sicheresZiel(weiter, "/profil");
   const w = await holeWoerterbuch();
 
   if (await aktuellesMitglied()) redirect(ziel);

@@ -29,7 +29,7 @@ export function EmpfehlungenImBrowser({ varianten, texte }: Props) {
       <EmpfehlungsListe eintraege={anzeige.eintraege} />
       <p className="flex flex-wrap items-center gap-x-8 gap-y-2">
         <span className="text-caption text-text-muted">{texte.hinweis}</span>
-        <Link prefetch={false} href="/mitglied" className={einzelLinkKlassen()}>
+        <Link prefetch={false} href="/profil" className={einzelLinkKlassen()}>
           {texte.konto}
         </Link>
       </p>

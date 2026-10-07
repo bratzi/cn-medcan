@@ -1,17 +1,15 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { redirect, unstable_rethrow } from "next/navigation";
+import { redirect } from "next/navigation";
 
 import { AbmeldeButton } from "@/components/auth/AbmeldeButton";
 import { ProfilFormular } from "@/components/auth/ProfilFormular";
 import { AvatarFormular } from "@/components/mitglied/AvatarFormular";
 import { GelesenMarkieren } from "@/components/mitglied/GelesenMarkieren";
+import { ProfilReiter } from "@/components/profil/ProfilReiter";
 import { Avatar, Badge, buttonKlassen, Card, CardBody, CardHeader, textLinkKlassen } from "@/components/ui";
 import { benachrichtigungenLaden } from "@/lib/query/benachrichtigungen";
 import { eigeneVorschlaege } from "@/lib/query/vorschlaege";
-import { ladeEmpfehlungen } from "@/lib/query/empfehlungen";
-import { EmpfehlungsListe } from "@/components/empfehlung/EmpfehlungsListe";
-import { begruendungText } from "@/lib/empfehlung-text";
 import { holeWoerterbuch } from "@/lib/i18n";
 import { aktuellesMitglied } from "@/lib/session";
 import type { VorschlagStatus } from "@/db/enums";
@@ -36,15 +34,9 @@ export default async function MitgliedPage() {
   const texte = w.mitglied;
   if (!mitglied) redirect("/anmelden?weiter=%2Fmitglied");
 
-  const [nachrichten, vorschlaege, empfehlungen] = await Promise.all([
+  const [nachrichten, vorschlaege] = await Promise.all([
     benachrichtigungenLaden(mitglied.mitgliedId),
     eigeneVorschlaege(mitglied.mitgliedId),
-    // Wie auf der Startseite: ein Fehler der Empfehlungen reißt die Seite nicht mit.
-    ladeEmpfehlungen(mitglied.mitgliedId).catch((fehler: unknown) => {
-      unstable_rethrow(fehler);
-      console.error("ladeEmpfehlungen fehlgeschlagen", fehler);
-      return null;
-    }),
   ]);
   const ungelesen = nachrichten.filter((n) => !n.gelesen).map((n) => n.id);
 
@@ -60,6 +52,10 @@ export default async function MitgliedPage() {
         </div>
         <AbmeldeButton texte={w.auth.formular} />
       </div>
+
+      {/* Seit Spec Profil 6 ist diese Seite der Reiter Konto von /profil; die
+          Empfehlungen stehen jetzt dort als bestätigte Vorschläge. */}
+      <ProfilReiter aktiv="konto" texte={w.profil} />
 
       <section aria-labelledby="status-titel" className="mt-8">
         <Card>
@@ -121,35 +117,6 @@ export default async function MitgliedPage() {
               </ul>
             )}
             <GelesenMarkieren ids={ungelesen} />
-          </CardBody>
-        </Card>
-      </section>
-
-      {/* Vorberechnet beim Speichern einer Bewertung (T11): hier nur eine Abfrage. */}
-      <section aria-labelledby="empfehlungen-titel" className="mt-8">
-        <Card>
-          <CardHeader>
-            <h2 id="empfehlungen-titel" className="text-h3 text-text">
-              {w.empfehlung.mitgliedTitel}
-            </h2>
-          </CardHeader>
-          <CardBody className="flex flex-col items-start gap-6">
-            {empfehlungen === null ? (
-              <p className="max-w-[68ch] text-body text-text">{w.empfehlung.fehler}</p>
-            ) : empfehlungen.length === 0 ? (
-              <p className="max-w-[68ch] text-body text-text-muted">{w.empfehlung.leer}</p>
-            ) : (
-              <EmpfehlungsListe
-                schmal
-                className="w-full"
-                eintraege={empfehlungen.map((e) => ({
-                  slug: e.slug,
-                  handelsname: e.handelsname,
-                  begruendung: begruendungText(e, w, sprache),
-                }))}
-              />
-            )}
-            <p className="text-caption text-text-muted">{w.empfehlung.hinweis}</p>
           </CardBody>
         </Card>
       </section>
