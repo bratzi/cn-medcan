@@ -156,7 +156,7 @@ function synthetischeDatenbank() {
   return { db, terpene, zeilen, bewertungen };
 }
 
-/** Der Ablauf von empfehlungenFortschreiben ohne Prisma: Profil, Vorauswahl in SQL, genaue Rechnung. */
+/** Der Ablauf von profilFortschreiben ohne Prisma: Profil, Vorauswahl in SQL, genaue Rechnung. */
 function mitVorauswahl(db: Database, terpene: TerpenZeile[], bewertungen: EigeneBewertung[]) {
   const ids = JSON.stringify([...new Set(bewertungen.map((b) => b.strainId))]);
   const bewertete = sortenAusZeilen(terpene, db.prepare(SORTEN_AROMA_SQL).all(ids) as SortenAromaZeile[]);

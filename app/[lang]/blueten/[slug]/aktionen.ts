@@ -4,7 +4,7 @@ import { revalidiereSprachen } from "@/lib/i18n/revalidiere";
 
 import { bewertungPruefen } from "@/lib/bewertung-eingabe";
 import { kennwerteFortschreiben } from "@/lib/kennwerte";
-import { empfehlungenFortschreiben } from "@/lib/query/empfehlungen";
+import { profilFortschreiben } from "@/lib/query/profil";
 import { getPrisma } from "@/lib/prisma";
 import { freigabeErforderlich } from "@/lib/session";
 import { holeSpracheAusAnfrage, holeWoerterbuchAusAnfrage } from "@/lib/i18n/anfrage";
@@ -104,17 +104,18 @@ export async function bewertungSpeichern(formData: FormData): Promise<BewertungE
     update: daten,
   });
   await kennwerteFortschreiben(strain.id);
-  // Empfehlungen nach aehnlichem Aroma (T11) hier vorberechnen, nie je Seitenaufruf.
+  // Empfehlungen und Profil (T11, Spec Profil 4.4) hier vorberechnen, nie je Seitenaufruf.
   // Ein Fehler darin soll die gespeicherte Bewertung nicht als gescheitert melden.
   try {
-    await empfehlungenFortschreiben(mitglied.mitgliedId);
+    await profilFortschreiben(mitglied.mitgliedId);
   } catch (fehler) {
-    console.error("empfehlungenFortschreiben fehlgeschlagen", fehler);
+    console.error("profilFortschreiben fehlgeschlagen", fehler);
   }
 
   revalidiereSprachen(`/blueten/${strain.slug}`);
   revalidiereSprachen("/");
   revalidiereSprachen("/admin");
   revalidiereSprachen("/mitglied");
+  revalidiereSprachen("/profil");
   return { ok: true, sofortSichtbar: istBetreiber, slug: strain.slug };
 }

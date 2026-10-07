@@ -1,74 +1,5 @@
-import {
-  AEHNLICH_SQL,
-  aehnlichVeraltet,
-  empfehlungenBerechnen,
-  empfehlungenErsetzen,
-  KANDIDATEN_ANZAHL,
-  KANDIDATEN_SQL,
-  profilTerpene,
-  SORTEN_AROMA_SQL,
-  sortenAusZeilen,
-  TERPENE_SQL,
-  type SortenAromaZeile,
-  type TerpenZeile,
-} from "@/lib/empfehlung";
-import { getEnv } from "@/lib/cloudflare";
+import { AEHNLICH_SQL, aehnlichVeraltet } from "@/lib/empfehlung";
 import { getPrisma } from "@/lib/prisma";
-import { parseGeschmacksMatrix, parseTerpenIntensitaet } from "@/lib/query/bewertung";
-
-/** Obergrenze eigener Bewertungen im Profil; erreicht wird geloggt. */
-const BEWERTUNGEN_HOECHSTENS = 1000;
-
-/**
- * Empfehlungen eines Mitglieds neu berechnen und in `nutzer_empfehlungen`
- * schreiben (T11, Nutzer 2026-09-29). Läuft beim Speichern einer Bewertung,
- * nie je Seitenaufruf. Zählen alle eigenen Bewertungen, auch noch nicht
- * freigegebene: es geht um den Geschmack des Mitglieds, nicht um die Community.
- * Aroma aller Sorten kommt als eine Zeile je Sorte (Review T11: CPU 10 ms).
- */
-export async function empfehlungenFortschreiben(mitgliedId: string): Promise<void> {
-  const prisma = await getPrisma();
-  const [eigene, terpene] = await Promise.all([
-    prisma.review.findMany({
-      where: { autorId: mitgliedId },
-      orderBy: { erstelltAm: "desc" },
-      select: { strainId: true, gesamtnote: true, terpenIntensitaet: true, geschmacksMatrix: true },
-      take: BEWERTUNGEN_HOECHSTENS,
-    }),
-    prisma.$queryRawUnsafe<TerpenZeile[]>(TERPENE_SQL),
-  ]);
-  if (eigene.length >= BEWERTUNGEN_HOECHSTENS) console.warn("empfehlungen: Bewertungsgrenze erreicht", BEWERTUNGEN_HOECHSTENS);
-  const bewertungen = eigene.map((r) => ({
-    strainId: r.strainId,
-    gesamtnote: r.gesamtnote,
-    terpene: parseTerpenIntensitaet(r.terpenIntensitaet),
-    geschmack: parseGeschmacksMatrix(r.geschmacksMatrix),
-  }));
-  const bewerteteIds = JSON.stringify([...new Set(bewertungen.map((b) => b.strainId))]);
-
-  // Erst das Profil aus den bewerteten Sorten, dann nur die Kandidaten, die D1
-  // danach vorsortiert: der Worker rechnet über rund 150 statt 700 Sorten.
-  const bewertete = sortenAusZeilen(terpene, await prisma.$queryRawUnsafe<SortenAromaZeile[]>(SORTEN_AROMA_SQL, bewerteteIds));
-  const gewichte = profilTerpene(bewertungen, bewertete, terpene);
-  const kandidaten =
-    Object.keys(gewichte).length === 0
-      ? []
-      : sortenAusZeilen(
-          terpene,
-          await prisma.$queryRawUnsafe<SortenAromaZeile[]>(
-            KANDIDATEN_SQL,
-            JSON.stringify(gewichte),
-            bewerteteIds,
-            KANDIDATEN_ANZAHL,
-          ),
-        );
-  const liste = empfehlungenBerechnen(bewertungen, [...bewertete, ...kandidaten]);
-
-  // Atomar ersetzen: D1-batch läuft als eine Transaktion, Prismas $transaction
-  // auf D1 dagegen als Einzelabfragen (siehe lib/auth.ts).
-  const { DB } = await getEnv();
-  await DB.batch(empfehlungenErsetzen(mitgliedId, liste).map((a) => DB.prepare(a.sql).bind(...a.params)));
-}
 
 export type GespeicherteEmpfehlung = {
   slug: string;
@@ -77,6 +8,8 @@ export type GespeicherteEmpfehlung = {
   bezugSlug: string;
   /** Schlüssel wie `t:Myrcen` oder `g:ZITRUS`. */
   gemeinsam: string[];
+  /** Von der Community bestätigt (Spec Profil 4.3). */
+  bestaetigt: boolean;
 };
 
 function gemeinsamAus(roh: string): string[] {
@@ -97,6 +30,7 @@ export async function ladeEmpfehlungen(mitgliedId: string): Promise<Gespeicherte
     take: 6,
     select: {
       gemeinsam: true,
+      bestaetigt: true,
       strain: { select: { slug: true, handelsname: true } },
       bezug: { select: { slug: true, handelsname: true } },
     },
@@ -107,6 +41,7 @@ export async function ladeEmpfehlungen(mitgliedId: string): Promise<Gespeicherte
     bezugHandelsname: z.bezug.handelsname,
     bezugSlug: z.bezug.slug,
     gemeinsam: gemeinsamAus(z.gemeinsam),
+    bestaetigt: z.bestaetigt,
   }));
 }
 

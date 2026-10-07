@@ -1,5 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 
 import type { GeschmacksKategorie } from "@/db/enums";
 import type { SortenAroma } from "@/lib/empfehlung";
@@ -142,4 +143,11 @@ test("auswertungen: Community ohne eigene Note, strenger negativ, ab zwei vergle
 test("auswertungen: Schnitte je Kategorie mit Ersatznote, auf 0,1 gerundet", () => {
   const a = auswertungen([zeile("a", null, { wirkung: 5 }), zeile("b", 3, { aussehen: 3 })]);
   assert.deepEqual(a.schnitte, { aussehen: 3.5, geruch: 4, geschmack: 4, wirkung: 4.5, konsistenz: 4, gesamt: 3.6 });
+});
+
+test("Bewertung speichern schreibt das Profil fort und erneuert /profil", () => {
+  const quelle = readFileSync("app/[lang]/blueten/[slug]/aktionen.ts", "utf8");
+  assert.match(quelle, /await profilFortschreiben\(mitglied\.mitgliedId\)/);
+  assert.doesNotMatch(quelle, /empfehlungenFortschreiben/);
+  assert.match(quelle, /revalidiereSprachen\("\/profil"\)/);
 });
