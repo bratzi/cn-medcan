@@ -8,6 +8,7 @@ import {
   bewertungsGewicht,
   empfehlungenBerechnen,
   empfehlungenErsetzen,
+  istBestaetigt,
   KANDIDATEN_ANZAHL,
   KANDIDATEN_SQL,
   profilTerpene,
@@ -141,7 +142,7 @@ function synthetischeDatenbank() {
     CREATE TABLE strains (id TEXT PRIMARY KEY, aktiv INTEGER);
     CREATE TABLE terpene (id TEXT PRIMARY KEY, name TEXT, geschmack TEXT);
     CREATE TABLE strain_terpene (strain_id TEXT, terpen_id TEXT, rang INTEGER);
-    CREATE TABLE sorten_kennwerte (strain_id TEXT PRIMARY KEY, geschmack_median TEXT, anzahl INTEGER);
+    CREATE TABLE sorten_kennwerte (strain_id TEXT PRIMARY KEY, geschmack_median TEXT, gesamtnote_median REAL, anzahl INTEGER);
   `);
   for (const t of terpene) db.prepare(`INSERT INTO terpene VALUES (?, ?, ?)`).run(t.id, t.name, t.geschmack);
   for (const z of zeilen) {
@@ -150,7 +151,7 @@ function synthetischeDatenbank() {
       const [tid, rang] = teil.split(":");
       db.prepare(`INSERT INTO strain_terpene VALUES (?, ?, ?)`).run(z.sid, tid, Number(rang));
     }
-    if (z.gm) db.prepare(`INSERT INTO sorten_kennwerte VALUES (?, ?, 3)`).run(z.sid, z.gm);
+    if (z.gm) db.prepare(`INSERT INTO sorten_kennwerte VALUES (?, ?, NULL, 3)`).run(z.sid, z.gm);
   }
   return { db, terpene, zeilen, bewertungen };
 }
@@ -225,7 +226,7 @@ test("sortenAusZeilen: Terpene nach Id und Rang, Median als Zahlen, Unbekanntes 
 test("empfehlungenErsetzen: zweimal speichern ersetzt die Liste atomar, höchstens sechs Zeilen", () => {
   const db = new Database(":memory:");
   db.exec(`CREATE TABLE nutzer_empfehlungen (mitglied_id TEXT, strain_id TEXT, rang INTEGER, score REAL,
-    bezug_strain_id TEXT, gemeinsam TEXT, PRIMARY KEY (mitglied_id, strain_id))`);
+    bezug_strain_id TEXT, gemeinsam TEXT, bestaetigt INTEGER NOT NULL DEFAULT 0, PRIMARY KEY (mitglied_id, strain_id))`);
   // Wie D1-batch: alle Anweisungen in einer Transaktion.
   const batch = db.transaction((anweisungen: ReturnType<typeof empfehlungenErsetzen>) => {
     for (const a of anweisungen) db.prepare(a.sql).run(...a.params);
@@ -293,4 +294,48 @@ test("begruendungText: nennt Bezugssorte und Aromen, sonst leer", () => {
     "weil dir Pink Kush gefiel: gemeinsam Myrcen, zitrisch",
   );
   assert.equal(begruendungText({ bezugHandelsname: "Pink Kush", gemeinsam: [] }, de, "de"), "");
+});
+
+const mitCommunity = (s: SortenAroma, median: number | null, anzahl: number): SortenAroma => ({ ...s, community: { median, anzahl } });
+
+test("istBestaetigt: ab 2 Bewertungen und Median ab 3,5", () => {
+  assert.equal(istBestaetigt({ median: 3.5, anzahl: 2 }), true);
+  assert.equal(istBestaetigt({ median: 3.4, anzahl: 5 }), false);
+  assert.equal(istBestaetigt({ median: 5, anzahl: 1 }), false);
+  assert.equal(istBestaetigt({ median: null, anzahl: 4 }), false);
+  assert.equal(istBestaetigt(undefined), false);
+});
+
+test("empfehlungen: ab drei bestätigten nur bestätigte, Rang nach Kosinus mal Median", () => {
+  const basis = Array.from({ length: 8 }, (_, i) => sorte(`k${i}`, [["Limonen", "ZITRUS"], ["Myrcen", "ERDIG"]]));
+  const sorten = [
+    ZITRUS,
+    mitCommunity(basis[0], 3.5, 2),
+    mitCommunity(basis[1], 5, 3),
+    mitCommunity(basis[2], 4, 2),
+    mitCommunity(basis[3], 5, 1), // zu wenige Stimmen
+    mitCommunity(basis[4], 3, 9), // Median zu niedrig
+    basis[5],
+  ];
+  const liste = empfehlungenBerechnen([{ strainId: "zitrus", gesamtnote: 5, terpene: {}, geschmack: {} }], sorten);
+  assert.deepEqual(liste.map((e) => e.strainId), ["k1", "k2", "k0"]);
+  assert.ok(liste.every((e) => e.bestaetigt));
+  assert.deepEqual(liste.map((e) => e.rang), [1, 2, 3]);
+});
+
+test("empfehlungen: unter drei bestätigten mit unbestätigten nach Aroma aufgefüllt", () => {
+  const basis = Array.from({ length: 8 }, (_, i) => sorte(`k${i}`, [["Limonen", "ZITRUS"], ["Myrcen", "ERDIG"]]));
+  const sorten = [ZITRUS, mitCommunity(basis[0], 4, 2), ...basis.slice(1)];
+  const liste = empfehlungenBerechnen([{ strainId: "zitrus", gesamtnote: 5, terpene: {}, geschmack: {} }], sorten);
+  assert.equal(liste.length, 6);
+  assert.equal(liste[0].strainId, "k0");
+  assert.equal(liste[0].bestaetigt, true);
+  assert.ok(liste.slice(1).every((e) => !e.bestaetigt));
+});
+
+test("sortenAusZeilen: Community-Median und Anzahl aus gn und an", () => {
+  const [s] = sortenAusZeilen([{ id: "m", name: "Myrcen", geschmack: "ERDIG" }], [{ sid: "a", tp: "m:1", gm: null, gn: 4.2, an: 3 }]);
+  assert.deepEqual(s.community, { median: 4.2, anzahl: 3 });
+  const [ohne] = sortenAusZeilen([{ id: "m", name: "Myrcen", geschmack: "ERDIG" }], [{ sid: "b", tp: "m:1", gm: null }]);
+  assert.equal(ohne.community, undefined);
 });

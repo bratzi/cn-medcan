@@ -22,6 +22,8 @@ export type SortenAroma = {
   terpene: readonly { name: string; geschmack: GeschmacksKategorie; rang: number }[];
   /** Community-Median je Geschmacksachse (Schlüssel wie `zitrus`, 0-5). */
   geschmackMedian?: Werte;
+  /** Freigegebene Bewertungen der Sorte aus `sorten_kennwerte` (Spec Profil 4.3). */
+  community?: { median: number | null; anzahl: number };
 };
 
 export type EigeneBewertung = {
@@ -41,9 +43,21 @@ export type Empfehlung = {
   bezugStrainId: string;
   /** Bis zu drei gemeinsame Schlüssel (`t:Myrcen`, `g:ZITRUS`), stärkste zuerst. */
   gemeinsam: string[];
+  /** Von der Community bestätigt (Spec Profil 4.3). */
+  bestaetigt: boolean;
 };
 
 export const EMPFEHLUNGEN_ANZAHL = 6;
+
+/** Bestätigt: so viele freigegebene Bewertungen und dieser Median der Gesamtnote (Nutzer 2026-10-07). */
+export const BESTAETIGT_MIN_ANZAHL = 2;
+export const BESTAETIGT_MIN_MEDIAN = 3.5;
+/** Unter so vielen bestätigten wird nach Aroma aufgefüllt, sichtbar markiert. */
+export const BESTAETIGT_MINDESTENS = 3;
+
+export function istBestaetigt(c: SortenAroma["community"]): boolean {
+  return !!c && c.anzahl >= BESTAETIGT_MIN_ANZAHL && c.median !== null && c.median >= BESTAETIGT_MIN_MEDIAN;
+}
 
 const ACHSE_ZU_ENUM = new Map<string, GeschmacksKategorie>(GESCHMACKS_ACHSEN.map((a) => [a.key, a.enumWert]));
 
@@ -143,7 +157,8 @@ function gemeinsameAromen(a: Vektor, b: Vektor): string[] {
   return [...terpene, ...geschmack].map(([k]) => k);
 }
 
-function profilAus(bewertungen: readonly EigeneBewertung[], sorten: readonly SortenAroma[]) {
+/** Profilvektor, positive Bewertungen und bewertete Ids; auch Grundlage des Profilnetzes (lib/profil.ts). */
+export function profilAus(bewertungen: readonly EigeneBewertung[], sorten: readonly SortenAroma[]) {
   const jeId = new Map(sorten.map((s) => [s.strainId, s]));
   const profil: Vektor = new Map();
   const positive: { strainId: string; vektor: Vektor }[] = [];
@@ -278,9 +293,22 @@ export function empfehlungenBerechnen(
     const score = summe === 0 || profilNorm === 0 ? 0 : skalar / (Math.sqrt(summe) * profilNorm);
     if (score > 0) kandidaten.push({ strainId: sorte.strainId, score, sorte });
   }
-  kandidaten.sort((a, b) => b.score - a.score || (a.strainId < b.strainId ? -1 : a.strainId > b.strainId ? 1 : 0));
+  const nachId = (a: { strainId: string }, b: { strainId: string }) => (a.strainId < b.strainId ? -1 : a.strainId > b.strainId ? 1 : 0);
+  kandidaten.sort((a, b) => b.score - a.score || nachId(a, b));
 
-  return kandidaten.slice(0, anzahl).map((kandidat, i) => {
+  // Bestätigt zuerst, Rang = Ähnlichkeit × Community-Note (Spec Profil 4.3).
+  const bestaetigte = kandidaten
+    .filter((k) => istBestaetigt(k.sorte.community))
+    .map((k) => ({ k, wert: (k.score * k.sorte.community!.median!) / 5 }))
+    .sort((a, b) => b.wert - a.wert || nachId(a.k, b.k))
+    .map((x) => x.k)
+    .slice(0, anzahl);
+  const auswahl =
+    bestaetigte.length >= BESTAETIGT_MINDESTENS
+      ? bestaetigte
+      : [...bestaetigte, ...kandidaten.filter((k) => !istBestaetigt(k.sorte.community))].slice(0, anzahl);
+
+  return auswahl.map((kandidat, i) => {
     const k = { ...kandidat, vektor: sortenVektor(kandidat.sorte) };
     let bezug = positive[0];
     let beste = -Infinity;
@@ -297,6 +325,7 @@ export function empfehlungenBerechnen(
       score: k.score,
       bezugStrainId: bezug.strainId,
       gemeinsam: gemeinsameAromen(normiert(k.vektor), bezug.vektor),
+      bestaetigt: istBestaetigt(kandidat.sorte.community),
     };
   });
 }
@@ -306,7 +335,9 @@ export const KANDIDATEN_ANZAHL = 150;
 
 const AROMA_SPALTEN = `s.id AS sid,
            GROUP_CONCAT(st.terpen_id || ':' || st.rang, ',') AS tp,
-           k.geschmack_median AS gm`;
+           k.geschmack_median AS gm,
+           k.gesamtnote_median AS gn,
+           k.anzahl AS an`;
 
 /**
  * Aroma bestimmter Sorten, eine Zeile je Sorte: `tp` ist „terpenId:rang,…“,
@@ -349,7 +380,7 @@ export const KANDIDATEN_SQL = `
 export const TERPENE_SQL = `SELECT id, name, geschmack FROM terpene ORDER BY id`;
 
 export type TerpenZeile = { id: string; name: string; geschmack: string };
-export type SortenAromaZeile = { sid: string; tp: string | null; gm: string | null };
+export type SortenAromaZeile = { sid: string; tp: string | null; gm: string | null; gn?: number | null; an?: number | null };
 
 function medianAus(roh: string | null): Werte | undefined {
   if (!roh) return undefined;
@@ -379,7 +410,9 @@ export function sortenAusZeilen(terpene: readonly TerpenZeile[], zeilen: readonl
     }
     if (liste.length === 0) continue;
     const geschmackMedian = medianAus(z.gm);
-    aus.push(geschmackMedian ? { strainId: z.sid, terpene: liste, geschmackMedian } : { strainId: z.sid, terpene: liste });
+    const sorte: SortenAroma = geschmackMedian ? { strainId: z.sid, terpene: liste, geschmackMedian } : { strainId: z.sid, terpene: liste };
+    if (typeof z.an === "number" && z.an > 0) sorte.community = { median: typeof z.gn === "number" ? z.gn : null, anzahl: z.an };
+    aus.push(sorte);
   }
   return aus;
 }
@@ -394,8 +427,8 @@ export function empfehlungenErsetzen(mitgliedId: string, liste: readonly Empfehl
   return [
     { sql: `DELETE FROM nutzer_empfehlungen WHERE mitglied_id = ?`, params: [mitgliedId] },
     ...liste.map((e) => ({
-      sql: `INSERT INTO nutzer_empfehlungen (mitglied_id, strain_id, rang, score, bezug_strain_id, gemeinsam) VALUES (?, ?, ?, ?, ?, ?)`,
-      params: [mitgliedId, e.strainId, e.rang, e.score, e.bezugStrainId, JSON.stringify(e.gemeinsam)],
+      sql: `INSERT INTO nutzer_empfehlungen (mitglied_id, strain_id, rang, score, bezug_strain_id, gemeinsam, bestaetigt) VALUES (?, ?, ?, ?, ?, ?, ?)`,
+      params: [mitgliedId, e.strainId, e.rang, e.score, e.bezugStrainId, JSON.stringify(e.gemeinsam), e.bestaetigt ? 1 : 0],
     })),
   ];
 }
