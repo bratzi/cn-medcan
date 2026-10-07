@@ -109,6 +109,7 @@ export function BewertungsFormular({
     // Die Bewertung steht; erst jetzt die Bilder, eines nach dem anderen (Spec 2026-10-06).
     const mitBildern = vorgemerkt.length > 0;
     let bildFehler: string[] = [];
+    let bilderGesendet = 0;
     if (mitBildern) {
       const lauf = await bilderSenden(vorgemerkt, strainId, bewertungsbildHochladen, {
         fortschritt: (nr, gesamt) => setBildLauf({ nr, gesamt }),
@@ -118,12 +119,13 @@ export function BewertungsFormular({
       for (const bild of vorgemerkt) if (!lauf.uebrig.includes(bild)) URL.revokeObjectURL(bild.vorschau);
       setVorgemerkt(lauf.uebrig);
       bildFehler = lauf.fehler;
+      bilderGesendet = lauf.gesendet;
       setBildLauf(null);
     }
     setLaeuft(false);
     setGespeichert(true);
     const basis = ergebnis.sofortSichtbar ? texte.gespeichert : texte.eingegangen;
-    setErfolg(mitBildern && !istBetreiber ? `${basis} ${texte.bilderPruefung}` : basis);
+    setErfolg(bilderGesendet > 0 && !istBetreiber ? `${basis} ${texte.bilderPruefung}` : basis);
     if (bildFehler.length > 0) setFehler(bildFehler.join(" "));
     // Community-Werte, Vorbelegung und Bilder neu vom Server; die Maske bleibt stehen.
     router.refresh();
@@ -219,7 +221,9 @@ export function BewertungsFormular({
                 ? texte.veroeffentlichen
                 : texte.einreichen}
         </Button>
-        <p aria-live="polite" className="text-small text-text-muted">
+        {/* Nur für Vorleser: der sichtbare Fortschritt steht im Knopftext; absolut gesetzt,
+            damit der Bereich keinen Leerraum im gap-Container erzeugt. */}
+        <p aria-live="polite" className="sr-only">
           {bildLauf ? t(texte.bildLaeuft, bildLauf) : null}
         </p>
         {fehler ? <Meldung art="fehler">{fehler}</Meldung> : null}

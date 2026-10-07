@@ -387,5 +387,8 @@ test("Versteckte Regler-Gruppe macht die Seite nicht breiter (fieldset min-conte
       regler: { werte: leereGeschmacksMatrix(), aendern: () => {} },
     }),
   );
-  assert.match(html, /<fieldset class="sr-only min-w-0"/);
+  // Die Legende entkommt dem Clip eines sr-only-Fieldsets (live: Seite 750 statt 478 px breit);
+  // deshalb steckt das Fieldset in einer sr-only-Hülle.
+  assert.match(html, /<div class="sr-only"><fieldset class="min-w-0"/);
+  assert.doesNotMatch(html, /<fieldset class="sr-only/);
 });

@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, type Dispatch, type SetStateAction } from "react";
+import { useEffect, useRef, useState, type Dispatch, type SetStateAction } from "react";
 
 import { bewertungsbildEntfernen } from "@/app/[lang]/blueten/[slug]/bewertungsbild-aktionen";
 import { BudpicBild } from "@/components/medien/Bild";
@@ -43,6 +43,14 @@ export function BewertungsBilder({ vorhanden, vorgemerkt, setVorgemerkt, onBesch
   const hydriert = useHydriert();
   const eingabe = useRef<HTMLInputElement>(null);
   const zaehler = useRef(0);
+  // Wird die Komponente während des Verkleinerns abgebaut, laufen waehlen/gewaehlt noch zu Ende.
+  const gemountet = useRef(false);
+  useEffect(() => {
+    gemountet.current = true;
+    return () => {
+      gemountet.current = false;
+    };
+  }, []);
   const [fehler, setFehler] = useState<string[]>([]);
   const [entfernt, setEntfernt] = useState<string | null>(null);
   const [verkleinert, setVerkleinert] = useState(false);
@@ -57,8 +65,10 @@ export function BewertungsBilder({ vorhanden, vorgemerkt, setVorgemerkt, onBesch
     try {
       await waehlen(alle);
     } finally {
-      setVerkleinert(false);
-      onBeschaeftigt(false);
+      if (gemountet.current) {
+        setVerkleinert(false);
+        onBeschaeftigt(false);
+      }
     }
   }
 
@@ -68,6 +78,11 @@ export function BewertungsBilder({ vorhanden, vorgemerkt, setVorgemerkt, onBesch
     const neu: VorgemerktesBild[] = [];
     for (const datei of alle.slice(0, anzahl)) {
       const klein = await bildVerkleinernFrei(datei, { maxKante: BUDPIC_MAX_KANTE, maxBytes: BUDPIC_MAX_BYTES });
+      if (!gemountet.current) {
+        // Abgebaut: bereits angelegte Vorschauen freigeben, nichts mehr setzen.
+        for (const bild of neu) URL.revokeObjectURL(bild.vorschau);
+        return;
+      }
       if (!klein.ok) {
         const grund = t(meldungen[klein.fehler.schluessel] ?? meldungen["budpic.fehlgeschlagen"], klein.fehler.parameter);
         zeilen.push(t(texte.bildFehler, { name: datei.name, grund }));

@@ -1163,7 +1163,14 @@ export function AromaKarte({
               "absolute flex -translate-y-1/2 flex-col items-start pl-4 text-left whitespace-nowrap transition-colors duration-normal",
               begleitBetont(begleiter[index].name) ? "text-text" : "text-text-muted",
             )}
-            style={{ left: `${(punkt.x / aktBreite) * 100}%`, top: `${(punkt.y / aktHoehe) * 100}%`, opacity: kartenSichtbar }}
+            style={{
+              left: `${(punkt.x / aktBreite) * 100}%`,
+              top: `${(punkt.y / aktHoehe) * 100}%`,
+              opacity: kartenSichtbar,
+              // Wie bei den Terpenen: schmal bis zum rechten Rand und umbrechen statt hinausragen.
+              maxWidth: schmal ? `${aktBreite - punkt.x}px` : undefined,
+              whiteSpace: schmal ? "normal" : undefined,
+            }}
           >
             {/* Hinweis in eigener Zeile, sonst ragt er über schmale Karten (Doppelseite) hinaus. */}
             <span className="inline-flex items-center gap-1.5 text-small italic">
@@ -1267,7 +1274,8 @@ export function AromaKarte({
       </div>
 
       {regler ? (
-        <fieldset className="sr-only min-w-0">
+        <div className="sr-only">
+        <fieldset className="min-w-0">
           <legend>{kt.reglerLegende}</legend>
           {GESCHMACKS_ACHSEN.map((achse, index) => (
             <label key={achse.key}>
@@ -1303,13 +1311,15 @@ export function AromaKarte({
             </label>
           ))}
         </fieldset>
+        </div>
       ) : null}
 
       {/* Terpen-Schalter für Tastatur und Vorleser, in der Reihenfolge der Spalte (Nutzer
           2026-10-03, vorher Regler 0 bis 5). Ein Terpen ist an oder aus; der Fokus hebt es in
           der Karte hervor. Der sichtbare Schalter ist der Name rechts in der Karte. */}
       {terpenSchalter ? (
-        <fieldset className="sr-only min-w-0">
+        <div className="sr-only">
+        <fieldset className="min-w-0">
           <legend>{kt.terpenLegende}</legend>
           {terpenFolge.map(({ name }) => (
             <label key={name}>
@@ -1324,6 +1334,7 @@ export function AromaKarte({
             </label>
           ))}
         </fieldset>
+        </div>
       ) : null}
 
       <div className="sr-only">
