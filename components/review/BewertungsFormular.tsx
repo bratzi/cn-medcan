@@ -85,7 +85,7 @@ export function BewertungsFormular({
   const [bildLauf, setBildLauf] = useState<{ nr: number; gesamt: number } | null>(null);
   const [fehler, setFehler] = useState<string | null>(null);
   const [erfolg, setErfolg] = useState<string | null>(null);
-  const [netz, setNetz] = useState<{ vorher: Geschmack | null; nachher: Geschmack } | null>(null);
+  const [netz, setNetz] = useState<{ vorher: Geschmack | null; nachher: Geschmack; geformt: boolean } | null>(null);
   // Nach dem ersten Speichern gibt es die Bewertung, auch bevor die Seite neu vom Server kommt.
   const [gespeichert, setGespeichert] = useState(false);
   const vorhanden = vorbelegung !== null || gespeichert;
@@ -236,7 +236,7 @@ export function BewertungsFormular({
         </p>
         {fehler ? <Meldung art="fehler">{fehler}</Meldung> : null}
         {erfolg ? <Meldung art="erfolg">{erfolg}</Meldung> : null}
-        {netz ? <MiniNetz vorher={netz.vorher} nachher={netz.nachher} texte={texte} achsen={achsen} /> : null}
+        {netz ? <MiniNetz vorher={netz.vorher} nachher={netz.nachher} geformt={netz.geformt} texte={texte} achsen={achsen} /> : null}
       </div>
     </form>
   );

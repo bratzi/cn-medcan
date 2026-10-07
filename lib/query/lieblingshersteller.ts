@@ -8,6 +8,7 @@ export async function ladeLieblingshersteller(mitgliedId: string): Promise<Liebl
   const prisma = await getPrisma();
   const zeilen = await prisma.review.findMany({
     where: { autorId: mitgliedId },
+    orderBy: { erstelltAm: "desc" },
     take: 1000,
     select: {
       gesamtnote: true,

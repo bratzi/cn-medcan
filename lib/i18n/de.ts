@@ -535,6 +535,8 @@ export const de = {
     miniNetzTitel: "So hat sich dein Netz verändert",
     miniNetzAenderung: "{liste}.",
     miniNetzGleich: "Dein Netz bleibt gleich: nur Noten ab 3,5 oder bis 2 formen es.",
+    miniNetzBestaetigt: "Dein Netz bestätigt sich: kaum Veränderung.",
+    miniNetzMagNicht: "mag ich nicht",
     miniNetzVorher: "vorher",
     miniNetzJetzt: "jetzt",
     miniNetzLink: "Zu deinem Profil",
@@ -975,6 +977,7 @@ export const de = {
     verlaufLeer: "Ab zwei Bewertungen siehst du hier, wie dein Netz wächst.",
     herstellerTitel: "Lieblingshersteller",
     herstellerSatz: "{name}: im Schnitt {note} von 5 aus {anzahl} Bewertungen.",
+    herstellerFehler: "Dein Lieblingshersteller lässt sich gerade nicht laden. Lade die Seite in ein paar Minuten neu.",
     herstellerLeer: "Sobald du zwei Blüten desselben Herstellers bewertet hast, steht hier dein Liebling.",
   },
   profilOeffentlich: {

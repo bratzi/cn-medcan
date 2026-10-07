@@ -48,5 +48,28 @@ test("NetzVerlauf: Regler über alle Schritte, Start beim neuesten, Beschriftung
   assert.match(html, /max="2"/);
   assert.match(html, /value="2"/);
   assert.match(html, /Nach 3 von 3 Bewertungen · 03\.09\.2026/);
-  assert.match(html, /aria-valuetext="Nach 3 von 3 Bewertungen · 03\.09\.2026"/);
+  assert.match(html, /aria-valuetext="Nach 3 von 3 Bewertungen · 03\.09\.2026\. Mit deiner/);
+});
+
+test("NetzVerlauf: Änderung zum vorigen Schritt steht als Text und im aria-valuetext", () => {
+  const html = verlauf([schritt(1, { FRUCHTIG: 0.4 }), schritt(2, { FRUCHTIG: 1, ERDIG: -0.5 })]);
+  assert.match(html, /aria-valuetext="Nach 2 von 2 Bewertungen · 02\.09\.2026\. Mit deiner Bewertung vom 02\.09\.2026: Fruchtig stärker, Erdig schwächer./);
+  assert.match(html, /<p[^>]*>Mit deiner Bewertung vom 02\.09\.2026: /);
+});
+
+test("NetzVerlauf: bleibt das Netz gleich, sagt der Text das; der erste Schritt hat keine Änderung", () => {
+  const html = verlauf([schritt(1, { FRUCHTIG: 1 }), schritt(2, { FRUCHTIG: 1 })]);
+  assert.match(html, /Mit deiner Bewertung vom 02\.09\.2026 blieb dein Netz gleich\./);
+  const erster = renderToStaticMarkup(
+    createElement(NetzVerlauf, { schritte: [schritt(1, { FRUCHTIG: 1 }), schritt(2, { ZITRUS: 1 })], texte: de.profil, achsen: de.label.geschmack, sprache: "de" }),
+  );
+  assert.doesNotMatch(erster, /blieb dein Netz gleich/);
+});
+
+test("NetzVerlauf: Legende mit Form für Fläche, Strich und dünne Kontur", () => {
+  const html = verlauf([schritt(1, { FRUCHTIG: 1 }), schritt(2, { FRUCHTIG: 1, ERDIG: -0.5 })]);
+  assert.match(html, />mag ich</);
+  assert.match(html, />mag ich nicht</);
+  assert.match(html, />vor der letzten Bewertung</);
+  assert.match(html, /stroke-dasharray="4 4"/);
 });

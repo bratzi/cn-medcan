@@ -526,6 +526,8 @@ export const en: Woerterbuch = {
     miniNetzTitel: "How your web changed",
     miniNetzAenderung: "{liste}.",
     miniNetzGleich: "Your web stays the same: only ratings from 3.5 up or 2 and below shape it.",
+    miniNetzBestaetigt: "Your web is confirmed: hardly any change.",
+    miniNetzMagNicht: "dislike",
     miniNetzVorher: "before",
     miniNetzJetzt: "now",
     miniNetzLink: "Go to your profile",
@@ -966,6 +968,7 @@ export const en: Woerterbuch = {
     verlaufLeer: "From two reviews on, you can watch your web grow here.",
     herstellerTitel: "Favourite producer",
     herstellerSatz: "{name}: {note} out of 5 on average across {anzahl} reviews.",
+    herstellerFehler: "Your favourite producer cannot be loaded right now. Reload the page in a few minutes.",
     herstellerLeer: "Once you have reviewed two flowers from the same producer, your favourite shows up here.",
   },
   profilOeffentlich: {

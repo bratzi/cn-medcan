@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 
 import type { SortenAroma } from "@/lib/empfehlung";
-import { profilAnzeige } from "@/lib/profil";
+import { profilAnzeige, profilNeuRechnen } from "@/lib/profil";
 import { profilVerlauf, verlaufAusDaten, verlaufDaten, VERLAUF_HOECHSTENS, type VerlaufEingabe } from "@/lib/profil-verlauf";
 
 // Sorten ohne Herstellerterpene: das Netz entsteht allein aus den Reglern.
@@ -50,9 +50,21 @@ test("profilVerlauf: höchstens 60 Schritte, die neuesten", () => {
 
 test("profilVerlauf: 1000 Bewertungen in unter 20 ms (CPU-Grenze 10 ms im Worker, hier großzügig)", () => {
   const reihe = Array.from({ length: 1000 }, (_, i) => b(`s${i}`, i % 2 ? 5 : 1, { fruchtig: i % 5, erdig: (i * 3) % 5 }, (i % 28) + 1));
-  const start = performance.now();
+  // Der kalte JIT-Lauf gehört nicht zur Messung (Review I1): einmal aufwärmen, dann das Minimum aus 5 Läufen.
   profilVerlauf(reihe, sorten);
-  assert.ok(performance.now() - start < 20);
+  let schnellster = Infinity;
+  for (let lauf = 0; lauf < 5; lauf++) {
+    const start = performance.now();
+    profilVerlauf(reihe, sorten);
+    schnellster = Math.min(schnellster, performance.now() - start);
+  }
+  assert.ok(schnellster < 20, `schnellster Lauf ${schnellster.toFixed(1)} ms`);
+});
+
+test("profilVerlauf: linear, keine Schleife ruft profilAus oder profilAnzeige auf", () => {
+  const q = readFileSync("lib/profil-verlauf.ts", "utf8");
+  assert.doesNotMatch(q, /profilAus\(|profilAnzeige\(/);
+  assert.match(q, /geschmacksBeitraege\(reihe, sorten\)/);
 });
 
 test("verlaufDaten/verlaufAusDaten: Hin und zurück, NULL und Kaputtes ergeben leere Liste", () => {
@@ -68,4 +80,33 @@ test("profilFortschreiben schreibt den Verlauf, ladeProfil liest ihn", () => {
   assert.match(q, /verlauf: verlaufDaten\(profilVerlauf\(/);
   assert.match(q, /erstelltAm: true/);
   assert.match(q, /verlaufAusDaten\(/);
+});
+
+test("profilNeuRechnen: veraltet, fehlend oder leerer Verlauf trotz Bewertungen, sonst nie", () => {
+  const jetzt = Date.UTC(2026, 9, 7, 12);
+  const frisch = new Date(jetzt - 3600_000);
+  const alt = new Date(jetzt - 25 * 3600_000);
+  const stand = (berechnetAm: Date, anzahl: number, verlauf: number) => ({ berechnetAm, werte: { anzahl }, verlauf: { length: verlauf } });
+  assert.equal(profilNeuRechnen(null, jetzt), true);
+  assert.equal(profilNeuRechnen(stand(alt, 5, 5), jetzt), true);
+  // Altprofil nach dem Deploy: Verlauf NULL, aber 30 Bewertungen.
+  assert.equal(profilNeuRechnen(stand(frisch, 30, 0), jetzt), true);
+  assert.equal(profilNeuRechnen(stand(frisch, 2, 0), jetzt), true);
+  // Ein Bewertung ergibt keinen sinnvollen Verlauf, kein Neurechnen.
+  assert.equal(profilNeuRechnen(stand(frisch, 1, 0), jetzt), false);
+  assert.equal(profilNeuRechnen(stand(frisch, 0, 0), jetzt), false);
+  // Gespeicherter, nicht leerer Verlauf unter 24 h: nie neu rechnen.
+  assert.equal(profilNeuRechnen(stand(frisch, 30, 30), jetzt), false);
+});
+
+test("Mitglied mit 2 Mittelfeld-Bewertungen hat einen Verlauf mit 2 Schritten und rechnet nicht in einer Schleife", () => {
+  const v = profilVerlauf([b("s1", 3, { erdig: 5 }, 1), b("s2", 3, { zitrus: 5 }, 2)], sorten);
+  assert.equal(v.length, 2);
+  const jetzt = Date.now();
+  assert.equal(profilNeuRechnen({ berechnetAm: new Date(jetzt), werte: { anzahl: 2 }, verlauf: v }, jetzt), false);
+});
+
+test("aktuellesProfil rechnet über profilNeuRechnen", () => {
+  const q = readFileSync("lib/query/profil.ts", "utf8");
+  assert.match(q, /profilNeuRechnen\(gespeichert, Date\.now\(\)\)/);
 });

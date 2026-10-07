@@ -27,6 +27,15 @@ export async function generateMetadata(): Promise<Metadata> {
   return { title: (await holeWoerterbuch()).profil.titel, robots: { index: false, follow: false } };
 }
 
+/** Wie oderNull, aber undefined: der Aufrufer unterscheidet „gescheitert“ von „keiner“. */
+function oderUndefined<T>(name: string) {
+  return (fehler: unknown): T | undefined => {
+    unstable_rethrow(fehler);
+    console.error(`${name} fehlgeschlagen`, fehler);
+    return undefined;
+  };
+}
+
 /** Fehler eines Teils reißen die Seite nicht mit (wie /mitglied); Redirects gehen durch. */
 function oderNull<T>(name: string) {
   return (fehler: unknown): T | null => {
@@ -59,7 +68,7 @@ export default async function ProfilPage() {
     ),
     ungeleseneAnzahl(mitglied.mitgliedId).catch(() => 0),
     ladeLieblingshersteller(mitglied.mitgliedId).catch(
-      oderNull<Awaited<ReturnType<typeof ladeLieblingshersteller>>>("ladeLieblingshersteller"),
+      oderUndefined<Awaited<ReturnType<typeof ladeLieblingshersteller>>>("ladeLieblingshersteller"),
     ),
   ]);
   const werte = profil?.werte ?? leereProfilWerte();

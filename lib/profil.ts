@@ -21,6 +21,24 @@ export function profilVeraltet(berechnetAm: Date | null | undefined, jetzt: numb
   return !berechnetAm || jetzt - berechnetAm.getTime() > PROFIL_GUELTIG_MS;
 }
 
+/**
+ * Neu rechnen: Stand fehlt, ist älter als 24 h, oder der Verlauf ist leer trotz
+ * mindestens zwei Bewertungen (Altprofil vor Stufe 3, Review M1). Das greift je
+ * Profil einmal: danach hat jede Bewertung einen Schritt, auch Mittelfeld-Noten.
+ */
+export function profilNeuRechnen(
+  gespeichert: { berechnetAm: Date; werte: { anzahl: number }; verlauf: { length: number } } | null,
+  jetzt: number,
+): boolean {
+  if (!gespeichert || profilVeraltet(gespeichert.berechnetAm, jetzt)) return true;
+  return gespeichert.verlauf.length === 0 && gespeichert.werte.anzahl >= 2;
+}
+
+/** Hat die Note das Netz geformt? Ab 3,5 oder bis 2 ja, Mittelfeld und fehlende Note nein. */
+export function netzGeformt(gesamtnote: number | null): boolean {
+  return bewertungsGewicht(gesamtnote) !== 0;
+}
+
 /** Altbewertungen vor v2 haben keine Gesamtnote: dann das Mittel der fünf Noten. */
 export function noteOderErsatz(r: {
   gesamtnote: number | null;

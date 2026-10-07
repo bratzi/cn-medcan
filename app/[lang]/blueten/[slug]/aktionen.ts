@@ -5,6 +5,7 @@ import { revalidiereSprachen } from "@/lib/i18n/revalidiere";
 import { bewertungPruefen } from "@/lib/bewertung-eingabe";
 import { kennwerteFortschreiben } from "@/lib/kennwerte";
 import { ladeProfil, profilFortschreiben } from "@/lib/query/profil";
+import { netzGeformt, noteOderErsatz } from "@/lib/profil";
 import type { Geschmack } from "@/lib/profil-typen";
 import { getPrisma } from "@/lib/prisma";
 import { freigabeErforderlich } from "@/lib/session";
@@ -17,7 +18,7 @@ import type { BeschaffenheitsKey } from "@/lib/query/bewertung";
 import type { GeschmacksKategorie } from "@/db/enums";
 
 export type BewertungErgebnis =
-  | { ok: true; sofortSichtbar: boolean; slug: string; netz: { vorher: Geschmack | null; nachher: Geschmack } | null }
+  | { ok: true; sofortSichtbar: boolean; slug: string; netz: { vorher: Geschmack | null; nachher: Geschmack; geformt: boolean } | null }
   | { ok: false; fehler: string };
 
 /**
@@ -112,13 +113,20 @@ export async function bewertungSpeichern(formData: FormData): Promise<BewertungE
   await kennwerteFortschreiben(strain.id);
   // Empfehlungen und Profil (T11, Spec Profil 4.4) hier vorberechnen, nie je Seitenaufruf.
   // Ein Fehler darin soll die gespeicherte Bewertung nicht als gescheitert melden.
-  let netz: { vorher: Geschmack | null; nachher: Geschmack } | null = null;
+  let netz: { vorher: Geschmack | null; nachher: Geschmack; geformt: boolean } | null = null;
   try {
     await profilFortschreiben(mitglied.mitgliedId);
     const nachher = await ladeProfil(mitglied.mitgliedId);
-    if (nachher) netz = { vorher: vorher?.werte.geschmack ?? null, nachher: nachher.werte.geschmack };
+    if (nachher) {
+      netz = {
+        vorher: vorher?.werte.geschmack ?? null,
+        nachher: nachher.werte.geschmack,
+        // Mittelfeld-Noten formen das Netz nicht: das Mini-Netz sagt dann etwas anderes als bei „kaum Veränderung“.
+        geformt: netzGeformt(noteOderErsatz({ gesamtnote: e.gesamtnote, ...e.noten })),
+      };
+    }
   } catch (fehler) {
-    console.error("profilFortschreiben fehlgeschlagen", fehler);
+    console.error("profilFortschreiben/ladeProfil (Mini-Netz) fehlgeschlagen", fehler);
   }
 
   revalidiereSprachen(`/blueten/${strain.slug}`);

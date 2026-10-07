@@ -51,3 +51,16 @@ test("ladeLieblingshersteller: nur eigene Bewertungen, begrenzt, Ersatznote", ()
   assert.match(q, /take: /);
   assert.match(q, /noteOderErsatz\(/);
 });
+
+test("Lieblingshersteller: ohne Daten (undefined) eine Fehlermeldung statt „noch keiner“", () => {
+  const html = renderToStaticMarkup(createElement(Lieblingshersteller, { daten: undefined, texte: de.profil, sprache: "de" }));
+  assert.match(html, /Dein Lieblingshersteller lässt sich gerade nicht laden/);
+  assert.doesNotMatch(html, /Sobald du zwei Blüten/);
+});
+
+test("ladeLieblingshersteller: neueste Bewertungen zuerst; die Seite unterscheidet Fehler von „keiner“", () => {
+  const q = readFileSync("lib/query/lieblingshersteller.ts", "utf8");
+  assert.match(q, /orderBy: \{ erstelltAm: "desc" \}/);
+  const seite = readFileSync("app/[lang]/profil/page.tsx", "utf8");
+  assert.match(seite, /ladeLieblingshersteller\(mitglied\.mitgliedId\)\.catch\(\s*oderUndefined/);
+});

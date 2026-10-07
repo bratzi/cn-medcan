@@ -15,7 +15,7 @@ test("/profil: nur angemeldet, nicht im Index, rechnet nur bei veraltetem Stand"
   assert.match(q, /index: false/);
   assert.match(q, /aktuellesProfil\(/);
   const query = readFileSync("lib/query/profil.ts", "utf8");
-  assert.match(query, /profilVeraltet\(/);
+  assert.match(query, /profilNeuRechnen\(/);
   assert.match(query, /await profilFortschreiben\(/);
 });
 

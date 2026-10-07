@@ -18,7 +18,7 @@ import {
   profilAnzeige,
   profilAusDaten,
   profilDaten,
-  profilVeraltet,
+  profilNeuRechnen,
 } from "@/lib/profil";
 import type { AuswertungsZeile, ProfilWerte, VerlaufSchritt } from "@/lib/profil-typen";
 import { profilVerlauf, verlaufAusDaten, verlaufDaten } from "@/lib/profil-verlauf";
@@ -110,14 +110,14 @@ export async function ladeProfil(
 
 /**
  * Stand für /profil (Spec Profil 4.4): der gespeicherte, außer er fehlt oder ist
- * älter als 24 h. Dann einmal neu rechnen, damit neue Community-Werte ankommen.
+ * älter als 24 h oder sein Verlauf fehlt (Altprofil). Dann einmal neu rechnen, damit neue Community-Werte ankommen.
  * Scheitert das, gilt der alte Stand (oder keiner); der Fehler wird geloggt.
  */
 export async function aktuellesProfil(
   mitgliedId: string,
 ): Promise<{ werte: ProfilWerte; berechnetAm: Date; verlauf: VerlaufSchritt[] } | null> {
   const gespeichert = await ladeProfil(mitgliedId);
-  if (!profilVeraltet(gespeichert?.berechnetAm, Date.now())) return gespeichert;
+  if (!profilNeuRechnen(gespeichert, Date.now())) return gespeichert;
   try {
     await profilFortschreiben(mitgliedId);
     return await ladeProfil(mitgliedId);

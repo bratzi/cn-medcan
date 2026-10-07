@@ -4,10 +4,12 @@ import { t } from "@/lib/i18n/text";
 import type { Woerterbuch } from "@/lib/i18n/typen";
 import type { Lieblingshersteller as Daten } from "@/lib/profil-typen";
 
-type Props = { daten: Daten | null; texte: Woerterbuch["profil"]; sprache: Sprache };
+/** `undefined`: die Abfrage ist gescheitert; `null`: es gibt (noch) keinen Liebling. */
+type Props = { daten: Daten | null | undefined; texte: Woerterbuch["profil"]; sprache: Sprache };
 
 /** Lieblingshersteller (Spec Profil 10), privat. Kein Kauf- oder Apothekenlink (HWG). */
 export function Lieblingshersteller({ daten, texte, sprache }: Props) {
+  if (daten === undefined) return <p className="max-w-[68ch] text-body text-text text-pretty">{texte.herstellerFehler}</p>;
   if (!daten) return <p className="max-w-[68ch] text-body text-text-muted text-pretty">{texte.herstellerLeer}</p>;
   return (
     <p className="max-w-[68ch] text-body text-text text-pretty">

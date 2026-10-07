@@ -7,7 +7,9 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { MiniNetz } from "@/components/review/MiniNetz";
 import { GESCHMACKS_KATEGORIEN } from "@/db/enums";
 import { de } from "@/lib/i18n/de";
+import { en } from "@/lib/i18n/en";
 import { ausklingen, startFortschritt, zwischenGeschmack } from "@/lib/netz-animation";
+import { netzGeformt } from "@/lib/profil";
 import type { Geschmack } from "@/lib/profil-typen";
 
 const g = (teil: Partial<Geschmack> = {}): Geschmack =>
@@ -32,8 +34,8 @@ test("startFortschritt: reduzierte Bewegung zeigt sofort den neuen Stand", () =>
   assert.equal(startFortschritt(false), 0);
 });
 
-const mini = (vorher: Geschmack | null, nachher: Geschmack) =>
-  renderToStaticMarkup(createElement(MiniNetz, { vorher, nachher, texte: de.bewerten, achsen: de.label.geschmack }));
+const mini = (vorher: Geschmack | null, nachher: Geschmack, geformt = false) =>
+  renderToStaticMarkup(createElement(MiniNetz, { vorher, nachher, geformt, texte: de.bewerten, achsen: de.label.geschmack }));
 
 test("MiniNetz: Kontur vorher, Änderung als Text, Link ins Profil", () => {
   const html = mini(g({ FRUCHTIG: 0.4 }), g({ FRUCHTIG: 1, ERDIG: -0.5 }));
@@ -63,4 +65,47 @@ test("BewertungsFormular zeigt das Mini-Netz nach Erfolg und setzt es beim neuen
   assert.match(q, /setNetz\(null\)/);
   assert.match(q, /setNetz\(ergebnis\.netz\)/);
   assert.match(q, /<MiniNetz/);
+});
+
+test("netzGeformt: nur deutliche Noten (ab 3,5 oder bis 2) formen das Netz", () => {
+  for (const n of [5, 4, 3.5, 2, 1.5, 1]) assert.equal(netzGeformt(n), true, String(n));
+  for (const n of [3.4, 3, 2.5, 2.1, null]) assert.equal(netzGeformt(n), false, String(n));
+});
+
+test("MiniNetz: deutliche Note ohne sichtbare Änderung bestätigt das Netz, Mittelfeld formt es nicht", () => {
+  const gleich = g({ SUESS: 1 });
+  const geformt = mini(gleich, gleich, true);
+  assert.match(geformt, /Dein Netz bestätigt sich: kaum Veränderung\./);
+  assert.doesNotMatch(geformt, /nur Noten ab 3,5/);
+  const mittel = mini(gleich, gleich, false);
+  assert.match(mittel, /nur Noten ab 3,5 oder bis 2 formen es/);
+  assert.doesNotMatch(mittel, /bestätigt sich/);
+  assert.ok(en.bewerten.miniNetzBestaetigt.length > 0);
+});
+
+test("bewertungSpeichern gibt mit, ob die Note das Netz geformt hat", () => {
+  const q = readFileSync("app/[lang]/blueten/[slug]/aktionen.ts", "utf8");
+  assert.match(q, /geformt: netzGeformt\(/);
+  assert.match(readFileSync("components/review/BewertungsFormular.tsx", "utf8"), /geformt=\{netz\.geformt\}/);
+});
+
+test("MiniNetz: Strichlinie hat einen Legendeneintrag, der Satz wird höflich angesagt", () => {
+  const html = mini(null, g({ SUESS: -1 }));
+  assert.match(html, /stroke-dasharray="4 4"/);
+  assert.match(html, /mag ich nicht/);
+  assert.match(html, /aria-live="polite"/);
+});
+
+test("MiniNetz: Link über einzelLinkKlassen, bei reduzierter Bewegung kein Frame mit dem alten Stand", () => {
+  const q = readFileSync("components/review/MiniNetz.tsx", "utf8");
+  assert.match(q, /className=\{einzelLinkKlassen\(\)\}/);
+  assert.doesNotMatch(q, /underline-offset-4/);
+  assert.match(q, /useState\(\(\) =>/);
+  assert.doesNotMatch(q, /useState\(0\)/);
+});
+
+test("bewertungSpeichern: Logzeile nennt Profil und Mini-Netz", () => {
+  const q = readFileSync("app/[lang]/blueten/[slug]/aktionen.ts", "utf8");
+  assert.match(q, /ladeProfil \(Mini-Netz\) fehlgeschlagen/);
+  assert.doesNotMatch(q, /"profilFortschreiben fehlgeschlagen"/);
 });
