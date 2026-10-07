@@ -87,17 +87,28 @@ test("Terpen-Band: Ruhezustand nur Icon und Name, Infos erscheinen beim Überfah
   // Kein aufklappender Tooltip: die Infos sind sichtbarer Inhalt.
   assert.doesNotMatch(band, /role="tooltip"/);
   assert.doesNotMatch(band, /aria-describedby/);
-  // Das Band ist die Gruppe, über die die Infos erscheinen.
-  assert.match(band, /group\/band/);
-  // Name größer als body und im Buch-Display.
-  assert.match(band, /font-buch[^"]*text-h2|text-h2[^"]*font-buch/);
-  // Infos in Ruhe unsichtbar, beim Überfahren und bei Tastaturfokus sichtbar.
-  assert.match(band, /opacity-0[^"]*group-hover\/band:opacity-100/);
-  assert.match(band, /group-focus-within\/band:opacity-100/);
+  // Der Eintrag ist die Gruppe, über die seine Infos erscheinen, nicht das Band (Nutzer 2026-10-07).
+  assert.match(band, /group\/eintrag/);
+  assert.doesNotMatch(band, /group\/band|group-hover\/band|group-focus-within\/band/);
+  // Name kleiner (body statt h2), im Buch-Display, gedämpft und beim Überfahren voll.
+  assert.match(band, /font-buch[^"]*text-body|text-body[^"]*font-buch/);
+  assert.doesNotMatch(band, /text-h2/);
+  assert.match(band, /text-text-muted[^"]*group-hover\/eintrag:text-text/);
+  // Infos in Ruhe unsichtbar, beim Überfahren des Eintrags und bei Tastaturfokus sichtbar.
+  assert.match(band, /opacity-0[^"]*group-hover\/eintrag:opacity-100/);
+  assert.match(band, /group-focus-within\/eintrag:opacity-100/);
+  // Senkrecht zentrierter Aufbau, Marke 56 px mit 32-px-Icon (mobil 44 und 24 px).
+  assert.match(band, /flex-col items-center/);
+  assert.match(band, /sm:size-14/);
+  assert.match(band, /size-6 sm:size-8/);
+  // Icon, Tönung und Ring in der Leitnotenfarbe (nie ein Verlauf als Textfarbe), Icon zum Textton abgemischt.
+  assert.match(band, /LINIEN_FARBE/);
+  assert.match(band, /--terpen-farbe/);
+  assert.match(band, /text-\[color-mix\(in_oklab,var\(--terpen-farbe\)_\d+%,var\(--color-text\)\)\]/);
   // Nur Web: mobil bleibt das schmale Icon-Band.
   assert.match(band, /max-sm:hidden/);
   // Die Breite eines Eintrags ist fix, sonst ruckt der Lauf und --band-kachel stimmt nicht.
-  assert.match(band, /w-64/);
+  assert.match(band, /sm:w-40/);
 });
 
 test("Terpen-Band hält beim Überfahren und bei Fokus an: Pause trägt denselben Selektorkopf wie der Lauf (Nutzer 2026-10-06)", () => {
@@ -118,13 +129,13 @@ test("Terpen-Band: Fallback schneidet nichts ab, Höhe, Infos unter dem Namen un
   assert.doesNotMatch(band, /overflow-clip/);
   assert.doesNotMatch(band, /translate-y-/);
   // Name und Icon in einer 44-px-Zeile, Infos als eigene Klasse, die nur im Laufmodus absolut steht.
-  assert.match(band, /min-h-11[^"]*font-buch/);
+  assert.match(band, /min-h-10[^"]*font-buch/);
   assert.match(band, /terpen-band-info/);
   assert.doesNotMatch(band, /\babsolute\b/);
   const lauf = ":root:not([data-sparmodus]) .terpen-band:has(> .terpen-band-spur > [aria-hidden]:not(:empty))";
   assert.match(css, new RegExp(`${lauf.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")} \\{\\s*height: 12rem;`));
   assert.match(css, /\.terpen-band-info \{\s*position: absolute;/);
-  assert.match(css, /:is\(:hover, :focus-within\) \.terpen-band-eintrag \{\s*translate: 0 -3rem;/);
+  assert.match(css, /\.terpen-band-eintrag:is\(:hover, :focus-within\) \{\s*translate: 0 -2\.5rem;/);
 });
 
 test("Terpen-Band-CSS: kein :has() innerhalb eines :has(), der Browser verwirft die Regel sonst (Befund 2026-10-07)", () => {

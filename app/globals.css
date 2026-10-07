@@ -1956,15 +1956,18 @@ html.joint-cursor :is(input:not([type="range"]):not([type="radio"]):not([type="c
       position: absolute;
       inset-inline: 0;
       top: 100%;
-      margin-top: 0.5rem;
+      margin-top: 0.25rem;
     }
 
     :root:not([data-sparmodus]) .terpen-band:has(> .terpen-band-spur > [aria-hidden]:not(:empty)) .terpen-band-eintrag {
       translate: 0 0;
     }
 
-    :root:not([data-sparmodus]) .terpen-band:has(> .terpen-band-spur > [aria-hidden]:not(:empty)):is(:hover, :focus-within) .terpen-band-eintrag {
-      translate: 0 -3rem;
+    /* Nur der Eintrag unter dem Zeiger rückt hoch (Nutzer 2026-10-07). Maße: Marke 56 + 4 +
+       Name 40 + 4 + Infos 76 = 180 px; ruhend sitzt der Eintrag (100 px) mittig bei 46 px,
+       um 2.5rem (40 px) hochgerückt füllt er 6 bis 186 px der 192 px. */
+    :root:not([data-sparmodus]) .terpen-band:has(> .terpen-band-spur > [aria-hidden]:not(:empty)) .terpen-band-eintrag:is(:hover, :focus-within) {
+      translate: 0 -2.5rem;
     }
   }
 

@@ -86,7 +86,7 @@ export function TerpenBandKopie() {
     <ul
       ref={ref}
       aria-hidden="true"
-      className="terpen-band-liste flex shrink-0 items-center gap-8 pr-8 sm:gap-16 sm:pr-16"
+      className="terpen-band-liste flex shrink-0 items-start gap-8 pr-8 sm:gap-12 sm:pr-12"
     />
   );
 }
