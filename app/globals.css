@@ -937,6 +937,46 @@ html.joint-cursor :is(input:not([type="range"]):not([type="radio"]):not([type="c
   background: var(--color-kopierstift);
 }
 
+/* Logo als Glas (Nutzer 2026-10-07), nur im Auftakt: dieselben Zutaten wie
+   .glas-maske, aber an der Buchstabenform. Tönung 160 Grad von kräftig nach
+   leicht, darüber der Glanz von oben links. Lichtkante und Schimmer sind eigene
+   Masken (public/marke/pinsel-licht.webp, -schatten.webp), weil Box-Schatten nur
+   den Rahmen kennen. Der farbige Schein folgt der Form per drop-shadow. */
+.marke-glas {
+  filter: drop-shadow(0 12px 32px color-mix(in oklab, var(--color-accent) 28%, transparent));
+}
+
+.marke-glas::before {
+  background:
+    linear-gradient(125deg, color-mix(in oklab, white 38%, transparent) 0%, transparent 32%),
+    linear-gradient(160deg, color-mix(in oklab, var(--color-accent) 72%, transparent), color-mix(in oklab, var(--color-accent) 34%, transparent) 70%);
+}
+
+.marke-glas::after {
+  background:
+    linear-gradient(125deg, color-mix(in oklab, white 38%, transparent) 0%, transparent 32%),
+    linear-gradient(160deg, color-mix(in oklab, var(--color-kopierstift) 76%, transparent), color-mix(in oklab, var(--color-kopierstift) 38%, transparent) 70%);
+}
+
+.marke-glas > span {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  -webkit-mask: var(--marke-maske) center / contain no-repeat;
+  mask: var(--marke-maske) center / contain no-repeat;
+}
+
+.marke-glas-licht {
+  --marke-maske: url("/marke/pinsel-licht.webp");
+  background: color-mix(in oklab, white 80%, transparent);
+}
+
+.marke-glas-schatten {
+  --marke-maske: url("/marke/pinsel-schatten.webp");
+  background: color-mix(in oklab, black 45%, transparent);
+}
+
 /* Konturen hinter der Wortmarke im Auftakt (Auftakt.tsx): dieselbe Schrift,
    nur als Umriss, in Grün- und Violetttönen, leicht versetzt. Günstig: kein 3D,
    keine Form-Animation, nur transform auf je einer Ebene; der Zeiger verschiebt

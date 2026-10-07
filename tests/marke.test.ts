@@ -79,6 +79,18 @@ test("Logo: Pinselschrift aus zwei Masken, Farben aus Tokens, ein Bild mit Namen
   assert.match(lies("components/layout/Kopf.tsx"), /<Logo className="w-18" \/>/);
 });
 
+test("Logo als Glas: Lichtkante und Schimmer folgen der Form, stumm für Screenreader; Kopf bleibt flach", () => {
+  const html = renderToStaticMarkup(createElement(Logo, { glas: true, className: "w-10" }));
+  assert.match(html, /^<span role="img" aria-label="Book of Terpz" class="marke-pinsel marke-glas w-10">/);
+  assert.equal(html.match(/aria-hidden="true"/g)?.length, 2);
+  assert.match(html, /class="marke-glas-schatten"/);
+  assert.match(html, /class="marke-glas-licht"/);
+  assert.match(css, /\.marke-glas-licht\s*\{[^}]*pinsel-licht\.webp/);
+  assert.match(css, /\.marke-glas-schatten\s*\{[^}]*pinsel-schatten\.webp/);
+  for (const datei of ["public/marke/pinsel-licht.webp", "public/marke/pinsel-schatten.webp"]) assert.ok(statSync(datei).size > 0, datei);
+  assert.doesNotMatch(lies("components/layout/Kopf.tsx"), /<Logo glas/);
+});
+
 test("Wortmarke als Umschlag: zwei Zeilen, ein zugänglicher Name", () => {
   const html = renderToStaticMarkup(createElement(Wortmarke, { groesse: "umschlag" }));
   assert.equal(html.match(/data-marke-zeile=""/g)?.length, 2);
@@ -101,9 +113,9 @@ test("Unterzeile: gedruckt, natürliche Schreibung, Versalien per CSS", () => {
   assert.doesNotMatch(html, /font-hand/);
 });
 
-test("Auftakt: die h1 ist das Logo, schreibt sich, nie per Einstieg versteckt", () => {
+test("Auftakt: die h1 ist das Logo als Glas, schreibt sich, nie per Einstieg versteckt", () => {
   const quelle = lies("components/story/Auftakt.tsx");
-  const h1 = /<h1[^>]*>\s*<Logo data-marke-zeile="" className="[^"]+" \/>\s*<\/h1>/.exec(quelle)?.[0];
+  const h1 = /<h1[^>]*>\s*<Logo glas data-marke-zeile="" className="[^"]+" \/>\s*<\/h1>/.exec(quelle)?.[0];
   assert.ok(h1, "die h1 enthält nicht genau das Logo");
   assert.match(h1, /className="auftakt-marke /);
   assert.doesNotMatch(h1, /data-story-einstieg/);
