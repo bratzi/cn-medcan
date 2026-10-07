@@ -160,7 +160,7 @@ export function BuchDoppelseite({ eintrag, ueberschrift: Ueberschrift, w, sprach
             </p>
           </div>
           {eintrag.istBetreiber ? null : (
-            <p data-eintritt="schreiben" style={ablauf(1)} className="font-hand text-vermerk text-kopierstift max-sm:basis-full sm:ml-auto">
+            <p data-eintritt="schreiben" style={ablauf(1)} className="font-hand text-vermerk text-accent max-sm:basis-full sm:ml-auto">
               {w.buch.vonEuch}
             </p>
           )}

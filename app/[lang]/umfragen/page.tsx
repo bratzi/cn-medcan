@@ -32,7 +32,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 /** Handschrift-Überschrift: kurz, Imperativ, in Kopierstift (Spec TP3 10). */
-const HAND_TITEL = "font-hand text-notiz text-kopierstift";
+const HAND_TITEL = "font-hand text-notiz text-accent";
 
 function RundenZeile({ runde, w, sprache }: { runde: UmfrageUebersicht; w: Woerterbuch; sprache: Sprache }) {
   return (

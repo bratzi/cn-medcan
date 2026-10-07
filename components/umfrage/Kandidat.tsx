@@ -11,7 +11,7 @@ import type { Woerterbuch } from "@/lib/i18n/typen";
 import { mehrzahl } from "@/lib/i18n/text";
 
 /** Handschrift am Stimmzettel: die Mindestgröße 32 px (Spec TP3 4 und 8.6). */
-const VERMERK = "font-hand text-vermerk text-kopierstift";
+const VERMERK = "font-hand text-vermerk text-accent";
 
 export type KandidatProps = {
   option: UmfrageOptionAnsicht;

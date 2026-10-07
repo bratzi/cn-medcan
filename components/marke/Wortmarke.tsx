@@ -1,48 +1,7 @@
 import { cn } from "@/lib/cn";
 
-type Props = {
-  groesse: "umschlag" | "plakat";
-  /** Nur umschlag: "Book of Terpz" in einer Zeile (Fuß) statt in zwei (Auftakt). */
-  einzeilig?: boolean;
-  className?: string;
-};
-
 /**
- * Die Marke "Book of Terpz" (Spec TP3 6): handschriftlich in Inspiration,
- * immer in Kopierstift-Violett. Der Name ist echter Text, kein Bild; wo er
- * nur Bild ist (Fuß), setzt der Aufrufer aria-hidden.
- *
- * Im Kopf steht seit 2026-09-26 das Logo (components/marke/Logo.tsx).
- * umschlag: text-umschlag, zweizeilig im Auftakt (dort als h1), einzeilig
- *           im Fuß. Das Leerzeichen zwischen den Zeilen hält den
- *           zugänglichen Namen "Book of Terpz" zusammen. An
- *           `data-marke-zeile` hängt der geschriebene Einstieg (globals.css).
- * plakat:   einzeilig in text-plakat, als h1 im Auftakt von Rand zu Rand
- *           (Spec Redesign 7); schreibt sich wie der Umschlag.
- */
-export function Wortmarke({ groesse, einzeilig = false, className }: Props) {
-  const signatur = groesse === "plakat";
-  const zeile = einzeilig || signatur ? "inline-block" : "block";
-  return (
-    <span
-      className={cn(
-        signatur ? "block font-hand text-plakat text-kopierstift" : "block font-hand text-umschlag text-kopierstift",
-        (einzeilig || signatur) && "whitespace-nowrap",
-        className,
-      )}
-    >
-      <span data-marke-zeile="" className={zeile}>
-        Book of
-      </span>{" "}
-      <span data-marke-zeile="" className={zeile}>
-        Terpz
-      </span>
-    </span>
-  );
-}
-
-/**
- * Die Unterzeile der Wortmarke (Spec TP3 6): gedruckt in Newsreader 500,
+ * Die Unterzeile unter dem Logo (Spec TP3 6): gedruckt in Newsreader 500,
  * gespeichert in natürlicher Schreibung, Versalien und Laufweite per CSS.
  */
 export function Unterzeile({ className }: { className?: string }) {

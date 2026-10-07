@@ -4,7 +4,6 @@ type Props = {
   className?: string;
   /** Halb durchsichtige Tönung, damit der Film durchscheint (Nutzer 2026-10-07); nur im Auftakt. */
   durchsichtig?: boolean;
-  "data-marke-zeile"?: string;
 };
 
 /**
@@ -18,13 +17,12 @@ type Props = {
  * Die Breite setzt der Aufrufer; die Höhe folgt dem Seitenverhältnis. Für
  * Screenreader ist es ein Bild mit dem Namen "Book of Terpz".
  */
-export function Logo({ className, durchsichtig = false, ...rest }: Props) {
+export function Logo({ className, durchsichtig = false }: Props) {
   return (
     <span
       role="img"
       aria-label="Book of Terpz"
       className={cn("marke-pinsel", durchsichtig && "marke-durchsichtig", className)}
-      {...rest}
     />
   );
 }

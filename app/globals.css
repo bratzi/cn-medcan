@@ -12,7 +12,7 @@
   --font-sans: var(--font-newsreader), Georgia, "Times New Roman", serif;
   --font-mono: var(--font-newsreader), Georgia, "Times New Roman", serif;
   --font-buch: var(--font-newsreader), Georgia, "Times New Roman", serif;
-  --font-hand: var(--font-inspiration), "Segoe Script", cursive;
+  --font-hand: var(--font-pinsel), "Segoe Script", cursive;
 
   /* ---- Spacing: Basis 4px, nur gerade Stufen (8px-Raster) -------------- */
   --spacing: 4px;
@@ -338,7 +338,7 @@
   /* Medien je Thema (Hero hell/dunkel): das verborgene Video schneidet nie
      den Viewport, loops.ts startet es also nicht. */
   /* Sparmodus (T2): Endlosschleifen stehen, Einblendungen laufen zu Ende. */
-  :root[data-sparmodus] :is(.glanz-wort, .auftakt-marke [data-marke-zeile], .blob-morph, .blob-linie, .bild-zoom,
+  :root[data-sparmodus] :is(.glanz-wort, .auftakt-marke .marke-pinsel, .blob-morph, .blob-linie, .bild-zoom,
       .bild-wechsel > *, .bild-schweben > *, .marke-kontur > span, .fazit-puls, .marke-puls, .glas-maske,
       .delta-puls, .bogen-fluss, .bogen-voll, .delta-funke) {
     animation-play-state: paused !important;
@@ -472,12 +472,8 @@
 
 @media (prefers-reduced-motion: no-preference) {
   /* Langsamer und später (Nutzer 2026-09-25: war fertig, bevor man es sah). */
-  .auftakt-marke [data-marke-zeile] {
+  .auftakt-marke .marke-pinsel {
     animation: schreiben 1.6s var(--ease-standard) 0.6s backwards;
-  }
-
-  .auftakt-marke [data-marke-zeile] + [data-marke-zeile] {
-    animation-delay: 2s;
   }
 
   .auftakt-unterzeile {
@@ -520,18 +516,8 @@
    einer Überschrift. Beide Enden tragen >= 4.5 auf surface, der Verlauf also
    auch. Ohne background-clip-Unterstützung bleibt die Farbe accent. */
 .farbverlauf {
+  /* Seit 2026-10-07 (Nutzer) einfarbig wie das Logo: Blattgrün, kein Verlauf mehr. */
   color: var(--color-accent);
-  background-image: linear-gradient(90deg, var(--color-accent), var(--color-kopierstift) 55%, var(--color-accent));
-  background-clip: text;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  /* Schreibschrift-Schwünge ragen über die Zeichenbox hinaus; der Verlauf wird
-     nur innerhalb der Box gemalt. Mehr Malfläche, per negativem Rand
-     ausgeglichen, damit sich das Layout nicht verschiebt. */
-  padding: 0.2em 0.3em 0.25em 0.25em;
-  margin: -0.2em -0.3em -0.25em -0.25em;
-  -webkit-box-decoration-break: clone;
-  box-decoration-break: clone;
 }
 
 /* Sweet Spot in der Mitte (Bewertung v2, T4): Qualität der Charge. Wie die
@@ -558,33 +544,6 @@
   letter-spacing: 0;
 }
 
-/* Wortmarke im Auftakt: Verlauf wie die Buzzwords, dazu ein Glanzstreifen,
-   der beim Hover einmal über den Schriftzug zieht. Je Zeile geclippt, damit
-   der geschriebene Einstieg (schreiben) weiter greift. */
-.auftakt-marke [data-marke-zeile] {
-  background-image:
-    linear-gradient(
-      105deg,
-      transparent 35%,
-      color-mix(in oklab, white 75%, transparent) 50%,
-      transparent 65%
-    ),
-    linear-gradient(90deg, var(--color-accent), var(--color-kopierstift) 55%, var(--color-accent));
-  background-size: 250% 100%, 100% 100%;
-  background-position: 130% 0, 0 0;
-  background-repeat: no-repeat;
-  background-clip: text;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  /* Schreibschrift-Schwünge ragen über die Zeichenbox hinaus; der Verlauf wird
-     nur innerhalb der Box gemalt. Mehr Malfläche, per negativem Rand
-     ausgeglichen, damit sich das Layout nicht verschiebt. */
-  padding: 0.2em 0.3em 0.25em 0.25em;
-  margin: -0.2em -0.3em -0.25em -0.25em;
-  -webkit-box-decoration-break: clone;
-  box-decoration-break: clone;
-}
-
 /* Derselbe Glanz für die übergroßen Schlusswörter (UeberlaufWort, Nutzer 2026-09-26). */
 .glanz-wort {
   display: inline-block;
@@ -595,7 +554,7 @@
       color-mix(in oklab, white 75%, transparent) 50%,
       transparent 65%
     ),
-    linear-gradient(90deg, var(--color-accent), var(--color-kopierstift) 55%, var(--color-accent));
+    linear-gradient(var(--color-accent), var(--color-accent));
   background-size: 250% 100%, 100% 100%;
   background-position: 130% 0, 0 0;
   background-repeat: no-repeat;
@@ -609,21 +568,6 @@
 @media (prefers-reduced-motion: no-preference) {
   .glanz-wort {
     animation: marke-glanz 3.5s var(--ease-standard) 2s infinite;
-  }
-}
-
-/* Glanz läuft von selbst: alle 3,5 s einmal von links nach rechts, dann Ruhe.
-   Die zweite Zeile folgt knapp versetzt. */
-@media (prefers-reduced-motion: no-preference) {
-  /* Zusammen mit dem geschriebenen Einstieg (schreiben), sonst überschriebe der Glanz ihn. */
-  .auftakt-marke [data-marke-zeile] {
-    animation:
-      schreiben 0.8s var(--ease-standard) 0.1s backwards,
-      marke-glanz 3.5s var(--ease-standard) 2s infinite;
-  }
-
-  .auftakt-marke [data-marke-zeile] + [data-marke-zeile] {
-    animation-delay: 0.8s, 2.12s;
   }
 }
 
@@ -1158,14 +1102,6 @@ html.joint-cursor :is(input:not([type="range"]):not([type="radio"]):not([type="c
 }
 
 /* Wortmarke im Fuß: derselbe Verlauf wie im Auftakt, blass. */
-.fuss-marke [data-marke-zeile] {
-  background-image: linear-gradient(90deg, var(--color-accent), var(--color-kopierstift) 55%, var(--color-accent));
-  background-clip: text;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  padding: 0.2em 0.3em 0.25em 0.25em;
-  margin: -0.2em -0.3em -0.25em -0.25em;
-}
 
 /* Schalterleiste unten rechts (components/layout/SchalterLeiste.tsx, T2): senkrecht,
    zurückgenommen bis Hover oder Fokus. Sichtbar 2 rem, Trefferfläche 44 px. */

@@ -7,7 +7,7 @@ import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 
 import { Logo } from "@/components/marke/Logo";
-import { Unterzeile, Wortmarke } from "@/components/marke/Wortmarke";
+import { Unterzeile } from "@/components/marke/Wortmarke";
 
 const lies = (datei: string) => readFileSync(join(process.cwd(), datei), "utf8");
 const css = lies("app/globals.css");
@@ -51,16 +51,22 @@ test("Handschrift-Grade nie unter 32 px (Spec TP3 4)", () => {
   assert.equal(token("vermerk"), "2rem");
 });
 
-test("Handschrift: Inspiration mit Rückfall, nur 400, keine synthetischen Schnitte", () => {
-  assert.match(css, /--font-hand:\s*var\(--font-inspiration\),[^;]*cursive;/);
+test("Handschrift: Pinselschrift Mr Dafoe mit Rückfall, nur 400, keine synthetischen Schnitte (Nutzer 2026-10-07)", () => {
+  assert.match(css, /--font-hand:\s*var\(--font-pinsel\),[^;]*cursive;/);
   for (const name of HAND_GRADE) {
-    assert.match(css, new RegExp(`--text-${name}--font-weight:\\s*400;`), name);
+    assert.match(css, new RegExp(String.raw`--text-${name}--font-weight:\s*400;`), name);
   }
   assert.match(css, /\.font-hand\s*\{[^}]*font-synthesis:\s*none/);
-  assert.match(
-    lies("app/[lang]/layout.tsx"),
-    /Inspiration\(\{[\s\S]*?variable: "--font-inspiration"[\s\S]*?weight: "400"[\s\S]*?adjustFontFallback: true/,
-  );
+  const layout = lies("app/[lang]/layout.tsx");
+  assert.match(layout, /Mr_Dafoe\(\{[\s\S]*?variable: "--font-pinsel"[\s\S]*?weight: "400"[\s\S]*?adjustFontFallback: true/);
+  assert.doesNotMatch(layout, /Inspiration/);
+});
+
+test("Handschrift wie das Logo: Blattgrün, keine Verläufe Grün-Lila mehr", () => {
+  assert.match(css, /\.farbverlauf\s*\{[^}]*color:\s*var\(--color-accent\);[^}]*\}/);
+  assert.doesNotMatch(/\.farbverlauf\s*\{[^}]*\}/.exec(css)?.[0] ?? "", /gradient/);
+  // Der Schriftverlauf Grün-Lila-Grün (55 %) ist weg; Linien und Balken dürfen weiter verlaufen.
+  assert.doesNotMatch(css, /var\(--color-kopierstift\) 55%, var\(--color-accent\)/);
 });
 
 const ohneTags = (html: string) => html.replace(/<[^>]+>/g, "");
@@ -88,19 +94,6 @@ test("Logo durchsichtig: nur Tönung, kein Glaseffekt, kein zusätzliches Elemen
   assert.doesNotMatch(lies("components/layout/Kopf.tsx"), /<Logo durchsichtig/);
 });
 
-test("Wortmarke als Umschlag: zwei Zeilen, ein zugänglicher Name", () => {
-  const html = renderToStaticMarkup(createElement(Wortmarke, { groesse: "umschlag" }));
-  assert.equal(html.match(/data-marke-zeile=""/g)?.length, 2);
-  assert.match(html, /\btext-umschlag\b/);
-  assert.equal(ohneTags(html), "Book of Terpz");
-});
-
-test("Wortmarke einzeilig (Fuß): bricht nicht um", () => {
-  const html = renderToStaticMarkup(createElement(Wortmarke, { groesse: "umschlag", einzeilig: true }));
-  assert.match(html, /\bwhitespace-nowrap\b/);
-  assert.equal(html.match(/class="inline-block"/g)?.length, 2);
-});
-
 test("Unterzeile: gedruckt, natürliche Schreibung, Versalien per CSS", () => {
   const html = renderToStaticMarkup(createElement(Unterzeile));
   assert.match(html, /^<p /);
@@ -112,7 +105,7 @@ test("Unterzeile: gedruckt, natürliche Schreibung, Versalien per CSS", () => {
 
 test("Auftakt: die h1 ist das Logo, durchsichtig, schreibt sich, nie per Einstieg versteckt", () => {
   const quelle = lies("components/story/Auftakt.tsx");
-  const h1 = /<h1[^>]*>\s*<Logo durchsichtig data-marke-zeile="" className="[^"]+" \/>\s*<\/h1>/.exec(quelle)?.[0];
+  const h1 = /<h1[^>]*>\s*<Logo durchsichtig className="[^"]+" \/>\s*<\/h1>/.exec(quelle)?.[0];
   assert.ok(h1, "die h1 enthält nicht genau das Logo");
   assert.match(h1, /className="auftakt-marke /);
   assert.doesNotMatch(h1, /data-story-einstieg/);
@@ -120,22 +113,14 @@ test("Auftakt: die h1 ist das Logo, durchsichtig, schreibt sich, nie per Einstie
   assert.doesNotMatch(quelle, /text-accent|groesse="buehne"|<Wortmarke/);
 });
 
-test("Wortmarke als Plakat: einzeilig, Plakat-Grad, schreibt sich", () => {
-  const html = renderToStaticMarkup(createElement(Wortmarke, { groesse: "plakat" }));
-  assert.equal(html.match(/data-marke-zeile=""/g)?.length, 2);
-  assert.match(html, /\btext-plakat\b/);
-  assert.match(html, /\bwhitespace-nowrap\b/);
-  assert.equal(ohneTags(html), "Book of Terpz");
-});
-
-test("Fuß: die Wortmarke liegt im Fuß hinter dem Inhalt, kein Tag, kein zweiter Name", () => {
+test("Fuß: das Logo liegt im Fuß hinter dem Inhalt, kein Tag, kein zweiter Name", () => {
   const fuss = lies("components/layout/Fuss.tsx");
   assert.match(
     fuss,
-    /<span aria-hidden="true" data-story="fuss-marke" className="fuss-marke [^"]*absolute[^"]*-z-10[^"]*">\s*<Wortmarke groesse="plakat" \/>\s*<\/span>/,
+    /<span aria-hidden="true" data-story="fuss-marke" className="fuss-marke [^"]*absolute[^"]*-z-10[^"]*">\s*<Logo className="[^"]+" \/>\s*<\/span>/,
   );
-  assert.equal(fuss.match(/<Wortmarke /g)?.length, 1);
-  assert.doesNotMatch(fuss, /fuss-tag|font-wand|>\s*gb\s*</);
+  assert.equal(fuss.match(/<Logo /g)?.length, 1);
+  assert.doesNotMatch(fuss, /fuss-tag|font-wand|>\s*gb\s*<|<Wortmarke/);
   assert.match(css, /\.fuss-marke\s*\{[^}]*translate:\s*0 0\.08em/);
   assert.doesNotMatch(css, /\.fuss-tag/);
   assert.match(lies("components/story/bewegung/schluss.ts"), /data-story="fuss-marke"/);

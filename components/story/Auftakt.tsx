@@ -44,11 +44,11 @@ export async function Auftakt() {
           Unterzeile in derselben aufrechten Druckschrift wie das Storytelling,
           leicht und deutlich kleiner, damit die Handschrift allein führt. */}
       <div className="flex flex-[2] flex-col items-center justify-center gap-4 px-6 py-8 sm:gap-6 sm:px-8">
-        {/* Das Logo schreibt sich wie früher die Wortmarke (data-marke-zeile, globals.css)
+        {/* Das Logo schreibt sich wie früher die Wortmarke (.auftakt-marke .marke-pinsel, globals.css)
             und pulsiert wie das Community-Fazit (marke-puls). */}
         <div data-story="titel" className="relative flex justify-center">
           <h1 id="auftakt-titel" className="auftakt-marke marke-puls relative flex justify-center">
-            <Logo durchsichtig data-marke-zeile="" className="w-[min(40rem,82vw)]" />
+            <Logo durchsichtig className="w-[min(40rem,82vw)]" />
           </h1>
         </div>
         <p

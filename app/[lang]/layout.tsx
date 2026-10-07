@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inspiration, Newsreader } from "next/font/google";
+import { Mr_Dafoe, Newsreader } from "next/font/google";
 import { notFound } from "next/navigation";
 import { lang } from "next/root-params";
 import type { ReactNode } from "react";
@@ -16,7 +16,7 @@ import "../globals.css";
 /**
  * Eine von zwei Familien (Spec Redesign 11): Newsreader trägt alles Gedruckte,
  * von der Story bis zur Bedienung und den Zahlen. Variabel 200 bis 800 mit
- * optischer Größe, normal und kursiv. Die zweite Familie ist Inspiration.
+ * optischer Größe, normal und kursiv. Die zweite Familie ist die Pinselschrift Mr Dafoe.
  */
 const newsreader = Newsreader({
   variable: "--font-newsreader",
@@ -26,9 +26,9 @@ const newsreader = Newsreader({
   display: "swap",
 });
 
-/** Handschrift (Spec TP3 4): Wortmarke und Randnotizen. Ein Schnitt, eine Datei. */
-const inspiration = Inspiration({
-  variable: "--font-inspiration",
+/** Handschrift seit 2026-10-07 (Nutzer): Pinselschrift passend zum Logo. Ein Schnitt, eine Datei. */
+const pinsel = Mr_Dafoe({
+  variable: "--font-pinsel",
   subsets: ["latin"],
   weight: "400",
   display: "swap",
@@ -59,7 +59,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
       lang={sprache === "en" ? "en-GB" : "de"}
       data-theme={THEMA_STANDARD}
       suppressHydrationWarning
-      className={`${newsreader.variable} ${inspiration.variable} h-full antialiased`}
+      className={`${newsreader.variable} ${pinsel.variable} h-full antialiased`}
     >
       <head>
         <script dangerouslySetInnerHTML={{ __html: THEMA_SKRIPT }} />

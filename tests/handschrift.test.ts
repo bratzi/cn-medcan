@@ -27,7 +27,7 @@ test("Randnotiz mit Zahl: Zahl gedruckt, Wort von Hand, vorgelesen als ein Satz"
   );
   assert.match(
     html,
-    /<span aria-hidden="true" data-story="randnotiz" class="font-hand text-notiz text-kopierstift">Stimmen<\/span>/,
+    /<span aria-hidden="true" data-story="randnotiz" class="font-hand text-notiz text-accent">Stimmen<\/span>/,
   );
 });
 
@@ -35,7 +35,7 @@ test("Leitsatz: nur Handschrift, ohne Zahl, nichts versteckt", () => {
   const html = randspalte({ zahl: null, wort: "Schlag vor." });
   assert.match(
     html,
-    /<span data-story="randnotiz" class="inline-block font-hand text-notiz text-kopierstift">Schlag vor\.<\/span>/,
+    /<span data-story="randnotiz" class="inline-block font-hand text-notiz text-accent">Schlag vor\.<\/span>/,
   );
   assert.doesNotMatch(html, /aria-hidden|data-randzahl|sr-only/);
 });
@@ -108,7 +108,7 @@ function kandidat(teil: Partial<KandidatProps> = {}): string {
 
 test("Community-Platz: Vermerk „von euch“ von Hand, der Name gedruckt", () => {
   const html = kandidat();
-  assert.match(html, /<span data-story="vermerk" class="font-hand text-vermerk text-kopierstift">von euch<\/span>/);
+  assert.match(html, /<span data-story="vermerk" class="font-hand text-vermerk text-accent">von euch<\/span>/);
   assert.doesNotMatch(html, /class="stempel"/);
   const name = /<a [^>]*>Nebelharz 22 \(fiktiv\)<\/a>/.exec(html)?.[0] ?? "";
   assert.match(name, /\bfont-buch\b/);
@@ -125,7 +125,7 @@ test("Eigene Stimme: handgeschriebenes x vor dem Namen, nur als Bild, dazu das B
   const html = kandidat({ gewaehlt: true });
   assert.match(
     html,
-    /<span aria-hidden="true" data-story="vermerk" class="font-hand text-vermerk text-kopierstift">x<\/span><a /,
+    /<span aria-hidden="true" data-story="vermerk" class="font-hand text-vermerk text-accent">x<\/span><a /,
   );
   assert.match(html, /Deine Stimme/);
 });
@@ -148,7 +148,7 @@ test("Das x hängt an derselben Bedingung wie die Zähler: nie in der Vorschlags
 
 test("/umfragen: Community-Überschriften von Hand, ohne Nebel und ohne Drehung", () => {
   const quelle = lies("app/[lang]/umfragen/page.tsx");
-  assert.match(quelle, /const HAND_TITEL = "font-hand text-notiz text-kopierstift";/);
+  assert.match(quelle, /const HAND_TITEL = "font-hand text-notiz text-accent";/);
   assert.equal(quelle.match(/className=\{cn\(HAND_TITEL, "self-start max-md:self-center"\)\}/g)?.length, 2);
   assert.doesNotMatch(quelle, /Textur|font-wand|WAND_TITEL|rotate/);
 });

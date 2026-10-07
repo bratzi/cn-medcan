@@ -14,7 +14,7 @@ die Design-Skills geladen (Zuordnung in der Memory `design-skills-einsatz`).
 ## 1. Zwei Stimmen
 - **Zwei Familien, keine dritte** (Spec Redesign 11). **Gedruckt**: Newsreader (auch Bedienung und Zahlen), Papier und Tinte. Messwerte, Reviews,
   Katalogdaten, Handelsnamen, Rechtshinweise und Bedienung sind immer gedruckt.
-- **Von Hand** (Community und Wortmarke im Fuß): Inspiration (`font-hand`) in `kopierstift`. Nur, wo die Community
+- **Von Hand** (Community): seit 2026-10-07 (Nutzer) die Pinselschrift Mr Dafoe (`font-hand`) passend zum Logo, in `accent` wie das Logo; einzelne Wörter in `kopierstift` wie das „of“. Nur, wo die Community
   spricht (Stimmen, Vorschläge, Zähler, „Wähl mit.“, Vermerke am Stimmzettel, Überschriften auf
   `/umfragen`), und in der Wortmarke. Kurze Zeilen, höchstens etwa sechs Wörter, nie Absätze.
 - Form der Handschrift ist die Randnotiz: ab `lg` in einer Randspalte neben dem gedruckten Text,
@@ -51,7 +51,7 @@ Schleife).
 - Auftakt (Referenz choreograffiti): die h1 ist die Wortmarke in `text-plakat` von Rand zu Rand.
 - Jede Startseiten-Sektion trägt einen Buzz-Satz (höchstens drei Wörter) über `components/story/Schlagwort` in `text-kulisse`, `text-border`, aria-hidden; Sektion `relative isolate overflow-x-clip`.
 - Ausnahme seit 2026-09-25 (Nutzer): das Community-Fazit (Prozentzahl) steht in `font-hand` mit `.farbverlauf`, weil es die Stimme der Community ist; sonst bleiben Zahlen gedruckt.
-- Inspiration nur 400 (`.font-hand` setzt `font-synthesis: none`) und **nie unter 32 px**: `font-hand`
+- Mr Dafoe nur 400 (`.font-hand` setzt `font-synthesis: none`) und **nie unter 32 px**: `font-hand`
   steht immer zusammen mit einem der vier Handschrift-Grade in derselben Zeile (Test `tests/marke.test.ts`).
 - Handschrift ohne Versalien, ohne Laufweite, ohne Drehung, in natürlicher Schreibung.
 - Betonung im Druck über die Kursive derselben Familie.
@@ -67,7 +67,7 @@ Komponenten nutzen nur semantische Tokens:
 - `accent` (Blattgrün) ist der einzige Bedienakzent, **ohne Ausnahme**: Buttons, Links, aktive
   Zustände, Fokus. Genau eine gefüllte Primäraktion pro Ansicht. Hover über `accent-hover`, nicht über
   Deckkraft.
-- `kopierstift` für Handschrift, Wortmarke und seit Redesign 12 für `.farbverlauf` (je ein Schlüsselwort pro Überschrift, Grün, Lila, Grün) und die Buzz-Sätze (abwechselnd `ton="gruen"`/`"lila"`, `opacity-15`); nie auf Buttons, Links oder Fokus. Gemessen auf
+- `kopierstift` für das „of“ im Logo und als Akzentwort in der Handschrift; `.farbverlauf` (je ein Schlüsselwort pro Überschrift) ist seit 2026-10-07 einfarbig `accent`, ohne Verlauf; die Buzz-Sätze (abwechselnd `ton="gruen"`/`"lila"`, `opacity-15`); nie auf Buttons, Links oder Fokus. Gemessen auf
   `surface`, `surface-raised` und `surface-sunken` (jeweils ≥ 4.5 in beiden Modi).
 - Datengrafiken in `text`/`text-muted` (Linie plus Fläche mit geringer Deckkraft), nicht in `accent`.
   Ausnahme seit Spec Redesign 14: AromaKarte und SweetSpot nutzen `accent` (Hersteller) und `kopierstift` (Community) als Reihenfarben.

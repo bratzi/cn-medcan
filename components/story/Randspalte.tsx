@@ -17,7 +17,7 @@ export function Randspalte({ notizen, sprache }: { notizen: readonly Randnotiz[]
         if (notiz.zahl === null) {
           return (
             <li key={notiz.wort}>
-              <span data-story="randnotiz" className="inline-block font-hand text-notiz text-kopierstift">
+              <span data-story="randnotiz" className="inline-block font-hand text-notiz text-accent">
                 {notiz.wort}
               </span>
             </li>
@@ -30,7 +30,7 @@ export function Randspalte({ notizen, sprache }: { notizen: readonly Randnotiz[]
             <span aria-hidden="true" data-randzahl="" data-ziel={notiz.zahl} className="numeric text-display text-text">
               {zahl}
             </span>
-            <span aria-hidden="true" data-story="randnotiz" className="font-hand text-notiz text-kopierstift">
+            <span aria-hidden="true" data-story="randnotiz" className="font-hand text-notiz text-accent">
               {notiz.wort}
             </span>
           </li>

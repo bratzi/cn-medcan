@@ -1,6 +1,7 @@
 import Link from "next/link";
 
-import { Unterzeile, Wortmarke } from "@/components/marke/Wortmarke";
+import { Logo } from "@/components/marke/Logo";
+import { Unterzeile } from "@/components/marke/Wortmarke";
 import { MEDIEN, type MedienArt } from "@/lib/medien";
 import { HAUPTNAVIGATION, KONTO_LINK } from "@/lib/navigation";
 import { RECHTLICHE_LINKS } from "@/lib/rechtliches";
@@ -106,11 +107,11 @@ export function Fuss({ w }: { w: Woerterbuch }) {
         </div>
       </div>
 
-      {/* Die Wortmarke liegt IM Fuß hinter dem Inhalt (Spec Redesign 10), nicht
-          darunter: absolut am unteren Rand, angeschnitten, blass. Der Name steht
-          im Kopf, hier ist er Bild. */}
-      <span aria-hidden="true" data-story="fuss-marke" className="fuss-marke pointer-events-none absolute inset-x-0 bottom-0 -z-10 block select-none text-center text-plakat">
-        <Wortmarke groesse="plakat" />
+      {/* Das Logo liegt IM Fuß hinter dem Inhalt (Spec Redesign 10, seit 2026-10-07 das
+          Pinsel-Logo statt der Wortmarke): absolut am unteren Rand, angeschnitten,
+          blass. Der Name steht im Kopf, hier ist es nur Bild. */}
+      <span aria-hidden="true" data-story="fuss-marke" className="fuss-marke pointer-events-none absolute inset-x-0 bottom-0 -z-10 flex select-none justify-center text-plakat">
+        <Logo className="w-[min(56rem,94vw)]" />
       </span>
     </footer>
   );
