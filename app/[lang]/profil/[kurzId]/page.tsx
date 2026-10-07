@@ -21,7 +21,7 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const w = await holeWoerterbuch();
   const profil = istKurzId(kurzId) ? await ladeOeffentlichesProfil(kurzId).catch(() => null) : null;
   return {
-    title: profil ? t(w.profilOeffentlich.titel, { name: profil.anzeigename }) : w.profil.titel,
+    title: profil ? t(w.profilOeffentlich.titel, { name: profil.anzeigename }) : w.fehlerseite.nichtGefunden,
     robots: { index: false, follow: false },
   };
 }

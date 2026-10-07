@@ -70,7 +70,15 @@ Worktrees, Gesamtreview, Fixwelle). Migrationen **0018 und 0019 sind remote eing
 - Buch: Name verlinkt nur bei öffentlichem Profil (`autorProfilAus`), Link trägt das aria-label.
 - Kopfknopf „Mein Profil“ ist auf `/profil/<id>` nicht mehr aktiv. Datenschutz ergänzt (Stand 7.10.2026).
 
-**Nicht live geprüft (als Erstes):** Workers Build für `8f9244b` lief beim Sessionende noch (queued);
+**Session 46 live geprüft (Build `8f9244b` success):** Schalter ein vergibt `/profil/un5cmk9r`, Seite zeigt
+Name, Avatar, 4 Bewertungen, „Noch kein Aroma-Netz“ (erwartet bis Neurechnung); Name im Buch `/reviews`
+verlinkt; Kopfknopf dort nicht aktiv; mobil 390 px ohne Überlauf (Notenzeile bricht je nach Namenslänge mal
+neben, mal unter dem Namen um – kosmetisch, offen); Schalter aus = 404; `/profil/ABC` = 404. Profil ist
+wieder privat. Fix: 404-Titel hieß „Mein Profil“, jetzt `fehlerseite.nichtGefunden`. Hinweis Browser-MCP:
+Klick per `ref` auf den Schalter ging zweimal ins Leere, Klick per Koordinate klappt (Werkzeug, nicht Seite).
+Noch nicht geprüft: Netz nach Neurechnung, hell, englisch.
+
+**Ursprünglicher Prüfplan:** Workers Build für `8f9244b` lief beim Sessionende noch (queued);
 Status über die Cloudflare-API prüfen (siehe Lehre Deploy unten). Dann live: `/mitglied` Schalter ein,
 Adresse öffnen (Netz evtl. leer bis Neurechnung: einmal `/profil` öffnen hilft nicht vor 24 h – eine
 Bewertung speichern oder in `/admin` freigeben rechnet neu), Name im Buch verlinkt, Schalter aus = 404,
