@@ -54,6 +54,7 @@ export function BuchNotiz({
   const [offen, setOffen] = useState(false);
   // null: nicht gemessen (Server, unter lg); 0: passt ganz; sonst Zeilen bis zur Auslassung.
   const [zeilen, setZeilen] = useState<number | null>(null);
+  const mitBild = Boolean(bild);
 
   useEffect(() => {
     const element = flaeche.current;
@@ -63,12 +64,12 @@ export function BuchNotiz({
       if (!window.matchMedia(NEBENEINANDER).matches) return setZeilen(null);
       // scrollHeight ist auch begrenzt die volle Höhe des Textes.
       const platz = element.clientHeight;
-      setZeilen(notizZeilen(platz, p.scrollHeight, Boolean(bild)));
+      setZeilen(notizZeilen(platz, p.scrollHeight, mitBild));
     };
     const beobachter = new ResizeObserver(messen);
     beobachter.observe(element);
     return () => beobachter.disconnect();
-  }, [offen, text, bild]);
+  }, [offen, text, mitBild]);
 
   const schliessenMitFokus = () => {
     setOffen(false);

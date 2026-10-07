@@ -34,7 +34,7 @@ export async function bewertungsbildHochladen(formData: FormData): Promise<Bewer
   const w = await holeWoerterbuchAusAnfrage();
   const fehler = (meldung: Meldung): BewertungsbildErgebnis => ({ ok: false, fehler: meldungText(w, meldung) });
 
-  let mitglied;
+  let mitglied: Awaited<ReturnType<typeof freigabeErforderlich>>;
   try {
     mitglied = await freigabeErforderlich();
   } catch {
@@ -91,7 +91,7 @@ export async function bewertungsbildHochladen(formData: FormData): Promise<Bewer
 /** Entfernt ein eigenes Bild einer Bewertung; fremde Bilder und freie Budpics bleiben unberührt. */
 export async function bewertungsbildEntfernen(formData: FormData): Promise<BewertungsbildEntfernenErgebnis> {
   const w = await holeWoerterbuchAusAnfrage();
-  let mitglied;
+  let mitglied: Awaited<ReturnType<typeof freigabeErforderlich>>;
   try {
     mitglied = await freigabeErforderlich();
   } catch {

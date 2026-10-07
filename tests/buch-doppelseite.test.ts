@@ -64,7 +64,7 @@ test("Links: Avatar, Name, Marke, Text und Kolophon in dieser Reihenfolge, ohne 
     aufsteigend(stellen(links, ['class="inline-flex shrink-0 select-none', ">Waldi<", ">Betreiber<", "Sehr dichte Blüten.", ">Datum<", ">Charge<", ">Bewertungen insgesamt<"])),
     "Reihenfolge links",
   );
-  assert.doesNotMatch(links, /Aussehen|viewBox="0 0 24 24"/);
+  assert.doesNotMatch(links, /Aussehen|viewBox="0 0 24 24"|data-eintritt="einlage"/);
 });
 
 test("Rechts: Blätter, Zahl, fünf Noten und die Einlage mit der Karte in dieser Reihenfolge", () => {

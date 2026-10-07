@@ -16,10 +16,10 @@ export const BUDPIC_MAX_OFFEN = 10;
 /** Freigegebene Bilder, die eine Sorte zeigt (neueste zuerst). */
 export const BUDPIC_MAX_ANZEIGE = 8;
 
-/** Bilder je Bewertung (Spec 2026-10-06, Nutzer): offene und freigegebene zaehlen, abgelehnte nicht. */
-export const BEWERTUNGSBILD_MAX = 3;
 /** Zeit je Bild in der Diashow. */
 export const BUDPIC_WECHSEL_MS = 5000;
+/** Bilder je Bewertung (Spec 2026-10-06, Nutzer): offene und freigegebene zaehlen, abgelehnte nicht. */
+export const BEWERTUNGSBILD_MAX = 3;
 
 export const BUDPIC_STATUS = ["OFFEN", "FREIGEGEBEN", "ABGELEHNT"] as const;
 export type BudpicStatus = (typeof BUDPIC_STATUS)[number];
