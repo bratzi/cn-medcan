@@ -444,6 +444,13 @@ async function BudpicListe({ status }: { status: "OFFEN" | "FREIGEGEBEN" }) {
                   <p className="text-small text-text-muted">
                     von {b.nutzer}, {DATUM.format(b.erstelltAm)}, <span className="numeric">{b.breite} × {b.hoehe}</span> px
                   </p>
+                  {b.ausBewertung ? (
+                    <p>
+                      <Badge variante="neutral" zeichen={false}>
+                        aus einer Bewertung
+                      </Badge>
+                    </p>
+                  ) : null}
                   <BudpicFreigabe id={b.id} breite={b.breite} hoehe={b.hoehe} handelsname={b.handelsname} freigegeben={!offen} />
                 </li>
               ))}

@@ -56,3 +56,8 @@ const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 export function istBudpicId(wert: unknown): wert is string {
   return typeof wert === "string" && UUID.test(wert);
 }
+
+/** Gehört das Bild zu einer Bewertung (Spec 2026-10-06)? Für den Vermerk in /admin. */
+export function budpicAusBewertung(reviewId: string | null): boolean {
+  return reviewId !== null;
+}
