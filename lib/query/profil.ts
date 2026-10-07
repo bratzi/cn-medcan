@@ -11,7 +11,7 @@ import {
   type TerpenZeile,
 } from "@/lib/empfehlung";
 import { getEnv } from "@/lib/cloudflare";
-import { noteOderErsatz, profilAnzeige, profilAusDaten, profilDaten } from "@/lib/profil";
+import { noteOderErsatz, profilAnzeige, profilAusDaten, profilDaten, profilVeraltet } from "@/lib/profil";
 import type { AuswertungsZeile, ProfilWerte } from "@/lib/profil-typen";
 import { getPrisma } from "@/lib/prisma";
 import { parseGeschmacksMatrix, parseTerpenIntensitaet } from "@/lib/query/bewertung";
@@ -83,6 +83,23 @@ export async function ladeProfil(mitgliedId: string): Promise<{ werte: ProfilWer
   const prisma = await getPrisma();
   const z = await prisma.nutzerProfil.findUnique({ where: { mitgliedId } });
   return z ? { werte: profilAusDaten(z), berechnetAm: z.berechnetAm } : null;
+}
+
+/**
+ * Stand für /profil (Spec Profil 4.4): der gespeicherte, außer er fehlt oder ist
+ * älter als 24 h. Dann einmal neu rechnen, damit neue Community-Werte ankommen.
+ * Scheitert das, gilt der alte Stand (oder keiner); der Fehler wird geloggt.
+ */
+export async function aktuellesProfil(mitgliedId: string): Promise<{ werte: ProfilWerte; berechnetAm: Date } | null> {
+  const gespeichert = await ladeProfil(mitgliedId);
+  if (!profilVeraltet(gespeichert?.berechnetAm, Date.now())) return gespeichert;
+  try {
+    await profilFortschreiben(mitgliedId);
+    return await ladeProfil(mitgliedId);
+  } catch (fehler) {
+    console.error("profilFortschreiben fehlgeschlagen", fehler);
+    return gespeichert;
+  }
 }
 
 /** Eigene Bewertungen mit Sorte und Community-Werten für die Auswertungen (Spec 4.5). */

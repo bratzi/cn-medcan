@@ -1,0 +1,44 @@
+import { test } from "node:test";
+import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
+import { createElement } from "react";
+import { renderToStaticMarkup } from "react-dom/server";
+
+import { ProfilReiter } from "@/components/profil/ProfilReiter";
+import { de } from "@/lib/i18n/de";
+
+const seite = () => readFileSync("app/[lang]/profil/page.tsx", "utf8");
+
+test("/profil: nur angemeldet, nicht im Index, rechnet nur bei veraltetem Stand", () => {
+  const q = seite();
+  assert.match(q, /redirect\("\/anmelden\?weiter=%2Fprofil"\)/);
+  assert.match(q, /index: false/);
+  assert.match(q, /aktuellesProfil\(/);
+  const query = readFileSync("lib/query/profil.ts", "utf8");
+  assert.match(query, /profilVeraltet\(/);
+  assert.match(query, /await profilFortschreiben\(/);
+});
+
+test("/profil: Reihenfolge Netz, Vorschläge, Top/Flop, Community, Schnitte; kein Apothekenlink", () => {
+  const q = seite();
+  const reihe = ["<ProfilNetz", "<EmpfehlungsListe", "<TopFlop", "<CommunityVergleich", "<Schnitte"].map((s) => q.indexOf(s));
+  assert.ok(reihe.every((i) => i > 0));
+  assert.deepEqual([...reihe].sort((a, b) => a - b), reihe);
+  assert.doesNotMatch(q, /apotheke/i);
+  assert.match(q, /<ProfilReiter\s+aktiv="profil"/);
+});
+
+test("/mitglied: Überschrift ist der Reiter Konto, nicht Mein Profil", () => {
+  const q = readFileSync("app/[lang]/mitglied/page.tsx", "utf8");
+  assert.match(q, /<h1[^>]*>\{w\.profil\.reiterKonto\}<\/h1>/);
+  assert.doesNotMatch(q, /kopf\.navigation\.konto/);
+});
+
+test("ProfilReiter: ungelesene Benachrichtigungen am Reiter Konto, ohne keine Marke", () => {
+  const mit = renderToStaticMarkup(
+    createElement(ProfilReiter, { aktiv: "profil", texte: de.profil, ungelesen: { anzahl: 2, text: "2 ungelesene Benachrichtigungen" } }),
+  );
+  assert.ok(mit.indexOf("Konto") < mit.indexOf("2 ungelesene Benachrichtigungen"));
+  const ohne = renderToStaticMarkup(createElement(ProfilReiter, { aktiv: "profil", texte: de.profil, ungelesen: { anzahl: 0, text: "x" } }));
+  assert.doesNotMatch(ohne, /sr-only/);
+});

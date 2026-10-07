@@ -109,6 +109,14 @@ const UMGESTELLT: string[] = [
   // T12: Register der Terpene und Geschmäcker.
   "components/story/TerpenRegister.tsx",
   "components/story/RegisterAuswahl.tsx",
+  // Profil Stufe 1 (Spec 2026-10-07)
+  "app/[lang]/profil/page.tsx",
+  "components/profil/ProfilNetz.tsx",
+  "components/profil/TerpenRangliste.tsx",
+  "components/profil/TopFlop.tsx",
+  "components/profil/CommunityVergleich.tsx",
+  "components/profil/Schnitte.tsx",
+  "components/profil/ProfilReiter.tsx",
 ];
 
 const ERLAUBT: string[] = ["Book of Terpz", "Deutsch"];

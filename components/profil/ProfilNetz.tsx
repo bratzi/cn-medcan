@@ -6,6 +6,7 @@ import type { Sprache } from "@/lib/i18n/sprache-kern";
 import { t } from "@/lib/i18n/text";
 import type { Woerterbuch } from "@/lib/i18n/typen";
 import { alsPolygon, netzPunkte } from "@/lib/netz";
+import { PROFIL_AUSSAGEKRAEFTIG_AB } from "@/lib/profil";
 import type { ProfilWerte } from "@/lib/profil-typen";
 import { GESCHMACKS_ACHSEN } from "@/lib/query/bewertung";
 
@@ -14,9 +15,6 @@ const MITTE = GROESSE / 2;
 const RADIUS = 110;
 const MAX = 5;
 const RINGE = [1, 2, 3, 4, 5] as const;
-// Wie PROFIL_AUSSAGEKRAEFTIG_AB in lib/profil.ts (Spec Profil 2.10). Die Datei
-// entsteht parallel; beim Zusammenführen ersetzt der Import diese Konstante.
-const AUSSAGEKRAEFTIG_AB = 3;
 
 /** Alle Achsen auf demselben Wert: ein Ring oder die Achsenenden. */
 function gleichmaessig(wert: number, radius = RADIUS) {
@@ -148,7 +146,7 @@ export function ProfilNetz({ werte, texte, achsen, sprache }: Props) {
         </div>
       ) : werte.gewichtet === 0 ? (
         <p className="max-w-[48ch] text-center text-body text-text-muted text-pretty">{texte.nurMittelfeld}</p>
-      ) : werte.gewichtet < AUSSAGEKRAEFTIG_AB ? (
+      ) : werte.gewichtet < PROFIL_AUSSAGEKRAEFTIG_AB ? (
         <p className="text-center text-small text-text-muted">{t(texte.vorlaeufig, { anzahl: werte.gewichtet })}</p>
       ) : null}
     </figure>

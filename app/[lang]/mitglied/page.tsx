@@ -19,7 +19,7 @@ import { holeSprache } from "@/lib/i18n";
 import { t } from "@/lib/i18n/text";
 
 export async function generateMetadata(): Promise<Metadata> {
-  return { title: (await holeWoerterbuch()).kopf.navigation.konto, robots: { index: false, follow: false } };
+  return { title: (await holeWoerterbuch()).profil.reiterKonto, robots: { index: false, follow: false } };
 }
 
 const STATUS_VARIANTE: Record<VorschlagStatus, "warning" | "success" | "danger"> = {
@@ -46,7 +46,7 @@ export default async function MitgliedPage() {
         <div className="flex items-center gap-4">
           <Avatar name={mitglied.anzeigename} bildId={mitglied.avatarId} groesse="md" />
           <div>
-            <h1 className="text-h1 text-text">{w.kopf.navigation.konto}</h1>
+            <h1 className="text-h1 text-text">{w.profil.reiterKonto}</h1>
             <p className="mt-2 text-body text-text-muted">{mitglied.email}</p>
           </div>
         </div>
