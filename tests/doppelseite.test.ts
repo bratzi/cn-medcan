@@ -155,3 +155,12 @@ test("Der Auszug kennt weder Reiter noch Kolophon noch feste Höhe noch Einzug",
   const html = zeige({ eintrag: eintrag(), ueberschrift: "h3" });
   assert.doesNotMatch(html, /--buch-h|role="tablist"|lg:grid-cols-5|lg:truncate|lg:contents|data-eintritt/);
 });
+
+test("Name verlinkt nur bei öffentlichem Profil", () => {
+  const offen = zeige({ eintrag: eintrag({ istBetreiber: false, autorName: "Mia", autorProfil: "abcd2345" }), ueberschrift: "h3" });
+  assert.match(offen, /<a [^>]*href="\/profil\/abcd2345"[^>]*>Mia<\/a>/);
+  const privat = zeige({ eintrag: eintrag({ istBetreiber: false, autorName: "Mia", autorProfil: null }), ueberschrift: "h3" });
+  assert.doesNotMatch(privat, /\/profil\//);
+  const ohneAutor = zeige({ eintrag: eintrag({ istBetreiber: false, autorName: null, autorProfil: "abcd2345" }), ueberschrift: "h3" });
+  assert.doesNotMatch(ohneAutor, /\/profil\//);
+});

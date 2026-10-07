@@ -1,3 +1,4 @@
+import Link from "next/link";
 import type { ReactNode } from "react";
 
 import { InstagramEmbed, baueEmbedUrl } from "@/components/produkt/InstagramEmbed";
@@ -14,8 +15,9 @@ import { NurAufgeschlagen } from "@/components/review/NurAufgeschlagen";
 import { eintragAnker, type EintragDaten } from "@/components/review/eintrag";
 import { ablauf } from "@/components/review/eintritt";
 import { FALZ_LINKS, FALZ_RECHTS } from "@/components/review/falz";
-import { Avatar, Badge } from "@/components/ui";
+import { Avatar, Badge, namenLinkKlassen } from "@/components/ui";
 import { cn } from "@/lib/cn";
+import { profilHref } from "@/lib/kurz-id";
 import type { Sprache } from "@/lib/i18n/sprache-kern";
 import { t } from "@/lib/i18n/text";
 import { aromaTexte, type Woerterbuch } from "@/lib/i18n/typen";
@@ -133,7 +135,14 @@ export function BuchDoppelseite({ eintrag, ueberschrift: Ueberschrift, w, sprach
               aria-label={t(w.buch.bewertungVon, { name })}
               className="font-buch text-h1 font-medium text-balance text-text wrap-break-word lg:line-clamp-2"
             >
-              <span title={name}>{name}</span>
+              {/* Link nur bei öffentlichem Profil (Spec Profil 9); sonst bleibt der Name reiner Text. */}
+              {eintrag.autorName && eintrag.autorProfil ? (
+                <Link prefetch={false} href={profilHref(eintrag.autorProfil)} title={name} className={namenLinkKlassen()}>
+                  {name}
+                </Link>
+              ) : (
+                <span title={name}>{name}</span>
+              )}
             </Ueberschrift>
             <p>
               <Badge variante={eintrag.istBetreiber ? "accent" : "neutral"} zeichen={false}>

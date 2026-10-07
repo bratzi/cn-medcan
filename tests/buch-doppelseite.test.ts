@@ -233,3 +233,14 @@ test("Ohne Text: Bildfeld füllt die Seite, der Platzhalter nimmt keinen Raum me
   assert.doesNotMatch(links, /<p class="[^"]*italic[^"]*lg:flex-1/);
   assert.match(links, /lg:flex-\[1_1_0px\][^"]*"><div class="lg:absolute lg:inset-0"><figure data-bildfeld="bild"/);
 });
+
+test("Name verlinkt nur bei öffentlichem Profil", () => {
+  const offen = zeige({ istBetreiber: false, autorName: "Mia", autorProfil: "abcd2345" });
+  assert.match(offen, /<a [^>]*href="\/profil\/abcd2345"[^>]*>Mia<\/a>/);
+  // Der Vorlesename der Überschrift bleibt unverändert.
+  assert.match(offen, /aria-label="Bewertung von Mia"/);
+  const privat = zeige({ istBetreiber: false, autorName: "Mia", autorProfil: null });
+  assert.doesNotMatch(privat, /\/profil\//);
+  const ohneAutor = zeige({ istBetreiber: false, autorName: null, autorProfil: "abcd2345" });
+  assert.doesNotMatch(ohneAutor, /\/profil\//);
+});

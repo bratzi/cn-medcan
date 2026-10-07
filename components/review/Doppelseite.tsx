@@ -6,8 +6,9 @@ import { BlattAnzeige } from "@/components/review/BlattAnzeige";
 import { eintragAnker, eintragHref, type EintragDaten } from "@/components/review/eintrag";
 import { FALZ_LINKS, FALZ_RECHTS } from "@/components/review/falz";
 import { KartenBild } from "@/components/review/SortenKopf";
-import { Avatar, buttonKlassen } from "@/components/ui";
+import { Avatar, buttonKlassen, namenLinkKlassen } from "@/components/ui";
 import { cn } from "@/lib/cn";
+import { profilHref } from "@/lib/kurz-id";
 import { formatiereDatum, formatiereWert, formatiereZahl } from "@/lib/format";
 import type { Sprache } from "@/lib/i18n/sprache-kern";
 import { t } from "@/lib/i18n/text";
@@ -125,7 +126,16 @@ export function Doppelseite({ eintrag, ueberschrift: Ueberschrift, story = false
             {/* gap-1 = 4px: Name und Datum sind ein Paar. Die Zeilen sind
                 Blöcke, damit sie der Textausrichtung der Seite folgen. */}
             <p className="flex min-w-0 flex-col gap-1">
-              <span className="text-body font-medium text-text wrap-break-word">{name}</span>
+              <span className="text-body font-medium text-text wrap-break-word">
+                {/* Link nur bei öffentlichem Profil (Spec Profil 9); sonst bleibt der Name reiner Text. */}
+                {eintrag.autorName && eintrag.autorProfil ? (
+                  <Link prefetch={false} href={profilHref(eintrag.autorProfil)} className={namenLinkKlassen()}>
+                    {name}
+                  </Link>
+                ) : (
+                  name
+                )}
+              </span>
               <span className="text-small text-text-muted">{datum}</span>
             </p>
           </div>

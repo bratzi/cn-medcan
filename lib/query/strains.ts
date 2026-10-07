@@ -12,6 +12,7 @@ import {
   type KultivarTyp,
   type RezeptStatus,
 } from "@/db/enums";
+import { autorProfilAus } from "@/lib/autor-profil";
 import type { GespeicherteBewertung } from "@/lib/bewertung-vorbelegung";
 import { getPrisma } from "@/lib/prisma";
 
@@ -179,6 +180,8 @@ export type ReviewEintrag = {
   autorAvatarId?: string | null;
   /** Freigegebene Bewertungen des Autors über alle Sorten (Buch, Spec 2026-10-05); null ohne Autor oder ohne Zahl. */
   autorBewertungen?: number | null;
+  /** Kurz-Id des öffentlichen Profils; null bei privatem Profil oder ohne Autor. */
+  autorProfil?: string | null;
   /** Gesamtnote in Blättern (T4); null bei Altbewertungen. */
   gesamtnote: number | null;
   aussehen: number;
@@ -622,7 +625,7 @@ export async function ladeStrainDetail(
           gesamtnote: true,
           charge: { select: { chargenNr: true } },
           // Der Name steht öffentlich im Buch (Profil: "Unter diesem Namen erscheinen deine Bewertungen").
-          autor: { select: { anzeigename: true, avatar: { select: { id: true } } } },
+          autor: { select: { anzeigename: true, profilOeffentlich: true, kurzId: true, avatar: { select: { id: true } } } },
           // Nur freigegebene, nie mit BLOB; Prisma lädt sie in einer Abfrage mit IN über höchstens 20 Ids.
           bilder: {
             where: { status: "FREIGEGEBEN" },
@@ -708,6 +711,8 @@ export async function ladeStrainDetail(
       autorName: review.autor?.anzeigename ?? null,
       autorAvatarId: review.autor?.avatar?.id ?? null,
       autorBewertungen: review.autorId ? (autorZahlen.get(review.autorId) ?? null) : null,
+      // Nur die Kurz-Id eines öffentlichen Profils verlässt den Server.
+      autorProfil: autorProfilAus(review.autor ?? null),
       gesamtnote: zuZahl(review.gesamtnote),
       aussehen: review.aussehen,
       geruch: review.geruch,
