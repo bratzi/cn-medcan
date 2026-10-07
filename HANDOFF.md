@@ -3,7 +3,7 @@
 > Übergabemedium zwischen Sessions. Wird nach jedem Arbeitsblock aktualisiert und committet.
 > Wer hier weiterarbeitet, liest diese Datei zuerst und braucht den Chatverlauf nicht.
 
-**Letzte Aktualisierung:** 2026-10-07 (Session 43)
+**Letzte Aktualisierung:** 2026-10-07 (Session 44)
 **Repo:** https://github.com/bratzi/cn-medcan (public)
 **Branch:** `main` (Makeover „Grünes Buch“ Teilprojekt 1 ist seit 2026-09-24 auf `main`)
 
@@ -28,15 +28,37 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 
 ## ⇢ Hier geht es weiter
 
-### ⇢ ALS ERSTES: diese Fragen in EINER AskUserQuestion stellen
+### ⇢ SESSION 45 (Sessionstart): Profil Stufe 1 ist live, weiter mit Stufe 2
 
-1. **Profil/Dashboard freigeben:** Das Grilling ist durch, alle Entscheidungen stehen unten unter
-   „SESSION 44“. Die Schlussfrage „Stimmt die Zusammenfassung so?“ blieb offen, weil der Nutzer
-   „safe 4 clear“ sagte („wir starten in einer neuen session das ganze“). Zusammenfassung kurz zeigen und
-   fragen: passt, dann Spec + Plan (Stufe 1 zuerst), oder etwas ändern?
+**Live und auf `main` (`199107e`, 713 Tests grün, tsc und eslint sauber):** Profil und Dashboard Stufe 1.
+Spec `docs/superpowers/specs/2026-10-07-profil-dashboard-design.md` (vom Nutzer freigegeben 2026-10-07),
+Plan `docs/superpowers/plans/2026-10-07-profil-stufe-1.md` (Task 1 selbst, Stränge A/B/C parallel in
+Worktrees, Task 8 selbst, Gesamtreview, Fixwelle). Migration 0017 ist **remote eingespielt**.
+- `/profil`: Netz (Fläche „mag ich“, gestrichelt „mag ich nicht“), Terpen-Rangliste, bestätigte Vorschläge
+  mit Marke „noch nicht bestätigt“, Top/Flop, Du und die Community, Schnitte. Kopfknopf heißt „Mein Profil“,
+  Reiter Profil | Konto, `/mitglied` heißt „Konto“ und hat keine Empfehlungen mehr; Reiter Konto zeigt
+  ungelesene Benachrichtigungen. Startseite markiert unbestätigte Vorschläge ebenso.
+- Community-Vergleich nimmt das fremde Mittel direkt aus `reviews` (`FREMDE_NOTEN_SQL`, Review W1).
+- **Live geprüft (DOM, 1143 px, Tab verborgen):** `/profil` als Betreiber: 4 Bewertungen, Netz mit Fläche,
+  7 Terpene, 6 Vorschläge (alle unbestätigt, Community dünn), Top/Flop, Community-Hinweis „sobald zwei“,
+  Schnitte. `/mitglied`: h1 „Konto“, Reiter Konto aktiv, Kopfknopf aktiv. Kein Überlauf.
+  **Nicht geprüft:** Optik per Screenshot (Tab verborgen), mobil unter 640 px, hell/dunkel, englisch,
+  Speichern einer Bewertung erneuert das Profil.
+- **Bewusst offen (Review K1):** Profil-Upsert läuft nach der Empfehlungs-Batch, nicht in ihr. Scheitert
+  er, wird geloggt; `/profil` rechnet nach 24 h neu.
 
-Danach ohne weitere Rückfrage: Spec `docs/superpowers/specs/2026-10-0x-profil-dashboard-design.md` schreiben,
-Plan in parallelen Strängen je Stufe (Dauerregel), Stufe 1 umsetzen.
+**Lehre Deploy:** Der Push `199107e` löste **keinen** Workers Build aus (GitHub-Webhook kam nicht an).
+Prüfen über Cloudflare-API `GET /accounts/{id}/builds/workers/1406f98f6bac4ea19a123496391118c7/builds`;
+manuell starten mit `POST /accounts/{id}/builds/triggers/f649c1f7-21f8-4eb5-8597-0b036c381c8e/builds`,
+Body `{ branch: "main", commit_hash: "<VOLLER Hash>" }` (Kurz-Hash scheitert beim Klonen). Build ~6 min.
+
+### ⇢ ALS ERSTES (Session 45): Plan Stufe 2 schreiben und umsetzen, ohne Rückfrage
+
+Rahmen in Spec Abschnitt 9: `mitglied.profil_oeffentlich` (Opt-in, Vorgabe aus), `mitglied.kurz_id`,
+`/profil/<kurz-id>` mit Name, Avatar, Zahl und Liste freigegebener Bewertungen und Netz (nie Vorschläge
+oder Auswertungen), aus = 404, Schalter in `/mitglied`, Name im Buch verlinkt nur bei öffentlichem Profil,
+Datenschutz ergänzen. Achtung: `istAktiv` markiert den Kopfknopf auch auf fremden `/profil/<id>`; dort
+klären. Plan in parallelen Strängen (Dauerregel), danach Stufe 3.
 
 ### ⇢ SESSION 44 (Sessionstart): Profil und Dashboard, Ergebnis des Grillings vom 2026-10-07
 
