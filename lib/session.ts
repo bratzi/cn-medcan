@@ -31,6 +31,10 @@ export type AngemeldetesMitglied = {
   /// Manuell vom Betreiber freigegeben - erst damit besteht Stimmrecht.
   freigegeben: boolean;
   rolle: MitgliedRolle;
+  /// Öffentliches Profil unter /profil/<kurzId> (Spec Profil 9). Opt-in, Vorgabe aus.
+  profilOeffentlich: boolean;
+  /// Kurz-Id des öffentlichen Profils, null bis zum ersten Einschalten. Bleibt beim Ausschalten.
+  kurzId: string | null;
 };
 
 /** Rohe Better-Auth-Sitzung. Nur innerhalb dieser Datei gebraucht. */
@@ -79,6 +83,9 @@ export const aktuellesMitglied = cache(async (): Promise<AngemeldetesMitglied | 
     // Ein Wert, der an den Triggern vorbei in die Spalte kam, faellt hier auf
     // die niedrigste Rolle zurueck statt ungeprueft Rechte zu tragen.
     rolle: istMitgliedRolle(satz.rolle) ? satz.rolle : "MITGLIED",
+    // Beide kommen mit dem Satz (include liefert alle Skalare), keine weitere Abfrage.
+    profilOeffentlich: satz.profilOeffentlich,
+    kurzId: satz.kurzId,
   };
 });
 
