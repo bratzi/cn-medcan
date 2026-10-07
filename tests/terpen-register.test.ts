@@ -114,6 +114,15 @@ test("Terpen-Band: Ruhezustand nur Icon und Name, Infos erscheinen beim Überfah
   assert.match(readFileSync(join(process.cwd(), "app/globals.css"), "utf8"), /\.terpen-band-info \{[^}]*padding-top: 0\.25rem;/);
 });
 
+test("Terpen-Band: Infos bleiben in der Spalte des Eintrags (Nutzer 2026-10-07, Text ragte bis 349 px ins Nachbarterpen)", () => {
+  const band = readFileSync(join(process.cwd(), "components/story/TerpenBand.tsx"), "utf8");
+  // Spur mit minmax(0,1fr): die Mindestbreite des Inhalts darf die 160-px-Spalte nicht aufweiten.
+  assert.match(band, /terpen-band-info[^"]*grid-cols-\[minmax\(0,1fr\)\]/);
+  // Duft allein in seiner Zeile und gekürzt; Duft und Sortenzahl nebeneinander passten nie in 160 px.
+  assert.doesNotMatch(band, /sortenText/);
+  assert.match(band, /<span className="truncate[^"]*" title=\{terpen\.duft\}>/);
+});
+
 test("Terpen-Band hält beim Überfahren und bei Fokus an: Pause trägt denselben Selektorkopf wie der Lauf (Nutzer 2026-10-06)", () => {
   const css = readFileSync(join(process.cwd(), "app/globals.css"), "utf8");
   // Der Lauf (0,5,0) setzt animation-play-state per Kurzschrift; eine schwächere Pause verliert.

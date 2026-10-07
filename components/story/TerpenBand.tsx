@@ -18,7 +18,7 @@ import { TerpenBandKopie } from "@/components/story/TerpenBandKopie";
  * Stand 2026-10-07 (dritte Überarbeitung): eine ruhige Register-Leiste wie
  * Daumenregister in einem Kräuterbuch. Jedes Terpen ist eine runde Marke (56 px,
  * Icon 32 px) in der Farbe seiner Leitnote, darunter zentriert der Name in
- * Buchschrift, klein und gedämpft. Die Infos (Duft, Sortenzahl, drei Noten mit
+ * Buchschrift, klein und gedämpft. Die Infos (Duft, drei Noten mit
  * Balken) erscheinen nur beim Eintrag unter dem Zeiger: Hover am Eintrag
  * (group/eintrag), nicht am Band. Nur dieser Eintrag rückt nach oben, damit
  * Marke, Name und Infos in die 192 px des Bands passen (globals.css). Bandhöhe
@@ -77,13 +77,17 @@ async function Inhalt() {
               {/* line-clamp-2 erzwingt die Grenze von zwei Zeilen (Höhenbudget). */}
               <span className="line-clamp-2">{terpen.name}</span>
             </span>
-            <span className="terpen-band-info pointer-events-none grid gap-1 opacity-0 transition-opacity duration-normal ease-standard group-hover/eintrag:pointer-events-auto group-hover/eintrag:opacity-100 group-focus-within/eintrag:pointer-events-auto group-focus-within/eintrag:opacity-100">
-              <span className="flex items-baseline justify-center gap-2 text-caption text-text-muted">
-                {terpen.duft ? <span className="truncate">{terpen.duft}</span> : null}
-                <span className="shrink-0">{terpen.sortenText}</span>
-              </span>
+            {/* minmax(0,1fr): ohne diese Spur weitet die Mindestbreite des Inhalts die Infos
+                über die 160-px-Spalte ins Nachbarterpen (live bis 349 px, Nutzer 2026-10-07).
+                Der Duft steht deshalb allein und gekürzt in seiner Zeile, der volle Satz im
+                title; für die Sortenzahl daneben war nie Platz, eine eigene Zeile sprengt die
+                Bandhöhe. */}
+            <span className="terpen-band-info pointer-events-none grid grid-cols-[minmax(0,1fr)] gap-1 opacity-0 transition-opacity duration-normal ease-standard group-hover/eintrag:pointer-events-auto group-hover/eintrag:opacity-100 group-focus-within/eintrag:pointer-events-auto group-focus-within/eintrag:opacity-100">
+              {terpen.duft ? (
+                <span className="truncate text-caption text-text-muted" title={terpen.duft}>{terpen.duft}</span>
+              ) : null}
               {/* Drei Noten: mehr sprengt die Bandhöhe, die wegen des Skeletts fest ist. */}
-              <span className="grid gap-1">
+              <span className="grid grid-cols-[minmax(0,1fr)] gap-1">
                 {terpen.noten.slice(0, 3).map((note) => (
                   <span key={note.anker} className="grid grid-cols-[minmax(0,5rem)_minmax(0,1fr)] items-center gap-2 text-left">
                     <span className="inline-flex items-center gap-2 text-caption text-text-muted">
