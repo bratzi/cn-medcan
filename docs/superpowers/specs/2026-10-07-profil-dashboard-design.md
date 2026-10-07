@@ -115,8 +115,8 @@ In `empfehlungenBerechnen` (nach dem Kosinus, vor dem Schnitt auf 6):
 Die Vorauswahl von 150 Kandidaten in D1 bleibt; eine bestätigte Sorte außerhalb der 150 ähnlichsten
 fällt heraus. Das ist gewollt: die Ähnlichkeit bleibt Voraussetzung.
 
-Die Startseite („Was dir schmecken könnte“) liest dieselbe Tabelle und bekommt die neue Reihenfolge ohne
-weitere Änderung; ihr Link „zu deinem Konto“ zeigt auf `/profil`.
+Die Startseite („Was dir schmecken könnte“) liest dieselbe Tabelle, bekommt die neue Reihenfolge und
+markiert unbestätigte Sorten genauso; ihr Link „zu deinem Konto“ zeigt auf `/profil`.
 
 ### 4.4 Fortschreiben
 
@@ -138,9 +138,9 @@ Eine Abfrage lädt die eigenen Bewertungen (`take: 1000`) mit Sorte (Slug, Hande
 
 - **Top und Flop:** nach Gesamtnote (Ersatz wie 4.2), Gleichstand nach Datum (neuere zuerst). Top die
   ersten 3, Flop die letzten 3 der übrigen. Bei 3 oder weniger Bewertungen kein Flop.
-- **Du gegen Community:** je Bewertung mit mindestens einer fremden freigegebenen Bewertung der Sorte.
-  Community-Mittel ohne die eigene: `(mittel × n − eigene) / (n − 1)`, falls die eigene freigegeben ist
-  (sie steckt dann im Mittel), sonst `mittel`. Satz: Mittel der Differenzen, auf 0,1 gerundet, als
+- **Du gegen Community:** je Bewertung mit mindestens einer fremden freigegebenen Bewertung der Sorte
+  mit Gesamtnote. Das fremde Mittel kommt per Abfrage direkt aus `reviews` (ohne die eigene), nicht aus
+  `sorten_kennwerte` (Review W1: dort zählt `anzahl` auch Bewertungen ohne Note). Satz: Mittel der Differenzen, auf 0,1 gerundet, als
   „strenger“ (negativ), „milder“ (positiv) oder „wie die Community“ (|d| < 0,1). Dazu die 3 Sorten mit
   der größten Abweichung. Ab 2 vergleichbaren Bewertungen, sonst ein Hinweis.
 - **Overall-Schnitt je Kategorie:** Mittel von Aussehen, Geruch, Geschmack, Wirkung, Konsistenz und

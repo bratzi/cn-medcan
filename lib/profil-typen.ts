@@ -26,8 +26,7 @@ export type AuswertungsZeile = {
   geschmack: number;
   wirkung: number;
   konsistenz: number;
-  freigegeben: boolean;
-  /** Aus `sorten_kennwerte`; null ohne Zeile. */
+  /** Fremde freigegebene Bewertungen der Sorte mit Gesamtnote (ohne die eigene); null ohne Abfrage. */
   community: { mittel: number | null; anzahl: number } | null;
 };
 

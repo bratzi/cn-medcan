@@ -103,7 +103,6 @@ const zeile = (slug: string, gesamtnote: number | null, extra: Partial<Auswertun
   geschmack: 4,
   wirkung: 4,
   konsistenz: 4,
-  freigegeben: false,
   community: null,
   ...extra,
 });
@@ -123,14 +122,13 @@ test("auswertungen: bei drei oder weniger kein Flop; leer ohne Schnitte", () => 
   assert.equal(leer.community.differenz, null);
 });
 
-test("auswertungen: Community ohne eigene Note, strenger negativ, ab zwei vergleichbaren", () => {
+test("auswertungen: fremdes Mittel, strenger negativ, ab zwei vergleichbaren", () => {
   const a = auswertungen([
-    // eigene freigegeben, steckt im Mittel: (4 × 3 − 3) / 2 = 4,5 → −1,5
-    zeile("a", 3, { freigegeben: true, community: { mittel: 4, anzahl: 3 } }),
-    // eigene nicht freigegeben: Mittel 4 → 0
-    zeile("b", 4, { community: { mittel: 4, anzahl: 1 } }),
-    // nur die eigene: kein Vergleich
-    zeile("c", 5, { freigegeben: true, community: { mittel: 5, anzahl: 1 } }),
+    zeile("a", 3, { community: { mittel: 4.5, anzahl: 2 } }), // −1,5
+    zeile("b", 4, { community: { mittel: 4, anzahl: 1 } }), // 0
+    // keine fremde Note: kein Vergleich
+    zeile("c", 5, { community: { mittel: null, anzahl: 0 } }),
+    zeile("d", 5),
   ]);
   assert.equal(a.community.vergleichbar, 2);
   // (−1,5 + 0) / 2 = −0,75; Math.round(−7,5) ergibt −7 → −0,7.
@@ -138,6 +136,17 @@ test("auswertungen: Community ohne eigene Note, strenger negativ, ab zwei vergle
   assert.deepEqual(a.community.abweichungen[0], { slug: "a", handelsname: "A", eigene: 3, community: 4.5 });
   assert.equal(a.community.abweichungen.length, 2);
   assert.equal(auswertungen([zeile("b", 4, { community: { mittel: 4, anzahl: 1 } })]).community.differenz, null);
+});
+
+test("auswertungen: gerundet wird erst das Ergebnis, nicht je Sorte", () => {
+  // Ungerundet: (0,04 + 0,04 + 0,14) / 3 ≈ 0,07 → 0,1 milder.
+  // Je Sorte auf 4,0 / 4,0 / 3,9 zwischengerundet wären es 0,03 → „wie die Community“.
+  const a = auswertungen([
+    zeile("a", 4, { community: { mittel: 3.96, anzahl: 3 } }),
+    zeile("b", 4, { community: { mittel: 3.96, anzahl: 3 } }),
+    zeile("c", 4, { community: { mittel: 3.86, anzahl: 3 } }),
+  ]);
+  assert.equal(a.community.differenz, 0.1);
 });
 
 test("auswertungen: Schnitte je Kategorie mit Ersatznote, auf 0,1 gerundet", () => {
@@ -150,4 +159,21 @@ test("Bewertung speichern schreibt das Profil fort und erneuert /profil", () => 
   assert.match(quelle, /await profilFortschreiben\(mitglied\.mitgliedId\)/);
   assert.doesNotMatch(quelle, /empfehlungenFortschreiben/);
   assert.match(quelle, /revalidiereSprachen\("\/profil"\)/);
+});
+
+test("FREMDE_NOTEN_SQL: ohne eigene, ohne Notenlose und Unfreigegebene, Seed zählt als fremd", async () => {
+  const { default: Database } = await import("better-sqlite3");
+  const { FREMDE_NOTEN_SQL } = await import("@/lib/profil");
+  const db = new Database(":memory:");
+  db.exec(`CREATE TABLE reviews (strain_id TEXT, autor_id TEXT, gesamtnote REAL, freigegeben INTEGER)`);
+  const neu = db.prepare(`INSERT INTO reviews VALUES (?, ?, ?, ?)`);
+  neu.run("s1", "ich", 2, 1);
+  neu.run("s1", "du", 4, 1);
+  neu.run("s1", "er", null, 1);
+  neu.run("s1", null, 5, 1);
+  neu.run("s1", "sie", 1, 0);
+  neu.run("s2", "ich", 3, 1);
+  neu.run("s3", "du", 3, 1);
+  const zeilen = db.prepare(FREMDE_NOTEN_SQL).all("ich", JSON.stringify(["s1", "s2"])) as { sid: string; m: number; n: number }[];
+  assert.deepEqual(zeilen, [{ sid: "s1", m: 4.5, n: 2 }]);
 });

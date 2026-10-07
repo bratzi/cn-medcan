@@ -411,7 +411,12 @@ export function sortenAusZeilen(terpene: readonly TerpenZeile[], zeilen: readonl
     if (liste.length === 0) continue;
     const geschmackMedian = medianAus(z.gm);
     const sorte: SortenAroma = geschmackMedian ? { strainId: z.sid, terpene: liste, geschmackMedian } : { strainId: z.sid, terpene: liste };
-    if (typeof z.an === "number" && z.an > 0) sorte.community = { median: typeof z.gn === "number" ? z.gn : null, anzahl: z.an };
+    // D1 liefert Zahlen heute als number; Text oder BigInt sollen trotzdem zählen (wie lib/query/community.ts).
+    const anzahl = Number(z.an ?? 0);
+    const median = z.gn == null ? null : Number(z.gn);
+    if (Number.isFinite(anzahl) && anzahl > 0) {
+      sorte.community = { median: median !== null && Number.isFinite(median) ? median : null, anzahl };
+    }
     aus.push(sorte);
   }
   return aus;

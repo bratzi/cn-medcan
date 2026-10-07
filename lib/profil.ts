@@ -100,6 +100,20 @@ export function profilAusDaten(z: { geschmack: string; terpene: string; anzahl: 
   return { geschmack, terpene, anzahl: z.anzahl, gewichtet: z.gewichtet };
 }
 
+/**
+ * Mittel der fremden freigegebenen Gesamtnoten je Sorte (Spec 4.5): ohne die
+ * eigene Bewertung, nur mit Note. Seed-Bewertungen ohne Autor zählen als fremd.
+ * Die Ids kommen als JSON-Liste (D1: höchstens 100 gebundene Werte).
+ * Parameter: Mitglied-Id, JSON-Liste der Sorten-Ids.
+ */
+export const FREMDE_NOTEN_SQL = `
+    SELECT strain_id AS sid, AVG(gesamtnote) AS m, COUNT(gesamtnote) AS n
+    FROM reviews
+    WHERE freigegeben = 1 AND gesamtnote IS NOT NULL
+      AND (autor_id IS NULL OR autor_id <> ?)
+      AND strain_id IN (SELECT value FROM json_each(?))
+    GROUP BY strain_id`;
+
 /** Top, Flop, Vergleich und Schnitte je Aufruf (Spec 4.5); reine Arithmetik. */
 export function auswertungen(zeilen: readonly AuswertungsZeile[]): Auswertungen {
   const mitNote = zeilen.map((z) => ({ z, note: noteOderErsatz(z) }));
@@ -108,25 +122,20 @@ export function auswertungen(zeilen: readonly AuswertungsZeile[]): Auswertungen 
   const top = sortiert.slice(0, 3).map(kurz);
   const flop = sortiert.slice(3).slice(-3).reverse().map(kurz);
 
-  // Community-Mittel ohne die eigene Note: freigegeben steckt sie in `mittel`.
-  // `anzahl` zählt alle freigegebenen, `mittel` nur die mit Gesamtnote; seit v2
-  // haben alle neuen eine, Altbewertungen ohne sind selten.
+  // `community` ist schon das Mittel der fremden Noten (lib/query/profil.ts).
+  // Gerundet wird erst für die Anzeige, sonst kippt der Satz an der 0,1-Schwelle.
   const vergleiche: { z: AuswertungsZeile; eigene: number; community: number }[] = [];
   for (const { z, note } of mitNote) {
     const c = z.community;
-    if (!c || c.mittel === null) continue;
-    const eigeneDrin = z.freigegeben && z.gesamtnote !== null;
-    const fremde = eigeneDrin ? c.anzahl - 1 : c.anzahl;
-    if (fremde < 1) continue;
-    const community = eigeneDrin ? (c.mittel * c.anzahl - z.gesamtnote!) / fremde : c.mittel;
-    vergleiche.push({ z, eigene: note, community: eine(community) });
+    if (!c || c.mittel === null || c.anzahl < 1) continue;
+    vergleiche.push({ z, eigene: note, community: c.mittel });
   }
   const differenz =
     vergleiche.length >= 2 ? eine(vergleiche.reduce((s, v) => s + (v.eigene - v.community), 0) / vergleiche.length) : null;
   const abweichungen = [...vergleiche]
     .sort((a, b) => Math.abs(b.eigene - b.community) - Math.abs(a.eigene - a.community))
     .slice(0, 3)
-    .map((v) => ({ slug: v.z.slug, handelsname: v.z.handelsname, eigene: v.eigene, community: v.community }));
+    .map((v) => ({ slug: v.z.slug, handelsname: v.z.handelsname, eigene: v.eigene, community: eine(v.community) }));
 
   let schnitte: Schnitte | null = null;
   if (zeilen.length > 0) {

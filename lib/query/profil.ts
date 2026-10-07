@@ -11,7 +11,7 @@ import {
   type TerpenZeile,
 } from "@/lib/empfehlung";
 import { getEnv } from "@/lib/cloudflare";
-import { noteOderErsatz, profilAnzeige, profilAusDaten, profilDaten, profilVeraltet } from "@/lib/profil";
+import { FREMDE_NOTEN_SQL, noteOderErsatz, profilAnzeige, profilAusDaten, profilDaten, profilVeraltet } from "@/lib/profil";
 import type { AuswertungsZeile, ProfilWerte } from "@/lib/profil-typen";
 import { getPrisma } from "@/lib/prisma";
 import { parseGeschmacksMatrix, parseTerpenIntensitaet } from "@/lib/query/bewertung";
@@ -102,7 +102,12 @@ export async function aktuellesProfil(mitgliedId: string): Promise<{ werte: Prof
   }
 }
 
-/** Eigene Bewertungen mit Sorte und Community-Werten für die Auswertungen (Spec 4.5). */
+/**
+ * Eigene Bewertungen mit Sorte und dem Mittel der fremden Noten (Spec 4.5).
+ * Das fremde Mittel kommt direkt aus `reviews`, nicht aus `sorten_kennwerte`:
+ * dort steckt die eigene Note mit drin, und `anzahl` zählt auch Bewertungen
+ * ohne Gesamtnote; herausrechnen ginge schief (Review Profil W1).
+ */
 export async function ladeAuswertungsZeilen(mitgliedId: string): Promise<AuswertungsZeile[]> {
   const prisma = await getPrisma();
   const zeilen = await prisma.review.findMany({
@@ -117,10 +122,22 @@ export async function ladeAuswertungsZeilen(mitgliedId: string): Promise<Auswert
       geschmack: true,
       wirkung: true,
       konsistenz: true,
-      freigegeben: true,
-      strain: { select: { slug: true, handelsname: true, kennwerte: { select: { gesamtnoteMittel: true, anzahl: true } } } },
+      strainId: true,
+      strain: { select: { slug: true, handelsname: true } },
     },
   });
+  const fremde = new Map<string, { mittel: number | null; anzahl: number }>();
+  if (zeilen.length > 0) {
+    const roh = await prisma.$queryRawUnsafe<{ sid: string; m: unknown; n: unknown }[]>(
+      FREMDE_NOTEN_SQL,
+      mitgliedId,
+      JSON.stringify(zeilen.map((z) => z.strainId)),
+    );
+    for (const r of roh) {
+      const m = Number(r.m);
+      fremde.set(r.sid, { mittel: Number.isFinite(m) ? m : null, anzahl: Number(r.n) || 0 });
+    }
+  }
   return zeilen.map((z) => ({
     slug: z.strain.slug,
     handelsname: z.strain.handelsname,
@@ -131,7 +148,6 @@ export async function ladeAuswertungsZeilen(mitgliedId: string): Promise<Auswert
     geschmack: z.geschmack,
     wirkung: z.wirkung,
     konsistenz: z.konsistenz,
-    freigegeben: z.freigegeben,
-    community: z.strain.kennwerte ? { mittel: z.strain.kennwerte.gesamtnoteMittel, anzahl: z.strain.kennwerte.anzahl } : null,
+    community: fremde.get(z.strainId) ?? null,
   }));
 }

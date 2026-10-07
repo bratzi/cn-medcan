@@ -42,3 +42,14 @@ test("ProfilReiter: ungelesene Benachrichtigungen am Reiter Konto, ohne keine Ma
   const ohne = renderToStaticMarkup(createElement(ProfilReiter, { aktiv: "profil", texte: de.profil, ungelesen: { anzahl: 0, text: "x" } }));
   assert.doesNotMatch(ohne, /sr-only/);
 });
+
+test("/profil: ohne ladbaren Stand nie die Leerskizze, Name im Kopf", () => {
+  const q = seite();
+  assert.match(q, /const netzFehlt = profil === null && \(zeilen === null \|\| zeilen\.length > 0\);/);
+  assert.match(q, /\{mitglied\.anzeigename\}/);
+});
+
+test("Startseite: unbestätigte Vorschläge tragen dieselbe Marke wie im Profil", () => {
+  const q = readFileSync("app/api/startseite/route.ts", "utf8");
+  assert.match(q, /e\.bestaetigt \? \{\} : \{ marke: w\.profil\.nichtBestaetigt \}/);
+});

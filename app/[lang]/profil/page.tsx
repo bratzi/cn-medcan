@@ -56,8 +56,10 @@ export default async function ProfilPage() {
   ]);
   const werte = profil?.werte ?? leereProfilWerte();
   const a = zeilen ? auswertungen(zeilen) : null;
-  // Kein gespeicherter Stand, obwohl es Bewertungen gibt: dann ist die Rechnung gescheitert.
-  const netzFehlt = profil === null && zeilen !== null && zeilen.length > 0;
+  // Kein gespeicherter Stand, obwohl es Bewertungen gibt oder sich das nicht
+  // prüfen lässt: dann nie die Leerskizze „Erste Bewertung abgeben“ zeigen.
+  const netzFehlt = profil === null && (zeilen === null || zeilen.length > 0);
+  const anzahl = zeilen?.length ?? profil?.werte.anzahl ?? null;
 
   return (
     <div className="mx-auto w-full max-w-180 px-4 py-16 sm:px-8">
@@ -65,8 +67,14 @@ export default async function ProfilPage() {
         <Avatar name={mitglied.anzeigename} bildId={mitglied.avatarId} groesse="md" />
         <div>
           <h1 className="text-h1 text-text">{texte.titel}</h1>
-          <p className="numeric mt-2 text-body text-text-muted">
-            {mehrzahl(sprache, texte.anzahl, zeilen?.length ?? werte.anzahl)}
+          <p className="mt-2 text-body text-text-muted wrap-break-word">
+            {mitglied.anzeigename}
+            {anzahl !== null ? (
+              <>
+                <span aria-hidden="true"> · </span>
+                <span className="numeric">{mehrzahl(sprache, texte.anzahl, anzahl)}</span>
+              </>
+            ) : null}
           </p>
         </div>
       </div>

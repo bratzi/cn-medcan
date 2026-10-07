@@ -41,6 +41,8 @@ export async function GET() {
         slug: e.slug,
         handelsname: e.handelsname,
         begruendung: begruendungText(e, w, sprache),
+        // Aufgefüllte Sorten sichtbar markieren wie im Profil (Spec Profil 2.4).
+        ...(e.bestaetigt ? {} : { marke: w.profil.nichtBestaetigt }),
       })),
     }),
     { headers: PRIVAT },
