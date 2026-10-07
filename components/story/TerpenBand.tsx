@@ -109,7 +109,7 @@ async function Inhalt() {
   );
 
   return (
-    <section aria-label={texte.terpene} className="terpen-band relative z-20 flex items-center overflow-x-clip border-y border-border bg-surface py-4 sm:min-h-48 sm:py-8">
+    <section aria-label={texte.terpene} className="terpen-band feldbuch-raster relative z-20 flex items-center overflow-x-clip bg-surface py-4 sm:min-h-48 sm:py-8">
       <div className="terpen-band-spur flex">
         {liste}
         <TerpenBandKopie />

@@ -356,8 +356,13 @@
   }
 
   /* Inspiration hat nur 400: keine künstlich fetten oder kursiven Schnitte. */
+  /* Mr Dafoe hat viel größere Kleinbuchstaben als die alte Inspiration (x-Höhe 0,35
+     statt rund 0,28); die Grade sind auf die alte Schrift abgestimmt. font-size-adjust
+     gleicht das an einer Stelle aus; 0,25 statt 0,28, weil sie sonst zu dick wirkt
+     (Nutzer 2026-10-07, live geprüft). */
   .font-hand {
     font-synthesis: none;
+    font-size-adjust: 0.25;
   }
 
   /* Bilder und Videos in normaler Farbe, in Hell wie Dunkel: kein Graustufen-,
@@ -537,6 +542,7 @@
    Schreibschrift eine kleine x-Höhe hat. */
 .hand-betont {
   font-family: var(--font-hand);
+  font-size-adjust: 0.25;
   font-style: normal;
   font-weight: 400;
   font-size: 1.35em;

@@ -20,13 +20,14 @@ export const ueberlaufPlatz: CSSProperties = {
  */
 export function UeberlaufWort({ wort, absatz = false }: { wort: string; absatz?: boolean }) {
   // absatz (Nutzer 2026-09-26, "Terpenprofil."): eigene Zeile knapp unter dem Satz,
-  // nur leicht nach rechts versetzt und schräg, statt am Satzende anzuschließen.
+  // nur leicht nach rechts versetzt und schräg, statt am Satzende anzuschließen. Seit Mr Dafoe
+  // (hohe Großbuchstaben) mit Abstand statt Überlappung (Nutzer 2026-10-07).
   return (
     <span className={absatz ? "relative block" : "relative inline-block w-0 align-baseline"}>
       <em
         className={
           absatz
-            ? "pointer-events-none relative -z-10 mx-auto -mt-[0.28em] block w-max translate-x-[0.35em] -rotate-3 text-left not-italic whitespace-nowrap"
+            ? "pointer-events-none relative -z-10 mx-auto mt-[0.1em] block w-max translate-x-[0.35em] -rotate-3 text-left not-italic whitespace-nowrap"
             : "pointer-events-none absolute bottom-0 left-0 -z-10 block w-max origin-bottom-left translate-x-[0.08em] translate-y-[0.34em] -rotate-3 text-left not-italic whitespace-nowrap"
         }
         style={{ fontSize: "var(--ueberlauf-grad)" }}

@@ -167,3 +167,11 @@ test("Terpen-Band-CSS: kein :has() innerhalb eines :has(), der Browser verwirft 
     }
   }
 });
+
+test("Terpenband wirkt nicht wie ein Band: keine Querlinien, das Spaltenraster läuft durch (Nutzer 2026-10-07)", () => {
+  const band = readFileSync(join(process.cwd(), "components/story/TerpenBand.tsx"), "utf8");
+  const klasse = /className="(terpen-band [^"]*)"/.exec(band)?.[1] ?? "";
+  assert.ok(klasse.split(" ").includes("feldbuch-raster"), klasse);
+  assert.ok(klasse.split(" ").includes("bg-surface"), klasse);
+  assert.ok(!klasse.split(" ").some((k) => k === "border-y" || k === "border-border"), klasse);
+});
