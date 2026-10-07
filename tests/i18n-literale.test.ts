@@ -61,8 +61,10 @@ const UMGESTELLT: string[] = [
   // Welle 3: Reviews und Bewerten
   "app/[lang]/reviews/page.tsx",
   "app/[lang]/blueten/[slug]/aktionen.ts",
+  "app/[lang]/blueten/[slug]/bewertungsbild-aktionen.ts",
   "lib/bewertung-eingabe.ts",
   "components/review/BewertungsFormular.tsx",
+  "components/review/BewertungsBilder.tsx",
   "components/review/BlattNote.tsx",
   "components/produkt/InstagramEmbed.tsx",
   "components/produkt/ReelNachKlick.tsx",

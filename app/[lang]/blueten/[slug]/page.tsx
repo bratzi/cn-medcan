@@ -8,7 +8,7 @@ import { CannabinoidBar } from "@/components/produkt/CannabinoidBar";
 import { TerpenProfil } from "@/components/review/SortenKopf";
 import { Titelblatt } from "@/components/produkt/Titelblatt";
 import { blueteBild } from "@/lib/medien";
-import { alsDiashow } from "@/lib/budpic-anzeige";
+import { alsDiashow, budpicMeldungen } from "@/lib/budpic-anzeige";
 import { musterBildId } from "@/lib/budpics";
 import { ladeFreieBudpics } from "@/lib/query/budpics";
 import { aehnlichImAroma } from "@/lib/query/empfehlungen";
@@ -323,6 +323,7 @@ async function ProduktInhalt({ slug, w, sprache }: { slug: string; w: Woerterbuc
                 vorbelegung={vorbelegung}
                 aromaTexte={aromaTexte(w, sprache)}
                 texte={w.bewerten}
+                bildMeldungen={budpicMeldungen(w)}
                 {...erkundung}
               />
             </div>

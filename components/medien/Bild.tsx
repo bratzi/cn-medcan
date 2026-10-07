@@ -74,7 +74,7 @@ export function BudpicBild({
   hoehe: number;
   alt: string;
   lazy?: boolean;
-  /** Vorschau eines noch nicht freigegebenen Bildes (nur Betreiber, /api/bild/offen/<id>, ohne Cache). */
+  /** Vorschau eines noch nicht freigegebenen Bildes (Betreiber oder Eigentümer, /api/bild/offen/<id>, ohne Cache). */
   offen?: boolean;
   className?: string;
 }) {
