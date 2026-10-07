@@ -324,6 +324,7 @@ async function ProduktInhalt({ slug, w, sprache }: { slug: string; w: Woerterbuc
                 aromaTexte={aromaTexte(w, sprache)}
                 texte={w.bewerten}
                 bildMeldungen={budpicMeldungen(w)}
+                achsen={w.label.geschmack}
                 {...erkundung}
               />
             </div>
