@@ -16,7 +16,12 @@ export const KONTO_LINK = { href: "/profil", schluessel: "konto" } as const;
 /** Pfade, die zusätzlich als „hier“ zählen: /mitglied ist der Reiter Konto von /profil. */
 const AUCH_AKTIV: Record<string, readonly string[]> = { "/profil": ["/mitglied"] };
 
+/** Nur die Seite selbst zählt: unter /profil/<kurz-id> stehen fremde öffentliche Profile. */
+const OHNE_UNTERSEITEN: ReadonlySet<string> = new Set(["/profil"]);
+
 /** Aktiv sind die Seite selbst und ihre Unterseiten, nicht ein blosser Namensanfang. */
 export function istAktiv(pfad: string, href: string): boolean {
-  return [href, ...(AUCH_AKTIV[href] ?? [])].some((h) => pfad === h || pfad.startsWith(`${h}/`));
+  return [href, ...(AUCH_AKTIV[href] ?? [])].some(
+    (h) => pfad === h || (!OHNE_UNTERSEITEN.has(h) && pfad.startsWith(`${h}/`)),
+  );
 }

@@ -50,6 +50,14 @@ export const revalidate = 86400;
  *   Cascade beim Löschen des Mitglieds oder der Sorte.
  *   Bilder zur Bewertung: app/blueten/[slug]/bewertungsbild-aktionen.ts (review_id an
  *   budpics, Spec 2026-10-06).
+ * - Profil: prisma/schema.prisma (NutzerProfil, Tabelle nutzer_profil, Aroma-Netz und
+ *   Terpene aus den eigenen Bewertungen, Cascade beim Löschen des Mitglieds);
+ *   app/[lang]/profil/page.tsx (privat, nur das eigene Mitglied). Öffentliches Profil:
+ *   Mitglied.profilOeffentlich (Vorgabe aus) und kurzId (8 Zufallszeichen, lib/kurz-id.ts),
+ *   gesetzt nur über profilSichtbarkeitSetzen in app/[lang]/mitglied/aktionen.ts für das
+ *   eigene Mitglied; app/[lang]/profil/[kurzId]/page.tsx zeigt nur bei eingeschaltetem
+ *   Profil Anzeigename, Profilbild, freigegebene Bewertungen und das Aroma-Netz aus
+ *   nutzer_profil, sonst 404; Vorschläge und Auswertungen nie.
  * - Löschen: User -> Mitglied, Sitzungen, Konto per Cascade; Stimmen,
  *   Vorschläge, Blütenvorschläge, Benachrichtigungen per Cascade;
  *   Bewertungen per SetNull (bleiben ohne Autor). Kein Selbstlöschen im
@@ -243,6 +251,17 @@ export default async function DatenschutzPage() {
             <p className="text-pretty">
               Bewertungen speichern wir mit deinen Noten, Angaben und Notizen. Öffentlich sichtbar
               werden sie erst nach unserer Freigabe, zusammen mit deinem Anzeigenamen.
+            </p>
+            <p className="text-pretty">
+              Aus deinen Bewertungen berechnen wir dein Profil: ein Aroma-Netz, deine Terpene,
+              Vorschläge mit ähnlichem Aroma und Auswertungen wie deine Schnitte. Das sehen nur du
+              und, technisch bedingt, wir. Schaltest du unter „Mein Profil“ im Reiter „Konto“ dein
+              öffentliches Profil ein, sehen alle unter einer zufälligen Adresse deinen
+              Anzeigenamen, dein Profilbild, die Zahl und Liste deiner freigegebenen Bewertungen
+              und dein Aroma-Netz; dein Name bei Bewertungen verweist dann dorthin. Vorschläge und
+              Auswertungen bleiben privat. Das öffentliche Profil ist anfangs aus, du kannst es
+              jederzeit wieder ausschalten; die Adresse führt dann ins Leere. Rechtsgrundlage ist
+              deine Einwilligung durch das Einschalten (Art. 6 Abs. 1 lit. a DSGVO).
             </p>
             <p className="text-pretty">
               Deine Stimme in einer Abstimmung speichern wir mit deinem Konto, damit jedes Mitglied
