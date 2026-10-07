@@ -36,7 +36,7 @@ export function budpicMeldungen(w: Woerterbuch): Record<string, string> {
   return Object.fromEntries(MELDUNGEN.map((k) => [k, w.meldung[k]]));
 }
 
-/** Bilder einer Bewertung für das Buch: Beschriftung nur das Datum, der Name steht im Kopf der Seite. */
+/** Bilder einer Bewertung fÃ¼r das Buch: Beschriftung nur das Datum, der Name steht im Kopf der Seite. */
 export function alsBuchBilder(liste: readonly ReviewBild[], sprache: Sprache): DiashowBild[] {
   return liste.map((b) => ({ id: b.id, breite: b.breite, hoehe: b.hoehe, beschriftung: formatiereDatum(b.erstelltAm, sprache) }));
 }

@@ -197,7 +197,7 @@ export type ReviewEintrag = {
   instagramReelUrl: string | null;
   chargenNr: string | null;
   erstelltAm: Date;
-  /** Freigegebene Bilder der Bewertung, älteste zuerst, höchstens drei; fehlt außerhalb der Blütenseite. */
+  /** Freigegebene Bilder der Bewertung, Ã¤lteste zuerst, hÃ¶chstens drei; fehlt auÃŸerhalb der BlÃ¼tenseite. */
   bilder?: ReviewBild[];
 };
 
@@ -623,7 +623,7 @@ export async function ladeStrainDetail(
           charge: { select: { chargenNr: true } },
           // Der Name steht Ã¶ffentlich im Buch (Profil: "Unter diesem Namen erscheinen deine Bewertungen").
           autor: { select: { anzeigename: true, avatar: { select: { id: true } } } },
-          // Nur freigegebene, nie mit BLOB; Prisma lädt sie in einer Abfrage mit IN über höchstens 20 Ids.
+          // Nur freigegebene, nie mit BLOB; Prisma lÃ¤dt sie in einer Abfrage mit IN Ã¼ber hÃ¶chstens 20 Ids.
           bilder: {
             where: { status: "FREIGEGEBEN" },
             select: { id: true, breite: true, hoehe: true, erstelltAm: true },
