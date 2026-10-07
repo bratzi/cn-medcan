@@ -24,11 +24,14 @@ test("Reiter: mit nur einer Tafel steht deren Titel statt einer Leiste", () => {
   const html = renderToStaticMarkup(
     createElement(BuchReiter, { bezeichnung: "Werte", reiter: [{ schluessel: "karte", titel: TITEL, inhalt: karte, eigeneLeiste: true }] }),
   );
-  // Gedruckt wie ein offener Reiter: Haarlinie unter der Zeile, Tintenstrich unter dem Titel.
+  // Gedruckt wie ein offener Reiter: Haarlinie unter der Zeile, Tintenstrich unter dem Titel. Die
+  // Haarlinie nur ab lg: mobil trennt schon die Linie über der Einlage, zwei Linien übereinander
+  // wirkten doppelt (Session 41).
   assert.match(
     html,
-    /<p data-register="titel" class="[^"]*\bborder-b border-border\b[^"]*"><span class="[^"]*\bborder-b-2\b[^"]*\bborder-text text-text\b[^"]*">Terpenbewertung<\/span><\/p>/,
+    /<p data-register="titel" class="[^"]*\blg:border-b lg:border-border\b[^"]*"><span class="[^"]*\bborder-b-2\b[^"]*\bborder-text text-text\b[^"]*">Terpenbewertung<\/span><\/p>/,
   );
+  assert.doesNotMatch(html, /data-register="titel" class="(?:[^"]* )?border-b\b/);
   assert.doesNotMatch(html, /role="tablist"/);
 });
 
@@ -37,8 +40,9 @@ test("Reiter: mit mehreren Tafeln steht die Leiste an der Stelle des Titels", ()
   assert.match(html, /role="tablist"/);
   assert.match(html, /role="tab"[^>]*aria-selected="true"[^>]*>Terpenbewertung</);
   const anfang = html.indexOf('data-karte="1"');
-  const offen = html.slice(anfang, html.indexOf("</div>", anfang));
-  assert.doesNotMatch(offen, /data-register="titel"/);
+  const offen = html.slice(anfang, html.indexOf("</p>", anfang));
+  // Ab lg ersetzt die Leiste den Titel; mobil ist die Leiste verborgen, dort steht der Titel (Session 41).
+  assert.match(offen, /data-register="titel" class="(?:[^"]* )?lg:hidden\b[^"]*"><span[^>]*>Terpenbewertung</);
 });
 
 test("Register statt Pillenleiste: Reiter stehen gedruckt auf einer Haarlinie, ohne Kasten und ohne Pille", () => {

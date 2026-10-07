@@ -126,13 +126,14 @@ export function BuchDoppelseite({ eintrag, ueberschrift: Ueberschrift, w, sprach
             />
           ) : null}
           <div className="flex min-w-0 flex-1 flex-col gap-2">
+            {/* title am inneren span, nicht an der Überschrift: dort neben aria-label läse ein
+                Vorleser den Namen als Beschreibung ein zweites Mal (Review Session 41). */}
             <Ueberschrift
               id={titelId}
-              title={name}
               aria-label={t(w.buch.bewertungVon, { name })}
               className="font-buch text-h1 font-medium text-balance text-text wrap-break-word lg:line-clamp-2"
             >
-              {name}
+              <span title={name}>{name}</span>
             </Ueberschrift>
             <p>
               <Badge variante={eintrag.istBetreiber ? "accent" : "neutral"} zeichen={false}>

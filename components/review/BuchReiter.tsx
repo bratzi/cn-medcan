@@ -33,14 +33,22 @@ const REITER = "-mb-px inline-flex h-11 items-center border-b-2 text-small font-
  * an den Schalter läuft (ohne `min-w-0`: wird es eng, bricht die Zeile, statt dass Reiter überlaufen).
  * Wo es keine Leiste gibt (nur eine Tafel), steht an ihrer Stelle der Titel der Tafel, gedruckt wie
  * ein offener Reiter, mit Tintenstrich statt des grünen Bedienstrichs: man kann ihn nicht wählen.
+ * Unter lg ist die Leiste verborgen, dort steht immer der Titel, und zwar ohne Haarlinie: über der
+ * Einlage liegt mobil schon eine Linie, zwei übereinander wirkten doppelt (Session 41).
  */
 export function ReiterLeiste({ titel }: { titel: string }) {
   const leiste = useContext(LeisteKontext);
-  if (leiste) return <div className="flex-1 max-lg:hidden">{leiste}</div>;
-  return (
-    <p data-register="titel" className="flex flex-1 border-b border-border">
+  const titelZeile = (
+    <p data-register="titel" className={cn("flex flex-1 lg:border-b lg:border-border", leiste ? "lg:hidden" : null)}>
       <span className={cn(REITER, "border-text text-text")}>{titel}</span>
     </p>
+  );
+  if (!leiste) return titelZeile;
+  return (
+    <>
+      <div className="flex-1 max-lg:hidden">{leiste}</div>
+      {titelZeile}
+    </>
   );
 }
 

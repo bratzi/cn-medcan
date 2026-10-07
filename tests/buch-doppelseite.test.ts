@@ -48,7 +48,8 @@ function reiterProps(teil: Partial<EintragDaten>) {
 test("Rahmen: eindeutige Id, Überschrift mit Namen, beide Hälften, die Höhe wächst mit dem Inhalt", () => {
   const html = zeige({ id: "r7" });
   assert.match(html, /<article id="eintrag-r7" aria-labelledby="eintrag-r7-titel"/);
-  assert.match(html, /<h3 id="eintrag-r7-titel" title="Waldi" aria-label="Bewertung von Waldi"/);
+  // title am inneren span: an der Überschrift neben aria-label läse ein Vorleser den Namen doppelt.
+  assert.match(html, /<h3 id="eintrag-r7-titel" aria-label="Bewertung von Waldi"[^>]*><span title="Waldi">Waldi<\/span><\/h3>/);
   assert.match(zeige({}, "h2"), /<h2 id="eintrag-r1-titel"/);
   assert.match(html, /<article [^>]*class="[^"]*\blg:min-h-\(--buch-h\)/);
   assert.doesNotMatch(html, /\blg:h-\(--buch-h\)/);

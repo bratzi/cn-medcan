@@ -1428,7 +1428,9 @@ html.joint-cursor :is(input:not([type="range"]):not([type="radio"]):not([type="c
 
 /* Einzug der Doppelseite im Buch (BuchDoppelseite.tsx, Spec 2026-10-05). Alles einmal, nur transform,
    opacity und clip-path. Es startet, sobald das Buch im Bild ist (`data-im-bild`, Buch.tsx) und die Seite
-   aufgeschlagen ist; beim Umblättern beginnt es neu, nach der Drehung (280 ms). `--i` ist der Platz in
+   aufgeschlagen ist; beim Umblättern beginnt es neu, 280 ms nach dem Start: die Drehung dauert 500 ms
+   (Buch.tsx), nach ihrem ersten Viertel (250 ms) liegt die neue Seite frei, der Einzug setzt kurz danach
+   ein und läuft mit dem zweiten Viertel aus. `--i` ist der Platz in
    der Staffel (components/review/eintritt.ts). Jede Bewegung hat einen Grund: Blätter und Zahl zeigen das
    Urteil zuerst, die Striche machen den Wert lesbar, die Einlage deckt sich in Leserichtung der Karte auf
    (Geschmack, dann Terpene), die Handschrift wird geschrieben. Nur mit Bewegung und ohne Sparmodus; sonst,
