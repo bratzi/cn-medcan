@@ -825,6 +825,7 @@ export const de = {
       ansehen: "Öffentliches Profil ansehen",
       adresse: "Adresse: {adresse}",
       fehler: "Das hat nicht geklappt. Versuch es noch einmal.",
+      erstNachFreigabe: "Ein öffentliches Profil kannst du einschalten, sobald dein Konto freigegeben ist.",
     },
   },
   budpic: {

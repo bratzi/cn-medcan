@@ -258,9 +258,11 @@ export default async function DatenschutzPage() {
               und, technisch bedingt, wir. Schaltest du unter „Mein Profil“ im Reiter „Konto“ dein
               öffentliches Profil ein, sehen alle unter einer zufälligen Adresse deinen
               Anzeigenamen, dein Profilbild, die Zahl und Liste deiner freigegebenen Bewertungen
-              und dein Aroma-Netz; dein Name bei Bewertungen verweist dann dorthin. Vorschläge und
-              Auswertungen bleiben privat. Das öffentliche Profil ist anfangs aus, du kannst es
-              jederzeit wieder ausschalten; die Adresse führt dann ins Leere. Rechtsgrundlage ist
+              und ein Aroma-Netz nur aus diesen freigegebenen Bewertungen; dein Name bei Bewertungen
+              verweist dann dorthin. Einschalten lässt es sich, sobald dein Konto freigegeben ist.
+              Vorschläge und Auswertungen bleiben privat. Das öffentliche Profil ist anfangs aus, du
+              kannst es jederzeit wieder ausschalten; die Adresse führt dann sofort ins Leere, der
+              Verweis bei deinem Namen verschwindet nach wenigen Minuten. Rechtsgrundlage ist
               deine Einwilligung durch das Einschalten (Art. 6 Abs. 1 lit. a DSGVO).
             </p>
             <p className="text-pretty">

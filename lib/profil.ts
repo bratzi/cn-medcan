@@ -100,6 +100,21 @@ export function profilAusDaten(z: { geschmack: string; terpene: string; anzahl: 
   return { geschmack, terpene, anzahl: z.anzahl, gewichtet: z.gewichtet };
 }
 
+/** Netz nur aus freigegebenen Bewertungen als ein JSON-Text für `nutzer_profil.oeffentlich` (Review W1). */
+export function oeffentlicheDaten(w: ProfilWerte): string {
+  return JSON.stringify(profilDaten(w));
+}
+
+/** Umkehrung von oeffentlicheDaten; fehlend oder kaputt ergibt null (dann kein öffentliches Netz). */
+export function oeffentlicheWerte(roh: string | null): ProfilWerte | null {
+  const z = roh === null ? undefined : json(roh);
+  if (!z || typeof z !== "object" || Array.isArray(z)) return null;
+  const { geschmack, terpene, anzahl, gewichtet } = z as Record<string, unknown>;
+  if (typeof geschmack !== "string" || typeof terpene !== "string") return null;
+  if (typeof anzahl !== "number" || typeof gewichtet !== "number") return null;
+  return profilAusDaten({ geschmack, terpene, anzahl, gewichtet });
+}
+
 /**
  * Mittel der fremden freigegebenen Gesamtnoten je Sorte (Spec 4.5): ohne die
  * eigene Bewertung, nur mit Note. Seed-Bewertungen ohne Autor zählen als fremd.

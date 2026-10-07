@@ -816,6 +816,7 @@ export const en: Woerterbuch = {
       ansehen: "View public profile",
       adresse: "Address: {adresse}",
       fehler: "That did not work. Please try again.",
+      erstNachFreigabe: "You can make your profile public once your account is approved.",
     },
   },
   budpic: {

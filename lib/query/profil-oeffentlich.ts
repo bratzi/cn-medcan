@@ -1,14 +1,15 @@
 import { cache } from "react";
 
 import { getPrisma } from "@/lib/prisma";
-import { profilAusDaten } from "@/lib/profil";
+import { oeffentlicheWerte } from "@/lib/profil";
 import { OEFFENTLICHE_BEWERTUNGEN, type OeffentlichesProfil } from "@/lib/profil-oeffentlich";
 
 /**
  * Öffentliches Profil (Spec Profil 9): nur wenn eingeschaltet, sonst null (404).
- * Nie Vorschläge oder Auswertungen, nie unfreigegebene Bewertungen. Das Netz
- * kommt ungerechnet aus nutzer_profil: fremde Aufrufe lösen keine Rechnung aus
- * (CPU-Limit); der Stand erneuert sich beim Speichern und beim Besuch des Inhabers.
+ * Nur freigegebene Mitglieder (Review W2: sonst wäre es ein unmoderierter Aushang).
+ * Nie Vorschläge oder Auswertungen, nie unfreigegebene Bewertungen, auch nicht im
+ * Netz: das kommt aus `nutzer_profil.oeffentlich`, nur aus freigegebenen gerechnet
+ * (Review W1), ungerechnet gelesen (CPU-Limit). Inaktive Sorten fehlen wie im Katalog.
  * `cache()` je Render-Durchlauf: Metadaten und Seite teilen sich eine Abfrage.
  */
 export const ladeOeffentlichesProfil = cache(async function ladeOeffentlichesProfil(
@@ -16,16 +17,16 @@ export const ladeOeffentlichesProfil = cache(async function ladeOeffentlichesPro
 ): Promise<OeffentlichesProfil | null> {
   const prisma = await getPrisma();
   const m = await prisma.mitglied.findFirst({
-    where: { kurzId, profilOeffentlich: true },
+    where: { kurzId, profilOeffentlich: true, freigegeben: true },
     select: {
       id: true,
       anzeigename: true,
       avatar: { select: { id: true } },
-      profil: { select: { geschmack: true, terpene: true, anzahl: true, gewichtet: true } },
+      profil: { select: { oeffentlich: true } },
     },
   });
   if (!m) return null;
-  const nurFrei = { autorId: m.id, freigegeben: true } as const;
+  const nurFrei = { autorId: m.id, freigegeben: true, strain: { aktiv: true } } as const;
   const [anzahl, zeilen] = await Promise.all([
     prisma.review.count({ where: nurFrei }),
     prisma.review.findMany({
@@ -39,7 +40,7 @@ export const ladeOeffentlichesProfil = cache(async function ladeOeffentlichesPro
     anzeigename: m.anzeigename,
     avatarId: m.avatar?.id ?? null,
     anzahl,
-    werte: m.profil ? profilAusDaten(m.profil) : null,
+    werte: oeffentlicheWerte(m.profil?.oeffentlich ?? null),
     bewertungen: zeilen.map((z) => ({
       id: z.id,
       slug: z.strain.slug,

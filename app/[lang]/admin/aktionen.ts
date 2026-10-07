@@ -5,6 +5,7 @@ import { revalidiereSprachen } from "@/lib/i18n/revalidiere";
 import { adminErforderlich } from "@/lib/session";
 import { kennwerteFortschreiben } from "@/lib/kennwerte";
 import { getPrisma } from "@/lib/prisma";
+import { profilFortschreiben } from "@/lib/query/profil";
 import { freigabeEingabePruefen, reviewIdPruefen, rolleEingabePruefen } from "@/lib/admin-eingabe";
 
 export type AdminErgebnis = { ok: true } | { ok: false; fehler: string };
@@ -82,6 +83,17 @@ function bewertungPfadeNeuLaden(slug: string) {
   revalidiereSprachen(`/blueten/${slug}`);
 }
 
+/**
+ * Das öffentliche Netz zählt nur freigegebene Bewertungen (Profil Stufe 2,
+ * Review W1): nach Freigabe und Verwerfen das Profil des Autors neu rechnen.
+ * Scheitert das, bleibt die Freigabe gültig; der alte Stand gilt bis zur
+ * nächsten Rechnung (Speichern oder /profil nach 24 h).
+ */
+async function oeffentlichesNetzFortschreiben(autorId: string | null): Promise<void> {
+  if (!autorId) return;
+  await profilFortschreiben(autorId).catch((fehler) => console.error("profilFortschreiben nach Freigabe fehlgeschlagen", fehler));
+}
+
 /** Community-Bewertung freigeben - danach ist sie oeffentlich sichtbar. */
 export async function bewertungFreigeben(formData: FormData): Promise<AdminErgebnis> {
   await adminErforderlich();
@@ -93,8 +105,9 @@ export async function bewertungFreigeben(formData: FormData): Promise<AdminErgeb
   if (!slug) return { ok: false, fehler: "Die Bewertung gibt es nicht mehr." };
 
   const prisma = await getPrisma();
-  const review = await prisma.review.update({ where: { id: geprueft.wert }, data: { freigegeben: true }, select: { strainId: true } });
+  const review = await prisma.review.update({ where: { id: geprueft.wert }, data: { freigegeben: true }, select: { strainId: true, autorId: true } });
   await kennwerteFortschreiben(review.strainId);
+  await oeffentlichesNetzFortschreiben(review.autorId);
 
   bewertungPfadeNeuLaden(slug);
   return { ok: true };
@@ -111,8 +124,9 @@ export async function bewertungVerwerfen(formData: FormData): Promise<AdminErgeb
   if (!slug) return { ok: false, fehler: "Die Bewertung gibt es nicht mehr." };
 
   const prisma = await getPrisma();
-  const review = await prisma.review.delete({ where: { id: geprueft.wert }, select: { strainId: true } });
+  const review = await prisma.review.delete({ where: { id: geprueft.wert }, select: { strainId: true, autorId: true } });
   await kennwerteFortschreiben(review.strainId);
+  await oeffentlichesNetzFortschreiben(review.autorId);
 
   bewertungPfadeNeuLaden(slug);
   return { ok: true };

@@ -62,6 +62,7 @@ export function BuchDoppelseite({ eintrag, ueberschrift: Ueberschrift, w, sprach
   const name = eintrag.autorName ?? (eintrag.istBetreiber ? w.buch.betreiberName : w.buch.ohneName);
   // Ohne Autor und ohne Betreiber (ohneName) gibt es keinen Kreis, sonst stünde ein Initial für "Anonym".
   const hatPerson = Boolean(eintrag.autorName) || eintrag.istBetreiber;
+  const verlinkt = Boolean(eintrag.autorName && eintrag.autorProfil);
   // Kein Ersatz aus der Umgebung: nur eine gültige eigene URL ergibt ein Reel.
   const reel = baueEmbedUrl(eintrag.instagramReelUrl) ? eintrag.instagramReelUrl : null;
 
@@ -132,12 +133,20 @@ export function BuchDoppelseite({ eintrag, ueberschrift: Ueberschrift, w, sprach
                 Vorleser den Namen als Beschreibung ein zweites Mal (Review Session 41). */}
             <Ueberschrift
               id={titelId}
-              aria-label={t(w.buch.bewertungVon, { name })}
+              // Mit Link trägt der Link das Label: ein aria-label an der Überschrift
+              // verdeckte sonst den Link vor Vorlesern (Review Stufe 2, Minor 6).
+              aria-label={verlinkt ? undefined : t(w.buch.bewertungVon, { name })}
               className="font-buch text-h1 font-medium text-balance text-text wrap-break-word lg:line-clamp-2"
             >
               {/* Link nur bei öffentlichem Profil (Spec Profil 9); sonst bleibt der Name reiner Text. */}
-              {eintrag.autorName && eintrag.autorProfil ? (
-                <Link prefetch={false} href={profilHref(eintrag.autorProfil)} title={name} className={namenLinkKlassen()}>
+              {verlinkt ? (
+                <Link
+                  prefetch={false}
+                  href={profilHref(eintrag.autorProfil!)}
+                  aria-label={t(w.buch.bewertungVon, { name })}
+                  title={name}
+                  className={namenLinkKlassen()}
+                >
                   {name}
                 </Link>
               ) : (

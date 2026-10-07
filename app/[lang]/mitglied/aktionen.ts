@@ -109,14 +109,21 @@ export async function avatarEntfernen(): Promise<ProfilErgebnis> {
 
 /**
  * Öffentliches Profil ein- oder ausschalten (Spec Profil 9, Opt-in). Das
- * Mitglied kommt aus der Sitzung. Trifft die neue Kurz-Id eine vergebene
+ * Mitglied kommt aus der Sitzung. Einschalten nur mit freigegebenem Konto
+ * (Review W2: sonst ein unmoderierter Aushang mit Name und Bild); Ausschalten
+ * geht immer. Trifft die neue Kurz-Id eine vergebene
  * (Unique-Index), wird höchstens dreimal neu gezogen; prüfen vor dem Schreiben
  * wäre eine Race Condition (lib/prisma-fehler.ts). Name im Buch und
- * Startseite ändern sich mit, deshalb auch / und /reviews. `an === true`
+ * Startseite ändern sich mit, deshalb auch / und /reviews; ohne Tag-Cache
+ * trifft das nur den Router-Cache, die statischen Seiten folgen spätestens
+ * nach ihrem revalidate (300 s). Die Adresse selbst gibt sofort 404. `an === true`
  * verhindert, dass ein beliebiger Wert aus dem Client als „an“ gilt.
  */
 export async function profilSichtbarkeitSetzen(an: boolean): Promise<ProfilErgebnis> {
   const mitglied = await mitgliedErforderlich();
+  if (an === true && !mitglied.freigegeben) {
+    return { ok: false, fehler: (await holeWoerterbuchAusAnfrage()).mitglied.sichtbarkeit.erstNachFreigabe };
+  }
   const prisma = await getPrisma();
   for (let versuch = 0; versuch < 3; versuch++) {
     try {

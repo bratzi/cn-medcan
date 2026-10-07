@@ -27,12 +27,12 @@ test("ProfilSichtbarkeit: aus zeigt Einschalten, an zeigt Adresse und Link", asy
   const { de } = await import("@/lib/i18n/de");
   // useRouter verlangt einen eingehängten App Router; im Test genügt ein leerer.
   const router = {} as never;
-  const rendere = (an: boolean) =>
+  const rendere = (an: boolean, moeglich = true) =>
     renderToStaticMarkup(
       createElement(
         AppRouterContext.Provider,
         { value: router },
-        createElement(ProfilSichtbarkeit, { an, kurzId: "alt23456", texte: de.mitglied.sichtbarkeit }),
+        createElement(ProfilSichtbarkeit, { an, kurzId: "alt23456", moeglich, texte: de.mitglied.sichtbarkeit }),
       ),
     );
   const aus = rendere(false);
@@ -43,4 +43,9 @@ test("ProfilSichtbarkeit: aus zeigt Einschalten, an zeigt Adresse und Link", asy
   assert.match(an, /Dein Profil ist öffentlich\./);
   assert.match(an, /href="\/profil\/alt23456"/);
   assert.match(an, /Wieder privat machen/);
+  // Ohne Freigabe kein Einschalten, aber ein schon öffentliches Profil lässt sich ausschalten (Review W2).
+  const gesperrt = rendere(false, false);
+  assert.doesNotMatch(gesperrt, /Profil öffentlich machen/);
+  assert.match(gesperrt, /sobald dein Konto freigegeben ist/);
+  assert.match(rendere(true, false), /Wieder privat machen/);
 });

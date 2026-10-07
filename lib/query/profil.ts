@@ -11,7 +11,15 @@ import {
   type TerpenZeile,
 } from "@/lib/empfehlung";
 import { getEnv } from "@/lib/cloudflare";
-import { FREMDE_NOTEN_SQL, noteOderErsatz, profilAnzeige, profilAusDaten, profilDaten, profilVeraltet } from "@/lib/profil";
+import {
+  FREMDE_NOTEN_SQL,
+  noteOderErsatz,
+  oeffentlicheDaten,
+  profilAnzeige,
+  profilAusDaten,
+  profilDaten,
+  profilVeraltet,
+} from "@/lib/profil";
 import type { AuswertungsZeile, ProfilWerte } from "@/lib/profil-typen";
 import { getPrisma } from "@/lib/prisma";
 import { parseGeschmacksMatrix, parseTerpenIntensitaet } from "@/lib/query/bewertung";
@@ -25,7 +33,8 @@ const BEWERTUNGEN_HOECHSTENS = 1000;
  * der Stand älter als 24 h ist; nie über alle Sorten je Seitenaufruf. Zählen
  * alle eigenen Bewertungen, auch noch nicht freigegebene: es geht um den
  * Geschmack des Mitglieds. Altbewertungen ohne Gesamtnote zählen mit dem
- * Mittel ihrer fünf Noten.
+ * Mittel ihrer fünf Noten. Das öffentliche Netz (Spalte `oeffentlich`) zählt
+ * nur freigegebene; deshalb läuft das auch nach Freigabe und Verwerfen in /admin.
  */
 export async function profilFortschreiben(mitgliedId: string): Promise<void> {
   const prisma = await getPrisma();
@@ -35,6 +44,7 @@ export async function profilFortschreiben(mitgliedId: string): Promise<void> {
       orderBy: { erstelltAm: "desc" },
       select: {
         strainId: true,
+        freigegeben: true,
         gesamtnote: true,
         aussehen: true,
         geruch: true,
@@ -69,7 +79,13 @@ export async function profilFortschreiben(mitgliedId: string): Promise<void> {
           await prisma.$queryRawUnsafe<SortenAromaZeile[]>(KANDIDATEN_SQL, JSON.stringify(gewichte), bewerteteIds, KANDIDATEN_ANZAHL),
         );
   const liste = empfehlungenBerechnen(bewertungen, [...bewertete, ...kandidaten]);
-  const daten = { ...profilDaten(profilAnzeige(bewertungen, bewertete)), berechnetAm: new Date() };
+  // Öffentlich nur, was freigegeben ist (Review W1): eigenes Netz für /profil/<kurzId>.
+  const freigegeben = bewertungen.filter((_, i) => eigene[i].freigegeben);
+  const daten = {
+    ...profilDaten(profilAnzeige(bewertungen, bewertete)),
+    oeffentlich: oeffentlicheDaten(profilAnzeige(freigegeben, bewertete)),
+    berechnetAm: new Date(),
+  };
 
   // Atomar ersetzen: D1-batch läuft als eine Transaktion, Prismas $transaction
   // auf D1 dagegen als Einzelabfragen (siehe lib/auth.ts).

@@ -209,7 +209,13 @@ export default async function MitgliedPage() {
             </h2>
           </CardHeader>
           <CardBody>
-            <ProfilSichtbarkeit an={mitglied.profilOeffentlich} kurzId={mitglied.kurzId} texte={texte.sichtbarkeit} />
+            <ProfilSichtbarkeit
+              an={mitglied.profilOeffentlich}
+              // Die Kurz-Id eines privaten Profils bleibt auf dem Server (Review Minor 5).
+              kurzId={mitglied.profilOeffentlich ? mitglied.kurzId : null}
+              moeglich={mitglied.freigegeben}
+              texte={texte.sichtbarkeit}
+            />
           </CardBody>
         </Card>
       </section>

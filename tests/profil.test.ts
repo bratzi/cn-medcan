@@ -177,3 +177,16 @@ test("FREMDE_NOTEN_SQL: ohne eigene, ohne Notenlose und Unfreigegebene, Seed zä
   const zeilen = db.prepare(FREMDE_NOTEN_SQL).all("ich", JSON.stringify(["s1", "s2"])) as { sid: string; m: number; n: number }[];
   assert.deepEqual(zeilen, [{ sid: "s1", m: 4.5, n: 2 }]);
 });
+
+test("oeffentlicheWerte: liest das Netz aus freigegebenen Bewertungen, kaputt oder fehlend ergibt null", async () => {
+  const { oeffentlicheDaten, oeffentlicheWerte, leereProfilWerte } = await import("@/lib/profil");
+  const w = leereProfilWerte();
+  w.geschmack.FRUCHTIG = 0.8;
+  w.terpene = [{ name: "Limonen", wert: 1 }];
+  w.anzahl = 2;
+  w.gewichtet = 1;
+  assert.deepEqual(oeffentlicheWerte(oeffentlicheDaten(w)), w);
+  assert.equal(oeffentlicheWerte(null), null);
+  assert.equal(oeffentlicheWerte("{kaputt"), null);
+  assert.equal(oeffentlicheWerte("[]"), null);
+});
