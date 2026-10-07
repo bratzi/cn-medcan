@@ -79,3 +79,10 @@ test("ProfilReiter: zwei Reiter, aktiver mit aria-current", async () => {
   assert.match(html, /href="\/profil"[^>]*>Profil</);
   assert.match(html, /aria-current="page"[^>]*href="\/mitglied"|href="\/mitglied"[^>]*aria-current="page"/);
 });
+
+test("istAktiv: fremdes öffentliches Profil markiert Mein Profil nicht", () => {
+  assert.equal(istAktiv("/profil/abcd2345", "/profil"), false);
+  assert.equal(istAktiv("/profil", "/profil"), true);
+  assert.equal(istAktiv("/mitglied", "/profil"), true);
+  assert.equal(istAktiv("/blueten/x", "/blueten"), true);
+});
