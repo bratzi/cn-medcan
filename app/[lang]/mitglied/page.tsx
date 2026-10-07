@@ -6,6 +6,7 @@ import { AbmeldeButton } from "@/components/auth/AbmeldeButton";
 import { ProfilFormular } from "@/components/auth/ProfilFormular";
 import { AvatarFormular } from "@/components/mitglied/AvatarFormular";
 import { GelesenMarkieren } from "@/components/mitglied/GelesenMarkieren";
+import { ProfilSichtbarkeit } from "@/components/mitglied/ProfilSichtbarkeit";
 import { ProfilReiter } from "@/components/profil/ProfilReiter";
 import { Avatar, Badge, buttonKlassen, Card, CardBody, CardHeader, textLinkKlassen } from "@/components/ui";
 import { benachrichtigungenLaden } from "@/lib/query/benachrichtigungen";
@@ -196,6 +197,19 @@ export default async function MitgliedPage() {
               texte={texte.avatar}
               meldungen={w.meldung}
             />
+          </CardBody>
+        </Card>
+      </section>
+
+      <section aria-labelledby="sichtbarkeit-titel" className="mt-8">
+        <Card>
+          <CardHeader>
+            <h2 id="sichtbarkeit-titel" className="text-h3 text-text">
+              {texte.sichtbarkeit.titel}
+            </h2>
+          </CardHeader>
+          <CardBody>
+            <ProfilSichtbarkeit an={mitglied.profilOeffentlich} kurzId={mitglied.kurzId} texte={texte.sichtbarkeit} />
           </CardBody>
         </Card>
       </section>

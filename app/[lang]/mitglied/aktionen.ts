@@ -10,6 +10,9 @@ import { AVATAR_MAX_BYTES, AVATAR_SEITE } from "@/lib/avatar";
 import { bildPruefen } from "@/lib/bild-pruefen";
 import { holeWoerterbuchAusAnfrage } from "@/lib/i18n/anfrage";
 import { meldungText } from "@/lib/i18n/text";
+import { sichtbarkeitsDaten } from "@/lib/profil-sichtbarkeit";
+import { neueKurzId } from "@/lib/kurz-id";
+import { istEindeutigkeitsfehler } from "@/lib/prisma-fehler";
 
 export type ProfilErgebnis = { ok: true } | { ok: false; fehler: string };
 
@@ -102,4 +105,30 @@ export async function avatarEntfernen(): Promise<ProfilErgebnis> {
   await prisma.nutzerAvatar.deleteMany({ where: { mitgliedId: mitglied.mitgliedId } });
   revalidiereSprachen("/mitglied");
   return { ok: true };
+}
+
+/**
+ * Öffentliches Profil ein- oder ausschalten (Spec Profil 9, Opt-in). Das
+ * Mitglied kommt aus der Sitzung. Trifft die neue Kurz-Id eine vergebene
+ * (Unique-Index), wird höchstens dreimal neu gezogen; prüfen vor dem Schreiben
+ * wäre eine Race Condition (lib/prisma-fehler.ts). Name im Buch und
+ * Startseite ändern sich mit, deshalb auch / und /reviews. `an === true`
+ * verhindert, dass ein beliebiger Wert aus dem Client als „an“ gilt.
+ */
+export async function profilSichtbarkeitSetzen(an: boolean): Promise<ProfilErgebnis> {
+  const mitglied = await mitgliedErforderlich();
+  const prisma = await getPrisma();
+  for (let versuch = 0; versuch < 3; versuch++) {
+    try {
+      await prisma.mitglied.update({
+        where: { id: mitglied.mitgliedId },
+        data: sichtbarkeitsDaten(an === true, mitglied.kurzId, neueKurzId),
+      });
+      for (const pfad of ["/mitglied", "/", "/reviews"]) revalidiereSprachen(pfad);
+      return { ok: true };
+    } catch (fehler) {
+      if (!istEindeutigkeitsfehler(fehler)) throw fehler;
+    }
+  }
+  return { ok: false, fehler: (await holeWoerterbuchAusAnfrage()).mitglied.sichtbarkeit.fehler };
 }
