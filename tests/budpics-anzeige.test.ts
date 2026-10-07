@@ -88,3 +88,10 @@ test("alsBuchBilder: nur das Datum, der Name steht schon im Kopf der Seite", () 
   assert.deepEqual(bilder, [{ id: liste[0].id, breite: 1280, hoehe: 960, beschriftung: "12.09.2026" }]);
   assert.deepEqual(alsBuchBilder([], "en"), []);
 });
+
+test("Diashow: eigene Klasse am figure, Standard unverändert", () => {
+  const mit = renderToStaticMarkup(createElement(BudpicDiashow, { bilder: alsDiashow(liste, de, "de"), name: "N", texte: de.budpic, className: "flex size-full flex-col gap-2" }));
+  assert.match(mit, /<figure class="flex size-full flex-col gap-2"/);
+  const ohne = renderToStaticMarkup(createElement(BudpicDiashow, { bilder: alsDiashow(liste, de, "de"), name: "N", texte: de.budpic }));
+  assert.match(ohne, /<figure class="flex w-full flex-col gap-2"/);
+});

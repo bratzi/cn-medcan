@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useId, useRef, useState, type CSSProperties } from "react";
+import { useEffect, useId, useRef, useState, type CSSProperties, type ReactNode } from "react";
 
 import { ablauf } from "@/components/review/eintritt";
 import { buttonKlassen } from "@/components/ui";
@@ -11,6 +11,15 @@ export const NOTIZ_KURZ = 280;
 /** Zeilenhöhe von text-h3 (1.75rem, ab sm) und Platz für den Knopf (h-9 + gap-2). */
 const ZEILE = 28;
 const KNOPF_PLATZ = 44;
+/** Platz des Bildfelds unter dem Text (Spec 2026-10-06): min-h-48 (192 px) plus 16 px aus gap-2 und mt-2. */
+export const BILD_PLATZ = 208;
+
+/** Zeilen bis zur Auslassung; 0 = der Text passt ganz. Mit Bild geht dessen Mindestplatz vorher ab. */
+export function notizZeilen(platz: number, textHoehe: number, mitBild: boolean): number {
+  const rest = platz - (mitBild ? BILD_PLATZ : 0);
+  if (textHoehe <= rest) return 0;
+  return Math.max(1, Math.floor((rest - KNOPF_PLATZ) / ZEILE));
+}
 const NEBENEINANDER = "(min-width: 64rem)";
 
 /**
@@ -23,7 +32,21 @@ const NEBENEINANDER = "(min-width: 64rem)";
  * ganz, ohne Knopf. `data-buch-eigen`: ein Klick ins offene Blatt blättert
  * nicht um.
  */
-export function BuchNotiz({ text, weiterlesen, schliessen }: { text: string; weiterlesen: string; schliessen: string }) {
+export function BuchNotiz({
+  text,
+  weiterlesen,
+  schliessen,
+  bild,
+  bildNurGross = false,
+}: {
+  text: string;
+  weiterlesen: string;
+  schliessen: string;
+  /** Bildfeld unter dem Text, in derselben gemessenen Fläche (BuchBildfeld). */
+  bild?: ReactNode;
+  /** Ersatzbild: unter lg ausgeblendet. */
+  bildNurGross?: boolean;
+}) {
   const id = useId();
   const flaeche = useRef<HTMLDivElement>(null);
   const absatz = useRef<HTMLParagraphElement>(null);
@@ -40,13 +63,12 @@ export function BuchNotiz({ text, weiterlesen, schliessen }: { text: string; wei
       if (!window.matchMedia(NEBENEINANDER).matches) return setZeilen(null);
       // scrollHeight ist auch begrenzt die volle Höhe des Textes.
       const platz = element.clientHeight;
-      if (p.scrollHeight <= platz) return setZeilen(0);
-      setZeilen(Math.max(1, Math.floor((platz - KNOPF_PLATZ) / ZEILE)));
+      setZeilen(notizZeilen(platz, p.scrollHeight, Boolean(bild)));
     };
     const beobachter = new ResizeObserver(messen);
     beobachter.observe(element);
     return () => beobachter.disconnect();
-  }, [offen, text]);
+  }, [offen, text, bild]);
 
   const schliessenMitFokus = () => {
     setOffen(false);
@@ -82,7 +104,7 @@ export function BuchNotiz({ text, weiterlesen, schliessen }: { text: string; wei
         id={id}
         style={stil}
         className={cn(
-          "max-w-[52ch] text-body text-pretty text-text sm:text-h3 sm:font-normal",
+          "flex-none max-w-[52ch] text-body text-pretty text-text sm:text-h3 sm:font-normal",
           offen || zeilen === 0 ? null : zeilen === null ? "lg:line-clamp-6" : "lg:line-clamp-(--notiz-zeilen)",
         )}
       >
@@ -99,6 +121,12 @@ export function BuchNotiz({ text, weiterlesen, schliessen }: { text: string; wei
         >
           {offen ? schliessen : weiterlesen}
         </button>
+      ) : null}
+      {bild ? (
+        // Das Bild nimmt den Rest der Fläche; ab lg absolut, damit es nichts zur Höhe beiträgt.
+        <div className={cn("relative mt-2 w-full lg:min-h-48 lg:flex-1", bildNurGross && "max-lg:hidden", offen && "lg:hidden")}>
+          <div className="lg:absolute lg:inset-0">{bild}</div>
+        </div>
       ) : null}
     </div>
   );

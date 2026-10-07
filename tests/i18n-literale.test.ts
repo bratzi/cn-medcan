@@ -55,6 +55,7 @@ const UMGESTELLT: string[] = [
   "components/review/BuchKolophon.tsx",
   "components/review/BuchDoppelseite.tsx",
   "components/review/BuchNotiz.tsx",
+  "components/review/BuchBildfeld.tsx",
   "components/review/BuchReiter.tsx",
   "components/review/erkundung-daten.ts",
   // Welle 3: Reviews und Bewerten

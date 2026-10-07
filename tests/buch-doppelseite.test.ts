@@ -9,6 +9,7 @@ import { BuchDoppelseite } from "@/components/review/BuchDoppelseite";
 import { BuchReiter } from "@/components/review/BuchReiter";
 import type { EintragDaten } from "@/components/review/eintrag";
 import type { KartenTerpen } from "@/lib/aromakarte";
+import { musterBildId } from "@/lib/budpics";
 import { de } from "@/lib/i18n/de";
 import { eintrag } from "./hilfen/eintrag";
 
@@ -63,7 +64,7 @@ test("Links: Avatar, Name, Marke, Text und Kolophon in dieser Reihenfolge, ohne 
     aufsteigend(stellen(links, ['class="inline-flex shrink-0 select-none', ">Waldi<", ">Betreiber<", "Sehr dichte Blüten.", ">Datum<", ">Charge<", ">Bewertungen insgesamt<"])),
     "Reihenfolge links",
   );
-  assert.doesNotMatch(links, /Aussehen|<figure|viewBox="0 0 24 24"/);
+  assert.doesNotMatch(links, /Aussehen|viewBox="0 0 24 24"/);
 });
 
 test("Rechts: Blätter, Zahl, fünf Noten und die Einlage mit der Karte in dieser Reihenfolge", () => {
@@ -105,7 +106,7 @@ test("Die Zahl der Bewertungen steht nur mit Zahl im Kolophon", () => {
 
 test("Ohne Text steht ruhig ein Hinweis, ohne Knopf", () => {
   const links = seiten(zeige({ notiz: null })).links;
-  assert.match(links, /<p class="text-body text-text-muted italic lg:flex-1">Kein Text zu dieser Bewertung\.<\/p>/);
+  assert.match(links, /<p class="text-body text-text-muted italic">Kein Text zu dieser Bewertung\.<\/p>/);
   assert.doesNotMatch(links, /Weiterlesen|<button/);
 });
 
@@ -187,4 +188,47 @@ test("Reiter bekommen nur serialisierbare Props (Server zu Client, sonst Fehlers
   for (const reiter of funde[0].reiter as { schluessel: string; inhalt: unknown }[]) {
     assert.notEqual(typeof reiter.inhalt, "function", `Reiter ${reiter.schluessel} reicht eine Funktion`);
   }
+});
+
+const BILD = (n: number) => ({ id: `${n}f2b8c1e-0a4d-4e6b-9c1a-2d5e7f809abc`, breite: 800, hoehe: 600, erstelltAm: new Date("2026-10-01T10:00:00Z") });
+
+test("Bildfeld: ein Bild statisch, ohne Diashow-Knöpfe, Beschriftung nur Datum", () => {
+  const { links } = seiten(zeige({ bilder: [BILD(1)] }));
+  assert.match(links, new RegExp(`src="/api/bild/${BILD(1).id}"`));
+  assert.doesNotMatch(links, /Diashow anhalten/);
+  assert.match(links, /01\.10\.2026/);
+});
+
+test("Bildfeld: drei Bilder als Diashow mit 1 / 3 und eigener Bezeichnung", () => {
+  const { links } = seiten(zeige({ bilder: [BILD(1), BILD(2), BILD(3)] }));
+  assert.match(links, /1 \/ 3/);
+  assert.match(links, /aria-label="Bilder zur Bewertung von Waldi"/);
+});
+
+test("Bildfeld: ohne Bild und ohne Herstellerbild das Musterbild, Symbolbild, nur ab lg", () => {
+  const { links } = seiten(zeige({ bilder: [], bildPfad: null }));
+  assert.match(links, new RegExp(musterBildId("nebelharz-22")));
+  assert.match(links, /Symbolbild/);
+  assert.match(links, /data-bildfeld="ersatz"[^>]*class="[^"]*\bmax-lg:hidden\b/);
+});
+
+test("Bildfeld: ohne Bild mit Herstellerbild dieses, ebenfalls als Symbolbild", () => {
+  // Ein Herstellerbild, das nicht zufällig das Musterbild der Sorte ist.
+  const hersteller = musterBildId("nebelharz-22") === "bluete-03" ? "bluete-04" : "bluete-03";
+  const { links } = seiten(zeige({ bilder: [], bildPfad: hersteller }));
+  assert.match(links, new RegExp(`/medien/${hersteller}-`));
+  assert.doesNotMatch(links, new RegExp(`/medien/${musterBildId("nebelharz-22")}-`));
+  assert.match(links, /Symbolbild/);
+});
+
+test("Linke Seite: Kopf, Text, Bildfeld, Kolophon in dieser Reihenfolge", () => {
+  const { links } = seiten(zeige({ bilder: [BILD(1)] }));
+  assert.ok(aufsteigend(stellen(links, ["<header", "Sehr dichte Blüten.", "data-bildfeld=", "<dl"])));
+});
+
+test("Ohne Text: Bildfeld füllt die Seite, der Platzhalter nimmt keinen Raum mehr", () => {
+  const { links } = seiten(zeige({ notiz: null, bilder: [BILD(1)] }));
+  assert.match(links, /Kein Text zu dieser Bewertung\./);
+  assert.doesNotMatch(links, /<p class="[^"]*italic[^"]*lg:flex-1/);
+  assert.match(links, /lg:flex-\[1_1_0px\][^"]*"><div class="lg:absolute lg:inset-0"><figure data-bildfeld="bild"/);
 });
