@@ -48,7 +48,7 @@ export async function Auftakt() {
             und pulsiert wie das Community-Fazit (marke-puls). */}
         <div data-story="titel" className="relative flex justify-center">
           <h1 id="auftakt-titel" className="auftakt-marke marke-puls relative flex justify-center">
-            <Logo glas data-marke-zeile="" className="w-[min(40rem,82vw)]" />
+            <Logo durchsichtig data-marke-zeile="" className="w-[min(40rem,82vw)]" />
           </h1>
         </div>
         <p
