@@ -120,10 +120,15 @@ export async function profilSichtbarkeitSetzen(an: boolean): Promise<ProfilErgeb
   const prisma = await getPrisma();
   for (let versuch = 0; versuch < 3; versuch++) {
     try {
-      await prisma.mitglied.update({
-        where: { id: mitglied.mitgliedId },
-        data: sichtbarkeitsDaten(an === true, mitglied.kurzId, neueKurzId),
-      });
+      const daten = sichtbarkeitsDaten(an === true, mitglied.kurzId, neueKurzId);
+      // Neue Kurz-Id nur, wenn noch keine steht: schalten zwei Tabs zugleich
+      // ein, behält die zuerst geschriebene ihre Adresse.
+      const { count } = daten.kurzId
+        ? await prisma.mitglied.updateMany({ where: { id: mitglied.mitgliedId, kurzId: null }, data: daten })
+        : { count: 0 };
+      if (count === 0) {
+        await prisma.mitglied.update({ where: { id: mitglied.mitgliedId }, data: { profilOeffentlich: daten.profilOeffentlich } });
+      }
       for (const pfad of ["/mitglied", "/", "/reviews"]) revalidiereSprachen(pfad);
       return { ok: true };
     } catch (fehler) {

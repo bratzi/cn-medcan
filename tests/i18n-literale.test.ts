@@ -117,6 +117,10 @@ const UMGESTELLT: string[] = [
   "components/profil/CommunityVergleich.tsx",
   "components/profil/Schnitte.tsx",
   "components/profil/ProfilReiter.tsx",
+  // Profil Stufe 2: oeffentliches Profil
+  "app/[lang]/profil/[kurzId]/page.tsx",
+  "components/profil/OeffentlicheBewertungen.tsx",
+  "components/mitglied/ProfilSichtbarkeit.tsx",
 ];
 
 const ERLAUBT: string[] = ["Book of Terpz", "Deutsch"];
