@@ -741,6 +741,8 @@ model NutzerProfil {
   gewichtet   Int
   /// Netz nur aus freigegebenen Bewertungen für /profil/<kurzId> (JSON wie oben); null bis zur nächsten Rechnung.
   oeffentlich String?
+  /// Verlauf des Netzes (Stufe 3): JSON [{anzahl, datum, geschmack}], die letzten 60 Schritte; null bis zur nächsten Rechnung.
+  verlauf     String?
   berechnetAm DateTime @map("berechnet_am")
 
   @@map("nutzer_profil")

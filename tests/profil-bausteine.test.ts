@@ -5,6 +5,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 
 import { EmpfehlungsListe } from "@/components/empfehlung/EmpfehlungsListe";
 import { CommunityVergleich } from "@/components/profil/CommunityVergleich";
+import { NetzGrafik } from "@/components/profil/NetzGrafik";
 import { ProfilNetz } from "@/components/profil/ProfilNetz";
 import { Schnitte } from "@/components/profil/Schnitte";
 import { TerpenRangliste } from "@/components/profil/TerpenRangliste";
@@ -139,4 +140,15 @@ test("EmpfehlungsListe: Marke als Badge nur, wo gesetzt", () => {
   );
   assert.equal(html.match(/noch nicht bestätigt/g)?.length, 1);
   assert.ok(html.indexOf("Beta") < html.indexOf("noch nicht bestätigt"));
+});
+
+test("NetzGrafik: Kontur vorher dünn ohne Fläche, ohne Kontur kein data-netz=vorher", () => {
+  const null10 = Array(10).fill(0);
+  const eins = [5, ...Array(9).fill(0)];
+  const mit = renderToStaticMarkup(createElement(NetzGrafik, { mag: eins, magNicht: null10, kontur: [3, ...Array(9).fill(0)] }));
+  assert.match(mit, /data-netz="vorher"[^>]*fill="none"[^>]*stroke-opacity="0.45"/);
+  const ohne = renderToStaticMarkup(createElement(NetzGrafik, { mag: eins, magNicht: null10 }));
+  assert.doesNotMatch(ohne, /data-netz="vorher"/);
+  // Ohne Beschriftung keine Achsennamen (Mini-Netz).
+  assert.doesNotMatch(ohne, /<span/);
 });

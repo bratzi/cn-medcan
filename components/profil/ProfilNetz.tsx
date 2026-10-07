@@ -1,25 +1,14 @@
 import Link from "next/link";
 
+import { NetzGrafik, netzAusGeschmack } from "@/components/profil/NetzGrafik";
 import { buttonKlassen } from "@/components/ui";
 import { formatiereWert } from "@/lib/format";
 import type { Sprache } from "@/lib/i18n/sprache-kern";
 import { t } from "@/lib/i18n/text";
 import type { Woerterbuch } from "@/lib/i18n/typen";
-import { alsPolygon, netzPunkte } from "@/lib/netz";
 import { PROFIL_AUSSAGEKRAEFTIG_AB } from "@/lib/profil";
 import type { ProfilWerte } from "@/lib/profil-typen";
 import { GESCHMACKS_ACHSEN } from "@/lib/query/bewertung";
-
-const GROESSE = 320;
-const MITTE = GROESSE / 2;
-const RADIUS = 110;
-const MAX = 5;
-const RINGE = [1, 2, 3, 4, 5] as const;
-
-/** Alle Achsen auf demselben Wert: ein Ring oder die Achsenenden. */
-function gleichmaessig(wert: number, radius = RADIUS) {
-  return netzPunkte(GESCHMACKS_ACHSEN.map(() => wert), MAX, radius, MITTE);
-}
 
 type Props = {
   werte: ProfilWerte;
@@ -35,72 +24,13 @@ type Props = {
  * Screenreader, das SVG ist aria-hidden. Nur Aroma, nie Wirkung (HWG).
  */
 export function ProfilNetz({ werte, texte, achsen, sprache }: Props) {
-  const mag = GESCHMACKS_ACHSEN.map((a) => Math.max(0, werte.geschmack[a.enumWert]) * MAX);
-  const magNicht = GESCHMACKS_ACHSEN.map((a) => Math.max(0, -werte.geschmack[a.enumWert]) * MAX);
+  const { mag, magNicht } = netzAusGeschmack(werte.geschmack);
   const hatMag = mag.some((x) => x > 0);
   const hatMagNicht = magNicht.some((x) => x > 0);
-  const beschriftung = gleichmaessig(MAX, RADIUS + 28);
 
   return (
     <figure className="flex flex-col items-center gap-4">
-      <div className="relative w-full max-w-sm">
-        <svg viewBox={`0 0 ${GROESSE} ${GROESSE}`} aria-hidden="true" className="block w-full text-text">
-          {RINGE.map((ring) => (
-            <polygon
-              key={ring}
-              points={alsPolygon(gleichmaessig(ring))}
-              fill="none"
-              stroke="currentColor"
-              strokeOpacity={0.15}
-              vectorEffect="non-scaling-stroke"
-            />
-          ))}
-          {gleichmaessig(MAX).map((p, i) => (
-            <line
-              key={GESCHMACKS_ACHSEN[i].key}
-              x1={MITTE}
-              y1={MITTE}
-              x2={p.x}
-              y2={p.y}
-              stroke="currentColor"
-              strokeOpacity={0.15}
-              vectorEffect="non-scaling-stroke"
-            />
-          ))}
-          {hatMag ? (
-            <polygon
-              data-netz="mag"
-              points={alsPolygon(netzPunkte(mag, MAX, RADIUS, MITTE))}
-              fill="currentColor"
-              fillOpacity={0.12}
-              stroke="currentColor"
-              strokeWidth={1.5}
-              vectorEffect="non-scaling-stroke"
-            />
-          ) : null}
-          {hatMagNicht ? (
-            <polygon
-              data-netz="mag-nicht"
-              points={alsPolygon(netzPunkte(magNicht, MAX, RADIUS, MITTE))}
-              fill="none"
-              stroke="currentColor"
-              strokeWidth={1.5}
-              strokeDasharray="4 4"
-              vectorEffect="non-scaling-stroke"
-            />
-          ) : null}
-        </svg>
-        {beschriftung.map((p, i) => (
-          <span
-            key={GESCHMACKS_ACHSEN[i].key}
-            aria-hidden="true"
-            className="absolute -translate-x-1/2 -translate-y-1/2 text-caption whitespace-nowrap text-text-muted"
-            style={{ left: `${(p.x / GROESSE) * 100}%`, top: `${(p.y / GROESSE) * 100}%` }}
-          >
-            {achsen[GESCHMACKS_ACHSEN[i].enumWert]}
-          </span>
-        ))}
-      </div>
+      <NetzGrafik mag={mag} magNicht={magNicht} beschriftung={GESCHMACKS_ACHSEN.map((a) => achsen[a.enumWert])} />
 
       {hatMag || hatMagNicht ? (
         <>

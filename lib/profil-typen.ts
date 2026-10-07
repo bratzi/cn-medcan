@@ -57,3 +57,15 @@ export type Auswertungen = {
   /** null ohne Bewertung. */
   schnitte: Schnitte | null;
 };
+
+/** Geschmacksachsen −1..1, normiert auf das stärkste |Gewicht| (wie ProfilWerte.geschmack). */
+export type Geschmack = Record<GeschmacksKategorie, number>;
+
+/** Ein Schritt im Verlauf des Netzes (Spec Profil 10): das Netz nach den ersten `anzahl` Bewertungen. */
+export type VerlaufSchritt = { anzahl: number; datum: string; geschmack: Geschmack };
+
+/** Veränderung einer Achse zwischen zwei Ständen; positiv heißt „stärker gemocht“. */
+export type NetzAenderung = { achse: GeschmacksKategorie; differenz: number };
+
+/** Hersteller mit dem höchsten Mittel ab 2 eigenen Bewertungen (Spec Profil 10). */
+export type Lieblingshersteller = { name: string; mittel: number; anzahl: number };
