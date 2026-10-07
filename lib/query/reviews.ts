@@ -12,6 +12,7 @@ import {
 } from "@/lib/query/bewertung";
 import type { GeschmacksKategorie } from "@/db/enums";
 import type { KartenTerpen } from "@/lib/aromakarte";
+import { autorProfilAus } from "@/lib/autor-profil";
 import { getPrisma } from "@/lib/prisma";
 
 /**
@@ -45,6 +46,8 @@ export type RedaktionelleReview = {
   istBetreiber: true;
   autorName: string | null;
   autorAvatarId?: string | null;
+  /** Kurz-Id des öffentlichen Profils; null bei privatem Profil oder ohne Autor. */
+  autorProfil?: string | null;
   gesamtnote: number | null;
   terpene: KartenTerpen[];
   terpenIntensitaet: TerpenIntensitaet;
@@ -70,7 +73,7 @@ const AUSWAHL = {
   erstelltAm: true,
   // Linke Seite der Doppelseite (T7): Name und Blätter-Note.
   gesamtnote: true,
-  autor: { select: { anzeigename: true, avatar: { select: { id: true } } } },
+  autor: { select: { anzeigename: true, profilOeffentlich: true, kurzId: true, avatar: { select: { id: true } } } },
   strain: {
     select: {
       handelsname: true,
@@ -102,7 +105,7 @@ type Satz = {
   instagramReelUrl: string | null;
   erstelltAm: Date;
   gesamtnote: number | null;
-  autor: { anzeigename: string; avatar: { id: string } | null } | null;
+  autor: { anzeigename: string; profilOeffentlich: boolean; kurzId: string | null; avatar: { id: string } | null } | null;
   strain: {
     handelsname: string;
     slug: string;
@@ -135,6 +138,8 @@ function zuAnsicht(satz: Satz): RedaktionelleReview {
     istBetreiber: true,
     autorName: satz.autor?.anzeigename ?? null,
     autorAvatarId: satz.autor?.avatar?.id ?? null,
+    // Nur die Kurz-Id eines öffentlichen Profils verlässt den Server.
+    autorProfil: autorProfilAus(satz.autor),
     gesamtnote: satz.gesamtnote,
     terpene: satz.strain.terpene.map((eintrag) => ({
       name: eintrag.terpen.name,
