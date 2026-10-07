@@ -419,6 +419,11 @@ model Mitglied {
   /// Preis-Sichtbarkeit nach §10 HWG ohne Schemaaenderung nachziehbar ist.
   rolle String @default("MITGLIED")
 
+  /// Öffentliches Profil unter /profil/<kurzId> (Spec Profil 9). Opt-in, Vorgabe aus.
+  profilOeffentlich Boolean @default(false) @map("profil_oeffentlich")
+  /// 8 Zeichen, beim ersten Einschalten vergeben, bleibt beim Ausschalten.
+  kurzId            String? @unique @map("kurz_id")
+
   erstelltAm DateTime @default(now()) @map("erstellt_am")
 
   vorschlaege UmfrageVorschlag[]
