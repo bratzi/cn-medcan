@@ -212,7 +212,7 @@ export default async function DatenschutzPage() {
               verkleinert es, bevor es hochgeladen wird. Wir speichern nur dieses kleine Bild, nie
               das Original, in unserer Datenbank (Cloudflare D1, EU). Es erscheint neben deinem
               Anzeigenamen bei Bewertungen und Vorschlägen und ist über seine Adresse abrufbar.
-              Ohne Bild zeigen wir deine Initialen. Du kannst es jederzeit unter „Mein Konto“
+              Ohne Bild zeigen wir deine Initialen. Du kannst es jederzeit unter „Mein Profil“ im Reiter „Konto“
               austauschen oder entfernen; dann wird es gelöscht. Beim Löschen deines Kontos
               verschwindet es mit.
             </p>

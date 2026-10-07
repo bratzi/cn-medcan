@@ -14,7 +14,7 @@ test("Kern zuerst: Bewertungen, Abstimmung, Blüten; Apotheken nur in Aussicht",
     HAUPTNAVIGATION.map((eintrag) => de.kopf.navigation[eintrag.schluessel]),
     ["Bewertungen", "Abstimmung", "Blüten"],
   );
-  assert.deepEqual(KONTO_LINK, { href: "/mitglied", schluessel: "konto" });
+  assert.deepEqual(KONTO_LINK, { href: "/profil", schluessel: "konto" });
   assert.equal(de.kopf.navigation.konto, "Mein Profil");
   assert.equal(en.kopf.navigation.bewertungen, "Reviews");
 });
@@ -61,4 +61,21 @@ test("Kopf: Aktiv-Markierung am Wort, keine Kapitelnummern mehr", async () => {
   // Stiftstrich (globals.css .kapitel-wort::after) sitzt am Wort; Nummern entfallen (Nutzer 2026-09-25).
   assert.match(html, /<span class="kapitel-wort">/);
   assert.doesNotMatch(html, /kapitel-nummer/);
+});
+
+test("istAktiv: Mein Profil gilt auch auf dem Reiter Konto", () => {
+  assert.equal(istAktiv("/profil", "/profil"), true);
+  assert.equal(istAktiv("/mitglied", "/profil"), true);
+  assert.equal(istAktiv("/mitglied-x", "/profil"), false);
+  assert.equal(istAktiv("/mitglied", "/reviews"), false);
+});
+
+test("ProfilReiter: zwei Reiter, aktiver mit aria-current", async () => {
+  const { createElement } = await import("react");
+  const { renderToStaticMarkup } = await import("react-dom/server");
+  const { ProfilReiter } = await import("@/components/profil/ProfilReiter");
+  const html = renderToStaticMarkup(createElement(ProfilReiter, { aktiv: "konto", texte: de.profil }));
+  assert.match(html, /<nav aria-label="Profil und Konto"/);
+  assert.match(html, /href="\/profil"[^>]*>Profil</);
+  assert.match(html, /aria-current="page"[^>]*href="\/mitglied"|href="\/mitglied"[^>]*aria-current="page"/);
 });
