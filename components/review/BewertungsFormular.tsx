@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { bewertungSpeichern } from "@/app/[lang]/blueten/[slug]/aktionen";
@@ -76,6 +76,7 @@ export function BewertungsFormular({
   const hydriert = useHydriert();
   const [laeuft, setLaeuft] = useState(false);
   const [vorgemerkt, setVorgemerkt] = useState<VorgemerktesBild[]>([]);
+  const [verkleinert, setVerkleinert] = useState(false);
   const [bildLauf, setBildLauf] = useState<{ nr: number; gesamt: number } | null>(null);
   const [fehler, setFehler] = useState<string | null>(null);
   const [erfolg, setErfolg] = useState<string | null>(null);
@@ -85,6 +86,13 @@ export function BewertungsFormular({
   // Neuer Stand nach dem Speichern: Blätter und Regler beginnen neu mit den gespeicherten
   // Werten, damit „Zurücksetzen“ zu ihnen zurückkehrt.
   const stand = vorbelegung?.stand ?? "neu";
+
+  // Beim Verlassen der Seite alle noch vorgemerkten Vorschauen freigeben.
+  const vorgemerktStand = useRef(vorgemerkt);
+  useEffect(() => {
+    vorgemerktStand.current = vorgemerkt;
+  }, [vorgemerkt]);
+  useEffect(() => () => vorgemerktStand.current.forEach((b) => URL.revokeObjectURL(b.vorschau)), []);
 
   async function absenden(ereignis: React.FormEvent<HTMLFormElement>) {
     ereignis.preventDefault();
@@ -177,6 +185,7 @@ export function BewertungsFormular({
           vorhanden={vorbelegung?.bilder ?? []}
           vorgemerkt={vorgemerkt}
           setVorgemerkt={setVorgemerkt}
+          onBeschaeftigt={setVerkleinert}
           istBetreiber={istBetreiber}
           gesperrt={laeuft}
           meldungen={bildMeldungen}
@@ -199,7 +208,7 @@ export function BewertungsFormular({
       {/* Rückmeldung direkt unter dem Knopf, an dem man gerade ist; darunter, damit der
           Knopf nach dem Klick nicht wegrutscht. */}
       <div className="flex flex-col items-start gap-4">
-        <Button type="submit" disabled={!hydriert || laeuft}>
+        <Button type="submit" disabled={!hydriert || laeuft || verkleinert}>
           {bildLauf
             ? t(texte.bildLaeuft, bildLauf)
             : laeuft
@@ -210,6 +219,9 @@ export function BewertungsFormular({
                 ? texte.veroeffentlichen
                 : texte.einreichen}
         </Button>
+        <p aria-live="polite" className="text-small text-text-muted">
+          {bildLauf ? t(texte.bildLaeuft, bildLauf) : null}
+        </p>
         {fehler ? <Meldung art="fehler">{fehler}</Meldung> : null}
         {erfolg ? <Meldung art="erfolg">{erfolg}</Meldung> : null}
       </div>

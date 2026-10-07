@@ -29,3 +29,9 @@ test("Offene Vorschau: Betreiber oder Eigentümer, sonst 404, nie gecacht", () =
   assert.match(OFFEN, /mitglied\.rolle !== "ADMIN" && bild\.mitgliedId !== mitglied\.mitgliedId/);
   assert.match(OFFEN, /private, no-store/);
 });
+
+test("neuLaden: Community-Bilder laden nur /admin neu, die Blütenseite erst im öffentlichen Zweig", () => {
+  const kopf = AKTION.slice(AKTION.indexOf("function neuLaden"), AKTION.indexOf("export async function bewertungsbildHochladen"));
+  assert.ok(kopf.indexOf('"/admin"') < kopf.indexOf("if (!oeffentlich) return;"));
+  assert.ok(kopf.indexOf("if (!oeffentlich) return;") < kopf.indexOf("/blueten/${slug}"));
+});

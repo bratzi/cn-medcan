@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useRef, useState, type Dispatch, type SetStateAction } from "react";
 
 import { bewertungsbildEntfernen } from "@/app/[lang]/blueten/[slug]/bewertungsbild-aktionen";
 import { BudpicBild } from "@/components/medien/Bild";
@@ -17,7 +17,9 @@ import type { Woerterbuch } from "@/lib/i18n/typen";
 type Props = {
   vorhanden: readonly VorbelegtesBild[];
   vorgemerkt: readonly VorgemerktesBild[];
-  setVorgemerkt: (neu: VorgemerktesBild[]) => void;
+  setVorgemerkt: Dispatch<SetStateAction<VorgemerktesBild[]>>;
+  /** Meldet nach oben, solange gewählte Bilder noch verkleinert werden (Absenden bleibt gesperrt). */
+  onBeschaeftigt: (beschaeftigt: boolean) => void;
   istBetreiber: boolean;
   /** Während des Speicherns: nichts wählen, nichts entfernen. */
   gesperrt: boolean;
@@ -37,16 +39,30 @@ const KACHEL = "size-24 overflow-hidden border border-border bg-surface-sunken";
  * verkleinert; gesendet wird erst nach dem Speichern der Bewertung
  * (BewertungsFormular, lib/bewertungsbilder-senden.ts).
  */
-export function BewertungsBilder({ vorhanden, vorgemerkt, setVorgemerkt, istBetreiber, gesperrt, meldungen, texte, onGeaendert }: Props) {
+export function BewertungsBilder({ vorhanden, vorgemerkt, setVorgemerkt, onBeschaeftigt, istBetreiber, gesperrt, meldungen, texte, onGeaendert }: Props) {
   const hydriert = useHydriert();
   const eingabe = useRef<HTMLInputElement>(null);
+  const zaehler = useRef(0);
   const [fehler, setFehler] = useState<string[]>([]);
   const [entfernt, setEntfernt] = useState<string | null>(null);
+  const [verkleinert, setVerkleinert] = useState(false);
   const frei = bilderFrei(vorhanden.map((b) => b.status)) - vorgemerkt.length;
 
   async function gewaehlt(ereignis: React.ChangeEvent<HTMLInputElement>) {
     const alle = Array.from(ereignis.target.files ?? []);
     ereignis.target.value = "";
+    if (verkleinert) return;
+    setVerkleinert(true);
+    onBeschaeftigt(true);
+    try {
+      await waehlen(alle);
+    } finally {
+      setVerkleinert(false);
+      onBeschaeftigt(false);
+    }
+  }
+
+  async function waehlen(alle: File[]) {
     const anzahl = annehmbareDateien(alle.length, frei);
     const zeilen: string[] = alle.length > anzahl ? [t(texte.bilderVoll, { max: BEWERTUNGSBILD_MAX })] : [];
     const neu: VorgemerktesBild[] = [];
@@ -58,7 +74,7 @@ export function BewertungsBilder({ vorhanden, vorgemerkt, setVorgemerkt, istBetr
         continue;
       }
       neu.push({
-        schluessel: `${datei.name}-${datei.lastModified}-${neu.length}-${vorgemerkt.length}`,
+        schluessel: `${datei.name}-${datei.lastModified}-${neu.length}-${vorgemerkt.length}-${zaehler.current++}`,
         name: datei.name,
         blob: klein.blob,
         breite: klein.breite,
@@ -67,12 +83,12 @@ export function BewertungsBilder({ vorhanden, vorgemerkt, setVorgemerkt, istBetr
       });
     }
     setFehler(zeilen);
-    setVorgemerkt([...vorgemerkt, ...neu]);
+    setVorgemerkt((vorher) => [...vorher, ...neu]);
   }
 
   function abwaehlen(bild: VorgemerktesBild) {
     URL.revokeObjectURL(bild.vorschau);
-    setVorgemerkt(vorgemerkt.filter((b) => b !== bild));
+    setVorgemerkt((vorher) => vorher.filter((b) => b !== bild));
   }
 
   async function entfernen(id: string) {
@@ -114,7 +130,7 @@ export function BewertungsBilder({ vorhanden, vorgemerkt, setVorgemerkt, istBetr
                 <img src={b.vorschau} width={b.breite} height={b.hoehe} alt={texte.bildAlt} className="size-full object-cover" />
               </div>
               <span className="text-caption text-text-muted">{texte.bildVorgemerkt}</span>
-              <Button type="button" variante="ghost" groesse="sm" disabled={gesperrt} onClick={() => abwaehlen(b)}>
+              <Button type="button" variante="ghost" groesse="sm" disabled={gesperrt || verkleinert} onClick={() => abwaehlen(b)}>
                 {texte.bildAbwaehlen}
               </Button>
             </li>
@@ -134,7 +150,7 @@ export function BewertungsBilder({ vorhanden, vorgemerkt, setVorgemerkt, istBetr
             aria-hidden="true"
           />
           <div>
-            <Button type="button" variante="secondary" groesse="sm" disabled={!hydriert || gesperrt} onClick={() => eingabe.current?.click()}>
+            <Button type="button" variante="secondary" groesse="sm" disabled={!hydriert || gesperrt || verkleinert} onClick={() => eingabe.current?.click()}>
               {texte.bilderWaehlen}
             </Button>
           </div>

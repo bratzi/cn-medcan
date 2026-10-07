@@ -15,6 +15,7 @@ const zeige = (vorhanden: { id: string; breite: number; hoehe: number; status: "
       vorhanden,
       vorgemerkt: [],
       setVorgemerkt: () => {},
+      onBeschaeftigt: () => {},
       istBetreiber,
       gesperrt: false,
       meldungen: budpicMeldungen(de),

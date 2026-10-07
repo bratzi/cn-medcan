@@ -14,11 +14,11 @@ import { freigabeErforderlich } from "@/lib/session";
 export type BewertungsbildErgebnis = { ok: true; id: string; sofortSichtbar: boolean } | { ok: false; fehler: string };
 export type BewertungsbildEntfernenErgebnis = { ok: true } | { ok: false; fehler: string };
 
-/** Blütenseite und /admin immer; Katalog und Startseite nur, wenn das Bild öffentlich war oder ist. */
+/** /admin immer; Blütenseite, Katalog und Startseite nur, wenn das Bild öffentlich war oder ist. */
 function neuLaden(slug: string, oeffentlich: boolean) {
   revalidiereSprachen("/admin");
-  revalidiereSprachen(`/blueten/${slug}`);
   if (!oeffentlich) return;
+  revalidiereSprachen(`/blueten/${slug}`);
   revalidiereSprachen("/blueten");
   revalidiereSprachen("/");
 }
