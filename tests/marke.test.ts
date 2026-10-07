@@ -65,22 +65,18 @@ test("Handschrift: Inspiration mit Rückfall, nur 400, keine synthetischen Schni
 
 const ohneTags = (html: string) => html.replace(/<[^>]+>/g, "");
 
-test("Logo im Kopf: Book of klein oben, Terpz im Fokus, Konturen, Verlauf und Glanz", () => {
-  const html = renderToStaticMarkup(createElement(Logo, { className: "text-marke" }));
-  assert.match(html, /\bfont-hand\b/);
-  assert.match(html, /\btext-marke\b/);
-  // Zugänglicher Name genau einmal, alles Sichtbare ist Bild.
-  assert.match(html, /<span class="sr-only">Book of Terpz<\/span>/);
-  const sichtbar = html.replace(/<span class="sr-only">[^<]*<\/span>/, "");
-  assert.equal(sichtbar.match(/aria-hidden="true"/g)?.length, 5);
-  // Vier Konturen wie im Auftakt, Glanz auf beiden Zeilen des Schriftzugs.
-  for (const n of [1, 2, 3, 4]) assert.match(html, new RegExp(`marke-kontur marke-kontur-${n}`));
-  assert.equal(html.match(/\bglanz-wort\b/g)?.length, 2);
-  // "Book of" kleiner als "Terpz", und zwar oben.
-  assert.ok(html.indexOf("Book of", html.indexOf("glanz-wort") - 200) < html.lastIndexOf("Terpz"));
-  assert.match(html, /text-\[0\.45em\]/);
-  assert.doesNotMatch(html, /font-buch|uppercase|text-accent/);
-  assert.match(lies("components/layout/Kopf.tsx"), /<Logo className="text-marke" \/>/);
+test("Logo: Pinselschrift aus zwei Masken, Farben aus Tokens, ein Bild mit Namen (Nutzer 2026-10-07)", () => {
+  const html = renderToStaticMarkup(createElement(Logo, { className: "w-18" }));
+  assert.match(html, /^<span role="img" aria-label="Book of Terpz" class="marke-pinsel w-18"><\/span>$/);
+  // Schrift in accent, "of" in kopierstift; Formen als Masken, nie Primitives oder Hex.
+  // Die letzte Regel je Pseudo-Element: die erste ist die gemeinsame für ::before und ::after.
+  const regel = (sel: string) => [...css.matchAll(new RegExp(String.raw`\.marke-pinsel::${sel}\s*\{[^}]*\}`, "g"))].at(-1)?.[0] ?? "";
+  assert.match(regel("before"), /marke\/pinsel\.webp/);
+  assert.match(regel("before"), /background:\s*var\(--color-accent\)/);
+  assert.match(regel("after"), /marke\/pinsel-of\.webp/);
+  assert.match(regel("after"), /background:\s*var\(--color-kopierstift\)/);
+  for (const datei of ["public/marke/pinsel.webp", "public/marke/pinsel-of.webp"]) assert.ok(statSync(datei).size > 0, datei);
+  assert.match(lies("components/layout/Kopf.tsx"), /<Logo className="w-18" \/>/);
 });
 
 test("Wortmarke als Umschlag: zwei Zeilen, ein zugänglicher Name", () => {
@@ -105,14 +101,14 @@ test("Unterzeile: gedruckt, natürliche Schreibung, Versalien per CSS", () => {
   assert.doesNotMatch(html, /font-hand/);
 });
 
-test("Auftakt: die h1 ist die Wortmarke als Plakat, nie per Einstieg versteckt", () => {
+test("Auftakt: die h1 ist das Logo, schreibt sich, nie per Einstieg versteckt", () => {
   const quelle = lies("components/story/Auftakt.tsx");
-  const h1 = /<h1[^>]*>\s*<Wortmarke groesse="plakat" \/>\s*<\/h1>/.exec(quelle)?.[0];
-  assert.ok(h1, "die h1 enthält nicht genau die Plakat-Wortmarke");
+  const h1 = /<h1[^>]*>\s*<Logo data-marke-zeile="" className="[^"]+" \/>\s*<\/h1>/.exec(quelle)?.[0];
+  assert.ok(h1, "die h1 enthält nicht genau das Logo");
   assert.match(h1, /className="auftakt-marke /);
   assert.doesNotMatch(h1, /data-story-einstieg/);
   assert.match(quelle, /<Unterzeile className="auftakt-unterzeile/);
-  assert.doesNotMatch(quelle, /text-accent|groesse="buehne"/);
+  assert.doesNotMatch(quelle, /text-accent|groesse="buehne"|<Wortmarke/);
 });
 
 test("Wortmarke als Plakat: einzeilig, Plakat-Grad, schreibt sich", () => {

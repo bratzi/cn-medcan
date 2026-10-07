@@ -905,6 +905,38 @@ html.joint-cursor :is(input:not([type="range"]):not([type="radio"]):not([type="c
   opacity: 0.6;
 }
 
+/* ==========================================================================
+   Logo Pinselschrift (Nutzer 2026-10-07)
+   Zwei Masken übereinander: die Schrift in accent, das "of" in kopierstift.
+   Die Farben kommen aus den Tokens, das Logo geht mit Hell und Dunkel mit.
+   ========================================================================== */
+
+.marke-pinsel {
+  position: relative;
+  display: inline-block;
+  aspect-ratio: 1773 / 1302;
+  max-width: 100%;
+}
+
+.marke-pinsel::before,
+.marke-pinsel::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  -webkit-mask: var(--marke-maske) center / contain no-repeat;
+  mask: var(--marke-maske) center / contain no-repeat;
+}
+
+.marke-pinsel::before {
+  --marke-maske: url("/marke/pinsel.webp");
+  background: var(--color-accent);
+}
+
+.marke-pinsel::after {
+  --marke-maske: url("/marke/pinsel-of.webp");
+  background: var(--color-kopierstift);
+}
+
 /* Konturen hinter der Wortmarke im Auftakt (Auftakt.tsx): dieselbe Schrift,
    nur als Umriss, in Grün- und Violetttönen, leicht versetzt. Günstig: kein 3D,
    keine Form-Animation, nur transform auf je einer Ebene; der Zeiger verschiebt

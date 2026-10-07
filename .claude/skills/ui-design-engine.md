@@ -14,7 +14,7 @@ die Design-Skills geladen (Zuordnung in der Memory `design-skills-einsatz`).
 ## 1. Zwei Stimmen
 - **Zwei Familien, keine dritte** (Spec Redesign 11). **Gedruckt**: Newsreader (auch Bedienung und Zahlen), Papier und Tinte. Messwerte, Reviews,
   Katalogdaten, Handelsnamen, Rechtshinweise und Bedienung sind immer gedruckt.
-- **Von Hand** (Community und Logo): Inspiration (`font-hand`) in `kopierstift`. Nur, wo die Community
+- **Von Hand** (Community und Wortmarke im Fuß): Inspiration (`font-hand`) in `kopierstift`. Nur, wo die Community
   spricht (Stimmen, Vorschläge, Zähler, „Wähl mit.“, Vermerke am Stimmzettel, Überschriften auf
   `/umfragen`), und in der Wortmarke. Kurze Zeilen, höchstens etwa sechs Wörter, nie Absätze.
 - Form der Handschrift ist die Randnotiz: ab `lg` in einer Randspalte neben dem gedruckten Text,
@@ -95,8 +95,11 @@ Komponenten nutzen nur semantische Tokens:
 - Motive nach Brand Guideline 6 und Leitplanken. Ziel ab TP3 Welle 2: freigestellte Motive in Farbe
   (`objekt`) und Tafeln (`tafel`), keine Mischmodi, kein `invert`. Bis dahin Fotos in Graustufen mit
   `medien-buch`, Videos mit `medien-video`.
-- Die Marke ist Text: Wortmarke und Handschrift werden nie als Bild eingebunden. Das Signet entsteht
-  mit `scripts/marke/signet.ts` aus der Schriftdatei.
+- Das Logo ist seit 2026-10-07 (Nutzer) Pinselschrift als Grafik: `components/marke/Logo.tsx`, zwei
+  Masken (`public/marke/pinsel*.webp`, `.marke-pinsel`), Schrift in `accent`, „of“ in
+  `kopierstift`, `role="img"` mit Namen. Es steht im Kopf und als h1 im Auftakt. Sonst bleibt die
+  Handschrift Text: Wortmarke im Fuß und Randnotizen werden nie als Bild eingebunden. Das Signet
+  entsteht mit `scripts/marke/signet.ts` aus der Schriftdatei.
 
 ## 7. Bewegung
 - **CSS** für Hover, Fokus, Tippen: 180 bis 350 ms (`--duration-fast/normal/slow`), nur Farbe,

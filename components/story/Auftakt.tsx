@@ -4,27 +4,15 @@ import { preload } from "react-dom";
 
 import { Loop } from "@/components/medien/Loop";
 import { Kopfzeile } from "@/components/story/Kopfzeile";
-import { Unterzeile, Wortmarke } from "@/components/marke/Wortmarke";
+import { Logo } from "@/components/marke/Logo";
+import { Unterzeile } from "@/components/marke/Wortmarke";
 import { holeWoerterbuch } from "@/lib/i18n";
-
-/**
- * Konturen hinter der Wortmarke (Nutzer 2026-09-25, statt der 3D-Bahnen): die
- * Schrift noch einmal übereinander, nur als Umriss, in Grün- und Violetttönen,
- * leicht versetzt. Jede driftet ruhig in eigenem Takt (globals.css,
- * .marke-kontur-N); mit der Maus darüber folgen sie verschieden tief.
- */
-const KONTUREN = [
-  { klasse: "marke-kontur-1", tiefe: "1.4" },
-  { klasse: "marke-kontur-2", tiefe: "2.2" },
-  { klasse: "marke-kontur-3", tiefe: "3" },
-  { klasse: "marke-kontur-4", tiefe: "1" },
-] as const;
 
 /**
  * Sektion 1 (Spec Redesign 7 und 8): der Umschlag als Filmbühne. Das Video
  * füllt die erste Ansicht in Schwarzweiß, ein Verlauf dunkelt es zur Schrift
- * hin ab, die Sektion trägt dunkle Rollen (`buehne-dunkel`). Die h1 ist die
- * handschriftliche Wortmarke von Rand zu Rand. Wortmarke und Unterzeile
+ * hin ab, die Sektion trägt dunkle Rollen (`buehne-dunkel`). Die h1 ist das
+ * Logo in Pinselschrift (Nutzer 2026-10-07). Logo und Unterzeile
  * schreiben sich per CSS (globals.css, `schreiben`) und stehen deshalb ohne
  * JavaScript und bei reduzierter Bewegung sofort da; dann bleibt auch das
  * Standbild stehen (loops.ts startet das Video nur mit der StoryBuehne).
@@ -56,23 +44,11 @@ export async function Auftakt() {
           Unterzeile in derselben aufrechten Druckschrift wie das Storytelling,
           leicht und deutlich kleiner, damit die Handschrift allein führt. */}
       <div className="flex flex-[2] flex-col items-center justify-center gap-4 px-6 py-8 sm:gap-6 sm:px-8">
-        {/* Konturen der Wortmarke dahinter: reine Dekoration, deshalb neben der h1;
-            die h1 bleibt genau die Wortmarke. */}
-        <div data-story="titel" data-punkt="" className="relative flex justify-center">
-          {KONTUREN.map((kontur) => (
-            <span
-              key={kontur.klasse}
-              aria-hidden="true"
-              data-punkt-tiefe={kontur.tiefe}
-              className={`marke-kontur ${kontur.klasse}`}
-            >
-              <Wortmarke groesse="plakat" />
-            </span>
-          ))}
-          {/* marke-puls: pulsiert wie das Community-Fazit (Nutzer 2026-09-25). */}
-          {/* Ein Tick dicker (Nutzer 2026-09-26): Inspiration hat nur einen Schnitt, daher feine Kontur. */}
-          <h1 id="auftakt-titel" className="auftakt-marke marke-puls relative flex justify-center" style={{ WebkitTextStroke: "0.012em var(--color-kopierstift)" }}>
-            <Wortmarke groesse="plakat" />
+        {/* Das Logo schreibt sich wie früher die Wortmarke (data-marke-zeile, globals.css)
+            und pulsiert wie das Community-Fazit (marke-puls). */}
+        <div data-story="titel" className="relative flex justify-center">
+          <h1 id="auftakt-titel" className="auftakt-marke marke-puls relative flex justify-center">
+            <Logo data-marke-zeile="" className="w-[min(40rem,82vw)]" />
           </h1>
         </div>
         <p
