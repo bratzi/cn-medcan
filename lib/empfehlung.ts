@@ -175,6 +175,25 @@ export function profilAus(bewertungen: readonly EigeneBewertung[], sorten: reado
 }
 
 /**
+ * Beitrag jeder Bewertung zu den Geschmacksachsen des Profils, Gewicht schon
+ * eingerechnet; nur `g:`-Schlüssel. Dieselbe Rechnung wie profilAus, aber je
+ * Bewertung einzeln: der Verlauf (Profil Stufe 3) summiert sie Schritt für
+ * Schritt und bleibt so linear statt quadratisch.
+ */
+export function geschmacksBeitraege(bewertungen: readonly EigeneBewertung[], sorten: readonly SortenAroma[]): Map<string, number>[] {
+  const jeId = new Map(sorten.map((s) => [s.strainId, s]));
+  return bewertungen.map((bewertung) => {
+    const aus = new Map<string, number>();
+    const gewicht = bewertungsGewicht(bewertung.gesamtnote);
+    if (gewicht === 0) return aus;
+    for (const [k, x] of normiert(bewertungsVektor(bewertung, jeId.get(bewertung.strainId)))) {
+      if (k.startsWith("g:")) aus.set(k, gewicht * x);
+    }
+    return aus;
+  });
+}
+
+/**
  * Terpengewichte des Profils je Terpen-Id (für `KANDIDATEN_SQL`). `sorten`
  * braucht nur die bewerteten Sorten. Ohne positive Bewertung leer.
  */

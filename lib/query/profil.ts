@@ -20,7 +20,8 @@ import {
   profilDaten,
   profilVeraltet,
 } from "@/lib/profil";
-import type { AuswertungsZeile, ProfilWerte } from "@/lib/profil-typen";
+import type { AuswertungsZeile, ProfilWerte, VerlaufSchritt } from "@/lib/profil-typen";
+import { profilVerlauf, verlaufAusDaten, verlaufDaten } from "@/lib/profil-verlauf";
 import { getPrisma } from "@/lib/prisma";
 import { parseGeschmacksMatrix, parseTerpenIntensitaet } from "@/lib/query/bewertung";
 
@@ -43,6 +44,7 @@ export async function profilFortschreiben(mitgliedId: string): Promise<void> {
       where: { autorId: mitgliedId },
       orderBy: { erstelltAm: "desc" },
       select: {
+        erstelltAm: true,
         strainId: true,
         freigegeben: true,
         gesamtnote: true,
@@ -79,11 +81,14 @@ export async function profilFortschreiben(mitgliedId: string): Promise<void> {
           await prisma.$queryRawUnsafe<SortenAromaZeile[]>(KANDIDATEN_SQL, JSON.stringify(gewichte), bewerteteIds, KANDIDATEN_ANZAHL),
         );
   const liste = empfehlungenBerechnen(bewertungen, [...bewertete, ...kandidaten]);
+  // Verlauf (Stufe 3): dieselben Bewertungen mit Datum, aus heutiger Sicht nachgerechnet.
+  const mitDatum = bewertungen.map((b, i) => ({ ...b, erstelltAm: eigene[i].erstelltAm }));
   // Öffentlich nur, was freigegeben ist (Review W1): eigenes Netz für /profil/<kurzId>.
   const freigegeben = bewertungen.filter((_, i) => eigene[i].freigegeben);
   const daten = {
     ...profilDaten(profilAnzeige(bewertungen, bewertete)),
     oeffentlich: oeffentlicheDaten(profilAnzeige(freigegeben, bewertete)),
+    verlauf: verlaufDaten(profilVerlauf(mitDatum, bewertete)),
     berechnetAm: new Date(),
   };
 
@@ -95,10 +100,12 @@ export async function profilFortschreiben(mitgliedId: string): Promise<void> {
 }
 
 /** Der gespeicherte Stand, eine Abfrage; null, wenn noch nie gerechnet. */
-export async function ladeProfil(mitgliedId: string): Promise<{ werte: ProfilWerte; berechnetAm: Date } | null> {
+export async function ladeProfil(
+  mitgliedId: string,
+): Promise<{ werte: ProfilWerte; berechnetAm: Date; verlauf: VerlaufSchritt[] } | null> {
   const prisma = await getPrisma();
   const z = await prisma.nutzerProfil.findUnique({ where: { mitgliedId } });
-  return z ? { werte: profilAusDaten(z), berechnetAm: z.berechnetAm } : null;
+  return z ? { werte: profilAusDaten(z), berechnetAm: z.berechnetAm, verlauf: verlaufAusDaten(z.verlauf) } : null;
 }
 
 /**
@@ -106,7 +113,9 @@ export async function ladeProfil(mitgliedId: string): Promise<{ werte: ProfilWer
  * älter als 24 h. Dann einmal neu rechnen, damit neue Community-Werte ankommen.
  * Scheitert das, gilt der alte Stand (oder keiner); der Fehler wird geloggt.
  */
-export async function aktuellesProfil(mitgliedId: string): Promise<{ werte: ProfilWerte; berechnetAm: Date } | null> {
+export async function aktuellesProfil(
+  mitgliedId: string,
+): Promise<{ werte: ProfilWerte; berechnetAm: Date; verlauf: VerlaufSchritt[] } | null> {
   const gespeichert = await ladeProfil(mitgliedId);
   if (!profilVeraltet(gespeichert?.berechnetAm, Date.now())) return gespeichert;
   try {

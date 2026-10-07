@@ -1,6 +1,6 @@
 import { GESCHMACKS_KATEGORIEN, istGeschmacksKategorie, type GeschmacksKategorie } from "@/db/enums";
 import { bewertungsGewicht, profilAus, type EigeneBewertung, type SortenAroma } from "@/lib/empfehlung";
-import type { AuswertungsZeile, Auswertungen, BewertungsKurz, ProfilWerte, Schnitte } from "@/lib/profil-typen";
+import type { AuswertungsZeile, Auswertungen, BewertungsKurz, Geschmack, ProfilWerte, Schnitte } from "@/lib/profil-typen";
 import { berechneGesamtnote } from "@/lib/query/bewertung";
 
 /**
@@ -44,13 +44,19 @@ export function leereProfilWerte(): ProfilWerte {
   return { geschmack: leererGeschmack(), terpene: [], anzahl: 0, gewichtet: 0 };
 }
 
-/** Netz und Terpenliste aus dem Profilvektor, je auf das stärkste |Gewicht| normiert (Spec 4.2). */
-export function profilAnzeige(bewertungen: readonly EigeneBewertung[], sorten: readonly SortenAroma[]): ProfilWerte {
-  const { profil } = profilAus(bewertungen, sorten);
+/** Die 10 Geschmacksachsen eines Profilvektors, auf das stärkste |Gewicht| normiert (Spec 4.2). */
+export function geschmackAusVektor(profil: ReadonlyMap<string, number>): Geschmack {
   const geschmack = leererGeschmack();
   let maxG = 0;
   for (const k of GESCHMACKS_KATEGORIEN) maxG = Math.max(maxG, Math.abs(profil.get(`g:${k}`) ?? 0));
   if (maxG > 0) for (const k of GESCHMACKS_KATEGORIEN) geschmack[k] = zwei((profil.get(`g:${k}`) ?? 0) / maxG);
+  return geschmack;
+}
+
+/** Netz und Terpenliste aus dem Profilvektor, je auf das stärkste |Gewicht| normiert (Spec 4.2). */
+export function profilAnzeige(bewertungen: readonly EigeneBewertung[], sorten: readonly SortenAroma[]): ProfilWerte {
+  const { profil } = profilAus(bewertungen, sorten);
+  const geschmack = geschmackAusVektor(profil);
 
   const terpenWerte: { name: string; wert: number }[] = [];
   for (const [k, x] of profil) if (k.startsWith("t:") && x !== 0) terpenWerte.push({ name: k.slice(2), wert: x });
