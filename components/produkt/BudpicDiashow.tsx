@@ -23,6 +23,8 @@ type Props = {
   texte: Woerterbuch["budpic"];
   /** Rahmen des Bildes (Seitenverhaeltnis oder Hoehe); Standard quadratisch. */
   rahmen?: string;
+  /** Klassen des äußeren figure; Standard "flex w-full flex-col gap-2". Im Buch füllt es die Höhe. */
+  className?: string;
 };
 
 /** Wert einer Media Query; auf dem Server false. */
@@ -60,7 +62,7 @@ function useTabVerborgen(): boolean {
  * Nur im Browser noetig, weil Zeitgeber und Zustand: das Muster ohne echtes
  * Bild ist dagegen ein statisches Bild (BudpicSchau) und laedt diese Datei nicht.
  */
-export function BudpicDiashow({ bilder, name, texte, rahmen = "aspect-square w-full" }: Props) {
+export function BudpicDiashow({ bilder, name, texte, rahmen = "aspect-square w-full", className = "flex w-full flex-col gap-2" }: Props) {
   const anzahl = bilder.length;
   const [aktuell, setAktuell] = useState(0);
   const [angehalten, setAngehalten] = useState(false);
@@ -86,7 +88,7 @@ export function BudpicDiashow({ bilder, name, texte, rahmen = "aspect-square w-f
 
   return (
     <figure
-      className="flex w-full flex-col gap-2"
+      className={className}
       aria-roledescription="carousel"
       aria-label={t(texte.diashow, { name })}
       onPointerEnter={(e) => e.pointerType === "mouse" && setUeber(true)}

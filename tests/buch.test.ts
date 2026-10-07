@@ -128,9 +128,9 @@ test("CPU-Budget: die rechte Hälfte rendert der Server nur für die offene Seit
   assert.equal(html.match(/<article /g)?.length, 5);
   const seiten = html.split('<div class="buch-seite"').slice(1);
   for (const [i, seite] of seiten.entries()) assert.match(seite, new RegExp(`Text ${5 - i}\.`));
-  // Noten (rechts oben) und Kolophon (links) sind billig und stehen immer im Server-HTML; die Einlage mit der Karte nur nah.
+  // Noten (rechts oben) und Kolophon (links) sind billig und stehen immer im Server-HTML; die Einlage mit der Karte nur nah (das Ersatzbild links ist auch ein figure).
   assert.deepEqual(
-    seiten.map((seite) => [seite.includes("<dt"), seite.includes("<figure")]),
+    seiten.map((seite) => [seite.includes("<dt"), seite.includes('data-eintritt="einlage"')]),
     [[true, true], [true, true], [true, false], [true, false], [true, true]],
   );
   // Die leere rechte Hälfte bleibt als Fläche stehen, das Buch dreht sie beim Blättern.

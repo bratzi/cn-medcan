@@ -5,6 +5,7 @@ import { AromaKarte } from "@/components/review/AromaKarte";
 import { aromaSerien, buchKarte } from "@/components/review/aroma-serien";
 import { BeschaffenheitsLeiste } from "@/components/review/BeschaffenheitsLeiste";
 import { BlattUrteil } from "@/components/review/BlattUrteil";
+import { BuchBildfeld } from "@/components/review/BuchBildfeld";
 import { BuchKolophon } from "@/components/review/BuchKolophon";
 import { BuchNotiz } from "@/components/review/BuchNotiz";
 import { BuchReiter, ReiterLeiste, type BuchReiterEintrag } from "@/components/review/BuchReiter";
@@ -47,7 +48,8 @@ export type BuchDoppelseiteProps = {
  * Haarlinie über den Werten. So bleibt das Buch hell wie dunkel aus einem Papier.
  *
  * Die Höhe wächst mit dem Inhalt (`lg:min-h-(--buch-h)`, globals.css): nichts läuft über den
- * Rahmen. Der Text links trägt nicht zur Höhe bei, die rechte Seite gibt sie vor. Id und
+ * Rahmen. Unter dem Text das Bildfeld (Spec 2026-10-06), in der gemessenen Fläche des Textes, damit
+ * die rechte Seite weiter die Höhe vorgibt. Der Text links trägt nicht zur Höhe bei, die rechte Seite gibt sie vor. Id und
  * Überschrift sind je Eintrag eindeutig, damit mehrere Doppelseiten gestapelt stehen können und
  * der Sprung auf #eintrag-… die richtige trifft.
  */
@@ -60,6 +62,10 @@ export function BuchDoppelseite({ eintrag, ueberschrift: Ueberschrift, w, sprach
   const hatPerson = Boolean(eintrag.autorName) || eintrag.istBetreiber;
   // Kein Ersatz aus der Umgebung: nur eine gültige eigene URL ergibt ein Reel.
   const reel = baueEmbedUrl(eintrag.instagramReelUrl) ? eintrag.instagramReelUrl : null;
+
+  const bildfeld = <BuchBildfeld eintrag={eintrag} name={name} w={w} sprache={sprache} />;
+  // Ohne eigenes Bild steht ein Ersatzbild, das unter lg entfällt (Nutzer 2026-10-06).
+  const nurErsatz = (eintrag.bilder ?? []).length === 0;
 
   const kartenWahl = buchKarte(eintrag.terpene, katalog, eintrag.terpenIntensitaet);
   const karte = (kopf: ReactNode) => (
@@ -142,9 +148,14 @@ export function BuchDoppelseite({ eintrag, ueberschrift: Ueberschrift, w, sprach
         </header>
 
         {eintrag.notiz ? (
-          <BuchNotiz text={eintrag.notiz} weiterlesen={w.buch.weiterlesen} schliessen={w.buch.schliessen} />
+          <BuchNotiz text={eintrag.notiz} weiterlesen={w.buch.weiterlesen} schliessen={w.buch.schliessen} bild={bildfeld} bildNurGross={nurErsatz} />
         ) : (
-          <p className="text-body text-text-muted italic lg:flex-1">{w.buch.keinText}</p>
+          <>
+            <p className="text-body text-text-muted italic">{w.buch.keinText}</p>
+            <div className={cn("relative w-full lg:min-h-48 lg:flex-[1_1_0px]", nurErsatz && "max-lg:hidden")}>
+              <div className="lg:absolute lg:inset-0">{bildfeld}</div>
+            </div>
+          </>
         )}
 
         <BuchKolophon eintrag={eintrag} w={w} sprache={sprache} />

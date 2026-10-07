@@ -15,7 +15,9 @@ export const AufgeschlagenKontext = createContext(true);
  * CPU-Limit von 10 ms. Ferne Seiten sind verborgen; ihre rechte Hälfte kommt
  * im Browser dazu, sobald man in ihre Nähe blättert. Ohne JavaScript bleibt
  * die linke Hälfte jeder Seite (Kopf, Name, Blätter, Text) lesbar.
+ *
+ * `ersatz` steht auf fernen Seiten statt nichts, z. B. das erste Bild statt der Diashow.
  */
-export function NurAufgeschlagen({ children }: { children: ReactNode }) {
-  return useContext(AufgeschlagenKontext) ? children : null;
+export function NurAufgeschlagen({ children, ersatz = null }: { children: ReactNode; ersatz?: ReactNode }) {
+  return useContext(AufgeschlagenKontext) ? children : ersatz;
 }
