@@ -7,7 +7,7 @@ import type { Sprache } from "@/lib/i18n/sprache-kern";
 import { t } from "@/lib/i18n/text";
 import type { Woerterbuch } from "@/lib/i18n/typen";
 import { PROFIL_AUSSAGEKRAEFTIG_AB } from "@/lib/profil";
-import type { ProfilWerte } from "@/lib/profil-typen";
+import type { Geschmack, ProfilWerte } from "@/lib/profil-typen";
 import { GESCHMACKS_ACHSEN } from "@/lib/query/bewertung";
 
 type Props = {
@@ -15,6 +15,10 @@ type Props = {
   texte: Woerterbuch["profil"];
   achsen: Woerterbuch["label"]["geschmack"];
   sprache: Sprache;
+  /** Stand vor der letzten Bewertung; zeichnet die dünne Kontur. Nur im eigenen Profil. */
+  vorher?: Geschmack | null;
+  /** Fertiger Satz zur Änderung; der Aufrufer baut ihn. */
+  aenderung?: string | null;
 };
 
 /**
@@ -23,14 +27,21 @@ type Props = {
  * Datengrafik in Tinte; die Werte stehen zusätzlich als Liste für
  * Screenreader, das SVG ist aria-hidden. Nur Aroma, nie Wirkung (HWG).
  */
-export function ProfilNetz({ werte, texte, achsen, sprache }: Props) {
+export function ProfilNetz({ werte, texte, achsen, sprache, vorher = null, aenderung = null }: Props) {
   const { mag, magNicht } = netzAusGeschmack(werte.geschmack);
   const hatMag = mag.some((x) => x > 0);
   const hatMagNicht = magNicht.some((x) => x > 0);
+  const kontur = vorher ? netzAusGeschmack(vorher).mag : null;
+  const hatKontur = !!kontur && kontur.some((x) => x > 0);
 
   return (
     <figure className="flex flex-col items-center gap-4">
-      <NetzGrafik mag={mag} magNicht={magNicht} beschriftung={GESCHMACKS_ACHSEN.map((a) => achsen[a.enumWert])} />
+      <NetzGrafik
+        mag={mag}
+        magNicht={magNicht}
+        kontur={hatKontur ? kontur : null}
+        beschriftung={GESCHMACKS_ACHSEN.map((a) => achsen[a.enumWert])}
+      />
 
       {hatMag || hatMagNicht ? (
         <>
@@ -50,8 +61,17 @@ export function ProfilNetz({ werte, texte, achsen, sprache }: Props) {
                 {texte.magIchNicht}
               </li>
             ) : null}
+            {hatKontur ? (
+              <li className="inline-flex items-center gap-2">
+                <svg viewBox="0 0 24 8" aria-hidden="true" className="h-2 w-6 text-text">
+                  <line x1="0" y1="4" x2="24" y2="4" stroke="currentColor" strokeOpacity={0.45} strokeWidth={1} />
+                </svg>
+                {texte.vorher}
+              </li>
+            ) : null}
           </ul>
           <figcaption className="text-small text-text-muted">{texte.netzSkala}</figcaption>
+          {aenderung ? <p className="max-w-[48ch] text-center text-small text-text-muted text-pretty">{aenderung}</p> : null}
           <ul className="sr-only">
             {GESCHMACKS_ACHSEN.map((a, i) => {
               const achse = achsen[a.enumWert];
