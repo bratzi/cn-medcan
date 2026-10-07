@@ -85,15 +85,11 @@ test("Logo: Pinselschrift aus zwei Masken, Farben aus Tokens, ein Bild mit Namen
   assert.match(lies("components/layout/Kopf.tsx"), /<Logo className="w-18" \/>/);
 });
 
-test("Logo durchsichtig: nur Tönung, kein Glaseffekt, kein zusätzliches Element; Kopf bleibt deckend", () => {
-  const html = renderToStaticMarkup(createElement(Logo, { durchsichtig: true, className: "w-10" }));
-  assert.equal(html, '<span role="img" aria-label="Book of Terpz" class="marke-pinsel marke-durchsichtig w-10"></span>');
-  assert.match(css, /\.marke-durchsichtig::before\s*\{[^}]*color-mix\(in oklab, var\(--color-accent\) 72%, transparent\)/);
-  assert.match(css, /\.marke-durchsichtig::after\s*\{[^}]*color-mix\(in oklab, var\(--color-kopierstift\) 76%, transparent\)/);
-  assert.doesNotMatch(css, /marke-glas|pinsel-licht|pinsel-schatten/);
-  assert.doesNotMatch(lies("components/layout/Kopf.tsx"), /<Logo durchsichtig/);
+test("Logo deckend wie die Vorlage, auch im Auftakt; keine Glas- oder Durchsichtig-Reste (Nutzer 2026-10-07)", () => {
+  assert.doesNotMatch(css, /marke-glas|marke-durchsichtig|pinsel-licht|pinsel-schatten/);
+  assert.match(css, /\.marke-pinsel\s*\{[^}]*aspect-ratio:\s*1726 \/ 1242;/);
+  assert.doesNotMatch(lies("components/story/Auftakt.tsx"), /durchsichtig|glas/);
 });
-
 test("Unterzeile: gedruckt, natürliche Schreibung, Versalien per CSS", () => {
   const html = renderToStaticMarkup(createElement(Unterzeile));
   assert.match(html, /^<p /);
@@ -103,9 +99,9 @@ test("Unterzeile: gedruckt, natürliche Schreibung, Versalien per CSS", () => {
   assert.doesNotMatch(html, /font-hand/);
 });
 
-test("Auftakt: die h1 ist das Logo, durchsichtig, schreibt sich, nie per Einstieg versteckt", () => {
+test("Auftakt: die h1 ist das Logo, schreibt sich, nie per Einstieg versteckt", () => {
   const quelle = lies("components/story/Auftakt.tsx");
-  const h1 = /<h1[^>]*>\s*<Logo durchsichtig className="[^"]+" \/>\s*<\/h1>/.exec(quelle)?.[0];
+  const h1 = /<h1[^>]*>\s*<Logo className="[^"]+" \/>\s*<\/h1>/.exec(quelle)?.[0];
   assert.ok(h1, "die h1 enthält nicht genau das Logo");
   assert.match(h1, /className="auftakt-marke /);
   assert.doesNotMatch(h1, /data-story-einstieg/);

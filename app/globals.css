@@ -858,7 +858,7 @@ html.joint-cursor :is(input:not([type="range"]):not([type="radio"]):not([type="c
 .marke-pinsel {
   position: relative;
   display: inline-block;
-  aspect-ratio: 1773 / 1302;
+  aspect-ratio: 1726 / 1242;
   max-width: 100%;
 }
 
@@ -879,18 +879,6 @@ html.joint-cursor :is(input:not([type="range"]):not([type="radio"]):not([type="c
 .marke-pinsel::after {
   --marke-maske: url("/marke/pinsel-of.webp");
   background: var(--color-kopierstift);
-}
-
-/* Logo durchsichtig (Nutzer 2026-10-07), nur im Auftakt: halb durchsichtige
-   Tönung, 160 Grad von kräftig nach leicht, damit der Film durchscheint. Kein
-   Glaseffekt (keine Lichtkanten, kein Glanz, kein Schein): die Schrift bleibt
-   flach und scharfkantig. */
-.marke-durchsichtig::before {
-  background: linear-gradient(160deg, color-mix(in oklab, var(--color-accent) 72%, transparent), color-mix(in oklab, var(--color-accent) 34%, transparent) 70%);
-}
-
-.marke-durchsichtig::after {
-  background: linear-gradient(160deg, color-mix(in oklab, var(--color-kopierstift) 76%, transparent), color-mix(in oklab, var(--color-kopierstift) 38%, transparent) 70%);
 }
 
 /* Konturen hinter der Wortmarke im Auftakt (Auftakt.tsx): dieselbe Schrift,
