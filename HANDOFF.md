@@ -3,7 +3,7 @@
 > Übergabemedium zwischen Sessions. Wird nach jedem Arbeitsblock aktualisiert und committet.
 > Wer hier weiterarbeitet, liest diese Datei zuerst und braucht den Chatverlauf nicht.
 
-**Letzte Aktualisierung:** 2026-10-07 (Session 44)
+**Letzte Aktualisierung:** 2026-10-07 (Session 45)
 **Repo:** https://github.com/bratzi/cn-medcan (public)
 **Branch:** `main` (Makeover „Grünes Buch“ Teilprojekt 1 ist seit 2026-09-24 auf `main`)
 
@@ -28,7 +28,7 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 
 ## ⇢ Hier geht es weiter
 
-### ⇢ SESSION 45 (Sessionstart): Profil Stufe 1 ist live, weiter mit Stufe 2
+### ⇢ SESSION 45 (erledigt): Profil Stufe 1 ist live
 
 **Live und auf `main` (`199107e`, 713 Tests grün, tsc und eslint sauber):** Profil und Dashboard Stufe 1.
 Spec `docs/superpowers/specs/2026-10-07-profil-dashboard-design.md` (vom Nutzer freigegeben 2026-10-07),
@@ -52,13 +52,41 @@ Prüfen über Cloudflare-API `GET /accounts/{id}/builds/workers/1406f98f6bac4ea1
 manuell starten mit `POST /accounts/{id}/builds/triggers/f649c1f7-21f8-4eb5-8597-0b036c381c8e/builds`,
 Body `{ branch: "main", commit_hash: "<VOLLER Hash>" }` (Kurz-Hash scheitert beim Klonen). Build ~6 min.
 
-### ⇢ ALS ERSTES (Session 45): Plan Stufe 2 schreiben und umsetzen, ohne Rückfrage
+### ⇢ SESSION 46 (Sessionstart): Profil Stufe 2 ist gepusht, Live-Prüfung offen, dann Stufe 3
 
-Rahmen in Spec Abschnitt 9: `mitglied.profil_oeffentlich` (Opt-in, Vorgabe aus), `mitglied.kurz_id`,
-`/profil/<kurz-id>` mit Name, Avatar, Zahl und Liste freigegebener Bewertungen und Netz (nie Vorschläge
-oder Auswertungen), aus = 404, Schalter in `/mitglied`, Name im Buch verlinkt nur bei öffentlichem Profil,
-Datenschutz ergänzen. Achtung: `istAktiv` markiert den Kopfknopf auch auf fremden `/profil/<id>`; dort
-klären. Plan in parallelen Strängen (Dauerregel), danach Stufe 3.
+**Auf `main` (`8f9244b`, 733 Tests grün, tsc und eslint sauber):** Profil Stufe 2, öffentliches Profil.
+Plan `docs/superpowers/plans/2026-10-07-profil-stufe-2.md` (Task 1 selbst, Stränge A–D parallel in
+Worktrees, Gesamtreview, Fixwelle). Migrationen **0018 und 0019 sind remote eingespielt**.
+- `mitglied.profil_oeffentlich` (Vorgabe aus) und `mitglied.kurz_id` (8 Zeichen aus `lib/kurz-id.ts`,
+  beim ersten Einschalten vergeben, bleibt beim Ausschalten; zwei Tabs überschreiben sie nicht).
+- Schalter in `/mitglied` (Karte „Öffentliches Profil“, `ProfilSichtbarkeit`): Einschalten nur mit
+  freigegebenem Konto (Review W2), Ausschalten immer. Action `profilSichtbarkeitSetzen`.
+- `/profil/<kurz-id>`: Name, Avatar, Zahl und Liste (50) der freigegebenen Bewertungen aktiver Sorten,
+  Netz und Terpene in dritter Person. Aus, falsche Form oder Konto nicht freigegeben = 404. noindex,
+  force-dynamic. Netz kommt aus `nutzer_profil.oeffentlich` (nur freigegebene Bewertungen, Review W1),
+  gerechnet in `profilFortschreiben`, auch nach Freigabe/Verwerfen in `/admin`. Bestehende Profile haben
+  dort NULL, bis sie neu gerechnet sind (Speichern, `/profil` nach 24 h, Freigabe) – bis dahin „Noch kein
+  Aroma-Netz“.
+- Buch: Name verlinkt nur bei öffentlichem Profil (`autorProfilAus`), Link trägt das aria-label.
+- Kopfknopf „Mein Profil“ ist auf `/profil/<id>` nicht mehr aktiv. Datenschutz ergänzt (Stand 7.10.2026).
+
+**Nicht live geprüft (als Erstes):** Workers Build für `8f9244b` lief beim Sessionende noch (queued);
+Status über die Cloudflare-API prüfen (siehe Lehre Deploy unten). Dann live: `/mitglied` Schalter ein,
+Adresse öffnen (Netz evtl. leer bis Neurechnung: einmal `/profil` öffnen hilft nicht vor 24 h – eine
+Bewertung speichern oder in `/admin` freigeben rechnet neu), Name im Buch verlinkt, Schalter aus = 404,
+`/profil/ABC` = 404, Kopfknopf auf fremdem Profil nicht aktiv, mobil unter 640 px.
+
+**Zurückgestellte Minors aus dem Review Stufe 2:** Tests für Query und Action nur per Quelltextsuche, keine
+Prisma-Attrappe (Minor 8); nach dem Ausschalten bleibt der Link auf `/` und `/reviews` bis zu 300 s
+(statisch, kein Tag-Cache; Datenschutztext sagt „nach wenigen Minuten“); `autorProfilAus` prüft die
+Kontofreigabe nicht (Link auf 404, falls ein Konto die Freigabe verliert).
+
+**Danach Stufe 3** (Spec): Verlauf des Netzes (nachgerechnet, dünne Kontur „vor der letzten Bewertung“
+plus Änderungszeile), Lieblingshersteller, Mini-Netz mit Animation vorher/nachher auf der Blütenseite
+nach dem Speichern. Plan in parallelen Strängen, ohne Rückfrage.
+
+**Aufräumen:** unter `.claude/worktrees/` liegen viele alte Agent-Worktrees (alle Branches gemergt?
+vor dem Entfernen mit `git branch --no-merged main` prüfen).
 
 ### ⇢ SESSION 44 (Sessionstart): Profil und Dashboard, Ergebnis des Grillings vom 2026-10-07
 
