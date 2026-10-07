@@ -1956,7 +1956,10 @@ html.joint-cursor :is(input:not([type="range"]):not([type="radio"]):not([type="c
       position: absolute;
       inset-inline: 0;
       top: 100%;
-      margin-top: 0.25rem;
+      /* 4 px Abstand zum Namen als Innenabstand statt Außenabstand: Innenabstand zählt zur
+         Trefferfläche, so liegt zwischen Eintrag und Infos keine tote Zone, die beim Hochrücken
+         den Hover verlöre (Review 2026-10-07). */
+      padding-top: 0.25rem;
     }
 
     :root:not([data-sparmodus]) .terpen-band:has(> .terpen-band-spur > [aria-hidden]:not(:empty)) .terpen-band-eintrag {

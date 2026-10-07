@@ -56,10 +56,13 @@ async function Inhalt() {
           className="terpen-band-eintrag group/eintrag flex flex-col items-center gap-1 text-center transition-transform duration-normal ease-standard sm:w-40"
           style={{ "--terpen-farbe": leitFarbe(terpen.noten[0]?.geschmack) } as React.CSSProperties}
         >
+          {/* Abstände von 4 px (gap-1 hier, am Namenblock und an den Noten): das 8-px-Raster ist
+              für die Gruppierung zu grob, Marke, Name und Infos gehören eng zusammen und müssen
+              samt Infos in 192 px passen (Budget in globals.css). */}
           {/* Marke: Tönung und Ring in der Leitnotenfarbe, das Icon in derselben Farbe, mit
               dem Textton abgemischt, damit es auf hellem wie dunklem Grund mindestens 3:1
               erreicht (WCAG 1.4.11; Gelb und Minzgrün sonst zu hell auf Hell). */}
-          <span className="grid size-11 shrink-0 place-items-center rounded-full bg-[color-mix(in_oklab,var(--terpen-farbe)_14%,transparent)] text-[color-mix(in_oklab,var(--terpen-farbe)_60%,var(--color-text))] ring-1 ring-inset ring-[color-mix(in_oklab,var(--terpen-farbe)_32%,transparent)] transition-colors duration-fast ease-standard group-hover/eintrag:bg-[color-mix(in_oklab,var(--terpen-farbe)_24%,transparent)] group-hover/eintrag:ring-[color-mix(in_oklab,var(--terpen-farbe)_56%,transparent)] sm:size-14">
+          <span className="grid size-11 shrink-0 place-items-center rounded-full bg-[color-mix(in_oklab,var(--terpen-farbe)_14%,transparent)] text-[color-mix(in_oklab,var(--terpen-farbe)_50%,var(--color-text))] ring-1 ring-inset ring-[color-mix(in_oklab,var(--terpen-farbe)_32%,transparent)] transition-colors duration-fast ease-standard group-hover/eintrag:bg-[color-mix(in_oklab,var(--terpen-farbe)_24%,transparent)] group-hover/eintrag:ring-[color-mix(in_oklab,var(--terpen-farbe)_56%,transparent)] sm:size-14">
             <TerpenIcon name={terpen.icon} className="size-6 sm:size-8" />
             <span className="sr-only">{terpen.name}</span>
           </span>
@@ -71,7 +74,8 @@ async function Inhalt() {
               stehen sie im Fluss. Mobil trägt der sr-only-Name die Information. */}
           <span aria-hidden="true" className="relative grid w-full gap-1 max-sm:hidden">
             <span className="flex min-h-10 items-start justify-center font-buch text-body font-normal leading-tight text-text-muted text-balance wrap-break-word transition-colors duration-fast ease-standard group-hover/eintrag:text-text">
-              {terpen.name}
+              {/* line-clamp-2 erzwingt die Grenze von zwei Zeilen (Höhenbudget). */}
+              <span className="line-clamp-2">{terpen.name}</span>
             </span>
             <span className="terpen-band-info pointer-events-none grid gap-1 opacity-0 transition-opacity duration-normal ease-standard group-hover/eintrag:pointer-events-auto group-hover/eintrag:opacity-100 group-focus-within/eintrag:pointer-events-auto group-focus-within/eintrag:opacity-100">
               <span className="flex items-baseline justify-center gap-2 text-caption text-text-muted">

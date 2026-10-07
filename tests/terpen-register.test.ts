@@ -109,6 +109,9 @@ test("Terpen-Band: Ruhezustand nur Icon und Name, Infos erscheinen beim Überfah
   assert.match(band, /max-sm:hidden/);
   // Die Breite eines Eintrags ist fix, sonst ruckt der Lauf und --band-kachel stimmt nicht.
   assert.match(band, /sm:w-40/);
+  // Zwei Zeilen höchstens; Abstand der Infos als Innenabstand (Trefferfläche), nicht als Außenabstand.
+  assert.match(band, /line-clamp-2/);
+  assert.match(readFileSync(join(process.cwd(), "app/globals.css"), "utf8"), /\.terpen-band-info \{[^}]*padding-top: 0\.25rem;/);
 });
 
 test("Terpen-Band hält beim Überfahren und bei Fokus an: Pause trägt denselben Selektorkopf wie der Lauf (Nutzer 2026-10-06)", () => {
