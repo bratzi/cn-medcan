@@ -3,7 +3,7 @@
 > Übergabemedium zwischen Sessions. Wird nach jedem Arbeitsblock aktualisiert und committet.
 > Wer hier weiterarbeitet, liest diese Datei zuerst und braucht den Chatverlauf nicht.
 
-**Letzte Aktualisierung:** 2026-10-07 (Session 42)
+**Letzte Aktualisierung:** 2026-10-07 (Session 43)
 **Repo:** https://github.com/bratzi/cn-medcan (public)
 **Branch:** `main` (Makeover „Grünes Buch“ Teilprojekt 1 ist seit 2026-09-24 auf `main`)
 
@@ -30,13 +30,90 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 
 ### ⇢ ALS ERSTES: diese Fragen in EINER AskUserQuestion stellen
 
-1. **Terpen-Band v3 (Startseite):** live seit Session 42 (`9da27cc`): Marke mit Icon in Leitnotenfarbe
-   zentriert, Name kleiner darunter, Infos nur beim überfahrenen Eintrag. Gefällt dir das so, oder andere
-   Farbidee (z. B. alle Icons einfarbig in Grün/Lila statt je Leitnote)?
-2. **Bewertungsbilder live ausprobieren:** Funktion ist komplett live, aber noch nie mit echtem Bild getestet.
-   Soll Claude als angemeldetes Mitglied/Betreiber ein Testbild hochladen (Upload, Diashow im Buch, Freigabe
-   in /admin) und es danach wieder löschen, oder machst du den ersten Upload selbst?
-3. **Wie weiter?** Kein offener Plan mehr. Neues Thema, oder zurückgestellte Minors angehen (Liste unten)?
+1. **Profil/Dashboard freigeben:** Das Grilling ist durch, alle Entscheidungen stehen unten unter
+   „SESSION 44“. Die Schlussfrage „Stimmt die Zusammenfassung so?“ blieb offen, weil der Nutzer
+   „safe 4 clear“ sagte („wir starten in einer neuen session das ganze“). Zusammenfassung kurz zeigen und
+   fragen: passt, dann Spec + Plan (Stufe 1 zuerst), oder etwas ändern?
+
+Danach ohne weitere Rückfrage: Spec `docs/superpowers/specs/2026-10-0x-profil-dashboard-design.md` schreiben,
+Plan in parallelen Strängen je Stufe (Dauerregel), Stufe 1 umsetzen.
+
+### ⇢ SESSION 44 (Sessionstart): Profil und Dashboard, Ergebnis des Grillings vom 2026-10-07
+
+Nutzerwunsch: jeder Benutzer bekommt ein Profil mit seinen Bewertungen, daraus abgeleiteten Vorlieben,
+Auswertungen und einem individuellen Netzgraphen („Skill-Matrix“), der sich mit jeder Bewertung neu ergibt.
+Darauf bauen Vorschläge auf, die von der Community bestätigt sind (mag fruchtig, also fruchtige Sorten mit
+guter Community-Wertung).
+
+**Fakten aus dem Code (vor dem Grilling geprüft):**
+- `/mitglied` zeigt schon „Könnte dir gefallen“ (6 Vorschläge, Tabelle `nutzer_empfehlungen`), gerechnet in
+  `lib/empfehlung.ts`: Profilvektor aus Terpenen (`t:`) und Geschmäckern (`g:`), Gewicht aus der Gesamtnote
+  (`bewertungsGewicht`: ab 3,5 positiv, bis 2 negativ), Kosinus, beim Speichern gerechnet (CPU 10 ms).
+- Die Vorschläge zählen bisher NUR Aroma-Ähnlichkeit, die Community-Gesamtnote fließt nicht ein.
+- `components/review/Netzdiagramm.tsx` gibt es für die Geschmacksmatrix einer Bewertung (Tinte, nicht Grün).
+- `Mitglied.anzeigename` ist nicht eindeutig.
+
+**Entscheidungen des Nutzers (nicht neu fragen):**
+- Sichtbarkeit: privat UND öffentlich. Öffentlich: Name, Avatar, Zahl der Bewertungen, Bewertungsliste,
+  Vorlieben-Netz. Privat bleiben Vorschläge und Auswertungen. Öffentliches Profil ist anfangs AUS (Opt-in,
+  Art. 9 DSGVO), Schalter in `/mitglied`.
+- Netz: 10 Geschmacksachsen als Netz, Terpene als Rangliste mit Balken darunter.
+- Rechnung: wie das bestehende Profil (Aroma der Sorte aus Herstellerterpenen, Community-Geschmack und
+  eigenen Reglern, gewichtet mit der eigenen Gesamtnote). Netz zeigt „mag ich“ als Fläche und „mag ich
+  nicht“ gestrichelt. Die Geschmacksregler sind Sweet-Spot-Werte und bedeuten allein kein „mag ich“.
+- Bestätigt: Sorte hat mindestens 2 Bewertungen (Community oder Betreiber) mit Median ab 3,5. Rang =
+  Aroma-Ähnlichkeit × Community-Note. Weniger als 3 bestätigte Treffer: mit Sorten nur nach Aroma
+  auffüllen, sichtbar markiert „noch nicht bestätigt“.
+- Auswertungen (alle vier gewählt): Top und Flop (je 3), du gegen Community (inkl. „du bewertest im Schnitt
+  0,4 strenger“), Overall-Schnitt je Kategorie, Verlauf des Netzes und Lieblingshersteller.
+- Verlauf: nachgerechnet aus heutiger Sicht (beim Speichern die Reihe nach 1, 2, 3 … Bewertungen nach
+  Datum rechnen und ablegen), keine Momentaufnahmen.
+- Adressen: privates Dashboard `/profil`; öffentlich `/profil/<kurz-id>` (keine Namen in der URL);
+  `/mitglied` bleibt Konto (Status, Avatar, Benachrichtigungen, Schalter öffentliches Profil).
+- Navigation: kein fünfter Menüpunkt; der Knopf „Mein Konto“ heißt „Mein Profil“ und führt zu `/profil`,
+  dort ein Reiter „Konto“ zu `/mitglied`. „Könnte dir gefallen“ zieht ins Profil um.
+- Betreiber: folgt denselben Regeln wie alle (Opt-in, kein Vergleich „wie nah bist du am Betreiber“).
+- Mindestzahl: Netz ab 1 Bewertung mit Hinweis „vorläufig, ab 3 aussagekräftig“ und Zähler; ohne Bewertung
+  leere Skizze mit Knopf „Erste Bewertung abgeben“.
+- HWG: Netz und Vorschläge nur Aroma, nie Wirkung. Vorschläge heißen neutral „Ähnlich im Aroma wie deine
+  Favoriten“, ohne Kauf- oder Apothekenlink. Wirkung im Overall-Schnitt nur privat.
+- Veränderung: im Profil der Stand vor der letzten Bewertung als dünne Kontur, dazu eine Änderungszeile
+  („seit X: Fruchtig stärker, Erdig schwächer“). Nach dem Speichern auf der Blütenseite ein Mini-Netz mit
+  Animation vorher/nachher direkt dort (Nutzer wählte „Mini-Netz direkt“).
+- Stufen: ein Plan, drei Stufen, jede einzeln live, innerhalb einer Stufe parallele Stränge.
+  Stufe 1: `/profil` privat (Netz + Terpenliste, bestätigte Vorschläge, Top/Flop, du gegen Community,
+  Overall-Schnitt, Navigation). Stufe 2: öffentliches Profil mit Opt-in und Link vom Namen im Buch.
+  Stufe 3: Verlauf, Lieblingshersteller, Mini-Netz auf der Blütenseite.
+
+**Claudes eigene Technikentscheidung (dem Nutzer genannt, nicht widersprochen):** beim Speichern einer
+Bewertung rechnen und ablegen (CPU-Limit); beim Aufruf neu rechnen, wenn der Stand älter als 24 h ist,
+damit neue Community-Werte ankommen. Cron verworfen: Free-Plan hat auch dort 10 ms CPU.
+
+### ⇢ SESSION 44 (Sessionstart): Stand nach Session 43
+
+**Live und auf `main` (674 Tests grün, tsc sauber):**
+- `f19a340` Terpen-Band: Infos ragten beim Überfahren bis 349 px ins Nachbarterpen (Spur `auto` weitete sich
+  auf die Mindestbreite von Duft + Sortenzahl). Jetzt `grid-cols-[minmax(0,1fr)]`, Duft allein und gekürzt
+  (voller Satz im `title`), Sortenzahl entfällt im Band (eigene Zeile sprengt die 192 px). **Live bestätigt:**
+  alle 11 Infos genau 160 px, Hover auf Limonen sauber. Nutzer: Band v3 sonst „passt“.
+- `45e34a0` Buch-Minors: mobil steht über der Karte immer der Titel „Terpenbewertung“ (auch bei mehreren
+  Reitern), Haarlinie darunter nur ab lg (keine doppelte Linie mehr); Buch-Überschrift trägt `title` am
+  inneren span statt neben `aria-label`; Kommentar zum Einzug (280 ms Vorlauf, Drehung 500 ms) stimmt.
+  **Live nicht geprüft** (mobil unter 640 px).
+
+**Bewertungsbilder live getestet (Nutzer-Go):** als Betreiber auf RS11 ein Testbild hochgeladen
+(per JS-DataTransfer, `file_upload` nimmt keine Pfade mehr), Meldung „Gespeichert und veröffentlicht“,
+Bild im Titelblatt und im Buch links unter dem Text; danach entfernt, Buch fällt aufs Symbolbild zurück.
+Bewertungsdatum blieb 02.10.2026. **Nicht geprüft:** Freigabe in /admin (Betreiber-Bilder sind sofort frei,
+dafür braucht es ein Community-Konto), Diashow mit mehreren Bildern, Review Focus 1.
+
+**Lehre Browser:** Im verborgenen Tab hängen auch Bildverkleinerung (Canvas/`fetch`) und Screenshots; der
+Nutzer muss das Chrome-Fenster nach vorn holen.
+
+**Zurückgestellte Minors (unverändert offen):** Regex-Quelltexttests statt Verhaltenstests; Fortschritt
+doppelt (Knopf + sr-only); Layoutsprung des Bands vor Hydration; Nicht-Mitglieder-Zweig der Blütenseite
+ohne Note; Session 41: Autor-Zahlen ab ~99 Autoren über D1-Parametergrenze, Kolophon gap-1 ohne
+Begründung, leere div.contents im Auszug. Verworfen: Kommentar „IN über höchstens 20 Ids“ (stimmt so).
 
 ### ⇢ SESSION 43 (Sessionstart): Stand nach Session 42
 
