@@ -75,17 +75,23 @@ Minuten alt. Das ist für Zähler dieser Art richtig und spart Sub-Requests.
 
 ## 6. Bewegung
 
-Kein neues Werkzeug. Die Staffel in `components/story/bewegung/auftakt.ts` bekommt feste Marken:
+Kein neues Werkzeug. Die Staffel in `components/story/bewegung/auftakt.ts` behält die Marken, die der
+Nutzer am 2026-09-25 gesetzt hat („später und länger"), und bekommt die Zahlen als letzten Schritt:
 
 | Zeit | Was |
 |------|-----|
-| 0,3 s | Logo schreibt sich (bestehendes `schreiben`) |
-| 1,0 s | Oberzeile blendet ein |
-| 1,4 s | Intro blendet ein |
-| 1,8 s | Zahlen zählen einmal hoch |
+| 0 s | Film blendet auf (bestehend) |
+| 0,6 s | Logo schreibt sich per CSS (bestehendes `schreiben`) |
+| 1,8 s | Oberzeile blendet ein (bestehend) |
+| 3,4 s | Intro blendet ein (bestehend) |
+| 4,2 s | Zahlenleiste blendet ein, die Zahlen zählen dabei einmal hoch |
 
-Die Zahlen nutzen `[data-zaehler]` und `zahlformat.ts`, die es für die Zähler im Buch schon gibt — damit
-zählen sie in der Sprache der Seite und mit den richtigen Trennzeichen. Bei
+Die Zahlen nutzen `zahlformat.ts`, das es für die Zähler im Buch schon gibt — damit zählen sie in der
+Sprache der Seite und mit den richtigen Trennzeichen. Sie tragen ein eigenes Merkmal
+`data-auftakt-zaehler`, **nicht** `data-zaehler`: `eintrag.ts` greift alle `[data-zaehler]` der Seite ab
+und würde sonst die Auftaktzahlen beim Aufschlagen der Doppelseite ein zweites Mal hochzählen. Die
+Zahlenleiste trägt `data-story-einstieg`, damit der CSS-Notfall sie wie Oberzeile und Intro nach 8 s
+zeigt, falls die Bühne nicht lädt. Bei
 `prefers-reduced-motion: reduce` steht sofort der Endwert, genau wie `eintrag.ts` es heute schon macht.
 
 Der Knopf „Bewerte jetzt mit" bleibt ab dem ersten Frame bedienbar und trägt weiterhin kein
