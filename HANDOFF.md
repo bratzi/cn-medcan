@@ -3,7 +3,7 @@
 > Übergabemedium zwischen Sessions. Wird nach jedem Arbeitsblock aktualisiert und committet.
 > Wer hier weiterarbeitet, liest diese Datei zuerst und braucht den Chatverlauf nicht.
 
-**Letzte Aktualisierung:** 2026-10-08 (Session 49)
+**Letzte Aktualisierung:** 2026-10-08 (Session 50)
 **Repo:** https://github.com/bratzi/cn-medcan (public)
 **Branch:** `main` (Makeover „Grünes Buch“ Teilprojekt 1 ist seit 2026-09-24 auf `main`)
 
@@ -28,11 +28,49 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 
 ## ⇢ Hier geht es weiter
 
-### ⇢ SESSION 50 (Sessionstart): nächstes Kernthema wählen
+### ⇢ SESSION 51 (Sessionstart): Kapitel auf echtem Gerät ansehen lassen, dann nächstes Kernthema
 
-**ALS ERSTES:** mit dem Nutzer das nächste Kernthema wählen (Reviews des Betreibers, Umfragen-Schleife,
-offene Punkte aus Profil-Reviews wie K1, M2/M10 Verlaufsrechnung). Auf echtem Telefon ansehen lassen:
-Menü mit Schalterreihe, Auftaktzahlen (Trennung „BEWERTUN-GEN“ nur im Iframe gesehen).
+**ALS ERSTES:** den Nutzer `/profil` und `/mitglied` auf echtem Telefon und am Rechner ansehen lassen
+(Optik „dein Kapitel“, Bewegung beim Scrollen, Reiterwechsel). Dann mit ihm das nächste Kernthema wählen
+(Reviews des Betreibers, Umfragen-Schleife). Offen und nicht geprüft: siehe unten.
+
+### ⇢ SESSION 50 (erledigt): Profil und Konto als „dein Kapitel im Grünen Buch“
+
+Nutzer-Wünsche: Profil und Konto über volle Breite als Dashboard, ausbauen (alle vier Bausteine:
+Kennzahlen, Umfragen im Konto, Meine Bewertungen, Aktivität und Verteilung), zwei Reiter bleiben,
+„Güte wie die Startseite, agenturlike“, alle Design-Skills. Telefon-Check aus Session 49: passt.
+Spec `docs/superpowers/specs/2026-10-08-profil-konto-dashboard-design.md` (freigegeben samt
+Regeländerungen: Handschrift-Randnotizen im Kapitel, Feldbuch-Raster und Schlagwort auf beiden Seiten),
+Plan `docs/superpowers/plans/2026-10-08-profil-konto-kapitel.md` (Task 1 selbst, Stränge A/B/C parallel in
+Worktrees, je Review, Gesamtreview Opus, eine Fix-Welle, Nachprüfung).
+
+- **Live auf `main`** (`cc3fc86`, `35f0f2d`, dazu der HANDOFF-Commit), 846 Tests grün, tsc, eslint, farben sauber.
+- **Aufbau:** `components/kapitel/` (KapitelRaster, Feld, FeldSkelett, Randnotizen, Kapitelkopf). Beide
+  Seiten volle Breite auf 4/10 Rasterspalten (ab 1080 px), Felder statt Karten, Kopf mit Name
+  (`text-kapitel`), großen Reitern, Freisteller (ab 1080 px, Tiefenebene) und Schlagwort; Randnotizen
+  (Zahl gedruckt, Wort Mr Dafoe). Jede Feldreihe in eigenem `Suspense` mit Skelett, `<ViewTransition
+  name="kapitel-kopf">` beim Reiterwechsel. Bewegung nur CSS (`.kapitel-*`, `[data-feld]` Vorhang,
+  `[data-saeule]`, `[data-balken]`, `[data-netz-erscheinen]`), aus bei reduzierter Bewegung und Sparmodus.
+- **Neu im Profil:** Aktivität 12 Monate (`components/profil/Aktivitaet.tsx`), Notenverteilung,
+  Register deiner Bewertungen mit Bildern (`?sortierung=datum|note|abstand`, `?alle=1`, Anker
+  `#bewertungen-titel`), Randnotizen bewertet / im Schnitt / zur Community / Hersteller / zuletzt.
+- **Neu im Konto:** Umfrage jetzt als Stimmzettel (Vermerk „deine Wahl“), Deine Stimmen mit Ausgang und
+  Link zur Bewertung (`lib/query/konto.ts`), Randnotizen dabei seit / gestimmt / getroffen / vorgeschlagen / neu.
+- **K1 erledigt:** Profil-Upsert läuft per `profilErsetzen` in derselben D1-Batch wie die Vorschläge
+  (Datum wie der Prisma-Adapter: ISO mit `+00:00`). **M2 erledigt:** Verlauf rechnet das Netz nur für
+  die letzten 60 Schritte. M10 war nirgends beschrieben und bleibt weg.
+- **Live geprüft** (Chrome im Vordergrund, 1418 px hell, Register dunkel): Kopf, Raster deckt Feldkanten,
+  alle Felder, Stimmzettel mit Schatten, Konto vollständig, ein gefüllter Knopf. 390 px per Iframe: kein
+  Überlauf, h1 endet bei 343 px, Handschrift-Wörter 140 von 188 px. Zwei Live-Befunde behoben
+  (`35f0f2d`): Register/Stimmen hatten 3 statt 5 Spalten (Tailwind sortierte `sm:` hinter
+  `min-[1080px]:`, jetzt beide als Pixel-Breakpoints), „Abmelden“ steht bei den Reitern.
+  **Lehre:** `sm:`/`md:`/`lg:` nie mit `min-[…px]:` auf derselben Eigenschaft mischen.
+- **Nicht geprüft:** echtes Telefon, Tablet 640 bis 1079 px, Dunkelmodus der übrigen Felder,
+  englisch, reduzierte Bewegung, Reiterwechsel-Animation gesehen, Mitglied ohne Bewertung und ohne Stimme
+  (nur per Tests), Bilder im Register mittig (Commit mit diesem HANDOFF, nicht live nachgesehen).
+- **Bewusst offen (Minor):** Kopf wartet auf `ungeleseneAnzahl`; Wertzahl der Säulen erscheint sofort,
+  während die Säule wächst; Staffelung der Säulen fehlt (scroll-gekoppelt nicht sauber mit Verzögerung);
+  Kopfbild lädt lazy; Quelltext-Test der Konto-Abfrage.
 
 ### ⇢ SESSION 49 (erledigt): Kleinkram Auftaktzahlen und Schalterleiste mobil
 

@@ -63,7 +63,7 @@ export function BewertungsRegister({ ansicht, sortierung, alle, texte, sprache }
       <ul className="grid grid-cols-2 gap-x-6 gap-y-8 min-[640px]:grid-cols-3 min-[1080px]:grid-cols-5">
         {ansicht.eintraege.map((e) => (
           <li key={e.slug} className="group flex min-w-0 flex-col gap-4">
-            <div className="aspect-4/5 overflow-hidden bg-surface-sunken">
+            <div className="flex aspect-4/5 items-center justify-center overflow-hidden bg-surface-sunken">
               {e.bild.art === "eigen" ? (
                 <BudpicBild
                   id={e.bild.id}

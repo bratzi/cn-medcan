@@ -37,7 +37,7 @@ export function MeineStimmen({ stimmen, texte, sprache }: { stimmen: readonly St
         const ausgang = stimmAusgang(s.phase, s.istGewinner);
         return (
           <li key={s.umfrageId} className="flex min-w-0 flex-col gap-4">
-            <div className="aspect-4/5 overflow-hidden bg-surface-sunken">
+            <div className="flex aspect-4/5 items-center justify-center overflow-hidden bg-surface-sunken">
               <Bild id={ersatzBildId(s.bildPfad, s.slug)} sizes="(min-width: 1080px) 20vw, (min-width: 640px) 33vw, 50vw" dekorativ className="size-full object-contain" />
             </div>
             <div className="flex flex-col gap-2">
