@@ -3,7 +3,7 @@
 > Übergabemedium zwischen Sessions. Wird nach jedem Arbeitsblock aktualisiert und committet.
 > Wer hier weiterarbeitet, liest diese Datei zuerst und braucht den Chatverlauf nicht.
 
-**Letzte Aktualisierung:** 2026-10-08 (Session 52)
+**Letzte Aktualisierung:** 2026-10-09 (Session 52, Ende)
 **Repo:** https://github.com/bratzi/cn-medcan (public)
 **Branch:** `main` (Makeover „Grünes Buch“ Teilprojekt 1 ist seit 2026-09-24 auf `main`)
 
@@ -28,27 +28,45 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 
 ## ⇢ Hier geht es weiter
 
-### ⇢ WARTELISTE (Nutzer 2026-10-09, Reihenfolge)
+### ⇢ SESSION 53 (Sessionstart)
 
-1. ~~Dein Kapitel~~ **live** (siehe Session 52 unten).
-2. ~~Profil und Konto entkoppeln~~ **erledigt `b690830`** (live-Sicht offen): Menü mit „Profil“, Knopf „Mein Konto“
-   nach /mitglied, ProfilReiter gelöscht, Kapitelkopf nennt die Seite (`seite`). „Dein Kapitel“ steht seit
-   `66f5afe` direkt hinter dem Terpen-Register (Nutzer: zu weit unten).
-3. ~~Auftakt-Kennzahlen~~ **erledigt `2d126fd`** (live-Sicht offen): klickbar (Sorten nach /blueten, Bewertungen nach /reviews, Stimmen nach /umfragen)
-   und in der Akzentschrift Mr Dafoe (Nutzer-Ausnahme von „Zahlen gedruckt“, ins Regelwerk eintragen).
-4. ~~Buch-Darstellung~~ **erledigt `242df55`, `+1`** (Spec/Plan 2026-10-09 buch-doppelseite-fokus; live-Sicht und Review offen): (Brainstorming, Design-Skills): Blätter-Bewertung zentrierter im Fokus,
-   Nutzertext kursiv/abgesetzt als Nutzerstimme, Akzentschrift rein, Profil mit Namen kleiner und eingefasst;
-   gilt für jedes Buch (/reviews, Startseite, Blütenseite).
-6. **Terpenband-Tooltip neu** (Nutzer: oft viel zu klein, awwwards-Niveau, alle Design-Skills).
-7. **Chargen zurücknehmen**: angeben und anzeigen bleibt, aber Startseite und Unterseiten erwähnen sie kaum noch,
-   kein Hauptaugenmerk der Plattform.
-5. **Bewertungsformular mit Fazit und Live-Terpenprofil** (großer Punkt, alle Design-Skills, Agentur-Niveau):
-   das Fazit wie auf der Startseite fehlt beim Bewerten; daneben das eigene Terpenprofil (Netz), das sich
-   beim Bewerten einer neuen Sorte live verändert.
+**ALS ERSTES: diese Fragen in EINER AskUserQuestion stellen:**
+1. Terpenband-Tooltip: Entwurf unten (Karte außerhalb des Bands) so bauen? Oder andere Richtung?
+2. Chargen zurücknehmen: nur Texte und Gewichtung (Startseite, Blüten-, Reviewseite), Angabe und Anzeige bleiben. Auch das Bewertungsschema-Wort „Charge“ im Kolophon belassen?
+3. Hero-Übergang: unter dem Hero einen weichen Verlauf in den Seitengrund (nur Hintergrund, keine Inhalte). Höhe des Verlaufs: kurz (ca. 96 px) oder lang (ca. 25 % der Hero-Höhe)?
+4. Reihenfolge der großen Punkte: Tooltip, Chargen, Hero-Verlauf, dann Bewertungsformular mit Fazit und Live-Terpenprofil?
 
-Erledigt dazwischen: **`a4a03b2`** Terpenband-Tooltip nicht mehr abgeschnitten (Band nur waagrecht beschnitten),
-Einträge sind Links auf ihre Register-Tafel, Register schlägt per hashchange auf; live geprüft (Tooltip ganz, Sprung geht).
-`ce112cb` Notenbalken im Tooltip wieder sichtbar (Block gestreckt), `fb5c2b8` Tafel mit Kopfabstand beim Sprung.
+Danach live nachsehen (noch nicht gesehen): Buch-Doppelseite neu (`242df55`, `937c34a`, `1b30c3a`) auf
+`/reviews`, Blütenseite, Startseite, 1143 und 494 px, hell und dunkel; Notizen-Kürzung mit Zitatzeichen bei langem
+Text (Review: schließendes Zeichen geht bei Kürzung verloren, ggf. KNOPF_PLATZ anpassen).
+
+### ⇢ WARTELISTE (Stand Session-Ende)
+
+1. **Terpenband-Tooltip neu** (Nutzer: oft viel zu klein, awwwards-Niveau, alle Design-Skills).
+   Ursache: Infos hängen in der 160-px-Spalte des Eintrags, das Band beschneidet seitlich.
+   Entwurf (Skills emil-design-eng, animate geladen): eine Karte als Insel `TerpenBandKarte` per Portal in `body`,
+   `position: fixed`, 288 px, eckig, `bg-surface-raised border-border-strong shadow-lg p-6`, `pointer-events: none`;
+   Kopf mit Marke in Leitfarbe, Name `font-buch text-h3`, „in N Sorten“; voller Duftsatz; drei Noten mit Balken
+   (ohne Spur); Hinweis „Klick öffnet die Tafel“. Lage aus reiner Funktion `kartenLage` (lib/terpen-karte.ts):
+   mittig unter dem Symbol, am Fensterrand geklemmt (16 px), Pfeil zeigt aufs Symbol, ohne Platz nach oben.
+   Ereignisse per Delegation am Band (`data-terpen` am li, auch in der Kopie), nur `pointerType` Maus, Fokus per
+   Tastatur ebenso, Escape und Scroll schließen. Bewegung: `@starting-style` Deckkraft + `scale(0.97)` +
+   4 px, 150 ms, `cubic-bezier(0.23, 1, 0.32, 1)`, Ursprung am Pfeil; Wechsel zum Nachbarn sofort; reduziert nur
+   Deckkraft. Info-Span im li und die Tooltip-CSS im Laufmodus entfallen; Tests in `terpen-register.test.ts`
+   anpassen. Erster Testentwurf für `kartenLage` war geschrieben (Mitte, Ränder, nach oben), nicht committet.
+2. **Chargen zurücknehmen** (Nutzer): Angabe und Anzeige bleiben, aber Startseite und Unterseiten erwähnen sie
+   kaum noch, kein Hauptaugenmerk.
+3. **Hero-Übergang weich** (Nutzer): unter dem Hero den Hintergrund transparent verlaufen lassen, damit die Kante
+   beim Scrollen nicht hart wirkt; nur der Hintergrund.
+4. **Bewertungsformular mit Fazit und Live-Terpenprofil** (großer Punkt, alle Design-Skills, Agentur-Niveau):
+   Fazit wie auf der Startseite fehlt beim Bewerten; daneben das eigene Terpenprofil (Netz), das sich beim
+   Bewerten einer neuen Sorte live verändert.
+
+Erledigt in Session 52 (alles gepusht): Dein Kapitel live; Profil/Konto entkoppelt (`b690830`); Kapitel hinter das
+Register (`66f5afe`); Auftakt-Kennzahlen in Mr Dafoe und klickbar (`2d126fd`); Terpenband-Tooltip nicht mehr
+abgeschnitten, Balken sichtbar, Einträge springen ins Register (`a4a03b2`, `ce112cb`, `fb5c2b8`); Buch-Doppelseite
+mit Exlibris, kursivem Zitat, Vermerk „meine notiz“/„von euch“, Urteil zentriert mit Note in Mr Dafoe
+(`242df55`, `937c34a`, Review-Fixes `1b30c3a`). Live geprüft: Kapitel, Menü, Sektionsposition, Kennzahlen, Band.
 
 ### ⇢ Offene Minors „Dein Kapitel“ (Gesamtreview, geparkt)
 
