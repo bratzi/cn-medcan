@@ -1,7 +1,11 @@
 import { AB_TABLET, type Choreografie } from "./typen";
+import { zahlFormat } from "./zahlformat";
 
 /** Gleich dem Einsatz von `einstieg-notfall` in globals.css (8 s). */
 const NOTFALL_MS = 8000;
+
+/** Die Zahlenleiste folgt dem Intro (3,4 s), wenn es halb steht (Spec 2026-10-08 Auftakt, 6). */
+const ZAHLEN_AB = 4.2;
 
 /**
  * Sektion 1 (Spec TP3 8.1, Redesign 21): eine komponierte Eröffnung. Der
@@ -21,9 +25,18 @@ export const auftakt: Choreografie = ({ gsap }) => {
   const einstieg = gsap.utils.toArray<HTMLElement>("[data-story-einstieg]");
   if (einstieg.length === 0) return;
 
+  // Eigenes Merkmal, nicht das der Noten: eintrag.ts greift jenes seitenweit ab.
+  const zaehler = gsap.utils
+    .toArray<HTMLElement>("[data-auftakt-zaehler]")
+    .filter((el) => Number.isFinite(Number(el.dataset.ziel)));
+  const ganz = (wert: number) => zahlFormat(document.documentElement.lang, 0).format(wert);
+  const endwerte = () => {
+    for (const el of zaehler) el.textContent = ganz(Number(el.dataset.ziel));
+  };
+
   let ablauf: ReturnType<typeof gsap.timeline> | null = null;
   const eroeffnen = () => {
-    ablauf = gsap
+    const zeitleiste = gsap
       .timeline({
         defaults: { ease: "power3.out" },
         // Ab hier übernimmt GSAP: der CSS-Notfall wird abgeschaltet. Die Texte stehen
@@ -55,11 +68,50 @@ export const auftakt: Choreografie = ({ gsap }) => {
         { opacity: 1, y: 0, filter: "blur(0px)", duration: 2.2, ease: "power2.out", clearProps: "filter" },
         3.4,
       );
+    ablauf = zeitleiste;
+
+    // Die Leiste fehlt, wenn die Abfrage scheiterte oder alles 0 ist: dann nichts tun.
+    if (zaehler.length > 0) {
+      zeitleiste.fromTo(
+        '[data-story="zahlen"]',
+        { opacity: 0, y: 16 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 1.2,
+          ease: "power2.out",
+          // Erst hier auf 0: vorher steht der Endwert aus dem HTML, nie eine falsche Null.
+          onStart: () => {
+            for (const el of zaehler) el.textContent = ganz(0);
+          },
+        },
+        ZAHLEN_AB,
+      );
+      // Leicht versetzt (80 ms je Zahl), damit die drei nicht als Block anlaufen.
+      zaehler.forEach((el, index) => {
+        const stand = { wert: 0 };
+        zeitleiste.to(
+          stand,
+          {
+            wert: Number(el.dataset.ziel),
+            duration: 1.6,
+            ease: "power2.out",
+            onUpdate: () => {
+              el.textContent = ganz(Math.round(stand.wert));
+            },
+          },
+          ZAHLEN_AB + index * 0.08,
+        );
+      });
+    }
   };
 
   if (document.visibilityState === "visible") {
     eroeffnen();
-    return () => ablauf?.revert();
+    return () => {
+      ablauf?.revert();
+      endwerte();
+    };
   }
 
   // Im Hintergrund geöffnet: erst beim Sichtbarwerden eröffnen, und nur, solange
@@ -73,6 +125,7 @@ export const auftakt: Choreografie = ({ gsap }) => {
   return () => {
     document.removeEventListener("visibilitychange", sichtbar);
     ablauf?.revert();
+    endwerte();
   };
 };
 

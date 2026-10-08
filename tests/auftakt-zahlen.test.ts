@@ -78,3 +78,20 @@ test("Auftakt: Zahlen im Suspense mit Skelett, Knopf ohne Einstieg", () => {
   const knopf = quelle.slice(quelle.indexOf("<Link"), quelle.indexOf("</Link>"));
   assert.doesNotMatch(knopf, /data-story-einstieg/);
 });
+
+test("Bewegung: Leiste bei 4,2 s, eigenes Merkmal, Endwerte beim Aufräumen", () => {
+  const quelle = lies("components/story/bewegung/auftakt.ts");
+  assert.match(quelle, /\[data-auftakt-zaehler\]/);
+  assert.match(quelle, /'\[data-story="zahlen"\]'/);
+  assert.match(quelle, /ZAHLEN_AB = 4\.2/);
+  assert.match(quelle, /zahlFormat\(document\.documentElement\.lang, 0\)/);
+  // Bestehende Marken bleiben (Nutzer 2026-09-25).
+  assert.match(quelle, /'\[data-story="oberzeile"\]'[\s\S]*?1\.8,/);
+  assert.match(quelle, /'\[data-story="intro"\]'[\s\S]*?3\.4,/);
+});
+
+test("Doppelseite greift nur [data-zaehler], der Auftakt nutzt es nicht", () => {
+  assert.match(lies("components/story/bewegung/eintrag.ts"), /"\[data-zaehler\]"/);
+  assert.doesNotMatch(lies("components/story/bewegung/auftakt.ts"), /\[data-zaehler\]/);
+  assert.doesNotMatch(lies("components/story/AuftaktZahlen.tsx"), /data-zaehler=/);
+});
