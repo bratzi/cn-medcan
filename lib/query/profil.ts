@@ -21,7 +21,7 @@ import {
   profilErsetzen,
   profilNeuRechnen,
 } from "@/lib/profil";
-import type { AuswertungsZeile, ProfilWerte, VerlaufSchritt } from "@/lib/profil-typen";
+import type { ProfilWerte, RegisterZeile, VerlaufSchritt } from "@/lib/profil-typen";
 import { profilVerlauf, verlaufAusDaten, verlaufDaten } from "@/lib/profil-verlauf";
 import { getPrisma } from "@/lib/prisma";
 import { parseGeschmacksMatrix, parseTerpenIntensitaet } from "@/lib/query/bewertung";
@@ -135,7 +135,7 @@ export async function aktuellesProfil(
  * dort steckt die eigene Note mit drin, und `anzahl` zählt auch Bewertungen
  * ohne Gesamtnote; herausrechnen ginge schief (Review Profil W1).
  */
-export async function ladeAuswertungsZeilen(mitgliedId: string): Promise<AuswertungsZeile[]> {
+export async function ladeAuswertungsZeilen(mitgliedId: string): Promise<RegisterZeile[]> {
   const prisma = await getPrisma();
   const zeilen = await prisma.review.findMany({
     where: { autorId: mitgliedId },
@@ -150,7 +150,14 @@ export async function ladeAuswertungsZeilen(mitgliedId: string): Promise<Auswert
       wirkung: true,
       konsistenz: true,
       strainId: true,
-      strain: { select: { slug: true, handelsname: true } },
+      strain: { select: { slug: true, handelsname: true, herstellerBildPfad: true, hersteller: { select: { name: true } } } },
+      // Dein erstes Bild zur Bewertung (Spec 2026-10-06): offene sieht der Eigentümer über /api/bild/offen.
+      bilder: {
+        where: { status: { in: ["OFFEN", "FREIGEGEBEN"] } },
+        orderBy: { erstelltAm: "asc" },
+        take: 1,
+        select: { id: true, breite: true, hoehe: true, status: true },
+      },
     },
   });
   const fremde = new Map<string, { mittel: number | null; anzahl: number }>();
@@ -176,5 +183,11 @@ export async function ladeAuswertungsZeilen(mitgliedId: string): Promise<Auswert
     wirkung: z.wirkung,
     konsistenz: z.konsistenz,
     community: fremde.get(z.strainId) ?? null,
+    strainId: z.strainId,
+    hersteller: z.strain.hersteller?.name ?? null,
+    bildPfad: z.strain.herstellerBildPfad,
+    eigenesBild: z.bilder[0]
+      ? { id: z.bilder[0].id, breite: z.bilder[0].breite, hoehe: z.bilder[0].hoehe, offen: z.bilder[0].status === "OFFEN" }
+      : null,
   }));
 }
