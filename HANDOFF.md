@@ -3,7 +3,7 @@
 > Übergabemedium zwischen Sessions. Wird nach jedem Arbeitsblock aktualisiert und committet.
 > Wer hier weiterarbeitet, liest diese Datei zuerst und braucht den Chatverlauf nicht.
 
-**Letzte Aktualisierung:** 2026-10-08 (Session 50)
+**Letzte Aktualisierung:** 2026-10-08 (Session 51)
 **Repo:** https://github.com/bratzi/cn-medcan (public)
 **Branch:** `main` (Makeover „Grünes Buch“ Teilprojekt 1 ist seit 2026-09-24 auf `main`)
 
@@ -28,11 +28,36 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 
 ## ⇢ Hier geht es weiter
 
-### ⇢ SESSION 51 (Sessionstart): Kapitel auf echtem Gerät ansehen lassen, dann nächstes Kernthema
+### ⇢ SESSION 52 (Sessionstart): `/reviews` live fertig prüfen
 
-**ALS ERSTES:** den Nutzer `/profil` und `/mitglied` auf echtem Telefon und am Rechner ansehen lassen
-(Optik „dein Kapitel“, Bewegung beim Scrollen, Reiterwechsel). Dann mit ihm das nächste Kernthema wählen
-(Reviews des Betreibers, Umfragen-Schleife). Offen und nicht geprüft: siehe unten.
+**ALS ERSTES:** `/reviews` live prüfen (falls in Session 51 nicht mehr geschehen): großes Buch mit
+Seitenleiste (Pillen, Sprung `#nr-25` nach `/reviews/band/2`), Sorte als Link auf jeder Doppelseite,
+Ranglisten als Gast (Anmelde-Hinweis) und als Mitglied (fünf Reiter, Karten, Seiten, Zurück-Taste),
+390 px und 1418 px, hell und dunkel. Danach den Nutzer drüberschauen lassen.
+
+### ⇢ SESSION 51 (erledigt): Profil/Konto/Blüte nachgeschärft, Bewertungsbuch und Ranglisten
+
+Nutzer-Wünsche: Kopfbild im Kapitel kleiner, Konto-Reihenfolge (Wichtiges oben), „getroffen“ unklar,
+Angaben zur Blüte aufklappbar (nur 3 bis 4 Kernangaben), Sektionstexte mittig wie die Startseite;
+dazu `/reviews` als ein Buch aller Bewertungen mit Bild, paginiert, darunter ein Ranglisten-Menü.
+- **`9a35003`, `547f968`:** Kapitelkopf-Freisteller absolut, `w-56`, `end-24` (weg von der Schalterleiste).
+  Konto: Angaben, Avatar, Sichtbarkeit, Status, Nachrichten, dann Umfrage mit Vorschlägen, zuletzt Stimmen.
+  Randnotizen: Stimmen / gewonnen / Vorschläge / ungelesen (Mehrzahl über `mehrzahl`). Blüte: vier
+  Kernangaben (Kultivar, Typ, Hersteller, Bestrahlung), Rest in `<details>`; Sektionsköpfe mittig in
+  `text-kapitel` mit Schlagwort (`SEKTION`, `SektionsKopf` in der Blütenseite). Live geprüft.
+- **Spec** `docs/superpowers/specs/2026-10-08-bewertungsbuch-ranglisten-design.md`, **Plan**
+  `docs/superpowers/plans/2026-10-08-bewertungsbuch-ranglisten.md`. Nutzer-Entscheidungen: alle Bewertungen,
+  Betreiber zuerst; Ranglisten je Sorte; **Ranglisten nur für angemeldete Mitglieder (§10 HWG)**.
+- **`2a278fa` (gepusht, Live-Prüfung offen):** `/reviews` = Band 1, `/reviews/band/[n]` (24 je Band,
+  statisch 300 s) über `lib/query/buch-band.ts`, `components/review/GrossesBuch.tsx`, Seitenleiste im
+  `Buch` (`leiste`, Sprung `#nr-<n>`, `lib/buch.ts`). Ranglisten: `lib/rangliste.ts` (Bayes C = 3),
+  `lib/query/rangliste.ts` (GROUP BY, gegen Remote-D1 lesend geprüft), `app/api/ranglisten/route.ts`
+  (401 ohne Sitzung), Insel `components/rangliste/`. Alte `Doppelseite` nur noch auf der Startseite;
+  `Inhaltsverzeichnis` gelöscht; `redaktionelleReviews` jetzt ungenutzt (Minor).
+- 874 Tests grün, tsc, eslint, farben sauber. Fix-Runde B und ihr Review hat der Controller selbst
+  gemacht (Subagenten liefen ins monatliche Ausgabenlimit).
+- **Offen (Minor):** `redaktionelleReviews` entfernen; Einrückung `BEWERTUNG_SELECT`; Startseite
+  `NeuesterEintrag` auf Doppelseite mit Bild umstellen (Nutzer fragen); Gesamtreview Opus steht aus.
 
 ### ⇢ SESSION 50 (erledigt): Profil und Konto als „dein Kapitel im Grünen Buch“
 
