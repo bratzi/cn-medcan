@@ -23,6 +23,18 @@ export function RandspaltenSkelett({ ansage }: { ansage: string }) {
   );
 }
 
+/** Höhe wie die echte Zahlenleiste im Auftakt (Zahl in text-display, Wort in text-small), damit nichts springt. */
+export function AuftaktZahlenSkelett({ ansage }: { ansage: string }) {
+  return (
+    <div role="status" data-skelett="" className="grid w-full max-w-3xl grid-cols-3 gap-4 sm:gap-8">
+      <SkelettAnsage text={ansage} />
+      {["sorten", "bewertungen", "stimmen"].map((schluessel) => (
+        <span key={schluessel} aria-hidden="true" className={`${SKELETT_FLAECHE} mx-auto h-20 w-24 sm:w-32`} />
+      ))}
+    </div>
+  );
+}
+
 export function DoppelseitenSkelett({ ansage }: { ansage: string }) {
   return (
     <div role="status" data-skelett="" className="grid grid-cols-1 border border-border lg:grid-cols-2">

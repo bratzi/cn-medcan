@@ -3,7 +3,9 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 
-import { zuAuftaktZahlen, hatAuftaktZahlen } from "@/lib/query/auftakt-zahlen";
+import { de } from "@/lib/i18n/de";
+import { en } from "@/lib/i18n/en";
+import { auftaktEintraege, zuAuftaktZahlen, hatAuftaktZahlen } from "@/lib/query/auftakt-zahlen";
 
 const lies = (datei: string) => readFileSync(join(process.cwd(), datei), "utf8");
 
@@ -36,4 +38,43 @@ test("Abfrage: eine queryRaw mit drei Unterabfragen, keine Transaktion", () => {
   assert.match(quelle, /FROM strains WHERE aktiv = 1/);
   assert.match(quelle, /FROM reviews WHERE freigegeben = 1/);
   assert.match(quelle, /FROM stimmen\)/);
+});
+
+test("Einträge deutsch: Tausenderpunkt, Mehrzahl, feste Reihenfolge", () => {
+  assert.deepEqual(auftaktEintraege({ sorten: 412, bewertungen: 37, stimmen: 1284 }, de.start.auftakt.zahlen, "de"), [
+    { schluessel: "sorten", zahl: 412, text: "412", wort: "Sorten im Katalog" },
+    { schluessel: "bewertungen", zahl: 37, text: "37", wort: "Bewertungen im Buch" },
+    { schluessel: "stimmen", zahl: 1284, text: "1.284", wort: "Stimmen abgegeben" },
+  ]);
+});
+
+test("Einträge englisch: Tausenderkomma, Einzahl bei 1", () => {
+  const eintraege = auftaktEintraege({ sorten: 1, bewertungen: 1, stimmen: 1284 }, en.start.auftakt.zahlen, "en");
+  assert.deepEqual(eintraege.map((e) => e.wort), ["strain in the catalogue", "review in the book", "votes cast"]);
+  assert.equal(eintraege[2].text, "1,284");
+});
+
+test("Einzahl deutsch bei 1", () => {
+  const eintraege = auftaktEintraege({ sorten: 1, bewertungen: 1, stimmen: 1 }, de.start.auftakt.zahlen, "de");
+  assert.deepEqual(eintraege.map((e) => e.wort), ["Sorte im Katalog", "Bewertung im Buch", "Stimme abgegeben"]);
+});
+
+test("Komponente: Fehlerfang, Endwert im HTML, eigenes Zählermerkmal", () => {
+  const quelle = lies("components/story/AuftaktZahlen.tsx");
+  assert.match(quelle, /unstable_rethrow\(fehler\);\s*console\.error/);
+  assert.match(quelle, /hatAuftaktZahlen/);
+  assert.match(quelle, /data-story="zahlen"/);
+  assert.match(quelle, /data-story-einstieg=""/);
+  assert.match(quelle, /data-auftakt-zaehler=""/);
+  assert.match(quelle, /data-ziel=\{eintrag\.zahl\}/);
+  assert.match(quelle, /\{eintrag\.text\}/);
+  assert.doesNotMatch(quelle, /data-zaehler/);
+});
+
+test("Auftakt: Zahlen im Suspense mit Skelett, Knopf ohne Einstieg", () => {
+  const quelle = lies("components/story/Auftakt.tsx");
+  assert.match(quelle, /<Suspense fallback=\{<AuftaktZahlenSkelett/);
+  assert.match(quelle, /<AuftaktZahlen \/>/);
+  const knopf = quelle.slice(quelle.indexOf("<Link"), quelle.indexOf("</Link>"));
+  assert.doesNotMatch(knopf, /data-story-einstieg/);
 });

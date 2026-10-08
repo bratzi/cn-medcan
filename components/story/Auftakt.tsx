@@ -1,9 +1,12 @@
 import { LoopSchalter } from "@/components/medien/LoopSchalter";
 import Link from "next/link";
 import { preload } from "react-dom";
+import { Suspense } from "react";
 
 import { Loop } from "@/components/medien/Loop";
+import { AuftaktZahlen } from "@/components/story/AuftaktZahlen";
 import { Kopfzeile } from "@/components/story/Kopfzeile";
+import { AuftaktZahlenSkelett } from "@/components/story/Skelette";
 import { Logo } from "@/components/marke/Logo";
 import { Unterzeile } from "@/components/marke/Wortmarke";
 import { holeWoerterbuch } from "@/lib/i18n";
@@ -22,7 +25,8 @@ import { holeWoerterbuch } from "@/lib/i18n";
  * nicht: er ist ab dem ersten Frame bedienbar.
  */
 export async function Auftakt() {
-  const texte = (await holeWoerterbuch()).start.auftakt;
+  const w = await holeWoerterbuch();
+  const texte = w.start.auftakt;
   // Standbild ist das größte Bild der ersten Ansicht: vor allem anderen anfordern.
   // Die Seite startet hell (lib/thema.ts), also das Standbild des hellen Videos.
   preload("/medien/auftakt-loop-hell-standbild.webp", { as: "image", fetchPriority: "high" });
@@ -72,9 +76,13 @@ export async function Auftakt() {
         </p>
       </div>
 
-      {/* "Bewerte jetzt mit" zentriert im freien Raum unter dem Intro, Verlaufsrahmen wie
-          "Mein Konto", folgt dem Zeiger wie die Storytelling-Videos (Nutzer 2026-09-25). */}
-      <div className="flex flex-1 items-center justify-center px-4 py-8">
+      {/* Im freien Raum unter dem Intro: erst die Zahlenleiste (Spec 2026-10-08 Auftakt),
+          dann "Bewerte jetzt mit", Verlaufsrahmen wie "Mein Konto", folgt dem Zeiger wie
+          die Storytelling-Videos (Nutzer 2026-09-25). */}
+      <div className="flex flex-1 flex-col items-center justify-center gap-8 px-6 py-8 sm:gap-12 sm:px-8">
+        <Suspense fallback={<AuftaktZahlenSkelett ansage={w.start.skelett.zahlen} />}>
+          <AuftaktZahlen />
+        </Suspense>
         <div data-punkt="" className="p-6">
           <Link prefetch={false}
             href="/blueten"

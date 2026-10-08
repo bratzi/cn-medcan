@@ -624,6 +624,11 @@ export const de = {
       intro1: "Wir testen Sorten nach festem Schema.",
       intro2: "Kollektiven Geschmack kultivieren · Terpene schmecken & verstehen · neue Maßstäbe definieren.",
       mitmachen: "Bewerte jetzt mit",
+      zahlen: {
+        sorten: { one: "Sorte im Katalog", other: "Sorten im Katalog" },
+        bewertungen: { one: "Bewertung im Buch", other: "Bewertungen im Buch" },
+        stimmen: { one: "Stimme abgegeben", other: "Stimmen abgegeben" },
+      },
     },
     transparent: {
       satz: "Wir schreiben auf, was drin ist. Hinter jedem Handelsnamen steckt ein",

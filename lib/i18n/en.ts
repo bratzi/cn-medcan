@@ -615,6 +615,11 @@ export const en: Woerterbuch = {
       intro1: "We test strains using a fixed scheme.",
       intro2: "Cultivating collective taste · tasting & understanding terpenes · setting new standards.",
       mitmachen: "Review with us",
+      zahlen: {
+        sorten: { one: "strain in the catalogue", other: "strains in the catalogue" },
+        bewertungen: { one: "review in the book", other: "reviews in the book" },
+        stimmen: { one: "vote cast", other: "votes cast" },
+      },
     },
     transparent: {
       satz: "We write down what is inside. Behind every trade name there is a",
