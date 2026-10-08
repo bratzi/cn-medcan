@@ -1,4 +1,4 @@
-# Profil und Konto: Dein Kapitel – Implementation Plan
+# Profil und Konto: Dein Kapitel Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
@@ -1623,7 +1623,7 @@ Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
 
 ---
 
-### Task 4 (Strang C): Konto – Umfrage jetzt, Meine Stimmen, Randnotizen
+### Task 4 (Strang C): Konto: Umfrage jetzt, Meine Stimmen, Randnotizen
 
 **Files:**
 - Create: `lib/konto.ts`, `lib/query/konto.ts`
