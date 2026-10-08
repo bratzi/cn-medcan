@@ -9,7 +9,8 @@ import type { KatalogTerpen } from "@/lib/query/strains";
 /**
  * Ein Band des großen Buchs auf /reviews (Spec Bewertungsbuch 4): alle freigegebenen Bewertungen
  * aller Sorten als Doppelseiten zum Blättern, jede mit dem Namen der Sorte über dem Kopf. Unter dem
- * Buch die Seitenleiste mit allen Einträgen über alle Bände.
+ * Buch die Seitenleiste mit allen Einträgen über alle Bände. Kein Autoplay: eine Doppelseite ist
+ * mobil mehrere Bildschirme hoch und blätterte sonst beim Lesen weiter.
  */
 export function GrossesBuch({
   band,
@@ -33,6 +34,7 @@ export function GrossesBuch({
         anhalten: w.buch.anhalten,
         abspielen: w.buch.abspielen,
       }}
+      autoplay={false}
       leiste={{ basis: band.basis, gesamt: band.gesamt, texte: { leiste: w.buch.leiste, nummer: w.buch.nummer } }}
       seiten={band.eintraege.map(({ review, produkt }) => ({
         anker: eintragAnker(review.id),

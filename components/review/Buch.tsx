@@ -282,11 +282,14 @@ export function Buch({
   bezeichnung,
   texte,
   leiste,
+  autoplay = true,
 }: {
   seiten: readonly BuchSeite[];
   bezeichnung: string;
   texte: BuchTexte;
   leiste?: BuchLeiste;
+  /** Startet das Blättern von selbst; aus, wo man lange auf einer Seite liest (großes Buch). */
+  autoplay?: boolean;
 }) {
   const anzahl = seiten.length;
   const mehrere = anzahl > 1;
@@ -298,7 +301,7 @@ export function Buch({
   const hinweisId = useId();
 
   const [stand, setStand] = useState<Stand>({ index: 0, vorher: null });
-  const [laeuft, setLaeuft] = useState(true);
+  const [laeuft, setLaeuft] = useState(autoplay);
   const [zeiger, setZeiger] = useState(false);
   const [fokus, setFokus] = useState(false);
   const [imBild, setImBild] = useState(false);

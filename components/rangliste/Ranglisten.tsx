@@ -119,7 +119,6 @@ export function Ranglisten({ texte, sprache }: Props) {
 
   return (
     <div className="flex flex-col gap-8">
-      <p className="mx-auto max-w-[68ch] text-pretty text-center text-body text-text-muted">{texte.satz}</p>
       <div
         role="tablist"
         aria-label={texte.reiterLeiste}
