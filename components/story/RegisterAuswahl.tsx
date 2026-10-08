@@ -126,7 +126,7 @@ function Tafel({
       tabIndex={-1}
       data-register-tafel=""
       data-aktiv={aktiv ? "" : undefined}
-      className="glas-tafel px-4 py-8 sm:px-10"
+      className="glas-tafel scroll-mt-[calc(var(--kopf-h,4rem)+2rem)] px-4 py-8 sm:px-10"
     >
       <p data-register-zeile="" className="text-small text-text-muted">
         {art}

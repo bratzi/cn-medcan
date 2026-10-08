@@ -204,3 +204,8 @@ test("Terpen-Band: Notenbalken bekommen Breite, der Notenblock streckt sich im z
   // Live 2026-10-09: justify-items-center schrumpfte den Block, die Balkenspalte war 0 px breit.
   assert.match(band, /<span className="grid w-full justify-self-stretch grid-cols-\[minmax\(0,1fr\)\] gap-1">/);
 });
+
+test("Register-Tafel: Sprungziel hält Abstand zum festen Kopf (Nutzer 2026-10-09, live 24 px darunter)", () => {
+  const register = readFileSync(join(process.cwd(), "components/story/RegisterAuswahl.tsx"), "utf8");
+  assert.match(register, /glas-tafel scroll-mt-\[calc\(var\(--kopf-h,4rem\)\+2rem\)\]/);
+});
