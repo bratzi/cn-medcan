@@ -40,14 +40,14 @@ export default function StartPage() {
         <TransparentMachen />
         {/* T12: Register der Terpene und Geschmäcker, vor der Aroma-Karte (Nutzer 2026-09-29). */}
         <TerpenRegister />
+        {/* Direkt hinter dem Register: wer die Terpene kennt, sieht sein eigenes Kapitel (Nutzer 2026-10-09). */}
+        <DeinKapitel />
         <AromaSektion />
         <WissenBuendeln />
         <GemeinsamLernen />
         <NeuesterEintrag />
         <Empfehlungen />
         <Abstimmung />
-        {/* Nach der Abstimmung schließt sich die Schleife bei dir (Nutzer 2026-10-09). */}
-        <DeinKapitel />
         <Katalog />
         <StoryBuehne />
       </div>

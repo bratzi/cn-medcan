@@ -163,5 +163,5 @@ test("Kapitel: Name deckt sich auf, Wörter schreiben sich, nur getauschte Knote
   assert.doesNotMatch(ablauf, /\b(width|height|top|left)\s*:/);
   const start = bewegung("start.ts");
   assert.match(start, /import \{ kapitel \} from "\.\/kapitel"/);
-  assert.match(start, /abstimmung,\n\s*kapitel,/);
+  assert.match(start, /register,\n\s*kapitel,/);
 });

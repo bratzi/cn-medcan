@@ -25,9 +25,9 @@ const SCROLL_CHOREOGRAFIEN: readonly Choreografie[] = [
   auftaktFilm,
   transparent,
   register,
+  kapitel,
   randnotizen,
   abstimmung,
-  kapitel,
   schluss,
   vorhang,
 ];

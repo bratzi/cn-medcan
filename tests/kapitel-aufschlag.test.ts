@@ -68,3 +68,11 @@ test("Name bricht nicht mitten im Wort: Grad text-kapitel statt text-titel (live
   assert.match(name, /text-kapitel/);
   assert.doesNotMatch(name, /text-titel/);
 });
+
+test("Dein Kapitel steht direkt hinter Terpene und ihre Geschmäcker (Nutzer 2026-10-09: zu weit unten)", async () => {
+  const { readFileSync } = await import("node:fs");
+  const seite = readFileSync("app/[lang]/page.tsx", "utf8");
+  assert.match(seite, /<TerpenRegister \/>\s*(\{\/\*[^]*?\*\/\}\s*)?<DeinKapitel \/>/);
+  const start = readFileSync("components/story/bewegung/start.ts", "utf8");
+  assert.match(start, /register,\n\s*kapitel,/);
+});
