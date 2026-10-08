@@ -63,7 +63,7 @@ export function KapitelAufschlag({
             groesse="lg"
             className="ring-1 ring-border-strong ring-offset-4 ring-offset-surface max-[639px]:size-20"
           />
-          <p data-story="kapitel-name" className="min-w-0 font-buch text-titel text-text wrap-break-word">
+          <p data-story="kapitel-name" className="min-w-0 font-buch text-kapitel text-text wrap-break-word">
             {daten.anzeigename}
           </p>
         </div>
