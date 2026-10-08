@@ -3,7 +3,7 @@
 > Übergabemedium zwischen Sessions. Wird nach jedem Arbeitsblock aktualisiert und committet.
 > Wer hier weiterarbeitet, liest diese Datei zuerst und braucht den Chatverlauf nicht.
 
-**Letzte Aktualisierung:** 2026-10-08 (Session 47)
+**Letzte Aktualisierung:** 2026-10-08 (Session 48)
 **Repo:** https://github.com/bratzi/cn-medcan (public)
 **Branch:** `main` (Makeover „Grünes Buch“ Teilprojekt 1 ist seit 2026-09-24 auf `main`)
 
@@ -28,36 +28,54 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 
 ## ⇢ Hier geht es weiter
 
-### ⇢ SESSION 48 (Sessionstart): Auftakt-Zahlenleiste umsetzen
+### ⇢ SESSION 49 (Sessionstart): offene Punkte aus der Auftakt-Zahlenleiste
 
 **ALS ERSTES: diese Fragen in EINER AskUserQuestion stellen**
-1. **Plan freigeben?** `docs/superpowers/plans/2026-10-08-auftakt-eyecatcher.md` (Spec
-   `docs/superpowers/specs/2026-10-08-auftakt-eyecatcher-design.md`, vom Nutzer mit „jo" freigegeben).
-   Optionen: „Passt" / „Ändern: …".
-2. **Ausführung?** Empfehlung **Native** (selbst in der Session, am Ende ein frischer Reviewer über alles),
-   weil die vier Tasks streng aufeinander aufbauen und drei davon `Auftakt.tsx` ändern; parallele
-   Worktrees passen hier ausnahmsweise nicht. Alternative: Subagent-driven (je Task Implementer + Reviewer).
+1. **Auftaktzahlen ansehen:** Gefällt die Leiste (Zahlen 709 / 25 / 4, Hochzählen ab 4,2 s)? Optionen:
+   „Passt" / „Ändern: …".
+2. **Kleinkram aus dem Review angehen?** (Mehrfachauswahl) M1 später Stream, M2 Sparmodus, M3 Skeletthöhe,
+   M4 Bewertungen nur aktiver Sorten zählen, M5 Kopieren verdoppelt Zahlen. Alle unten erklärt.
+3. **Terpenband unter der Kopfzeile** (auf 390 px verdeckt der Kopf die Symbole, seit Session 47 offen):
+   angehen oder lassen?
 
-Danach Plan Task 1 bis 4 abarbeiten (Native: Skill `superpowers:executing-plans`), Design-Skills dabei
-einsetzen (`design-taste-frontend`, `animate`, `build-awwwards-quality-sites`), pushen, live prüfen wie in
-Task 4 Step 6 beschrieben, HANDOFF.
+Danach je nach Antwort weiter; sonst nächstes Kernthema mit dem Nutzer wählen.
 
-**Stand `main` = `5d9c80d`**, 781 Tests grün, tsc und eslint projektweit sauber, `npm run farben` sauber.
-Arbeitsbaum sauber, nur Branch `main`, keine Worktrees mehr.
+### ⇢ SESSION 48 (erledigt): Auftakt-Zahlenleiste ist live
 
-**Nutzer-Entscheidungen Session 47 (bindend):**
-- Hero: **nur die Marke** (keine Umfrage/Review oben), **Bewegung wie heute, nur besser** (kein WebGL,
-  kein neues Werkzeug), **Live-Zahlen statt zweiter Handlung**: Sorten im Katalog, Bewertungen im Buch,
-  Stimmen abgegeben.
-- Zeitmarken vom 2026-09-25 bleiben (Oberzeile 1,8 s, Intro 3,4 s); Zahlen bei 4,2 s.
-- Akzentwort-Konturen: **mit Schriftgröße skalieren** (erledigt, siehe unten).
-- Schalterleiste rechts darf Inhalt überlagern („sind nur kleine Buttons") – nicht anfassen.
-- Fließtext läuft im Storytelling unter den Bildkreis – gewollt („die bewegen sich ja hin und her").
+**Stand `main` = `daeafbc`** (nach dem HANDOFF-Commit eins weiter), 796 Tests grün, tsc und eslint
+projektweit sauber, `npm run farben` sauber. Plan `docs/superpowers/plans/2026-10-08-auftakt-eyecatcher.md`
+nativ ausgeführt, danach ein frischer Reviewer (Opus) über alles.
 
-**Fallen, die der Plan schon berücksichtigt:**
-- Keine `$transaction` auf D1; drei Zähler in **einer** `$queryRaw` (Muster `communityZahlen`).
-- Zählermerkmal `data-auftakt-zaehler`, nicht `data-zaehler`: `components/story/bewegung/eintrag.ts`
-  greift alle `[data-zaehler]` der Seite ab und würde die Auftaktzahlen ein zweites Mal hochzählen.
+- **Neu:** `lib/query/auftakt-zahlen.ts` (reine Zuordnung), `lib/query/start-zahlen.ts` (eine `$queryRaw`,
+  drei Unterabfragen), `components/story/AuftaktZahlen.tsx` (im `Suspense`, Fehlerfang mit
+  `unstable_rethrow`, alles 0 heißt keine Leiste), `AuftaktZahlenSkelett`, Wörterbuch
+  `start.auftakt.zahlen` de/en, Bewegung in `components/story/bewegung/auftakt.ts` (`ZAHLEN_AB = 4.2`,
+  Merkmal `data-auftakt-zaehler`, 80 ms versetzt, Endwerte beim Aufräumen). Verlauf über dem Film
+  `via-surface/30` statt `/5`. `alsZahl` aus `community.ts` ist exportiert.
+- **Entscheidungen beim Bauen:** Zahlen in `numeric` wie in der Randspalte (nicht `font-light`, das
+  Regelwerk erlaubt leichte Newsreader erst ab 40 px). Wörter in `text-text` wie das Intro.
+- **Review-Fix I1:** Auf Telefonen lief die Leiste aus den Spalten. Jetzt mobil `text-h1` für die Zahl,
+  `text-caption` ohne Sperrung für das Wort, `hyphens-auto` als Rückfall.
+- **Live geprüft** (`c146964`, Chrome im Vordergrund): 1041 px hell: Leiste zwischen Intro und Knopf,
+  Hochzählen gesehen (657 → 709), Werte 709 / 25 / 4. 390 px per Iframe gemessen: drei Spalten à 104 px,
+  kein Überlauf, aber „BEWERTUN-GEN“ getrennt und die mittlere Zahl stand höher. Beides in `daeafbc`
+  behoben (`justify-end`, mobil `px-4`, gemessen Wort 109 px, Spalte dann 114 px). **`daeafbc` live nicht
+  mehr angesehen.** Dunkel: Bühne gesehen, Leiste lag unter dem gepinnten Rand (Fenster 762 px hoch).
+  **Nicht geprüft:** englisch live (Sprachcookie ist HttpOnly, Schalter per Skript nicht gefunden; Tests
+  decken Wörter und `1,284` ab), reduzierte Bewegung, JavaScript aus, Kontrast der Oberzeile in Zahlen
+  (Canvas-Messung lieferte 0; auf dem hellen Film sichtbar gut lesbar).
+- **Lehre Browser:** Ist der Chrome-Tab verborgen (`visibilityState: hidden`), läuft keine Timeline und
+  Oberzeile, Intro und Leiste stehen auf Deckkraft 0. Erst den Nutzer bitten, Chrome nach vorn zu holen.
+  Das Fenster geht nicht unter 494 px; 390 px per Iframe gleicher Herkunft messen.
+
+**Offen aus dem Review (Minor, bewusst nicht gemacht):**
+- M1: Streamt die Leiste erst nach dem Start der Bühne (nur beim ersten Render je Sprache nach einem
+  Deploy), erscheint sie ohne Zählen per CSS-Notfall nach 8 s.
+- M2: Im Sparmodus bleiben alle Einstiegszeilen 8 s verborgen (vorbestehend, gilt jetzt auch für die Leiste).
+  Fix wäre `:root[data-sparmodus] [data-story-einstieg] { opacity: 1; animation: none }`.
+- M3: Skelett `h-20` weicht von der echten Leiste ab (67 px Desktop, 87 bis 107 px mobil).
+- M4: „Bewertungen im Buch“ zählt auch Bewertungen inaktiver Sorten.
+- M5: Markieren und Kopieren verdoppelt die Zahlen (aria-hidden plus sr-only), Fix `select-none`.
 
 ### ⇢ SESSION 47 (erledigt): Optik live geprüft, Fehler raus, Hero-Spec und Plan
 
