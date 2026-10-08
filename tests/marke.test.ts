@@ -63,7 +63,10 @@ test("Handschrift: Pinselschrift Mr Dafoe mit Rückfall, nur 400, keine syntheti
 });
 
 test("Handschrift wie das Logo: Blattgrün, keine Verläufe Grün-Lila mehr", () => {
-  assert.match(css, /\.farbverlauf\s*\{[^}]*color:\s*var\(--color-accent\);[^}]*\}/);
+  // Seit 2026-10-08 im Logo-Ton, damit Hero und Storytelling gleich wirken.
+  assert.match(css, /\.farbverlauf\s*\{[^}]*color:\s*var\(--color-logo\);[^}]*\}/);
+  // Die Kontur zum Duennermachen ist wieder raus: sie machte die Woerter unleserlich.
+  assert.doesNotMatch(/\.farbverlauf\s*\{[^}]*\}/.exec(css)?.[0] ?? "", /text-stroke/);
   assert.doesNotMatch(/\.farbverlauf\s*\{[^}]*\}/.exec(css)?.[0] ?? "", /gradient/);
   // Der Schriftverlauf Grün-Lila-Grün (55 %) ist weg; Linien und Balken dürfen weiter verlaufen.
   assert.doesNotMatch(css, /var\(--color-kopierstift\) 55%, var\(--color-accent\)/);

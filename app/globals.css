@@ -543,13 +543,11 @@
    einer Überschrift. Beide Enden tragen >= 4.5 auf surface, der Verlauf also
    auch. Ohne background-clip-Unterstützung bleibt die Farbe accent. */
 .farbverlauf {
-  /* Seit 2026-10-07 (Nutzer) einfarbig wie das Logo.
-     Mr Dafoe hat nur einen Schnitt; die Kontur in der Papierfarbe nimmt von aussen an
-     jedem Strich ab und laesst die Woerter duenner wirken, ohne sie zu verkleinern
-     (Nutzer 2026-10-08). paint-order zeichnet erst die Fuellung, dann die Kontur. */
-  color: var(--color-accent);
-  -webkit-text-stroke: 0.02em var(--color-surface);
-  paint-order: fill stroke;
+  /* Seit 2026-10-07 (Nutzer) einfarbig wie das Logo, im selben Ton, damit Hero und
+     Storytelling gleich wirken. Eine Kontur in der Papierfarbe sollte die Striche
+     duenner wirken lassen; sie machte die Woerter unleserlich und ist am 2026-10-08
+     wieder raus (Nutzer). */
+  color: var(--color-logo);
 }
 
 /* Sweet Spot in der Mitte (Bewertung v2, T4): Qualität der Charge. Wie die
@@ -570,9 +568,6 @@
 .hand-betont {
   font-family: var(--font-hand);
   font-size-adjust: 0.25;
-  /* Wie .farbverlauf: duenner wirkende Striche ohne kleinere Schrift. */
-  -webkit-text-stroke: 0.02em var(--color-surface);
-  paint-order: fill stroke;
   font-style: normal;
   font-weight: 400;
   font-size: 1.35em;
