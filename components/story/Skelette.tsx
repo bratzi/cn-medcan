@@ -23,13 +23,20 @@ export function RandspaltenSkelett({ ansage }: { ansage: string }) {
   );
 }
 
-/** Höhe wie die echte Zahlenleiste im Auftakt (Zahl in text-display, Wort in text-small), damit nichts springt. */
+/**
+ * Maße wie die echte Zahlenleiste im Auftakt (AuftaktZahlen.tsx), damit nichts
+ * springt: Zahl 1em hoch in text-h1/text-display (leading-none), darunter das
+ * Wort eine Zeile in text-caption/text-small, gleiche Abstände.
+ */
 export function AuftaktZahlenSkelett({ ansage }: { ansage: string }) {
   return (
-    <div role="status" data-skelett="" className="grid w-full max-w-3xl grid-cols-3 gap-4 sm:gap-8">
+    <div role="status" data-skelett="" className="grid w-full max-w-3xl grid-cols-3 gap-2 text-center sm:gap-8">
       <SkelettAnsage text={ansage} />
       {["sorten", "bewertungen", "stimmen"].map((schluessel) => (
-        <span key={schluessel} aria-hidden="true" className={`${SKELETT_FLAECHE} mx-auto h-20 w-24 sm:w-32`} />
+        <div key={schluessel} aria-hidden="true" className="flex flex-col items-center gap-2">
+          <span className={`${SKELETT_FLAECHE} text-h1 sm:text-display h-[1em] w-20 sm:w-28`} />
+          <span className={`${SKELETT_FLAECHE} text-caption sm:text-small h-lh w-16 sm:w-24`} />
+        </div>
       ))}
     </div>
   );

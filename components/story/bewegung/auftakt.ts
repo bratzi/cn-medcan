@@ -26,15 +26,100 @@ export const auftakt: Choreografie = ({ gsap }) => {
   if (einstieg.length === 0) return;
 
   // Eigenes Merkmal, nicht das der Noten: eintrag.ts greift jenes seitenweit ab.
-  const zaehler = gsap.utils
-    .toArray<HTMLElement>("[data-auftakt-zaehler]")
-    .filter((el) => Number.isFinite(Number(el.dataset.ziel)));
+  // Bei jedem Aufruf neu gesucht: die Leiste kann nach dem Start nachstreamen.
+  const zaehlerSuchen = () =>
+    gsap.utils
+      .toArray<HTMLElement>("[data-auftakt-zaehler]")
+      .filter((el) => Number.isFinite(Number(el.dataset.ziel)));
   const ganz = (wert: number) => zahlFormat(document.documentElement.lang, 0).format(wert);
   const endwerte = () => {
-    for (const el of zaehler) el.textContent = ganz(Number(el.dataset.ziel));
+    for (const el of zaehlerSuchen()) el.textContent = ganz(Number(el.dataset.ziel));
+  };
+
+  // Leiste einblenden und hochzählen, ab `ab` Sekunden in `zeitleiste`.
+  const zahlenEinplanen = (zeitleiste: ReturnType<typeof gsap.timeline>, zaehler: HTMLElement[], ab: number) => {
+    zeitleiste.fromTo(
+      '[data-story="zahlen"]',
+      { opacity: 0, y: 16 },
+      {
+        opacity: 1,
+        y: 0,
+        duration: 1.2,
+        ease: "power2.out",
+        // Erst hier auf 0: vorher steht der Endwert aus dem HTML, nie eine falsche Null.
+        onStart: () => {
+          for (const el of zaehler) el.textContent = ganz(0);
+        },
+      },
+      ab,
+    );
+    // Leicht versetzt (80 ms je Zahl), damit die drei nicht als Block anlaufen.
+    zaehler.forEach((el, index) => {
+      const stand = { wert: 0 };
+      zeitleiste.to(
+        stand,
+        {
+          wert: Number(el.dataset.ziel),
+          duration: 1.6,
+          ease: "power2.out",
+          onUpdate: () => {
+            el.textContent = ganz(Math.round(stand.wert));
+          },
+        },
+        ab + index * 0.08,
+      );
+    });
   };
 
   let ablauf: ReturnType<typeof gsap.timeline> | null = null;
+  let spaet: ReturnType<typeof gsap.timeline> | null = null;
+  let spaetStopp: (() => void) | null = null;
+
+  /**
+   * Streamt die Leiste erst nach dem Start (erster Render je Sprache nach einem
+   * Deploy, Review M1), stand sonst der CSS-Notfall an: 8 s nach dem Einfügen
+   * und ohne Zählen. Darum auf sie warten und sie in einer eigenen Zeitleiste
+   * nachholen, zum geplanten Zeitpunkt oder sofort, wenn der vorbei ist. Erst
+   * im Leerlauf: React hydriert sie kurz nach dem Tausch, Inline-Styles davor
+   * meldeten Abweichungen (wie wennInhaltGeladen in start.ts).
+   */
+  const aufLeisteWarten = (zeitleiste: ReturnType<typeof gsap.timeline>) => {
+    const buehne = document.querySelector('[data-story="auftakt"]');
+    if (!buehne?.querySelector("[data-skelett]")) return;
+    let leerlaufStopp: (() => void) | null = null;
+    const holen = () => {
+      const zaehler = zaehlerSuchen();
+      if (zaehler.length === 0) return;
+      spaet = gsap.timeline({
+        defaults: { ease: "power3.out" },
+        onStart: () => {
+          gsap.set('[data-story="zahlen"]', { animation: "none" });
+        },
+      });
+      zahlenEinplanen(spaet, zaehler, Math.max(0, ZAHLEN_AB - zeitleiste.time()));
+    };
+    const beobachter = new MutationObserver(() => {
+      if (!buehne.querySelector('[data-story="zahlen"]')) {
+        // Kein Skelett und keine Leiste: Abfrage scheiterte oder alles 0.
+        if (!buehne.querySelector("[data-skelett]")) beobachter.disconnect();
+        return;
+      }
+      beobachter.disconnect();
+      if (typeof window.requestIdleCallback === "function") {
+        const id = window.requestIdleCallback(holen, { timeout: 1000 });
+        leerlaufStopp = () => window.cancelIdleCallback(id);
+      } else {
+        const id = window.setTimeout(holen, 200);
+        leerlaufStopp = () => window.clearTimeout(id);
+      }
+    });
+    beobachter.observe(buehne, { childList: true, subtree: true });
+    spaetStopp = () => {
+      beobachter.disconnect();
+      leerlaufStopp?.();
+    };
+  };
+
   const eroeffnen = () => {
     const zeitleiste = gsap
       .timeline({
@@ -70,48 +155,22 @@ export const auftakt: Choreografie = ({ gsap }) => {
       );
     ablauf = zeitleiste;
 
-    // Die Leiste fehlt, wenn die Abfrage scheiterte oder alles 0 ist: dann nichts tun.
-    if (zaehler.length > 0) {
-      zeitleiste.fromTo(
-        '[data-story="zahlen"]',
-        { opacity: 0, y: 16 },
-        {
-          opacity: 1,
-          y: 0,
-          duration: 1.2,
-          ease: "power2.out",
-          // Erst hier auf 0: vorher steht der Endwert aus dem HTML, nie eine falsche Null.
-          onStart: () => {
-            for (const el of zaehler) el.textContent = ganz(0);
-          },
-        },
-        ZAHLEN_AB,
-      );
-      // Leicht versetzt (80 ms je Zahl), damit die drei nicht als Block anlaufen.
-      zaehler.forEach((el, index) => {
-        const stand = { wert: 0 };
-        zeitleiste.to(
-          stand,
-          {
-            wert: Number(el.dataset.ziel),
-            duration: 1.6,
-            ease: "power2.out",
-            onUpdate: () => {
-              el.textContent = ganz(Math.round(stand.wert));
-            },
-          },
-          ZAHLEN_AB + index * 0.08,
-        );
-      });
-    }
+    // Die Leiste fehlt, wenn die Abfrage scheiterte oder alles 0 ist, oder sie streamt noch.
+    const zaehler = zaehlerSuchen();
+    if (zaehler.length > 0) zahlenEinplanen(zeitleiste, zaehler, ZAHLEN_AB);
+    else aufLeisteWarten(zeitleiste);
+  };
+
+  const aufraeumen = () => {
+    spaetStopp?.();
+    spaet?.revert();
+    ablauf?.revert();
+    endwerte();
   };
 
   if (document.visibilityState === "visible") {
     eroeffnen();
-    return () => {
-      ablauf?.revert();
-      endwerte();
-    };
+    return aufraeumen;
   }
 
   // Im Hintergrund geöffnet: erst beim Sichtbarwerden eröffnen, und nur, solange
@@ -124,8 +183,7 @@ export const auftakt: Choreografie = ({ gsap }) => {
   document.addEventListener("visibilitychange", sichtbar);
   return () => {
     document.removeEventListener("visibilitychange", sichtbar);
-    ablauf?.revert();
-    endwerte();
+    aufraeumen();
   };
 };
 

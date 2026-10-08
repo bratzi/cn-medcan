@@ -36,7 +36,8 @@ test("Abfrage: eine queryRaw mit drei Unterabfragen, keine Transaktion", () => {
   assert.match(quelle, /\$queryRaw/);
   assert.doesNotMatch(quelle, /\$transaction|\.count\(/);
   assert.match(quelle, /FROM strains WHERE aktiv = 1/);
-  assert.match(quelle, /FROM reviews WHERE freigegeben = 1/);
+  // Nur Bewertungen aktiver Sorten (Review M4): sonst zählt das Buch, was es nicht zeigt.
+  assert.match(quelle, /FROM reviews r JOIN strains s ON s\.id = r\.strain_id WHERE r\.freigegeben = 1 AND s\.aktiv = 1/);
   assert.match(quelle, /FROM stimmen\)/);
 });
 
@@ -69,6 +70,29 @@ test("Komponente: Fehlerfang, Endwert im HTML, eigenes Zählermerkmal", () => {
   assert.match(quelle, /data-ziel=\{eintrag\.zahl\}/);
   assert.match(quelle, /\{eintrag\.text\}/);
   assert.doesNotMatch(quelle, /data-zaehler/);
+  // Kopieren liefert jede Zahl einmal (Review M5): die hochzählenden Ziffern sind nicht markierbar.
+  assert.match(quelle, /aria-hidden="true" className="select-none" data-auftakt-zaehler=""/);
+});
+
+test("Skelett hat die Maße der echten Leiste: Zahl 1em in text-h1/text-display, Wort eine Zeile (Review M3)", () => {
+  const quelle = lies("components/story/Skelette.tsx");
+  const skelett = quelle.slice(quelle.indexOf("export function AuftaktZahlenSkelett"), quelle.indexOf("export function DoppelseitenSkelett"));
+  assert.match(skelett, /grid-cols-3 gap-2[^"]*sm:gap-8/);
+  assert.match(skelett, /flex-col items-center gap-2/);
+  assert.match(skelett, /text-h1 sm:text-display h-\[1em\]/);
+  assert.match(skelett, /text-caption sm:text-small h-lh/);
+  assert.doesNotMatch(skelett, /h-20/);
+});
+
+test("Sparmodus: Einstiegszeilen stehen sofort, kein 8-s-Warten (Review M2)", () => {
+  const css = lies("app/globals.css");
+  assert.match(css, /:root\[data-sparmodus\] \[data-story-einstieg\]\s*\{\s*opacity: 1;\s*animation: none;/);
+});
+
+test("Spät gestreamte Leiste zählt trotzdem hoch (Review M1)", () => {
+  const quelle = lies("components/story/bewegung/auftakt.ts");
+  assert.match(quelle, /new MutationObserver/);
+  assert.match(quelle, /ZAHLEN_AB - zeitleiste\.time\(\)/);
 });
 
 test("Auftakt: Zahlen im Suspense mit Skelett, Knopf ohne Einstieg", () => {

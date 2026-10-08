@@ -479,6 +479,13 @@
        Texte schon da und würden danach noch einmal einblenden (Nutzer 2026-09-25). */
     animation: einstieg-notfall 0s linear 8s forwards;
   }
+
+  /* Im Sparmodus startet die StoryBuehne nicht: die Zeilen stehen sofort statt
+     nach dem Notfall (Review M2). */
+  :root[data-sparmodus] [data-story-einstieg] {
+    opacity: 1;
+    animation: none;
+  }
 }
 
 @keyframes einstieg-notfall {

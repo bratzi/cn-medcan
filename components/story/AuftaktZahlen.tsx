@@ -13,7 +13,8 @@ import { auftaktZahlen } from "@/lib/query/start-zahlen";
  * ist er sofort richtig. Die Ziffern sind aria-hidden, damit Vorleser nicht
  * das Hochzählen mitlesen; der Endwert steht als sr-only daneben. Das
  * Merkmal heißt data-auftakt-zaehler, nicht wie das der Noten: das greift
- * eintrag.ts seitenweit ab. Zahlen gesetzt wie in der Randspalte (numeric).
+ * eintrag.ts seitenweit ab. select-none an den Ziffern: wer die Leiste
+ * markiert und kopiert, bekommt jede Zahl einmal (aus dem sr-only). Zahlen gesetzt wie in der Randspalte (numeric).
  */
 export async function AuftaktZahlen() {
   const [w, sprache] = await Promise.all([holeWoerterbuch(), holeSprache()]);
@@ -32,7 +33,7 @@ export async function AuftaktZahlen() {
         <div key={eintrag.schluessel} className="flex flex-col-reverse items-center justify-end gap-2">
           <dt className="font-sans text-caption uppercase hyphens-auto text-balance text-text sm:text-small tracking-normal sm:tracking-gesperrt">{eintrag.wort}</dt>
           <dd className="numeric text-h1 sm:text-display leading-none text-text">
-            <span aria-hidden="true" data-auftakt-zaehler="" data-ziel={eintrag.zahl}>
+            <span aria-hidden="true" className="select-none" data-auftakt-zaehler="" data-ziel={eintrag.zahl}>
               {eintrag.text}
             </span>
             <span className="sr-only">{eintrag.text}</span>
