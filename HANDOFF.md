@@ -3,7 +3,7 @@
 > Übergabemedium zwischen Sessions. Wird nach jedem Arbeitsblock aktualisiert und committet.
 > Wer hier weiterarbeitet, liest diese Datei zuerst und braucht den Chatverlauf nicht.
 
-**Letzte Aktualisierung:** 2026-10-08 (Session 48)
+**Letzte Aktualisierung:** 2026-10-08 (Session 49)
 **Repo:** https://github.com/bratzi/cn-medcan (public)
 **Branch:** `main` (Makeover „Grünes Buch“ Teilprojekt 1 ist seit 2026-09-24 auf `main`)
 
@@ -28,17 +28,29 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 
 ## ⇢ Hier geht es weiter
 
-### ⇢ SESSION 49 (Sessionstart): offene Punkte aus der Auftakt-Zahlenleiste
+### ⇢ SESSION 50 (Sessionstart): nächstes Kernthema wählen
 
-**ALS ERSTES: diese Fragen in EINER AskUserQuestion stellen**
-1. **Auftaktzahlen ansehen:** Gefällt die Leiste (Zahlen 709 / 25 / 4, Hochzählen ab 4,2 s)? Optionen:
-   „Passt" / „Ändern: …".
-2. **Kleinkram aus dem Review angehen?** (Mehrfachauswahl) M1 später Stream, M2 Sparmodus, M3 Skeletthöhe,
-   M4 Bewertungen nur aktiver Sorten zählen, M5 Kopieren verdoppelt Zahlen. Alle unten erklärt.
-3. **Terpenband unter der Kopfzeile** (auf 390 px verdeckt der Kopf die Symbole, seit Session 47 offen):
-   angehen oder lassen?
+**ALS ERSTES:** mit dem Nutzer das nächste Kernthema wählen (Reviews des Betreibers, Umfragen-Schleife,
+offene Punkte aus Profil-Reviews wie K1, M2/M10 Verlaufsrechnung). Auf echtem Telefon ansehen lassen:
+Menü mit Schalterreihe, Auftaktzahlen (Trennung „BEWERTUN-GEN“ nur im Iframe gesehen).
 
-Danach je nach Antwort weiter; sonst nächstes Kernthema mit dem Nutzer wählen.
+### ⇢ SESSION 49 (erledigt): Kleinkram Auftaktzahlen und Schalterleiste mobil
+
+Nutzer-Antworten: Auftaktzahlen passen; M1 bis M5 angehen; Terpenband angehen.
+- **`5facb00`** M1 bis M5 (800 Tests grün, tsc und eslint sauber):
+  M1 `auftakt.ts` wartet per MutationObserver auf eine spät gestreamte Leiste und zählt sie in eigener
+  Zeitleiste hoch (`ZAHLEN_AB - zeitleiste.time()`, sonst sofort), erst im Leerlauf wegen Hydrierung.
+  M2 `:root[data-sparmodus] [data-story-einstieg] { opacity: 1; animation: none }`.
+  M3 Skelett wie die echte Leiste (Zahl `h-[1em]` in `text-h1 sm:text-display`, Wort `h-lh`).
+  M4 Bewertungen nur bei aktiven Sorten (JOIN `strains`). M5 `select-none` an den Ziffern.
+  **Live geprüft:** Werte 710 / 26 / 4, Kopieren liefert jede Zahl einmal, Sparmodus ohne Notfall-Animation.
+  M1 und M3 live nicht sichtbar zu machen (nur beim ersten Render nach Deploy).
+- **Terpenband:** Kopf verdeckt das Band auf 390 px nur beim normalen Scrollen wie jeden Inhalt. Echter
+  Fehler war die feste Schalterleiste rechts über Band-Symbolen und Text. Nutzer wählte „Schalterleiste mobil“.
+- **`1fbd22e`** Schalterleiste unter lg (64rem) als Reihe (`.schalter-reihe`) im Aufklappmenü unter der
+  Navigation, Randleiste erst ab lg. **Live geprüft** 390 px (Iframe): Randleiste `display: none`, Reihe
+  mit vier Knöpfen à 44 px, Thema-Umschalten im Menü geht hin und zurück. Nicht geprüft: Tablet 640 bis
+  1024 px gesehen, dunkel gesehen, Sprache wechseln aus dem Menü.
 
 ### ⇢ SESSION 48 (erledigt): Auftakt-Zahlenleiste ist live
 
