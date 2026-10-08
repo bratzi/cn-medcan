@@ -958,44 +958,49 @@ html.joint-cursor :is(input:not([type="range"]):not([type="radio"]):not([type="c
   pointer-events: none;
 }
 
+/* Versatz und Strich hängen an der Schriftgröße (Nutzer 2026-10-08): in em allein
+   wächst der Versatz bei 174px Kulissenschrift auf fast 8px und die Kontur zerfällt
+   in versetzte Haarlinien. Deshalb wächst der Versatz nur bis zum Deckel mit (min(),
+   das ist der Wert bei rund 40px Schrift) und der Strich wächst leicht mit (max()).
+   So sitzt die Kontur bei 174px genauso eng wie bei 40px. */
 .marke-kontur > span {
   --versatz-x: 0.02em;
   --versatz-y: 0.015em;
   color: transparent;
   -webkit-text-fill-color: transparent;
-  -webkit-text-stroke: var(--strich, 1px) var(--kontur);
+  -webkit-text-stroke: max(var(--strich, 1px), 0.012em) var(--kontur);
   transform: translate(var(--versatz-x), var(--versatz-y));
 }
 
 .marke-kontur-1 > span {
   --kontur: var(--color-kopierstift);
   --strich: 1.5px;
-  --versatz-x: -0.025em;
-  --versatz-y: 0.02em;
+  --versatz-x: calc(-1 * min(0.025em, 1px));
+  --versatz-y: min(0.02em, 0.8px);
   --drift: 9s;
 }
 
 .marke-kontur-2 > span {
   --kontur: var(--color-accent);
   --strich: 1px;
-  --versatz-x: 0.03em;
-  --versatz-y: -0.018em;
+  --versatz-x: min(0.03em, 1.2px);
+  --versatz-y: calc(-1 * min(0.018em, 0.72px));
   --drift: 12s;
 }
 
 .marke-kontur-3 > span {
   --kontur: color-mix(in oklab, var(--color-kopierstift) 55%, var(--color-surface));
   --strich: 1px;
-  --versatz-x: 0.045em;
-  --versatz-y: 0.03em;
+  --versatz-x: min(0.045em, 1.8px);
+  --versatz-y: min(0.03em, 1.2px);
   --drift: 15s;
 }
 
 .marke-kontur-4 > span {
   --kontur: color-mix(in oklab, var(--color-accent) 55%, var(--color-surface));
   --strich: 1px;
-  --versatz-x: -0.04em;
-  --versatz-y: -0.028em;
+  --versatz-x: calc(-1 * min(0.04em, 1.6px));
+  --versatz-y: calc(-1 * min(0.028em, 1.12px));
   --drift: 11s;
 }
 
