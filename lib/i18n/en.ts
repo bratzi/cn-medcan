@@ -6,7 +6,7 @@ export const en: Woerterbuch = {
     direktZumInhalt: "Skip to content",
     nurDeutsch: "This page is only available in German.",
     beschreibung:
-      "Reviews of prescription medical cannabis following a fixed scheme, each tied to one batch. The community votes on which strain is reviewed next.",
+      "Reviews of prescription medical cannabis following a fixed scheme. The community votes on which strain is reviewed next.",
   },
   sprache: {
     gruppe: "Language",
@@ -381,7 +381,7 @@ export const en: Woerterbuch = {
   },
   bluete: {
     nichtGefunden: "Flower not found",
-    metaBeschreibung: "My review, cannabinoid and terpene profile, batches and reported pharmacy stock for {handelsname}.",
+    metaBeschreibung: "My review, cannabinoid and terpene profile and reported pharmacy stock for {handelsname}.",
     alleBlueten: "All flowers",
     bewerten: "Review this strain",
     communityLesen: { one: "Read {anzahl} community review", other: "Read {anzahl} community reviews" },
@@ -392,7 +392,7 @@ export const en: Woerterbuch = {
     profilOhneCommunity: "Green is what the producer's information suggests. The comparison appears with the first reviews.",
     deineBewertung: "Your review",
     communityLeer:
-      "There is no community review for {handelsname} yet. Be the first: appearance, smell, taste, consistency, aroma and condition, tied to your batch.",
+      "There is no community review for {handelsname} yet. Be the first: appearance, smell, taste, consistency, aroma and condition.",
     ersteBewertung: "Write the first review",
     vonFuenf: "of 5",
     charge: "Batch {charge}",
@@ -485,14 +485,14 @@ export const en: Woerterbuch = {
   },
   reviews: {
     titel: "Reviews",
-    metaBeschreibung: "My reviews following a fixed scheme, each tied to a specific batch.",
-    satz: "I test every strain using the same scheme and note which batch it was.",
+    metaBeschreibung: "My reviews following a fixed scheme.",
+    satz: "I test every strain using the same scheme, so you can compare them.",
     leerTitel: "The first chapter is being written.",
     leerText: "The vote decides which strain I test first.",
     zurAbstimmung: "To the vote",
   },
   bewerten: {
-    satz: "Following a fixed scheme, tied to one batch. So that we can compare.",
+    satz: "Following a fixed scheme. So that we can compare.",
     anmeldenHinweis: "Please sign in to write a review.",
     anmelden: "Sign in",
     nichtFreigegeben: "You can review here as soon as your account is approved.",

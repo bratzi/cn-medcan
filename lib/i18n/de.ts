@@ -10,7 +10,7 @@ export const de = {
     direktZumInhalt: "Direkt zum Inhalt",
     nurDeutsch: "Diese Seite gibt es nur auf Deutsch.",
     beschreibung:
-      "Bewertungen verschreibungspflichtiger Cannabisarzneimittel nach festem Schema, jeweils an eine Charge gebunden. Die Community stimmt ab, welche Sorte als Nächstes bewertet wird.",
+      "Bewertungen verschreibungspflichtiger Cannabisarzneimittel nach festem Schema. Die Community stimmt ab, welche Sorte als Nächstes bewertet wird.",
   },
   sprache: {
     gruppe: "Sprache",
@@ -389,7 +389,7 @@ export const de = {
   },
   bluete: {
     nichtGefunden: "Blüte nicht gefunden",
-    metaBeschreibung: "Meine Bewertung, Cannabinoid- und Terpenprofil, Chargen und gemeldete Apothekenbestände zu {handelsname}.",
+    metaBeschreibung: "Meine Bewertung, Cannabinoid- und Terpenprofil und gemeldete Apothekenbestände zu {handelsname}.",
     alleBlueten: "Alle Blüten",
     bewerten: "Diese Sorte bewerten",
     communityLesen: { one: "{anzahl} Bewertung der Community lesen", other: "{anzahl} Bewertungen der Community lesen" },
@@ -400,7 +400,7 @@ export const de = {
     profilOhneCommunity: "Grün ist, was die Herstellerangaben erwarten lassen. Mit den ersten Bewertungen kommt der Vergleich dazu.",
     deineBewertung: "Deine Bewertung",
     communityLeer:
-      "Zu {handelsname} gibt es noch keine Bewertung aus der Community. Gib die erste ab: Aussehen, Geruch, Geschmack, Konsistenz, Aroma und Beschaffenheit, gebunden an deine Charge.",
+      "Zu {handelsname} gibt es noch keine Bewertung aus der Community. Gib die erste ab: Aussehen, Geruch, Geschmack, Konsistenz, Aroma und Beschaffenheit.",
     ersteBewertung: "Erste Bewertung abgeben",
     vonFuenf: "von 5",
     charge: "Charge {charge}",
@@ -494,14 +494,14 @@ export const de = {
   },
   reviews: {
     titel: "Bewertungen",
-    metaBeschreibung: "Meine Bewertungen nach festem Schema, jeweils an eine konkrete Charge gebunden.",
-    satz: "Jede Sorte teste ich nach demselben Schema und schreibe dazu, welche Charge es war.",
+    metaBeschreibung: "Meine Bewertungen nach festem Schema.",
+    satz: "Jede Sorte teste ich nach demselben Schema, damit du sie vergleichen kannst.",
     leerTitel: "Das erste Kapitel wird gerade geschrieben.",
     leerText: "Welche Sorte ich zuerst teste, entscheidet die Abstimmung.",
     zurAbstimmung: "Zur Abstimmung",
   },
   bewerten: {
-    satz: "Nach festem Schema, an eine Charge gebunden. Damit wir vergleichen können.",
+    satz: "Nach festem Schema. Damit wir vergleichen können.",
     anmeldenHinweis: "Zum Bewerten bitte anmelden.",
     anmelden: "Anmelden",
     nichtFreigegeben: "Sobald dein Konto freigeschaltet ist, kannst du hier bewerten.",
