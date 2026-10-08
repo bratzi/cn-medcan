@@ -28,14 +28,25 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 
 ## ⇢ Hier geht es weiter
 
-### ⇢ SESSION 53 (Sessionstart): Nutzer schaut `/reviews` an
+### ⇢ SESSION 53 (Sessionstart): Spec „Dein Kapitel“ freigeben lassen, dann Plan
 
-Nutzer drüberschauen lassen. Offen: Gast-Ansicht der Ranglisten (Anmelde-Hinweis) live nicht gesehen,
-nur Tests (Session als Mitglied); echtes Telefon 390 px (Fenster ging nur auf 494 px). Fragen an den
-Nutzer: Ranglisten-Karten mobil einspaltig mit vollbreitem Bild (sehr lang), lieber zwei Spalten?
-Startseite `NeuesterEintrag` auf Doppelseite mit Bild umstellen? Minor aus Session 51 weiter offen.
+**Großer Punkt (Nutzer 2026-10-09):** Profil als Highlight-Sektion auf der Startseite, agenturreif.
+Nutzer-Entscheidungen: Inhalt „Dein Kapitel live“ (Mitglied eigenes Kapitel über `/api/startseite`,
+Gast dasselbe am öffentlichen Betreiber-Profil „GrünesBuch“), Position nach der Abstimmung.
+Spec `docs/superpowers/specs/2026-10-09-startseite-dein-kapitel-design.md` wartet auf Freigabe; danach
+`writing-plans`, Stränge parallel schneiden (Daten/API, Komponente, Bewegung).
 
-### ⇢ SESSION 52 (erledigt): `/reviews` live geprüft
+Noch live nachsehen: `a37eea1` (Startseite ohne Wirkungsnote, nur 4 Noten), Ranglisten mobil zwei Spalten,
+`aa95926` (Satz einmal, großes Buch steht still). Gast-Ansicht Ranglisten nicht gesehen.
+
+**Dauerregel neu:** Review-Darstellung ändern heißt Startseite im selben Zug mitziehen (Memory).
+
+### ⇢ SESSION 52 (erledigt): `/reviews` live geprüft, Startseite nachgezogen
+
+- **`1da0662`:** Startseite „Der neueste Eintrag“ nutzt jetzt `Buch` + `BuchDoppelseite` (Bild, Sorte als Link)
+  über `ladeNeuestenBetreiberEintrag` (`lib/query/buch-band.ts`). Alte `Doppelseite`, Choreografie
+  `bewegung/eintrag.ts`, `neuesteRedaktionelleReview`/`redaktionelleReviews` gelöscht. Ranglisten-Karten
+  mobil zwei Spalten. **`a37eea1`:** Wirkungsnote fehlt wieder im Startseiten-Auszug (`auszug`, Regel 9).
 
 - Live geprüft (Chrome, 1143 px dunkel, 1400 px hell, 494 px dunkel, als Mitglied): Kopf mittig,
   Sorte als Link, Seitenleiste 1 2 3 … 25 26, Sprung `/reviews/band/2#nr-25` schlägt Eintrag 25 auf
