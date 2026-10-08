@@ -64,9 +64,11 @@ export async function Auftakt() {
           data-story-einstieg=""
           className="mt-2 w-full text-center font-sans text-small uppercase sm:mt-4 leading-relaxed tracking-gesperrt text-text text-balance"
         >
-          {/* Ab md genau zwei Zeilen, je Satz eine, ohne Umbruch und damit breiter als die übrigen Texte (Nutzer 2026-09-25). */}
-          <span className="md:block md:whitespace-nowrap">{texte.intro1}</span>{" "}
-          <span className="md:block md:whitespace-nowrap">{texte.intro2}</span>
+          {/* Ab md je Satz eine eigene Zeile, breiter als die übrigen Texte (Nutzer 2026-09-25).
+              Der Umbruch bleibt bis xl erlaubt: mit 0,3em Sperrung braucht der zweite Satz
+              rund 1200 px, lief also zwischen md und xl rechts aus dem Bild. */}
+          <span className="md:block xl:whitespace-nowrap">{texte.intro1}</span>{" "}
+          <span className="md:block xl:whitespace-nowrap">{texte.intro2}</span>
         </p>
       </div>
 

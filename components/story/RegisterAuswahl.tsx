@@ -1,6 +1,6 @@
 "use client";
 
-import { Fragment, useEffect, useMemo, useRef, useState, type CSSProperties, type FocusEvent, type PointerEvent, type ReactNode } from "react";
+import { Fragment, useEffect, useMemo, useRef, useState, useSyncExternalStore, type CSSProperties, type FocusEvent, type PointerEvent, type ReactNode } from "react";
 
 import { GeschmackIcon, TerpenIcon } from "@/components/review/AromaIcon";
 import type { GeschmacksKategorie } from "@/db/enums";
@@ -149,6 +149,12 @@ function Tafel({
   );
 }
 
+// Hydrier-Merker ohne setState im Effekt: ein Store, der nie meldet. Der Server-Schnappschuss
+// ist false, der Client-Schnappschuss true, also schaltet React beim Hydrieren einmal um.
+const abonnierenNichts = () => () => {};
+const imClient = () => true;
+const aufDemServer = () => false;
+
 function Eintrag({ begriff, children }: { begriff: string; children: ReactNode }) {
   return (
     <div data-register-zeile="" className="grid gap-2">
@@ -175,8 +181,8 @@ function Eintrag({ begriff, children }: { begriff: string; children: ReactNode }
 export function RegisterAuswahl({ ansicht, start, texte }: { ansicht: RegisterAnsicht; start: string; texte: RegisterTexte }) {
   const [aktiv, setAktiv] = useState(start);
   // Erst nach dem Hydrieren alle Tafeln; Server und erster Client-Render zeigen nur die gewählte.
-  const [montiert, setMontiert] = useState(false);
-  useEffect(() => setMontiert(true), []);
+  // useSyncExternalStore statt setState im Effekt: der Server-Schnappschuss ist false, der Client true.
+  const montiert = useSyncExternalStore(abonnierenNichts, imClient, aufDemServer);
   const zeige = (anker: string) => montiert || anker === aktiv;
   // Verbindung (T17): Maus-Hover und Tastaturfokus heben vorübergehend hervor; ohne beides gilt
   // die gewählte Pille, außer sie wurde durch erneutes Tippen gelöst.
