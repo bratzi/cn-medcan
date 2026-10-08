@@ -16,7 +16,6 @@ import { Lieblingshersteller } from "@/components/profil/Lieblingshersteller";
 import { NetzVerlauf } from "@/components/profil/NetzVerlauf";
 import { NotenVerteilung } from "@/components/profil/NotenVerteilung";
 import { ProfilNetz } from "@/components/profil/ProfilNetz";
-import { ProfilReiter } from "@/components/profil/ProfilReiter";
 import { Schnitte } from "@/components/profil/Schnitte";
 import { TerpenRangliste } from "@/components/profil/TerpenRangliste";
 import { TopFlop } from "@/components/profil/TopFlop";
@@ -26,11 +25,10 @@ import { musterBildId } from "@/lib/budpics";
 import { begruendungText } from "@/lib/empfehlung-text";
 import { formatiereDatum } from "@/lib/format";
 import { holeSprache, holeWoerterbuch } from "@/lib/i18n";
-import { mehrzahl, t } from "@/lib/i18n/text";
+import { t } from "@/lib/i18n/text";
 import { aenderungsListe, netzAenderung } from "@/lib/netz-aenderung";
 import { auswertungen, leereProfilWerte, noteOderErsatz } from "@/lib/profil";
 import { monatsReihe, notenVerteilung, profilNotizen } from "@/lib/profil-dashboard";
-import { ungeleseneAnzahl } from "@/lib/query/benachrichtigungen";
 import { ladeEmpfehlungen } from "@/lib/query/empfehlungen";
 import { ladeLieblingshersteller } from "@/lib/query/lieblingshersteller";
 import { aktuellesProfil, ladeAuswertungsZeilen } from "@/lib/query/profil";
@@ -82,12 +80,11 @@ type SuchParameter = Record<string, string | string[] | undefined>;
  */
 export default async function ProfilPage({ searchParams }: { searchParams: Promise<SuchParameter> }) {
   const mitglied = await aktuellesMitglied();
-  const { w, sprache } = await textLaden();
+  const { w } = await textLaden();
   if (!mitglied) redirect("/anmelden?weiter=%2Fprofil");
   const texte = w.profil;
   const id = mitglied.mitgliedId;
   const register = registerParameter(await searchParams);
-  const ungelesen = await ungeleseneAnzahl(id).catch(oderNull<number>("ungeleseneAnzahl")).then((n) => n ?? 0);
 
   return (
     <KapitelRaster>
@@ -102,13 +99,7 @@ export default async function ProfilPage({ searchParams }: { searchParams: Promi
               <KopfBild id={id} />
             </Suspense>
           }
-          reiter={
-            <ProfilReiter
-              aktiv="profil"
-              texte={texte}
-              ungelesen={{ anzahl: ungelesen, text: mehrzahl(sprache, w.kopf.ungelesen, ungelesen) }}
-            />
-          }
+          seite={texte.reiterProfil}
         />
       </ViewTransition>
       <Suspense fallback={<FeldSkelett spalten={10} hoehe="klein" />}>

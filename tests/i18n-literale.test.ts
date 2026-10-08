@@ -119,7 +119,6 @@ const UMGESTELLT: string[] = [
   "components/profil/TopFlop.tsx",
   "components/profil/CommunityVergleich.tsx",
   "components/profil/Schnitte.tsx",
-  "components/profil/ProfilReiter.tsx",
   // Profil Stufe 3: Verlauf, Lieblingshersteller, Mini-Netz
   "components/profil/NetzGrafik.tsx",
   "components/profil/NetzVerlauf.tsx",

@@ -8,8 +8,6 @@ import { FeldSkelett } from "@/components/kapitel/FeldSkelett";
 import { Kapitelkopf } from "@/components/kapitel/Kapitelkopf";
 import { KapitelRaster } from "@/components/kapitel/KapitelRaster";
 import { Randnotizen } from "@/components/kapitel/Randnotizen";
-import { ProfilReiter } from "@/components/profil/ProfilReiter";
-import { de } from "@/lib/i18n/de";
 
 const html = (el: Parameters<typeof renderToStaticMarkup>[0]) => renderToStaticMarkup(el);
 
@@ -62,7 +60,7 @@ test("Kapitelkopf: Name als h1 gedruckt, bricht um, Schlagwort aria-hidden", () 
     createElement(Kapitelkopf, {
       name: "A".repeat(60),
       avatarId: null,
-      reiter: createElement("nav", null, "R"),
+      seite: "Profil",
       schlagwort: "dein Geschmack",
       ton: "gruen",
     }),
@@ -71,11 +69,7 @@ test("Kapitelkopf: Name als h1 gedruckt, bricht um, Schlagwort aria-hidden", () 
   assert.match(h, /wrap-break-word/);
   assert.match(h, /font-buch/);
   assert.match(h, /aria-hidden="true"[^>]*>dein Geschmack</);
+  // Der Seitenname steht gedruckt im Kopf (keine Reiter mehr, Nutzer 2026-10-09).
+  assert.match(h, /text-h2[^"]*">Profil</);
 });
 
-test("ProfilReiter: aktiv mit aria-current, ungelesene Zahl mit Text", () => {
-  const h = html(createElement(ProfilReiter, { aktiv: "konto", texte: de.profil, ungelesen: { anzahl: 2, text: "2 ungelesen" } }));
-  assert.match(h, /aria-current="page"[^>]*>Konto/);
-  assert.match(h, /text-h2/);
-  assert.match(h, /2 ungelesen/);
-});

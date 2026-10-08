@@ -5,17 +5,18 @@ import { HAUPTNAVIGATION, KONTO_LINK, istAktiv } from "@/lib/navigation";
 import { de } from "@/lib/i18n/de";
 import { en } from "@/lib/i18n/en";
 
-test("Kern zuerst: Bewertungen, Abstimmung, Blüten; Apotheken nur in Aussicht", () => {
+test("Kern zuerst: Bewertungen, Abstimmung, Blüten, Profil; Konto getrennt als Knopf (Nutzer 2026-10-09)", () => {
   assert.deepEqual(
     HAUPTNAVIGATION.map((eintrag) => eintrag.href),
-    ["/reviews", "/umfragen", "/blueten"],
+    ["/reviews", "/umfragen", "/blueten", "/profil"],
   );
   assert.deepEqual(
     HAUPTNAVIGATION.map((eintrag) => de.kopf.navigation[eintrag.schluessel]),
-    ["Bewertungen", "Abstimmung", "Blüten"],
+    ["Bewertungen", "Abstimmung", "Blüten", "Profil"],
   );
-  assert.deepEqual(KONTO_LINK, { href: "/profil", schluessel: "konto" });
-  assert.equal(de.kopf.navigation.konto, "Mein Profil");
+  assert.deepEqual(KONTO_LINK, { href: "/mitglied", schluessel: "konto" });
+  assert.equal(de.kopf.navigation.konto, "Mein Konto");
+  assert.equal(en.kopf.navigation.konto, "My account");
   assert.equal(en.kopf.navigation.bewertungen, "Reviews");
 });
 
@@ -30,6 +31,13 @@ test("istAktiv: kein Treffer über einen bloßen Namensanfang oder die Startseit
   assert.equal(istAktiv("/reviews", "/umfragen"), false);
 });
 
+test("istAktiv: Profil und Konto sind getrennt, fremde Profile zählen nicht als eigenes", () => {
+  assert.equal(istAktiv("/mitglied", "/profil"), false);
+  assert.equal(istAktiv("/profil", "/mitglied"), false);
+  assert.equal(istAktiv("/profil/abc123", "/profil"), false);
+  assert.equal(istAktiv("/mitglied", "/mitglied"), true);
+});
+
 test("Kopf: Leiste erst ab lg, darunter Menüknopf mit Popover und Konto als Symbol", async () => {
   const { createElement } = await import("react");
   const { renderToStaticMarkup } = await import("react-dom/server");
@@ -41,7 +49,9 @@ test("Kopf: Leiste erst ab lg, darunter Menüknopf mit Popover und Konto als Sym
   assert.match(html, /<button type="button" popoverTarget="kopf-menue" class="kopf-menue-knopf [^"]*lg:hidden">/i);
   assert.match(html, /<div id="kopf-menue" popover="auto"/);
   assert.match(html, /Menü öffnen/);
-  assert.match(html, /class="max-lg:sr-only">Mein Profil/);
+  assert.match(html, /class="max-lg:sr-only">Mein Konto/);
+  // Profil ist ein Menüpunkt, nicht der Knopf.
+  assert.match(html, /href="\/profil"[^>]*>(<span[^>]*>)?Profil</);
 });
 
 test("Kopf: Menüknopf ist ab lg per CSS verborgen, nicht nur per Utility", async () => {
@@ -63,26 +73,8 @@ test("Kopf: Aktiv-Markierung am Wort, keine Kapitelnummern mehr", async () => {
   assert.doesNotMatch(html, /kapitel-nummer/);
 });
 
-test("istAktiv: Mein Profil gilt auch auf dem Reiter Konto", () => {
-  assert.equal(istAktiv("/profil", "/profil"), true);
-  assert.equal(istAktiv("/mitglied", "/profil"), true);
-  assert.equal(istAktiv("/mitglied-x", "/profil"), false);
-  assert.equal(istAktiv("/mitglied", "/reviews"), false);
-});
-
-test("ProfilReiter: zwei Reiter, aktiver mit aria-current", async () => {
-  const { createElement } = await import("react");
-  const { renderToStaticMarkup } = await import("react-dom/server");
-  const { ProfilReiter } = await import("@/components/profil/ProfilReiter");
-  const html = renderToStaticMarkup(createElement(ProfilReiter, { aktiv: "konto", texte: de.profil }));
-  assert.match(html, /<nav aria-label="Profil und Konto"/);
-  assert.match(html, /href="\/profil"[^>]*>Profil</);
-  assert.match(html, /aria-current="page"[^>]*href="\/mitglied"|href="\/mitglied"[^>]*aria-current="page"/);
-});
-
-test("istAktiv: fremdes öffentliches Profil markiert Mein Profil nicht", () => {
+test("istAktiv: fremdes öffentliches Profil markiert Profil nicht", () => {
   assert.equal(istAktiv("/profil/abcd2345", "/profil"), false);
   assert.equal(istAktiv("/profil", "/profil"), true);
-  assert.equal(istAktiv("/mitglied", "/profil"), true);
   assert.equal(istAktiv("/blueten/x", "/blueten"), true);
 });

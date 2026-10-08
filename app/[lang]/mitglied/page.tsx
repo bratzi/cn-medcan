@@ -16,7 +16,6 @@ import { GelesenMarkieren } from "@/components/mitglied/GelesenMarkieren";
 import { MeineStimmen } from "@/components/mitglied/MeineStimmen";
 import { ProfilSichtbarkeit } from "@/components/mitglied/ProfilSichtbarkeit";
 import { UmfrageJetzt } from "@/components/mitglied/UmfrageJetzt";
-import { ProfilReiter } from "@/components/profil/ProfilReiter";
 import { Badge, buttonKlassen, textLinkKlassen } from "@/components/ui";
 import type { VorschlagStatus } from "@/db/enums";
 import { benachrichtigungSatz } from "@/lib/benachrichtigung";
@@ -93,7 +92,7 @@ export default async function MitgliedPage() {
               <KopfBild id={id} />
             </Suspense>
           }
-          reiter={<ProfilReiter aktiv="konto" texte={w.profil} />}
+          seite={w.profil.reiterKonto}
         />
       </ViewTransition>
       <Suspense fallback={<FeldSkelett spalten={10} hoehe="klein" />}>

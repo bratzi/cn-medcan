@@ -1,11 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { createElement } from "react";
-import { renderToStaticMarkup } from "react-dom/server";
-
-import { ProfilReiter } from "@/components/profil/ProfilReiter";
-import { de } from "@/lib/i18n/de";
 
 const seite = () => readFileSync("app/[lang]/profil/page.tsx", "utf8");
 
@@ -43,7 +38,9 @@ test("/profil: Kapitel-Reihenfolge, Raster, kein Apothekenlink", () => {
   assert.match(q, /<Suspense/);
   assert.doesNotMatch(q, /apotheke/i);
   assert.doesNotMatch(q, /max-w-180/);
-  assert.match(q, /<ProfilReiter\s+aktiv="profil"/);
+  // Seit 2026-10-09 (Nutzer) keine Reiter mehr: Profil und Konto sind eigene Seiten.
+  assert.doesNotMatch(q, /ProfilReiter/);
+  assert.match(q, /seite=\{texte\.reiterProfil\}/);
 });
 
 test("/profil: Kontur aus dem vorletzten Verlaufsschritt, nie auf dem öffentlichen Profil", () => {
@@ -59,6 +56,8 @@ test("/mitglied: Titel ist der Reiter Konto, h1 ist der Name im Kapitelkopf", ()
   assert.match(q, /title: \(await holeWoerterbuch\(\)\)\.profil\.reiterKonto/);
   assert.match(q, /name=\{mitglied\.anzeigename\}/);
   assert.doesNotMatch(q, /kopf\.navigation\.konto/);
+  assert.doesNotMatch(q, /ProfilReiter/);
+  assert.match(q, /seite=\{w\.profil\.reiterKonto\}/);
 });
 
 test("/mitglied: erst Konto (Angaben, Avatar, Sichtbarkeit, Status, Nachrichten), dann Umfrage und Stimmen; ein Primärknopf", () => {
@@ -73,15 +72,6 @@ test("/mitglied: erst Konto (Angaben, Avatar, Sichtbarkeit, Status, Nachrichten)
   assert.doesNotMatch(q, /buttonKlassen\("primary"\)/, "die Primäraktion steht nur in UmfrageJetzt");
   assert.doesNotMatch(q, /max-w-180/);
   assert.match(q, /<KapitelRaster/);
-});
-
-test("ProfilReiter: ungelesene Benachrichtigungen am Reiter Konto, ohne keine Marke", () => {
-  const mit = renderToStaticMarkup(
-    createElement(ProfilReiter, { aktiv: "profil", texte: de.profil, ungelesen: { anzahl: 2, text: "2 ungelesene Benachrichtigungen" } }),
-  );
-  assert.ok(mit.indexOf("Konto") < mit.indexOf("2 ungelesene Benachrichtigungen"));
-  const ohne = renderToStaticMarkup(createElement(ProfilReiter, { aktiv: "profil", texte: de.profil, ungelesen: { anzahl: 0, text: "x" } }));
-  assert.doesNotMatch(ohne, /sr-only/);
 });
 
 test("/profil: ohne ladbaren Stand nie die Leerskizze, Name im Kopf", () => {
