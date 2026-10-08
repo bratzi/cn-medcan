@@ -19,6 +19,7 @@ test("Gäste: anonymer Stimmzettel, Gast-Empfehlungen, Gast-Zugang", () => {
     abstimmung: { umfrageId: null, zustand: { art: "ANONYM" } },
     empfehlungen: { art: "GAST" },
     budpicZugang: "gast",
+    kapitel: null,
   });
 });
 

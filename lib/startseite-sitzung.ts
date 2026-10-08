@@ -2,6 +2,7 @@ import type { EmpfehlungsEintrag } from "@/components/empfehlung/EmpfehlungsList
 import type { BudpicZugang } from "@/components/produkt/BudpicBeitragen";
 import type { StimmZustand } from "@/components/umfrage/UmfrageKarte";
 import { stimmZustand } from "@/components/umfrage/stimmzustand";
+import type { KapitelDaten } from "@/lib/kapitel-start";
 
 /**
  * Die nutzerbezogenen Teile der statischen Startseite (Spec 2026-10-01,
@@ -14,6 +15,8 @@ export type StartseitenSitzung = {
   abstimmung: { umfrageId: string | null; zustand: StimmZustand };
   empfehlungen: { art: "GAST" } | { art: "LISTE"; eintraege: EmpfehlungsEintrag[] };
   budpicZugang: BudpicZugang;
+  /** Das eigene Kapitel (Spec Dein Kapitel 4.2); null für Gäste und wenn die Abfrage scheitert. */
+  kapitel: KapitelDaten | null;
 };
 
 export type SitzungsStand =
@@ -26,6 +29,7 @@ export function sitzungsAntwort(eingabe: {
   umfrageId: string | null;
   eigeneOptionId: string | null;
   empfehlungen: readonly EmpfehlungsEintrag[];
+  kapitel?: KapitelDaten | null;
 }): StartseitenSitzung {
   const { mitglied } = eingabe;
   if (!mitglied) {
@@ -33,12 +37,14 @@ export function sitzungsAntwort(eingabe: {
       abstimmung: { umfrageId: eingabe.umfrageId, zustand: { art: "ANONYM" } },
       empfehlungen: { art: "GAST" },
       budpicZugang: "gast",
+      kapitel: null,
     };
   }
   return {
     abstimmung: { umfrageId: eingabe.umfrageId, zustand: stimmZustand(mitglied, eingabe.eigeneOptionId) },
     empfehlungen: { art: "LISTE", eintraege: [...eingabe.empfehlungen] },
     budpicZugang: mitglied.freigegeben ? "freigegeben" : "mitglied",
+    kapitel: eingabe.kapitel ?? null,
   };
 }
 
@@ -77,4 +83,9 @@ export function empfehlungenAnzeige(stand: SitzungsStand): EmpfehlungenAnzeige {
   const { empfehlungen } = stand.daten;
   if (empfehlungen.art === "GAST") return { art: "gast" };
   return empfehlungen.eintraege.length === 0 ? { art: "leer" } : { art: "liste", eintraege: empfehlungen.eintraege };
+}
+
+/** Das eigene Kapitel, sobald die Sitzung da ist; sonst bleibt das Schaufenster stehen. */
+export function kapitelAnzeige(stand: SitzungsStand): KapitelDaten | null {
+  return stand.status === "fertig" ? stand.daten.kapitel : null;
 }
