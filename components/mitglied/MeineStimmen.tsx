@@ -32,7 +32,7 @@ export function MeineStimmen({ stimmen, texte, sprache }: { stimmen: readonly St
     );
   }
   return (
-    <ul className="grid grid-cols-2 gap-x-6 gap-y-8 sm:grid-cols-3 min-[1080px]:grid-cols-5">
+    <ul className="grid grid-cols-2 gap-x-6 gap-y-8 min-[640px]:grid-cols-3 min-[1080px]:grid-cols-5">
       {stimmen.map((s) => {
         const ausgang = stimmAusgang(s.phase, s.istGewinner);
         return (

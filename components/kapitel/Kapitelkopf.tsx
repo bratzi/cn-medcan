@@ -27,12 +27,13 @@ export function Kapitelkopf({ name, avatarId, reiter, bild, schlagwort, ton, akt
     <header className="relative isolate col-span-4 grid grid-cols-subgrid overflow-x-clip pt-16 min-[1080px]:col-span-10 min-[1080px]:pt-24">
       <Schlagwort satz={schlagwort} ton={ton} oben="top-8 sm:top-12" />
       <div className="col-span-4 flex min-w-0 flex-col gap-8 px-6 min-[1080px]:col-span-6 min-[1080px]:px-8">
-        <div className="flex items-start justify-between gap-4">
-          <Avatar name={name} bildId={avatarId} groesse="lg" />
+        <Avatar name={name} bildId={avatarId} groesse="lg" />
+        <h1 className="kapitel-name font-buch text-kapitel text-text text-balance wrap-break-word">{name}</h1>
+        {/* „Abmelden“ steht bei den Reitern: dort sucht man die Bedienung des Kontos. */}
+        <div className="flex flex-wrap items-center gap-x-8 gap-y-4">
+          {reiter}
           {aktion}
         </div>
-        <h1 className="kapitel-name font-buch text-kapitel text-text text-balance wrap-break-word">{name}</h1>
-        {reiter}
       </div>
       {bild ? (
         <div aria-hidden="true" className="hidden min-[1080px]:col-span-4 min-[1080px]:flex min-[1080px]:items-end min-[1080px]:px-8">
