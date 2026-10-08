@@ -152,3 +152,16 @@ test("Auftakt beim Hinausscrollen: das Logo wächst an seinem Platz statt nach o
   assert.match(quelle, /gsap\.fromTo\('\[data-story="titel"\]', \{ scale: 1 \}, \{ scale: 1\.15,/);
   assert.doesNotMatch(quelle, /yPercent: -30/);
 });
+
+test("Kapitel: Name deckt sich auf, Wörter schreiben sich, nur getauschte Knoten bleiben stehen", () => {
+  const ablauf = bewegung("kapitel.ts");
+  assert.match(ablauf, /'\[data-story="kapitel"\]'/);
+  assert.match(ablauf, /SCHREIBEN_AB/);
+  assert.match(ablauf, /isConnected/);
+  assert.match(ablauf, /onEnter/);
+  assert.match(ablauf, /once: true/);
+  assert.doesNotMatch(ablauf, /\b(width|height|top|left)\s*:/);
+  const start = bewegung("start.ts");
+  assert.match(start, /import \{ kapitel \} from "\.\/kapitel"/);
+  assert.match(start, /abstimmung,\n\s*kapitel,/);
+});
