@@ -36,9 +36,12 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
    `66f5afe` direkt hinter dem Terpen-Register (Nutzer: zu weit unten).
 3. ~~Auftakt-Kennzahlen~~ **erledigt `2d126fd`** (live-Sicht offen): klickbar (Sorten nach /blueten, Bewertungen nach /reviews, Stimmen nach /umfragen)
    und in der Akzentschrift Mr Dafoe (Nutzer-Ausnahme von „Zahlen gedruckt“, ins Regelwerk eintragen).
-4. **Buch-Darstellung überall neu** (Brainstorming, Design-Skills): Blätter-Bewertung zentrierter im Fokus,
+4. ~~Buch-Darstellung~~ **erledigt `242df55`, `+1`** (Spec/Plan 2026-10-09 buch-doppelseite-fokus; live-Sicht und Review offen): (Brainstorming, Design-Skills): Blätter-Bewertung zentrierter im Fokus,
    Nutzertext kursiv/abgesetzt als Nutzerstimme, Akzentschrift rein, Profil mit Namen kleiner und eingefasst;
    gilt für jedes Buch (/reviews, Startseite, Blütenseite).
+6. **Terpenband-Tooltip neu** (Nutzer: oft viel zu klein, awwwards-Niveau, alle Design-Skills).
+7. **Chargen zurücknehmen**: angeben und anzeigen bleibt, aber Startseite und Unterseiten erwähnen sie kaum noch,
+   kein Hauptaugenmerk der Plattform.
 5. **Bewertungsformular mit Fazit und Live-Terpenprofil** (großer Punkt, alle Design-Skills, Agentur-Niveau):
    das Fazit wie auf der Startseite fehlt beim Bewerten; daneben das eigene Terpenprofil (Netz), das sich
    beim Bewerten einer neuen Sorte live verändert.
