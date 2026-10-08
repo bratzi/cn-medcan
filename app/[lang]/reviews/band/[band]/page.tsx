@@ -16,6 +16,6 @@ export default async function BandPage({ params }: { params: Promise<{ band: str
   const { band } = await params;
   const nummer = Number(band);
   // Band 1 hat genau eine Adresse: /reviews.
-  if (!/^\d+$/.test(band) || nummer < 2) notFound();
+  if (!/^\d+$/.test(band) || nummer < 2 || String(nummer) !== band) notFound();
   return <BewertungenSeite band={nummer} />;
 }

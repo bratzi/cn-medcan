@@ -22,12 +22,18 @@ test("/reviews und Bandseiten statisch, 300 s", () => {
   }
 });
 
+test("/reviews: Ranglisten unter dem Buch, Anker für das Anmelden", () => {
+  const inhalt = readFileSync("app/[lang]/reviews/seite.tsx", "utf8");
+  assert.ok(inhalt.indexOf("<GrossesBuch") < inhalt.indexOf("<Ranglisten"));
+  assert.match(inhalt, /id="ranglisten"/);
+});
+
 test("/reviews ohne alte Doppelseite und ohne Inhaltsverzeichnis", () => {
   assert.doesNotMatch(seite, /Doppelseite|Inhaltsverzeichnis/);
 });
 
 test("Bandseite: Band 1 und Unsinn sind 404", () => {
-  assert.match(band, /if \(!\/\^\\d\+\$\/\.test\(band\) \|\| nummer < 2\) notFound\(\);/);
+  assert.match(band, /if \(!\/\^\\d\+\$\/\.test\(band\) \|\| nummer < 2 \|\| String\(nummer\) !== band\) notFound\(\);/);
 });
 
 test("Großes Buch: BuchDoppelseite mit Sorte, Seitenleiste mit Basis", () => {

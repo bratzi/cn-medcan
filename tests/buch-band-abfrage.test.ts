@@ -7,7 +7,7 @@ const q = readFileSync("lib/query/buch-band.ts", "utf8");
 test("ladeBand: nur freigegebene, aktive Sorten, Buchreihenfolge, Band zu 24", () => {
   assert.match(q, /freigegeben: true/);
   assert.match(q, /strain: \{ aktiv: true \}/);
-  assert.match(q, /orderBy: \[\{ istRedaktionell: "desc" \}, \{ erstelltAm: "desc" \}\]/);
+  assert.match(q, /orderBy: \[\{ istRedaktionell: "desc" \}, \{ erstelltAm: "desc" \}, \{ id: "asc" \}\]/);
   assert.match(q, /skip: \(band - 1\) \* BAND_GROESSE/);
   assert.match(q, /take: BAND_GROESSE/);
   assert.match(q, /BEWERTUNG_SELECT/);

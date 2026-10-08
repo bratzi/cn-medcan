@@ -25,7 +25,8 @@ export const ladeBand = cache(async (band: number): Promise<Band | null> => {
   if (!Number.isInteger(band) || band < 1 || band > baende) return null;
   const zeilen = await prisma.review.findMany({
     where: WO,
-    orderBy: [{ istRedaktionell: "desc" }, { erstelltAm: "desc" }],
+    // id als letzte Ordnung: bei gleicher Zeit überlappen oder überspringen Bände sonst Einträge.
+    orderBy: [{ istRedaktionell: "desc" }, { erstelltAm: "desc" }, { id: "asc" }],
     skip: (band - 1) * BAND_GROESSE,
     take: BAND_GROESSE,
     select: {
