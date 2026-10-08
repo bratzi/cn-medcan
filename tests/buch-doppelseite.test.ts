@@ -84,7 +84,7 @@ test("Die fünf Noten stehen genau einmal im HTML, mobil wie am Rechner", () => 
 
 test("Handschrift nur bei Community: von euch am Rand, die Marke bleibt gedruckt", () => {
   const community = seiten(zeige({ istBetreiber: false, autorName: "Mia" })).links;
-  assert.match(community, /<p data-eintritt="schreiben" style="--i:1" class="font-hand text-vermerk text-accent[^"]*">von euch<\/p>/);
+  assert.match(community, /<p data-eintritt="schreiben" style="--i:1" class="font-hand text-vermerk text-logo[^"]*">von euch<\/p>/);
   assert.match(community, />Community</);
   const betreiber = seiten(zeige()).links;
   assert.doesNotMatch(betreiber, /font-hand|von euch/);

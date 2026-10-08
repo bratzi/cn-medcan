@@ -111,7 +111,7 @@ test("Terpen-Band: Ruhezustand nur Icon und Name, Infos erscheinen beim Überfah
   assert.match(band, /sm:w-40/);
   // Zwei Zeilen höchstens; Abstand der Infos als Innenabstand (Trefferfläche), nicht als Außenabstand.
   assert.match(band, /line-clamp-2/);
-  assert.match(readFileSync(join(process.cwd(), "app/globals.css"), "utf8"), /\.terpen-band-info \{[^}]*padding-bottom: 0\.25rem;/);
+  assert.match(readFileSync(join(process.cwd(), "app/globals.css"), "utf8"), /\.terpen-band-info \{[^}]*padding-top: 0\.25rem;/);
 });
 
 test("Terpen-Band: Infos bleiben in der Spalte des Eintrags (Nutzer 2026-10-07, Text ragte bis 349 px ins Nachbarterpen)", () => {
@@ -132,7 +132,7 @@ test("Terpen-Band hält beim Überfahren und bei Fokus an: Pause trägt denselbe
   );
 });
 
-test("Terpen-Band: Fallback schneidet nichts ab, Höhe, Infos über der Marke und Herabrücken nur im Laufmodus (Review 2026-10-07)", () => {
+test("Terpen-Band: Fallback schneidet nichts ab, Höhe, Tooltip unter dem Symbol nur im Laufmodus (Review 2026-10-07)", () => {
   const band = readFileSync(join(process.cwd(), "components/story/TerpenBand.tsx"), "utf8");
   const css = readFileSync(join(process.cwd(), "app/globals.css"), "utf8");
   // Grundzustand (Fallback, umbrochen): Mindesthöhe statt fester Höhe, nur waagrechter Beschnitt, kein Versatz.
@@ -147,8 +147,11 @@ test("Terpen-Band: Fallback schneidet nichts ab, Höhe, Infos über der Marke un
   const lauf = ":root:not([data-sparmodus]) .terpen-band:has(> .terpen-band-spur > [aria-hidden]:not(:empty))";
   assert.match(css, new RegExp(`${lauf.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")} \\{\\s*height: 12rem;`));
   assert.match(css, /\.terpen-band-info \{\s*position: absolute;/);
-  assert.match(css, /\.terpen-band-eintrag:is\(:hover, :focus-within\) \{\s*translate: 0 2\.5rem;/);
-  assert.match(css, /\.terpen-band-info \{\s*position: absolute;\s*inset-inline: 0;\s*bottom: 100%;/);
+  // Tooltip unter dem Symbol; der Eintrag bleibt stehen, nur das Symbol waechst (Nutzer 2026-10-08).
+  assert.match(css, /\.terpen-band-info \{\s*position: absolute;[^}]*top: 100%;/);
+  assert.match(css, /\.terpen-band-info \{[^}]*text-align: center;/);
+  assert.doesNotMatch(css, /\.terpen-band-eintrag:is\(:hover, :focus-within\)/);
+  assert.match(band, /group-hover\/eintrag:scale-110/);
 });
 
 test("Terpen-Band-CSS: kein :has() innerhalb eines :has(), der Browser verwirft die Regel sonst (Befund 2026-10-07)", () => {

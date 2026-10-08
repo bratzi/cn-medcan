@@ -62,7 +62,7 @@ async function Inhalt() {
           {/* Marke: Tönung und Ring in der Leitnotenfarbe, das Icon in derselben Farbe, mit
               dem Textton abgemischt, damit es auf hellem wie dunklem Grund mindestens 3:1
               erreicht (WCAG 1.4.11; Gelb und Minzgrün sonst zu hell auf Hell). */}
-          <span className="grid size-11 shrink-0 place-items-center rounded-full bg-[color-mix(in_oklab,var(--terpen-farbe)_14%,transparent)] text-[color-mix(in_oklab,var(--terpen-farbe)_50%,var(--color-text))] ring-1 ring-inset ring-[color-mix(in_oklab,var(--terpen-farbe)_32%,transparent)] transition-colors duration-fast ease-standard group-hover/eintrag:bg-[color-mix(in_oklab,var(--terpen-farbe)_24%,transparent)] group-hover/eintrag:ring-[color-mix(in_oklab,var(--terpen-farbe)_56%,transparent)] sm:size-14">
+          <span className="grid size-11 shrink-0 place-items-center rounded-full bg-[color-mix(in_oklab,var(--terpen-farbe)_14%,transparent)] text-[color-mix(in_oklab,var(--terpen-farbe)_50%,var(--color-text))] ring-1 ring-inset ring-[color-mix(in_oklab,var(--terpen-farbe)_32%,transparent)] transition-colors duration-fast ease-standard group-hover/eintrag:bg-[color-mix(in_oklab,var(--terpen-farbe)_24%,transparent)] group-hover/eintrag:ring-[color-mix(in_oklab,var(--terpen-farbe)_56%,transparent)] transition-transform group-hover/eintrag:scale-110 group-focus-within/eintrag:scale-110 sm:size-14">
             <TerpenIcon name={terpen.icon} className="size-6 sm:size-8" />
             <span className="sr-only">{terpen.name}</span>
           </span>
@@ -82,14 +82,14 @@ async function Inhalt() {
                 Der Duft steht deshalb allein und gekürzt in seiner Zeile, der volle Satz im
                 title; für die Sortenzahl daneben war nie Platz, eine eigene Zeile sprengt die
                 Bandhöhe. */}
-            <span className="terpen-band-info pointer-events-none grid grid-cols-[minmax(0,1fr)] gap-1 opacity-0 transition-opacity duration-normal ease-standard group-hover/eintrag:pointer-events-auto group-hover/eintrag:opacity-100 group-focus-within/eintrag:pointer-events-auto group-focus-within/eintrag:opacity-100">
+            <span className="terpen-band-info pointer-events-none grid grid-cols-[minmax(0,1fr)] justify-items-center gap-1 rounded-lg border border-border bg-surface-raised px-3 py-2 text-center opacity-0 shadow-md transition-opacity duration-normal ease-standard group-hover/eintrag:pointer-events-auto group-hover/eintrag:opacity-100 group-focus-within/eintrag:pointer-events-auto group-focus-within/eintrag:opacity-100">
               {terpen.duft ? (
                 <span className="truncate text-caption text-text-muted" title={terpen.duft}>{terpen.duft}</span>
               ) : null}
               {/* Drei Noten: mehr sprengt die Bandhöhe, die wegen des Skeletts fest ist. */}
               <span className="grid grid-cols-[minmax(0,1fr)] gap-1">
                 {terpen.noten.slice(0, 3).map((note) => (
-                  <span key={note.anker} className="grid grid-cols-[minmax(0,5rem)_minmax(0,1fr)] items-center gap-2 text-left">
+                  <span key={note.anker} className="grid w-full grid-cols-[minmax(0,5rem)_minmax(0,1fr)] items-center gap-2 text-left">
                     <span className="inline-flex items-center gap-2 text-caption text-text-muted">
                       <GeschmackIcon geschmack={note.geschmack} className="size-4 shrink-0" />
                       <span className="truncate">{note.label}</span>

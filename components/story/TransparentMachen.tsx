@@ -134,6 +134,9 @@ function Paar({
   );
 }
 
+/** Dieselben vier Konturen wie hinter der Prozentzahl im Community-Fazit (globals.css). */
+const BUZZ_KONTUREN = ["marke-kontur-1", "marke-kontur-2", "marke-kontur-3", "marke-kontur-4"] as const;
+
 /**
  * Prägnantes Schlagwort im Absatz (Nutzer 2026-09-25: in jedem Absatz eines,
  * koloriert): Farbverlauf der Marke, größer als der Fließgrad.
@@ -141,10 +144,17 @@ function Paar({
 function Buzz({ children }: { children: ReactNode }) {
   return (
     <em
-      className="farbverlauf font-hand text-erzaehlung not-italic leading-[0.8]"
+      className="relative isolate inline-block font-hand text-erzaehlung not-italic leading-[0.8]"
       style={{ fontSize: "calc(var(--text-kapitel) * 1.35)" }}
     >
-      {children}
+      {/* Dieselbe Bewegung wie die Prozentzahl im Community-Fazit (Nutzer 2026-10-08):
+          vier driftende Konturen dahinter, der Schriftzug darüber pulsiert ruhig. */}
+      {BUZZ_KONTUREN.map((klasse) => (
+        <span key={klasse} aria-hidden="true" className={`marke-kontur ${klasse}`}>
+          <span>{children}</span>
+        </span>
+      ))}
+      <span className="fazit-puls farbverlauf block">{children}</span>
     </em>
   );
 }

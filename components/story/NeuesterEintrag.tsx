@@ -53,7 +53,7 @@ export async function NeuesterEintrag() {
       className="relative isolate overflow-x-clip bg-linear-to-b from-transparent via-surface-sunken to-transparent px-4 pt-24 pb-32 sm:px-8 sm:pt-32 sm:pb-48"
     >
       {/* Unter dem Eintrag, nicht darüber (Nutzer 2026-09-25). */}
-      <Schlagwort satz={texte.schlagwort} ton="gruen" oben="bottom-0 translate-y-1/2" />
+      <Schlagwort satz={texte.schlagwort} ton="gruen" oben="bottom-8 sm:bottom-12" />
       <div className="mx-auto flex w-full max-w-360 flex-col gap-12">
         <h2 id="eintrag-titel" className="font-buch text-kapitel text-text max-md:text-center">
           {texte.vor} <em className="farbverlauf hand-betont">{texte.betont}</em> {texte.nach}

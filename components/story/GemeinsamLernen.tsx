@@ -29,7 +29,7 @@ export async function GemeinsamLernen() {
         <Loop id="pflanze-loop" buehne className="h-full opacity-50" />
       </div>
       {/* Unten zwischen dieser und der nächsten Sektion (Nutzer 2026-09-25). */}
-      <Schlagwort satz={texte.schlagwort} oben="bottom-0 translate-y-1/2" />
+      <Schlagwort satz={texte.schlagwort} oben="bottom-8 sm:bottom-12" />
 
       <div className="mx-auto grid w-full max-w-360 grid-cols-1 gap-16 lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] lg:gap-24">
         <div className="flex flex-col items-start gap-6 max-lg:items-center max-lg:text-center lg:sticky lg:top-32 lg:self-start">

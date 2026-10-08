@@ -31,7 +31,7 @@ export async function Empfehlungen() {
       aria-labelledby="empfehlungen-titel"
       className="relative isolate scroll-mt-[calc(var(--kopf-h,4rem)+2rem)] overflow-x-clip px-4 pt-24 pb-32 sm:px-8 sm:pt-32 sm:pb-48"
     >
-      <Schlagwort satz={texte.schlagwort} oben="bottom-0 translate-y-1/2" />
+      <Schlagwort satz={texte.schlagwort} oben="bottom-8 sm:bottom-12" />
       <div className="mx-auto flex w-full max-w-360 flex-col gap-12">
         <h2 id="empfehlungen-titel" className="font-buch text-kapitel text-text text-balance max-md:text-center">
           {texte.startVor} <em className="farbverlauf hand-betont">{texte.startBetont}</em> {texte.startNach}
