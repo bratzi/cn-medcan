@@ -90,7 +90,7 @@ async function Inhalt() {
                 <span className="truncate text-caption text-text-muted" title={terpen.duft}>{terpen.duft}</span>
               ) : null}
               {/* Drei Noten: mehr sprengt die Bandhöhe, die wegen des Skeletts fest ist. */}
-              <span className="grid grid-cols-[minmax(0,1fr)] gap-1">
+              <span className="grid w-full justify-self-stretch grid-cols-[minmax(0,1fr)] gap-1">
                 {terpen.noten.slice(0, 3).map((note) => (
                   <span key={note.anker} className="grid w-full grid-cols-[minmax(0,5rem)_minmax(0,1fr)] items-center gap-2 text-left">
                     <span className="inline-flex items-center gap-2 text-caption text-text-muted">

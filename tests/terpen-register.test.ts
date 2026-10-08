@@ -198,3 +198,9 @@ test("Terpen-Band: jeder Eintrag springt zu seiner Tafel im Register, auch mobil
   // Das Register schlägt die Tafel aus der Adresse auf.
   assert.match(register, /hashchange/);
 });
+
+test("Terpen-Band: Notenbalken bekommen Breite, der Notenblock streckt sich im zentrierten Tooltip (Nutzer 2026-10-09)", () => {
+  const band = readFileSync(join(process.cwd(), "components/story/TerpenBand.tsx"), "utf8");
+  // Live 2026-10-09: justify-items-center schrumpfte den Block, die Balkenspalte war 0 px breit.
+  assert.match(band, /<span className="grid w-full justify-self-stretch grid-cols-\[minmax\(0,1fr\)\] gap-1">/);
+});
