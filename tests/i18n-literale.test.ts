@@ -127,9 +127,21 @@ const UMGESTELLT: string[] = [
   "app/[lang]/profil/[kurzId]/page.tsx",
   "components/profil/OeffentlicheBewertungen.tsx",
   "components/mitglied/ProfilSichtbarkeit.tsx",
+  // Kapitel Profil und Konto (Spec 2026-10-08)
+  "components/kapitel/Feld.tsx",
+  "components/kapitel/FeldSkelett.tsx",
+  "components/kapitel/KapitelRaster.tsx",
+  "components/kapitel/Kapitelkopf.tsx",
+  "components/kapitel/Randnotizen.tsx",
+  "components/profil/Aktivitaet.tsx",
+  "components/profil/NotenVerteilung.tsx",
+  "components/profil/BewertungsRegister.tsx",
+  "components/mitglied/UmfrageJetzt.tsx",
+  "components/mitglied/MeineStimmen.tsx",
 ];
 
-const ERLAUBT: string[] = ["Book of Terpz", "Deutsch"];
+// "alle": Name des Suchparameters ?alle=1 im Bewertungs-Register, kein Oberflaechentext.
+const ERLAUBT: string[] = ["Book of Terpz", "Deutsch", "alle"];
 
 const DEUTSCH =
   /[äöüÄÖÜß]|\b(und|oder|nicht|mit|für|bitte|Bitte|keine?|noch|eine?|wird|werden|ist|sind|zur|zum|dein|deine|wir|uns|Sie|jetzt|hier|alle|wählen)\b/;

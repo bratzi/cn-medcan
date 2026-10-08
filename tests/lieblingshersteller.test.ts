@@ -62,5 +62,5 @@ test("ladeLieblingshersteller: neueste Bewertungen zuerst; die Seite unterscheid
   const q = readFileSync("lib/query/lieblingshersteller.ts", "utf8");
   assert.match(q, /orderBy: \{ erstelltAm: "desc" \}/);
   const seite = readFileSync("app/[lang]/profil/page.tsx", "utf8");
-  assert.match(seite, /ladeLieblingshersteller\(mitglied\.mitgliedId\)\.catch\(\s*oderUndefined/);
+  assert.match(seite, /ladeLieblingshersteller\(id\)\.catch\(\s*oderUndefined/);
 });

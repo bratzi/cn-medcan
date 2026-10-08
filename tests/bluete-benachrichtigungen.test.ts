@@ -18,8 +18,8 @@ test("Zaehler: Kopf bleibt statisch, Zahl kommt aus der API", () => {
 
 test("Mitgliederbereich: Benachrichtigungen und eigene Vorschlaege", () => {
   const seite = lies("app/[lang]/mitglied/page.tsx");
-  assert.match(seite, /benachrichtigungenLaden\(mitglied\.mitgliedId\)/);
-  assert.match(seite, /eigeneVorschlaege\(mitglied\.mitgliedId\)/);
+  assert.match(seite, /benachrichtigungenLaden\(id\)/);
+  assert.match(seite, /eigeneVorschlaege\(id\)/);
   assert.match(seite, /<GelesenMarkieren/);
   assert.match(lies("app/[lang]/mitglied/aktionen.ts"), /export async function benachrichtigungenGelesen/);
 });

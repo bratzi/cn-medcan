@@ -1,22 +1,35 @@
 import type { Metadata } from "next";
 import { redirect, unstable_rethrow } from "next/navigation";
+import { cache, Suspense, ViewTransition } from "react";
 
 import { EmpfehlungsListe } from "@/components/empfehlung/EmpfehlungsListe";
+import { Feld } from "@/components/kapitel/Feld";
+import { FeldSkelett } from "@/components/kapitel/FeldSkelett";
+import { Kapitelkopf } from "@/components/kapitel/Kapitelkopf";
+import { KapitelRaster } from "@/components/kapitel/KapitelRaster";
+import { Randnotizen } from "@/components/kapitel/Randnotizen";
+import { Bild } from "@/components/medien/Bild";
+import { Aktivitaet } from "@/components/profil/Aktivitaet";
+import { BewertungsRegister } from "@/components/profil/BewertungsRegister";
 import { CommunityVergleich } from "@/components/profil/CommunityVergleich";
 import { Lieblingshersteller } from "@/components/profil/Lieblingshersteller";
 import { NetzVerlauf } from "@/components/profil/NetzVerlauf";
+import { NotenVerteilung } from "@/components/profil/NotenVerteilung";
 import { ProfilNetz } from "@/components/profil/ProfilNetz";
 import { ProfilReiter } from "@/components/profil/ProfilReiter";
 import { Schnitte } from "@/components/profil/Schnitte";
 import { TerpenRangliste } from "@/components/profil/TerpenRangliste";
 import { TopFlop } from "@/components/profil/TopFlop";
-import { Avatar, Card, CardBody, CardHeader } from "@/components/ui";
+import { registerAnsicht, registerParameter } from "@/lib/bewertungs-register";
+import { ersatzBildId } from "@/lib/bewertungsbilder";
+import { musterBildId } from "@/lib/budpics";
 import { begruendungText } from "@/lib/empfehlung-text";
 import { formatiereDatum } from "@/lib/format";
 import { holeSprache, holeWoerterbuch } from "@/lib/i18n";
 import { mehrzahl, t } from "@/lib/i18n/text";
 import { aenderungsListe, netzAenderung } from "@/lib/netz-aenderung";
-import { auswertungen, leereProfilWerte } from "@/lib/profil";
+import { auswertungen, leereProfilWerte, noteOderErsatz } from "@/lib/profil";
+import { monatsReihe, notenVerteilung, profilNotizen } from "@/lib/profil-dashboard";
 import { ungeleseneAnzahl } from "@/lib/query/benachrichtigungen";
 import { ladeEmpfehlungen } from "@/lib/query/empfehlungen";
 import { ladeLieblingshersteller } from "@/lib/query/lieblingshersteller";
@@ -45,32 +58,127 @@ function oderNull<T>(name: string) {
   };
 }
 
-/**
- * Privates Dashboard (Spec Profil 5): Netz und Terpene, bestätigte Vorschläge,
- * Top/Flop, Vergleich mit der Community, Schnitte. Profilwerte kommen
- * vorberechnet aus nutzer_profil; neu gerechnet wird nur, wenn der Stand fehlt
- * oder älter als 24 h ist (CPU-Limit 10 ms). Nur Aroma in Netz und Vorschlägen (HWG).
- */
-export default async function ProfilPage() {
-  const mitglied = await aktuellesMitglied();
+// Je Aufruf eine Abfrage je Quelle, auch wenn mehrere Felder sie lesen (Spec 9).
+// Erst das Profil: ist es veraltet, schreibt es auch die Vorschläge neu.
+const profilLaden = cache((id: string) =>
+  aktuellesProfil(id).catch(oderNull<Awaited<ReturnType<typeof aktuellesProfil>>>("aktuellesProfil")),
+);
+const zeilenLaden = cache((id: string) =>
+  ladeAuswertungsZeilen(id).catch(oderNull<Awaited<ReturnType<typeof ladeAuswertungsZeilen>>>("ladeAuswertungsZeilen")),
+);
+const textLaden = cache(async () => {
   const [w, sprache] = await Promise.all([holeWoerterbuch(), holeSprache()]);
-  const texte = w.profil;
-  if (!mitglied) redirect("/anmelden?weiter=%2Fprofil");
+  return { w, sprache };
+});
 
-  // Erst das Profil: ist es veraltet, schreibt es auch die Vorschläge neu.
-  const profil = await aktuellesProfil(mitglied.mitgliedId).catch(
-    oderNull<Awaited<ReturnType<typeof aktuellesProfil>>>("aktuellesProfil"),
+type SuchParameter = Record<string, string | string[] | undefined>;
+
+/**
+ * Dein Kapitel im Grünen Buch (Spec Profil und Konto 3 bis 6): Kopf und Reiter
+ * stehen sofort, die Feldreihen streamen je mit einem Skelett. Profilwerte
+ * kommen vorberechnet aus nutzer_profil; neu gerechnet wird nur, wenn der
+ * Stand fehlt oder älter als 24 h ist (CPU-Limit 10 ms). Nur Aroma in Netz
+ * und Vorschlägen (HWG).
+ */
+export default async function ProfilPage({ searchParams }: { searchParams: Promise<SuchParameter> }) {
+  const mitglied = await aktuellesMitglied();
+  const { w, sprache } = await textLaden();
+  if (!mitglied) redirect("/anmelden?weiter=%2Fprofil");
+  const texte = w.profil;
+  const id = mitglied.mitgliedId;
+  const register = registerParameter(await searchParams);
+  const ungelesen = await ungeleseneAnzahl(id).catch(() => 0);
+
+  return (
+    <KapitelRaster>
+      <ViewTransition name="kapitel-kopf">
+        <Kapitelkopf
+          name={mitglied.anzeigename}
+          avatarId={mitglied.avatarId}
+          schlagwort={texte.kapitel.schlagwort}
+          ton="gruen"
+          bild={
+            <Suspense fallback={null}>
+              <KopfBild id={id} />
+            </Suspense>
+          }
+          reiter={
+            <ProfilReiter
+              aktiv="profil"
+              texte={texte}
+              ungelesen={{ anzahl: ungelesen, text: mehrzahl(sprache, w.kopf.ungelesen, ungelesen) }}
+            />
+          }
+        />
+      </ViewTransition>
+      <Suspense fallback={<FeldSkelett spalten={10} hoehe="klein" />}>
+        <ViewTransition>
+          <Notizen id={id} />
+        </ViewTransition>
+      </Suspense>
+      <Suspense
+        fallback={
+          <>
+            <FeldSkelett spalten={6} hoehe="gross" />
+            <FeldSkelett spalten={4} hoehe="gross" />
+          </>
+        }
+      >
+        <ViewTransition>
+          <ReiheNetz id={id} />
+        </ViewTransition>
+      </Suspense>
+      <Suspense
+        fallback={
+          <>
+            <FeldSkelett spalten={6} />
+            <FeldSkelett spalten={4} />
+          </>
+        }
+      >
+        <ViewTransition>
+          <ReiheVorschlaege id={id} />
+        </ViewTransition>
+      </Suspense>
+      <Suspense fallback={<FeldSkelett spalten={10} />}>
+        <ViewTransition>
+          <ReiheAuswertung id={id} />
+        </ViewTransition>
+      </Suspense>
+      <Suspense fallback={<FeldSkelett spalten={10} hoehe="gross" />}>
+        <ViewTransition>
+          <ReiheRegister id={id} register={register} />
+        </ViewTransition>
+      </Suspense>
+    </KapitelRaster>
   );
-  const [empfehlungen, zeilen, ungelesen, liebling] = await Promise.all([
-    ladeEmpfehlungen(mitglied.mitgliedId).catch(oderNull<Awaited<ReturnType<typeof ladeEmpfehlungen>>>("ladeEmpfehlungen")),
-    ladeAuswertungsZeilen(mitglied.mitgliedId).catch(
-      oderNull<Awaited<ReturnType<typeof ladeAuswertungsZeilen>>>("ladeAuswertungsZeilen"),
-    ),
-    ungeleseneAnzahl(mitglied.mitgliedId).catch(() => 0),
-    ladeLieblingshersteller(mitglied.mitgliedId).catch(
-      oderUndefined<Awaited<ReturnType<typeof ladeLieblingshersteller>>>("ladeLieblingshersteller"),
-    ),
-  ]);
+}
+
+/** Freisteller im Kopf: deine bestbewertete Sorte, ohne Bewertung ein festes Musterbild. */
+async function KopfBild({ id }: { id: string }) {
+  const zeilen = await zeilenLaden(id);
+  const beste = zeilen?.length ? zeilen.reduce((a, b) => (noteOderErsatz(b) > noteOderErsatz(a) ? b : a)) : null;
+  const bildId = beste ? ersatzBildId(beste.bildPfad, beste.slug) : musterBildId("profil");
+  return <Bild id={bildId} sizes="(min-width: 1080px) 35vw, 0px" dekorativ />;
+}
+
+async function Notizen({ id }: { id: string }) {
+  const [{ w, sprache }, zeilen] = await Promise.all([textLaden(), zeilenLaden(id)]);
+  if (zeilen === null) return null;
+  const a = auswertungen(zeilen);
+  const hersteller = new Set(zeilen.map((z) => z.hersteller).filter(Boolean)).size;
+  return (
+    <Randnotizen
+      beschriftung={w.profil.kapitel.notizenLeiste}
+      notizen={profilNotizen({ zeilen, differenz: a.community.differenz, hersteller }, w.profil.kapitel, sprache)}
+    />
+  );
+}
+
+/** Reihe 1: Netz (6) und Terpene (4). */
+async function ReiheNetz({ id }: { id: string }) {
+  const [{ w, sprache }, profil, zeilen] = await Promise.all([textLaden(), profilLaden(id), zeilenLaden(id)]);
+  const texte = w.profil;
   const werte = profil?.werte ?? leereProfilWerte();
   // Stufe 3: Kontur und Änderungszeile aus den letzten zwei Schritten des Verlaufs.
   const verlauf = profil?.verlauf ?? [];
@@ -85,165 +193,148 @@ export default async function ProfilPage() {
         ? t(texte.aenderung, { datum, liste: aenderungsListe(liste, w.label.geschmack, texte) })
         : t(texte.aenderungGleich, { datum });
   }
-  const a = zeilen ? auswertungen(zeilen) : null;
   // Kein gespeicherter Stand, obwohl es Bewertungen gibt oder sich das nicht
   // prüfen lässt: dann nie die Leerskizze „Erste Bewertung abgeben“ zeigen.
   const netzFehlt = profil === null && (zeilen === null || zeilen.length > 0);
-  const anzahl = zeilen?.length ?? profil?.werte.anzahl ?? null;
-
   return (
-    <div className="mx-auto w-full max-w-180 px-4 py-16 sm:px-8">
-      <div className="flex items-center gap-4">
-        <Avatar name={mitglied.anzeigename} bildId={mitglied.avatarId} groesse="md" />
-        <div>
-          <h1 className="text-h1 text-text">{texte.titel}</h1>
-          <p className="mt-2 text-body text-text-muted wrap-break-word">
-            {mitglied.anzeigename}
-            {anzahl !== null ? (
-              <>
-                <span aria-hidden="true"> · </span>
-                <span className="numeric">{mehrzahl(sprache, texte.anzahl, anzahl)}</span>
-              </>
-            ) : null}
-          </p>
-        </div>
-      </div>
-      <ProfilReiter
-        aktiv="profil"
-        texte={texte}
-        ungelesen={{ anzahl: ungelesen, text: mehrzahl(sprache, w.kopf.ungelesen, ungelesen) }}
-      />
+    <>
+      <Feld id="netz" spalten={6} titel={texte.netzTitel} satz={!netzFehlt && werte.anzahl > 0 ? texte.netzSatz : undefined}>
+        {netzFehlt ? (
+          <p className="max-w-[68ch] text-body text-text">{texte.fehler}</p>
+        ) : (
+          <div data-netz-erscheinen="" className="mx-auto w-full max-w-160">
+            <ProfilNetz
+              werte={werte}
+              texte={texte}
+              achsen={w.label.geschmack}
+              sprache={sprache}
+              vorher={vorletzter?.geschmack ?? null}
+              aenderung={aenderung}
+            />
+          </div>
+        )}
+      </Feld>
+      <Feld id="terpene" spalten={4} titel={texte.terpeneTitel}>
+        {netzFehlt ? (
+          <p className="max-w-[68ch] text-body text-text">{texte.fehler}</p>
+        ) : (
+          <TerpenRangliste terpene={werte.terpene} texte={texte} sprache={sprache} />
+        )}
+      </Feld>
+    </>
+  );
+}
 
-      <section aria-labelledby="netz-titel" className="mt-8">
-        <Card>
-          <CardHeader>
-            <h2 id="netz-titel" className="text-h3 text-text">
-              {texte.netzTitel}
-            </h2>
-          </CardHeader>
-          <CardBody className="flex flex-col items-center gap-8">
-            {netzFehlt ? (
-              <p className="max-w-[68ch] self-start text-body text-text">{texte.fehler}</p>
-            ) : (
-              <>
-                {werte.anzahl > 0 ? (
-                  <p className="max-w-[68ch] self-start text-body text-text-muted text-pretty">{texte.netzSatz}</p>
-                ) : null}
-                <ProfilNetz
-                  werte={werte}
-                  texte={texte}
-                  achsen={w.label.geschmack}
-                  sprache={sprache}
-                  vorher={vorletzter?.geschmack ?? null}
-                  aenderung={aenderung}
-                />
-                <TerpenRangliste terpene={werte.terpene} texte={texte} sprache={sprache} />
-              </>
-            )}
-          </CardBody>
-        </Card>
-      </section>
+/** Reihe 2: bestätigte Vorschläge (6) und Verlauf (4). */
+async function ReiheVorschlaege({ id }: { id: string }) {
+  const { w, sprache } = await textLaden();
+  const texte = w.profil;
+  // Erst das Profil, dann die Vorschläge: ein veraltetes Profil schreibt sie neu.
+  const profil = await profilLaden(id);
+  const [empfehlungen, zeilen] = await Promise.all([
+    ladeEmpfehlungen(id).catch(oderNull<Awaited<ReturnType<typeof ladeEmpfehlungen>>>("ladeEmpfehlungen")),
+    zeilenLaden(id),
+  ]);
+  const netzFehlt = profil === null && (zeilen === null || zeilen.length > 0);
+  return (
+    <>
+      <Feld id="vorschlaege" spalten={6} titel={texte.vorschlaegeTitel}>
+        {empfehlungen === null ? (
+          <p className="max-w-[68ch] text-body text-text">{w.empfehlung.fehler}</p>
+        ) : empfehlungen.length === 0 ? (
+          <p className="max-w-[68ch] text-body text-text-muted">{w.empfehlung.leer}</p>
+        ) : (
+          <EmpfehlungsListe
+            schmal
+            className="w-full"
+            eintraege={empfehlungen.map((e) => ({
+              slug: e.slug,
+              handelsname: e.handelsname,
+              begruendung: begruendungText(e, w, sprache),
+              marke: e.bestaetigt ? undefined : texte.nichtBestaetigt,
+            }))}
+          />
+        )}
+        <p className="text-caption text-text-muted">
+          {texte.bestaetigtHinweis} {w.empfehlung.hinweis}
+        </p>
+      </Feld>
+      <Feld id="verlauf" spalten={4} titel={texte.verlaufTitel}>
+        {netzFehlt ? (
+          <p className="max-w-[68ch] text-body text-text">{texte.fehler}</p>
+        ) : (
+          <NetzVerlauf schritte={profil?.verlauf ?? []} texte={texte} achsen={w.label.geschmack} sprache={sprache} />
+        )}
+      </Feld>
+    </>
+  );
+}
 
-      <section aria-labelledby="vorschlaege-titel" className="mt-8">
-        <Card>
-          <CardHeader>
-            <h2 id="vorschlaege-titel" className="text-h3 text-text">
-              {texte.vorschlaegeTitel}
-            </h2>
-          </CardHeader>
-          <CardBody className="flex flex-col items-start gap-6">
-            {empfehlungen === null ? (
-              <p className="max-w-[68ch] text-body text-text">{w.empfehlung.fehler}</p>
-            ) : empfehlungen.length === 0 ? (
-              <p className="max-w-[68ch] text-body text-text-muted">{w.empfehlung.leer}</p>
-            ) : (
-              <EmpfehlungsListe
-                schmal
-                className="w-full"
-                eintraege={empfehlungen.map((e) => ({
-                  slug: e.slug,
-                  handelsname: e.handelsname,
-                  begruendung: begruendungText(e, w, sprache),
-                  marke: e.bestaetigt ? undefined : texte.nichtBestaetigt,
-                }))}
-              />
-            )}
-            <p className="text-caption text-text-muted">
-              {texte.bestaetigtHinweis} {w.empfehlung.hinweis}
-            </p>
-          </CardBody>
-        </Card>
-      </section>
-
-      {a === null ? (
-        <p className="mt-8 max-w-[68ch] text-body text-text">{texte.fehler}</p>
-      ) : a.schnitte ? (
+/**
+ * Reihen 3 bis 5: Aktivität (10); Notenverteilung (3), Top und Flop (4),
+ * Lieblingshersteller (3); Community (6), Schnitte (4). Ohne Bewertung nur
+ * die Aktivität mit ihrem Leersatz.
+ */
+async function ReiheAuswertung({ id }: { id: string }) {
+  const [{ w, sprache }, zeilen, liebling] = await Promise.all([
+    textLaden(),
+    zeilenLaden(id),
+    ladeLieblingshersteller(id).catch(oderUndefined<Awaited<ReturnType<typeof ladeLieblingshersteller>>>("ladeLieblingshersteller")),
+  ]);
+  const texte = w.profil;
+  if (zeilen === null) {
+    return (
+      <Feld id="auswertung" spalten={10} titel={texte.aktivitaetTitel}>
+        <p className="max-w-[68ch] text-body text-text">{texte.fehler}</p>
+      </Feld>
+    );
+  }
+  const a = auswertungen(zeilen);
+  return (
+    <>
+      <Feld id="aktivitaet" spalten={10} titel={texte.aktivitaetTitel} satz={texte.aktivitaetSatz}>
+        <Aktivitaet monate={monatsReihe(zeilen.map((z) => z.erstelltAm), new Date(), sprache)} texte={texte} />
+      </Feld>
+      {a.schnitte ? (
         <>
-          <section aria-labelledby="topflop-titel" className="mt-8">
-            <Card>
-              <CardHeader>
-                <h2 id="topflop-titel" className="text-h3 text-text">
-                  {texte.topFlopTitel}
-                </h2>
-              </CardHeader>
-              <CardBody>
-                <TopFlop top={a.top} flop={a.flop} texte={texte} sprache={sprache} />
-              </CardBody>
-            </Card>
-          </section>
-          <section aria-labelledby="hersteller-titel" className="mt-8">
-            <Card>
-              <CardHeader>
-                <h2 id="hersteller-titel" className="text-h3 text-text">
-                  {texte.herstellerTitel}
-                </h2>
-              </CardHeader>
-              <CardBody>
-                <Lieblingshersteller daten={liebling} texte={texte} sprache={sprache} />
-              </CardBody>
-            </Card>
-          </section>
-          <section aria-labelledby="community-titel" className="mt-8">
-            <Card>
-              <CardHeader>
-                <h2 id="community-titel" className="text-h3 text-text">
-                  {texte.communityTitel}
-                </h2>
-              </CardHeader>
-              <CardBody>
-                <CommunityVergleich daten={a.community} texte={texte} sprache={sprache} />
-              </CardBody>
-            </Card>
-          </section>
-          <section aria-labelledby="schnitte-titel" className="mt-8">
-            <Card>
-              <CardHeader>
-                <h2 id="schnitte-titel" className="text-h3 text-text">
-                  {texte.schnitteTitel}
-                </h2>
-              </CardHeader>
-              <CardBody>
-                <Schnitte daten={a.schnitte} texte={texte} noten={w.schema.noten} sprache={sprache} />
-              </CardBody>
-            </Card>
-          </section>
+          <Feld id="verteilung" spalten={3} titel={texte.verteilungTitel} satz={texte.verteilungSatz}>
+            <NotenVerteilung stufen={notenVerteilung(zeilen)} texte={texte} />
+          </Feld>
+          <Feld id="topflop" spalten={4} titel={texte.topFlopTitel}>
+            <TopFlop top={a.top} flop={a.flop} texte={texte} sprache={sprache} />
+          </Feld>
+          <Feld id="hersteller" spalten={3} titel={texte.herstellerTitel}>
+            <Lieblingshersteller daten={liebling} texte={texte} sprache={sprache} />
+          </Feld>
+          <Feld id="community" spalten={6} titel={texte.communityTitel}>
+            <CommunityVergleich daten={a.community} texte={texte} sprache={sprache} />
+          </Feld>
+          <Feld id="schnitte" spalten={4} titel={texte.schnitteTitel} satz={texte.schnitteSatz}>
+            <Schnitte daten={a.schnitte} texte={texte} noten={w.schema.noten} sprache={sprache} />
+          </Feld>
         </>
       ) : null}
+    </>
+  );
+}
 
-      {!netzFehlt ? (
-        <section aria-labelledby="verlauf-titel" className="mt-8">
-          <Card>
-            <CardHeader>
-              <h2 id="verlauf-titel" className="text-h3 text-text">
-                {texte.verlaufTitel}
-              </h2>
-            </CardHeader>
-            <CardBody>
-              <NetzVerlauf schritte={verlauf} texte={texte} achsen={w.label.geschmack} sprache={sprache} />
-            </CardBody>
-          </Card>
-        </section>
-      ) : null}
-    </div>
+/** Reihe 6: deine Bewertungen als Register mit Bildern (10). */
+async function ReiheRegister({ id, register }: { id: string; register: ReturnType<typeof registerParameter> }) {
+  const [{ w, sprache }, zeilen] = await Promise.all([textLaden(), zeilenLaden(id)]);
+  const texte = w.profil;
+  return (
+    <Feld id="bewertungen" spalten={10} titel={texte.registerTitel} satz={texte.registerSatz}>
+      {zeilen === null ? (
+        <p className="max-w-[68ch] text-body text-text">{texte.fehler}</p>
+      ) : (
+        <BewertungsRegister
+          ansicht={registerAnsicht(zeilen, register)}
+          sortierung={register.sortierung}
+          alle={register.alle}
+          texte={texte}
+          sprache={sprache}
+        />
+      )}
+    </Feld>
   );
 }

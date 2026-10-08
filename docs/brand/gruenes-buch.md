@@ -11,7 +11,8 @@ Das Buch ist meine Stimme: gedruckt, systematisch, belegbar, an Chargen gebunden
 Katalogdaten, Handelsnamen, Rechtshinweise und Bedienung sind immer gedruckt. Von Hand geschrieben wird,
 was mitgeschrieben wird: die Community (Stimmen, Vorschläge, Zähler, „Wähl mit.“, „Ihr schlagt vor.“) und
 der Titel auf dem Umschlag, das Logo. Das Buch führt deutlich: Handschrift steht nur in kurzen Zeilen,
-höchstens etwa sechs Wörter, nie als Absatz.
+höchstens etwa sechs Wörter, nie als Absatz. Im eigenen Kapitel (Profil und Konto) schreibt das Mitglied
+mit: seine Zahlen stehen dort als Randnotizen, Zahl gedruckt, Wort von Hand.
 
 Die Form der Handschrift ist die **Randnotiz**: auf breiten Ansichten in einer Randspalte neben dem
 gedruckten Text, auf dem Handy direkt zwischen den Absätzen. Motive liegen auf der Seite wie
@@ -157,7 +158,7 @@ Schriftgrade je Sektion.
 Pillen für Buttons, Chips, Badges, Filter-Einstiege. Alles andere eckig wie Buchseiten (Flächen,
 Karten, Tafeln, Eingabefelder, Tabellen). Ein einziger Bogen: der Rahmen um das Netzdiagramm im
 neuesten Eintrag. 8-px-Raster wie bisher. Schatten nur als Ebenen-Signal, Farbton 165; freigestellte
-Motive tragen ihren Kontaktschatten aus der Pipeline. Feldbuch-Raster hinter der Startseite: Spalten in
+Motive tragen ihren Kontaktschatten aus der Pipeline. Feldbuch-Raster hinter der Startseite und hinter deinem Kapitel (Profil, Konto): Spalten in
 `border`, 10 ab 1080 px, 4 darunter.
 
 ## 6. Bildsprache

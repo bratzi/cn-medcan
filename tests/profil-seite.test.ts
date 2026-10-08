@@ -19,12 +19,30 @@ test("/profil: nur angemeldet, nicht im Index, rechnet nur bei veraltetem Stand"
   assert.match(query, /await profilFortschreiben\(/);
 });
 
-test("/profil: Reihenfolge Netz, Vorschläge, Top/Flop, Lieblingshersteller, Community, Schnitte, Verlauf; kein Apothekenlink", () => {
+test("/profil: Kapitel-Reihenfolge, Raster, kein Apothekenlink", () => {
   const q = seite();
-  const reihe = ["<ProfilNetz", "<EmpfehlungsListe", "<TopFlop", "<Lieblingshersteller", "<CommunityVergleich", "<Schnitte", "<NetzVerlauf"].map((s) => q.indexOf(s));
-  assert.ok(reihe.every((i) => i > 0));
+  const reihe = [
+    "<Kapitelkopf",
+    "<Randnotizen",
+    "<ProfilNetz",
+    "<TerpenRangliste",
+    "<EmpfehlungsListe",
+    "<NetzVerlauf",
+    "<Aktivitaet",
+    "<NotenVerteilung",
+    "<TopFlop",
+    "<Lieblingshersteller",
+    "<CommunityVergleich",
+    "<Schnitte",
+    "<BewertungsRegister",
+  ].map((s) => q.indexOf(s));
+  assert.ok(reihe.every((i) => i > 0), JSON.stringify(reihe));
   assert.deepEqual([...reihe].sort((a, b) => a - b), reihe);
+  assert.match(q, /<KapitelRaster/);
+  assert.match(q, /<ViewTransition/);
+  assert.match(q, /<Suspense/);
   assert.doesNotMatch(q, /apotheke/i);
+  assert.doesNotMatch(q, /max-w-180/);
   assert.match(q, /<ProfilReiter\s+aktiv="profil"/);
 });
 
@@ -36,10 +54,25 @@ test("/profil: Kontur aus dem vorletzten Verlaufsschritt, nie auf dem öffentlic
   assert.doesNotMatch(oeffentlich, /vorher=|NetzVerlauf|Lieblingshersteller/);
 });
 
-test("/mitglied: Überschrift ist der Reiter Konto, nicht Mein Profil", () => {
+test("/mitglied: Titel ist der Reiter Konto, h1 ist der Name im Kapitelkopf", () => {
   const q = readFileSync("app/[lang]/mitglied/page.tsx", "utf8");
-  assert.match(q, /<h1[^>]*>\{w\.profil\.reiterKonto\}<\/h1>/);
+  assert.match(q, /title: \(await holeWoerterbuch\(\)\)\.profil\.reiterKonto/);
+  assert.match(q, /name=\{mitglied\.anzeigename\}/);
   assert.doesNotMatch(q, /kopf\.navigation\.konto/);
+});
+
+test("/mitglied: Kapitel mit Umfrage, Stimmen, Nachrichten, dann Einstellungen; ein Primärknopf", () => {
+  const q = readFileSync("app/[lang]/mitglied/page.tsx", "utf8");
+  const koerper = q.slice(q.indexOf("export default async function MitgliedPage"), q.indexOf("async function KopfBild"));
+  const reihe = ["<Kapitelkopf", "<Notizen", "<ReiheUmfrage", "<ReiheStimmen", "<ReiheNachrichten", "<AvatarFormular", "<ProfilFormular", "<ProfilSichtbarkeit"].map((s) =>
+    koerper.indexOf(s),
+  );
+  assert.ok(reihe.every((i) => i > 0), JSON.stringify(reihe));
+  assert.deepEqual([...reihe].sort((a, b) => a - b), reihe);
+  for (const s of ["<Randnotizen", "<UmfrageJetzt", "<MeineStimmen", "<GelesenMarkieren"]) assert.ok(q.includes(s), s);
+  assert.doesNotMatch(q, /buttonKlassen\("primary"\)/, "die Primäraktion steht nur in UmfrageJetzt");
+  assert.doesNotMatch(q, /max-w-180/);
+  assert.match(q, /<KapitelRaster/);
 });
 
 test("ProfilReiter: ungelesene Benachrichtigungen am Reiter Konto, ohne keine Marke", () => {

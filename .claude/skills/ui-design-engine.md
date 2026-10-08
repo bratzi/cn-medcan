@@ -16,7 +16,9 @@ die Design-Skills geladen (Zuordnung in der Memory `design-skills-einsatz`).
   Katalogdaten, Handelsnamen, Rechtshinweise und Bedienung sind immer gedruckt.
 - **Von Hand** (Community): seit 2026-10-07 (Nutzer) die Pinselschrift Mr Dafoe (`font-hand`) passend zum Logo, in `accent` wie das Logo; einzelne Wörter in `kopierstift` wie das „of“. Nur, wo die Community
   spricht (Stimmen, Vorschläge, Zähler, „Wähl mit.“, Vermerke am Stimmzettel, Überschriften auf
-  `/umfragen`), und in der Wortmarke. Kurze Zeilen, höchstens etwa sechs Wörter, nie Absätze.
+  `/umfragen`), und in der Wortmarke. Seit 2026-10-08 (Nutzer, Spec Profil und Konto 11) auch die
+  Randnotizen im Kapitelkopf von `/profil` und `/mitglied` und der Vermerk „deine Wahl“ am Stimmzettel
+  im Konto: das Mitglied ist Community. Kurze Zeilen, höchstens etwa sechs Wörter, nie Absätze.
 - Form der Handschrift ist die Randnotiz: ab `lg` in einer Randspalte neben dem gedruckten Text,
   darunter direkt zwischen den Absätzen.
 - Handschriftliche Zeichen nur aus Glyphen der Schrift; keine gezeichneten Unterstreichungen, Kringel
@@ -30,6 +32,8 @@ die Design-Skills geladen (Zuordnung in der Memory `design-skills-einsatz`).
 - **Erlaubt:** art-direktierte Größen und Positionen in `components/story/` und `components/marke/`
   in `vw`, `vh`, `%` oder Brüchen (`w-[42vw]`, `left-[44vw]`), weil sie Komposition sind, kein Abstand
   zwischen Inhalten. `max-w-[68ch]` und ähnliche Lesemaße bleiben erlaubt.
+- Feldbuch-Raster und Schlagwort stehen seit 2026-10-08 (Nutzer) auch hinter `/profil` und `/mitglied`
+  (`components/kapitel/`): Felder liegen randlos auf 4 bzw. ab 1080 px 10 Rasterspalten, Spaltenabstand 0.
 
 ## 3. Typografie
 | Rolle | Klasse | Einsatz |
@@ -115,6 +119,9 @@ Komponenten nutzen nur semantische Tokens:
 - Neu erlaubt: CSS scroll-gekoppelte Tiefenebenen (`animation-timeline: view()`, nur `transform`, nur
   unter `@supports` und `prefers-reduced-motion: no-preference`), der WebGL-Effekt „Kopierstift läuft“
   nur in `components/story/bewegung/tinte.ts`, Seitenwechsel per `<ViewTransition>`.
+- Profil und Konto (dein Kapitel, seit 2026-10-08) bewegen sich nur per CSS: `.kapitel-name`,
+  `.kapitel-notiz-wort`, `.kapitel-tiefe`, `[data-feld]`, `[data-saeule]`, `[data-balken]`,
+  `[data-netz-erscheinen]` in `globals.css`; der Reiterwechsel per `<ViewTransition name="kapitel-kopf">`.
 - Three.js nur in `components/story/bewegung/blaetter.ts`, dynamisch importiert, nur Desktop, nie bei reduzierter Bewegung.
 - Reduzierte Bewegung: GSAP, Lenis und `tinte.ts` werden nicht geladen, Endzustände stehen sofort da.
 - Der statische erste Frame ist ohne JavaScript vollständig. Ausgeblendet wird vor dem Start nur
