@@ -5,6 +5,7 @@ import { Logo } from "@/components/marke/Logo";
 import { KontoZaehler } from "@/components/layout/KontoZaehler";
 import { KopfMenue } from "@/components/layout/KopfMenue";
 import { KopfZustand } from "@/components/layout/KopfZustand";
+import { SchalterLeiste } from "@/components/layout/SchalterLeiste";
 import type { Sprache } from "@/lib/i18n/sprache-kern";
 import type { Woerterbuch } from "@/lib/i18n/typen";
 import { HAUPTNAVIGATION, KONTO_LINK } from "@/lib/navigation";
@@ -104,6 +105,8 @@ export function Kopf({ sprache, w }: Props) {
               </li>
             </ul>
           </nav>
+          {/* Unter lg stehen die Schalter hier statt am rechten Rand (Nutzer 2026-10-08). */}
+          <SchalterLeiste sprache={sprache} w={w} imMenue />
         </KopfMenue>
       </div>
       <KopfZustand />

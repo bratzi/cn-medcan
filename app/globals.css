@@ -1188,6 +1188,21 @@ html.joint-cursor :is(input:not([type="range"]):not([type="radio"]):not([type="c
   opacity: 1;
 }
 
+/* Im Aufklappmenü unter lg: eine Reihe unter der Navigation, voll deckend. */
+.schalter-reihe {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 2rem;
+}
+
+/* Am Rand erst ab lg: schmaler lag die Leiste über Terpenband und Text (Nutzer
+   2026-10-08), dort steht sie im Menü. Ohne Layer wie .kopf-menue, darum hier. */
+@media (width < 64rem) {
+  .schalter-leiste {
+    display: none;
+  }
+}
+
 @media (hover: none) {
   .schalter-leiste {
     opacity: 0.8;

@@ -67,3 +67,10 @@ test("Schalter sitzt in der Leiste unten rechts, nicht mehr im Kopf (Nutzer 2026
   assert.match(lies("components/layout/SchalterLeiste.tsx"), /<ThemaSchalter texte=\{w\.kopf\.thema\} \/>/);
   assert.match(lies("app/[lang]/layout.tsx"), /<SchalterLeiste sprache=\{sprache\} w=\{w\} \/>/);
 });
+
+test("Unter lg stehen die Schalter im Aufklappmenü, die Randleiste erst ab lg (Nutzer 2026-10-08)", () => {
+  assert.match(lies("components/layout/Kopf.tsx"), /<SchalterLeiste sprache=\{sprache\} w=\{w\} imMenue \/>\s*<\/KopfMenue>/);
+  const css = lies("app/globals.css");
+  assert.match(css, /@media \(width < 64rem\) \{\s*\.schalter-leiste \{\s*display: none;/);
+  assert.match(css, /\.schalter-reihe \{\s*display: flex;/);
+});
