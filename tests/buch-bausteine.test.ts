@@ -24,7 +24,9 @@ test("Blatturteil: fünf große Blätter, die Zahl in der Buchschrift, der Wert 
   assert.equal(html.match(/<svg aria-hidden="true" viewBox="0 0 24 24"/g)?.length, 5);
   // Drei volle Blätter zu je zwei Hälften plus die linke Hälfte des halben.
   assert.equal(html.match(/fill-accent opacity-100/g)?.length, 7);
-  assert.match(html, /<span aria-hidden="true" class="numeric text-kapitel text-text">3,5<\/span>/);
+  // Seit 2026-10-09 (Nutzer): zentriert im Fokus, die Note in der Akzentschrift.
+  assert.match(html, /^<div class="flex flex-col items-center gap-2 text-center">/);
+  assert.match(html, /<span aria-hidden="true" class="font-hand text-notiz text-logo">3,5<\/span>/);
   assert.match(html, /<span aria-hidden="true" class="text-small text-text-muted">von 5 Blättern<\/span>/);
   assert.match(html, /<span class="sr-only">3,5 von 5 Blättern<\/span>/);
 });

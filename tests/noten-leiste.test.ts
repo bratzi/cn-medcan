@@ -17,3 +17,9 @@ test("NotenLeiste: Auszug ohne Wirkung (Regel 9), voller Eintrag mit", () => {
   assert.doesNotMatch(zeige(true), new RegExp(`<dt[^>]*>${label}</dt>`));
   assert.equal((zeige(true).match(/<dt/g) ?? []).length, 4);
 });
+
+test("NotenLeiste: Zellen zentriert unter dem Urteil (Nutzer 2026-10-09)", () => {
+  const html = zeige(false);
+  assert.match(html, /<div class="flex min-w-0 flex-col items-center gap-1 text-center">/);
+  assert.match(html, /<dd class="flex flex-col items-center gap-2">/);
+});

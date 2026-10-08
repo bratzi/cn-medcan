@@ -31,9 +31,9 @@ export function NotenLeiste({
         const zahl = formatiereZahl(wert, 1, sprache);
         return (
           // gap-1 = 4px: Bezeichnung und Wert sind ein Paar.
-          <div key={achse.key} className="flex min-w-0 flex-col gap-1">
+          <div key={achse.key} className="flex min-w-0 flex-col items-center gap-1 text-center">
             <dt className="text-small text-text-muted">{w.schema.noten[achse.key].label}</dt>
-            <dd className="flex flex-col gap-2">
+            <dd className="flex flex-col items-center gap-2">
               <span data-eintritt="auf" style={ablauf(5 + index)} className="numeric text-h2 text-text">
                 <span aria-hidden="true">{zahl}</span>
                 <span aria-hidden="true" className="text-small text-text-muted">
@@ -41,7 +41,8 @@ export function NotenLeiste({
                 </span>
                 <span className="sr-only">{`${zahl} ${w.bluete.vonFuenf}`}</span>
               </span>
-              <span aria-hidden="true" className="block border-b border-border">
+              {/* w-full: in der zentrierten Zelle schrumpfte die Haarlinie sonst auf 0 px. */}
+              <span aria-hidden="true" className="block w-full border-b border-border">
                 <span
                   data-eintritt="strich"
                   style={{ ...ablauf(5 + index), transform: `scaleX(${anteil})` }}
