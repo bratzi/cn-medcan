@@ -74,12 +74,13 @@ const ohneTags = (html: string) => html.replace(/<[^>]+>/g, "");
 test("Logo: Pinselschrift aus zwei Masken, Farben aus Tokens, ein Bild mit Namen (Nutzer 2026-10-07)", () => {
   const html = renderToStaticMarkup(createElement(Logo, { className: "w-18" }));
   assert.match(html, /^<span role="img" aria-label="Book of Terpz" class="marke-pinsel w-18"><\/span>$/);
-  // Schrift in accent, "of" in kopierstift; Formen als Masken, nie Primitives oder Hex.
+  // Schrift im Logo-Ton, "of" in kopierstift; Formen als Masken, nie Primitives oder Hex.
+  // Das Logo ist Grafik (3:1), die Handschrift bleibt auf accent (4.5, Haarstriche).
   // Die Regel je Pseudo-Element, die die Form (Maske) setzt.
   const regel = (sel: string) =>
     [...css.matchAll(new RegExp(String.raw`\.marke-pinsel::${sel}\s*\{[^}]*\}`, "g"))].find((t) => t[0].includes("--marke-maske: url"))?.[0] ?? "";
   assert.match(regel("before"), /marke\/pinsel\.webp/);
-  assert.match(regel("before"), /linear-gradient\(var\(--color-accent\), var\(--color-accent\)\)/);
+  assert.match(regel("before"), /linear-gradient\(var\(--color-logo\), var\(--color-logo\)\)/);
   assert.match(regel("after"), /marke\/pinsel-of\.webp/);
   assert.match(regel("after"), /linear-gradient\(var\(--color-kopierstift\), var\(--color-kopierstift\)\)/);
   for (const datei of ["public/marke/pinsel.webp", "public/marke/pinsel-of.webp"]) assert.ok(statSync(datei).size > 0, datei);

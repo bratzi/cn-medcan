@@ -57,6 +57,8 @@ const ROLLEN = {
   kopierstift: ["violett-500", "violett-400"],
   "kopierstift-fg": ["neutral-0", "neutral-1000"],
   "focus-ring": ["blatt-600", "blatt-400"],
+  // Das Logo ist Grafik, kein Text: 3:1 genuegt (WCAG 1.4.11), deshalb heller als accent.
+  logo: ["blatt-500", "blatt-400"],
   danger: ["danger-500", "danger-400"],
   success: ["success-500", "success-400"],
   warning: ["warning-500", "warning-400"],
@@ -76,6 +78,9 @@ const PAARE = [
   ["accent", "surface-raised", 4.5],
   ["accent-fg", "accent", 4.5],
   ["accent-fg", "accent-hover", 4.5],
+  // Das Logo steht im Kopf, im Auftakt und im Fuss, nie auf der eingesenkten Flaeche.
+  ["logo", "surface", 3],
+  ["logo", "surface-raised", 3],
   ["focus-ring", "surface", 3],
   ["border-strong", "surface", 3],
   ["border-strong", "surface-raised", 3],

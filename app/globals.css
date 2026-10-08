@@ -164,6 +164,11 @@
   --color-text-muted: var(--color-neutral-600);
   --color-accent: var(--color-blatt-600);
   --color-accent-hover: var(--color-blatt-700);
+  /* Logo und Handschrift sind immer mindestens 32 px, also grosse Schrift: 3:1 genuegt
+     (WCAG 1.4.3). Deshalb heller und minziger als der Bedien-Akzent, damit die Marke in
+     Hell und Dunkel gleich wirkt (Nutzer 2026-10-08). Gemessen 3.62 / 3.37 / 3.08 auf
+     den drei Papieren. */
+  --color-logo: var(--color-blatt-500);
   --color-accent-fg: var(--color-neutral-0);
   --color-accent-subtle: var(--color-blatt-100);
   --color-kopierstift: var(--color-violett-500);
@@ -219,6 +224,7 @@
     --color-accent-hover: var(--color-blatt-500);
     --color-accent-fg: var(--color-neutral-1000);
     --color-accent-subtle: var(--color-blatt-900);
+    --color-logo: var(--color-blatt-400);
     --color-kopierstift: var(--color-violett-400);
     --color-kopierstift-fg: var(--color-neutral-1000);
     --color-focus-ring: var(--color-blatt-400);
@@ -251,6 +257,7 @@
   --color-accent-hover: var(--color-blatt-500);
   --color-accent-fg: var(--color-neutral-1000);
   --color-accent-subtle: var(--color-blatt-900);
+  --color-logo: var(--color-blatt-400);
   --color-kopierstift: var(--color-violett-400);
   --color-kopierstift-fg: var(--color-neutral-1000);
   --color-focus-ring: var(--color-blatt-400);
@@ -375,14 +382,24 @@
     opacity: 0;
   }
 
-  /* Feldbuch-Raster hinter der Startseite (Spec 4.7). */
-  .feldbuch-raster {
+  /* Feldbuch-Raster hinter der Startseite (Spec 4.7). Die Sektionen nach der ersten
+     Buchseite tragen es mit: der gepinnte Auftakt bleibt im Hintergrund stehen und
+     schien sonst samt seiner Zeitungsleiste als Strich zwischen den Sektionen durch
+     (Nutzer 2026-10-08). Mit eigenem Grund decken sie ihn ab, die senkrechten Linien
+     laufen weiter durch. */
+  .feldbuch-raster,
+  [data-story="transparent"] ~ section {
     background-image: linear-gradient(to right, var(--color-border) 1px, transparent 1px);
     background-size: calc(100% / 4) 100%;
   }
 
+  [data-story="transparent"] ~ section {
+    background-color: var(--color-surface);
+  }
+
   @media (min-width: 1080px) {
-    .feldbuch-raster {
+    .feldbuch-raster,
+    [data-story="transparent"] ~ section {
       background-size: calc(100% / 10) 100%;
     }
   }
@@ -511,6 +528,7 @@
   --color-accent: var(--color-blatt-400);
   --color-accent-hover: var(--color-blatt-500);
   --color-accent-fg: var(--color-neutral-1000);
+  --color-logo: var(--color-blatt-400);
   --color-kopierstift: var(--color-violett-400);
   --color-focus-ring: var(--color-blatt-400);
   color: var(--color-text);
@@ -521,8 +539,13 @@
    einer Überschrift. Beide Enden tragen >= 4.5 auf surface, der Verlauf also
    auch. Ohne background-clip-Unterstützung bleibt die Farbe accent. */
 .farbverlauf {
-  /* Seit 2026-10-07 (Nutzer) einfarbig wie das Logo: Blattgrün, kein Verlauf mehr. */
+  /* Seit 2026-10-07 (Nutzer) einfarbig wie das Logo.
+     Mr Dafoe hat nur einen Schnitt; die Kontur in der Papierfarbe nimmt von aussen an
+     jedem Strich ab und laesst die Woerter duenner wirken, ohne sie zu verkleinern
+     (Nutzer 2026-10-08). paint-order zeichnet erst die Fuellung, dann die Kontur. */
   color: var(--color-accent);
+  -webkit-text-stroke: 0.02em var(--color-surface);
+  paint-order: fill stroke;
 }
 
 /* Sweet Spot in der Mitte (Bewertung v2, T4): Qualität der Charge. Wie die
@@ -543,6 +566,9 @@
 .hand-betont {
   font-family: var(--font-hand);
   font-size-adjust: 0.25;
+  /* Wie .farbverlauf: duenner wirkende Striche ohne kleinere Schrift. */
+  -webkit-text-stroke: 0.02em var(--color-surface);
+  paint-order: fill stroke;
   font-style: normal;
   font-weight: 400;
   font-size: 1.35em;
@@ -887,7 +913,7 @@ html.joint-cursor :is(input:not([type="range"]):not([type="radio"]):not([type="c
       transparent 35%,
       color-mix(in oklab, white 75%, transparent) 50%,
       transparent 65%
-    ), linear-gradient(var(--color-accent), var(--color-accent));
+    ), linear-gradient(var(--color-logo), var(--color-logo));
 }
 
 .marke-pinsel::after {
