@@ -106,3 +106,12 @@ test("Feinschliff: Abstände im 8px-Raster, Verlauf trägt die Schrift", () => {
   }
   assert.match(quelle, /from-surface\/40 via-surface\/30 to-surface/);
 });
+
+test("Telefon: Zahlen und Wörter passen in drei Spalten (Review I1)", () => {
+  const quelle = lies("components/story/AuftaktZahlen.tsx");
+  // Mono bei 39 px ist für "1.284" breiter als eine Spalte bei 390 px: darunter eine Stufe kleiner.
+  assert.match(quelle, /numeric text-h1 sm:text-display/);
+  // Gesperrte Versalien sprengen die Spalte: auf Telefonen ohne Sperrung, mit Trennung.
+  assert.match(quelle, /tracking-normal sm:tracking-gesperrt/);
+  assert.match(quelle, /hyphens-auto/);
+});
