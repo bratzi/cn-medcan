@@ -14,25 +14,31 @@ export function Aktivitaet({ monate, texte }: { monate: readonly Monat[]; texte:
   if (hoechstens === 0) return <p className="max-w-[68ch] text-body text-text-muted">{texte.aktivitaetLeer}</p>;
   return (
     <div>
-      <div aria-hidden="true" className="flex h-48 items-end gap-2 border-b border-border-strong">
+      <div aria-hidden="true" className="flex gap-2 border-b border-border-strong pt-6">
         {monate.map((m) => (
-          <div key={m.schluessel} className="flex h-full min-w-0 flex-1 flex-col items-center justify-end gap-2">
-            {m.anzahl > 0 ? <span className="numeric text-caption text-text">{m.anzahl}</span> : null}
+          <div key={m.schluessel} className="relative h-48 min-w-0 flex-1">
             <div
               data-saeule=""
               style={{ height: `${(m.anzahl / hoechstens) * 100}%` }}
               className={cn(
-                "w-full transition-colors duration-fast ease-standard hover:bg-text",
+                "absolute inset-x-0 bottom-0 transition-colors duration-fast ease-standard hover:bg-text",
                 m.laufend ? "bg-text" : "bg-text-muted/40",
               )}
-            />
+            >
+              {m.anzahl > 0 ? (
+                <span data-wert="" className="numeric absolute inset-x-0 bottom-full mb-2 text-center text-caption text-text">
+                  {m.anzahl}
+                </span>
+              ) : null}
+            </div>
           </div>
         ))}
       </div>
       <div aria-hidden="true" className="mt-2 flex gap-2">
         {monate.map((m) => (
-          <span key={m.schluessel} className={cn("min-w-0 flex-1 truncate text-center text-caption", m.laufend ? "text-text" : "text-text-muted")}>
-            {m.kurz}
+          <span key={m.schluessel} className={cn("min-w-0 flex-1 text-center text-caption", m.laufend ? "text-text" : "text-text-muted")}>
+            <span className="sm:hidden">{m.kurz.slice(0, 1)}</span>
+            <span className="hidden sm:inline">{m.kurz}</span>
           </span>
         ))}
       </div>
@@ -47,7 +53,7 @@ export function Aktivitaet({ monate, texte }: { monate: readonly Monat[]; texte:
         <tbody>
           {monate.map((m) => (
             <tr key={m.schluessel}>
-              <th scope="row">{m.schluessel}</th>
+              <th scope="row">{`${m.kurz} ${m.schluessel.slice(0, 4)}`}</th>
               <td>{m.anzahl}</td>
             </tr>
           ))}

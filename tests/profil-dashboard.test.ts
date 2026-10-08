@@ -67,6 +67,14 @@ test("profilNotizen: fünf Notizen; ohne Community-Abstand entfällt sie", () =>
   assert.equal(ohne.length, 4);
 });
 
+test("profilNotizen: Vorzeichen am gerundeten Wert, nie ±0,0", () => {
+  const zeilen = [z(4, "2026-10-02T10:00:00Z")];
+  for (const d of [-0.04, 0.04, 0]) {
+    assert.equal(profilNotizen({ zeilen, differenz: d, hersteller: 1 }, de.profil.kapitel, "de")[2].zahl, "0,0");
+  }
+  assert.equal(profilNotizen({ zeilen, differenz: 0.4, hersteller: 1 }, de.profil.kapitel, "de")[2].zahl, "+0,4");
+});
+
 test("profilNotizen: ohne Bewertung nur „0 bewertet“", () => {
   const n = profilNotizen({ zeilen: [], differenz: null, hersteller: 0 }, de.profil.kapitel, "de");
   assert.deepEqual(n.map((x) => [x.zahl, x.wort]), [["0", "bewertet"]]);
@@ -77,6 +85,8 @@ test("Aktivitaet: Säulen mit data-saeule, Wert nur ab 1, Tabelle für Screenrea
   const h = renderToStaticMarkup(createElement(Aktivitaet, { monate, texte: de.profil }));
   assert.equal((h.match(/data-saeule/g) ?? []).length, 12);
   assert.match(h, /<table class="sr-only"/);
+  assert.equal((h.match(/data-wert/g) ?? []).length, 1, "nur der Monat mit 1 trägt eine Wertzahl, keine 0");
+  assert.match(h, /Okt 2026/);
   assert.doesNotMatch(h, /accent/);
   const leer = renderToStaticMarkup(createElement(Aktivitaet, { monate: monatsReihe([], new Date(), "de"), texte: de.profil }));
   assert.match(leer, /noch keine Bewertung/);

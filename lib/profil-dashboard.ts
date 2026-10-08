@@ -64,8 +64,10 @@ export function profilNotizen(
   const schnitt = formatiereZahl(zeilen.reduce((s, z) => s + noteOderErsatz(z), 0) / zeilen.length, 1, sprache);
   notizen.push({ zahl: schnitt, wort: texte.schnitt, satz: t(texte.srSchnitt, { zahl: schnitt }) });
   if (differenz !== null) {
-    const betrag = formatiereZahl(Math.abs(differenz), 1, sprache);
-    const zahl = differenz > 0 ? `+${betrag}` : differenz < 0 ? `−${betrag}` : betrag;
+    // Vorzeichen am gerundeten Wert, damit nie „±0,0“ entsteht.
+    const gerundet = Math.round(Math.abs(differenz) * 10) / 10;
+    const betrag = formatiereZahl(gerundet, 1, sprache);
+    const zahl = gerundet === 0 ? betrag : differenz > 0 ? `+${betrag}` : `−${betrag}`;
     notizen.push({ zahl, wort: texte.community, satz: t(texte.srCommunity, { zahl }) });
   }
   notizen.push({ zahl: String(hersteller), wort: texte.hersteller, satz: t(texte.srHersteller, { zahl: hersteller }) });
