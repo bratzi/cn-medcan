@@ -59,8 +59,9 @@ nativ ausgeführt, danach ein frischer Reviewer (Opus) über alles.
 - **Live geprüft** (`c146964`, Chrome im Vordergrund): 1041 px hell: Leiste zwischen Intro und Knopf,
   Hochzählen gesehen (657 → 709), Werte 709 / 25 / 4. 390 px per Iframe gemessen: drei Spalten à 104 px,
   kein Überlauf, aber „BEWERTUN-GEN“ getrennt und die mittlere Zahl stand höher. Beides in `daeafbc`
-  behoben (`justify-end`, mobil `px-4`, gemessen Wort 109 px, Spalte dann 114 px). **`daeafbc` live nicht
-  mehr angesehen.** Dunkel: Bühne gesehen, Leiste lag unter dem gepinnten Rand (Fenster 762 px hoch).
+  behoben (`justify-end`, mobil `px-4`). Live auf `65bc771` nachgesehen: Zahlen stehen auf einer Linie.
+  Im Iframe trennt „BEWERTUN-GEN“ weiter, weil dort eine 15-px-Bildlaufleiste die Spalte auf 109 px drückt
+  (Wort 109 px); Telefone mit überlagerter Leiste haben 114 px. Auf echtem Telefon ansehen. Dunkel: Bühne gesehen, Leiste lag unter dem gepinnten Rand (Fenster 762 px hoch).
   **Nicht geprüft:** englisch live (Sprachcookie ist HttpOnly, Schalter per Skript nicht gefunden; Tests
   decken Wörter und `1,284` ab), reduzierte Bewegung, JavaScript aus, Kontrast der Oberzeile in Zahlen
   (Canvas-Messung lieferte 0; auf dem hellen Film sichtbar gut lesbar).
