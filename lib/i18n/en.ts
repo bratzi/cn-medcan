@@ -672,6 +672,7 @@ export const en: Woerterbuch = {
       sorten: { one: "In one of our strains", other: "In {anzahl} of our strains" },
       keineSorte: "Not in any of our strains yet",
       sortenKurz: { one: "{anzahl} strain", other: "{anzahl} strains" },
+      karteHinweis: "Click to open its entry",
       stoffe: {
         myrcen: { duft: "Earthy and musky, with a hint of ripe mango.", vorkommen: "Mango, hops, thyme, lemongrass" },
         limonen: { duft: "Fresh and zesty, like citrus peel.", vorkommen: "Lemon and orange peel, juniper, peppermint" },

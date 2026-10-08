@@ -681,6 +681,7 @@ export const de = {
       sorten: { one: "In einer unserer Sorten", other: "In {anzahl} unserer Sorten" },
       keineSorte: "Noch in keiner unserer Sorten",
       sortenKurz: { one: "{anzahl} Sorte", other: "{anzahl} Sorten" },
+      karteHinweis: "Klick öffnet die Tafel",
       stoffe: {
         myrcen: { duft: "Erdig und moschusartig, mit einem Hauch reifer Mango.", vorkommen: "Mango, Hopfen, Thymian, Zitronengras" },
         limonen: { duft: "Frisch und spritzig nach Zitrusschale.", vorkommen: "Zitronen- und Orangenschalen, Wacholder, Pfefferminze" },

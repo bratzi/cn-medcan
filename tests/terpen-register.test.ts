@@ -4,6 +4,7 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 
 import { baueTerpenRegister } from "@/lib/terpen-register";
+import { KARTE_ABSTAND, KARTE_BREITE, KARTE_RAND, kartenLage } from "@/lib/terpen-karte";
 
 const KATALOG = [
   { name: "Myrcen", geschmack: "ERDIG" as const, sorten: 12 },
@@ -94,9 +95,8 @@ test("Terpen-Band: Ruhezustand nur Icon und Name, Infos erscheinen beim Überfah
   assert.match(band, /font-buch[^"]*text-body|text-body[^"]*font-buch/);
   assert.doesNotMatch(band, /text-h2/);
   assert.match(band, /text-text-muted[^"]*group-hover\/eintrag:text-text/);
-  // Infos in Ruhe unsichtbar, beim Überfahren des Eintrags und bei Tastaturfokus sichtbar.
-  assert.match(band, /opacity-0[^"]*group-hover\/eintrag:opacity-100/);
-  assert.match(band, /group-focus-within\/eintrag:opacity-100/);
+  // Die Infos stehen nicht mehr im Eintrag, sondern in der Karte (Nutzer 2026-10-09).
+  assert.doesNotMatch(band, /terpen-band-info/);
   // Senkrecht zentrierter Aufbau, Marke 56 px mit 32-px-Icon (mobil 44 und 24 px).
   assert.match(band, /flex-col items-center/);
   assert.match(band, /sm:size-14/);
@@ -109,18 +109,8 @@ test("Terpen-Band: Ruhezustand nur Icon und Name, Infos erscheinen beim Überfah
   assert.match(band, /max-sm:hidden/);
   // Die Breite eines Eintrags ist fix, sonst ruckt der Lauf und --band-kachel stimmt nicht.
   assert.match(band, /sm:w-40/);
-  // Zwei Zeilen höchstens; Abstand der Infos als Innenabstand (Trefferfläche), nicht als Außenabstand.
+  // Zwei Zeilen höchstens.
   assert.match(band, /line-clamp-2/);
-  assert.match(readFileSync(join(process.cwd(), "app/globals.css"), "utf8"), /\.terpen-band-info \{[^}]*padding-top: 0\.25rem;/);
-});
-
-test("Terpen-Band: Infos bleiben in der Spalte des Eintrags (Nutzer 2026-10-07, Text ragte bis 349 px ins Nachbarterpen)", () => {
-  const band = readFileSync(join(process.cwd(), "components/story/TerpenBand.tsx"), "utf8");
-  // Spur mit minmax(0,1fr): die Mindestbreite des Inhalts darf die 160-px-Spalte nicht aufweiten.
-  assert.match(band, /terpen-band-info[^"]*grid-cols-\[minmax\(0,1fr\)\]/);
-  // Duft allein in seiner Zeile und gekürzt; Duft und Sortenzahl nebeneinander passten nie in 160 px.
-  assert.doesNotMatch(band, /sortenText/);
-  assert.match(band, /<span className="truncate[^"]*" title=\{terpen\.duft\}>/);
 });
 
 test("Terpen-Band hält beim Überfahren und bei Fokus an: Pause trägt denselben Selektorkopf wie der Lauf (Nutzer 2026-10-06)", () => {
@@ -132,7 +122,7 @@ test("Terpen-Band hält beim Überfahren und bei Fokus an: Pause trägt denselbe
   );
 });
 
-test("Terpen-Band: Fallback schneidet nichts ab, Höhe, Tooltip unter dem Symbol nur im Laufmodus (Review 2026-10-07)", () => {
+test("Terpen-Band: Fallback schneidet nichts ab, feste Höhe nur im Laufmodus (Review 2026-10-07)", () => {
   const band = readFileSync(join(process.cwd(), "components/story/TerpenBand.tsx"), "utf8");
   const css = readFileSync(join(process.cwd(), "app/globals.css"), "utf8");
   // Grundzustand (Fallback, umbrochen): Mindesthöhe statt fester Höhe, nur waagrechter Beschnitt, kein Versatz.
@@ -140,16 +130,12 @@ test("Terpen-Band: Fallback schneidet nichts ab, Höhe, Tooltip unter dem Symbol
   assert.doesNotMatch(band, /sm:h-48/);
   assert.doesNotMatch(band, /overflow-clip/);
   assert.doesNotMatch(band, /translate-y-/);
-  // Name und Icon in einer 44-px-Zeile, Infos als eigene Klasse, die nur im Laufmodus absolut steht.
+  // Name und Icon in einer 44-px-Zeile.
   assert.match(band, /min-h-10[^"]*font-buch/);
-  assert.match(band, /terpen-band-info/);
   assert.doesNotMatch(band, /\babsolute\b/);
   const lauf = ":root:not([data-sparmodus]) .terpen-band:has(> .terpen-band-spur > [aria-hidden]:not(:empty))";
   assert.match(css, new RegExp(`${lauf.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")} \\{\\s*height: 12rem;`));
-  assert.match(css, /\.terpen-band-info \{\s*position: absolute;/);
-  // Tooltip unter dem Symbol; der Eintrag bleibt stehen, nur das Symbol waechst (Nutzer 2026-10-08).
-  assert.match(css, /\.terpen-band-info \{\s*position: absolute;[^}]*top: 100%;/);
-  assert.match(css, /\.terpen-band-info \{[^}]*text-align: center;/);
+  // Der Eintrag bleibt stehen, nur das Symbol waechst (Nutzer 2026-10-08).
   assert.doesNotMatch(css, /\.terpen-band-eintrag:is\(:hover, :focus-within\)/);
   assert.match(band, /group-hover\/eintrag:scale-110/);
 });
@@ -180,14 +166,6 @@ test("Terpenband wirkt nicht wie ein Band: keine Querlinien, das Spaltenraster l
   assert.ok(!klasse.split(" ").some((k) => k === "border-y" || k === "border-border"), klasse);
 });
 
-test("Terpen-Band: Tooltip wird nicht abgeschnitten, das Band beschneidet nur waagrecht (Nutzer 2026-10-09)", () => {
-  const css = readFileSync(join(process.cwd(), "app/globals.css"), "utf8");
-  const band = css.slice(css.indexOf(".terpen-band-spur > [aria-hidden]"), css.indexOf("@keyframes terpen-band"));
-  // Live 2026-10-09: Band 192 px mit overflow-y: clip, Tooltip 681 bis 770 px, Band endete bei 727.
-  assert.doesNotMatch(band, /overflow-y: clip/);
-  assert.match(band, /overflow-y: visible;/);
-});
-
 test("Terpen-Band: jeder Eintrag springt zu seiner Tafel im Register, auch mobil (Nutzer 2026-10-09)", () => {
   const band = readFileSync(join(process.cwd(), "components/story/TerpenBand.tsx"), "utf8");
   const kopie = readFileSync(join(process.cwd(), "components/story/TerpenBandKopie.tsx"), "utf8");
@@ -199,13 +177,50 @@ test("Terpen-Band: jeder Eintrag springt zu seiner Tafel im Register, auch mobil
   assert.match(register, /hashchange/);
 });
 
-test("Terpen-Band: Notenbalken bekommen Breite, der Notenblock streckt sich im zentrierten Tooltip (Nutzer 2026-10-09)", () => {
-  const band = readFileSync(join(process.cwd(), "components/story/TerpenBand.tsx"), "utf8");
-  // Live 2026-10-09: justify-items-center schrumpfte den Block, die Balkenspalte war 0 px breit.
-  assert.match(band, /<span className="grid w-full justify-self-stretch grid-cols-\[minmax\(0,1fr\)\] gap-1">/);
-});
-
 test("Register-Tafel: Sprungziel hält Abstand zum festen Kopf (Nutzer 2026-10-09, live 24 px darunter)", () => {
   const register = readFileSync(join(process.cwd(), "components/story/RegisterAuswahl.tsx"), "utf8");
   assert.match(register, /glas-tafel scroll-mt-\[calc\(var\(--kopf-h,4rem\)\+2rem\)\]/);
+});
+
+test("kartenLage: Karte mittig unter dem Symbol, Pfeil auf dessen Mitte (Nutzer 2026-10-09)", () => {
+  const lage = kartenLage({ links: 500, oben: 600, breite: 56, hoehe: 56 }, 1200);
+  assert.deepEqual(lage, { links: 528 - 144, oben: 600 + 56 + KARTE_ABSTAND, breite: KARTE_BREITE, pfeil: 144 });
+});
+
+test("kartenLage: am Fensterrand geklemmt, der Pfeil wandert mit und bleibt in der Karte", () => {
+  const linksAmRand = kartenLage({ links: 4, oben: 0, breite: 56, hoehe: 56 }, 1200);
+  assert.equal(linksAmRand.links, KARTE_RAND);
+  assert.equal(linksAmRand.pfeil, 24);
+  const rechtsAmRand = kartenLage({ links: 1100, oben: 0, breite: 56, hoehe: 56 }, 1200);
+  assert.equal(rechtsAmRand.links, 1200 - KARTE_RAND - KARTE_BREITE);
+  assert.equal(rechtsAmRand.pfeil, 1128 - rechtsAmRand.links);
+  // Pfeil nie über die Ecke: höchstens 24 px vor der rechten Kante.
+  const ganzRechts = kartenLage({ links: 1190, oben: 0, breite: 56, hoehe: 56 }, 1200);
+  assert.equal(ganzRechts.pfeil, KARTE_BREITE - 24);
+});
+
+test("kartenLage: klappt nie nach oben und wird in engen Fenstern schmaler", () => {
+  const lage = kartenLage({ links: 100, oben: 10, breite: 44, hoehe: 44 }, 300);
+  assert.equal(lage.oben, 10 + 44 + KARTE_ABSTAND);
+  assert.equal(lage.breite, 300 - 2 * KARTE_RAND);
+  assert.equal(lage.links, KARTE_RAND);
+});
+
+test("Terpen-Karte: Portal ausserhalb des Bands, Delegation über data-terpen, nur Maus und sichtbarer Fokus (Nutzer 2026-10-09)", () => {
+  const band = readFileSync(join(process.cwd(), "components/story/TerpenBand.tsx"), "utf8");
+  const karte = readFileSync(join(process.cwd(), "components/story/TerpenBandKarte.tsx"), "utf8");
+  const css = readFileSync(join(process.cwd(), "app/globals.css"), "utf8");
+  assert.match(band, /data-terpen=\{terpen\.anker\}/);
+  assert.match(band, /data-terpen-marke/);
+  assert.match(band, /<TerpenBandKarte /);
+  assert.match(karte, /createPortal\([^)]*document\.body\)/s);
+  assert.match(karte, /pointerType !== "mouse"/);
+  assert.match(karte, /:focus-visible/);
+  assert.match(karte, /"Escape"/);
+  assert.match(karte, /addEventListener\("scroll"/);
+  assert.match(karte, /aria-hidden="true"/);
+  assert.match(karte, /pointer-events-none fixed/);
+  // Einblendung aus dem Pfeil, nie aus dem Nichts; reduziert nur Deckkraft.
+  assert.match(css, /\.terpen-karte \{[^]*?@starting-style \{\s*opacity: 0;\s*transform: translateY\(4px\) scale\(0\.97\);/);
+  assert.match(css, /transform-origin: var\(--pfeil, 50%\) 0;/);
 });

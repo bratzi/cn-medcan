@@ -2126,41 +2126,15 @@ html.joint-cursor :is(input:not([type="range"]):not([type="radio"]):not([type="c
     display: flex;
   }
 
-  /* Feste Höhe, Beschnitt, Infos unter dem Namen und Hochrücken beim Überfahren nur im
-     Laufmodus ab sm: Im Fallback (reduzierte Bewegung, Sparmodus, ohne JavaScript) umbricht
-     die Liste in mehrere Zeilen, das Band wächst mit (min-h-48) und nichts wird abgeschnitten,
-     verschoben oder überlagert. Die Bedingung "Kopie gefüllt" steht ohne verschachteltes
-     :has(), das CSS verwirft (Befund 2026-10-07, die Regel galt live nicht). */
+  /* Feste Höhe nur im Laufmodus ab sm: Im Fallback (reduzierte Bewegung, Sparmodus, ohne
+     JavaScript) umbricht die Liste in mehrere Zeilen, das Band wächst mit (min-h-48) und
+     nichts wird abgeschnitten. Die Infos zeigt seit 2026-10-09 die Karte außerhalb des Bands
+     (.terpen-karte). Die Bedingung "Kopie gefüllt" steht ohne verschachteltes :has(), das
+     CSS verwirft (Befund 2026-10-07, die Regel galt live nicht). */
   @media (min-width: 40rem) {
     :root:not([data-sparmodus]) .terpen-band:has(> .terpen-band-spur > [aria-hidden]:not(:empty)) {
       height: 12rem;
       padding-block: 0;
-      /* Nur waagrecht beschneiden (Klasse overflow-x-clip): der Tooltip hängt unter dem Eintrag
-         und ragt über die 192 px hinaus. Senkrecht beschnitten war er live unten abgeschnitten
-         (Nutzer 2026-10-09: Band endete bei 727 px, Tooltip bei 770 px). */
-      overflow-y: visible;
-    }
-
-    /* Tooltip unter dem Symbol (Nutzer 2026-10-08): die Infos blenden darunter ein, das
-       Symbol selbst bleibt stehen und wird beim Ueberfahren nur groesser. Nichts rueckt
-       mehr, der Eintrag behaelt seinen Platz im Band. */
-    :root:not([data-sparmodus]) .terpen-band:has(> .terpen-band-spur > [aria-hidden]:not(:empty)) .terpen-band-info {
-      position: absolute;
-      left: 50%;
-      translate: -50% 0;
-      top: 100%;
-      width: 100%;
-      /* 4 px Abstand zum Namen als Innenabstand statt Aussenabstand: Innenabstand zaehlt
-         zur Trefferflaeche, so liegt zwischen Eintrag und Tooltip keine tote Zone. */
-      padding-top: 0.25rem;
-      text-align: center;
-    }
-    :root:not([data-sparmodus]) .terpen-band:has(> .terpen-band-spur > [aria-hidden]:not(:empty)) .terpen-band-eintrag {
-      position: relative;
-      translate: 0 0;
-    }
-    :root:not([data-sparmodus]) .terpen-band:has(> .terpen-band-spur > [aria-hidden]:not(:empty)) .terpen-band-eintrag > a > span[aria-hidden] {
-      position: static;
     }
   }
 
@@ -2179,6 +2153,48 @@ html.joint-cursor :is(input:not([type="range"]):not([type="radio"]):not([type="c
 @keyframes terpen-band {
   to {
     translate: calc(-1 * var(--band-kachel, 50%)) 0;
+  }
+}
+
+/* Terpen-Karte (TerpenBandKarte, Nutzer 2026-10-09): hängt per Portal fest unter dem
+   Symbol, der Pfeil zeigt auf dessen Mitte (--pfeil aus kartenLage). Einblendung 150 ms
+   aus dem Pfeil heraus: Deckkraft, 4 px Weg und scale(0.97), nie aus dem Nichts. Der
+   Wechsel zum Nachbarn bleibt ohne Einblendung, weil das Element stehen bleibt und nur
+   left/top springen. Bei reduzierter Bewegung nur Deckkraft. */
+.terpen-karte {
+  transform-origin: var(--pfeil, 50%) 0;
+  transition:
+    opacity 150ms cubic-bezier(0.23, 1, 0.32, 1),
+    transform 150ms cubic-bezier(0.23, 1, 0.32, 1);
+
+  @starting-style {
+    opacity: 0;
+    transform: translateY(4px) scale(0.97);
+  }
+}
+
+/* Pfeil: ein auf die Spitze gestelltes Quadrat mit denselben Kanten wie die Karte. */
+.terpen-karte::before {
+  content: "";
+  position: absolute;
+  top: -0.4375rem;
+  left: calc(var(--pfeil, 50%) - 0.375rem);
+  width: 0.75rem;
+  height: 0.75rem;
+  rotate: 45deg;
+  background: var(--color-surface-raised);
+  border-top: 1px solid var(--color-border-strong);
+  border-left: 1px solid var(--color-border-strong);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .terpen-karte {
+    transition: opacity 150ms cubic-bezier(0.23, 1, 0.32, 1);
+
+    @starting-style {
+      opacity: 0;
+      transform: none;
+    }
   }
 }
 
