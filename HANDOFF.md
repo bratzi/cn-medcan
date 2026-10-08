@@ -3,7 +3,7 @@
 > Übergabemedium zwischen Sessions. Wird nach jedem Arbeitsblock aktualisiert und committet.
 > Wer hier weiterarbeitet, liest diese Datei zuerst und braucht den Chatverlauf nicht.
 
-**Letzte Aktualisierung:** 2026-10-08 (Session 46)
+**Letzte Aktualisierung:** 2026-10-08 (Session 47)
 **Repo:** https://github.com/bratzi/cn-medcan (public)
 **Branch:** `main` (Makeover „Grünes Buch“ Teilprojekt 1 ist seit 2026-09-24 auf `main`)
 
@@ -27,6 +27,52 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 ---
 
 ## ⇢ Hier geht es weiter
+
+### ⇢ SESSION 48 (Sessionstart): Auftakt-Zahlenleiste umsetzen
+
+**ALS ERSTES: diese Fragen in EINER AskUserQuestion stellen**
+1. **Plan freigeben?** `docs/superpowers/plans/2026-10-08-auftakt-eyecatcher.md` (Spec
+   `docs/superpowers/specs/2026-10-08-auftakt-eyecatcher-design.md`, vom Nutzer mit „jo" freigegeben).
+   Optionen: „Passt" / „Ändern: …".
+2. **Ausführung?** Empfehlung **Native** (selbst in der Session, am Ende ein frischer Reviewer über alles),
+   weil die vier Tasks streng aufeinander aufbauen und drei davon `Auftakt.tsx` ändern; parallele
+   Worktrees passen hier ausnahmsweise nicht. Alternative: Subagent-driven (je Task Implementer + Reviewer).
+
+Danach Plan Task 1 bis 4 abarbeiten (Native: Skill `superpowers:executing-plans`), Design-Skills dabei
+einsetzen (`design-taste-frontend`, `animate`, `build-awwwards-quality-sites`), pushen, live prüfen wie in
+Task 4 Step 6 beschrieben, HANDOFF.
+
+**Stand `main` = `5d9c80d`**, 781 Tests grün, tsc und eslint projektweit sauber, `npm run farben` sauber.
+Arbeitsbaum sauber, nur Branch `main`, keine Worktrees mehr.
+
+**Nutzer-Entscheidungen Session 47 (bindend):**
+- Hero: **nur die Marke** (keine Umfrage/Review oben), **Bewegung wie heute, nur besser** (kein WebGL,
+  kein neues Werkzeug), **Live-Zahlen statt zweiter Handlung**: Sorten im Katalog, Bewertungen im Buch,
+  Stimmen abgegeben.
+- Zeitmarken vom 2026-09-25 bleiben (Oberzeile 1,8 s, Intro 3,4 s); Zahlen bei 4,2 s.
+- Akzentwort-Konturen: **mit Schriftgröße skalieren** (erledigt, siehe unten).
+- Schalterleiste rechts darf Inhalt überlagern („sind nur kleine Buttons") – nicht anfassen.
+- Fließtext läuft im Storytelling unter den Bildkreis – gewollt („die bewegen sich ja hin und her").
+
+**Fallen, die der Plan schon berücksichtigt:**
+- Keine `$transaction` auf D1; drei Zähler in **einer** `$queryRaw` (Muster `communityZahlen`).
+- Zählermerkmal `data-auftakt-zaehler`, nicht `data-zaehler`: `components/story/bewegung/eintrag.ts`
+  greift alle `[data-zaehler]` der Seite ab und würde die Auftaktzahlen ein zweites Mal hochzählen.
+
+### ⇢ SESSION 47 (erledigt): Optik live geprüft, Fehler raus, Hero-Spec und Plan
+
+- **Live geprüft** (Chrome im Vordergrund, Screenshots gingen): 1440 und 390 px, hell und dunkel.
+  In Ordnung: Logo, Terpen-Tooltip, Sektionsübergänge ohne Strich, kein Seitenüberlauf, Fuß, Fazit-Leiste.
+- **`a0506dc`** Intro-Zeile bricht bis xl um (lief zwischen 768 und 1280 px raus; 0,3em Sperrung braucht
+  ~1200 px). Live nicht gesondert bei 1000 px nachgemessen.
+- **`a0506dc`, `1629741`** `react-hooks/set-state-in-effect` in `RegisterAuswahl.tsx` und `AromaKarte.tsx`
+  über `useSyncExternalStore` (Server false, Client true) gelöst. eslint projektweit sauber.
+- **`7bbbd20`** Konturen der Akzentwörter (`.marke-kontur-1..4`): Versatz nur noch bis zum Wert bei ~40 px
+  Schrift (`min(em, px)`), Strich `max(px, 0.012em)`. Live gemessen bei 256 px Schrift: Versatz
+  1,8/1,2 px statt 11,5/7,7 px, Strich 3,1 px; hell gesehen sauber. Dunkel nach dem Fix nicht erneut gesehen.
+- **Aufgeräumt:** 20 Agent-Worktrees, ihre `node_modules`-Reste und 20 `worktree-agent-*`-Branches gelöscht.
+- Offen und nicht angefasst: Terpenband läuft unter die Kopfzeile (auf 390 px verdeckt der Kopf die
+  Symbole) – dem Nutzer nicht eigens vorgelegt, bei Gelegenheit fragen.
 
 ### ⇢ SESSION 45 (erledigt): Profil Stufe 1 ist live
 
@@ -52,7 +98,7 @@ Prüfen über Cloudflare-API `GET /accounts/{id}/builds/workers/1406f98f6bac4ea1
 manuell starten mit `POST /accounts/{id}/builds/triggers/f649c1f7-21f8-4eb5-8597-0b036c381c8e/builds`,
 Body `{ branch: "main", commit_hash: "<VOLLER Hash>" }` (Kurz-Hash scheitert beim Klonen). Build ~6 min.
 
-### ⇢ SESSION 47 (Sessionstart): Marken-Makeover ist live, Optik-Prüfung offen
+### ⇢ SESSION 46b (erledigt in Session 47): Marken-Makeover ist live
 
 **Auf `main` (`30818ba`, 781 Tests grün, tsc sauber, `npm run farben` sauber).** Alle Builds bis
 `30818ba` sind erfolgreich. In dieser Session ist Profil Stufe 3 fertig geworden und danach das
