@@ -3,7 +3,7 @@
 > Übergabemedium zwischen Sessions. Wird nach jedem Arbeitsblock aktualisiert und committet.
 > Wer hier weiterarbeitet, liest diese Datei zuerst und braucht den Chatverlauf nicht.
 
-**Letzte Aktualisierung:** 2026-10-08 (Session 51)
+**Letzte Aktualisierung:** 2026-10-08 (Session 52)
 **Repo:** https://github.com/bratzi/cn-medcan (public)
 **Branch:** `main` (Makeover „Grünes Buch“ Teilprojekt 1 ist seit 2026-09-24 auf `main`)
 
@@ -28,12 +28,24 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 
 ## ⇢ Hier geht es weiter
 
-### ⇢ SESSION 52 (Sessionstart): `/reviews` live fertig prüfen
+### ⇢ SESSION 53 (Sessionstart): Nutzer schaut `/reviews` an
 
-**ALS ERSTES:** `/reviews` live prüfen (falls in Session 51 nicht mehr geschehen): großes Buch mit
-Seitenleiste (Pillen, Sprung `#nr-25` nach `/reviews/band/2`), Sorte als Link auf jeder Doppelseite,
-Ranglisten als Gast (Anmelde-Hinweis) und als Mitglied (fünf Reiter, Karten, Seiten, Zurück-Taste),
-390 px und 1418 px, hell und dunkel. Danach den Nutzer drüberschauen lassen.
+Nutzer drüberschauen lassen. Offen: Gast-Ansicht der Ranglisten (Anmelde-Hinweis) live nicht gesehen,
+nur Tests (Session als Mitglied); echtes Telefon 390 px (Fenster ging nur auf 494 px). Fragen an den
+Nutzer: Ranglisten-Karten mobil einspaltig mit vollbreitem Bild (sehr lang), lieber zwei Spalten?
+Startseite `NeuesterEintrag` auf Doppelseite mit Bild umstellen? Minor aus Session 51 weiter offen.
+
+### ⇢ SESSION 52 (erledigt): `/reviews` live geprüft
+
+- Live geprüft (Chrome, 1143 px dunkel, 1400 px hell, 494 px dunkel, als Mitglied): Kopf mittig,
+  Sorte als Link, Seitenleiste 1 2 3 … 25 26, Sprung `/reviews/band/2#nr-25` schlägt Eintrag 25 auf
+  (Seite 1 von 2), fünf Reiter, Karten, Reiter in der Adresse (`#ranglisten-meiste-1`), Zurück-Taste
+  stellt den Reiter zurück, kein Überlauf. `/api/ranglisten` ohne Cookies endet am Passwort-Gate (HTML),
+  kein Leck. Erst sah der Tab die alte Fassung: Browser-Kopie, frischer Abruf war neu.
+- **`aa95926`:** Ranglisten-Erklärsatz stand doppelt (Sektionskopf und Insel), Insel-Satz entfernt.
+  Großes Buch ohne Autoplay (`Buch`-Prop `autoplay`, Standard an; Startseite unverändert): mobil ist
+  eine Doppelseite mehrere Bildschirme hoch und blätterte beim Lesen alle 8 s weiter. 874 Tests grün.
+  **Live noch nicht nachgesehen** (Deploy lief beim Sessionende): Satz einmal, Buch steht still, Play-Knopf startet.
 
 ### ⇢ SESSION 51 (erledigt): Profil/Konto/Blüte nachgeschärft, Bewertungsbuch und Ranglisten
 
