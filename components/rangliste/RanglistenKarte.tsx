@@ -29,7 +29,7 @@ export function RanglistenKarte({ karte, nach, texte, sprache }: Props) {
       <div className="flex aspect-square items-center justify-center overflow-hidden bg-surface-sunken">
         <Bild
           id={karte.bildId}
-          sizes="(min-width: 1080px) 25vw, (min-width: 640px) 50vw, 100vw"
+          sizes="(min-width: 1080px) 25vw, 50vw"
           dekorativ
         />
       </div>

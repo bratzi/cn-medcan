@@ -1,6 +1,5 @@
 import { abstimmung } from "./abstimmung";
 import { auftakt, auftaktFilm, umschlagWirdSeite } from "./auftakt";
-import { eintrag } from "./eintrag";
 import { beobachteLoops } from "./loops";
 import { beobachtePunkte } from "./punkte";
 import { randnotizen } from "./randnotizen";
@@ -26,7 +25,6 @@ const SCROLL_CHOREOGRAFIEN: readonly Choreografie[] = [
   transparent,
   register,
   randnotizen,
-  eintrag,
   abstimmung,
   schluss,
   vorhang,

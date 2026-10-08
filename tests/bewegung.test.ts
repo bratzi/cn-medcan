@@ -76,7 +76,7 @@ test("Randspalte ohne Schwenk und Pin: wand.ts ist weg (Spec TP3 8.3)", () => {
   assert.doesNotMatch(css, /ist-schwenk|wand-reihe/);
 });
 
-test("Randzahlen haben ein eigenes Attribut, data-zaehler bleibt der Doppelseite", () => {
+test("Randzahlen haben ein eigenes Attribut", () => {
   const ablauf = readFileSync(join("components", "story", "bewegung", "randnotizen.ts"), "utf8");
   assert.match(ablauf, /"\[data-randzahl\]"/);
   assert.doesNotMatch(ablauf, /data-zaehler/);

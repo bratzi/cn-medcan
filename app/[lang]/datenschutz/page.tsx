@@ -34,7 +34,7 @@ export const revalidate = 86400;
  *   ReelNachKlick.tsx, Zwei-Klick-Lösung: bis zum Klick auf „Reel von
  *   Instagram laden“ keine Anfrage an instagram.com, danach iframe mit
  *   referrerPolicy="no-referrer"; die Wahl wird nicht gespeichert; nur in
- *   Doppelseite.tsx, nur wenn der Betreiber ein Reel verknüpft hat
+ *   BuchDoppelseite.tsx, nur wenn der Betreiber ein Reel verknüpft hat
  *   (app/blueten/[slug]/aktionen.ts).
  * - Schriften: next/font/google in app/layout.tsx (beim Build eingebettet,
  *   keine Anfrage an Google im Browser). Medien aus public/medien.

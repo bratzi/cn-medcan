@@ -114,12 +114,6 @@ test("Bewegung: Leiste bei 4,2 s, eigenes Merkmal, Endwerte beim Aufräumen", ()
   assert.match(quelle, /'\[data-story="intro"\]'[\s\S]*?3\.4,/);
 });
 
-test("Doppelseite greift nur [data-zaehler], der Auftakt nutzt es nicht", () => {
-  assert.match(lies("components/story/bewegung/eintrag.ts"), /"\[data-zaehler\]"/);
-  assert.doesNotMatch(lies("components/story/bewegung/auftakt.ts"), /\[data-zaehler\]/);
-  assert.doesNotMatch(lies("components/story/AuftaktZahlen.tsx"), /data-zaehler=/);
-});
-
 test("Feinschliff: Abstände im 8px-Raster, Verlauf trägt die Schrift", () => {
   const quelle = lies("components/story/Auftakt.tsx");
   // Nur gerade Tailwind-Stufen (4px je Stufe) an Oberzeile und Intro.

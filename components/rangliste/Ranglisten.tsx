@@ -152,7 +152,7 @@ export function Ranglisten({ texte, sprache }: Props) {
       </div>
       <div role="tabpanel" id="rangliste-tafel" aria-labelledby={`rangliste-reiter-${nach}`} className="flex flex-col gap-8">
         {zeige.art === "laedt" ? (
-          <div role="status" aria-label={texte.laedt} className="grid grid-cols-1 gap-8 min-[640px]:grid-cols-2 min-[1080px]:grid-cols-4">
+          <div role="status" aria-label={texte.laedt} className="grid grid-cols-2 gap-x-4 gap-y-8 min-[640px]:gap-x-8 min-[1080px]:grid-cols-4">
             {Array.from({ length: 12 }, (_, i) => (
               <div key={i} aria-hidden="true" className="aspect-square bg-surface-sunken" />
             ))}
@@ -171,7 +171,7 @@ export function Ranglisten({ texte, sprache }: Props) {
             <p className="text-center text-body text-text-muted">{nach === "uneins" ? texte.leerUneins : texte.leer}</p>
           ) : (
             <>
-              <div className="grid grid-cols-1 gap-8 transition-opacity duration-fast starting:opacity-0 motion-reduce:transition-none min-[640px]:grid-cols-2 min-[1080px]:grid-cols-4">
+              <div className="grid grid-cols-2 gap-x-4 gap-y-8 min-[640px]:gap-x-8 transition-opacity duration-fast starting:opacity-0 motion-reduce:transition-none min-[1080px]:grid-cols-4">
                 {zeige.antwort.karten.map((karte) => (
                   <RanglistenKarte key={karte.slug} karte={karte} nach={nach} texte={texte} sprache={sprache} />
                 ))}

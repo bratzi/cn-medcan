@@ -50,7 +50,6 @@ const UMGESTELLT: string[] = [
   "components/review/BlattAnzeige.tsx",
   "components/medien/SchalterSymbole.tsx",
   "lib/buch.ts",
-  "components/review/Doppelseite.tsx",
   "components/review/BlattUrteil.tsx",
   "components/review/NotenLeiste.tsx",
   "components/review/BuchKolophon.tsx",
