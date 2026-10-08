@@ -77,7 +77,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
 const ABSTAND = "mt-16 sm:mt-24";
 /** Sektion mit Schlagwort: der Satz steht im oberen Polster, deshalb Polster statt Rand. */
-const SEKTION = "relative isolate overflow-x-clip pt-16 sm:pt-24";
+const SEKTION = "relative isolate overflow-x-clip pt-24 sm:pt-32";
 
 /**
  * Sektionskopf wie auf der Startseite (Nutzer 2026-10-08: „nicht so
@@ -240,12 +240,12 @@ async function ProduktInhalt({ slug, w, sprache }: { slug: string; w: Woerterbuc
           </div>
         ))}
       </dl>
-      <details className="group mt-12">
+      <details className="group mt-12 text-center">
         <summary
           className={buttonKlassen(
             "secondary",
             "md",
-            "mx-auto flex w-fit cursor-pointer list-none [&::-webkit-details-marker]:hidden",
+            "cursor-pointer list-none [&::-webkit-details-marker]:hidden",
           )}
         >
           <span className="group-open:hidden">{texte.alleAngaben}</span>
@@ -258,7 +258,7 @@ async function ProduktInhalt({ slug, w, sprache }: { slug: string; w: Woerterbuc
             <path d="M3 6l5 5 5-5" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
         </summary>
-        <div className="mt-12 grid grid-cols-1 gap-12 lg:grid-cols-2">
+        <div className="mt-12 grid grid-cols-1 gap-12 text-start lg:grid-cols-2">
           <Faktenliste zeilen={produktFakten(strain, w)} />
           <div className="flex flex-col gap-12">
             <div>

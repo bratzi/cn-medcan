@@ -22,7 +22,8 @@ type Props = {
  * Freisteller als Tiefenebene, dahinter ein Schlagwort wie in jeder
  * Startseiten-Sektion. Der Freisteller liegt absolut und bestimmt die Höhe
  * des Kopfs nicht mit: als halbe Kopfhöhe schob er die Felder nach unten
- * und stach zu sehr hervor (Nutzer 2026-10-08).
+ * und stach zu sehr hervor (Nutzer 2026-10-08). `end-24` hält ihn von der
+ * Schalterleiste am rechten Rand fern.
  */
 export function Kapitelkopf({ name, avatarId, reiter, bild, schlagwort, ton, aktion }: Props) {
   return (
@@ -38,7 +39,7 @@ export function Kapitelkopf({ name, avatarId, reiter, bild, schlagwort, ton, akt
         </div>
       </div>
       {bild ? (
-        <div aria-hidden="true" className="pointer-events-none absolute end-8 bottom-0 hidden w-56 min-[1080px]:block">
+        <div aria-hidden="true" className="pointer-events-none absolute end-24 bottom-0 hidden w-56 min-[1080px]:block">
           <div className="kapitel-tiefe">{bild}</div>
         </div>
       ) : null}
