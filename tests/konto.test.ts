@@ -25,7 +25,7 @@ test("kontoNotizen: fünf, auch mit Nullen; Jahr als Zahl", () => {
     "de",
   );
   assert.deepEqual(n.map((x) => x.zahl), ["2025", "0", "0", "0", "0"]);
-  assert.deepEqual(n.map((x) => x.wort), ["dabei seit", "gestimmt", "getroffen", "vorgeschlagen", "neu"]);
+  assert.deepEqual(n.map((x) => x.wort), ["dabei seit", "Stimmen", "gewonnen", "Vorschläge", "ungelesen"]);
   assert.equal(n[1].satz, "0 Stimmen abgegeben");
 });
 

@@ -8,7 +8,7 @@ type Props = {
   avatarId: string | null;
   /** Der ProfilReiter. */
   reiter: ReactNode;
-  /** Freisteller rechts (ab 1080 px), schon als <Bild> gebaut. */
+  /** Kleiner Freisteller rechts (ab 1080 px), schon als <Bild> gebaut. */
   bild?: ReactNode;
   schlagwort: string;
   ton: "gruen" | "lila";
@@ -18,9 +18,11 @@ type Props = {
 
 /**
  * Kapitelkopf (Spec 5): dein Name als Kapitelüberschrift, gedruckt (Namen
- * nie in Handschrift), darunter die Reiter. Rechts ab 1080 px ein
+ * nie in Handschrift), darunter die Reiter. Rechts ab 1080 px ein kleiner
  * Freisteller als Tiefenebene, dahinter ein Schlagwort wie in jeder
- * Startseiten-Sektion.
+ * Startseiten-Sektion. Der Freisteller liegt absolut und bestimmt die Höhe
+ * des Kopfs nicht mit: als halbe Kopfhöhe schob er die Felder nach unten
+ * und stach zu sehr hervor (Nutzer 2026-10-08).
  */
 export function Kapitelkopf({ name, avatarId, reiter, bild, schlagwort, ton, aktion }: Props) {
   return (
@@ -36,8 +38,8 @@ export function Kapitelkopf({ name, avatarId, reiter, bild, schlagwort, ton, akt
         </div>
       </div>
       {bild ? (
-        <div aria-hidden="true" className="hidden min-[1080px]:col-span-4 min-[1080px]:flex min-[1080px]:items-end min-[1080px]:px-8">
-          <div className="kapitel-tiefe w-full">{bild}</div>
+        <div aria-hidden="true" className="pointer-events-none absolute end-8 bottom-0 hidden w-56 min-[1080px]:block">
+          <div className="kapitel-tiefe">{bild}</div>
         </div>
       ) : null}
     </header>

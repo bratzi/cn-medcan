@@ -163,7 +163,7 @@ async function KopfBild({ id }: { id: string }) {
     return <BudpicBild id={bildId} breite={breite} hoehe={hoehe} offen={offen} alt="" className="h-auto w-full object-contain" />;
   }
   const bildId = beste ? ersatzBildId(beste.bildPfad, beste.slug) : musterBildId("profil");
-  return <Bild id={bildId} sizes="(min-width: 1080px) 35vw, 0px" dekorativ />;
+  return <Bild id={bildId} sizes="(min-width: 1080px) 224px, 0px" dekorativ />;
 }
 
 async function Notizen({ id }: { id: string }) {

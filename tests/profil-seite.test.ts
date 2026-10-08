@@ -61,10 +61,10 @@ test("/mitglied: Titel ist der Reiter Konto, h1 ist der Name im Kapitelkopf", ()
   assert.doesNotMatch(q, /kopf\.navigation\.konto/);
 });
 
-test("/mitglied: Kapitel mit Umfrage, Stimmen, Nachrichten, dann Einstellungen; ein Primärknopf", () => {
+test("/mitglied: erst Konto (Angaben, Avatar, Sichtbarkeit, Status, Nachrichten), dann Umfrage und Stimmen; ein Primärknopf", () => {
   const q = readFileSync("app/[lang]/mitglied/page.tsx", "utf8");
   const koerper = q.slice(q.indexOf("export default async function MitgliedPage"), q.indexOf("async function KopfBild"));
-  const reihe = ["<Kapitelkopf", "<Notizen", "<ReiheUmfrage", "<ReiheStimmen", "<ReiheNachrichten", "<AvatarFormular", "<ProfilFormular", "<ProfilSichtbarkeit"].map((s) =>
+  const reihe = ["<Kapitelkopf", "<Notizen", "<ProfilFormular", "<AvatarFormular", "<ProfilSichtbarkeit", "<Status", "<ReiheNachrichten", "<ReiheUmfrage", "<ReiheStimmen"].map((s) =>
     koerper.indexOf(s),
   );
   assert.ok(reihe.every((i) => i > 0), JSON.stringify(reihe));

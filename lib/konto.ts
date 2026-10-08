@@ -33,9 +33,9 @@ export function kontoNotizen(
   const jahr = String(e.dabeiSeit.getUTCFullYear());
   return [
     { zahl: jahr, wort: texte.dabei, satz: t(texte.srDabei, { zahl: jahr }) },
-    { zahl: String(e.stimmen), wort: texte.gestimmt, satz: mehrzahl(sprache, texte.srGestimmt, e.stimmen) },
+    { zahl: String(e.stimmen), wort: mehrzahl(sprache, texte.gestimmt, e.stimmen), satz: mehrzahl(sprache, texte.srGestimmt, e.stimmen) },
     { zahl: String(e.gewonnen), wort: texte.getroffen, satz: mehrzahl(sprache, texte.srGetroffen, e.gewonnen) },
-    { zahl: String(e.vorgeschlagen), wort: texte.vorgeschlagen, satz: mehrzahl(sprache, texte.srVorgeschlagen, e.vorgeschlagen) },
+    { zahl: String(e.vorgeschlagen), wort: mehrzahl(sprache, texte.vorgeschlagen, e.vorgeschlagen), satz: mehrzahl(sprache, texte.srVorgeschlagen, e.vorgeschlagen) },
     { zahl: String(e.ungelesen), wort: texte.neu, satz: mehrzahl(sprache, texte.srNeu, e.ungelesen) },
   ];
 }

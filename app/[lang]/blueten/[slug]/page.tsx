@@ -3,7 +3,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound, unstable_rethrow } from "next/navigation";
 
-import { ABSCHNITT_TITEL, seitenRahmen } from "@/components/layout/Seitenkopf";
+import { seitenRahmen } from "@/components/layout/Seitenkopf";
+import { Schlagwort } from "@/components/story/Schlagwort";
 import { CannabinoidBar } from "@/components/produkt/CannabinoidBar";
 import { TerpenProfil } from "@/components/review/SortenKopf";
 import { Titelblatt } from "@/components/produkt/Titelblatt";
@@ -75,6 +76,23 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 }
 
 const ABSTAND = "mt-16 sm:mt-24";
+/** Sektion mit Schlagwort: der Satz steht im oberen Polster, deshalb Polster statt Rand. */
+const SEKTION = "relative isolate overflow-x-clip pt-16 sm:pt-24";
+
+/**
+ * Sektionskopf wie auf der Startseite (Nutzer 2026-10-08: „nicht so
+ * linksbündig, mehr zentriert“): Kapitelgrad, mittig, darunter ein Satz.
+ */
+function SektionsKopf({ id, titel, satz }: { id: string; titel: string; satz?: string }) {
+  return (
+    <div className="mx-auto flex max-w-3xl flex-col items-center gap-4 text-center">
+      <h2 id={id} className="font-buch text-kapitel text-balance text-text wrap-break-word">
+        {titel}
+      </h2>
+      {satz ? <p className="max-w-[56ch] text-body text-pretty text-text-muted">{satz}</p> : null}
+    </div>
+  );
+}
 
 function unternehmenWert(eintrag: UnternehmenEintrag): ReactNode {
   const name = eintrag.website ? (
@@ -92,20 +110,27 @@ function unternehmenWert(eintrag: UnternehmenEintrag): ReactNode {
   );
 }
 
+/** Die vier Angaben, die zugeklappt stehen bleiben (Nutzer 2026-10-08). */
+function kernFakten(strain: StrainDetail, w: Woerterbuch): Fakt[] {
+  const f = w.bluete.fakten;
+  const ka = f.keineAngabe;
+  return [
+    { begriff: f.kultivar, wert: strain.kultivarName ?? ka },
+    { begriff: f.kultivartyp, wert: w.label.kultivarTyp[strain.kultivarTyp] },
+    { begriff: f.hersteller, wert: strain.hersteller?.name ?? ka },
+    { begriff: f.bestrahlung, wert: w.label.bestrahlung[strain.bestrahlung as Bestrahlung] ?? strain.bestrahlung },
+  ];
+}
+
+/** Die übrigen Angaben zum Aufklappen; die Kernangaben stehen schon darüber. */
 function produktFakten(strain: StrainDetail, w: Woerterbuch): Fakt[] {
   const f = w.bluete.fakten;
   const ka = f.keineAngabe;
   return [
     { begriff: f.handelsname, wert: strain.handelsname },
-    { begriff: f.kultivar, wert: strain.kultivarName ?? ka },
-    { begriff: f.kultivartyp, wert: w.label.kultivarTyp[strain.kultivarTyp] },
     { begriff: f.darreichungsform, wert: w.label.darreichungsform[strain.darreichungsform] },
     { begriff: f.genetik, wert: strain.genetik ?? ka },
     { begriff: f.pzn, wert: strain.pzn ? <span className="numeric">{strain.pzn}</span> : ka },
-    {
-      begriff: f.bestrahlung,
-      wert: w.label.bestrahlung[strain.bestrahlung as Bestrahlung] ?? strain.bestrahlung,
-    },
     { begriff: f.anbauland, wert: strain.anbauland ?? ka },
     { begriff: f.hersteller, wert: strain.hersteller ? unternehmenWert(strain.hersteller) : ka },
     { begriff: f.importeur, wert: strain.importeur ? unternehmenWert(strain.importeur) : ka },
@@ -202,34 +227,62 @@ async function ProduktInhalt({ slug, w, sprache }: { slug: string; w: Woerterbuc
    * weil er auf dieser Seite Handelsname, Kultivar und Wirkstoffe des Titelblatts wiederholt.
    */
   const angabenZurBluete = (
-    <section aria-labelledby="daten-titel" className={ABSTAND}>
-      <h2 id="daten-titel" className={ABSCHNITT_TITEL}>
-        {texte.angaben}
-      </h2>
-      <div className="mt-8 grid grid-cols-1 gap-12 lg:grid-cols-2">
-        <Faktenliste zeilen={produktFakten(strain, w)} />
-        <div className="flex flex-col gap-12">
-        <div>
-        <h3 className="text-h3 text-text">{texte.wirkstoffspannen}</h3>
-        <CannabinoidBar
-          className="mt-4"
-          thcMin={strain.thcMinProzent}
-          thcMax={strain.thcMaxProzent}
-          cbdMin={strain.cbdMinProzent}
-          cbdMax={strain.cbdMaxProzent}
-          w={w}
-          sprache={sprache}
-        />
-        <p className="mt-4 text-caption text-text-muted">
-          {t(texte.herstellerangabe, {
-            thc: formatiereProzentSpanne(strain.thcMinProzent, strain.thcMaxProzent, 1, sprache),
-            cbd: formatiereProzentSpanne(strain.cbdMinProzent, strain.cbdMaxProzent, 1, sprache),
-          })}
-        </p>
+    <section aria-labelledby="daten-titel" className={SEKTION}>
+      <Schlagwort satz={texte.schlagwort.angaben} ton="gruen" />
+      <SektionsKopf id="daten-titel" titel={texte.angaben} />
+      {/* Zugeklappt nur die vier Kernangaben (Nutzer 2026-10-08): die volle Liste
+          zog die Seite in die Länge. Der Rest liegt in <details>, ohne JavaScript. */}
+      <dl className="mx-auto mt-12 grid max-w-4xl grid-cols-2 gap-8 text-center sm:grid-cols-4">
+        {kernFakten(strain, w).map((fakt) => (
+          <div key={fakt.begriff} className="flex min-w-0 flex-col gap-2">
+            <dt className="text-small text-text-muted">{fakt.begriff}</dt>
+            <dd className="font-buch text-h3 text-text text-balance wrap-break-word">{fakt.wert}</dd>
+          </div>
+        ))}
+      </dl>
+      <details className="group mt-12">
+        <summary
+          className={buttonKlassen(
+            "secondary",
+            "md",
+            "mx-auto flex w-fit cursor-pointer list-none [&::-webkit-details-marker]:hidden",
+          )}
+        >
+          <span className="group-open:hidden">{texte.alleAngaben}</span>
+          <span className="hidden group-open:inline">{texte.wenigerAngaben}</span>
+          <svg
+            aria-hidden="true"
+            viewBox="0 0 16 16"
+            className="size-4 transition-transform duration-normal ease-standard group-open:rotate-180"
+          >
+            <path d="M3 6l5 5 5-5" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </summary>
+        <div className="mt-12 grid grid-cols-1 gap-12 lg:grid-cols-2">
+          <Faktenliste zeilen={produktFakten(strain, w)} />
+          <div className="flex flex-col gap-12">
+            <div>
+              <h3 className="text-h3 text-text">{texte.wirkstoffspannen}</h3>
+              <CannabinoidBar
+                className="mt-4"
+                thcMin={strain.thcMinProzent}
+                thcMax={strain.thcMaxProzent}
+                cbdMin={strain.cbdMinProzent}
+                cbdMax={strain.cbdMaxProzent}
+                w={w}
+                sprache={sprache}
+              />
+              <p className="mt-4 text-caption text-text-muted">
+                {t(texte.herstellerangabe, {
+                  thc: formatiereProzentSpanne(strain.thcMinProzent, strain.thcMaxProzent, 1, sprache),
+                  cbd: formatiereProzentSpanne(strain.cbdMinProzent, strain.cbdMaxProzent, 1, sprache),
+                })}
+              </p>
+            </div>
+            {strain.terpene.length > 0 ? <TerpenProfil terpene={strain.terpene} w={w} sprache={sprache} /> : null}
+          </div>
         </div>
-          {strain.terpene.length > 0 ? <TerpenProfil terpene={strain.terpene} w={w} sprache={sprache} /> : null}
-        </div>
-      </div>
+      </details>
     </section>
   );
   // Nach dem Anmelden zurück an die Maske; das Fragment kodiert, sonst gehört es zu /anmelden.
@@ -288,7 +341,8 @@ async function ProduktInhalt({ slug, w, sprache }: { slug: string; w: Woerterbuc
 
       {/* Alle Bewertungen der Sorte als ein Buch zum Blättern (T7): Betreiber zuerst,
           dann die Community. Ersetzt die eigenen Doppelseiten untereinander und die Liste. */}
-      <div className={ABSTAND}>
+      <div className={SEKTION}>
+        <Schlagwort satz={texte.schlagwort.bewertungen} ton="lila" />
         <BewertungsBuch reviews={strain.reviews} kennwerte={strain.kennwerte} produkt={produkt} w={w} sprache={sprache} katalog={katalog} />
       </div>
 
@@ -298,21 +352,33 @@ async function ProduktInhalt({ slug, w, sprache }: { slug: string; w: Woerterbuc
       <section
         id="bewerten"
         aria-labelledby="bewerten-titel"
-        className={cn(ABSTAND, "flex scroll-mt-[calc(var(--kopf-h,4rem)+2rem)] flex-col gap-4")}
+        className={cn(SEKTION, "flex scroll-mt-[calc(var(--kopf-h,4rem)+2rem)] flex-col gap-4")}
       >
-        <h2 id="bewerten-titel" className={ABSCHNITT_TITEL}>
-          {mitglied?.freigegeben
-            ? vorbelegung
-              ? texte.deineBewertung
-              : texte.bewerten
-            : erkundung.serien.length > 0
-              ? texte.profilFrage
-              : texte.bewerten}
-        </h2>
+        <Schlagwort satz={texte.schlagwort.bewerten} ton="gruen" />
+        <SektionsKopf
+          id="bewerten-titel"
+          titel={
+            mitglied?.freigegeben
+              ? vorbelegung
+                ? texte.deineBewertung
+                : texte.bewerten
+              : erkundung.serien.length > 0
+                ? texte.profilFrage
+                : texte.bewerten
+          }
+          satz={
+            mitglied?.freigegeben
+              ? w.bewerten.satz
+              : erkundung.serien.length > 0
+                ? geschmack.anzahlBewertungen >= 1
+                  ? t(texte.profilMitCommunity, { anzahl: geschmack.anzahlBewertungen })
+                  : texte.profilOhneCommunity
+                : undefined
+          }
+        />
         {mitglied?.freigegeben ? (
           <>
-            <p className="max-w-[68ch] text-body text-text-muted text-pretty">{w.bewerten.satz}</p>
-            <div className="mt-4">
+            <div className="mt-8">
               <BewertungsFormular
                 strainId={strain.id}
                 handelsname={strain.handelsname}
@@ -332,24 +398,17 @@ async function ProduktInhalt({ slug, w, sprache }: { slug: string; w: Woerterbuc
         ) : (
           <>
             {erkundung.serien.length > 0 ? (
-              <>
-                <p className="max-w-[68ch] text-body text-text-muted text-pretty">
-                  {geschmack.anzahlBewertungen >= 1
-                    ? t(texte.profilMitCommunity, { anzahl: geschmack.anzahlBewertungen })
-                    : texte.profilOhneCommunity}
-                </p>
-                <div className="mt-4">
-                  <AromaErkundung
-                    titel={strain.handelsname}
-                        terpene={strain.terpene}
-                    katalog={katalog}
-                    texte={aromaTexte(w, sprache)}
-                    {...erkundung}
-                  />
-                </div>
-              </>
+              <div className="mt-8">
+                <AromaErkundung
+                  titel={strain.handelsname}
+                  terpene={strain.terpene}
+                  katalog={katalog}
+                  texte={aromaTexte(w, sprache)}
+                  {...erkundung}
+                />
+              </div>
             ) : null}
-            <div className="mt-8 flex flex-col items-start gap-4">
+            <div className="mt-8 flex flex-col items-center gap-4 text-center">
               {mitglied ? (
                 <p className="max-w-[60ch] text-body text-text">{w.bewerten.nichtFreigegeben}</p>
               ) : (
@@ -367,13 +426,13 @@ async function ProduktInhalt({ slug, w, sprache }: { slug: string; w: Woerterbuc
       </section>
 
       {aehnliche.length > 0 ? (
-        <section aria-labelledby="aehnlich-titel" className={ABSTAND}>
-          <h2 id="aehnlich-titel" className={ABSCHNITT_TITEL}>
-            {w.empfehlung.bluetenTitel}
-          </h2>
-          <p className="mt-2 max-w-[68ch] text-small text-text-muted">
-            {w.empfehlung.bluetenSatz} {w.empfehlung.hinweis}
-          </p>
+        <section aria-labelledby="aehnlich-titel" className={SEKTION}>
+          <Schlagwort satz={texte.schlagwort.aehnlich} ton="lila" />
+          <SektionsKopf
+            id="aehnlich-titel"
+            titel={w.empfehlung.bluetenTitel}
+            satz={`${w.empfehlung.bluetenSatz} ${w.empfehlung.hinweis}`}
+          />
           <EmpfehlungsListe
             className="mt-8"
             eintraege={aehnliche.map((a) => ({
@@ -393,12 +452,7 @@ async function ProduktInhalt({ slug, w, sprache }: { slug: string; w: Woerterbuc
       ) : null}
 
       <section aria-labelledby="chargen-titel" className={ABSTAND}>
-        <h2 id="chargen-titel" className={ABSCHNITT_TITEL}>
-          {texte.chargen}
-        </h2>
-        <p className="mt-2 max-w-[68ch] text-small text-text-muted">
-          {texte.chargenSatz}
-        </p>
+        <SektionsKopf id="chargen-titel" titel={texte.chargen} satz={texte.chargenSatz} />
         <div className="mt-8">
           <Chargentabelle chargen={strain.chargen} w={w} sprache={sprache} />
         </div>

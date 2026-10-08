@@ -1,4 +1,3 @@
-import { ABSCHNITT_TITEL } from "@/components/layout/Seitenkopf";
 import { Buch } from "@/components/review/Buch";
 import { BuchDoppelseite } from "@/components/review/BuchDoppelseite";
 import { alsEintrag, eintragAnker } from "@/components/review/eintrag";
@@ -40,8 +39,9 @@ export function BewertungsBuch({
   const seiten = buchReihenfolge(reviews);
   return (
     <section aria-labelledby="bewertungen-titel" className="flex flex-col gap-8">
-      <div className="flex flex-col items-start gap-4">
-        <h2 id="bewertungen-titel" className={ABSCHNITT_TITEL}>
+      {/* Kopf mittig wie die Startseite (Nutzer 2026-10-08). */}
+      <div className="mx-auto flex max-w-3xl flex-col items-center gap-4 text-center">
+        <h2 id="bewertungen-titel" className="font-buch text-kapitel text-balance text-text">
           {w.buch.titel}
         </h2>
         {median !== null && kennwerte ? (

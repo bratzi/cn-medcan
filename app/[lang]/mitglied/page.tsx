@@ -25,6 +25,7 @@ import { musterBildId } from "@/lib/budpics";
 import { formatiereDatum } from "@/lib/format";
 import { holeSprache, holeWoerterbuch } from "@/lib/i18n";
 import { t } from "@/lib/i18n/text";
+import type { Woerterbuch } from "@/lib/i18n/typen";
 import { kontoNotizen } from "@/lib/konto";
 import { benachrichtigungenLaden } from "@/lib/query/benachrichtigungen";
 import { ladeStimmen, stimmZahlen } from "@/lib/query/konto";
@@ -66,9 +67,9 @@ const stimmenLaden = cache((id: string) => ladeStimmen(id).catch(oderNull<Awaite
 const umfrageLaden = cache(() => aktiveUmfrage().catch(oderNull<Awaited<ReturnType<typeof aktiveUmfrage>>>("aktiveUmfrage")));
 
 /**
- * Dein Kapitel, Reiter Konto (Spec Profil und Konto 5, 7): links, was du
- * mitbestimmst (Umfrage, Stimmen, Nachrichten, Vorschläge), darunter die
- * Einstellungen. Seit Spec Profil 6 ist diese Seite der Reiter Konto von
+ * Dein Kapitel, Reiter Konto (Spec Profil und Konto 5, 7): oben dein Konto
+ * (Angaben, Avatar, Sichtbarkeit, Status, Nachrichten), darunter, was du
+ * mitbestimmst (Umfrage, Vorschläge, Stimmen). Seit Spec Profil 6 ist diese Seite der Reiter Konto von
  * /profil; die Empfehlungen stehen dort als bestätigte Vorschläge.
  */
 export default async function MitgliedPage() {
@@ -100,41 +101,14 @@ export default async function MitgliedPage() {
           <Notizen id={id} dabeiSeit={mitglied.erstelltAm} />
         </ViewTransition>
       </Suspense>
-      <Suspense
-        fallback={
-          <>
-            <FeldSkelett spalten={6} />
-            <FeldSkelett spalten={4} />
-          </>
-        }
-      >
-        <ViewTransition>
-          <ReiheUmfrage id={id} freigegeben={mitglied.freigegeben} rolle={mitglied.rolle} />
-        </ViewTransition>
-      </Suspense>
-      <Suspense fallback={<FeldSkelett spalten={10} hoehe="gross" />}>
-        <ViewTransition>
-          <ReiheStimmen id={id} />
-        </ViewTransition>
-      </Suspense>
-      <Suspense
-        fallback={
-          <>
-            <FeldSkelett spalten={6} />
-            <FeldSkelett spalten={4} />
-          </>
-        }
-      >
-        <ViewTransition>
-          <ReiheNachrichten id={id} />
-        </ViewTransition>
-      </Suspense>
-
-      <Feld id="avatar" spalten={3} titel={texte.avatar.titel}>
-        <AvatarFormular name={mitglied.anzeigename} avatarId={mitglied.avatarId} texte={texte.avatar} meldungen={w.meldung} />
-      </Feld>
+      {/* Reihenfolge (Nutzer 2026-10-08): erst, was dein Konto ausmacht (Angaben,
+          Avatar, Sichtbarkeit, Status, Nachrichten), danach die Umfrage und
+          zuletzt der Rückblick auf deine Stimmen. */}
       <Feld id="angaben" spalten={4} titel={texte.angaben}>
         <ProfilFormular anzeigename={mitglied.anzeigename} instagramHandle={mitglied.instagramHandle} texte={texte.profil} />
+      </Feld>
+      <Feld id="avatar" spalten={3} titel={texte.avatar.titel}>
+        <AvatarFormular name={mitglied.anzeigename} avatarId={mitglied.avatarId} texte={texte.avatar} meldungen={w.meldung} />
       </Feld>
       <Feld id="sichtbarkeit" spalten={3} titel={texte.sichtbarkeit.titel}>
         <ProfilSichtbarkeit
@@ -145,6 +119,29 @@ export default async function MitgliedPage() {
           texte={texte.sichtbarkeit}
         />
       </Feld>
+      <Status freigegeben={mitglied.freigegeben} rolle={mitglied.rolle} texte={texte} />
+      <Suspense fallback={<FeldSkelett spalten={6} />}>
+        <ViewTransition>
+          <ReiheNachrichten id={id} />
+        </ViewTransition>
+      </Suspense>
+      <Suspense
+        fallback={
+          <>
+            <FeldSkelett spalten={6} />
+            <FeldSkelett spalten={4} />
+          </>
+        }
+      >
+        <ViewTransition>
+          <ReiheUmfrage id={id} freigegeben={mitglied.freigegeben} />
+        </ViewTransition>
+      </Suspense>
+      <Suspense fallback={<FeldSkelett spalten={10} hoehe="gross" />}>
+        <ViewTransition>
+          <ReiheStimmen id={id} />
+        </ViewTransition>
+      </Suspense>
 
       {/* Der einzige Einstieg zu /admin. Bewusst nicht in der Navigation:
           die muesste sonst auf jeder Seite die Sitzung lesen und waere
@@ -165,7 +162,7 @@ async function KopfBild({ id }: { id: string }) {
   const stimmen = await stimmenLaden(id);
   const letzte = stimmen?.[0];
   const bildId = letzte ? ersatzBildId(letzte.bildPfad, letzte.slug) : musterBildId("konto");
-  return <Bild id={bildId} sizes="(min-width: 1080px) 35vw, 0px" dekorativ />;
+  return <Bild id={bildId} sizes="(min-width: 1080px) 224px, 0px" dekorativ />;
 }
 
 async function Notizen({ id, dabeiSeit }: { id: string; dabeiSeit: Date }) {
@@ -193,9 +190,38 @@ async function Notizen({ id, dabeiSeit }: { id: string; dabeiSeit: Date }) {
   );
 }
 
-/** Reihe 1: die Umfrage jetzt als Stimmzettel (6) und dein Status (4). */
-async function ReiheUmfrage({ id, freigegeben, rolle }: { id: string; freigegeben: boolean; rolle: keyof Awaited<ReturnType<typeof textLaden>>["w"]["mitglied"]["rollen"] }) {
-  const [{ w, sprache }, umfrage] = await Promise.all([textLaden(), umfrageLaden()]);
+/** Dein Status (4): freigegeben oder nicht, und deine Rolle. */
+function Status({
+  freigegeben,
+  rolle,
+  texte,
+}: {
+  freigegeben: boolean;
+  rolle: keyof Woerterbuch["mitglied"]["rollen"];
+  texte: Woerterbuch["mitglied"];
+}) {
+  return (
+    <Feld id="status" spalten={4} titel={texte.status}>
+      <div className="flex flex-wrap items-center gap-2">
+        {/* Zustand nie nur ueber Farbe: das Badge traegt Klartext und
+            einen Formmarker, daneben steht ein erklaerender Satz. */}
+        {freigegeben ? (
+          <Badge variante="success">{texte.freigegeben}</Badge>
+        ) : (
+          <Badge variante="warning">{texte.freigabeAus}</Badge>
+        )}
+        <Badge variante="neutral" zeichen={false}>
+          {t(texte.rolle, { rolle: texte.rollen[rolle] })}
+        </Badge>
+      </div>
+      <p className="max-w-[68ch] text-body text-text-muted">{freigegeben ? texte.freigegebenText : texte.nichtFreigegebenText}</p>
+    </Feld>
+  );
+}
+
+/** Danach: die Umfrage jetzt als Stimmzettel (6) und deine Blüten-Vorschläge (4). */
+async function ReiheUmfrage({ id, freigegeben }: { id: string; freigegeben: boolean }) {
+  const [{ w, sprache }, umfrage, vorschlaege] = await Promise.all([textLaden(), umfrageLaden(), vorschlaegeLaden(id)]);
   const texte = w.mitglied;
   const eigene = umfrage ? await eigeneStimme(umfrage.id, id).catch(oderNull<Awaited<ReturnType<typeof eigeneStimme>>>("eigeneStimme")) : null;
   return (
@@ -209,73 +235,6 @@ async function ReiheUmfrage({ id, freigegeben, rolle }: { id: string; freigegebe
           phasen={w.umfrage.phasen}
           sprache={sprache}
         />
-      </Feld>
-      <Feld id="status" spalten={4} titel={texte.status}>
-        <div className="flex flex-wrap items-center gap-2">
-          {/* Zustand nie nur ueber Farbe: das Badge traegt Klartext und
-              einen Formmarker, daneben steht ein erklaerender Satz. */}
-          {freigegeben ? (
-            <Badge variante="success">{texte.freigegeben}</Badge>
-          ) : (
-            <Badge variante="warning">{texte.freigabeAus}</Badge>
-          )}
-          <Badge variante="neutral" zeichen={false}>
-            {t(texte.rolle, { rolle: texte.rollen[rolle] })}
-          </Badge>
-        </div>
-        <p className="max-w-[68ch] text-body text-text-muted">{freigegeben ? texte.freigegebenText : texte.nichtFreigegebenText}</p>
-      </Feld>
-    </>
-  );
-}
-
-/** Reihe 2: deine Stimmen, die Schleife (10). */
-async function ReiheStimmen({ id }: { id: string }) {
-  const [{ w, sprache }, stimmen] = await Promise.all([textLaden(), stimmenLaden(id)]);
-  const texte = w.mitglied;
-  return (
-    <Feld id="stimmen" spalten={10} titel={texte.stimmenTitel} satz={texte.stimmenSatz}>
-      {stimmen === null ? (
-        <p className="max-w-[68ch] text-body text-text">{w.profil.fehler}</p>
-      ) : (
-        <MeineStimmen stimmen={stimmen} texte={texte} sprache={sprache} />
-      )}
-    </Feld>
-  );
-}
-
-/** Reihe 3: Benachrichtigungen (6) und deine Blüten-Vorschläge (4). */
-async function ReiheNachrichten({ id }: { id: string }) {
-  const [{ w, sprache }, nachrichten, vorschlaege] = await Promise.all([textLaden(), nachrichtenLaden(id), vorschlaegeLaden(id)]);
-  const texte = w.mitglied;
-  const ungelesen = (nachrichten ?? []).filter((n) => !n.gelesen).map((n) => n.id);
-  return (
-    <>
-      <Feld id="nachrichten" spalten={6} titel={texte.benachrichtigungen}>
-        {nachrichten === null ? (
-          <p className="max-w-[68ch] text-body text-text">{w.profil.fehler}</p>
-        ) : nachrichten.length === 0 ? (
-          <p className="text-body text-text-muted">{texte.nichtsNeues}</p>
-        ) : (
-          <ul className="flex flex-col gap-4">
-            {nachrichten.map((n) => (
-              <li key={n.id} className="flex flex-col gap-2">
-                <span className="flex flex-wrap items-center gap-2 text-small text-text-muted">
-                  <span className="numeric">{formatiereDatum(n.erstelltAm, sprache)}</span>
-                  {!n.gelesen ? <Badge variante="accent">{texte.neu}</Badge> : null}
-                </span>
-                {n.link ? (
-                  <Link prefetch={false} href={n.link} className={textLinkKlassen()}>
-                    {benachrichtigungSatz(w.benachrichtigung, n)}
-                  </Link>
-                ) : (
-                  <span className="text-body text-text">{benachrichtigungSatz(w.benachrichtigung, n)}</span>
-                )}
-              </li>
-            ))}
-          </ul>
-        )}
-        <GelesenMarkieren ids={ungelesen} />
       </Feld>
       <Feld id="vorschlaege" spalten={4} titel={texte.meineVorschlaege}>
         {vorschlaege === null ? (
@@ -308,5 +267,55 @@ async function ReiheNachrichten({ id }: { id: string }) {
         </Link>
       </Feld>
     </>
+  );
+}
+
+/** Zuletzt: deine Stimmen, die Schleife (10). */
+async function ReiheStimmen({ id }: { id: string }) {
+  const [{ w, sprache }, stimmen] = await Promise.all([textLaden(), stimmenLaden(id)]);
+  const texte = w.mitglied;
+  return (
+    <Feld id="stimmen" spalten={10} titel={texte.stimmenTitel} satz={texte.stimmenSatz}>
+      {stimmen === null ? (
+        <p className="max-w-[68ch] text-body text-text">{w.profil.fehler}</p>
+      ) : (
+        <MeineStimmen stimmen={stimmen} texte={texte} sprache={sprache} />
+      )}
+    </Feld>
+  );
+}
+
+/** Neben dem Status: deine Benachrichtigungen (6). */
+async function ReiheNachrichten({ id }: { id: string }) {
+  const [{ w, sprache }, nachrichten] = await Promise.all([textLaden(), nachrichtenLaden(id)]);
+  const texte = w.mitglied;
+  const ungelesen = (nachrichten ?? []).filter((n) => !n.gelesen).map((n) => n.id);
+  return (
+    <Feld id="nachrichten" spalten={6} titel={texte.benachrichtigungen}>
+      {nachrichten === null ? (
+        <p className="max-w-[68ch] text-body text-text">{w.profil.fehler}</p>
+      ) : nachrichten.length === 0 ? (
+        <p className="text-body text-text-muted">{texte.nichtsNeues}</p>
+      ) : (
+        <ul className="flex flex-col gap-4">
+          {nachrichten.map((n) => (
+            <li key={n.id} className="flex flex-col gap-2">
+              <span className="flex flex-wrap items-center gap-2 text-small text-text-muted">
+                <span className="numeric">{formatiereDatum(n.erstelltAm, sprache)}</span>
+                {!n.gelesen ? <Badge variante="accent">{texte.neu}</Badge> : null}
+              </span>
+              {n.link ? (
+                <Link prefetch={false} href={n.link} className={textLinkKlassen()}>
+                  {benachrichtigungSatz(w.benachrichtigung, n)}
+                </Link>
+              ) : (
+                <span className="text-body text-text">{benachrichtigungSatz(w.benachrichtigung, n)}</span>
+              )}
+            </li>
+          ))}
+        </ul>
+      )}
+      <GelesenMarkieren ids={ungelesen} />
+    </Feld>
   );
 }
