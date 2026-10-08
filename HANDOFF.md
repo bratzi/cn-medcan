@@ -31,8 +31,9 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 ### ⇢ WARTELISTE (Nutzer 2026-10-09, Reihenfolge)
 
 1. ~~Dein Kapitel~~ **live** (siehe Session 52 unten).
-2. **Profil und Konto entkoppeln** (Entwurf im Chat, Nutzer-Bestätigung offen): Menü Bewertungen, Abstimmung,
-   Blüten, **Profil**; Knopf rechts „Mein Konto“ (/mitglied) mit Zähler; ProfilReiter weg; Texte „unter Mein Konto“.
+2. ~~Profil und Konto entkoppeln~~ **erledigt `b690830`** (live-Sicht offen): Menü mit „Profil“, Knopf „Mein Konto“
+   nach /mitglied, ProfilReiter gelöscht, Kapitelkopf nennt die Seite (`seite`). „Dein Kapitel“ steht seit
+   `66f5afe` direkt hinter dem Terpen-Register (Nutzer: zu weit unten).
 3. ~~Auftakt-Kennzahlen~~ **erledigt `2d126fd`** (live-Sicht offen): klickbar (Sorten nach /blueten, Bewertungen nach /reviews, Stimmen nach /umfragen)
    und in der Akzentschrift Mr Dafoe (Nutzer-Ausnahme von „Zahlen gedruckt“, ins Regelwerk eintragen).
 4. **Buch-Darstellung überall neu** (Brainstorming, Design-Skills): Blätter-Bewertung zentrierter im Fokus,
