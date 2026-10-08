@@ -28,6 +28,21 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 
 ## ⇢ Hier geht es weiter
 
+### ⇢ WARTELISTE (Nutzer 2026-10-09, Reihenfolge)
+
+1. **Dein Kapitel** zu Ende: Stränge A/B/C fertig, Task-Reviews laufen, dann Merge A, B, C, Gesamtreview Opus,
+   eine Fix-Welle, Push, live. Ledger `.superpowers/sdd/2026-10-09-startseite-dein-kapitel/progress.md`.
+2. **Profil und Konto entkoppeln** (Entwurf im Chat, Nutzer-Bestätigung offen): Menü Bewertungen, Abstimmung,
+   Blüten, **Profil**; Knopf rechts „Mein Konto“ (/mitglied) mit Zähler; ProfilReiter weg; Texte „unter Mein Konto“.
+3. **Auftakt-Kennzahlen**: klickbar (Sorten nach /blueten, Bewertungen nach /reviews, Stimmen nach /umfragen)
+   und in der Akzentschrift Mr Dafoe (Nutzer-Ausnahme von „Zahlen gedruckt“, ins Regelwerk eintragen).
+4. **Buch-Darstellung überall neu** (Brainstorming, Design-Skills): Blätter-Bewertung zentrierter im Fokus,
+   Nutzertext kursiv/abgesetzt als Nutzerstimme, Akzentschrift rein, Profil mit Namen kleiner und eingefasst;
+   gilt für jedes Buch (/reviews, Startseite, Blütenseite).
+
+Erledigt dazwischen: **`a4a03b2`** Terpenband-Tooltip nicht mehr abgeschnitten (Band nur waagrecht beschnitten),
+Einträge sind Links auf ihre Register-Tafel, Register schlägt per hashchange auf. Live-Prüfung offen.
+
 ### ⇢ SESSION 53 (Sessionstart): Spec „Dein Kapitel“ freigeben lassen, dann Plan
 
 **Großer Punkt (Nutzer 2026-10-09):** Profil als Highlight-Sektion auf der Startseite, agenturreif.
