@@ -44,6 +44,8 @@ const UMGESTELLT: string[] = [
   "components/review/Aufklaerung.tsx",
   // T7: Buch zum Blättern (CommunityStimmen ging darin auf).
   "components/review/Buch.tsx",
+  "components/rangliste/Ranglisten.tsx",
+  "components/rangliste/RanglistenKarte.tsx",
   "components/review/BewertungsBuch.tsx",
   "components/review/BlattAnzeige.tsx",
   "components/medien/SchalterSymbole.tsx",
