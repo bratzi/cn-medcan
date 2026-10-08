@@ -39,9 +39,13 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 4. **Buch-Darstellung überall neu** (Brainstorming, Design-Skills): Blätter-Bewertung zentrierter im Fokus,
    Nutzertext kursiv/abgesetzt als Nutzerstimme, Akzentschrift rein, Profil mit Namen kleiner und eingefasst;
    gilt für jedes Buch (/reviews, Startseite, Blütenseite).
+5. **Bewertungsformular mit Fazit und Live-Terpenprofil** (großer Punkt, alle Design-Skills, Agentur-Niveau):
+   das Fazit wie auf der Startseite fehlt beim Bewerten; daneben das eigene Terpenprofil (Netz), das sich
+   beim Bewerten einer neuen Sorte live verändert.
 
 Erledigt dazwischen: **`a4a03b2`** Terpenband-Tooltip nicht mehr abgeschnitten (Band nur waagrecht beschnitten),
-Einträge sind Links auf ihre Register-Tafel, Register schlägt per hashchange auf. Live-Prüfung offen.
+Einträge sind Links auf ihre Register-Tafel, Register schlägt per hashchange auf; live geprüft (Tooltip ganz, Sprung geht).
+`ce112cb` Notenbalken im Tooltip wieder sichtbar (Block gestreckt), `fb5c2b8` Tafel mit Kopfabstand beim Sprung.
 
 ### ⇢ SESSION 53 (Sessionstart): Spec „Dein Kapitel“ freigeben lassen, dann Plan
 
