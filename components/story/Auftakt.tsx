@@ -35,7 +35,7 @@ export async function Auftakt() {
     <section
       aria-labelledby="auftakt-titel"
       data-story="auftakt"
-      className="buehne-dunkel relative isolate -mt-(--kopf-h,4rem) flex min-h-svh flex-col overflow-hidden pt-[calc(var(--kopf-h,4rem)+4rem)] pb-8"
+      className="buehne-dunkel relative isolate -mt-(--kopf-h,4rem) flex min-h-svh flex-col overflow-hidden pt-[calc(var(--kopf-h,4rem)+4rem)] pb-24"
     >
       <div aria-hidden="true" data-story="auftakt-film" className="pointer-events-none absolute inset-0 -z-10">
         {/* Je Thema ein eigenes Video (Nutzer 2026-09-29); das verborgene lädt nichts. */}
@@ -44,6 +44,10 @@ export async function Auftakt() {
         {/* Mitte auf 30 % statt 5 % (Spec 2026-10-08 Auftakt, 7.3): die Oberzeile trägt
             auch auf hellen Frames. Gemessen nach dem Deploy, Ziel 4,5:1. */}
         <div className="absolute inset-0 bg-linear-to-b from-surface/40 via-surface/30 to-surface" />
+        {/* Weicher Übergang in den Seitengrund (Nutzer 2026-10-09): die Bühne ist in beiden
+            Modi dunkel, darunter beginnt hell das Band; ohne Verlauf war die Kante beim Scrollen
+            hart. 96 px, nur Hintergrund, unter der Kopfzeile (pb-24 hält die Zone frei). */}
+        <div className="auftakt-uebergang absolute inset-x-0 bottom-0 h-24" />
       </div>
 
       {/* Wortmarke und Unterzeile als eine Gruppe auf gemeinsamer Achse: die

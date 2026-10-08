@@ -669,6 +669,24 @@
   background-color: var(--color-surface);
 }
 
+/* Seitengrund außerhalb der Bühne: auf :root aufgelöst und so vererbt, dass er auch
+   innerhalb von .buehne-dunkel den echten Grund der Seite trägt. */
+:root {
+  --color-seite: var(--color-surface);
+}
+
+/* Übergang am Fuß des Auftakts (Nutzer 2026-10-09): von der dunklen Bühne weich in den
+   Seitengrund, mit gestaffelten Stufen statt linear, damit kein Saum entsteht. */
+.auftakt-uebergang {
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    color-mix(in oklab, var(--color-seite) 20%, transparent) 30%,
+    color-mix(in oklab, var(--color-seite) 60%, transparent) 60%,
+    var(--color-seite)
+  );
+}
+
 /* Farbverlauf Grün, Lila, Grün (Spec Redesign 12) für je ein Schlüsselwort
    einer Überschrift. Beide Enden tragen >= 4.5 auf surface, der Verlauf also
    auch. Ohne background-clip-Unterstützung bleibt die Farbe accent. */
