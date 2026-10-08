@@ -65,3 +65,6 @@ db/.migrate-diff.sqlite
 # private Sammlung des Nutzers, Repo ist public
 /1.json
 __pycache__/
+
+# Arbeitsverzeichnisse der Agenten (eigene Git-Repos, nie mitcommitten)
+.claude/worktrees/
