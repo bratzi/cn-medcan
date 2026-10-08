@@ -477,6 +477,9 @@ export const en: Woerterbuch = {
     keinText: "No text with this review.",
     bilderDiashow: "Images with the review by {name}",
     blaetter: "of 5 leaves",
+    leiste: "All entries",
+    nummer: "Entry {nummer}",
+    grossBereich: "All reviews",
   },
   reviews: {
     titel: "Reviews",
@@ -485,8 +488,6 @@ export const en: Woerterbuch = {
     leerTitel: "The first chapter is being written.",
     leerText: "The vote decides which strain I test first.",
     zurAbstimmung: "To the vote",
-    neuester: "The latest entry",
-    alle: "All entries",
   },
   bewerten: {
     satz: "Following a fixed scheme, tied to one batch. So that we can compare.",

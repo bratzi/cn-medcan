@@ -14,6 +14,8 @@ import {
   type ReactNode,
 } from "react";
 
+import Link from "next/link";
+
 import { SchalterSymbole } from "@/components/medien/SchalterSymbole";
 import { AufgeschlagenKontext } from "@/components/review/NurAufgeschlagen";
 import {
@@ -21,10 +23,14 @@ import {
   ankerSeite,
   autoBlaettern,
   autoZiel,
+  bandHref,
+  bandVon,
   blaetterPlan,
   drehRichtung,
   klickRichtung,
   nahSeite,
+  nummerSeite,
+  seitenleiste,
   tastenRichtung,
   wischRichtung,
   zielSeite,
@@ -40,6 +46,12 @@ export type BuchTexte = Pick<
   Woerterbuch["buch"],
   "tastatur" | "seite" | "zurueck" | "weiter" | "anhalten" | "abspielen"
 >;
+
+/**
+ * Seitenleiste des großen Buchs (Spec Bewertungsbuch 4): `basis` Einträge liegen in früheren Bänden,
+ * `gesamt` zählt alle Einträge über alle Bände. Nur serialisierbare Werte.
+ */
+export type BuchLeiste = { basis: number; gesamt: number; texte: { leiste: string; nummer: string } };
 
 /** Eine Seite des Buchs: eine Doppelseite, gefunden über ihren Anker (#eintrag-…). */
 export type BuchSeite = { anker: string; inhalt: ReactNode };
@@ -234,6 +246,13 @@ const KNOPF =
   "transition-[background-color,scale] duration-[var(--duration-fast),120ms] ease-[cubic-bezier(0.23,1,0.32,1)] hover:bg-surface-sunken " +
   "motion-safe:active:scale-[0.97] aria-disabled:cursor-default aria-disabled:opacity-50 aria-disabled:hover:bg-surface-raised aria-disabled:active:scale-100";
 
+/** Eine Nummer der Seitenleiste: 44-px-Pille wie die Knöpfe. */
+const PILLE =
+  "inline-flex size-11 items-center justify-center rounded-full border numeric text-small " +
+  "transition-[background-color,scale] duration-[var(--duration-fast),120ms] ease-[cubic-bezier(0.23,1,0.32,1)] motion-safe:active:scale-[0.97]";
+const PILLE_RUHIG = "border-border-strong bg-surface-raised text-text hover:bg-surface-sunken";
+const PILLE_AKTUELL = "border-accent bg-accent text-accent-fg";
+
 type Stand = {
   /** Die aufgeschlagene Seite. */
   index: number;
@@ -258,7 +277,17 @@ type Stand = {
  * blättert; während des Autoplays schweigt sie (APG Carousel), sonst spräche
  * sie alle 8 s.
  */
-export function Buch({ seiten, bezeichnung, texte }: { seiten: readonly BuchSeite[]; bezeichnung: string; texte: BuchTexte }) {
+export function Buch({
+  seiten,
+  bezeichnung,
+  texte,
+  leiste,
+}: {
+  seiten: readonly BuchSeite[];
+  bezeichnung: string;
+  texte: BuchTexte;
+  leiste?: BuchLeiste;
+}) {
   const anzahl = seiten.length;
   const mehrere = anzahl > 1;
   const buehne = useRef<HTMLDivElement>(null);
@@ -285,10 +314,12 @@ export function Buch({ seiten, bezeichnung, texte }: { seiten: readonly BuchSeit
   const [letzterAnker, setLetzterAnker] = useState(keinAnker);
   if (anker !== letzterAnker) {
     setLetzterAnker(anker);
-    const seite = ankerSeite(
-      anker,
-      seiten.map((eintrag) => eintrag.anker),
-    );
+    // #nr-<n> (Seitenleiste, aus einem anderen Band) gilt nur mit Seitenleiste.
+    const seite =
+      ankerSeite(
+        anker,
+        seiten.map((eintrag) => eintrag.anker),
+      ) ?? (leiste ? nummerSeite(anker, leiste.basis, anzahl) : null);
     if (seite !== null) setStand({ index: seite, vorher: null });
   }
 
@@ -534,6 +565,42 @@ export function Buch({ seiten, bezeichnung, texte }: { seiten: readonly BuchSeit
             {texte.tastatur}
           </p>
         </div>
+      ) : null}
+      {leiste && leiste.gesamt > 1 ? (
+        <nav aria-label={leiste.texte.leiste} className="flex flex-wrap justify-center gap-2">
+          {seitenleiste(leiste.basis + stand.index + 1, leiste.gesamt).map((punkt) => {
+            if (punkt.art === "luecke") {
+              return (
+                <span key={punkt.schluessel} aria-hidden="true" className="inline-flex h-11 items-center text-text-muted">
+                  …
+                </span>
+              );
+            }
+            const n = punkt.nummer;
+            const beschriftung = t(leiste.texte.nummer, { nummer: n });
+            const imBand = n > leiste.basis && n <= leiste.basis + anzahl;
+            if (!imBand) {
+              return (
+                <Link key={n} prefetch={false} href={`${bandHref(bandVon(n))}#nr-${n}`} aria-label={beschriftung} className={cn(PILLE, PILLE_RUHIG)}>
+                  {n}
+                </Link>
+              );
+            }
+            const aktuell = n === leiste.basis + stand.index + 1;
+            return (
+              <button
+                key={n}
+                type="button"
+                aria-label={beschriftung}
+                aria-current={aktuell ? "page" : undefined}
+                onClick={() => blaettern(n - leiste.basis - 1)}
+                className={cn(PILLE, aktuell ? PILLE_AKTUELL : PILLE_RUHIG)}
+              >
+                {n}
+              </button>
+            );
+          })}
+        </nav>
       ) : null}
     </div>
   );

@@ -21,7 +21,7 @@ export function einzelLinkKlassen(className?: string): string {
 }
 
 /**
- * Handelsnamen als Link in Listen (Inhaltsverzeichnis, Vorschläge,
+ * Handelsnamen als Link in Listen (Vorschläge,
  * Stimmzettel): Tinte, der Unterstrich zeigt den Link, beim Hover dunkelt
  * nur die Unterstrichfarbe nach (Guideline 7).
  */
