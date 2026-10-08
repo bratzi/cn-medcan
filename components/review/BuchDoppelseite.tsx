@@ -12,7 +12,7 @@ import { BuchNotiz } from "@/components/review/BuchNotiz";
 import { BuchReiter, ReiterLeiste, type BuchReiterEintrag } from "@/components/review/BuchReiter";
 import { NotenLeiste } from "@/components/review/NotenLeiste";
 import { NurAufgeschlagen } from "@/components/review/NurAufgeschlagen";
-import { eintragAnker, type EintragDaten } from "@/components/review/eintrag";
+import { eintragAnker, eintragHref, type EintragDaten } from "@/components/review/eintrag";
 import { ablauf } from "@/components/review/eintritt";
 import { FALZ_LINKS, FALZ_RECHTS } from "@/components/review/falz";
 import { Avatar, Badge, namenLinkKlassen } from "@/components/ui";
@@ -37,6 +37,8 @@ export type BuchDoppelseiteProps = {
   sprache: Sprache;
   /** Terpenkatalog, damit die Karte vom Bewertenden ergänzte Terpene zeigen kann. */
   katalog?: readonly KatalogTerpen[];
+  /** Im großen Buch über alle Sorten: der Handelsname als Link über dem Kopf der linken Seite. */
+  sorte?: boolean;
 };
 
 /**
@@ -55,7 +57,7 @@ export type BuchDoppelseiteProps = {
  * Überschrift sind je Eintrag eindeutig, damit mehrere Doppelseiten gestapelt stehen können und
  * der Sprung auf #eintrag-… die richtige trifft.
  */
-export function BuchDoppelseite({ eintrag, ueberschrift: Ueberschrift, w, sprache, katalog = [] }: BuchDoppelseiteProps) {
+export function BuchDoppelseite({ eintrag, ueberschrift: Ueberschrift, w, sprache, katalog = [], sorte = false }: BuchDoppelseiteProps) {
   const texte = aromaTexte(w, sprache);
   const anker = eintragAnker(eintrag.id);
   const titelId = `${anker}-titel`;
@@ -118,6 +120,13 @@ export function BuchDoppelseite({ eintrag, ueberschrift: Ueberschrift, w, sprach
       className="grid scroll-mt-8 grid-cols-1 border border-border-strong bg-surface-raised shadow-md lg:min-h-(--buch-h) lg:grid-cols-2"
     >
       <div data-buchseite="links" className={cn(SEITE, FALZ_LINKS)}>
+        {sorte ? (
+          <p className="font-buch text-h3 text-text">
+            <Link prefetch={false} href={eintragHref(eintrag.slug, eintrag.id)} className={namenLinkKlassen()}>
+              {eintrag.handelsname}
+            </Link>
+          </p>
+        ) : null}
         <header data-eintritt="auf" style={ablauf(0)} className="flex flex-wrap items-center gap-x-6 gap-y-2">
           {hatPerson ? (
             // ring-offset-4 = 4px: optische Korrektur, der feine Ring liegt wie ein Stempel um das Bild.

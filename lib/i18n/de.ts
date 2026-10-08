@@ -486,6 +486,9 @@ export const de = {
     keinText: "Kein Text zu dieser Bewertung.",
     bilderDiashow: "Bilder zur Bewertung von {name}",
     blaetter: "von 5 Blättern",
+    leiste: "Alle Einträge",
+    nummer: "Eintrag {nummer}",
+    grossBereich: "Alle Bewertungen",
   },
   reviews: {
     titel: "Bewertungen",
@@ -494,8 +497,6 @@ export const de = {
     leerTitel: "Das erste Kapitel wird gerade geschrieben.",
     leerText: "Welche Sorte ich zuerst teste, entscheidet die Abstimmung.",
     zurAbstimmung: "Zur Abstimmung",
-    neuester: "Der neueste Eintrag",
-    alle: "Alle Einträge",
   },
   bewerten: {
     satz: "Nach festem Schema, an eine Charge gebunden. Damit wir vergleichen können.",

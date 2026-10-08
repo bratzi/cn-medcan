@@ -18,6 +18,8 @@ export type SeitenkopfProps = {
   zurueck?: { href: string; text: string };
   /** Kontoseiten: Spalte 480 px statt 1440 px. */
   schmal?: boolean;
+  /** Titel und Satz auch ab md mittig (Buch über alle Sorten). */
+  mittig?: boolean;
   /** Zusatz unter dem Satz, z. B. die E-Mail auf /mitglied. */
   children?: ReactNode;
 };
@@ -27,9 +29,9 @@ export type SeitenkopfProps = {
  * Du und Ich, keine Oberzeile. Ab md linksbuendig, schmal zentriert
  * (Nutzer 2026-09-27: mobil wirkte alles zu linksbuendig).
  */
-export function Seitenkopf({ titel, satz, zurueck, schmal = false, children }: SeitenkopfProps) {
+export function Seitenkopf({ titel, satz, zurueck, schmal = false, mittig = false, children }: SeitenkopfProps) {
   return (
-    <header className={cn(seitenRahmen(schmal), "pt-16 max-md:text-center sm:pt-24")}>
+    <header className={cn(seitenRahmen(schmal), "pt-16 sm:pt-24", mittig ? "text-center" : "max-md:text-center")}>
       {zurueck ? (
         <p className="mb-8">
           <Link prefetch={false} href={zurueck.href} className={einzelLinkKlassen()}>
@@ -38,7 +40,7 @@ export function Seitenkopf({ titel, satz, zurueck, schmal = false, children }: S
         </p>
       ) : null}
       <h1 className="font-buch text-kapitel text-balance text-text wrap-break-word">{titel}</h1>
-      {satz ? <p className="mt-4 max-w-[56ch] text-body text-pretty text-text-muted max-md:mx-auto">{satz}</p> : null}
+      {satz ? <p className={cn("mt-4 max-w-[56ch] text-body text-pretty text-text-muted max-md:mx-auto", mittig && "mx-auto")}>{satz}</p> : null}
       {children ? <div className="mt-4">{children}</div> : null}
     </header>
   );

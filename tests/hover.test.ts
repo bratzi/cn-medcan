@@ -15,7 +15,6 @@ export const DATEIEN = [
   "components/review/Buch.tsx",
   "components/review/BewertungsBuch.tsx",
   "components/review/Doppelseite.tsx",
-  "components/review/Inhaltsverzeichnis.tsx",
   "components/umfrage/StimmFormular.tsx",
   "components/umfrage/Kandidat.tsx",
   "components/umfrage/UmfrageKarte.tsx",
