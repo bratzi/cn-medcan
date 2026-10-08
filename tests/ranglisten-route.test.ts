@@ -18,3 +18,8 @@ test("Abfrage: GROUP BY in D1, nur freigegeben und aktive Sorten, höchstens 12 
   assert.match(abfrage, /s\.aktiv = 1/);
   assert.match(abfrage, /id: \{ in: ids \}/);
 });
+
+test("Abfrage: Betreiber-Note der neuesten Betreiber-Bewertung, Datumsformate vereinheitlicht", () => {
+  assert.match(abfrage, /ORDER BY strftime\('%Y-%m-%dT%H:%M:%fZ', b\.erstellt_am\) DESC, b\.id DESC LIMIT 1/);
+  assert.match(abfrage, /begrenzeSeite\(/);
+});

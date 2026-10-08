@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { KARTEN_JE_SEITE, ordne, parameter, seiteVon, type SortenZeile } from "@/lib/rangliste";
+import { begrenzeSeite, KARTEN_JE_SEITE, ordne, parameter, seiteVon, type SortenZeile } from "@/lib/rangliste";
 
 const z = (id: string, noten: number[], extra: Partial<SortenZeile> = {}): SortenZeile => ({
   strainId: id,
@@ -67,4 +67,12 @@ test("seiteVon: 12 je Seite, Seite außerhalb ergibt leer", () => {
   assert.equal(seiteVon(viele, 3).plaetze.length, 6);
   assert.equal(seiteVon(viele, 3).seiten, 3);
   assert.equal(seiteVon(viele, 9).plaetze.length, 0);
+});
+
+test("begrenzeSeite: Seite jenseits der letzten wird die letzte, nie unter 1", () => {
+  const viele = ordne(Array.from({ length: 30 }, (_, i) => z(`s${i}`, [1 + (i % 5)])), "hoechste");
+  assert.equal(begrenzeSeite(viele, 9), 3);
+  assert.equal(begrenzeSeite(viele, 2), 2);
+  assert.equal(begrenzeSeite(viele, 0), 1);
+  assert.equal(begrenzeSeite([], 5), 1);
 });

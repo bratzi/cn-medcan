@@ -52,3 +52,8 @@ export function seiteVon(plaetze: readonly Platz[], seite: number): { plaetze: P
   const seiten = Math.max(1, Math.ceil(plaetze.length / KARTEN_JE_SEITE));
   return { plaetze: plaetze.slice((seite - 1) * KARTEN_JE_SEITE, seite * KARTEN_JE_SEITE), seiten };
 }
+
+/** Seite auf 1 bis letzte Seite begrenzen: ein alter Hash darf nie ins Leere führen. */
+export function begrenzeSeite(plaetze: readonly Platz[], seite: number): number {
+  return Math.min(Math.max(1, seite), seiteVon(plaetze, 1).seiten);
+}

@@ -32,10 +32,13 @@ function ausHash(hash: string): { nach: Rangliste; seite: number } {
 const hoerer = new Set<() => void>();
 function abonniere(rueck: () => void) {
   hoerer.add(rueck);
+  // Zurück und Vor lösen popstate (und bei Hashwechsel hashchange) aus.
   window.addEventListener("hashchange", rueck);
+  window.addEventListener("popstate", rueck);
   return () => {
     hoerer.delete(rueck);
     window.removeEventListener("hashchange", rueck);
+    window.removeEventListener("popstate", rueck);
   };
 }
 const hashJetzt = () => window.location.hash;
@@ -65,7 +68,14 @@ export function Ranglisten({ texte, sprache }: Props) {
       .then(async (antwort) => {
         if (antwort.status === 401) return setzeLadung({ art: "gast", schluessel });
         if (!antwort.ok) return setzeLadung({ art: "fehler", schluessel });
-        setzeLadung({ art: "daten", antwort: (await antwort.json()) as RanglistenAntwort, schluessel });
+        const daten = (await antwort.json()) as RanglistenAntwort;
+        if (daten.seite !== seite) {
+          // Seite jenseits der letzten: der Server hat begrenzt; den Hash angleichen (ersetzen, nicht stapeln).
+          window.history.replaceState(null, "", `#ranglisten-${nach}-${daten.seite}`);
+          hoerer.forEach((rueck) => rueck());
+          return;
+        }
+        setzeLadung({ art: "daten", antwort: daten, schluessel });
       })
       .catch((fehler: unknown) => {
         if (fehler instanceof DOMException && fehler.name === "AbortError") return;
@@ -78,19 +88,25 @@ export function Ranglisten({ texte, sprache }: Props) {
   const zeige: Ladung = !bereit ? { art: "gast", schluessel } : ladung.schluessel === schluessel ? ladung : { art: "laedt", schluessel };
 
   const waehle = useCallback((neuNach: Rangliste, neuSeite: number) => {
-    window.history.replaceState(null, "", `#ranglisten-${neuNach}-${neuSeite}`);
+    // pushState: jede Eingabe des Mitglieds ist ein Schritt für Zurück.
+    window.history.pushState(null, "", `#ranglisten-${neuNach}-${neuSeite}`);
     hoerer.forEach((rueck) => rueck());
   }, []);
   function taste(e: KeyboardEvent<HTMLButtonElement>, index: number) {
-    const schritt = e.key === "ArrowRight" ? 1 : e.key === "ArrowLeft" ? -1 : 0;
-    if (schritt === 0) return;
+    const letzter = RANGLISTEN.length - 1;
+    let ziel: number;
+    if (e.key === "ArrowRight") ziel = (index + 1) % RANGLISTEN.length;
+    else if (e.key === "ArrowLeft") ziel = (index + letzter) % RANGLISTEN.length;
+    else if (e.key === "Home") ziel = 0;
+    else if (e.key === "End") ziel = letzter;
+    else return;
     e.preventDefault();
-    const ziel = (index + schritt + RANGLISTEN.length) % RANGLISTEN.length;
     waehle(RANGLISTEN[ziel], 1);
     reiterRefs.current[ziel]?.focus();
   }
 
-  if (zeige.art === "gast") {
+  // Bis die erste Antwort da ist, steht der Gast-Hinweis: keine Reiter und kein Skelett für Gäste.
+  if (zeige.art === "gast" || ladung.schluessel === "") {
     return (
       <div className="flex flex-col items-center gap-6 text-center">
         <p className="max-w-[68ch] text-pretty text-body">{texte.gast}</p>
@@ -144,7 +160,7 @@ export function Ranglisten({ texte, sprache }: Props) {
           </div>
         ) : null}
         {zeige.art === "fehler" ? (
-          <div className="flex flex-col items-center gap-6 text-center">
+          <div role="alert" className="flex flex-col items-center gap-6 text-center">
             <p className="text-body">{texte.fehler}</p>
             <button type="button" className={buttonKlassen("secondary")} onClick={() => setzeVersuch((v) => v + 1)}>
               {texte.nochmal}
