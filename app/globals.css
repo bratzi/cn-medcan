@@ -2135,7 +2135,10 @@ html.joint-cursor :is(input:not([type="range"]):not([type="radio"]):not([type="c
     :root:not([data-sparmodus]) .terpen-band:has(> .terpen-band-spur > [aria-hidden]:not(:empty)) {
       height: 12rem;
       padding-block: 0;
-      overflow-y: clip;
+      /* Nur waagrecht beschneiden (Klasse overflow-x-clip): der Tooltip hängt unter dem Eintrag
+         und ragt über die 192 px hinaus. Senkrecht beschnitten war er live unten abgeschnitten
+         (Nutzer 2026-10-09: Band endete bei 727 px, Tooltip bei 770 px). */
+      overflow-y: visible;
     }
 
     /* Tooltip unter dem Symbol (Nutzer 2026-10-08): die Infos blenden darunter ein, das
@@ -2156,7 +2159,7 @@ html.joint-cursor :is(input:not([type="range"]):not([type="radio"]):not([type="c
       position: relative;
       translate: 0 0;
     }
-    :root:not([data-sparmodus]) .terpen-band:has(> .terpen-band-spur > [aria-hidden]:not(:empty)) .terpen-band-eintrag > span[aria-hidden] {
+    :root:not([data-sparmodus]) .terpen-band:has(> .terpen-band-spur > [aria-hidden]:not(:empty)) .terpen-band-eintrag > a > span[aria-hidden] {
       position: static;
     }
   }

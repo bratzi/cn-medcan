@@ -56,6 +56,9 @@ async function Inhalt() {
           className="terpen-band-eintrag group/eintrag flex flex-col items-center gap-1 text-center transition-transform duration-normal ease-standard sm:w-40"
           style={{ "--terpen-farbe": leitFarbe(terpen.noten[0]?.geschmack) } as React.CSSProperties}
         >
+          {/* Der Eintrag springt zu seiner Tafel im Register darunter (Nutzer 2026-10-09: mobil tat
+              Antippen nichts). Der Link trägt den Fokus; group-focus-within zeigt die Infos. */}
+          <a href={`#${terpen.anker}`} className="flex flex-col items-center gap-1">
           {/* Abstände von 4 px (gap-1 hier, am Namenblock und an den Noten): das 8-px-Raster ist
               für die Gruppierung zu grob, Marke, Name und Infos gehören eng zusammen und müssen
               samt Infos in 192 px passen (Budget in globals.css). */}
@@ -103,6 +106,7 @@ async function Inhalt() {
               </span>
             </span>
           </span>
+          </a>
         </li>
       ))}
     </ul>

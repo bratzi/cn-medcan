@@ -241,6 +241,22 @@ export function RegisterAuswahl({ ansicht, start, texte }: { ansicht: RegisterAn
     document.getElementById(aktiv)?.focus();
   }, [aktiv]);
 
+  // Sprung aus dem Terpen-Band (#<anker>, Nutzer 2026-10-09): die Tafel aufschlagen und den Fokus
+  // hineinsetzen, der Fokus bringt sie ins Bild. Beim Laden und bei jedem Wechsel der Adresse.
+  useEffect(() => {
+    const terpene = new Set(ansicht.terpene.map((terpen) => terpen.anker));
+    const aufschlagen = () => {
+      const ziel = decodeURIComponent(window.location.hash.slice(1));
+      if (!terpene.has(ziel)) return;
+      fokusNach.current = ziel;
+      setAktiv(ziel);
+      setGeloest(false);
+    };
+    aufschlagen();
+    window.addEventListener("hashchange", aufschlagen);
+    return () => window.removeEventListener("hashchange", aufschlagen);
+  }, [ansicht.terpene]);
+
   const waehle = (anker: string, fokus = false) => {
     if (fokus) fokusNach.current = anker;
     setAktiv(anker);

@@ -36,6 +36,8 @@ export function TerpenBandKopie() {
         knoten.removeAttribute("aria-describedby");
         knoten.removeAttribute("id");
       });
+      // Die Einträge sind Links zur Tafel im Register; in der stummen Kopie kein Tabstopp.
+      kopie.querySelectorAll("a").forEach((link) => link.setAttribute("tabindex", "-1"));
       return kopie;
     };
 

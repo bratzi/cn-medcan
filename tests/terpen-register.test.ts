@@ -179,3 +179,22 @@ test("Terpenband wirkt nicht wie ein Band: keine Querlinien, das Spaltenraster l
   assert.ok(klasse.split(" ").includes("bg-surface"), klasse);
   assert.ok(!klasse.split(" ").some((k) => k === "border-y" || k === "border-border"), klasse);
 });
+
+test("Terpen-Band: Tooltip wird nicht abgeschnitten, das Band beschneidet nur waagrecht (Nutzer 2026-10-09)", () => {
+  const css = readFileSync(join(process.cwd(), "app/globals.css"), "utf8");
+  const band = css.slice(css.indexOf(".terpen-band-spur > [aria-hidden]"), css.indexOf("@keyframes terpen-band"));
+  // Live 2026-10-09: Band 192 px mit overflow-y: clip, Tooltip 681 bis 770 px, Band endete bei 727.
+  assert.doesNotMatch(band, /overflow-y: clip/);
+  assert.match(band, /overflow-y: visible;/);
+});
+
+test("Terpen-Band: jeder Eintrag springt zu seiner Tafel im Register, auch mobil (Nutzer 2026-10-09)", () => {
+  const band = readFileSync(join(process.cwd(), "components/story/TerpenBand.tsx"), "utf8");
+  const kopie = readFileSync(join(process.cwd(), "components/story/TerpenBandKopie.tsx"), "utf8");
+  const register = readFileSync(join(process.cwd(), "components/story/RegisterAuswahl.tsx"), "utf8");
+  assert.match(band, /<a\b[^>]*href=\{`#\$\{terpen\.anker\}`\}/);
+  // Die stumme Kopie ist kein Tabstopp.
+  assert.match(kopie, /setAttribute\("tabindex", "-1"\)/);
+  // Das Register schlägt die Tafel aus der Adresse auf.
+  assert.match(register, /hashchange/);
+});
