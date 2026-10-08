@@ -34,7 +34,7 @@ export function AuftaktZahlenSkelett({ ansage }: { ansage: string }) {
       <SkelettAnsage text={ansage} />
       {["sorten", "bewertungen", "stimmen"].map((schluessel) => (
         <div key={schluessel} aria-hidden="true" className="flex flex-col items-center gap-2">
-          <span className={`${SKELETT_FLAECHE} text-h1 sm:text-display h-[1em] w-20 sm:w-28`} />
+          <span className={`${SKELETT_FLAECHE} text-notiz h-[1em] w-20 sm:w-28`} />
           <span className={`${SKELETT_FLAECHE} text-caption sm:text-small h-lh w-16 sm:w-24`} />
         </div>
       ))}

@@ -79,7 +79,7 @@ test("Skelett hat die Maße der echten Leiste: Zahl 1em in text-h1/text-display,
   const skelett = quelle.slice(quelle.indexOf("export function AuftaktZahlenSkelett"), quelle.indexOf("export function DoppelseitenSkelett"));
   assert.match(skelett, /grid-cols-3 gap-2[^"]*sm:gap-8/);
   assert.match(skelett, /flex-col items-center gap-2/);
-  assert.match(skelett, /text-h1 sm:text-display h-\[1em\]/);
+  assert.match(skelett, /text-notiz h-\[1em\]/);
   assert.match(skelett, /text-caption sm:text-small h-lh/);
   assert.doesNotMatch(skelett, /h-20/);
 });
@@ -128,7 +128,8 @@ test("Feinschliff: Abstände im 8px-Raster, Verlauf trägt die Schrift", () => {
 test("Telefon: Zahlen und Wörter passen in drei Spalten (Review I1)", () => {
   const quelle = lies("components/story/AuftaktZahlen.tsx");
   // Mono bei 39 px ist für "1.284" breiter als eine Spalte bei 390 px: darunter eine Stufe kleiner.
-  assert.match(quelle, /numeric text-h1 sm:text-display/);
+  // Seit 2026-10-09 (Nutzer) in der Akzentschrift: Mr Dafoe ist schmaler als Mono, text-notiz beginnt bei 32 px.
+  assert.match(quelle, /font-hand text-notiz/);
   // Gesperrte Versalien sprengen die Spalte: auf Telefonen ohne Sperrung, mit Trennung.
   assert.match(quelle, /tracking-normal sm:tracking-gesperrt/);
   assert.match(quelle, /hyphens-auto/);
@@ -142,4 +143,16 @@ test("Zahlen stehen auf einer Linie, auch wenn ein Wort zweizeilig bricht (live 
 test("Telefon: 16 px Seitenpolster, damit BEWERTUNGEN bei 390 px ungetrennt passt (live 2026-10-08)", () => {
   // Gemessen: Wort 109 px, Spalte bei px-6 nur 104 px, bei px-4 114 px.
   assert.match(lies("components/story/Auftakt.tsx"), /flex flex-1 flex-col items-center justify-center gap-8 px-4 py-8 sm:gap-12 sm:px-8/);
+});
+
+test("Kennzahlen springen ins passende Menü und stehen in der Akzentschrift (Nutzer 2026-10-09)", () => {
+  const quelle = lies("components/story/AuftaktZahlen.tsx");
+  assert.match(quelle, /sorten: "\/blueten"/);
+  assert.match(quelle, /bewertungen: "\/reviews"/);
+  assert.match(quelle, /stimmen: "\/umfragen"/);
+  assert.match(quelle, /<Link[^>]*href=\{ZIEL\[eintrag\.schluessel\]\}/);
+  // Die ganze Zelle ist Klickfläche, der Link trägt Zahl und Wort als Namen.
+  assert.match(quelle, /after:absolute after:inset-0/);
+  assert.match(quelle, /font-hand text-notiz text-logo/);
+  assert.doesNotMatch(quelle, /numeric/);
 });
