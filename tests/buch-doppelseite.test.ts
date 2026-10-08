@@ -82,13 +82,22 @@ test("Die fünf Noten stehen genau einmal im HTML, mobil wie am Rechner", () => 
   assert.doesNotMatch(html, /hidden lg:contents|contents lg:hidden/);
 });
 
-test("Handschrift nur bei Community: von euch am Rand, die Marke bleibt gedruckt", () => {
+test("Vermerk von Hand über dem Text: meine notiz beim Betreiber, von euch bei der Community (Nutzer 2026-10-09)", () => {
   const community = seiten(zeige({ istBetreiber: false, autorName: "Mia" })).links;
   assert.match(community, /<p data-eintritt="schreiben" style="--i:1" class="font-hand text-vermerk text-logo[^"]*">von euch<\/p>/);
   assert.match(community, />Community</);
   const betreiber = seiten(zeige()).links;
-  assert.doesNotMatch(betreiber, /font-hand|von euch/);
+  assert.match(betreiber, /<p data-eintritt="schreiben" style="--i:1" class="font-hand text-vermerk text-logo[^"]*">meine notiz<\/p>/);
   assert.match(betreiber, />Betreiber</);
+  // Der Vermerk steht über dem Text, nach dem Exlibris.
+  assert.ok(betreiber.indexOf("meine notiz") > betreiber.indexOf(">Betreiber<"));
+});
+
+test("Stimme der Person: kursives Zitat mit grüner Linie, ohne Text kein Vermerk (Nutzer 2026-10-09)", () => {
+  const links = seiten(zeige({ notiz: "Zitrus vorne, sauber im Abgang." })).links;
+  assert.match(links, /<p [^>]*class="[^"]*\bfont-buch italic\b[^"]*\bborder-l-2 border-accent pl-4\b[^"]*"[^>]*><q>Zitrus vorne, sauber im Abgang\.<\/q><\/p>/);
+  const ohne = seiten(zeige({ notiz: null })).links;
+  assert.doesNotMatch(ohne, /meine notiz|font-hand/);
 });
 
 test("Ohne Autor und ohne Betreiber kein Kreis, sonst ein Avatar mit Ring", () => {
@@ -97,7 +106,16 @@ test("Ohne Autor und ohne Betreiber kein Kreis, sonst ein Avatar mit Ring", () =
   assert.doesNotMatch(anonym, /select-none/);
   const betreiber = seiten(zeige({ autorName: null })).links;
   assert.match(betreiber, />Book of Terpz</);
-  assert.match(betreiber, /\bsize-32\b[^"]*\bring-1\b[^"]*\bmax-sm:size-20\b/);
+  // Exlibris (Nutzer 2026-10-09): kleiner Avatar in einer eingefassten Pille, nicht mehr 128 px.
+  assert.match(betreiber, /\bsize-10\b/);
+  assert.doesNotMatch(betreiber, /\bsize-32\b/);
+  assert.match(betreiber, /<header [^>]*class="[^"]*\brounded-full border border-border-strong\b/);
+});
+
+test("Exlibris: Name als h3 in text-h3, bricht in der Pille um", () => {
+  const html = zeige({ autorName: "A".repeat(50) });
+  assert.match(html, /<h3 [^>]*class="[^"]*\btext-h3\b[^"]*\bwrap-break-word\b/);
+  assert.doesNotMatch(html, /<h3 [^>]*class="[^"]*\btext-h1\b/);
 });
 
 test("Die Zahl der Bewertungen steht nur mit Zahl im Kolophon", () => {

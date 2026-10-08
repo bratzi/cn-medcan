@@ -105,11 +105,12 @@ export function BuchNotiz({
         id={id}
         style={stil}
         className={cn(
-          "flex-none max-w-[52ch] text-body text-pretty text-text sm:text-h3 sm:font-normal",
+          // Kursives Zitat mit Linie in Blattgrün (Nutzer 2026-10-09): als Stimme der Person abgesetzt.
+          "flex-none max-w-[52ch] font-buch italic text-body text-pretty text-text sm:text-h3 sm:font-normal border-l-2 border-accent pl-4",
           offen || zeilen === 0 ? null : zeilen === null ? "lg:line-clamp-6" : "lg:line-clamp-(--notiz-zeilen)",
         )}
       >
-        {text}
+        <q>{text}</q>
       </p>
       {gekuerzt || offen ? (
         <button

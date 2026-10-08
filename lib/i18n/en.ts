@@ -471,6 +471,7 @@ export const en: Woerterbuch = {
     schliessen: "Close",
     bewertungVon: "Review by {name}",
     vonEuch: "from you",
+    meineNotiz: "my note",
     datum: "Date",
     chargeLabel: "Batch",
     nichtAngegeben: "not stated",

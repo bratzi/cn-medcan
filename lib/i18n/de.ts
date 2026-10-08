@@ -480,6 +480,7 @@ export const de = {
     schliessen: "Schließen",
     bewertungVon: "Bewertung von {name}",
     vonEuch: "von euch",
+    meineNotiz: "meine notiz",
     datum: "Datum",
     chargeLabel: "Charge",
     nichtAngegeben: "nicht angegeben",

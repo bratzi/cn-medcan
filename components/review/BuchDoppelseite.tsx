@@ -129,17 +129,15 @@ export function BuchDoppelseite({ eintrag, ueberschrift: Ueberschrift, w, sprach
             </Link>
           </p>
         ) : null}
-        <header data-eintritt="auf" style={ablauf(0)} className="flex flex-wrap items-center gap-x-6 gap-y-2">
-          {hatPerson ? (
-            // ring-offset-4 = 4px: optische Korrektur, der feine Ring liegt wie ein Stempel um das Bild.
-            <Avatar
-              name={name}
-              bildId={eintrag.autorAvatarId}
-              groesse="lg"
-              className="ring-1 ring-border-strong ring-offset-4 ring-offset-surface-raised max-sm:size-20"
-            />
-          ) : null}
-          <div className="flex min-w-0 flex-1 flex-col gap-2">
+        {/* Exlibris (Nutzer 2026-10-09): die Person klein und eingefasst, damit der erste Blick
+            beim Urteil rechts landet und nicht beim Bild der Person. */}
+        <header
+          data-eintritt="auf"
+          style={ablauf(0)}
+          className="flex w-fit max-w-full items-center gap-4 rounded-full border border-border-strong py-2 pr-6 pl-2"
+        >
+          {hatPerson ? <Avatar name={name} bildId={eintrag.autorAvatarId} groesse="md" /> : null}
+          <div className="flex min-w-0 flex-wrap items-center gap-x-4 gap-y-2">
             {/* title am inneren span, nicht an der Überschrift: dort neben aria-label läse ein
                 Vorleser den Namen als Beschreibung ein zweites Mal (Review Session 41). */}
             <Ueberschrift
@@ -147,7 +145,7 @@ export function BuchDoppelseite({ eintrag, ueberschrift: Ueberschrift, w, sprach
               // Mit Link trägt der Link das Label: ein aria-label an der Überschrift
               // verdeckte sonst den Link vor Vorlesern (Review Stufe 2, Minor 6).
               aria-label={verlinkt ? undefined : t(w.buch.bewertungVon, { name })}
-              className="font-buch text-h1 font-medium text-balance text-text wrap-break-word lg:line-clamp-2"
+              className="font-buch text-h3 font-medium text-balance text-text wrap-break-word lg:line-clamp-2"
             >
               {/* Link nur bei öffentlichem Profil (Spec Profil 9); sonst bleibt der Name reiner Text. */}
               {verlinkt ? (
@@ -170,15 +168,16 @@ export function BuchDoppelseite({ eintrag, ueberschrift: Ueberschrift, w, sprach
               </Badge>
             </p>
           </div>
-          {eintrag.istBetreiber ? null : (
-            <p data-eintritt="schreiben" style={ablauf(1)} className="font-hand text-vermerk text-logo max-sm:basis-full sm:ml-auto">
-              {w.buch.vonEuch}
-            </p>
-          )}
         </header>
 
         {eintrag.notiz ? (
-          <BuchNotiz text={eintrag.notiz} weiterlesen={w.buch.weiterlesen} schliessen={w.buch.schliessen} bild={bildfeld} bildNurGross={nurErsatz} />
+          <>
+            {/* Die Stimme der Person (Nutzer 2026-10-09): ein Vermerk von Hand, nie der Name (Leitplanke 4). */}
+            <p data-eintritt="schreiben" style={ablauf(1)} className="font-hand text-vermerk text-logo">
+              {eintrag.istBetreiber ? w.buch.meineNotiz : w.buch.vonEuch}
+            </p>
+            <BuchNotiz text={eintrag.notiz} weiterlesen={w.buch.weiterlesen} schliessen={w.buch.schliessen} bild={bildfeld} bildNurGross={nurErsatz} />
+          </>
         ) : (
           <>
             <p className="text-body text-text-muted italic">{w.buch.keinText}</p>
