@@ -16,7 +16,7 @@ const BLAETTER = [1, 2, 3, 4, 5] as const;
 export function BlattUrteil({ note, w, sprache }: { note: number; w: Woerterbuch; sprache: Sprache }) {
   const wert = formatiereWert(note, sprache);
   return (
-    <div className="flex flex-col items-center gap-2 text-center">
+    <div className="flex w-full flex-col items-center gap-2 border-b border-border pb-6 text-center">
       <span aria-hidden="true" className="flex w-56 shrink-0 sm:w-64 lg:w-48 xl:w-64">
         {blattFuellungen(note).map((fuellung, index) => (
           <span key={BLAETTER[index]} data-eintritt="blatt" style={ablauf(index)} className="relative aspect-square min-w-0 flex-1">

@@ -142,7 +142,8 @@ test("Langer Name klammert ab lg auf zwei Zeilen, bricht um und steht ganz im ti
   const name = "Ein sehr langer Anzeigename eines Mitglieds mit vielen Wörtern darin";
   const html = zeige({ autorName: name });
   assert.match(html, new RegExp(`title="${name}"`));
-  assert.match(html, /<h3 [^>]*class="[^"]*\blg:line-clamp-2\b/);
+  // Auch mobil zwei Zeilen: in der runden Pille sprengte ein dreizeiliger Name die Rundung (Review 2026-10-09).
+  assert.match(html, /<h3 [^>]*class="[^"]*(?<!lg:)\bline-clamp-2\b/);
   assert.match(html, /<h3 [^>]*class="[^"]*\bwrap-break-word\b/);
 });
 

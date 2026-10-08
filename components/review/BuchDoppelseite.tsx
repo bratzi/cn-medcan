@@ -145,7 +145,7 @@ export function BuchDoppelseite({ eintrag, ueberschrift: Ueberschrift, w, sprach
               // Mit Link trägt der Link das Label: ein aria-label an der Überschrift
               // verdeckte sonst den Link vor Vorlesern (Review Stufe 2, Minor 6).
               aria-label={verlinkt ? undefined : t(w.buch.bewertungVon, { name })}
-              className="font-buch text-h3 font-medium text-balance text-text wrap-break-word lg:line-clamp-2"
+              className="font-buch text-h3 font-medium text-balance text-text wrap-break-word line-clamp-2"
             >
               {/* Link nur bei öffentlichem Profil (Spec Profil 9); sonst bleibt der Name reiner Text. */}
               {verlinkt ? (
