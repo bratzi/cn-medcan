@@ -98,3 +98,20 @@ test("ladeAuswertungsZeilen: eigenes Bild, Hersteller und Bildpfad in derselben 
   assert.match(teil, /herstellerBildPfad:\s*true/);
   assert.match(teil, /hersteller:\s*\{\s*select:\s*\{\s*name:\s*true/);
 });
+
+test("BewertungsRegister: Abstand 0,04 wird zu 0,0 ohne Vorzeichen, 0,4 zu +0,4", () => {
+  const render = (note: number, mittel: number) =>
+    renderToStaticMarkup(
+      createElement(BewertungsRegister, {
+        ansicht: registerAnsicht([r("a", note, 1, { mittel, anzahl: 3 })], { sortierung: "datum", alle: true }),
+        sortierung: "datum",
+        alle: true,
+        texte: de.profil,
+        sprache: "de",
+      }),
+    );
+  assert.doesNotMatch(render(4, 3.96), /[+−]0,0/);
+  assert.doesNotMatch(render(4, 4.04), /[+−]0,0/);
+  assert.match(render(4, 3.6), /\+0,4/);
+  assert.match(render(3.6, 4), /−0,4/);
+});

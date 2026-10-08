@@ -94,3 +94,23 @@ test("Startseite: unbestätigte Vorschläge tragen dieselbe Marke wie im Profil"
   const q = readFileSync("app/api/startseite/route.ts", "utf8");
   assert.match(q, /e\.bestaetigt \? \{\} : \{ marke: w\.profil\.nichtBestaetigt \}/);
 });
+
+test("/profil: Terpene-Feld zeigt ohne Terpene den Leersatz und setzt ohneTitel; /profil/[kurzId] nicht", () => {
+  const q = seite();
+  assert.match(q, /werte\.terpene\.length === 0\s*\?\s*\(\s*<p className="max-w-\[68ch\] text-body text-text-muted">\{texte\.leer\}<\/p>/);
+  assert.match(q, /<TerpenRangliste[^>]*ohneTitel/);
+  const oeffentlich = readFileSync("app/[lang]/profil/[kurzId]/page.tsx", "utf8");
+  assert.doesNotMatch(oeffentlich, /ohneTitel/);
+});
+
+test("/profil: Kopfbild nimmt das eigene Bild der besten Bewertung über BudpicBild", () => {
+  const q = seite();
+  assert.match(q, /beste\?\.eigenesBild/);
+  assert.match(q, /<BudpicBild[^>]*alt=""/);
+});
+
+test("Randnotizen und Vorhang: Wort bricht um, Schatten wird nicht abgeschnitten", () => {
+  assert.match(readFileSync("components/kapitel/Randnotizen.tsx", "utf8"), /wrap-break-word hyphens-auto/);
+  const css = readFileSync("app/globals.css", "utf8");
+  assert.match(css, /@keyframes feld-vorhang \{\s*from \{\s*clip-path: inset\(-32px -32px 100% -32px\);\s*\}\s*to \{\s*clip-path: inset\(-32px\);/);
+});

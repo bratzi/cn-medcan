@@ -24,7 +24,7 @@ export function Randnotizen({ notizen, beschriftung }: { notizen: readonly Randn
           <span
             aria-hidden="true"
             style={{ "--i": i } as CSSProperties}
-            className="kapitel-notiz-wort font-hand text-notiz text-logo"
+            className="kapitel-notiz-wort font-hand text-notiz text-logo wrap-break-word hyphens-auto"
           >
             {n.wort}
           </span>

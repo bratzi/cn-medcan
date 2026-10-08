@@ -15,24 +15,31 @@ export function Aktivitaet({ monate, texte }: { monate: readonly Monat[]; texte:
   return (
     <div>
       <div aria-hidden="true" className="flex gap-2 border-b border-border-strong pt-6">
-        {monate.map((m) => (
-          <div key={m.schluessel} className="relative h-48 min-w-0 flex-1">
-            <div
-              data-saeule=""
-              style={{ height: `${(m.anzahl / hoechstens) * 100}%` }}
-              className={cn(
-                "absolute inset-x-0 bottom-0 transition-colors duration-fast ease-standard hover:bg-text",
-                m.laufend ? "bg-text" : "bg-text-muted/40",
-              )}
-            >
+        {monate.map((m) => {
+          const hoehe = (m.anzahl / hoechstens) * 100;
+          return (
+            <div key={m.schluessel} className="relative h-48 min-w-0 flex-1">
+              <div
+                data-saeule=""
+                style={{ height: `${hoehe}%` }}
+                className={cn(
+                  "absolute inset-x-0 bottom-0 transition-colors duration-fast ease-standard hover:bg-text",
+                  m.laufend ? "bg-text" : "bg-text-muted/40",
+                )}
+              />
+              {/* Geschwister der Säule: die Zahl wird beim Wachsen nicht mitgestaucht. */}
               {m.anzahl > 0 ? (
-                <span data-wert="" className="numeric absolute inset-x-0 bottom-full mb-2 text-center text-caption text-text">
+                <span
+                  data-wert=""
+                  style={{ bottom: `calc(${hoehe}% + 8px)` }}
+                  className="numeric absolute inset-x-0 text-center text-caption text-text"
+                >
                   {m.anzahl}
                 </span>
               ) : null}
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
       <div aria-hidden="true" className="mt-2 flex gap-2">
         {monate.map((m) => (

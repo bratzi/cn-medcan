@@ -100,3 +100,20 @@ test("NotenVerteilung: Balken ohne Spur, Liste für Screenreader, Leersatz", () 
   const leer = renderToStaticMarkup(createElement(NotenVerteilung, { stufen: notenVerteilung([]), texte: de.profil }));
   assert.match(leer, /ersten Bewertung/);
 });
+
+test("profilNotizen: Vorlesesätze in Einzahl und Mehrzahl", () => {
+  const eine = [z(4, "2026-10-02T10:00:00Z")];
+  const eins = profilNotizen({ zeilen: eine, differenz: null, hersteller: 1 }, de.profil.kapitel, "de");
+  assert.equal(eins[0].satz, "1 Bewertung");
+  assert.equal(eins.find((n) => n.wort === "Hersteller")?.satz, "Blüten von 1 Hersteller bewertet");
+  const zwei = [z(4, "2026-10-02T10:00:00Z"), z(3, "2026-09-01T10:00:00Z")];
+  const mehr = profilNotizen({ zeilen: zwei, differenz: null, hersteller: 2 }, de.profil.kapitel, "de");
+  assert.equal(mehr[0].satz, "2 Bewertungen");
+  assert.equal(mehr.find((n) => n.wort === "Hersteller")?.satz, "Blüten von 2 Herstellern bewertet");
+});
+
+test("Aktivitaet: Wertzahl ist Geschwister der Säule, nicht in ihr", () => {
+  const monate = monatsReihe([new Date("2026-10-02T10:00:00Z")], new Date("2026-10-08T10:00:00Z"), "de");
+  const h = renderToStaticMarkup(createElement(Aktivitaet, { monate, texte: de.profil }));
+  assert.match(h, /data-saeule=""[^>]*><\/div><span data-wert=""[^>]*bottom:calc\(100% \+ 8px\)/);
+});

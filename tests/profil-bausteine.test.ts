@@ -152,3 +152,12 @@ test("NetzGrafik: Kontur vorher dünn ohne Fläche, ohne Kontur kein data-netz=v
   // Ohne Beschriftung keine Achsennamen (Mini-Netz).
   assert.doesNotMatch(ohne, /<span/);
 });
+
+test("TerpenRangliste: ohneTitel lässt die h3 weg, sonst bleibt sie", () => {
+  const terpene = [{ name: "Limonen", wert: 1 }];
+  const mit = renderToStaticMarkup(createElement(TerpenRangliste, { terpene, texte: de.profil, sprache: "de" }));
+  const ohne = renderToStaticMarkup(createElement(TerpenRangliste, { terpene, texte: de.profil, sprache: "de", ohneTitel: true }));
+  assert.match(mit, /<h3/);
+  assert.doesNotMatch(ohne, /<h3/);
+  assert.match(ohne, /Limonen/);
+});

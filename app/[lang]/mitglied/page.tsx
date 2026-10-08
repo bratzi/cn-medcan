@@ -169,7 +169,7 @@ async function KopfBild({ id }: { id: string }) {
 }
 
 async function Notizen({ id, dabeiSeit }: { id: string; dabeiSeit: Date }) {
-  const [{ w }, zahlen, vorschlaege, nachrichten] = await Promise.all([
+  const [{ w, sprache }, zahlen, vorschlaege, nachrichten] = await Promise.all([
     textLaden(),
     stimmZahlen(id).catch(oderNull<Awaited<ReturnType<typeof stimmZahlen>>>("stimmZahlen")),
     vorschlaegeLaden(id),
@@ -187,6 +187,7 @@ async function Notizen({ id, dabeiSeit }: { id: string; dabeiSeit: Date }) {
           ungelesen: nachrichten?.filter((n) => !n.gelesen).length ?? 0,
         },
         w.mitglied.kapitel,
+        sprache,
       )}
     />
   );
@@ -196,7 +197,7 @@ async function Notizen({ id, dabeiSeit }: { id: string; dabeiSeit: Date }) {
 async function ReiheUmfrage({ id, freigegeben, rolle }: { id: string; freigegeben: boolean; rolle: keyof Awaited<ReturnType<typeof textLaden>>["w"]["mitglied"]["rollen"] }) {
   const [{ w, sprache }, umfrage] = await Promise.all([textLaden(), umfrageLaden()]);
   const texte = w.mitglied;
-  const eigene = umfrage ? await eigeneStimme(umfrage.id, id).catch(() => null) : null;
+  const eigene = umfrage ? await eigeneStimme(umfrage.id, id).catch(oderNull<Awaited<ReturnType<typeof eigeneStimme>>>("eigeneStimme")) : null;
   return (
     <>
       <Feld id="umfrage" spalten={6} stimmzettel titel={texte.umfrageTitel}>

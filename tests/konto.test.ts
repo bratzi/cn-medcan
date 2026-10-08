@@ -7,6 +7,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { MeineStimmen } from "@/components/mitglied/MeineStimmen";
 import { UmfrageJetzt } from "@/components/mitglied/UmfrageJetzt";
 import { de } from "@/lib/i18n/de";
+import { en } from "@/lib/i18n/en";
 import { kontoNotizen, stimmAusgang, type StimmZeile } from "@/lib/konto";
 import type { UmfrageAnsicht } from "@/lib/query/umfragen";
 
@@ -21,6 +22,7 @@ test("kontoNotizen: fünf, auch mit Nullen; Jahr als Zahl", () => {
   const n = kontoNotizen(
     { dabeiSeit: new Date("2025-03-01T00:00:00Z"), stimmen: 0, gewonnen: 0, vorgeschlagen: 0, ungelesen: 0 },
     de.mitglied.kapitel,
+    "de",
   );
   assert.deepEqual(n.map((x) => x.zahl), ["2025", "0", "0", "0", "0"]);
   assert.deepEqual(n.map((x) => x.wort), ["dabei seit", "gestimmt", "getroffen", "vorgeschlagen", "neu"]);
@@ -108,6 +110,7 @@ test("MeineStimmen: Ausgang als Badge mit Text, Link zur Bewertung nur bei Gewin
   assert.match(h, />läuft</);
   assert.equal((h.match(/Zur Bewertung/g) ?? []).length, 1);
   assert.match(h, /wrap-break-word/);
+  assert.match(h, /href="\/blueten\/sorte-eins#eintrag-r1"/, "Zur Bewertung führt auf den Anker");
 });
 
 test("MeineStimmen: leer mit Weg zu den Umfragen", () => {
@@ -121,4 +124,28 @@ test("lib/query/konto: Stimmen mit take, Zahlen in einer Abfrage", () => {
   assert.match(q, /take:\s*MEINE_STIMMEN/);
   assert.match(q, /SUM\(/);
   assert.match(q, /COUNT\(\*\)/);
+});
+
+test("kontoNotizen: Vorlesesätze in Einzahl und Mehrzahl, deutsch und englisch", () => {
+  const e = (n: number) => ({ dabeiSeit: new Date("2025-03-01T00:00:00Z"), stimmen: n, gewonnen: n, vorgeschlagen: n, ungelesen: n });
+  const eins = kontoNotizen(e(1), de.mitglied.kapitel, "de").map((x) => x.satz);
+  assert.deepEqual(eins.slice(1), ["1 Stimme abgegeben", "1 deiner Stimmen hat gewonnen", "1 Blüte vorgeschlagen", "1 ungelesene Nachricht"]);
+  const zwei = kontoNotizen(e(2), de.mitglied.kapitel, "de").map((x) => x.satz);
+  assert.deepEqual(zwei.slice(1), ["2 Stimmen abgegeben", "2 deiner Stimmen haben gewonnen", "2 Blüten vorgeschlagen", "2 ungelesene Nachrichten"]);
+  const en1 = kontoNotizen(e(1), en.mitglied.kapitel, "en").map((x) => x.satz);
+  assert.deepEqual(en1.slice(1), ["1 vote cast", "1 of your votes won", "1 flower suggested", "1 unread message"]);
+});
+
+test("ProfilFormular: Speichern ist sekundär, die Primäraktion bleibt dem Stimmzettel", () => {
+  const q = readFileSync("components/auth/ProfilFormular.tsx", "utf8");
+  assert.match(q, /<Button type="submit" variante="secondary"/);
+});
+
+test("Seiten: Teilfehler werden geloggt statt still geschluckt", () => {
+  const m = readFileSync("app/[lang]/mitglied/page.tsx", "utf8");
+  const p = readFileSync("app/[lang]/profil/page.tsx", "utf8");
+  assert.doesNotMatch(m, /\.catch\(\(\) =>/);
+  assert.doesNotMatch(p, /\.catch\(\(\) =>/);
+  assert.match(m, /oderNull<.*>\("eigeneStimme"\)/);
+  assert.match(p, /oderNull<number>\("ungeleseneAnzahl"\)/);
 });

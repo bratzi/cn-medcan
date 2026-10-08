@@ -1,6 +1,7 @@
 import type { Randnotiz } from "@/components/kapitel/Randnotizen";
 import type { UmfragePhase } from "@/db/enums";
-import { t } from "@/lib/i18n/text";
+import type { Sprache } from "@/lib/i18n/sprache-kern";
+import { mehrzahl, t } from "@/lib/i18n/text";
 import type { Woerterbuch } from "@/lib/i18n/typen";
 
 export type Ausgang = "laeuft" | "gewonnen" | "nichtGewonnen";
@@ -27,13 +28,14 @@ export type StimmZeile = {
 export function kontoNotizen(
   e: { dabeiSeit: Date; stimmen: number; gewonnen: number; vorgeschlagen: number; ungelesen: number },
   texte: Woerterbuch["mitglied"]["kapitel"],
+  sprache: Sprache,
 ): Randnotiz[] {
   const jahr = String(e.dabeiSeit.getUTCFullYear());
   return [
     { zahl: jahr, wort: texte.dabei, satz: t(texte.srDabei, { zahl: jahr }) },
-    { zahl: String(e.stimmen), wort: texte.gestimmt, satz: t(texte.srGestimmt, { zahl: e.stimmen }) },
-    { zahl: String(e.gewonnen), wort: texte.getroffen, satz: t(texte.srGetroffen, { zahl: e.gewonnen }) },
-    { zahl: String(e.vorgeschlagen), wort: texte.vorgeschlagen, satz: t(texte.srVorgeschlagen, { zahl: e.vorgeschlagen }) },
-    { zahl: String(e.ungelesen), wort: texte.neu, satz: t(texte.srNeu, { zahl: e.ungelesen }) },
+    { zahl: String(e.stimmen), wort: texte.gestimmt, satz: mehrzahl(sprache, texte.srGestimmt, e.stimmen) },
+    { zahl: String(e.gewonnen), wort: texte.getroffen, satz: mehrzahl(sprache, texte.srGetroffen, e.gewonnen) },
+    { zahl: String(e.vorgeschlagen), wort: texte.vorgeschlagen, satz: mehrzahl(sprache, texte.srVorgeschlagen, e.vorgeschlagen) },
+    { zahl: String(e.ungelesen), wort: texte.neu, satz: mehrzahl(sprache, texte.srNeu, e.ungelesen) },
   ];
 }

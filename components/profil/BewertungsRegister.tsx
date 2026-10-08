@@ -26,6 +26,13 @@ const ziel = (sortierung: Sortierung, alle: boolean) => {
   return `/profil${q ? `?${q}` : ""}#bewertungen-titel`;
 };
 
+/** Vorzeichen erst nach der Rundung auf 0,1, damit nie „+0,0“ oder „−0,0“ entsteht. */
+export function abstandText(abstand: number, sprache: Sprache): string {
+  const gerundet = Math.round(Math.abs(abstand) * 10) / 10;
+  const betrag = formatiereZahl(gerundet, 1, sprache);
+  return gerundet === 0 ? betrag : abstand > 0 ? `+${betrag}` : `−${betrag}`;
+}
+
 /**
  * Deine Bewertungen als Register mit Bildern (Spec 6): je Eintrag dein Bild
  * oder das der Sorte, die Note groß, darunter Community und Abstand.
@@ -93,9 +100,7 @@ export function BewertungsRegister({ ansicht, sortierung, alle, texte, sprache }
               </p>
               {e.abstand !== null ? (
                 <p className="text-small text-text numeric">
-                  {t(texte.registerAbstand, {
-                    wert: `${e.abstand > 0 ? "+" : e.abstand < 0 ? "−" : ""}${formatiereZahl(Math.abs(e.abstand), 1, sprache)}`,
-                  })}
+                  {t(texte.registerAbstand, { wert: abstandText(e.abstand, sprache) })}
                 </p>
               ) : null}
             </div>

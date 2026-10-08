@@ -82,7 +82,7 @@ export function ProfilFormular({ anzeigename, instagramHandle, texte }: Props & 
       ) : null}
 
       <div>
-        <Button type="submit" disabled={!hydriert || laeuft}>
+        <Button type="submit" variante="secondary" disabled={!hydriert || laeuft}>
           {laeuft ? texte.speichert : texte.speichern}
         </Button>
       </div>

@@ -592,10 +592,10 @@
 
 @keyframes feld-vorhang {
   from {
-    clip-path: inset(0 0 100% 0);
+    clip-path: inset(-32px -32px 100% -32px);
   }
   to {
-    clip-path: inset(0);
+    clip-path: inset(-32px);
   }
 }
 

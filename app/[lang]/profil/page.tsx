@@ -8,7 +8,7 @@ import { FeldSkelett } from "@/components/kapitel/FeldSkelett";
 import { Kapitelkopf } from "@/components/kapitel/Kapitelkopf";
 import { KapitelRaster } from "@/components/kapitel/KapitelRaster";
 import { Randnotizen } from "@/components/kapitel/Randnotizen";
-import { Bild } from "@/components/medien/Bild";
+import { Bild, BudpicBild } from "@/components/medien/Bild";
 import { Aktivitaet } from "@/components/profil/Aktivitaet";
 import { BewertungsRegister } from "@/components/profil/BewertungsRegister";
 import { CommunityVergleich } from "@/components/profil/CommunityVergleich";
@@ -87,7 +87,7 @@ export default async function ProfilPage({ searchParams }: { searchParams: Promi
   const texte = w.profil;
   const id = mitglied.mitgliedId;
   const register = registerParameter(await searchParams);
-  const ungelesen = await ungeleseneAnzahl(id).catch(() => 0);
+  const ungelesen = await ungeleseneAnzahl(id).catch(oderNull<number>("ungeleseneAnzahl")).then((n) => n ?? 0);
 
   return (
     <KapitelRaster>
@@ -158,6 +158,10 @@ export default async function ProfilPage({ searchParams }: { searchParams: Promi
 async function KopfBild({ id }: { id: string }) {
   const zeilen = await zeilenLaden(id);
   const beste = zeilen?.length ? zeilen.reduce((a, b) => (noteOderErsatz(b) > noteOderErsatz(a) ? b : a)) : null;
+  if (beste?.eigenesBild) {
+    const { id: bildId, breite, hoehe, offen } = beste.eigenesBild;
+    return <BudpicBild id={bildId} breite={breite} hoehe={hoehe} offen={offen} alt="" className="h-auto w-full object-contain" />;
+  }
   const bildId = beste ? ersatzBildId(beste.bildPfad, beste.slug) : musterBildId("profil");
   return <Bild id={bildId} sizes="(min-width: 1080px) 35vw, 0px" dekorativ />;
 }
@@ -217,8 +221,10 @@ async function ReiheNetz({ id }: { id: string }) {
       <Feld id="terpene" spalten={4} titel={texte.terpeneTitel}>
         {netzFehlt ? (
           <p className="max-w-[68ch] text-body text-text">{texte.fehler}</p>
+        ) : werte.terpene.length === 0 ? (
+          <p className="max-w-[68ch] text-body text-text-muted">{texte.leer}</p>
         ) : (
-          <TerpenRangliste terpene={werte.terpene} texte={texte} sprache={sprache} />
+          <TerpenRangliste terpene={werte.terpene} texte={texte} sprache={sprache} ohneTitel />
         )}
       </Feld>
     </>

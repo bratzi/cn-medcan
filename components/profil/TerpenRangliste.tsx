@@ -4,14 +4,14 @@ import type { Woerterbuch } from "@/lib/i18n/typen";
 import type { ProfilWerte } from "@/lib/profil-typen";
 
 type Terpen = ProfilWerte["terpene"][number];
-type Props = { terpene: ProfilWerte["terpene"]; texte: Woerterbuch["profil"]; sprache: Sprache };
+type Props = { terpene: ProfilWerte["terpene"]; texte: Woerterbuch["profil"]; sprache: Sprache; ohneTitel?: boolean };
 
 /**
  * Terpene des Profils als Rangliste (Spec Profil 5.1): Balken in Tinte, Länge
  * relativ zum stärksten. Abgelehnte stehen abgesetzt unter „eher nicht“,
  * gestrichelt umrandet ohne Fläche. Nur Aroma (HWG).
  */
-export function TerpenRangliste({ terpene, texte, sprache }: Props) {
+export function TerpenRangliste({ terpene, texte, sprache, ohneTitel }: Props) {
   if (terpene.length === 0) return null;
   const positiv = terpene.filter((e) => e.wert > 0);
   const negativ = terpene.filter((e) => e.wert < 0);
@@ -28,7 +28,7 @@ export function TerpenRangliste({ terpene, texte, sprache }: Props) {
   );
   return (
     <div className="flex w-full flex-col gap-4">
-      <h3 className="text-small font-medium text-text">{texte.terpeneTitel}</h3>
+      {ohneTitel ? null : <h3 className="text-small font-medium text-text">{texte.terpeneTitel}</h3>}
       {positiv.length > 0 ? <ol className="flex flex-col gap-2">{positiv.map((e) => zeile(e, false))}</ol> : null}
       {negativ.length > 0 ? (
         <>

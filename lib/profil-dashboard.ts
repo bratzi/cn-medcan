@@ -1,7 +1,7 @@
 import type { Randnotiz } from "@/components/kapitel/Randnotizen";
 import { formatiereDatum, formatiereZahl } from "@/lib/format";
 import type { Sprache } from "@/lib/i18n/sprache-kern";
-import { t } from "@/lib/i18n/text";
+import { mehrzahl, t } from "@/lib/i18n/text";
 import type { Woerterbuch } from "@/lib/i18n/typen";
 import { noteOderErsatz } from "@/lib/profil";
 import type { AuswertungsZeile } from "@/lib/profil-typen";
@@ -58,7 +58,7 @@ export function profilNotizen(
   sprache: Sprache,
 ): Randnotiz[] {
   const anzahl = String(zeilen.length);
-  const notizen: Randnotiz[] = [{ zahl: anzahl, wort: texte.bewertet, satz: t(texte.srBewertet, { zahl: anzahl }) }];
+  const notizen: Randnotiz[] = [{ zahl: anzahl, wort: texte.bewertet, satz: mehrzahl(sprache, texte.srBewertet, zeilen.length) }];
   if (zeilen.length === 0) return notizen;
 
   const schnitt = formatiereZahl(zeilen.reduce((s, z) => s + noteOderErsatz(z), 0) / zeilen.length, 1, sprache);
@@ -70,7 +70,7 @@ export function profilNotizen(
     const zahl = gerundet === 0 ? betrag : differenz > 0 ? `+${betrag}` : `−${betrag}`;
     notizen.push({ zahl, wort: texte.community, satz: t(texte.srCommunity, { zahl }) });
   }
-  notizen.push({ zahl: String(hersteller), wort: texte.hersteller, satz: t(texte.srHersteller, { zahl: hersteller }) });
+  notizen.push({ zahl: String(hersteller), wort: texte.hersteller, satz: mehrzahl(sprache, texte.srHersteller, hersteller) });
   const letzte = zeilen.reduce((a, b) => (b.erstelltAm > a.erstelltAm ? b : a)).erstelltAm;
   notizen.push({
     zahl: TAG[sprache].format(letzte),
