@@ -6,6 +6,8 @@ import { readFileSync } from "node:fs";
 test("Startseite zeigt den neuesten Eintrag als Doppelseite wie das große Buch", () => {
   const quelle = readFileSync("components/story/NeuesterEintrag.tsx", "utf8");
   assert.match(quelle, /<BuchDoppelseite[^>]*\bsorte\b/);
+  // Regel 9: keine Wirkungsnote auf der Startseite.
+  assert.match(quelle, /<BuchDoppelseite[^>]*\bauszug\b/);
   assert.match(quelle, /<Buch\b/);
   assert.match(quelle, /ladeNeuestenBetreiberEintrag/);
 });

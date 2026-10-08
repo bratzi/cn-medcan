@@ -1,5 +1,6 @@
 import type { EintragDaten } from "@/components/review/eintrag";
 import { ablauf } from "@/components/review/eintritt";
+import { cn } from "@/lib/cn";
 import { formatiereZahl } from "@/lib/format";
 import type { Sprache } from "@/lib/i18n/sprache-kern";
 import type { Woerterbuch } from "@/lib/i18n/typen";
@@ -8,12 +9,23 @@ import { BEWERTUNGS_ACHSEN } from "@/lib/query/bewertung";
 /**
  * Die fünf Noten zwischen Blatturteil und Karte (Spec 2026-10-05): Zahl und ein Tintenstrich
  * auf einer Haarlinie, ohne gefüllte Spur. Alle fünf, auch Wirkung: der volle Eintrag zeigt sie,
- * der Auszug auf der Startseite nie. Mobil zwei Spalten, ab sm fünf.
+ * der Auszug auf der Startseite nie (`ohneWirkung`, Regel 9). Mobil zwei Spalten, ab sm fünf bzw. vier.
  */
-export function NotenLeiste({ eintrag, w, sprache }: { eintrag: EintragDaten; w: Woerterbuch; sprache: Sprache }) {
+export function NotenLeiste({
+  eintrag,
+  w,
+  sprache,
+  ohneWirkung = false,
+}: {
+  eintrag: EintragDaten;
+  w: Woerterbuch;
+  sprache: Sprache;
+  ohneWirkung?: boolean;
+}) {
+  const achsen = ohneWirkung ? BEWERTUNGS_ACHSEN.filter((achse) => achse.key !== "wirkung") : BEWERTUNGS_ACHSEN;
   return (
-    <dl className="grid grid-cols-2 gap-x-6 gap-y-4 sm:grid-cols-5 sm:gap-x-4">
-      {BEWERTUNGS_ACHSEN.map((achse, index) => {
+    <dl className={cn("grid grid-cols-2 gap-x-6 gap-y-4 sm:gap-x-4", ohneWirkung ? "sm:grid-cols-4" : "sm:grid-cols-5")}>
+      {achsen.map((achse, index) => {
         const wert = eintrag[achse.key];
         const anteil = Math.min(Math.max(wert / 5, 0), 1);
         const zahl = formatiereZahl(wert, 1, sprache);

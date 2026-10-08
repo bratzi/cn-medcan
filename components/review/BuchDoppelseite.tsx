@@ -39,6 +39,8 @@ export type BuchDoppelseiteProps = {
   katalog?: readonly KatalogTerpen[];
   /** Im großen Buch über alle Sorten: der Handelsname als Link über dem Kopf der linken Seite. */
   sorte?: boolean;
+  /** Auszug auf der Startseite: ohne Wirkungsnote (Regel 9, HWG). */
+  auszug?: boolean;
 };
 
 /**
@@ -57,7 +59,7 @@ export type BuchDoppelseiteProps = {
  * Überschrift sind je Eintrag eindeutig, damit mehrere Doppelseiten gestapelt stehen können und
  * der Sprung auf #eintrag-… die richtige trifft.
  */
-export function BuchDoppelseite({ eintrag, ueberschrift: Ueberschrift, w, sprache, katalog = [], sorte = false }: BuchDoppelseiteProps) {
+export function BuchDoppelseite({ eintrag, ueberschrift: Ueberschrift, w, sprache, katalog = [], sorte = false, auszug = false }: BuchDoppelseiteProps) {
   const texte = aromaTexte(w, sprache);
   const anker = eintragAnker(eintrag.id);
   const titelId = `${anker}-titel`;
@@ -191,7 +193,7 @@ export function BuchDoppelseite({ eintrag, ueberschrift: Ueberschrift, w, sprach
 
       <div data-buchseite="rechts" className={cn(SEITE, FALZ_RECHTS)}>
         {eintrag.gesamtnote !== null ? <BlattUrteil note={eintrag.gesamtnote} w={w} sprache={sprache} /> : null}
-        <NotenLeiste eintrag={eintrag} w={w} sprache={sprache} />
+        <NotenLeiste eintrag={eintrag} w={w} sprache={sprache} ohneWirkung={auszug} />
         {/* Im Buch nur auf nahen Seiten (CPU-Limit, T7-Review), sonst immer. Die Fläche bleibt
             stehen: das Buch dreht sie beim Blättern. */}
         <NurAufgeschlagen>

@@ -60,7 +60,7 @@ async function EintragInhalt() {
         {
           anker: eintragAnker(review.id),
           inhalt: (
-            <BuchDoppelseite eintrag={alsEintrag(review, produkt)} ueberschrift="h3" w={w} sprache={sprache} katalog={katalog} sorte />
+            <BuchDoppelseite eintrag={alsEintrag(review, produkt)} ueberschrift="h3" w={w} sprache={sprache} katalog={katalog} sorte auszug />
           ),
         },
       ]}
