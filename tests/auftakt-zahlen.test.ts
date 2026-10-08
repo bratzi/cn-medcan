@@ -115,3 +115,13 @@ test("Telefon: Zahlen und Wörter passen in drei Spalten (Review I1)", () => {
   assert.match(quelle, /tracking-normal sm:tracking-gesperrt/);
   assert.match(quelle, /hyphens-auto/);
 });
+
+test("Zahlen stehen auf einer Linie, auch wenn ein Wort zweizeilig bricht (live 2026-10-08)", () => {
+  // flex-col-reverse: justify-end schiebt die Zahl nach oben, Wörter hängen darunter.
+  assert.match(lies("components/story/AuftaktZahlen.tsx"), /flex flex-col-reverse items-center justify-end gap-2/);
+});
+
+test("Telefon: 16 px Seitenpolster, damit BEWERTUNGEN bei 390 px ungetrennt passt (live 2026-10-08)", () => {
+  // Gemessen: Wort 109 px, Spalte bei px-6 nur 104 px, bei px-4 114 px.
+  assert.match(lies("components/story/Auftakt.tsx"), /flex flex-1 flex-col items-center justify-center gap-8 px-4 py-8 sm:gap-12 sm:px-8/);
+});

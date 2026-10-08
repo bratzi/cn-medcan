@@ -29,7 +29,7 @@ export async function AuftaktZahlen() {
   return (
     <dl data-story="zahlen" data-story-einstieg="" className="grid w-full max-w-3xl grid-cols-3 gap-2 text-center sm:gap-8">
       {auftaktEintraege(zahlen, w.start.auftakt.zahlen, sprache).map((eintrag) => (
-        <div key={eintrag.schluessel} className="flex flex-col-reverse items-center gap-2">
+        <div key={eintrag.schluessel} className="flex flex-col-reverse items-center justify-end gap-2">
           <dt className="font-sans text-caption uppercase hyphens-auto text-balance text-text sm:text-small tracking-normal sm:tracking-gesperrt">{eintrag.wort}</dt>
           <dd className="numeric text-h1 sm:text-display leading-none text-text">
             <span aria-hidden="true" data-auftakt-zaehler="" data-ziel={eintrag.zahl}>

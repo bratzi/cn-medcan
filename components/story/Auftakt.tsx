@@ -81,7 +81,7 @@ export async function Auftakt() {
       {/* Im freien Raum unter dem Intro: erst die Zahlenleiste (Spec 2026-10-08 Auftakt),
           dann "Bewerte jetzt mit", Verlaufsrahmen wie "Mein Konto", folgt dem Zeiger wie
           die Storytelling-Videos (Nutzer 2026-09-25). */}
-      <div className="flex flex-1 flex-col items-center justify-center gap-8 px-6 py-8 sm:gap-12 sm:px-8">
+      <div className="flex flex-1 flex-col items-center justify-center gap-8 px-4 py-8 sm:gap-12 sm:px-8">
         <Suspense fallback={<AuftaktZahlenSkelett ansage={w.start.skelett.zahlen} />}>
           <AuftaktZahlen />
         </Suspense>
