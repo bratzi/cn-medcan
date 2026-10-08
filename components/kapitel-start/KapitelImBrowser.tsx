@@ -1,6 +1,6 @@
 "use client";
 
-import { ViewTransition, type ReactNode } from "react";
+import { useDeferredValue, ViewTransition, type ReactNode } from "react";
 
 import { KapitelAufschlag, type KapitelTexte } from "@/components/kapitel-start/KapitelAufschlag";
 import { useStartSitzung } from "@/components/story/StartSitzung";
@@ -14,10 +14,12 @@ import { kapitelAnzeige } from "@/lib/startseite-sitzung";
  */
 export function KapitelImBrowser({ schaufenster, texte, sprache }: { schaufenster: ReactNode; texte: KapitelTexte; sprache: Sprache }) {
   const sitzung = useStartSitzung();
-  const eigenes = sitzung ? kapitelAnzeige(sitzung.stand) : null;
+  // useDeferredValue statt setState: nur Transitions, Suspense und useDeferredValue lösen die
+  // ViewTransition aus (Next-Doku view-transitions), ein einfaches setState in StartSitzung nicht.
+  const eigenes = useDeferredValue(sitzung ? kapitelAnzeige(sitzung.stand) : null);
   return (
     <>
-      <ViewTransition key={eigenes ? "eigen" : "schaufenster"}>
+      <ViewTransition key={eigenes ? "eigen" : "schaufenster"} enter="auto" exit="auto" default="none">
         <div>{eigenes ? <KapitelAufschlag daten={eigenes} art="eigen" texte={texte} sprache={sprache} /> : schaufenster}</div>
       </ViewTransition>
       <p aria-live="polite" className="sr-only">

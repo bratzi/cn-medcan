@@ -246,11 +246,14 @@ export function RegisterAuswahl({ ansicht, start, texte }: { ansicht: RegisterAn
   useEffect(() => {
     const terpene = new Set(ansicht.terpene.map((terpen) => terpen.anker));
     const aufschlagen = () => {
-      const ziel = decodeURIComponent(window.location.hash.slice(1));
+      // Die Anker sind ASCII (register-…): ohne Dekodieren, ein Hash wie "#%" darf nicht werfen.
+      const ziel = window.location.hash.slice(1);
       if (!terpene.has(ziel)) return;
       fokusNach.current = ziel;
       setAktiv(ziel);
       setGeloest(false);
+      // Hash leeren, damit derselbe Eintrag im Band erneut hashchange auslöst.
+      window.history.replaceState(null, "", window.location.pathname + window.location.search);
     };
     aufschlagen();
     window.addEventListener("hashchange", aufschlagen);

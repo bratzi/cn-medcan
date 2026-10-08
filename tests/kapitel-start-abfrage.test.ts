@@ -29,3 +29,13 @@ test("API: Kapitel-Fehler bricht die Sitzung nicht", () => {
   assert.match(route, /ladeEigenesKapitel\(mitglied\.mitgliedId\)\.catch\(/);
   assert.match(route, /kapitel,/);
 });
+
+test("Abfrage: orderBy und select stehen inline, kein readonly-Tupel (tsc)", () => {
+  assert.doesNotMatch(quelle, /ZULETZT/);
+  assert.match(quelle, /orderBy: \[\{ erstelltAm: "desc" \}, \{ id: "asc" \}\]/);
+});
+
+test("Eigenes Kapitel liest nur die vier Netz-Spalten des Profils, nicht verlauf/oeffentlich", () => {
+  assert.match(quelle, /profil: \{ select: \{ geschmack: true, terpene: true, anzahl: true, gewichtet: true \} \}/);
+  assert.doesNotMatch(quelle, /profil: true/);
+});

@@ -9,18 +9,17 @@ import { stimmZahlen } from "@/lib/query/konto";
 
 const FREI = { freigegeben: true, strain: { aktiv: true } } as const;
 
-const ZULETZT = {
-  orderBy: [{ erstelltAm: "desc" }, { id: "asc" }],
-  select: { gesamtnote: true, erstelltAm: true, strain: { select: { slug: true, handelsname: true } } },
-} as const;
-
 async function eigeneZahlen(autorId: string) {
   const prisma = await getPrisma();
   const wo = { ...FREI, autorId };
   const [bewertet, schnitt, zuletzt] = await Promise.all([
     prisma.review.count({ where: wo }),
     prisma.review.aggregate({ where: { ...wo, gesamtnote: { not: null } }, _avg: { gesamtnote: true } }),
-    prisma.review.findFirst({ where: wo, ...ZULETZT }),
+    prisma.review.findFirst({
+      where: wo,
+      orderBy: [{ erstelltAm: "desc" }, { id: "asc" }],
+      select: { gesamtnote: true, erstelltAm: true, strain: { select: { slug: true, handelsname: true } } },
+    }),
   ]);
   return {
     bewertet,
@@ -66,7 +65,7 @@ export async function ladeEigenesKapitel(mitgliedId: string): Promise<KapitelDat
   const [m, zahlen, stimmen] = await Promise.all([
     prisma.mitglied.findUnique({
       where: { id: mitgliedId },
-      select: { anzeigename: true, avatar: { select: { id: true } }, profil: true },
+      select: { anzeigename: true, avatar: { select: { id: true } }, profil: { select: { geschmack: true, terpene: true, anzahl: true, gewichtet: true } } },
     }),
     eigeneZahlen(mitgliedId),
     stimmZahlen(mitgliedId),

@@ -133,3 +133,17 @@ test("globals.css: ohne backdrop-filter oder bei weniger Transparenz bleibt die 
   assert.match(weniger, /--tafel-papier:\s*9\d%/);
   assert.match(weniger, /backdrop-filter:\s*none/);
 });
+
+const auswahlQuelle = readFileSync(join(process.cwd(), "components/story/RegisterAuswahl.tsx"), "utf8");
+
+test("RegisterAuswahl: kaputter Hash wirft nicht, die Anker sind ASCII ohne decodeURIComponent", () => {
+  assert.doesNotMatch(auswahlQuelle, /decodeURIComponent/);
+  assert.match(auswahlQuelle, /const ziel = window\.location\.hash\.slice\(1\);/);
+});
+
+test("RegisterAuswahl: nach dem Aufschlagen wird der Hash geleert, damit derselbe Klick wieder hashchange feuert", () => {
+  assert.match(
+    auswahlQuelle,
+    /history\.replaceState\(null, "", window\.location\.pathname \+ window\.location\.search\)/,
+  );
+});
