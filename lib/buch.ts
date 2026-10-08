@@ -145,3 +145,42 @@ export function blaetterPlan(richtung: Richtung): {
     legt: { haelfte: hinten, von: 90 * richtung, falz: FALZ[hinten] },
   };
 }
+
+/** Ein Band des großen Buchs auf /reviews (Spec Bewertungsbuch 4): jede Doppelseite trägt eine Aroma-Karte. */
+export const BAND_GROESSE = 24;
+
+export function bandAnzahl(gesamt: number): number {
+  return Math.max(1, Math.ceil(gesamt / BAND_GROESSE));
+}
+
+/** Band einer Eintragsnummer, beides ab 1. */
+export function bandVon(nummer: number): number {
+  return Math.floor((nummer - 1) / BAND_GROESSE) + 1;
+}
+
+export function bandHref(band: number): string {
+  return band <= 1 ? "/reviews" : `/reviews/band/${band}`;
+}
+
+export type Leistenpunkt = { art: "nummer"; nummer: number } | { art: "luecke"; schluessel: string };
+
+/** Nummern unter dem Buch: die Ränder, das Umfeld der aktuellen, dazwischen Lücken (ab 1). */
+export function seitenleiste(aktuell: number, gesamt: number, rand = 2, umfeld = 1): Leistenpunkt[] {
+  const sichtbar = (n: number) => n <= rand || n > gesamt - rand || Math.abs(n - aktuell) <= umfeld;
+  // Eine Lücke, die nur eine Nummer verbirgt, wäre länger als die Nummer selbst: dann die Nummer zeigen.
+  const zeigen = (n: number) => sichtbar(n) || (n > 1 && n < gesamt && sichtbar(n - 1) && sichtbar(n + 1));
+  const punkte: Leistenpunkt[] = [];
+  for (let n = 1; n <= gesamt; n++) {
+    if (zeigen(n)) punkte.push({ art: "nummer", nummer: n });
+    else if (punkte.at(-1)?.art !== "luecke") punkte.push({ art: "luecke", schluessel: `luecke-${n}` });
+  }
+  return punkte;
+}
+
+/** Sprungziel #nr-<n> aus einem anderen Band: Index im Band (basis = Nummer vor dem ersten Eintrag) oder null. */
+export function nummerSeite(hash: string, basis: number, anzahl: number): number | null {
+  const treffer = /^#nr-(\d+)$/.exec(hash);
+  if (!treffer) return null;
+  const index = Number(treffer[1]) - basis - 1;
+  return index >= 0 && index < anzahl ? index : null;
+}
