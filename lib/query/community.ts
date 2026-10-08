@@ -27,7 +27,7 @@ export type Randnotiz = { zahl: number | null; wort: string };
 export const LEITSAETZE = ["schlagVor", "stimmAb", "liesMit"] as const;
 
 /** D1 liefert COUNT je nach Adapter als number, bigint oder string. */
-function alsZahl(wert: unknown): number {
+export function alsZahl(wert: unknown): number {
   if (typeof wert === "bigint") return wert >= 0n ? Number(wert) : 0;
   if (typeof wert === "number") return Number.isFinite(wert) && wert >= 0 ? wert : 0;
   if (typeof wert === "string" && /^\d+$/.test(wert)) return Number(wert);
