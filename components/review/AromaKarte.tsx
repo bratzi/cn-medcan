@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, Fragment, useCallback, useContext, useEffect, useId, useRef, useState } from "react";
+import { createContext, Fragment, useCallback, useContext, useEffect, useId, useRef, useState, useSyncExternalStore } from "react";
 
 import {
   achsenImKarte,
@@ -202,6 +202,11 @@ function balkenEnde(knoten: Punkt, wert: number, versatz: number, laenge = 110):
  */
 export const KarteSofortKontext = createContext(false);
 
+// Store, der nie meldet; trägt nur den Unterschied zwischen Server und Client.
+const abonnierenNichts = () => () => {};
+const imClient = () => true;
+const aufDemServer = () => false;
+
 export function AromaKarte({
   terpene: ungeordnet,
   serien: roheSerien,
@@ -231,8 +236,11 @@ export function AromaKarte({
   // Karte erst nach dem Hydrieren (CPU-Limit der Startseite, Fehler 1102): Server und erster
   // Client-Render tragen nur das leere SVG mit derselben viewBox als Platzhalter fester Höhe,
   // ohne Bögen, Balken und Beschriftungen. Tabelle und Regler (sr-only) bleiben im Server-HTML.
-  const [montiert, setMontiert] = useState(useContext(KarteSofortKontext));
-  useEffect(() => setMontiert(true), []);
+  // Hydrier-Merker über useSyncExternalStore statt setState im Effekt: der Server-Schnappschuss
+  // ist false, der Client-Schnappschuss true. Der Kontext zeichnet die Karte sofort.
+  const sofort = useContext(KarteSofortKontext);
+  const hydriert = useSyncExternalStore(abonnierenNichts, imClient, aufDemServer);
+  const montiert = sofort || hydriert;
   const svgRef = useRef<SVGSVGElement>(null);
   const spurId = `spur-${useId().replace(/:/g, "")}`;
   // Beim Ziehen folgen die Balken dem Griff sofort, sonst gleiten sie.
