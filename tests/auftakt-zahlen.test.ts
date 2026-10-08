@@ -95,3 +95,14 @@ test("Doppelseite greift nur [data-zaehler], der Auftakt nutzt es nicht", () => 
   assert.doesNotMatch(lies("components/story/bewegung/auftakt.ts"), /\[data-zaehler\]/);
   assert.doesNotMatch(lies("components/story/AuftaktZahlen.tsx"), /data-zaehler=/);
 });
+
+test("Feinschliff: Abstände im 8px-Raster, Verlauf trägt die Schrift", () => {
+  const quelle = lies("components/story/Auftakt.tsx");
+  // Nur gerade Tailwind-Stufen (4px je Stufe) an Oberzeile und Intro.
+  const oberzeile = quelle.slice(quelle.indexOf('data-story="oberzeile"'), quelle.indexOf('data-story="intro"'));
+  const intro = quelle.slice(quelle.indexOf('data-story="intro"'), quelle.indexOf("</p>", quelle.indexOf('data-story="intro"')));
+  for (const block of [oberzeile, intro]) {
+    for (const [, stufe] of block.matchAll(/\b(?:sm:)?mt-(\d+)\b/g)) assert.equal(Number(stufe) % 2, 0, `mt-${stufe} liegt nicht im 8px-Raster`);
+  }
+  assert.match(quelle, /from-surface\/40 via-surface\/30 to-surface/);
+});

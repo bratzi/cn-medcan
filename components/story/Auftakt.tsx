@@ -41,7 +41,9 @@ export async function Auftakt() {
         {/* Je Thema ein eigenes Video (Nutzer 2026-09-29); das verborgene lädt nichts. */}
         <Loop id="auftakt-loop" buehne className="nur-dunkel h-full opacity-75" />
         <Loop id="auftakt-loop-hell" buehne className="nur-hell h-full opacity-75" />
-        <div className="absolute inset-0 bg-linear-to-b from-surface/40 via-surface/5 to-surface" />
+        {/* Mitte auf 30 % statt 5 % (Spec 2026-10-08 Auftakt, 7.3): die Oberzeile trägt
+            auch auf hellen Frames. Gemessen nach dem Deploy, Ziel 4,5:1. */}
+        <div className="absolute inset-0 bg-linear-to-b from-surface/40 via-surface/30 to-surface" />
       </div>
 
       {/* Wortmarke und Unterzeile als eine Gruppe auf gemeinsamer Achse: die
