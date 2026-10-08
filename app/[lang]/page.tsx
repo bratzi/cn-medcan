@@ -1,4 +1,5 @@
 import { Abstimmung } from "@/components/story/Abstimmung";
+import { DeinKapitel } from "@/components/story/DeinKapitel";
 import { AromaSektion } from "@/components/story/AromaSektion";
 import { Empfehlungen } from "@/components/story/Empfehlungen";
 import { Auftakt } from "@/components/story/Auftakt";
@@ -45,6 +46,8 @@ export default function StartPage() {
         <NeuesterEintrag />
         <Empfehlungen />
         <Abstimmung />
+        {/* Nach der Abstimmung schließt sich die Schleife bei dir (Nutzer 2026-10-09). */}
+        <DeinKapitel />
         <Katalog />
         <StoryBuehne />
       </div>
