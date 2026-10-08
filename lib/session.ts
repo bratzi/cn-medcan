@@ -35,6 +35,8 @@ export type AngemeldetesMitglied = {
   profilOeffentlich: boolean;
   /// Kurz-Id des öffentlichen Profils, null bis zum ersten Einschalten. Bleibt beim Ausschalten.
   kurzId: string | null;
+  /** Seit wann es den Mitgliedssatz gibt (Randnotiz „dabei seit“ im Konto). */
+  erstelltAm: Date;
 };
 
 /** Rohe Better-Auth-Sitzung. Nur innerhalb dieser Datei gebraucht. */
@@ -86,6 +88,7 @@ export const aktuellesMitglied = cache(async (): Promise<AngemeldetesMitglied | 
     // Beide kommen mit dem Satz (include liefert alle Skalare), keine weitere Abfrage.
     profilOeffentlich: satz.profilOeffentlich,
     kurzId: satz.kurzId,
+    erstelltAm: satz.erstelltAm,
   };
 });
 

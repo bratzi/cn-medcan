@@ -18,6 +18,7 @@ import {
   profilAnzeige,
   profilAusDaten,
   profilDaten,
+  profilErsetzen,
   profilNeuRechnen,
 } from "@/lib/profil";
 import type { AuswertungsZeile, ProfilWerte, VerlaufSchritt } from "@/lib/profil-typen";
@@ -93,10 +94,11 @@ export async function profilFortschreiben(mitgliedId: string): Promise<void> {
   };
 
   // Atomar ersetzen: D1-batch läuft als eine Transaktion, Prismas $transaction
-  // auf D1 dagegen als Einzelabfragen (siehe lib/auth.ts).
+  // auf D1 dagegen als Einzelabfragen (siehe lib/auth.ts). Vorschläge und
+  // Profil gehen in dieselbe Batch (Review Profil K1).
   const { DB } = await getEnv();
-  await DB.batch(empfehlungenErsetzen(mitgliedId, liste).map((a) => DB.prepare(a.sql).bind(...a.params)));
-  await prisma.nutzerProfil.upsert({ where: { mitgliedId }, create: { mitgliedId, ...daten }, update: daten });
+  const anweisungen = [...empfehlungenErsetzen(mitgliedId, liste), profilErsetzen(mitgliedId, daten)];
+  await DB.batch(anweisungen.map((a) => DB.prepare(a.sql).bind(...a.params)));
 }
 
 /** Der gespeicherte Stand, eine Abfrage; null, wenn noch nie gerechnet. */

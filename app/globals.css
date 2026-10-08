@@ -524,6 +524,129 @@
 }
 
 /* ==========================================================================
+   Kapitel (Spec Profil und Konto 8): Profil und Konto bewegen sich nur per
+   CSS. Jede Regel hat einen Grund in der Spec; ohne Unterstützung oder bei
+   reduzierter Bewegung und im Sparmodus steht alles sofort.
+   ========================================================================== */
+
+@media (prefers-reduced-motion: no-preference) {
+  /* Hierarchie: das Kapitel beginnt mit deinem Namen. */
+  :root:not([data-sparmodus]) .kapitel-name {
+    animation: kapitel-auf 0.7s var(--ease-standard) backwards;
+  }
+
+  /* Erzählung: die Wörter der Randnotizen werden mitgeschrieben. */
+  :root:not([data-sparmodus]) .kapitel-notiz-wort {
+    animation: schreiben 0.8s var(--ease-standard) calc(0.3s + var(--i, 0) * 80ms) backwards;
+  }
+}
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    /* Brand 7: der Abschnitt wird als Vorhang von oben aufgedeckt. */
+    :root:not([data-sparmodus]) [data-feld] {
+      animation: feld-vorhang linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 40%;
+    }
+
+    /* Brand 7: Tiefenebene, der Freisteller wandert mit dem Scrollweg. */
+    :root:not([data-sparmodus]) .kapitel-tiefe {
+      animation: kapitel-tiefe linear both;
+      animation-timeline: view();
+      animation-range: cover;
+    }
+
+    /* Erzählung: die Menge wächst von der Grundlinie. */
+    :root:not([data-sparmodus]) [data-saeule] {
+      transform-origin: bottom;
+      animation: saeule-wachsen linear both;
+      animation-timeline: view();
+      animation-range: entry 10% cover 35%;
+    }
+
+    :root:not([data-sparmodus]) [data-balken] {
+      transform-origin: left;
+      animation: balken-wachsen linear both;
+      animation-timeline: view();
+      animation-range: entry 10% cover 35%;
+    }
+
+    /* Zustand: dein Netz steht. */
+    :root:not([data-sparmodus]) [data-netz-erscheinen] {
+      animation: netz-erscheinen linear both;
+      animation-timeline: view();
+      animation-range: entry 0% cover 30%;
+    }
+  }
+}
+
+@keyframes kapitel-auf {
+  from {
+    clip-path: inset(100% 0 0 0);
+  }
+  to {
+    clip-path: inset(0);
+  }
+}
+
+@keyframes feld-vorhang {
+  from {
+    clip-path: inset(0 0 100% 0);
+  }
+  to {
+    clip-path: inset(0);
+  }
+}
+
+@keyframes kapitel-tiefe {
+  from {
+    translate: 0 -24px;
+  }
+  to {
+    translate: 0 24px;
+  }
+}
+
+@keyframes saeule-wachsen {
+  from {
+    scale: 1 0;
+  }
+  to {
+    scale: 1 1;
+  }
+}
+
+@keyframes balken-wachsen {
+  from {
+    scale: 0 1;
+  }
+  to {
+    scale: 1 1;
+  }
+}
+
+@keyframes netz-erscheinen {
+  from {
+    opacity: 0;
+    scale: 0.9;
+  }
+  to {
+    opacity: 1;
+    scale: 1;
+  }
+}
+
+/* Seitenwechsel per <ViewTransition>: bei reduzierter Bewegung ohne Animation. */
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}
+
+/* ==========================================================================
    Bühne dunkel (Spec Redesign 8): der Auftakt über dem Video trägt in
    beiden Modi die dunklen Rollen, damit Schrift auf dem Film lesbar bleibt.
    ========================================================================== */

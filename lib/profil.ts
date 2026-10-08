@@ -1,5 +1,5 @@
 import { GESCHMACKS_KATEGORIEN, istGeschmacksKategorie, type GeschmacksKategorie } from "@/db/enums";
-import { bewertungsGewicht, profilAus, type EigeneBewertung, type SortenAroma } from "@/lib/empfehlung";
+import { bewertungsGewicht, profilAus, type EigeneBewertung, type SortenAroma, type SqlAnweisung } from "@/lib/empfehlung";
 import type { AuswertungsZeile, Auswertungen, BewertungsKurz, Geschmack, ProfilWerte, Schnitte } from "@/lib/profil-typen";
 import { berechneGesamtnote } from "@/lib/query/bewertung";
 
@@ -190,4 +190,35 @@ export function auswertungen(zeilen: readonly AuswertungsZeile[]): Auswertungen 
   }
 
   return { top, flop, community: { differenz, vergleichbar: vergleiche.length, abweichungen }, schnitte };
+}
+
+/** Eine Zeile `nutzer_profil`, wie `profilFortschreiben` sie schreibt. */
+export type ProfilZeile = {
+  geschmack: string;
+  terpene: string;
+  anzahl: number;
+  gewichtet: number;
+  oeffentlich: string;
+  verlauf: string;
+  berechnetAm: Date;
+};
+
+/** D1 speichert DateTime so, wie der Prisma-D1-Adapter schreibt: ISO mit +00:00 statt Z. */
+export function d1Datum(d: Date): string {
+  return d.toISOString().replace("Z", "+00:00");
+}
+
+/**
+ * Upsert des Profils als Anweisung für dieselbe D1-batch wie die Vorschläge
+ * (Review Profil K1): beide stehen atomar oder keiner.
+ */
+export function profilErsetzen(mitgliedId: string, z: ProfilZeile): SqlAnweisung {
+  return {
+    sql: `INSERT INTO nutzer_profil (mitglied_id, geschmack, terpene, anzahl, gewichtet, oeffentlich, verlauf, berechnet_am)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+      ON CONFLICT(mitglied_id) DO UPDATE SET geschmack = excluded.geschmack, terpene = excluded.terpene,
+        anzahl = excluded.anzahl, gewichtet = excluded.gewichtet, oeffentlich = excluded.oeffentlich,
+        verlauf = excluded.verlauf, berechnet_am = excluded.berechnet_am`,
+    params: [mitgliedId, z.geschmack, z.terpene, z.anzahl, z.gewichtet, z.oeffentlich, z.verlauf, d1Datum(z.berechnetAm)],
+  };
 }

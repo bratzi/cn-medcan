@@ -20,11 +20,14 @@ export function profilVerlauf(bewertungen: readonly VerlaufEingabe[], sorten: re
   const beitraege = geschmacksBeitraege(reihe, sorten);
   const summe = new Map<string, number>();
   const schritte: VerlaufSchritt[] = [];
+  // Summen für alle, das Netz nur für die gespeicherten letzten Schritte (Review Profil M2).
+  const ab = Math.max(0, reihe.length - VERLAUF_HOECHSTENS);
   reihe.forEach((bewertung, i) => {
     for (const [k, x] of beitraege[i]) summe.set(k, (summe.get(k) ?? 0) + x);
+    if (i < ab) return;
     schritte.push({ anzahl: i + 1, datum: bewertung.erstelltAm.toISOString(), geschmack: geschmackAusVektor(summe) });
   });
-  return schritte.slice(-VERLAUF_HOECHSTENS);
+  return schritte;
 }
 
 export function verlaufDaten(schritte: readonly VerlaufSchritt[]): string {

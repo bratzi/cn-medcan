@@ -2,8 +2,8 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 
-import type { SortenAroma } from "@/lib/empfehlung";
-import { profilAnzeige, profilNeuRechnen } from "@/lib/profil";
+import { geschmacksBeitraege, type SortenAroma } from "@/lib/empfehlung";
+import { geschmackAusVektor, profilAnzeige, profilNeuRechnen } from "@/lib/profil";
 import { profilVerlauf, verlaufAusDaten, verlaufDaten, VERLAUF_HOECHSTENS, type VerlaufEingabe } from "@/lib/profil-verlauf";
 
 // Sorten ohne Herstellerterpene: das Netz entsteht allein aus den Reglern.
@@ -109,4 +109,28 @@ test("Mitglied mit 2 Mittelfeld-Bewertungen hat einen Verlauf mit 2 Schritten un
 test("aktuellesProfil rechnet über profilNeuRechnen", () => {
   const q = readFileSync("lib/query/profil.ts", "utf8");
   assert.match(q, /profilNeuRechnen\(gespeichert, Date\.now\(\)\)/);
+});
+
+/** Die Rechnung vor M2: Netz für jeden Schritt, danach gekürzt. */
+function verlaufAlt(reihe: VerlaufEingabe[]) {
+  const sortiert = [...reihe].sort(
+    (a, c) => a.erstelltAm.getTime() - c.erstelltAm.getTime() || (a.strainId < c.strainId ? -1 : a.strainId > c.strainId ? 1 : 0),
+  );
+  const beitraege = geschmacksBeitraege(sortiert, sorten);
+  const summe = new Map<string, number>();
+  const schritte = sortiert.map((x, i) => {
+    for (const [k, w] of beitraege[i]) summe.set(k, (summe.get(k) ?? 0) + w);
+    return { anzahl: i + 1, datum: x.erstelltAm.toISOString(), geschmack: geschmackAusVektor(summe) };
+  });
+  return schritte.slice(-VERLAUF_HOECHSTENS);
+}
+
+test("profilVerlauf (M2): gleiches Ergebnis wie vorher für 1, 60, 61 und 130 Bewertungen", () => {
+  const achsen = ["fruchtig", "erdig", "zitrus", "suess"];
+  for (const n of [1, 60, 61, 130]) {
+    const reihe = Array.from({ length: n }, (_, i) =>
+      b(`s${i}`, [5, 1.5, 4, 3, null][i % 5], { [achsen[i % 4]]: (i % 5) + 1 }, (i % 28) + 1),
+    );
+    assert.deepEqual(profilVerlauf(reihe, sorten), verlaufAlt(reihe), `n = ${n}`);
+  }
 });
