@@ -3,7 +3,7 @@
 > Übergabemedium zwischen Sessions. Wird nach jedem Arbeitsblock aktualisiert und committet.
 > Wer hier weiterarbeitet, liest diese Datei zuerst und braucht den Chatverlauf nicht.
 
-**Letzte Aktualisierung:** 2026-10-07 (Session 45)
+**Letzte Aktualisierung:** 2026-10-08 (Session 46)
 **Repo:** https://github.com/bratzi/cn-medcan (public)
 **Branch:** `main` (Makeover „Grünes Buch“ Teilprojekt 1 ist seit 2026-09-24 auf `main`)
 
@@ -52,7 +52,66 @@ Prüfen über Cloudflare-API `GET /accounts/{id}/builds/workers/1406f98f6bac4ea1
 manuell starten mit `POST /accounts/{id}/builds/triggers/f649c1f7-21f8-4eb5-8597-0b036c381c8e/builds`,
 Body `{ branch: "main", commit_hash: "<VOLLER Hash>" }` (Kurz-Hash scheitert beim Klonen). Build ~6 min.
 
-### ⇢ SESSION 46 (Sessionstart): Profil Stufe 2 ist gepusht, Live-Prüfung offen, dann Stufe 3
+### ⇢ SESSION 47 (Sessionstart): Marken-Makeover ist live, Optik-Prüfung offen
+
+**Auf `main` (`30818ba`, 781 Tests grün, tsc sauber, `npm run farben` sauber).** Alle Builds bis
+`30818ba` sind erfolgreich. In dieser Session ist Profil Stufe 3 fertig geworden und danach das
+Marken-Makeover entstanden.
+
+**Profil Stufe 3 ist live und geprüft** (Plan `docs/superpowers/plans/2026-10-07-profil-stufe-3.md`,
+Migration 0020 remote eingespielt): Verlauf des Netzes (JSON-Spalte `nutzer_profil.verlauf`, letzte 60
+Schritte, beim Speichern nachgerechnet), Kontur „vor der letzten Bewertung“ mit Änderungszeile,
+Lieblingshersteller, Mini-Netz nach dem Speichern auf der Blütenseite, Verlauf-Regler auf `/profil`.
+Live gesehen: Kontur, Änderungszeile „Erdig schwächer, Fruchtig stärker“, Lieblingshersteller-Hinweis,
+Verlauf. Altprofile rechnen beim ersten Aufruf einmal nach. Offen aus dem Review: M2 (CPU der
+Verlaufsrechnung, gemessen 1,4–3 ms bei 100 Bewertungen, 13–30 ms bei 1000) und M10 (Kleinkram Verlauf).
+
+**Marken-Makeover (Nutzer-Entscheidungen dieser Session, alle live):**
+- **Logo:** Pinselschrift als Grafik, `components/marke/Logo.tsx`, zwei Masken `public/marke/pinsel.webp`
+  und `pinsel-of.webp` (aus dem Nutzerbild freigestellt, 2x hochgerechnet), CSS `.marke-pinsel`. Schrift
+  im Token `--color-logo`, das „of“ in `kopierstift`. Steht im Kopf, als h1 im Auftakt (deckend, **kein
+  Glas** – der Nutzer fand Glas billig) und blass im Fuß. Endloser Glanzstreifen (`marke-glanz`) in beiden
+  Farbebenen. Beim Hinausscrollen wächst es auf 115 %, es gleitet nicht mehr nach oben.
+- **Handschrift:** Inspiration ist ersetzt durch **Mr Dafoe** (`--font-pinsel`), überall. `font-size-adjust:
+  0.25` gleicht die viel größere x-Höhe aus. Farbe ist `--color-logo`, damit Hero und Storytelling gleich
+  wirken. Die Grün-Lila-Verläufe in Schrift sind weg (`.farbverlauf` ist einfarbig).
+- **Farb-Token `--color-logo`** (hell `blatt-500`, dunkel `blatt-400`): heller und minziger als `accent`,
+  gemessen 3.62 / 3.37 auf seinen Flächen. **Abweichung von Spec TP3 5**, die für Handschrift 4,5:1
+  verlangt: begründet damit, dass Mr Dafoe keine Haarstriche mehr hat wie Inspiration. `scripts/farben-pruefen.mjs`
+  prüft die Rolle `logo` mit 3:1 auf `surface` und `surface-raised` (nicht auf `surface-sunken`, dort
+  steht das Logo nie: 2,81).
+- **Terpenband:** keine Querlinien mehr, trägt das Spaltenraster; beim Überfahren erscheint ein Tooltip
+  **unter** dem Symbol (zentriert, eigene Fläche), der Eintrag rückt nicht mehr, nur das Symbol wächst.
+- **Sektionen:** Der gepinnte Auftakt bleibt im Hintergrund stehen und schien samt seiner Zeitungsleiste
+  als waagerechter Strich durch. Alle Sektionen nach `[data-story="transparent"]` tragen jetzt Grund und
+  Raster (`globals.css`, Geschwister-Selektor).
+- **Schlagwörter** (`Schlagwort.tsx`): `--text-kulisse` von 40rem auf 15rem herunter, und sie stehen im
+  Polster der eigenen Sektion statt auf der Kante (dort schnitt die Nachbarsektion sie ab).
+- **Akzentwörter** im Storytelling tragen die Bewegung der Prozentzahl aus dem Community-Fazit: vier
+  driftende Konturen plus `fazit-puls`.
+- **Schalterleiste** (Sprache/Thema) sitzt senkrecht mittig am rechten Rand statt in der Ecke.
+
+**⇢ Hier weitermachen:**
+1. **Optik live prüfen** (am Ende der Session brach die Browser-Verbindung ab, nur gemessen, nicht
+   gesehen): Akzentwörter ohne Kontur und im Logo-Ton (`30818ba`), Schlagwörter in beiden Themes und auf
+   Mobil, Terpen-Tooltip, Schalterleiste, Übergänge zwischen allen Sektionen.
+2. **Hero als Eyecatcher**: Der Nutzer hat eine Runde mit allen Design-Skills gewünscht
+   (`build-awwwards-quality-sites`, `animate`, `design-taste-frontend`), die noch aussteht.
+3. **Intro-Zeile im Hero** („Kollektiven Geschmack kultivieren · …“) läuft bei rund 1000 px Fensterbreite
+   rechts aus dem Bild. Bestand schon vor dem Makeover.
+4. **eslint-Fehler** in `components/story/RegisterAuswahl.tsx:179` (`react-hooks/set-state-in-effect`),
+   vorbestehend, nicht aus dieser Session.
+5. **Aufräumen:** `.claude/worktrees/` steht seit `7472d86` in `.gitignore`. Ein `git add -A` hatte die
+   Agent-Worktrees als Submodul-Einträge committet, was den Cloudflare-Build beim Klonen abbrechen ließ
+   („error occurred while updating repository submodules“). Nie `git add -A` über `.claude` laufen lassen.
+
+**Lehre Browser-MCP:** Screenshots scheitern mit „Script injection timed out“, sobald Chrome im
+Hintergrund liegt; `javascript_tool` läuft trotzdem. Messen geht also immer, Sehen nur mit Chrome im
+Vordergrund.
+
+---
+
+### ⇢ SESSION 46 (erledigt): Profil Stufe 2 ist gepusht, Live-Prüfung offen, dann Stufe 3
 
 **Auf `main` (`8f9244b`, 733 Tests grün, tsc und eslint sauber):** Profil Stufe 2, öffentliches Profil.
 Plan `docs/superpowers/plans/2026-10-07-profil-stufe-2.md` (Task 1 selbst, Stränge A–D parallel in
