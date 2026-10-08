@@ -12,6 +12,7 @@ import {
   type KultivarTyp,
   type RezeptStatus,
 } from "@/db/enums";
+import type { KartenTerpen } from "@/lib/aromakarte";
 import { autorProfilAus } from "@/lib/autor-profil";
 import type { GespeicherteBewertung } from "@/lib/bewertung-vorbelegung";
 import { getPrisma } from "@/lib/prisma";
@@ -203,6 +204,83 @@ export type ReviewEintrag = {
   /** Freigegebene Bilder der Bewertung, älteste zuerst, höchstens drei; fehlt außerhalb der Blütenseite. */
   bilder?: ReviewBild[];
 };
+
+/**
+ * Das `select` einer Bewertung für Buch und Blütenseite (Spec Bewertungsbuch 3): eine Quelle für
+ * die Blüte und das große Buch über alle Sorten.
+ */
+export const BEWERTUNG_SELECT = {
+    id: true,
+    istRedaktionell: true,
+    autorId: true,
+    aussehen: true,
+    geruch: true,
+    geschmack: true,
+    wirkung: true,
+    konsistenz: true,
+    feuchtigkeitProzent: true,
+    geschmacksMatrix: true,
+    terpenIntensitaet: true,
+    beschaffenheit: true,
+    notiz: true,
+    instagramReelUrl: true,
+    erstelltAm: true,
+    gesamtnote: true,
+    charge: { select: { chargenNr: true } },
+    // Der Name steht öffentlich im Buch (Profil: "Unter diesem Namen erscheinen deine Bewertungen").
+    autor: { select: { anzeigename: true, profilOeffentlich: true, kurzId: true, avatar: { select: { id: true } } } },
+    // Nur freigegebene, nie mit BLOB; Prisma lädt sie in einer Abfrage mit IN über höchstens 20 Ids.
+    bilder: {
+      where: { status: "FREIGEGEBEN" },
+      select: { id: true, breite: true, hoehe: true, erstelltAm: true },
+      orderBy: { erstelltAm: "asc" },
+      take: 3,
+    },
+  } satisfies Prisma.ReviewSelect;
+
+export type BewertungZeile = Prisma.ReviewGetPayload<{ select: typeof BEWERTUNG_SELECT }>;
+
+/** Eine Bewertungszeile als Eintrag im Buch; `autorZahlen` kommt aus `ladeAutorZahlen`. */
+export function alsReviewEintrag(review: BewertungZeile, autorZahlen: ReadonlyMap<string, number>): ReviewEintrag {
+  return {
+    id: review.id,
+    istRedaktionell: review.istRedaktionell,
+    autorName: review.autor?.anzeigename ?? null,
+    autorAvatarId: review.autor?.avatar?.id ?? null,
+    autorBewertungen: review.autorId ? (autorZahlen.get(review.autorId) ?? null) : null,
+    // Nur die Kurz-Id eines öffentlichen Profils verlässt den Server.
+    autorProfil: autorProfilAus(review.autor ?? null),
+    gesamtnote: zuZahl(review.gesamtnote),
+    aussehen: review.aussehen,
+    geruch: review.geruch,
+    geschmack: review.geschmack,
+    wirkung: review.wirkung,
+    konsistenz: review.konsistenz,
+    feuchtigkeitProzent: zuZahl(review.feuchtigkeitProzent),
+    geschmacksMatrix: review.geschmacksMatrix,
+    terpenIntensitaet: review.terpenIntensitaet,
+    beschaffenheit: review.beschaffenheit,
+    notiz: review.notiz,
+    instagramReelUrl: review.instagramReelUrl,
+    chargenNr: review.charge?.chargenNr ?? null,
+    erstelltAm: review.erstelltAm,
+    bilder: review.bilder,
+  };
+}
+
+/** Ein Terpen einer Sorte als Karteneintrag der Aroma-Karte. */
+export function alsKartenTerpen(eintrag: {
+  rang: number;
+  konzentrationProzent: number | null;
+  terpen: { name: string; geschmack: string };
+}): KartenTerpen {
+  return {
+    name: eintrag.terpen.name,
+    geschmack: alsGeschmacksKategorie(eintrag.terpen.geschmack),
+    konzentrationProzent: zuZahl(eintrag.konzentrationProzent),
+    rang: eintrag.rang,
+  };
+}
 
 export type UnternehmenEintrag = {
   name: string;
@@ -606,34 +684,7 @@ export async function ladeStrainDetail(
         // Betreiber zuerst: bei mehr als 20 Bewertungen fiele er sonst aus dem Buch (T7-Review, Nutzer 2026-09-29).
         orderBy: [{ istRedaktionell: "desc" }, { erstelltAm: "desc" }],
         take: 20,
-        select: {
-          id: true,
-          istRedaktionell: true,
-          autorId: true,
-          aussehen: true,
-          geruch: true,
-          geschmack: true,
-          wirkung: true,
-          konsistenz: true,
-          feuchtigkeitProzent: true,
-          geschmacksMatrix: true,
-          terpenIntensitaet: true,
-          beschaffenheit: true,
-          notiz: true,
-          instagramReelUrl: true,
-          erstelltAm: true,
-          gesamtnote: true,
-          charge: { select: { chargenNr: true } },
-          // Der Name steht öffentlich im Buch (Profil: "Unter diesem Namen erscheinen deine Bewertungen").
-          autor: { select: { anzeigename: true, profilOeffentlich: true, kurzId: true, avatar: { select: { id: true } } } },
-          // Nur freigegebene, nie mit BLOB; Prisma lädt sie in einer Abfrage mit IN über höchstens 20 Ids.
-          bilder: {
-            where: { status: "FREIGEGEBEN" },
-            select: { id: true, breite: true, hoehe: true, erstelltAm: true },
-            orderBy: { erstelltAm: "asc" },
-            take: 3,
-          },
-        },
+        select: BEWERTUNG_SELECT,
       },
       kennwerte: KENNWERTE_SELECT,
     },
@@ -705,30 +756,7 @@ export async function ladeStrainDetail(
       laborBericht: charge.laborBericht,
       verfallsdatum: charge.verfallsdatum,
     })),
-    reviews: zeile.reviews.map((review) => ({
-      id: review.id,
-      istRedaktionell: review.istRedaktionell,
-      autorName: review.autor?.anzeigename ?? null,
-      autorAvatarId: review.autor?.avatar?.id ?? null,
-      autorBewertungen: review.autorId ? (autorZahlen.get(review.autorId) ?? null) : null,
-      // Nur die Kurz-Id eines öffentlichen Profils verlässt den Server.
-      autorProfil: autorProfilAus(review.autor ?? null),
-      gesamtnote: zuZahl(review.gesamtnote),
-      aussehen: review.aussehen,
-      geruch: review.geruch,
-      geschmack: review.geschmack,
-      wirkung: review.wirkung,
-      konsistenz: review.konsistenz,
-      feuchtigkeitProzent: zuZahl(review.feuchtigkeitProzent),
-      geschmacksMatrix: review.geschmacksMatrix,
-      terpenIntensitaet: review.terpenIntensitaet,
-      beschaffenheit: review.beschaffenheit,
-      notiz: review.notiz,
-      instagramReelUrl: review.instagramReelUrl,
-      chargenNr: review.charge?.chargenNr ?? null,
-      erstelltAm: review.erstelltAm,
-      bilder: review.bilder,
-    })),
+    reviews: zeile.reviews.map((review) => alsReviewEintrag(review, autorZahlen)),
     kennwerte: zeile.kennwerte,
     aktualisiertAm: zeile.aktualisiertAm,
   };
