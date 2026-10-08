@@ -30,11 +30,10 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 
 ### ⇢ WARTELISTE (Nutzer 2026-10-09, Reihenfolge)
 
-1. **Dein Kapitel** zu Ende: Stränge A/B/C fertig, Task-Reviews laufen, dann Merge A, B, C, Gesamtreview Opus,
-   eine Fix-Welle, Push, live. Ledger `.superpowers/sdd/2026-10-09-startseite-dein-kapitel/progress.md`.
+1. ~~Dein Kapitel~~ **live** (siehe Session 52 unten).
 2. **Profil und Konto entkoppeln** (Entwurf im Chat, Nutzer-Bestätigung offen): Menü Bewertungen, Abstimmung,
    Blüten, **Profil**; Knopf rechts „Mein Konto“ (/mitglied) mit Zähler; ProfilReiter weg; Texte „unter Mein Konto“.
-3. **Auftakt-Kennzahlen**: klickbar (Sorten nach /blueten, Bewertungen nach /reviews, Stimmen nach /umfragen)
+3. ~~Auftakt-Kennzahlen~~ **erledigt `2d126fd`** (live-Sicht offen): klickbar (Sorten nach /blueten, Bewertungen nach /reviews, Stimmen nach /umfragen)
    und in der Akzentschrift Mr Dafoe (Nutzer-Ausnahme von „Zahlen gedruckt“, ins Regelwerk eintragen).
 4. **Buch-Darstellung überall neu** (Brainstorming, Design-Skills): Blätter-Bewertung zentrierter im Fokus,
    Nutzertext kursiv/abgesetzt als Nutzerstimme, Akzentschrift rein, Profil mit Namen kleiner und eingefasst;
@@ -47,20 +46,23 @@ Erledigt dazwischen: **`a4a03b2`** Terpenband-Tooltip nicht mehr abgeschnitten (
 Einträge sind Links auf ihre Register-Tafel, Register schlägt per hashchange auf; live geprüft (Tooltip ganz, Sprung geht).
 `ce112cb` Notenbalken im Tooltip wieder sichtbar (Block gestreckt), `fb5c2b8` Tafel mit Kopfabstand beim Sprung.
 
-### ⇢ SESSION 53 (Sessionstart): Spec „Dein Kapitel“ freigeben lassen, dann Plan
+### ⇢ Offene Minors „Dein Kapitel“ (Gesamtreview, geparkt)
 
-**Großer Punkt (Nutzer 2026-10-09):** Profil als Highlight-Sektion auf der Startseite, agenturreif.
-Nutzer-Entscheidungen: Inhalt „Dein Kapitel live“ (Mitglied eigenes Kapitel über `/api/startseite`,
-Gast dasselbe am öffentlichen Betreiber-Profil „GrünesBuch“), Position nach der Abstimmung.
-Spec `docs/superpowers/specs/2026-10-09-startseite-dein-kapitel-design.md` wartet auf Freigabe; danach
-`writing-plans`, Stränge parallel schneiden (Daten/API, Komponente, Bewegung).
+Fokusverlust beim Umblättern; Mitglied mit Bewertungen aber ohne `nutzer_profil` sieht „Dein Netz entsteht mit
+deiner ersten Bewertung“ (falsch, nur bei `bewertet === 0` zeigen); `KapitelTexte` schickt `w.profil` doppelt
+in die Insel; Randnotizen inline statt `components/kapitel/Randnotizen` (Kommentar fehlt); leeres Mitglied zeigt
+„0 gestimmt“; Mitglied mit Abfragefehler sieht „Konto anlegen“; Band-Link nur so breit wie sein Inhalt (`w-full`);
+CRLF/LF-Wechsel in `globals.css`/`page.tsx` (`.gitattributes` mit `eol=lf` erwägen). Dazu Task-Minors:
+`max-[639px]:size-20`, leeres `<span />`, onEnter-Timeline im Cleanup nicht gekillt, Name-Clip ohne Rand.
 
-Noch live nachsehen: `a37eea1` (Startseite ohne Wirkungsnote, nur 4 Noten), Ranglisten mobil zwei Spalten,
-`aa95926` (Satz einmal, großes Buch steht still). Gast-Ansicht Ranglisten nicht gesehen.
+### ⇢ SESSION 52 (erledigt): `/reviews` live geprüft, Startseite nachgezogen, Dein Kapitel live
 
-**Dauerregel neu:** Review-Darstellung ändern heißt Startseite im selben Zug mitziehen (Memory).
-
-### ⇢ SESSION 52 (erledigt): `/reviews` live geprüft, Startseite nachgezogen
+- **Dein Kapitel** (Spec/Plan 2026-10-09): Task 1 selbst (`dabd6cd`), Stränge A/B/C parallel, je Review, Gesamtreview
+  Opus, eine Fix-Welle `734a143` (tsc-orderBy, `useDeferredValue` für die Überblendung, Hash ohne decode, Hash
+  nach Sprung leeren, Profil-Select eng), `5fd4aa2` Name `text-kapitel` (brach live mitten im Wort). Live als
+  Mitglied geprüft (eigenes Kapitel, gestimmt 3, Netz, „Zu deinem Kapitel“, kein Überlauf); Gast-HTML enthält das
+  Schaufenster GrünesBuch mit Vermerk und „Konto anlegen“, keine Wirkung. D1 lesend: 5 / 4,6 / 20.
+  Nicht live gesehen: Überblendung beim Umblättern, Zurück-Taste nach Hash-Leeren, 390 px, dunkel.
 
 - **`1da0662`:** Startseite „Der neueste Eintrag“ nutzt jetzt `Buch` + `BuchDoppelseite` (Bild, Sorte als Link)
   über `ladeNeuestenBetreiberEintrag` (`lib/query/buch-band.ts`). Alte `Doppelseite`, Choreografie
