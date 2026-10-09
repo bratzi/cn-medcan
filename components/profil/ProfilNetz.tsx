@@ -32,7 +32,12 @@ type Props = {
  */
 export function ProfilNetz({ werte, texte, achsen, sprache, verlauf = [], className }: Props) {
   const staende: NetzStand[] =
-    verlauf.length >= 2 ? verlauf.map((s) => ({ geschmack: s.geschmack, datum: s.datum, anzahl: s.anzahl })) : [{ geschmack: werte.geschmack }];
+    verlauf.length >= 2
+      ? verlauf.map((s) => ({ geschmack: s.geschmack, terpene: s.terpene, datum: s.datum, anzahl: s.anzahl }))
+      : [{ geschmack: werte.geschmack }];
+  // Der heutige Stand trägt immer das gespeicherte Terpen-Netz, auch wenn der Verlauf älter ist als die Terpene.
+  const letzter = staende[staende.length - 1];
+  staende[staende.length - 1] = { ...letzter, terpene: letzter.terpene ?? werte.terpenNetz };
 
   return (
     <figure className="flex flex-col items-center gap-4">

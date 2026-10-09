@@ -25,6 +25,10 @@ export type AromaNetzTexte = Pick<
   | "verlaufRegler"
   | "verlaufAbspielen"
   | "verlaufAnhalten"
+  | "terpenSkala"
+  | "modusWahl"
+  | "modusGeschmack"
+  | "modusTerpene"
 >;
 
 /** Was ProfilNetz braucht: das Netz und die Hinweise darunter. Schmal, weil die Startseiten-Insel es serialisiert. */
@@ -39,9 +43,11 @@ export function profilNetzTexte(p: Woerterbuch["profil"]): ProfilNetzTexte {
 export function aromaNetzTexte(p: AromaNetzTexte): AromaNetzTexte {
   const { magIch, magIchNicht, vorher, netzSkala, netzHinweis, note, srMag, srMagNicht, srNeutral, staerker, schwaecher } = p;
   const { aenderung, aenderungGleich, verlaufSchritt, verlaufRegler, verlaufAbspielen, verlaufAnhalten } = p;
+  const { terpenSkala, modusWahl, modusGeschmack, modusTerpene } = p;
   return {
     magIch, magIchNicht, vorher, netzSkala, netzHinweis, note, srMag, srMagNicht, srNeutral, staerker, schwaecher,
     aenderung, aenderungGleich, verlaufSchritt, verlaufRegler, verlaufAbspielen, verlaufAnhalten,
+    terpenSkala, modusWahl, modusGeschmack, modusTerpene,
   };
 }
 

@@ -2289,6 +2289,28 @@ button.netz-marke:active .netz-marke-kreis {
   }
 }
 
+/* Lesung außen an der Marke (Nutzer 2026-10-09: nicht in die Mitte). 28 px = halbe Marke (22) plus
+   6 px Luft. Die Seite rechnet lesungsLage (lib/netz-vektor) und spiegelt am Viewport-Rand. */
+.netz-lesung[data-seite="rechts"] {
+  translate: 28px -50%;
+  transform-origin: left center;
+}
+
+.netz-lesung[data-seite="links"] {
+  translate: calc(-100% - 28px) -50%;
+  transform-origin: right center;
+}
+
+.netz-lesung[data-seite="oben"] {
+  translate: -50% calc(-100% - 28px);
+  transform-origin: center bottom;
+}
+
+.netz-lesung[data-seite="unten"] {
+  translate: -50% 28px;
+  transform-origin: center top;
+}
+
 /* Zeitleiste des Verlaufs: dünne Spur, ein Punkt je Bewertung (data-vergangen in Akzent),
    Griff 20 px in Akzent mit Ring im Seitengrund. */
 .netz-zeitleiste {

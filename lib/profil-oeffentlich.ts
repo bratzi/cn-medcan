@@ -35,6 +35,7 @@ export function netzTexte(w: Woerterbuch): Woerterbuch["profil"] {
     magIch: o.magIch,
     magIchNicht: o.magIchNicht,
     netzSkala: o.netzSkala,
+    terpenSkala: o.terpenSkala,
     vorlaeufig: o.vorlaeufig,
     nurMittelfeld: o.nurMittelfeld,
     srMag: o.srMag,
