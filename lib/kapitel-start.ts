@@ -12,6 +12,10 @@ import type { ProfilWerte, VerlaufSchritt } from "@/lib/profil-typen";
 export type KapitelDaten = {
   anzeigename: string;
   avatarId: string | null;
+  /** Wer schreibt (Nutzer 2026-10-09: man soll sehen, dass das ein Mensch ist). Optional: ältere gemerkte Antworten haben es nicht. */
+  rolle?: "betreiber" | "mitglied";
+  /** Seit wann das Mitglied dabei ist, ISO. */
+  seit?: string | null;
   /** Freigegebene Bewertungen zu aktiven Sorten. */
   bewertet: number;
   /** Mittel der eigenen Gesamtnoten, eine Stelle; null ohne Gesamtnote. */
@@ -25,8 +29,9 @@ export type KapitelDaten = {
   zuletzt: { slug: string; handelsname: string; gesamtnote: number | null; datum: string } | null;
 };
 
-export type KapitelEingabe = Omit<KapitelDaten, "zuletzt" | "verlauf"> & {
+export type KapitelEingabe = Omit<KapitelDaten, "zuletzt" | "verlauf" | "seit"> & {
   verlauf?: VerlaufSchritt[];
+  seit?: Date | null;
   zuletzt: { slug: string; handelsname: string; gesamtnote: number | null; erstelltAm: Date } | null;
 };
 
@@ -35,6 +40,8 @@ export function kapitelAus(e: KapitelEingabe): KapitelDaten {
   return {
     anzeigename: e.anzeigename,
     avatarId: e.avatarId,
+    rolle: e.rolle ?? "mitglied",
+    seit: e.seit ? e.seit.toISOString() : null,
     bewertet: e.bewertet,
     schnitt: ohneBewertung || e.schnitt === null ? null : Math.round(e.schnitt * 10) / 10,
     dritte: e.dritte,

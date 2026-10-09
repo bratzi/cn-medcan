@@ -756,6 +756,12 @@ export const en: Woerterbuch = {
       leerNetz: "Your web takes shape with your first review.",
       ersteBewertung: "Write your first review",
       geladen: "Your chapter is open.",
+      betreiber: "Operator",
+      mitglied: "Member",
+      dabeiSeit: "member since {datum}",
+      mag: "likes {aromen}",
+      und: "and",
+      ueberDich: "About the member",
     },
     katalog: {
       fehler: "The catalogue cannot be loaded right now. Reload the page in a few minutes; everything else keeps working.",

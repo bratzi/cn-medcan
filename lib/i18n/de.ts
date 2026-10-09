@@ -765,6 +765,12 @@ export const de = {
       leerNetz: "Dein Netz entsteht mit deiner ersten Bewertung.",
       ersteBewertung: "Erste Bewertung schreiben",
       geladen: "Dein Kapitel ist aufgeschlagen.",
+      betreiber: "Betreiber",
+      mitglied: "Mitglied",
+      dabeiSeit: "dabei seit {datum}",
+      mag: "mag {aromen}",
+      und: "und",
+      ueberDich: "Über das Mitglied",
     },
     katalog: {
       fehler: "Der Katalog lässt sich gerade nicht laden. Lade die Seite in ein paar Minuten neu, der Rest funktioniert weiter.",

@@ -57,7 +57,7 @@ export async function GemeinsamLernen() {
           {STATIONEN.map((station, index) => (
             <li
               key={station}
-              className="grid grid-cols-[4rem_minmax(0,1fr)] items-baseline gap-4 border-t border-border-strong py-8 last:border-b sm:grid-cols-[6rem_minmax(0,1fr)] sm:gap-8 md:py-10"
+              className="flex flex-col items-center gap-4 border-t border-border-strong py-8 text-center last:border-b md:py-10 lg:grid lg:grid-cols-[6rem_minmax(0,1fr)] lg:items-baseline lg:gap-8 lg:text-start"
             >
               <span className="farbverlauf font-hand text-vermerk leading-none tabular-nums">0{index + 1}</span>
               <span className="font-buch text-erzaehlung leading-[1.1] text-text text-balance">

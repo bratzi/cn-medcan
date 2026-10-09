@@ -53,7 +53,7 @@ test("Zuletzt: Handelsname als Link, keine Wirkung", () => {
 });
 
 test("Ohne Bewertung: Leer-Satz und Erste Bewertung statt Netz und Zuletzt", () => {
-  const leer = kapitelAus({ ...daten, bewertet: 0, schnitt: null, netz: null, zuletzt: null, dritte: { art: "gestimmt", zahl: 2 } });
+  const leer = kapitelAus({ ...daten, seit: null, bewertet: 0, schnitt: null, netz: null, zuletzt: null, dritte: { art: "gestimmt", zahl: 2 } });
   const html = zeige("eigen", leer);
   assert.match(html, new RegExp(t.leerNetz));
   assert.match(html, /href="\/blueten"/);
@@ -66,6 +66,16 @@ test("Bewertet, aber ohne gespeichertes Netz: kein Satz von der ersten Bewertung
   const html = zeige("eigen", { ...daten, netz: null });
   assert.doesNotMatch(html, new RegExp(t.leerNetz));
   assert.match(html, new RegExp(t.zumKapitel));
+});
+
+test("Zentrierte Säule mit Angaben zum Menschen: Rolle, dabei seit, Vorlieben (Nutzer 2026-10-09)", () => {
+  const html = zeige("schaufenster", kapitelAus({ ...daten, seit: new Date("2026-09-23T10:00:00Z"), rolle: "betreiber", zuletzt: null }));
+  assert.match(html, /text-center/);
+  assert.match(html, new RegExp(t.betreiber));
+  assert.match(html, /dabei seit 23\.09\.2026/);
+  assert.match(html, /mag Zitrus/);
+  // Das Netz steht vor den Zahlen: Blickfang in der Mitte.
+  assert.ok(html.indexOf("data-netz-erscheinen") < html.indexOf(t.notizen));
 });
 
 test("Name bricht nicht mitten im Wort: Grad text-kapitel statt text-titel (live 2026-10-09, „GrünesBuc / h“ bei 1143 px)", () => {

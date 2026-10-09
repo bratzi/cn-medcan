@@ -44,7 +44,7 @@ export async function DeinKapitel() {
     >
       <Schlagwort satz={texte.schlagwort} ton="lila" />
       <div className="mx-auto flex w-full max-w-360 flex-col gap-12">
-        <h2 id="kapitel-titel" className="font-buch text-kapitel text-text text-center min-[640px]:text-left">
+        <h2 id="kapitel-titel" className="font-buch text-kapitel text-text text-center text-balance">
           {texte.vor} <em className="farbverlauf hand-betont">{texte.betont}</em>
         </h2>
         <KapitelImBrowser schaufenster={schaufenster} texte={kapitelTexteFuerInsel} sprache={sprache} />

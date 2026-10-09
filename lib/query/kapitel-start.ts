@@ -41,7 +41,7 @@ export const ladeSchaufensterKapitel = cache(async (): Promise<KapitelDaten | nu
   const m = await prisma.mitglied.findFirst({
     where: { rolle: "ADMIN", profilOeffentlich: true, freigegeben: true },
     orderBy: { erstelltAm: "asc" },
-    select: { id: true, anzeigename: true, avatar: { select: { id: true } }, profil: { select: { oeffentlich: true } } },
+    select: { id: true, anzeigename: true, erstelltAm: true, avatar: { select: { id: true } }, profil: { select: { oeffentlich: true } } },
   });
   if (!m) return null;
   const [zahlen, vonEuch] = await Promise.all([
@@ -51,6 +51,8 @@ export const ladeSchaufensterKapitel = cache(async (): Promise<KapitelDaten | nu
   return kapitelAus({
     anzeigename: m.anzeigename,
     avatarId: m.avatar?.id ?? null,
+    rolle: "betreiber",
+    seit: m.erstelltAm,
     ...zahlen,
     dritte: { art: "vonEuch", zahl: vonEuch },
     netz: oeffentlicheWerte(m.profil?.oeffentlich ?? null),
@@ -66,7 +68,7 @@ export async function ladeEigenesKapitel(mitgliedId: string): Promise<KapitelDat
   const [m, zahlen, stimmen] = await Promise.all([
     prisma.mitglied.findUnique({
       where: { id: mitgliedId },
-      select: { anzeigename: true, avatar: { select: { id: true } }, profil: { select: { geschmack: true, terpene: true, anzahl: true, gewichtet: true, verlauf: true } } },
+      select: { anzeigename: true, rolle: true, erstelltAm: true, avatar: { select: { id: true } }, profil: { select: { geschmack: true, terpene: true, anzahl: true, gewichtet: true, verlauf: true } } },
     }),
     eigeneZahlen(mitgliedId),
     stimmZahlen(mitgliedId),
@@ -75,6 +77,8 @@ export async function ladeEigenesKapitel(mitgliedId: string): Promise<KapitelDat
   return kapitelAus({
     anzeigename: m.anzeigename,
     avatarId: m.avatar?.id ?? null,
+    rolle: m.rolle === "ADMIN" ? "betreiber" : "mitglied",
+    seit: m.erstelltAm,
     ...zahlen,
     dritte: { art: "gestimmt", zahl: stimmen.stimmen },
     netz: m.profil ? profilAusDaten(m.profil) : null,

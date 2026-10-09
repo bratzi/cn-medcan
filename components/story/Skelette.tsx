@@ -12,7 +12,7 @@ export function SkelettAnsage({ text }: { text: string }) {
 
 export function RandspaltenSkelett({ ansage }: { ansage: string }) {
   return (
-    <div role="status" data-skelett="" className="flex flex-col gap-8">
+    <div role="status" data-skelett="" className="flex flex-col gap-8 max-lg:items-center">
       <SkelettAnsage text={ansage} />
       {/* Höhe wie eine echte Randnotiz: Zahl in text-display neben dem Wort in
           text-notiz (clamp 2 bis 4.5rem), damit beim Laden nichts springt. */}
