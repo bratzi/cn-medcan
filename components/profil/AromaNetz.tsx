@@ -13,38 +13,8 @@ import type { Woerterbuch } from "@/lib/i18n/typen";
 import { aenderungsListe, netzAenderung } from "@/lib/netz-aenderung";
 import { zwischenGeschmack } from "@/lib/netz-animation";
 import type { Geschmack } from "@/lib/profil-typen";
+import type { AromaNetzTexte } from "@/lib/aroma-netz-texte";
 import { GESCHMACKS_ACHSEN } from "@/lib/query/bewertung";
-
-/** Nur die Texte, die das Netz im Browser braucht, nicht das ganze Profil-Wörterbuch. */
-export type AromaNetzTexte = Pick<
-  Woerterbuch["profil"],
-  | "magIch"
-  | "magIchNicht"
-  | "vorher"
-  | "netzSkala"
-  | "netzHinweis"
-  | "note"
-  | "srMag"
-  | "srMagNicht"
-  | "srNeutral"
-  | "staerker"
-  | "schwaecher"
-  | "aenderung"
-  | "aenderungGleich"
-  | "verlaufSchritt"
-  | "verlaufRegler"
-  | "verlaufAbspielen"
-  | "verlaufAnhalten"
->;
-
-export function aromaNetzTexte(p: Woerterbuch["profil"]): AromaNetzTexte {
-  const { magIch, magIchNicht, vorher, netzSkala, netzHinweis, note, srMag, srMagNicht, srNeutral, staerker, schwaecher } = p;
-  const { aenderung, aenderungGleich, verlaufSchritt, verlaufRegler, verlaufAbspielen, verlaufAnhalten } = p;
-  return {
-    magIch, magIchNicht, vorher, netzSkala, netzHinweis, note, srMag, srMagNicht, srNeutral, staerker, schwaecher,
-    aenderung, aenderungGleich, verlaufSchritt, verlaufRegler, verlaufAbspielen, verlaufAnhalten,
-  };
-}
 
 /** Ein Stand des Netzes; Datum und Zahl nur, wenn er aus dem Verlauf stammt. */
 export type NetzStand = { geschmack: Geschmack; datum?: string; anzahl?: number };

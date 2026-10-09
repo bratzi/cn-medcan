@@ -75,3 +75,10 @@ test("Aroma-Netz: Morph per Bild-Takt, reduzierte Bewegung springt, Abspielen hÃ
   const css = readFileSync("app/globals.css", "utf8");
   assert.match(css, /\.netz-lesung \{[^]*?@starting-style \{\s*opacity: 0;/);
 });
+
+test("Aroma-Netz: Server ruft keine Funktion aus der Client-Datei auf (live 2026-10-09, /profil brach)", () => {
+  const client = readFileSync("components/profil/AromaNetz.tsx", "utf8");
+  assert.match(client, /^"use client";/);
+  assert.doesNotMatch(client, /export function aromaNetzTexte/);
+  assert.match(readFileSync("components/profil/ProfilNetz.tsx", "utf8"), /from "@\/lib\/aroma-netz-texte"/);
+});

@@ -1,7 +1,8 @@
 import Link from "next/link";
 
 import { NetzGrafik } from "@/components/profil/NetzGrafik";
-import { AromaNetz, aromaNetzTexte, type NetzStand } from "@/components/profil/AromaNetz";
+import { AromaNetz, type NetzStand } from "@/components/profil/AromaNetz";
+import { aromaNetzTexte } from "@/lib/aroma-netz-texte";
 import { buttonKlassen } from "@/components/ui";
 import type { Sprache } from "@/lib/i18n/sprache-kern";
 import { t } from "@/lib/i18n/text";
