@@ -30,16 +30,14 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 
 ### ⇢ SESSION 54 (Sessionstart)
 
-**ALS ERSTES live nachsehen (nach Session 53 noch nicht gesehen):**
-1. Terpenband-Karte nach Fix `0026bb7`: liegt sie unter dem Namen, nicht mehr darüber? Pfeil sichtbar?
-2. Weicher Rand über dem Band (`0026bb7`, `.terpen-band::before`): schneidet das Band den gepinnten Auftakt beim
-   Scrollen noch hart? Hell und dunkel.
-3. Blütenseite `#bewerten` ab 118rem: Fazit-Spalte scrollt in sich (`d71bd53`), Live-Netz unten erreichbar;
-   Note ändern und Regler ziehen, Netz muss sich ändern. Unter 118rem: Leiste unten, Sheet zeigt Fazit und Netz.
-4. Profil `/profil`: Netz jetzt `max-w-xl`; heller Modus der Aroma-Blüte und der Marken (Kontrast der Icons).
-5. Mobil 494 px: Netz-Marken (44 px) am Rand, Zeitleiste, Karte im Band (nur Maus, mobil keine Karte).
-6. Aus Session 52 offen: Buch-Doppelseite neu (`242df55`, `937c34a`, `1b30c3a`) auf `/reviews`, Blütenseite,
-   Startseite, 1143 und 494 px, hell und dunkel; Notizen-Kürzung mit Zitatzeichen bei langem Text.
+**Live geprüft am Ende von Session 53 (alles gut):** Terpen-Karte unter dem Namen mit Pfeil (hell); weicher Rand
+über dem Band (hell); Profil-Netz größer, hell, mobil 494 px ohne Querscrollen, Antippen zeigt die Lesung;
+Blütenseite unter 118rem: Leiste unten, Sheet mit Fazit und Live-Netz samt Kontur.
+
+**Noch offen live:** Fazit-Spalte ab 118rem nach Scroll-Fix `d71bd53` (Fenster ab 1888 px); Note ändern und
+sehen, dass das Live-Netz folgt; dunkler Modus der Karte. Aus Session 52: Buch-Doppelseite (`242df55`, `937c34a`,
+`1b30c3a`) auf `/reviews`, Blütenseite, Startseite, 1143 und 494 px, hell und dunkel; Notizen-Kürzung mit
+Zitatzeichen bei langem Text.
 
 **Danach fragen (eine AskUserQuestion):** gefällt das Aroma-Netz so (Farbe, Größe, Lesung in der Mitte), und was
 als Nächstes: offene Minors „Dein Kapitel“ unten, oder neue Wünsche?
