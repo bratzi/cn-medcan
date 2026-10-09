@@ -17,4 +17,16 @@ export { BucketCachePurge, DOQueueHandler, DOShardedTagCache } from "./.open-nex
 // Start: die erste Anfrage stoesst auf denselben Fehler und meldet ihn.
 import("./.open-next/server-functions/default/handler.mjs").catch(() => {});
 
-export default worker;
+// Dateien unter /_next/static/ liefert Cloudflare direkt aus. Was davon den
+// Worker erreicht, stammt aus einem frueheren Deploy (offener Tab, alter Chunk)
+// und existiert nicht mehr. Next brauchte fuer dieses 404 live rund 79 ms CPU;
+// hier kostet es fast nichts. Der Browser laedt die Seite dann neu.
+export default {
+  ...worker,
+  async fetch(request, env, ctx) {
+    if (new URL(request.url).pathname.startsWith("/_next/static/")) {
+      return new Response("Not Found", { status: 404, headers: { "Cache-Control": "no-store" } });
+    }
+    return worker.fetch(request, env, ctx);
+  },
+};
