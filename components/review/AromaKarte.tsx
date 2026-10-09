@@ -415,6 +415,9 @@ export function AromaKarte({
   const skalaY = karte[0].y - 34;
   const skalaUnten = karte[karte.length - 1].y + 10;
   const skalaMitteX = balkenEnde(karte[0], QUALITAET_MITTE, 0, balken).x;
+  // Name über dem Balken: 20 über der Achse, in der dichten Karte (Achsen rund 29 auseinander)
+  // höchstens den halben Abstand, sonst streicht der Balken der Achse darüber den Namen durch.
+  const nameUeber = Math.min(20, (karte[1].y - karte[0].y) / 2);
   const knoten = karte.map((punkt, index) => mische(punkt, netzPunkt(index, MAX, radius + 34, mitte), t));
   const spalte = terpeneImKarte(reihe.length, aktBreite, aktHoehe);
   const platz = new Map(reihe.map((eintrag, index) => [eintrag.schluessel, spalte[index]]));
@@ -1112,7 +1115,7 @@ export function AromaKarte({
               // Mindestens 124 vom Rand, damit der längste Name (Icon + KRÄUTRIG, rund 118 px)
               // auf schmalen Karten nicht links hinausragt.
               left: `${((t < 0.5 ? Math.max(punkt.x - 150 * kartenSichtbar, 124) : punkt.x) / aktBreite) * 100}%`,
-              top: `${((punkt.y - 20 * kartenSichtbar) / aktHoehe) * 100}%`,
+              top: `${((punkt.y - nameUeber * kartenSichtbar) / aktHoehe) * 100}%`,
             }}
           >
             <GeschmackIcon geschmack={GESCHMACKS_ACHSEN[index].enumWert} />
