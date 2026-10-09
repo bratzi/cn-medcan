@@ -35,7 +35,7 @@ test("Abfrage: orderBy und select stehen inline, kein readonly-Tupel (tsc)", () 
   assert.match(quelle, /orderBy: \[\{ erstelltAm: "desc" \}, \{ id: "asc" \}\]/);
 });
 
-test("Eigenes Kapitel liest nur die vier Netz-Spalten des Profils, nicht verlauf/oeffentlich", () => {
-  assert.match(quelle, /profil: \{ select: \{ geschmack: true, terpene: true, anzahl: true, gewichtet: true \} \}/);
+test("Eigenes Kapitel liest die Netz-Spalten und seit 2026-10-09 den Verlauf", () => {
+  assert.match(quelle, /profil: \{ select: \{ geschmack: true, terpene: true, anzahl: true, gewichtet: true, verlauf: true \} \}/);
   assert.doesNotMatch(quelle, /profil: true/);
 });

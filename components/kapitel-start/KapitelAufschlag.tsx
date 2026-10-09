@@ -90,6 +90,8 @@ export function KapitelAufschlag({
               texte={art === "schaufenster" ? alle.profilOeffentlich : alle.profil}
               achsen={alle.achsen}
               sprache={sprache}
+              verlauf={daten.verlauf}
+              className="w-full max-w-96"
             />
           </div>
         ) : (

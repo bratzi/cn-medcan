@@ -13,7 +13,6 @@ import { Aktivitaet } from "@/components/profil/Aktivitaet";
 import { BewertungsRegister } from "@/components/profil/BewertungsRegister";
 import { CommunityVergleich } from "@/components/profil/CommunityVergleich";
 import { Lieblingshersteller } from "@/components/profil/Lieblingshersteller";
-import { NetzVerlauf } from "@/components/profil/NetzVerlauf";
 import { NotenVerteilung } from "@/components/profil/NotenVerteilung";
 import { ProfilNetz } from "@/components/profil/ProfilNetz";
 import { Schnitte } from "@/components/profil/Schnitte";
@@ -23,10 +22,7 @@ import { registerAnsicht, registerParameter } from "@/lib/bewertungs-register";
 import { ersatzBildId } from "@/lib/bewertungsbilder";
 import { musterBildId } from "@/lib/budpics";
 import { begruendungText } from "@/lib/empfehlung-text";
-import { formatiereDatum } from "@/lib/format";
 import { holeSprache, holeWoerterbuch } from "@/lib/i18n";
-import { t } from "@/lib/i18n/text";
-import { aenderungsListe, netzAenderung } from "@/lib/netz-aenderung";
 import { auswertungen, leereProfilWerte, noteOderErsatz } from "@/lib/profil";
 import { monatsReihe, notenVerteilung, profilNotizen } from "@/lib/profil-dashboard";
 import { ladeEmpfehlungen } from "@/lib/query/empfehlungen";
@@ -175,19 +171,9 @@ async function ReiheNetz({ id }: { id: string }) {
   const [{ w, sprache }, profil, zeilen] = await Promise.all([textLaden(), profilLaden(id), zeilenLaden(id)]);
   const texte = w.profil;
   const werte = profil?.werte ?? leereProfilWerte();
-  // Stufe 3: Kontur und Änderungszeile aus den letzten zwei Schritten des Verlaufs.
+  // Der Verlauf läuft seit 2026-10-09 im selben Netz (Nutzer: zwei Netze wirkten doppelt);
+  // der vorige Stand steht dort als dünne Kontur.
   const verlauf = profil?.verlauf ?? [];
-  const letzter = verlauf.at(-1);
-  const vorletzter = verlauf.at(-2);
-  let aenderung: string | null = null;
-  if (letzter && vorletzter) {
-    const liste = netzAenderung(vorletzter.geschmack, letzter.geschmack);
-    const datum = formatiereDatum(letzter.datum, sprache);
-    aenderung =
-      liste.length > 0
-        ? t(texte.aenderung, { datum, liste: aenderungsListe(liste, w.label.geschmack, texte) })
-        : t(texte.aenderungGleich, { datum });
-  }
   // Kein gespeicherter Stand, obwohl es Bewertungen gibt oder sich das nicht
   // prüfen lässt: dann nie die Leerskizze „Erste Bewertung abgeben“ zeigen.
   const netzFehlt = profil === null && (zeilen === null || zeilen.length > 0);
@@ -203,8 +189,7 @@ async function ReiheNetz({ id }: { id: string }) {
               texte={texte}
               achsen={w.label.geschmack}
               sprache={sprache}
-              vorher={vorletzter?.geschmack ?? null}
-              aenderung={aenderung}
+              verlauf={verlauf}
             />
           </div>
         )}
@@ -222,27 +207,22 @@ async function ReiheNetz({ id }: { id: string }) {
   );
 }
 
-/** Reihe 2: bestätigte Vorschläge (6) und Verlauf (4). */
+/** Reihe 2: bestätigte Vorschläge über die volle Breite (seit 2026-10-09 steckt der Verlauf im Netz). */
 async function ReiheVorschlaege({ id }: { id: string }) {
   const { w, sprache } = await textLaden();
   const texte = w.profil;
   // Erst das Profil, dann die Vorschläge: ein veraltetes Profil schreibt sie neu.
-  const profil = await profilLaden(id);
-  const [empfehlungen, zeilen] = await Promise.all([
-    ladeEmpfehlungen(id).catch(oderNull<Awaited<ReturnType<typeof ladeEmpfehlungen>>>("ladeEmpfehlungen")),
-    zeilenLaden(id),
-  ]);
-  const netzFehlt = profil === null && (zeilen === null || zeilen.length > 0);
+  await profilLaden(id);
+  const empfehlungen = await ladeEmpfehlungen(id).catch(oderNull<Awaited<ReturnType<typeof ladeEmpfehlungen>>>("ladeEmpfehlungen"));
   return (
     <>
-      <Feld id="vorschlaege" spalten={6} titel={texte.vorschlaegeTitel}>
+      <Feld id="vorschlaege" spalten={10} titel={texte.vorschlaegeTitel}>
         {empfehlungen === null ? (
           <p className="max-w-[68ch] text-body text-text">{w.empfehlung.fehler}</p>
         ) : empfehlungen.length === 0 ? (
           <p className="max-w-[68ch] text-body text-text-muted">{w.empfehlung.leer}</p>
         ) : (
           <EmpfehlungsListe
-            schmal
             className="w-full"
             eintraege={empfehlungen.map((e) => ({
               slug: e.slug,
@@ -255,13 +235,6 @@ async function ReiheVorschlaege({ id }: { id: string }) {
         <p className="text-caption text-text-muted">
           {texte.bestaetigtHinweis} {w.empfehlung.hinweis}
         </p>
-      </Feld>
-      <Feld id="verlauf" spalten={4} titel={texte.verlaufTitel}>
-        {netzFehlt ? (
-          <p className="max-w-[68ch] text-body text-text">{texte.fehler}</p>
-        ) : (
-          <NetzVerlauf schritte={profil?.verlauf ?? []} texte={texte} achsen={w.label.geschmack} sprache={sprache} />
-        )}
       </Feld>
     </>
   );

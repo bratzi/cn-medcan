@@ -75,6 +75,7 @@ Komponenten nutzen nur semantische Tokens:
   `surface`, `surface-raised` und `surface-sunken` (jeweils ≥ 4.5 in beiden Modi).
 - Datengrafiken in `text`/`text-muted` (Linie plus Fläche mit geringer Deckkraft), nicht in `accent`.
   Ausnahme seit Spec Redesign 14: AromaKarte und SweetSpot nutzen `accent` (Hersteller) und `kopierstift` (Community) als Reihenfarben.
+  Ausnahme seit 2026-10-09 (Nutzer): das Aroma-Netz (`NetzGrafik`, `AromaNetz`) füllt „mag ich“ als Aroma-Blüte (Farbkreis aus `bluetenKreis`), Ecken und Achsenmarken in `vollFarbe`; Ringe, Rand und Strichlinie bleiben Tinte, die Achsen tragen Icons statt Namen (Name und Wert in der Mitte bei Hover, Fokus, Antippen).
   Ausnahme seit 2026-09-25 (Nutzer): die zwei Linien um die Video-Blobs im Storytelling (`.blob-linie`) in `accent` und `kopierstift`, reine Dekoration, aria-hidden.
 - Verboten in Komponenten: Primitives (`blatt-*`, `violett-*`, `neutral-*`), Hex, `oklch()`,
   Tailwind-Standardpaletten, `dark:`-Farbvarianten. Dark Mode entsteht allein über die Tokens.

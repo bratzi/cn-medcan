@@ -5,6 +5,7 @@ import { cache } from "react";
 import { kapitelAus, type KapitelDaten } from "@/lib/kapitel-start";
 import { getPrisma } from "@/lib/prisma";
 import { oeffentlicheWerte, profilAusDaten } from "@/lib/profil";
+import { verlaufAusDaten } from "@/lib/profil-verlauf";
 import { stimmZahlen } from "@/lib/query/konto";
 
 const FREI = { freigegeben: true, strain: { aktiv: true } } as const;
@@ -65,7 +66,7 @@ export async function ladeEigenesKapitel(mitgliedId: string): Promise<KapitelDat
   const [m, zahlen, stimmen] = await Promise.all([
     prisma.mitglied.findUnique({
       where: { id: mitgliedId },
-      select: { anzeigename: true, avatar: { select: { id: true } }, profil: { select: { geschmack: true, terpene: true, anzahl: true, gewichtet: true } } },
+      select: { anzeigename: true, avatar: { select: { id: true } }, profil: { select: { geschmack: true, terpene: true, anzahl: true, gewichtet: true, verlauf: true } } },
     }),
     eigeneZahlen(mitgliedId),
     stimmZahlen(mitgliedId),
@@ -77,5 +78,6 @@ export async function ladeEigenesKapitel(mitgliedId: string): Promise<KapitelDat
     ...zahlen,
     dritte: { art: "gestimmt", zahl: stimmen.stimmen },
     netz: m.profil ? profilAusDaten(m.profil) : null,
+    verlauf: verlaufAusDaten(m.profil?.verlauf ?? null),
   });
 }

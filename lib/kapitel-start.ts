@@ -3,7 +3,7 @@ import { formatiereZahl } from "@/lib/format";
 import type { Sprache } from "@/lib/i18n/sprache-kern";
 import { t } from "@/lib/i18n/text";
 import type { Woerterbuch } from "@/lib/i18n/typen";
-import type { ProfilWerte } from "@/lib/profil-typen";
+import type { ProfilWerte, VerlaufSchritt } from "@/lib/profil-typen";
 
 /**
  * Ein Kapitel auf der Startseite (Spec Dein Kapitel 4): das Schaufenster des Betreibers oder das eigene.
@@ -20,10 +20,13 @@ export type KapitelDaten = {
   dritte: { art: "gestimmt" | "vonEuch"; zahl: number };
   /** null ohne Bewertung oder ohne gewichtete Bewertung. */
   netz: ProfilWerte | null;
+  /** Verlauf des Netzes, älteste zuerst; nur im eigenen Kapitel, sonst leer (Nutzer 2026-10-09). */
+  verlauf: VerlaufSchritt[];
   zuletzt: { slug: string; handelsname: string; gesamtnote: number | null; datum: string } | null;
 };
 
-export type KapitelEingabe = Omit<KapitelDaten, "zuletzt"> & {
+export type KapitelEingabe = Omit<KapitelDaten, "zuletzt" | "verlauf"> & {
+  verlauf?: VerlaufSchritt[];
   zuletzt: { slug: string; handelsname: string; gesamtnote: number | null; erstelltAm: Date } | null;
 };
 
@@ -36,6 +39,7 @@ export function kapitelAus(e: KapitelEingabe): KapitelDaten {
     schnitt: ohneBewertung || e.schnitt === null ? null : Math.round(e.schnitt * 10) / 10,
     dritte: e.dritte,
     netz: ohneBewertung || !e.netz || e.netz.gewichtet === 0 ? null : e.netz,
+    verlauf: ohneBewertung || !e.netz || e.netz.gewichtet === 0 ? [] : (e.verlauf ?? []),
     zuletzt:
       ohneBewertung || !e.zuletzt
         ? null

@@ -22,7 +22,6 @@ test("/profil: Kapitel-Reihenfolge, Raster, kein Apothekenlink", () => {
     "<ProfilNetz",
     "<TerpenRangliste",
     "<EmpfehlungsListe",
-    "<NetzVerlauf",
     "<Aktivitaet",
     "<NotenVerteilung",
     "<TopFlop",
@@ -43,12 +42,13 @@ test("/profil: Kapitel-Reihenfolge, Raster, kein Apothekenlink", () => {
   assert.match(q, /seite=\{texte\.reiterProfil\}/);
 });
 
-test("/profil: Kontur aus dem vorletzten Verlaufsschritt, nie auf dem öffentlichen Profil", () => {
+test("/profil: Verlauf im Netz statt in eigenem Feld, nie auf dem öffentlichen Profil (Nutzer 2026-10-09)", () => {
   const q = seite();
-  assert.match(q, /verlauf\.at\(-2\)/);
-  assert.match(q, /vorher=\{/);
+  assert.match(q, /verlauf=\{verlauf\}/);
+  assert.doesNotMatch(q, /NetzVerlauf|id="verlauf"/);
+  assert.match(q, /<Feld id="vorschlaege" spalten=\{10\}/);
   const oeffentlich = readFileSync("app/[lang]/profil/[kurzId]/page.tsx", "utf8");
-  assert.doesNotMatch(oeffentlich, /vorher=|NetzVerlauf|Lieblingshersteller/);
+  assert.doesNotMatch(oeffentlich, /verlauf=|NetzVerlauf|Lieblingshersteller/);
 });
 
 test("/mitglied: Titel ist der Reiter Konto, h1 ist der Name im Kapitelkopf", () => {

@@ -1,3 +1,8 @@
+import { vollFarbe } from "@/lib/aroma-farben";
+import { GESCHMACKS_ACHSEN } from "@/lib/query/bewertung";
+
+const STREIFEN = `linear-gradient(90deg, ${GESCHMACKS_ACHSEN.map((a) => vollFarbe(a.enumWert)).join(", ")})`;
+
 type Props = {
   /** Beschriftung der Fläche (Stand, der gilt). */
   mag: string;
@@ -12,9 +17,8 @@ export function NetzLegende({ mag, magNicht = null, vorher = null }: Props) {
   return (
     <ul className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-small text-text-muted">
       <li className="inline-flex items-center gap-2">
-        <svg viewBox="0 0 24 8" aria-hidden="true" className="h-2 w-6 text-text">
-          <rect width="24" height="8" fill="currentColor" fillOpacity={0.12} stroke="currentColor" strokeWidth={1.5} />
-        </svg>
+        {/* Die Fläche ist seit 2026-10-09 die Aroma-Blüte: Farbstreifen in den Geschmacksfarben, Rand in Tinte. */}
+        <span aria-hidden="true" className="netz-bluete h-2 w-6 border border-text" style={{ background: STREIFEN }} />
         {mag}
       </li>
       {magNicht ? (
