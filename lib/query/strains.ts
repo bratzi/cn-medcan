@@ -359,6 +359,8 @@ function baueWhere(
   if (filter.thcMin > 0) bedingungen.thcMaxProzent = { gte: filter.thcMin };
   if (filter.thcMax < 100) bedingungen.thcMinProzent = { lte: filter.thcMax };
 
+  if (filter.hersteller.length > 0) bedingungen.herstellerId = { in: filter.hersteller };
+
   if (filter.geschmack.length > 0) {
     // Dominantes Terpen = Rang 1.
     bedingungen.terpene = {
@@ -776,6 +778,8 @@ export type FilterFacetten = {
   thcSpanne: { min: number; max: number };
   preisSpanneCent: { min: number | null; max: number | null };
   apotheken: { slug: string; name: string; ort: string }[];
+  /** Hersteller aktiver Sorten mit Sortenzahl, nach Name (Spec 2026-10-09 C). */
+  hersteller: { id: string; name: string; anzahl: number }[];
 };
 
 const ALLE_GESCHMAECKER: GeschmacksKategorie[] = [
@@ -793,7 +797,7 @@ const ALLE_GESCHMAECKER: GeschmacksKategorie[] = [
 
 /**
  * Werte fuer die Filterleiste.
- * SIEBEN Datenbankabfragen, gebuendelt in einem `$transaction`-Block.
+ * ACHT Datenbankabfragen, gebuendelt in einem `$transaction`-Block.
  *
  * TODO Caching: `unstable_cache` aus `next/cache` existiert in Next 16.3.6 und
  * waere fachlich richtig (Daten fuer alle Nutzer gleich, duerfen Minuten alt
@@ -821,7 +825,8 @@ export async function ladeFilterFacetten(
     thcAggregat,
     preisAggregat,
     apotheken,
-    // `Promise.all` statt `$transaction`: gleiche Zahl an Sub-Requests (sieben,
+    herstellerListe,
+    // `Promise.all` statt `$transaction`: gleiche Zahl an Sub-Requests (acht,
     // parallel), aber Prisma behaelt die genaue Typinferenz der `groupBy`-
     // Aggregate, die ein `$transaction`-Array verliert.
   ] = await Promise.all([
@@ -866,6 +871,13 @@ export async function ladeFilterFacetten(
       select: { slug: true, name: true, ort: true },
       orderBy: { name: "asc" },
       take: 200,
+    }),
+    // Eine Abfrage mit Zählung je Hersteller statt groupBy plus Namensabfrage (Sub-Request-Grenze).
+    prisma.unternehmen.findMany({
+      where: { hergestellt: { some: { aktiv: true } } },
+      select: { id: true, name: true, _count: { select: { hergestellt: { where: { aktiv: true } } } } },
+      orderBy: { name: "asc" },
+      take: 400,
     }),
   ]);
 
@@ -917,6 +929,7 @@ export async function ladeFilterFacetten(
       max: preisAggregat._max.preisProGrammCent ?? null,
     },
     apotheken,
+    hersteller: herstellerListe.map((h) => ({ id: h.id, name: h.name, anzahl: h._count.hergestellt })),
   };
 }
 

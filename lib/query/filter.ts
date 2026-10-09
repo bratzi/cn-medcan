@@ -113,6 +113,8 @@ export const strainFilterSchema = z.object({
     })
     .catch(false),
   apotheke: slugListe,
+  /** Unternehmen-Ids der Hersteller (Spec 2026-10-09 C); Namen haben keinen Slug. */
+  hersteller: slugListe,
   sortierung: z
     .unknown()
     .transform((rohwert) => ersterWert(rohwert))
@@ -133,6 +135,7 @@ const LEERER_FILTER: StrainFilter = {
   preisMax: undefined,
   nurVerfuegbar: false,
   apotheke: [],
+  hersteller: [],
   sortierung: "relevanz",
   seite: 1,
 };
@@ -190,6 +193,8 @@ export function serialisiereFilter(filter: StrainFilter): URLSearchParams {
   if (filter.nurVerfuegbar) params.set("nurVerfuegbar", "1");
   if (filter.apotheke.length > 0)
     params.set("apotheke", filter.apotheke.join(","));
+  if (filter.hersteller.length > 0)
+    params.set("hersteller", filter.hersteller.join(","));
   if (filter.sortierung !== "relevanz")
     params.set("sortierung", filter.sortierung);
   if (filter.seite > 1) params.set("seite", String(filter.seite));
@@ -210,7 +215,8 @@ export function istFilterLeer(filter: StrainFilter): boolean {
     filter.thcMax === THC_MAX_DEFAULT &&
     filter.preisMax === undefined &&
     !filter.nurVerfuegbar &&
-    filter.apotheke.length === 0
+    filter.apotheke.length === 0 &&
+    filter.hersteller.length === 0
   );
 }
 
