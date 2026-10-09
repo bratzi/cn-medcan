@@ -82,8 +82,7 @@ Timeline im Cleanup gekillt; Kommentar zu inline-Randnotizen. Band-Link und `siz
 902 Tests grün. Live per DOM geprüft (Fenster verdeckt, keine Screenshots): als Mitglied bei 1143 px eigenes Kapitel,
 „Zu deinem Kapitel“, kein Querscroll; Gast-HTML mit Vermerk und „Konto anlegen“; Aroma-Karte im Buch ohne Überschneidung
 von Name und Balken. Nur das Aussehen ist noch nicht angesehen.
-**Offen, Nutzer fragen:** 374 Dateien liegen mit CRLF im Index. `.gitattributes` mit `eol=lf` hieße einen großen
-Commit nur mit Zeilenenden (`git add --renormalize .`); ohne Renormalisierung kippt jede Datei beim nächsten Anfassen.
+**Zeilenenden (Nutzer, Session 55):** CRLF bleibt, keine `.gitattributes`, kein Renormalisieren. Nächste Aufgabe nennt der Nutzer.
 
 **Arbeitsweise seit Session 53 (Nutzer):** nach jeder erledigten Aufgabe sofort pushen; die Live-Prüfung
 gesammelt am Ende eines Durchgangs und dann korrigieren (Memory `immer-nach-github-pushen`).
