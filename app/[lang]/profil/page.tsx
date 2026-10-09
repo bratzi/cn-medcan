@@ -16,7 +16,6 @@ import { Lieblingshersteller } from "@/components/profil/Lieblingshersteller";
 import { NotenVerteilung } from "@/components/profil/NotenVerteilung";
 import { ProfilNetz } from "@/components/profil/ProfilNetz";
 import { Schnitte } from "@/components/profil/Schnitte";
-import { TerpenRangliste } from "@/components/profil/TerpenRangliste";
 import { TopFlop } from "@/components/profil/TopFlop";
 import { registerAnsicht, registerParameter } from "@/lib/bewertungs-register";
 import { ersatzBildId } from "@/lib/bewertungsbilder";
@@ -103,14 +102,7 @@ export default async function ProfilPage({ searchParams }: { searchParams: Promi
           <Notizen id={id} />
         </ViewTransition>
       </Suspense>
-      <Suspense
-        fallback={
-          <>
-            <FeldSkelett spalten={6} hoehe="gross" />
-            <FeldSkelett spalten={4} hoehe="gross" />
-          </>
-        }
-      >
+      <Suspense fallback={<FeldSkelett spalten={10} hoehe="gross" />}>
         <ViewTransition>
           <ReiheNetz id={id} />
         </ViewTransition>
@@ -166,7 +158,7 @@ async function Notizen({ id }: { id: string }) {
   );
 }
 
-/** Reihe 1: Netz (6) und Terpene (4). */
+/** Reihe 1: das Aroma-Netz über die volle Breite; die Terpene stecken seit 2026-10-09 im Netz (Schalter). */
 async function ReiheNetz({ id }: { id: string }) {
   const [{ w, sprache }, profil, zeilen] = await Promise.all([textLaden(), profilLaden(id), zeilenLaden(id)]);
   const texte = w.profil;
@@ -179,7 +171,7 @@ async function ReiheNetz({ id }: { id: string }) {
   const netzFehlt = profil === null && (zeilen === null || zeilen.length > 0);
   return (
     <>
-      <Feld id="netz" spalten={6} titel={texte.netzTitel} satz={!netzFehlt && werte.anzahl > 0 ? texte.netzSatz : undefined}>
+      <Feld id="netz" spalten={10} titel={texte.netzTitel} satz={!netzFehlt && werte.anzahl > 0 ? texte.netzSatz : undefined}>
         {netzFehlt ? (
           <p className="max-w-[68ch] text-body text-text">{texte.fehler}</p>
         ) : (
@@ -193,15 +185,6 @@ async function ReiheNetz({ id }: { id: string }) {
               className="w-full max-w-xl"
             />
           </div>
-        )}
-      </Feld>
-      <Feld id="terpene" spalten={4} titel={texte.terpeneTitel}>
-        {netzFehlt ? (
-          <p className="max-w-[68ch] text-body text-text">{texte.fehler}</p>
-        ) : werte.terpene.length === 0 ? (
-          <p className="max-w-[68ch] text-body text-text-muted">{texte.leer}</p>
-        ) : (
-          <TerpenRangliste terpene={werte.terpene} texte={texte} sprache={sprache} ohneTitel />
         )}
       </Feld>
     </>

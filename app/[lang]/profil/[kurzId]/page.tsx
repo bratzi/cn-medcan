@@ -3,7 +3,6 @@ import { notFound } from "next/navigation";
 
 import { OeffentlicheBewertungen } from "@/components/profil/OeffentlicheBewertungen";
 import { ProfilNetz } from "@/components/profil/ProfilNetz";
-import { TerpenRangliste } from "@/components/profil/TerpenRangliste";
 import { Avatar, Card, CardBody, CardHeader } from "@/components/ui";
 import { holeSprache, holeWoerterbuch } from "@/lib/i18n";
 import { mehrzahl, t } from "@/lib/i18n/text";
@@ -66,7 +65,6 @@ export default async function OeffentlichesProfilPage({ params }: Params) {
                   {t(texte.netzSatz, { name: profil.anzeigename })}
                 </p>
                 <ProfilNetz werte={werte} texte={netz} achsen={w.label.geschmack} sprache={sprache} />
-                <TerpenRangliste terpene={werte.terpene} texte={netz} sprache={sprache} />
               </>
             ) : (
               <p className="self-start text-body text-text-muted">{texte.netzLeer}</p>

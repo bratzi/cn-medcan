@@ -44,18 +44,13 @@ test("profilAnzeige: mag ich positiv, mag ich nicht negativ, stärkste Achse 1",
   assert.ok(betraege.every((x) => x <= 1));
   assert.equal(w.anzahl, 2);
   assert.equal(w.gewichtet, 2);
-  assert.equal(w.terpene[0].name, "Limonen");
-  assert.equal(w.terpene[0].wert, 1);
-  assert.ok(w.terpene.some((t) => t.name === "Humulen" && t.wert < 0));
-  // Positive vor negativen.
-  const ersteNegative = w.terpene.findIndex((t) => t.wert < 0);
-  assert.ok(w.terpene.slice(ersteNegative).every((t) => t.wert < 0));
+  assert.equal(w.terpenNetz.limonen, 1);
+  assert.ok(w.terpenNetz.humulen < 0);
 });
 
-test("profilAnzeige: höchstens 8 positive und 3 negative Terpene", () => {
-  const namen = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"];
-  const viel = sorte("viel", namen.map((n): [string, GeschmacksKategorie] => [n, "SUESS"]));
-  const wenig = sorte("wenig", ["K", "L", "M", "N", "O"].map((n): [string, GeschmacksKategorie] => [n, "ERDIG"]));
+test("profilAnzeige: Terpen-Netz hat genau die zehn festen Achsen, fremde Terpene fallen weg", () => {
+  const viel = sorte("viel", ["Myrcen", "Guajol"].map((n): [string, GeschmacksKategorie] => [n, "SUESS"]));
+  const wenig = sorte("wenig", ["Nerolidol"].map((n): [string, GeschmacksKategorie] => [n, "ERDIG"]));
   const w = profilAnzeige(
     [
       { strainId: "viel", gesamtnote: 5, terpene: {}, geschmack: {} },
@@ -63,14 +58,16 @@ test("profilAnzeige: höchstens 8 positive und 3 negative Terpene", () => {
     ],
     [viel, wenig],
   );
-  assert.equal(w.terpene.filter((t) => t.wert > 0).length, 8);
-  assert.equal(w.terpene.filter((t) => t.wert < 0).length, 3);
+  assert.equal(Object.keys(w.terpenNetz).length, 10);
+  assert.ok(w.terpenNetz.myrcen > 0);
+  assert.ok(w.terpenNetz.nerolidol < 0);
+  assert.equal("guajol" in w.terpenNetz, false);
 });
 
 test("profilAnzeige: nur Mittelfeld ergibt Nullen, aber den Zähler", () => {
   const w = profilAnzeige([{ strainId: "zitrus", gesamtnote: 3, terpene: {}, geschmack: {} }], [ZITRUS]);
   assert.ok(Object.values(w.geschmack).every((x) => x === 0));
-  assert.deepEqual(w.terpene, []);
+  assert.ok(Object.values(w.terpenNetz).every((x) => x === 0));
   assert.equal(w.anzahl, 1);
   assert.equal(w.gewichtet, 0);
 });
@@ -83,7 +80,8 @@ test("profilDaten und profilAusDaten: Hin und zurück, kaputter Text wird leer",
   const fremd = profilAusDaten({ geschmack: '{"ZITRUS":0.5,"UNBEKANNT":1,"ERDIG":"x"}', terpene: '[{"name":"Myrcen","wert":0.4},{"name":3}]', anzahl: 1, gewichtet: 1 });
   assert.equal(fremd.geschmack.ZITRUS, 0.5);
   assert.equal(fremd.geschmack.ERDIG, 0);
-  assert.deepEqual(fremd.terpene, [{ name: "Myrcen", wert: 0.4 }]);
+  // Alte Listenform: das Netz entsteht aus der Liste, neu normiert.
+  assert.equal(fremd.terpenNetz.myrcen, 1);
 });
 
 test("profilVeraltet: fehlt oder älter als 24 h", () => {
@@ -182,7 +180,7 @@ test("oeffentlicheWerte: liest das Netz aus freigegebenen Bewertungen, kaputt od
   const { oeffentlicheDaten, oeffentlicheWerte, leereProfilWerte } = await import("@/lib/profil");
   const w = leereProfilWerte();
   w.geschmack.FRUCHTIG = 0.8;
-  w.terpene = [{ name: "Limonen", wert: 1 }];
+  w.terpenNetz.limonen = 1;
   w.anzahl = 2;
   w.gewichtet = 1;
   assert.deepEqual(oeffentlicheWerte(oeffentlicheDaten(w)), w);

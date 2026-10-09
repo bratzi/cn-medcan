@@ -20,7 +20,6 @@ test("/profil: Kapitel-Reihenfolge, Raster, kein Apothekenlink", () => {
     "<Kapitelkopf",
     "<Randnotizen",
     "<ProfilNetz",
-    "<TerpenRangliste",
     "<EmpfehlungsListe",
     "<Aktivitaet",
     "<NotenVerteilung",
@@ -85,12 +84,11 @@ test("Startseite: unbestätigte Vorschläge tragen dieselbe Marke wie im Profil"
   assert.match(q, /e\.bestaetigt \? \{\} : \{ marke: w\.profil\.nichtBestaetigt \}/);
 });
 
-test("/profil: Terpene-Feld zeigt ohne Terpene den Leersatz und setzt ohneTitel; /profil/[kurzId] nicht", () => {
+test("/profil: kein Feld Terpene mehr, die Terpene stecken im Netz (Nutzer 2026-10-09)", () => {
   const q = seite();
-  assert.match(q, /werte\.terpene\.length === 0\s*\?\s*\(\s*<p className="max-w-\[68ch\] text-body text-text-muted">\{texte\.leer\}<\/p>/);
-  assert.match(q, /<TerpenRangliste[^>]*ohneTitel/);
+  assert.doesNotMatch(q, /id="terpene"|TerpenRangliste/);
   const oeffentlich = readFileSync("app/[lang]/profil/[kurzId]/page.tsx", "utf8");
-  assert.doesNotMatch(oeffentlich, /ohneTitel/);
+  assert.doesNotMatch(oeffentlich, /TerpenRangliste/);
 });
 
 test("/profil: Kopfbild nimmt das eigene Bild der besten Bewertung über BudpicBild", () => {

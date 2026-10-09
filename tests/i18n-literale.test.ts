@@ -115,7 +115,6 @@ const UMGESTELLT: string[] = [
   // Profil Stufe 1 (Spec 2026-10-07)
   "app/[lang]/profil/page.tsx",
   "components/profil/ProfilNetz.tsx",
-  "components/profil/TerpenRangliste.tsx",
   "components/profil/TopFlop.tsx",
   "components/profil/CommunityVergleich.tsx",
   "components/profil/Schnitte.tsx",

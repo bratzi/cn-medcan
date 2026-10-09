@@ -15,7 +15,7 @@ test("netzTexte: dritte Person statt „mag ich“, Rest aus profil", () => {
   assert.equal(t.magIch, "mag");
   assert.equal(t.magIchNicht, "mag nicht");
   assert.equal(t.nurMittelfeld, de.profilOeffentlich.nurMittelfeld);
-  assert.equal(t.terpeneTitel, de.profil.terpeneTitel);
+  assert.equal(t.netzTitel, de.profil.netzTitel);
 });
 
 test("OeffentlicheBewertungen: Links auf den Eintrag, Note oder Hinweis", () => {

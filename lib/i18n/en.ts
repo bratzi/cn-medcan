@@ -1036,8 +1036,6 @@ export const en: Woerterbuch = {
     srMag: "{achse}: like, {wert} of 5",
     srMagNicht: "{achse}: dislike, {wert} of 5",
     srNeutral: "{achse}: neutral",
-    terpeneTitel: "Terpenes",
-    terpeneEherNicht: "rather not",
     vorschlaegeTitel: "Similar in aroma to your favourites",
     nichtBestaetigt: "not yet confirmed",
     bestaetigtHinweis: "Confirmed means: at least two reviews with a median of 3.5 or more.",

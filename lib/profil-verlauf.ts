@@ -2,6 +2,7 @@ import { istGeschmacksKategorie } from "@/db/enums";
 import { geschmacksBeitraege, type EigeneBewertung, type SortenAroma } from "@/lib/empfehlung";
 import { geschmackAusVektor, leereProfilWerte } from "@/lib/profil";
 import type { VerlaufSchritt } from "@/lib/profil-typen";
+import { terpenNetzAusVektor, terpenNetzLesen } from "@/lib/terpen-achsen";
 
 /**
  * Verlauf des Netzes (Spec Profil 2.6 und 10): aus heutiger Sicht
@@ -25,7 +26,7 @@ export function profilVerlauf(bewertungen: readonly VerlaufEingabe[], sorten: re
   reihe.forEach((bewertung, i) => {
     for (const [k, x] of beitraege[i]) summe.set(k, (summe.get(k) ?? 0) + x);
     if (i < ab) return;
-    schritte.push({ anzahl: i + 1, datum: bewertung.erstelltAm.toISOString(), geschmack: geschmackAusVektor(summe) });
+    schritte.push({ anzahl: i + 1, datum: bewertung.erstelltAm.toISOString(), geschmack: geschmackAusVektor(summe), terpene: terpenNetzAusVektor(summe) });
   });
   return schritte;
 }
@@ -53,7 +54,9 @@ export function verlaufAusDaten(roh: string | null): VerlaufSchritt[] {
     for (const [k, v] of Object.entries(geschmack)) {
       if (istGeschmacksKategorie(k) && typeof v === "number" && Number.isFinite(v)) g[k] = Math.max(-1, Math.min(1, v));
     }
-    aus.push({ anzahl, datum, geschmack: g });
+    // Schritte vor 2026-10-09 tragen keine Terpene; dann zeigt der Terpen-Modus nur den heutigen Stand.
+    const tn = terpenNetzLesen((s as Record<string, unknown>).terpene);
+    aus.push(tn ? { anzahl, datum, geschmack: g, terpene: tn } : { anzahl, datum, geschmack: g });
   }
   return aus;
 }

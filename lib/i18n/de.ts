@@ -1045,8 +1045,6 @@ export const de = {
     srMag: "{achse}: mag ich, {wert} von 5",
     srMagNicht: "{achse}: mag ich nicht, {wert} von 5",
     srNeutral: "{achse}: neutral",
-    terpeneTitel: "Terpene",
-    terpeneEherNicht: "eher nicht",
     vorschlaegeTitel: "Ähnlich im Aroma wie deine Favoriten",
     nichtBestaetigt: "noch nicht bestätigt",
     bestaetigtHinweis: "Bestätigt heißt: mindestens zwei Bewertungen mit einem Median ab 3,5.",

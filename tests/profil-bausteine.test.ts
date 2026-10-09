@@ -8,16 +8,16 @@ import { CommunityVergleich } from "@/components/profil/CommunityVergleich";
 import { NetzGrafik } from "@/components/profil/NetzGrafik";
 import { ProfilNetz } from "@/components/profil/ProfilNetz";
 import { Schnitte } from "@/components/profil/Schnitte";
-import { TerpenRangliste } from "@/components/profil/TerpenRangliste";
 import { TopFlop } from "@/components/profil/TopFlop";
 import { GESCHMACKS_KATEGORIEN } from "@/db/enums";
 import { de } from "@/lib/i18n/de";
 import type { ProfilWerte } from "@/lib/profil-typen";
+import { leeresTerpenNetz } from "@/lib/terpen-achsen";
 
 // Eigene Hilfe statt leereProfilWerte: lib/profil.ts entsteht parallel in Strang A.
 const leer = (): ProfilWerte => ({
   geschmack: Object.fromEntries(GESCHMACKS_KATEGORIEN.map((k) => [k, 0])) as ProfilWerte["geschmack"],
-  terpene: [],
+  terpenNetz: leeresTerpenNetz(),
   anzahl: 0,
   gewichtet: 0,
 });
@@ -60,31 +60,6 @@ test("ProfilNetz: ab 3 gewichteten kein Vorläufig-Hinweis, ohne Ablehnung keine
   const html = netz(werte);
   assert.doesNotMatch(html, /Vorläufig/);
   assert.doesNotMatch(html, /data-netz="mag-nicht"/);
-});
-
-test("TerpenRangliste: Balken nach Wert, Ablehnung abgesetzt unter „eher nicht“", () => {
-  const html = renderToStaticMarkup(
-    createElement(TerpenRangliste, {
-      terpene: [
-        { name: "Limonen", wert: 1 },
-        { name: "Myrcen", wert: 0.5 },
-        { name: "Humulen", wert: -0.4 },
-      ],
-      texte: de.profil,
-      sprache: "de",
-    }),
-  );
-  assert.match(html, /Limonen/);
-  assert.match(html, /width:100%/);
-  assert.match(html, /width:50%/);
-  assert.match(html, /eher nicht/);
-  assert.match(html, /width:40%/);
-  assert.ok(html.indexOf("Myrcen") < html.indexOf("eher nicht"));
-  assert.ok(html.indexOf("eher nicht") < html.indexOf("Humulen"));
-});
-
-test("TerpenRangliste: leer rendert nichts", () => {
-  assert.equal(renderToStaticMarkup(createElement(TerpenRangliste, { terpene: [], texte: de.profil, sprache: "de" })), "");
 });
 
 test("TopFlop: Noten mit Komma, Links zur Blüte, ohne Flop der Hinweis", () => {
@@ -153,11 +128,3 @@ test("NetzGrafik: Kontur vorher dünn ohne Fläche, ohne Kontur kein data-netz=v
   assert.doesNotMatch(ohne, /<span/);
 });
 
-test("TerpenRangliste: ohneTitel lässt die h3 weg, sonst bleibt sie", () => {
-  const terpene = [{ name: "Limonen", wert: 1 }];
-  const mit = renderToStaticMarkup(createElement(TerpenRangliste, { terpene, texte: de.profil, sprache: "de" }));
-  const ohne = renderToStaticMarkup(createElement(TerpenRangliste, { terpene, texte: de.profil, sprache: "de", ohneTitel: true }));
-  assert.match(mit, /<h3/);
-  assert.doesNotMatch(ohne, /<h3/);
-  assert.match(ohne, /Limonen/);
-});

@@ -9,10 +9,11 @@ import { GESCHMACKS_KATEGORIEN } from "@/db/enums";
 import { bluetenKreis, vollFarbe } from "@/lib/aroma-farben";
 import { de } from "@/lib/i18n/de";
 import type { Geschmack, ProfilWerte, VerlaufSchritt } from "@/lib/profil-typen";
+import { leeresTerpenNetz } from "@/lib/terpen-achsen";
 
 const g = (teil: Partial<Geschmack> = {}): Geschmack =>
   ({ ...Object.fromEntries(GESCHMACKS_KATEGORIEN.map((k) => [k, 0])), ...teil }) as Geschmack;
-const werte = (geschmack: Geschmack): ProfilWerte => ({ geschmack, terpene: [], anzahl: 4, gewichtet: 4 });
+const werte = (geschmack: Geschmack): ProfilWerte => ({ geschmack, terpenNetz: leeresTerpenNetz(), anzahl: 4, gewichtet: 4 });
 const schritt = (anzahl: number, teil: Partial<Geschmack>): VerlaufSchritt => ({
   anzahl,
   datum: new Date(Date.UTC(2026, 8, anzahl)).toISOString(),

@@ -1,4 +1,5 @@
 import type { GeschmacksKategorie } from "@/db/enums";
+import type { TerpenNetz } from "@/lib/terpen-achsen";
 
 /**
  * Profilwerte eines Mitglieds (Spec Profil 4.2). Je Geschmacksachse -1..1,
@@ -7,8 +8,8 @@ import type { GeschmacksKategorie } from "@/db/enums";
  */
 export type ProfilWerte = {
   geschmack: Record<GeschmacksKategorie, number>;
-  /** Erst höchstens 8 positive (stärkste zuerst), dann höchstens 3 negative (stärkste Ablehnung zuerst). */
-  terpene: { name: string; wert: number }[];
+  /** Zehn feste Terpen-Achsen (lib/terpen-achsen), −1..1 auf das stärkste |Gewicht| normiert (Spec 2026-10-09). */
+  terpenNetz: TerpenNetz;
   /** Alle eigenen Bewertungen. */
   anzahl: number;
   /** Davon mit Gewicht ungleich 0 (ab 3,5 oder bis 2). */
@@ -72,7 +73,7 @@ export type Auswertungen = {
 export type Geschmack = Record<GeschmacksKategorie, number>;
 
 /** Ein Schritt im Verlauf des Netzes (Spec Profil 10): das Netz nach den ersten `anzahl` Bewertungen. */
-export type VerlaufSchritt = { anzahl: number; datum: string; geschmack: Geschmack };
+export type VerlaufSchritt = { anzahl: number; datum: string; geschmack: Geschmack; terpene?: TerpenNetz };
 
 /** Veränderung einer Achse zwischen zwei Ständen; positiv heißt „stärker gemocht“. */
 export type NetzAenderung = { achse: GeschmacksKategorie; differenz: number };

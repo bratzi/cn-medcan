@@ -4,6 +4,7 @@ import { readFileSync } from "node:fs";
 
 import { geschmacksBeitraege, type SortenAroma } from "@/lib/empfehlung";
 import { geschmackAusVektor, profilAnzeige, profilNeuRechnen } from "@/lib/profil";
+import { terpenNetzAusVektor } from "@/lib/terpen-achsen";
 import { profilVerlauf, verlaufAusDaten, verlaufDaten, VERLAUF_HOECHSTENS, type VerlaufEingabe } from "@/lib/profil-verlauf";
 
 // Sorten ohne Herstellerterpene: das Netz entsteht allein aus den Reglern.
@@ -120,7 +121,7 @@ function verlaufAlt(reihe: VerlaufEingabe[]) {
   const summe = new Map<string, number>();
   const schritte = sortiert.map((x, i) => {
     for (const [k, w] of beitraege[i]) summe.set(k, (summe.get(k) ?? 0) + w);
-    return { anzahl: i + 1, datum: x.erstelltAm.toISOString(), geschmack: geschmackAusVektor(summe) };
+    return { anzahl: i + 1, datum: x.erstelltAm.toISOString(), geschmack: geschmackAusVektor(summe), terpene: terpenNetzAusVektor(summe) };
   });
   return schritte.slice(-VERLAUF_HOECHSTENS);
 }
@@ -133,4 +134,17 @@ test("profilVerlauf (M2): gleiches Ergebnis wie vorher für 1, 60, 61 und 130 Be
     );
     assert.deepEqual(profilVerlauf(reihe, sorten), verlaufAlt(reihe), `n = ${n}`);
   }
+});
+
+test("profilVerlauf: Schritte tragen das Terpen-Netz (Spec 2026-10-09 A)", () => {
+  const mitTerpen: VerlaufEingabe = { ...b("s1", 5, { blumig: 5 }, 1), terpene: { Linalool: 5 } };
+  const v = profilVerlauf([mitTerpen], sorten);
+  assert.equal(v.at(-1)?.terpene?.linalool, 1);
+});
+
+test("profilAnzeige: Terpen-Netz aus den Reglern", () => {
+  const mitTerpen: VerlaufEingabe = { ...b("s1", 5, { blumig: 5 }, 1), terpene: { Linalool: 5, Myrcen: 2.5 } };
+  const n = profilAnzeige([mitTerpen], sorten).terpenNetz;
+  assert.equal(n.linalool, 1);
+  assert.equal(n.myrcen, 0.5);
 });

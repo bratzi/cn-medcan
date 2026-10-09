@@ -2,6 +2,7 @@ import { GESCHMACKS_KATEGORIEN, istGeschmacksKategorie, type GeschmacksKategorie
 import { bewertungsGewicht, profilAus, type EigeneBewertung, type SortenAroma, type SqlAnweisung } from "@/lib/empfehlung";
 import type { AuswertungsZeile, Auswertungen, BewertungsKurz, Geschmack, ProfilWerte, Schnitte } from "@/lib/profil-typen";
 import { berechneGesamtnote } from "@/lib/query/bewertung";
+import { leeresTerpenNetz, terpenNetzAusListe, terpenNetzAusVektor, terpenNetzLesen } from "@/lib/terpen-achsen";
 
 /**
  * Profil und Dashboard, Stufe 1 (Spec 2026-10-07). Reine Rechnung: das Netz
@@ -13,9 +14,6 @@ import { berechneGesamtnote } from "@/lib/query/bewertung";
 export const PROFIL_GUELTIG_MS = 24 * 60 * 60 * 1000;
 /** Ab so vielen gewichteten Bewertungen gilt das Netz als aussagekräftig. */
 export const PROFIL_AUSSAGEKRAEFTIG_AB = 3;
-
-const TERPENE_POSITIV = 8;
-const TERPENE_NEGATIV = 3;
 
 export function profilVeraltet(berechnetAm: Date | null | undefined, jetzt: number): boolean {
   return !berechnetAm || jetzt - berechnetAm.getTime() > PROFIL_GUELTIG_MS;
@@ -59,7 +57,7 @@ function leererGeschmack(): Record<GeschmacksKategorie, number> {
 }
 
 export function leereProfilWerte(): ProfilWerte {
-  return { geschmack: leererGeschmack(), terpene: [], anzahl: 0, gewichtet: 0 };
+  return { geschmack: leererGeschmack(), terpenNetz: leeresTerpenNetz(), anzahl: 0, gewichtet: 0 };
 }
 
 /** Die 10 Geschmacksachsen eines Profilvektors, auf das stärkste |Gewicht| normiert (Spec 4.2). */
@@ -71,22 +69,14 @@ export function geschmackAusVektor(profil: ReadonlyMap<string, number>): Geschma
   return geschmack;
 }
 
-/** Netz und Terpenliste aus dem Profilvektor, je auf das stärkste |Gewicht| normiert (Spec 4.2). */
+/** Geschmacks- und Terpen-Netz aus dem Profilvektor, je auf das stärkste |Gewicht| normiert (Spec 4.2, 2026-10-09). */
 export function profilAnzeige(bewertungen: readonly EigeneBewertung[], sorten: readonly SortenAroma[]): ProfilWerte {
   const { profil } = profilAus(bewertungen, sorten);
   const geschmack = geschmackAusVektor(profil);
 
-  const terpenWerte: { name: string; wert: number }[] = [];
-  for (const [k, x] of profil) if (k.startsWith("t:") && x !== 0) terpenWerte.push({ name: k.slice(2), wert: x });
-  const maxT = Math.max(0, ...terpenWerte.map((t) => Math.abs(t.wert)));
-  const normiert = maxT > 0 ? terpenWerte.map((t) => ({ name: t.name, wert: zwei(t.wert / maxT) })) : [];
-  const nachName = (a: { name: string }, b: { name: string }) => a.name.localeCompare(b.name, "de");
-  const positiv = normiert.filter((t) => t.wert > 0).sort((a, b) => b.wert - a.wert || nachName(a, b)).slice(0, TERPENE_POSITIV);
-  const negativ = normiert.filter((t) => t.wert < 0).sort((a, b) => a.wert - b.wert || nachName(a, b)).slice(0, TERPENE_NEGATIV);
-
   return {
     geschmack,
-    terpene: [...positiv, ...negativ],
+    terpenNetz: terpenNetzAusVektor(profil),
     anzahl: bewertungen.length,
     gewichtet: bewertungen.filter((b) => bewertungsGewicht(b.gesamtnote) !== 0).length,
   };
@@ -94,7 +84,7 @@ export function profilAnzeige(bewertungen: readonly EigeneBewertung[], sorten: r
 
 /** Spalten für `nutzer_profil`. */
 export function profilDaten(w: ProfilWerte) {
-  return { geschmack: JSON.stringify(w.geschmack), terpene: JSON.stringify(w.terpene), anzahl: w.anzahl, gewichtet: w.gewichtet };
+  return { geschmack: JSON.stringify(w.geschmack), terpene: JSON.stringify(w.terpenNetz), anzahl: w.anzahl, gewichtet: w.gewichtet };
 }
 
 function json(roh: string): unknown {
@@ -114,14 +104,18 @@ export function profilAusDaten(z: { geschmack: string; terpene: string; anzahl: 
       if (istGeschmacksKategorie(k) && typeof v === "number" && Number.isFinite(v)) geschmack[k] = Math.max(-1, Math.min(1, v));
     }
   }
+  // Bis 2026-10-09 stand hier eine Liste (bis 8 positive, 3 negative Terpene); alte Zeilen gelten,
+  // bis sie sich nach höchstens 24 h neu rechnen.
   const t = json(z.terpene);
-  const terpene = Array.isArray(t)
-    ? t.filter(
-        (x): x is { name: string; wert: number } =>
-          !!x && typeof x.name === "string" && typeof x.wert === "number" && Number.isFinite(x.wert),
-      ).map((x) => ({ name: x.name, wert: x.wert }))
-    : [];
-  return { geschmack, terpene, anzahl: z.anzahl, gewichtet: z.gewichtet };
+  const terpenNetz = Array.isArray(t)
+    ? terpenNetzAusListe(
+        t.filter(
+          (x): x is { name: string; wert: number } =>
+            !!x && typeof x.name === "string" && typeof x.wert === "number" && Number.isFinite(x.wert),
+        ),
+      )
+    : (terpenNetzLesen(t) ?? leeresTerpenNetz());
+  return { geschmack, terpenNetz, anzahl: z.anzahl, gewichtet: z.gewichtet };
 }
 
 /** Netz nur aus freigegebenen Bewertungen als ein JSON-Text für `nutzer_profil.oeffentlich` (Review W1). */

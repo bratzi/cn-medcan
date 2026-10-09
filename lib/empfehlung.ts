@@ -180,8 +180,8 @@ export function profilAus(bewertungen: readonly EigeneBewertung[], sorten: reado
 }
 
 /**
- * Beitrag jeder Bewertung zu den Geschmacksachsen des Profils, Gewicht schon
- * eingerechnet; nur `g:`-Schlüssel. Dieselbe Rechnung wie profilAus, aber je
+ * Beitrag jeder Bewertung zu Geschmacks- und Terpenachsen des Profils, Gewicht schon
+ * eingerechnet; `g:`- und `t:`-Schlüssel. Dieselbe Rechnung wie profilAus, aber je
  * Bewertung einzeln: der Verlauf (Profil Stufe 3) summiert sie Schritt für
  * Schritt und bleibt so linear statt quadratisch.
  */
@@ -192,7 +192,7 @@ export function geschmacksBeitraege(bewertungen: readonly EigeneBewertung[], sor
     const gewicht = bewertungsGewicht(bewertung.gesamtnote);
     if (gewicht === 0) return aus;
     for (const [k, x] of normiert(bewertungsVektor(bewertung, jeId.get(bewertung.strainId)))) {
-      if (k.startsWith("g:")) aus.set(k, gewicht * x);
+      if (k.startsWith("g:") || k.startsWith("t:")) aus.set(k, gewicht * x);
     }
     return aus;
   });
