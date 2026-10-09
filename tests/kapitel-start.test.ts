@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 
 import { kapitelAus, kapitelNotizen } from "@/lib/kapitel-start";
 import { de } from "@/lib/i18n/de";
-import { leereProfilWerte } from "@/lib/profil";
+import { leereProfilWerte, oeffentlicheDaten, oeffentlicheWerte } from "@/lib/profil";
 import { istMitglied, kapitelAnzeige, sitzungsAntwort } from "@/lib/startseite-sitzung";
 
 const basis = {
@@ -69,4 +69,12 @@ test("istMitglied: nur eine fertige Sitzung mit Konto, auch wenn das Kapitel feh
   assert.equal(istMitglied({ status: "fertig", daten: gast }), false);
   assert.equal(istMitglied({ status: "laedt" }), false);
   assert.equal(istMitglied({ status: "fehler" }), false);
+});
+
+test("kapitelAus: Netz trägt das Terpen-Netz für den Schalter (Spec 2026-10-09 A6)", () => {
+  const netz = { ...leereProfilWerte(), geschmack: { ...leereProfilWerte().geschmack, ZITRUS: 1 }, terpenNetz: { ...leereProfilWerte().terpenNetz, linalool: 1 }, anzahl: 3, gewichtet: 3 };
+  const k = kapitelAus({ ...basis, netz });
+  assert.equal(k.netz?.terpenNetz.linalool, 1);
+  // Öffentliches Profil: gespeichert und gelesen bleibt das Terpen-Netz erhalten.
+  assert.equal(oeffentlicheWerte(oeffentlicheDaten(netz))?.terpenNetz.linalool, 1);
 });
