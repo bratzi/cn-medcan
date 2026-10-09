@@ -124,8 +124,8 @@ export function FazitLauf({
             </button>
           </div>
         ) : null}
-        {/* Seit dem Live-Netz (2026-10-09) ist die Spalte höher als das Fenster: sie scrollt in sich. */}
-        <div className="min-[118rem]:sticky min-[118rem]:top-[calc(var(--kopf-h,4rem)+2rem)] min-[118rem]:max-h-[calc(100svh-var(--kopf-h,4rem)-4rem)] min-[118rem]:overflow-y-auto min-[118rem]:overscroll-contain">{children}</div>
+        {/* Seit dem Live-Netz (2026-10-09) ist die Spalte höher als das Fenster: sie scrollt in sich, nur senkrecht (die Scrollleiste nahm 15 px Breite, live 2026-10-09). */}
+        <div className="min-[118rem]:sticky min-[118rem]:top-[calc(var(--kopf-h,4rem)+2rem)] min-[118rem]:max-h-[calc(100svh-var(--kopf-h,4rem)-4rem)] min-[118rem]:overflow-y-auto min-[118rem]:overflow-x-hidden min-[118rem]:overscroll-contain">{children}</div>
       </aside>
 
       <button
