@@ -346,6 +346,8 @@ export const en: Woerterbuch = {
       verfuegbarkeit: "Availability",
       nurVerfuegbar: "Available flowers only",
       apotheke: "Pharmacy",
+      hersteller: "Manufacturer",
+      herstellerSuche: "Search manufacturers",
       sortierung: "Sort by",
       sortierungen: {
         relevanz: "Relevance",
@@ -366,6 +368,8 @@ export const en: Woerterbuch = {
       hoechstpreis: "Maximum price {text}",
       apotheke: "Pharmacy: {wert}",
       apothekeBeschreibung: "Pharmacy {wert}",
+      hersteller: "Manufacturer: {wert}",
+      herstellerBeschreibung: "Manufacturer {wert}",
       entfernen: "Remove filter {wert}",
     },
     karte: {

@@ -97,6 +97,7 @@ export function FilterLeiste({ facetten, filter, gesamt, texte, titel, zurueckse
   const filterSchluessel = serialisiereFilter(filter).toString();
   const [entwurf, setEntwurf] = useState<Entwurf>(() => entwurfAus(filter));
   const [gesehenerSchluessel, setGesehenerSchluessel] = useState(filterSchluessel);
+  const [herstellerSuche, setHerstellerSuche] = useState("");
 
   // Kam ein neuer Filter von aussen (Chip entfernt, Zuruecksetzen, Zurueck-
   // Taste), wird der Entwurf nachgezogen. Stimmt er schon mit der URL ueberein,
@@ -151,6 +152,10 @@ export function FilterLeiste({ facetten, filter, gesamt, texte, titel, zurueckse
   const aktuellerPreis = entwurf.preisMax ?? preisMax;
 
   const zeigeApothekenScroll = facetten.apotheken.length > 8;
+  // Hersteller (Spec 2026-10-09 C): die Liste ist lang, darum eine Suche davor. Gewählte bleiben immer sichtbar.
+  const herstellerSicht = facetten.hersteller.filter(
+    (h) => filter.hersteller.includes(h.id) || h.name.toLowerCase().includes(herstellerSuche.trim().toLowerCase()),
+  );
 
   return (
     <div className="flex flex-col gap-6">
@@ -345,6 +350,40 @@ export function FilterLeiste({ facetten, filter, gesamt, texte, titel, zurueckse
                 <span>
                   {apotheke.name}
                   <span className="text-text-muted">, {apotheke.ort}</span>
+                </span>
+              </label>
+            ))}
+          </div>
+        </fieldset>
+      ) : null}
+
+      {facetten.hersteller.length > 0 ? (
+        <fieldset className="flex flex-col gap-2 border-0 p-0">
+          <legend className="text-small font-medium text-text">{texte.hersteller}</legend>
+          <input
+            type="search"
+            value={herstellerSuche}
+            onChange={(event) => setHerstellerSuche(event.target.value)}
+            placeholder={texte.herstellerSuche}
+            aria-label={texte.herstellerSuche}
+            className="min-h-11 rounded-md border border-border-strong bg-surface px-3 text-small text-text placeholder:text-text-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring"
+          />
+          <div className="max-h-80 overflow-y-auto rounded-md border border-border px-2">
+            {herstellerSicht.map((hersteller) => (
+              <label key={hersteller.id} className={CHECKBOX_ZEILE}>
+                <input
+                  type="checkbox"
+                  checked={filter.hersteller.includes(hersteller.id)}
+                  onChange={(event) =>
+                    setzeSofort({
+                      hersteller: umschalten(filter.hersteller, hersteller.id, event.target.checked),
+                    })
+                  }
+                  className={CHECKBOX}
+                />
+                <span>
+                  {hersteller.name}
+                  <span className="text-text-muted numeric"> {hersteller.anzahl}</span>
                 </span>
               </label>
             ))}

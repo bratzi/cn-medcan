@@ -354,6 +354,8 @@ export const de = {
       verfuegbarkeit: "Verfügbarkeit",
       nurVerfuegbar: "Nur verfügbare Blüten",
       apotheke: "Apotheke",
+      hersteller: "Hersteller",
+      herstellerSuche: "Hersteller suchen",
       sortierung: "Sortierung",
       sortierungen: {
         relevanz: "Relevanz",
@@ -374,6 +376,8 @@ export const de = {
       hoechstpreis: "Höchstpreis {text}",
       apotheke: "Apotheke: {wert}",
       apothekeBeschreibung: "Apotheke {wert}",
+      hersteller: "Hersteller: {wert}",
+      herstellerBeschreibung: "Hersteller {wert}",
       entfernen: "Filter {wert} entfernen",
     },
     karte: {

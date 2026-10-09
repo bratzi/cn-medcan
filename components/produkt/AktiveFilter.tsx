@@ -11,6 +11,8 @@ type Props = {
   filter: StrainFilter;
   /** Nur zur Anzeige der Apothekennamen — Slug allein waere nicht lesbar. */
   apothekenNamen?: ReadonlyMap<string, string>;
+  /** Id zu Name der Hersteller (Spec 2026-10-09 C). */
+  herstellerNamen?: ReadonlyMap<string, string>;
   w: Woerterbuch;
   sprache: Sprache;
 };
@@ -31,7 +33,7 @@ const STANDARD = leererFilter();
  * Aktive Filter als entfernbare Chips. Server Component: jeder Chip ist ein
  * normaler Link auf die Query ohne diesen Wert — funktioniert ohne JavaScript.
  */
-export function AktiveFilter({ filter, apothekenNamen, w, sprache }: Props) {
+export function AktiveFilter({ filter, apothekenNamen, herstellerNamen, w, sprache }: Props) {
   if (istFilterLeer(filter)) return null;
   const texte = w.katalog.aktiv;
 
@@ -116,6 +118,16 @@ export function AktiveFilter({ filter, apothekenNamen, w, sprache }: Props) {
       text: t(texte.apotheke, { wert: name }),
       beschreibung: t(texte.apothekeBeschreibung, { wert: name }),
       ziel: ohne({ apotheke: filter.apotheke.filter((wert) => wert !== slug) }),
+    });
+  }
+
+  for (const id of filter.hersteller) {
+    const name = herstellerNamen?.get(id) ?? id;
+    chips.push({
+      schluessel: `hersteller-${id}`,
+      text: t(texte.hersteller, { wert: name }),
+      beschreibung: t(texte.herstellerBeschreibung, { wert: name }),
+      ziel: ohne({ hersteller: filter.hersteller.filter((wert) => wert !== id) }),
     });
   }
 
