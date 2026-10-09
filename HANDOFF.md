@@ -35,7 +35,13 @@ allen Routen Error 1102 („Worker exceeded CPU time limit“, `exceededCpu` bei
 11:23 kam. Seit 01:06 UTC 78 solche Abbrüche, in den 72 h davor fast keine. Die Anfragen brauchen im Schnitt
 115 bis 136 ms CPU (vor und nach den letzten Commits gleich, kein Regress); Cloudflare hat das bisher
 geduldet und setzt das Limit jetzt zeitweise durch. Bezahlplan ist ausgeschlossen (Memory `nie-kostenpflichtig`).
-Ausweg nur über weniger CPU je Anfrage (mehr statisch/ISR ausliefern, teure Abfragen cachen). Nutzer entscheiden lassen.
+Nutzer (Session 54): Rechenzeit senken. Erledigt: `ca9778d` eigener Einstieg `worker.mjs` lädt den Next-Server
+beim Isolat-Start (OpenNext importierte ihn erst in der ersten Anfrage, ~115 ms); `c54cfd5` `/api/startseite`
+zwei Minuten im sessionStorage (`START_SPEICHER`, geleert bei Kontowechsel, Stimme, Bewertung); `544fc54`
+veraltete `/_next/static/`-Chunks bekommen im Einstieg direkt 404. Gemessen danach: Treffer auf `/` und
+`/reviews` ~10 ms, kalte oder dynamische Seiten weiter 100 bis 400 ms (`/profil`, `/umfragen`, `/blueten/[slug]`,
+`/api/ranglisten`). Nächste Hebel: ISR-`revalidate` 300 s höher (jeder Neubau der Startseite 700 bis 1300 ms),
+oder On-Demand-Revalidierung mit D1-Tag-Cache; Render-CPU der Startseite senken.
 Abfrage dazu: Cloudflare-MCP, `POST /accounts/{id}/workers/observability/telemetry/query`, Filter
 `$metadata.service = cn-medcan`, Gruppe `$workers.outcome`.
 
