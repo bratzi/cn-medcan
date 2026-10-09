@@ -364,8 +364,10 @@ async function ProduktInhalt({ slug, w, sprache }: { slug: string; w: Woerterbuc
         aria-labelledby="bewerten-titel"
         // Ab 118rem steht das Fazit samt Live-Netz rechts neben der Maske, außerhalb der Sektion
         // (FazitLauf); overflow-x-clip schnitt es ab (live 2026-10-09). Den Schlagwort-Satz
-        // beschneidet seither Schlagwort selbst.
-        className={cn(SEKTION, "flex scroll-mt-[calc(var(--kopf-h,4rem)+2rem)] flex-col gap-4 min-[118rem]:overflow-x-visible")}
+        // beschneidet seither Schlagwort selbst. Knapp über 118rem lag die Spalte unter der
+        // Schalterleiste und ragte über den Rand (live 2026-10-09): die Sektion rückt dort nach
+        // links, bis der Seitenrand ab 128rem von selbst reicht.
+        className={cn(SEKTION, "flex scroll-mt-[calc(var(--kopf-h,4rem)+2rem)] flex-col gap-4 min-[118rem]:right-[max(0px,calc(5rem_-_(100vw_-_118rem)_/_2))] min-[118rem]:overflow-x-visible")}
       >
         <Schlagwort satz={texte.schlagwort.bewerten} ton="gruen" />
         <SektionsKopf
