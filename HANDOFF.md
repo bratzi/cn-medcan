@@ -75,8 +75,14 @@ Gefunden und behoben: `187434a` dichte Aroma-Karte im Buch ab lg (Achsen 29 px a
 
 **Noch offen live:** Notizen-Kürzung mit Zitatzeichen bei langem Text (keine lange Notiz in den Daten).
 
-**Danach fragen (eine AskUserQuestion):** gefällt das Aroma-Netz so (Farbe, Größe, Lesung in der Mitte), und was
-als Nächstes: offene Minors „Dein Kapitel“ unten, oder neue Wünsche?
+**Nutzer (Session 55):** Aroma-Netz passt so. Danach Minors „Dein Kapitel“ erledigt (`073f77c`): Mitglied ohne
+geladenes Kapitel sieht im Schaufenster „Zu deinem Kapitel“ statt „Konto anlegen“ (`istMitglied`, Insel bekommt
+Schaufenster-Daten statt Knoten); Fokus bleibt beim Umblättern im Kapitel; Insel serialisiert nur `ProfilNetzTexte`;
+Timeline im Cleanup gekillt; Kommentar zu inline-Randnotizen. Band-Link und `size-20` entfielen mit dem Säulen-Umbau.
+902 Tests grün. **Live noch nicht gesehen** (Browserfenster lag verdeckt, `visibilityState: hidden`, dann stehen rAF
+und Screenshots): `073f77c` Kapitel als Gast und Mitglied; Aroma-Fix `187434a` nur per Messung bestätigt.
+**Offen, Nutzer fragen:** 374 Dateien liegen mit CRLF im Index. `.gitattributes` mit `eol=lf` hieße einen großen
+Commit nur mit Zeilenenden (`git add --renormalize .`); ohne Renormalisierung kippt jede Datei beim nächsten Anfassen.
 
 **Arbeitsweise seit Session 53 (Nutzer):** nach jeder erledigten Aufgabe sofort pushen; die Live-Prüfung
 gesammelt am Ende eines Durchgangs und dann korrigieren (Memory `immer-nach-github-pushen`).
@@ -102,15 +108,6 @@ gesammelt am Ende eines Durchgangs und dann korrigieren (Memory `immer-nach-gith
   Schlagwort clippt selbst. Fazit steht auch ohne Community-Werte. Live-Netz daneben: `ladeLiveNetzBasis`
   (Server, alle eigenen Bewertungen außer dieser Sorte) plus `liveGeschmack` im Browser (`lib/live-netz.ts`, Test
   gegen `profilAnzeige`). Live geprüft: Spalte sichtbar, Netz drin; Scroll-Fix noch nicht live gesehen.
-
-### ⇢ Offene Minors „Dein Kapitel“ (Gesamtreview, geparkt)
-
-Fokusverlust beim Umblättern; Mitglied mit Bewertungen aber ohne `nutzer_profil` sieht „Dein Netz entsteht mit
-deiner ersten Bewertung“ (falsch, nur bei `bewertet === 0` zeigen); `KapitelTexte` schickt `w.profil` doppelt
-in die Insel; Randnotizen inline statt `components/kapitel/Randnotizen` (Kommentar fehlt); leeres Mitglied zeigt
-„0 gestimmt“; Mitglied mit Abfragefehler sieht „Konto anlegen“; Band-Link nur so breit wie sein Inhalt (`w-full`);
-CRLF/LF-Wechsel in `globals.css`/`page.tsx` (`.gitattributes` mit `eol=lf` erwägen). Dazu Task-Minors:
-`max-[639px]:size-20`, leeres `<span />`, onEnter-Timeline im Cleanup nicht gekillt, Name-Clip ohne Rand.
 
 ### ⇢ SESSION 52 (erledigt): `/reviews` live geprüft, Startseite nachgezogen, Dein Kapitel live
 
