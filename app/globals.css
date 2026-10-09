@@ -1860,12 +1860,14 @@ html.joint-cursor :is(input:not([type="range"]):not([type="radio"]):not([type="c
    über --fluss-dauer (lib/aromakarte.ts flussDauer), linear, nur stroke-dashoffset.
    Ohne Bewegung und im Sparmodus aus; die Linie bleibt farbig stehen. */
 .bogen-fluss {
-  visibility: hidden;
+  /* display statt visibility: ein sichtbar gesetztes Kind schlüge durch die verdeckten Buchseiten
+     (visibility: hidden, Animation pausiert) und bliebe dort als Standbild stehen. */
+  display: none;
 }
 
 @media (prefers-reduced-motion: no-preference) {
   .bogen-fluss {
-    visibility: visible;
+    display: inline;
     animation: bogen-fluss var(--fluss-dauer, 3s) linear infinite;
   }
 }
@@ -1873,19 +1875,19 @@ html.joint-cursor :is(input:not([type="range"]):not([type="radio"]):not([type="c
 /* Genau im Sweet Spot (Nutzer 2026-09-30, zuvor am Maximum, T5d) pulsiert die ganze Linie statt eines Strichs. */
 .bogen-voll,
 .delta-funke {
-  visibility: hidden;
+  display: none;
 }
 
 @media (prefers-reduced-motion: no-preference) {
   .bogen-voll {
-    visibility: visible;
+    display: inline;
     animation: bogen-voll var(--fluss-dauer, 1.2s) ease-in-out infinite;
   }
 
   /* Funken am Griff, wenn ein Geschmacksregler genau im Sweet Spot steht (Nutzer
      2026-09-30): kleine Punkte steigen auf und verglühen, nur transform und opacity. */
   .delta-funke {
-    visibility: visible;
+    display: inline;
     transform-box: fill-box;
     transform-origin: center;
     animation: delta-funke 0.9s cubic-bezier(0.23, 1, 0.32, 1) infinite;
@@ -1901,7 +1903,7 @@ html.joint-cursor :is(input:not([type="range"]):not([type="radio"]):not([type="c
 }
 
 :root[data-sparmodus] :is(.bogen-fluss, .bogen-voll, .delta-funke) {
-  visibility: hidden;
+  display: none;
 }
 
 /* Der Strich (Länge --fluss-strich von 100, T5d) tritt am Anfang ein und läuft ganz hinaus. */
