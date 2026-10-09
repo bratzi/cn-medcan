@@ -20,6 +20,7 @@ export const kapitel: Choreografie = ({ gsap, ScrollTrigger }) => {
   gsap.set(name, NAME_AB);
   gsap.set(woerter, SCHREIBEN_AB);
 
+  let ablauf: ReturnType<typeof gsap.timeline> | null = null;
   const ausloeser = ScrollTrigger.create({
     trigger: sektion,
     start: "top 70%",
@@ -27,7 +28,7 @@ export const kapitel: Choreografie = ({ gsap, ScrollTrigger }) => {
     onEnter: () => {
       const n = name.filter((el) => el.isConnected);
       const w = woerter.filter((el) => el.isConnected);
-      const ablauf = gsap.timeline();
+      ablauf = gsap.timeline();
       if (n.length) ablauf.fromTo(n, NAME_AB, NAME_BIS);
       if (w.length) ablauf.fromTo(w, SCHREIBEN_AB, { ...SCHREIBEN_BIS, stagger: 0.2 }, n.length ? "-=0.4" : 0);
     },
@@ -35,6 +36,7 @@ export const kapitel: Choreografie = ({ gsap, ScrollTrigger }) => {
 
   return () => {
     ausloeser.kill();
+    ablauf?.kill();
     gsap.set([...name, ...woerter], { clearProps: "clipPath" });
   };
 };

@@ -85,6 +85,11 @@ export function empfehlungenAnzeige(stand: SitzungsStand): EmpfehlungenAnzeige {
   return empfehlungen.eintraege.length === 0 ? { art: "leer" } : { art: "liste", eintraege: empfehlungen.eintraege };
 }
 
+/** Angemeldet laut Sitzung; während des Ladens und bei Fehler unbekannt, dann wie ein Gast. */
+export function istMitglied(stand: SitzungsStand): boolean {
+  return stand.status === "fertig" && stand.daten.abstimmung.zustand.art !== "ANONYM";
+}
+
 /** Das eigene Kapitel, sobald die Sitzung da ist; sonst bleibt das Schaufenster stehen. */
 export function kapitelAnzeige(stand: SitzungsStand): KapitelDaten | null {
   return stand.status === "fertig" ? stand.daten.kapitel : null;

@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ProfilNetz } from "@/components/profil/ProfilNetz";
 import { BlattAnzeige } from "@/components/review/BlattAnzeige";
 import { Avatar, Badge, buttonKlassen, namenLinkKlassen } from "@/components/ui";
+import { profilNetzTexte, type ProfilNetzTexte } from "@/lib/aroma-netz-texte";
 import { formatiereDatum, formatiereZahl } from "@/lib/format";
 import { kapitelNotizen, type KapitelDaten } from "@/lib/kapitel-start";
 import type { Sprache } from "@/lib/i18n/sprache-kern";
@@ -13,13 +14,18 @@ import { netzTexte } from "@/lib/profil-oeffentlich";
 /** Nur die Texte, die das Kapitel braucht: die Insel serialisiert sie ins HTML, nicht das ganze Wörterbuch. */
 export type KapitelTexte = {
   kapitel: Woerterbuch["start"]["kapitel"];
-  profil: Woerterbuch["profil"];
-  profilOeffentlich: Woerterbuch["profil"];
+  profil: ProfilNetzTexte;
+  profilOeffentlich: ProfilNetzTexte;
   achsen: Woerterbuch["label"]["geschmack"];
 };
 
 export function kapitelTexte(w: Woerterbuch): KapitelTexte {
-  return { kapitel: w.start.kapitel, profil: w.profil, profilOeffentlich: netzTexte(w), achsen: w.label.geschmack };
+  return {
+    kapitel: w.start.kapitel,
+    profil: profilNetzTexte(w.profil),
+    profilOeffentlich: profilNetzTexte(netzTexte(w)),
+    achsen: w.label.geschmack,
+  };
 }
 
 /** Die zwei stärksten Vorlieben im Netz, Namen aus den Achsen; nur „mag ich“ (Wert über 0). */
@@ -45,18 +51,23 @@ export function KapitelAufschlag({
   art,
   texte: alle,
   sprache,
+  mitglied = false,
 }: {
   daten: KapitelDaten;
   art: "schaufenster" | "eigen";
   texte: KapitelTexte;
   sprache: Sprache;
+  /** Angemeldet, aber das eigene Kapitel fehlt (Abfrage gescheitert): kein „Konto anlegen“. */
+  mitglied?: boolean;
 }) {
   const texte = alle.kapitel;
   const notizen = kapitelNotizen(daten, texte, sprache);
   const leer = daten.bewertet === 0;
   const aktion =
     art === "schaufenster"
-      ? { href: "/registrieren", text: texte.kontoAnlegen }
+      ? mitglied
+        ? { href: "/profil", text: texte.zumKapitel }
+        : { href: "/registrieren", text: texte.kontoAnlegen }
       : leer
         ? { href: "/blueten", text: texte.ersteBewertung }
         : { href: "/profil", text: texte.zumKapitel };
@@ -113,6 +124,9 @@ export function KapitelAufschlag({
         </p>
       ) : null}
 
+      {/* Bewusst nicht components/kapitel/Randnotizen: die liegen im Subgrid des Profil-Rasters,
+          hier stehen die Zahlen frei und mittig in der Säule. Gleich bleibt das Muster: Zahl
+          gedruckt, Wort von Hand, vorgelesen ein Satz je Notiz. */}
       <ul aria-label={texte.notizen} className="flex flex-wrap justify-center gap-x-16 gap-y-8">
         {notizen.map((n) => (
           <li key={n.wort} className="flex min-w-0 flex-col items-center gap-2">

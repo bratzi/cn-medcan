@@ -1,10 +1,8 @@
-import Link from "next/link";
 import { unstable_rethrow } from "next/navigation";
 
-import { KapitelAufschlag, kapitelTexte } from "@/components/kapitel-start/KapitelAufschlag";
+import { kapitelTexte } from "@/components/kapitel-start/KapitelAufschlag";
 import { KapitelImBrowser } from "@/components/kapitel-start/KapitelImBrowser";
 import { Schlagwort } from "@/components/story/Schlagwort";
-import { buttonKlassen } from "@/components/ui";
 import { holeSprache, holeWoerterbuch } from "@/lib/i18n";
 import type { KapitelDaten } from "@/lib/kapitel-start";
 import { ladeSchaufensterKapitel } from "@/lib/query/kapitel-start";
@@ -25,16 +23,6 @@ export async function DeinKapitel() {
     console.error("ladeSchaufensterKapitel fehlgeschlagen", fehler);
     daten = null;
   }
-  const schaufenster = daten ? (
-    <KapitelAufschlag daten={daten} art="schaufenster" texte={kapitelTexteFuerInsel} sprache={sprache} />
-  ) : (
-    <div className="flex flex-col items-start gap-6">
-      <p className="max-w-[48ch] text-body text-text-muted text-pretty">{texte.satzGast}</p>
-      <Link prefetch={false} href="/registrieren" className={buttonKlassen("primary")}>
-        {texte.kontoAnlegen}
-      </Link>
-    </div>
-  );
   return (
     <section
       id="kapitel"
@@ -47,7 +35,7 @@ export async function DeinKapitel() {
         <h2 id="kapitel-titel" className="font-buch text-kapitel text-text text-center text-balance">
           {texte.vor} <em className="farbverlauf hand-betont">{texte.betont}</em>
         </h2>
-        <KapitelImBrowser schaufenster={schaufenster} texte={kapitelTexteFuerInsel} sprache={sprache} />
+        <KapitelImBrowser schaufenster={daten} texte={kapitelTexteFuerInsel} sprache={sprache} />
       </div>
     </section>
   );

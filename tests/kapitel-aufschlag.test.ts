@@ -92,3 +92,19 @@ test("Dein Kapitel steht direkt hinter Terpene und ihre Geschmäcker (Nutzer 202
   const start = readFileSync("components/story/bewegung/start.ts", "utf8");
   assert.match(start, /register,\n\s*kapitel,/);
 });
+
+test("Schaufenster für ein Mitglied ohne eigenes Kapitel: kein Konto anlegen (Minor Dein Kapitel)", () => {
+  const html = renderToStaticMarkup(
+    createElement(KapitelAufschlag, { daten, art: "schaufenster", texte: kapitelTexte(de), sprache: "de", mitglied: true }),
+  );
+  assert.doesNotMatch(html, /href="\/registrieren"/);
+  assert.match(html, /href="\/profil"/);
+  assert.match(html, new RegExp(t.zumKapitel));
+});
+
+test("Insel-Texte: nur was das Netz braucht, nicht das ganze Profil-Wörterbuch (Minor Dein Kapitel)", () => {
+  const texte = kapitelTexte(de);
+  assert.ok(Object.keys(texte.profil).length < Object.keys(de.profil).length);
+  assert.equal(texte.profil.leer, de.profil.leer);
+  assert.equal(texte.profilOeffentlich.magIch, de.profilOeffentlich.magIch);
+});

@@ -27,7 +27,16 @@ export type AromaNetzTexte = Pick<
   | "verlaufAnhalten"
 >;
 
-export function aromaNetzTexte(p: Woerterbuch["profil"]): AromaNetzTexte {
+/** Was ProfilNetz braucht: das Netz und die Hinweise darunter. Schmal, weil die Startseiten-Insel es serialisiert. */
+export type ProfilNetzTexte = AromaNetzTexte &
+  Pick<Woerterbuch["profil"], "leer" | "ersteBewertung" | "nurMittelfeld" | "vorlaeufig">;
+
+export function profilNetzTexte(p: Woerterbuch["profil"]): ProfilNetzTexte {
+  const { leer, ersteBewertung, nurMittelfeld, vorlaeufig } = p;
+  return { ...aromaNetzTexte(p), leer, ersteBewertung, nurMittelfeld, vorlaeufig };
+}
+
+export function aromaNetzTexte(p: AromaNetzTexte): AromaNetzTexte {
   const { magIch, magIchNicht, vorher, netzSkala, netzHinweis, note, srMag, srMagNicht, srNeutral, staerker, schwaecher } = p;
   const { aenderung, aenderungGleich, verlaufSchritt, verlaufRegler, verlaufAbspielen, verlaufAnhalten } = p;
   return {

@@ -4,7 +4,7 @@ import assert from "node:assert/strict";
 import { kapitelAus, kapitelNotizen } from "@/lib/kapitel-start";
 import { de } from "@/lib/i18n/de";
 import { leereProfilWerte } from "@/lib/profil";
-import { kapitelAnzeige, sitzungsAntwort } from "@/lib/startseite-sitzung";
+import { istMitglied, kapitelAnzeige, sitzungsAntwort } from "@/lib/startseite-sitzung";
 
 const basis = {
   anzeigename: "GrünesBuch",
@@ -60,4 +60,13 @@ test("Sitzung: Gast ohne Kapitel, Mitglied mit Kapitel, laden ohne Kapitel", () 
   assert.deepEqual(kapitelAnzeige({ status: "fertig", daten: mitglied }), kapitel);
   assert.equal(kapitelAnzeige({ status: "laedt" }), null);
   assert.equal(kapitelAnzeige({ status: "fehler" }), null);
+});
+
+test("istMitglied: nur eine fertige Sitzung mit Konto, auch wenn das Kapitel fehlt", () => {
+  const ohneKapitel = sitzungsAntwort({ mitglied: { freigegeben: false }, umfrageId: null, eigeneOptionId: null, empfehlungen: [], kapitel: null });
+  assert.equal(istMitglied({ status: "fertig", daten: ohneKapitel }), true);
+  const gast = sitzungsAntwort({ mitglied: null, umfrageId: null, eigeneOptionId: null, empfehlungen: [] });
+  assert.equal(istMitglied({ status: "fertig", daten: gast }), false);
+  assert.equal(istMitglied({ status: "laedt" }), false);
+  assert.equal(istMitglied({ status: "fehler" }), false);
 });

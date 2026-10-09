@@ -2,7 +2,7 @@ import Link from "next/link";
 
 import { NetzGrafik } from "@/components/profil/NetzGrafik";
 import { AromaNetz, type NetzStand } from "@/components/profil/AromaNetz";
-import { aromaNetzTexte } from "@/lib/aroma-netz-texte";
+import { aromaNetzTexte, type ProfilNetzTexte } from "@/lib/aroma-netz-texte";
 import { buttonKlassen } from "@/components/ui";
 import type { Sprache } from "@/lib/i18n/sprache-kern";
 import { t } from "@/lib/i18n/text";
@@ -14,7 +14,7 @@ const LEER = Array.from({ length: 10 }, () => 0);
 
 type Props = {
   werte: ProfilWerte;
-  texte: Woerterbuch["profil"];
+  texte: ProfilNetzTexte;
   achsen: Woerterbuch["label"]["geschmack"];
   sprache: Sprache;
   /** Gespeicherter Verlauf (älteste zuerst); ab zwei Schritten zeigt das Netz die Zeitleiste. Nur im eigenen Profil. */
