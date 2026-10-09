@@ -3,7 +3,7 @@
 > Übergabemedium zwischen Sessions. Wird nach jedem Arbeitsblock aktualisiert und committet.
 > Wer hier weiterarbeitet, liest diese Datei zuerst und braucht den Chatverlauf nicht.
 
-**Letzte Aktualisierung:** 2026-10-09 (Session 53, Ende)
+**Letzte Aktualisierung:** 2026-10-09 (Session 54)
 **Repo:** https://github.com/bratzi/cn-medcan (public)
 **Branch:** `main` (Makeover „Grünes Buch“ Teilprojekt 1 ist seit 2026-09-24 auf `main`)
 
@@ -28,16 +28,29 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 
 ## ⇢ Hier geht es weiter
 
-### ⇢ SESSION 54 (Sessionstart)
+### ⇢ SESSION 54
+
+**ACHTUNG CPU-Limit (Free-Plan, 10 ms je Anfrage):** Am 2026-10-09 ab 11:18 UTC lieferte der Worker auf
+allen Routen Error 1102 („Worker exceeded CPU time limit“, `exceededCpu` bei 10 ms), bis der nächste Deploy
+11:23 kam. Seit 01:06 UTC 78 solche Abbrüche, in den 72 h davor fast keine. Die Anfragen brauchen im Schnitt
+115 bis 136 ms CPU (vor und nach den letzten Commits gleich, kein Regress); Cloudflare hat das bisher
+geduldet und setzt das Limit jetzt zeitweise durch. Bezahlplan ist ausgeschlossen (Memory `nie-kostenpflichtig`).
+Ausweg nur über weniger CPU je Anfrage (mehr statisch/ISR ausliefern, teure Abfragen cachen). Nutzer entscheiden lassen.
+Abfrage dazu: Cloudflare-MCP, `POST /accounts/{id}/workers/observability/telemetry/query`, Filter
+`$metadata.service = cn-medcan`, Gruppe `$workers.outcome`.
+
+**Session 54 live:** `8108943` Bewerten-Sektion rückt zwischen 118rem und 128rem nach links (Fazit-Spalte lag
+unter der Schalterleiste, ragte 3 px über den Rand); live bei 1898 px geprüft: kein Querscroll, Spalte frei.
+`e574e2e` Spalte scrollt nur senkrecht (Inhalt 4 px zu breit, zweite Leiste); noch nicht live gesehen.
+Live-Netz folgt den Aroma-Reglern (Diesel 0 bis 3,8 geprüft, zurückgesetzt, nichts gespeichert).
+`/reviews` 1898 px hell und dunkel: Doppelseite gut, kein Überlauf.
 
 **Live geprüft am Ende von Session 53 (alles gut):** Terpen-Karte unter dem Namen mit Pfeil (hell); weicher Rand
 über dem Band (hell); Profil-Netz größer, hell, mobil 494 px ohne Querscrollen, Antippen zeigt die Lesung;
 Blütenseite unter 118rem: Leiste unten, Sheet mit Fazit und Live-Netz samt Kontur.
 
-**Noch offen live:** Fazit-Spalte ab 118rem nach Scroll-Fix `d71bd53` (Fenster ab 1888 px); Note ändern und
-sehen, dass das Live-Netz folgt; dunkler Modus der Karte. Aus Session 52: Buch-Doppelseite (`242df55`, `937c34a`,
-`1b30c3a`) auf `/reviews`, Blütenseite, Startseite, 1143 und 494 px, hell und dunkel; Notizen-Kürzung mit
-Zitatzeichen bei langem Text.
+**Noch offen live:** dunkler Modus der Terpen-Karte; Buch-Doppelseite auf Blütenseite und Startseite, 1143 und
+494 px; Notizen-Kürzung mit Zitatzeichen bei langem Text.
 
 **Danach fragen (eine AskUserQuestion):** gefällt das Aroma-Netz so (Farbe, Größe, Lesung in der Mitte), und was
 als Nächstes: offene Minors „Dein Kapitel“ unten, oder neue Wünsche?
