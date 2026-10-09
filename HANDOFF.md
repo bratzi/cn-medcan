@@ -106,6 +106,19 @@ Timeline im Cleanup gekillt; Kommentar zu inline-Randnotizen. Band-Link und `siz
 von Name und Balken. Nur das Aussehen ist noch nicht angesehen.
 **Zeilenenden (Nutzer, Session 55):** CRLF bleibt, keine `.gitattributes`, kein Renormalisieren. Nächste Aufgabe nennt der Nutzer.
 
+**Bug Bewertungsbuch (Nutzer, Session 55), behoben und live per DOM bestätigt:** `9c3213c` Lichtlinien verdeckter
+Buchseiten lagen eingefroren über der aktiven Karte (sichtbar nach Karte zu Netz und beim Blättern). Ursache:
+`.bogen-fluss`/`.bogen-voll`/`.delta-funke` schalteten sich per `visibility: visible` ein und schlugen durch das
+`visibility: hidden` der verdeckten Seiten; jetzt `display`. Test `tests/buch-verdeckte-seiten.test.ts` verbietet
+`visibility: visible` in `globals.css`.
+
+**⇢ JETZT:** Spec `docs/superpowers/specs/2026-10-09-netz-terpene-profil-hersteller-design.md` (`ea82c52`): Aroma-Netz
+mit Schalter Geschmäcker/Terpene (10 feste Hauptterpene) und Lesung außen an der Marke, auf allen AromaNetz;
+Profil neu geordnet (Aktivität, Netz, Top/Flop, Noten+Hersteller, Schnitte+Community, Bewertungen, Ähnlich) mit
+Feldköpfen im Startseiten-Stil; Katalog-Filter Hersteller und Hersteller-Rangliste im Profil. Nutzer hat den
+Entwurf im Chat freigegeben; **wartet auf Durchsicht der Spec**, dann writing-plans (Stränge A und C parallel,
+B danach).
+
 **Arbeitsweise seit Session 53 (Nutzer):** nach jeder erledigten Aufgabe sofort pushen; die Live-Prüfung
 gesammelt am Ende eines Durchgangs und dann korrigieren (Memory `immer-nach-github-pushen`).
 
