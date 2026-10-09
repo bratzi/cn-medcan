@@ -57,7 +57,17 @@ Live-Netz folgt den Aroma-Reglern (Diesel 0 bis 3,8 geprüft, zurückgesetzt, ni
 über dem Band (hell); Profil-Netz größer, hell, mobil 494 px ohne Querscrollen, Antippen zeigt die Lesung;
 Blütenseite unter 118rem: Leiste unten, Sheet mit Fazit und Live-Netz samt Kontur.
 
-**Noch offen live:** dunkler Modus der Terpen-Karte; Buch-Doppelseite auf Blütenseite und Startseite, 1143 und
+**Session 54, weiter (live geprüft 494 px hell und dunkel):** `06b7321` On-Demand-Revalidierung: D1-Tag-Cache in
+eigener Datenbank `cn-medcan-tags` (Tabelle per `db/tag-cache.sql` remote angelegt), Startseite, `/reviews`, Bände
+`revalidate = 86400`; Bewertung speichern/freigeben/bebildern revalidiert `/` und `/reviews` (layout). Build lief
+durch, Seiten antworten. **Noch nicht live bewiesen:** dass eine neue Bewertung sofort auf Startseite und `/reviews`
+erscheint (beim nächsten Speichern prüfen; falls nicht, Telemetrie auf Tag-Cache-Fehler ansehen).
+`9d08193` Dein Kapitel als zentrierte Säule (Nutzer): Avatar, Name, Rolle als Badge, „dabei seit“, zwei liebste
+Aromen, darunter groß das Netz (max 640 px), Zahlen zentriert, Zuletzt und Aktion mittig. `KapitelDaten` hat
+optional `rolle` und `seit`. „Wissen bündeln“-Zahlen und Runden-Schritte unter lg mittig. Desktop-Breite nicht
+live gesehen (Fenster ließ sich nicht ziehen).
+
+**Noch offen live:** Kapitel auf Desktop; dunkler Modus der Terpen-Karte; Buch-Doppelseite auf Blütenseite und Startseite, 1143 und
 494 px; Notizen-Kürzung mit Zitatzeichen bei langem Text.
 
 **Danach fragen (eine AskUserQuestion):** gefällt das Aroma-Netz so (Farbe, Größe, Lesung in der Mitte), und was
