@@ -1,9 +1,12 @@
-import { GeschmackIcon } from "@/components/review/AromaIcon";
-import { bluetenKreis, vollFarbe } from "@/lib/aroma-farben";
+import type { ReactNode } from "react";
+
+import { GeschmackIcon, TerpenIcon } from "@/components/review/AromaIcon";
+import { farbKreis, vollFarbe } from "@/lib/aroma-farben";
 import { alsPolygon, netzPunkte, type NetzPunkt } from "@/lib/netz";
 import { NETZ_MAX } from "@/lib/netz-skala";
 import type { Geschmack } from "@/lib/profil-typen";
 import { GESCHMACKS_ACHSEN } from "@/lib/query/bewertung";
+import { TERPEN_ACHSEN, hauptAroma } from "@/lib/terpen-achsen";
 
 const GROESSE = 320;
 const MITTE = GROESSE / 2;
@@ -12,11 +15,32 @@ const RADIUS = 110;
 const MARKEN_RADIUS = RADIUS + 30;
 export { NETZ_MAX };
 const RINGE = [1, 2, 3, 4, 5] as const;
-const BLUETE = bluetenKreis(GESCHMACKS_ACHSEN.map((a) => a.enumWert));
+/** Eine Achse des Netzes: Schlüssel, Farbe der Marke und des Blütenkeils, Icon (Spec 2026-10-09 A). */
+export type NetzAchse = { key: string; farbe: string; icon: ReactNode };
+
+/** Die zehn Geschmacksachsen, wie das Netz sie seit jeher zeigt. */
+export function geschmacksAchsen(): NetzAchse[] {
+  return GESCHMACKS_ACHSEN.map((a) => ({ key: a.key, farbe: vollFarbe(a.enumWert), icon: <GeschmackIcon geschmack={a.enumWert} className="size-5" /> }));
+}
+
+/** Die zehn festen Terpen-Achsen, Farbe aus dem stärksten Aroma des Terpens. */
+export function terpenAchsen(): NetzAchse[] {
+  return TERPEN_ACHSEN.map((a) => ({
+    key: a.schluessel,
+    farbe: vollFarbe(hauptAroma(a.schluessel)),
+    icon: <TerpenIcon name={a.schluessel} className="size-5" />,
+  }));
+}
 
 /** Alle Achsen auf demselben Wert: ein Ring oder die Achsenenden. */
-function gleichmaessig(wert: number, radius = RADIUS) {
-  return netzPunkte(GESCHMACKS_ACHSEN.map(() => wert), NETZ_MAX, radius, MITTE);
+function gleichmaessig(wert: number, anzahl: number, radius = RADIUS) {
+  return netzPunkte(Array.from({ length: anzahl }, () => wert), NETZ_MAX, radius, MITTE);
+}
+
+/** Lage der Marke von Achse `index` in Prozent der Grafik (0..100), für die Lesung außen. */
+export function markenLage(index: number, anzahl: number): { x: number; y: number } {
+  const p = gleichmaessig(NETZ_MAX, anzahl, MARKEN_RADIUS)[index];
+  return { x: (p.x / GROESSE) * 100, y: (p.y / GROESSE) * 100 };
 }
 
 /** Lage in Prozent der Grafik, für HTML über dem SVG (Blüte, Marken). */
@@ -39,6 +63,8 @@ type Props = {
   kontur?: readonly number[] | null;
   /** Achsenmarken mit Icon in der Farbe des Geschmacks; aus für das Mini-Netz. */
   marken?: boolean;
+  /** Achsen in Zeichenreihenfolge; Standard sind die Geschmäcker. `mag`/`magNicht` haben dieselbe Länge. */
+  achsen?: readonly NetzAchse[];
   /** Hervorgehobene Achse (Zeiger oder Fokus auf ihrer Marke); null ohne. */
   aktiv?: number | null;
   /**
@@ -64,6 +90,7 @@ export function NetzGrafik({
   magNicht,
   kontur = null,
   marken = false,
+  achsen,
   aktiv = null,
   bedienung = null,
   className = "w-full max-w-sm",
@@ -72,8 +99,10 @@ export function NetzGrafik({
   const hatMagNicht = magNicht.some((x) => x > 0);
   const hatKontur = !!kontur && kontur.some((x) => x > 0);
   const magPunkte = netzPunkte(mag, NETZ_MAX, RADIUS, MITTE);
-  const enden = gleichmaessig(NETZ_MAX);
-  const orte = gleichmaessig(NETZ_MAX, MARKEN_RADIUS);
+  const liste = achsen ?? geschmacksAchsen();
+  const bluete = farbKreis(liste.map((a) => a.farbe));
+  const enden = gleichmaessig(NETZ_MAX, liste.length);
+  const orte = gleichmaessig(NETZ_MAX, liste.length, MARKEN_RADIUS);
   const zuschnitt = `polygon(${magPunkte.map((p) => { const q = prozent(p); return `${q.x} ${q.y}`; }).join(", ")})`;
 
   return (
@@ -83,14 +112,14 @@ export function NetzGrafik({
           aria-hidden="true"
           data-netz="bluete"
           className="netz-bluete absolute inset-0"
-          style={{ background: BLUETE, clipPath: zuschnitt }}
+          style={{ background: bluete, clipPath: zuschnitt }}
         />
       ) : null}
       <svg viewBox={`0 0 ${GROESSE} ${GROESSE}`} aria-hidden="true" className="relative block w-full text-text">
         {RINGE.map((ring) => (
           <polygon
             key={ring}
-            points={alsPolygon(gleichmaessig(ring))}
+            points={alsPolygon(gleichmaessig(ring, liste.length))}
             fill="none"
             stroke="currentColor"
             strokeOpacity={0.15}
@@ -99,12 +128,12 @@ export function NetzGrafik({
         ))}
         {enden.map((p, i) => (
           <line
-            key={GESCHMACKS_ACHSEN[i].key}
+            key={liste[i].key}
             x1={MITTE}
             y1={MITTE}
             x2={p.x}
             y2={p.y}
-            stroke={aktiv === i ? vollFarbe(GESCHMACKS_ACHSEN[i].enumWert) : "currentColor"}
+            stroke={aktiv === i ? liste[i].farbe : "currentColor"}
             strokeOpacity={aktiv === i ? 1 : 0.15}
             strokeWidth={aktiv === i ? 2 : 1}
             vectorEffect="non-scaling-stroke"
@@ -148,12 +177,12 @@ export function NetzGrafik({
         {magPunkte.map((p, i) =>
           mag[i] > 0 ? (
             <circle
-              key={GESCHMACKS_ACHSEN[i].key}
+              key={liste[i].key}
               data-netz="punkt"
               cx={p.x}
               cy={p.y}
               r={aktiv === i ? 6 : 4}
-              fill={vollFarbe(GESCHMACKS_ACHSEN[i].enumWert)}
+              fill={liste[i].farbe}
               stroke="var(--color-surface)"
               strokeWidth={2}
               vectorEffect="non-scaling-stroke"
@@ -163,17 +192,17 @@ export function NetzGrafik({
       </svg>
       {marken
         ? orte.map((p, i) => {
-            const achse = GESCHMACKS_ACHSEN[i];
+            const achse = liste[i];
             const lage = prozent(p);
             const stil = {
               left: lage.x,
               top: lage.y,
-              "--netz-farbe": vollFarbe(achse.enumWert),
+              "--netz-farbe": achse.farbe,
             } as React.CSSProperties;
             const zustand = aktiv === null ? undefined : aktiv === i ? "an" : "aus";
             const inhalt = (
               <span className="netz-marke-kreis grid size-9 place-items-center rounded-full">
-                <GeschmackIcon geschmack={achse.enumWert} className="size-5" />
+                {achse.icon}
               </span>
             );
             return bedienung ? (

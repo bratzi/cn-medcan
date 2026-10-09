@@ -51,8 +51,13 @@ export function vollFarbe(geschmack: GeschmacksKategorie): string {
  * Uhrzeigersinn wie in lib/netz.ts. Zwischen zwei Achsen mischt der Browser.
  */
 export function bluetenKreis(achsen: readonly GeschmacksKategorie[]): string {
-  if (achsen.length === 0) return "transparent";
-  const schritt = 360 / achsen.length;
-  const stufen = achsen.map((geschmack, index) => `${vollFarbe(geschmack)} ${Math.round(schritt * index * 10) / 10}deg`);
-  return `conic-gradient(from 0deg at 50% 50%, ${stufen.join(", ")}, ${vollFarbe(achsen[0])} 360deg)`;
+  return farbKreis(achsen.map(vollFarbe));
+}
+
+/** Farbkreis aus beliebigen Farben, erste oben, im Uhrzeigersinn (Blüte des Terpen-Netzes, 2026-10-09). */
+export function farbKreis(farben: readonly string[]): string {
+  if (farben.length === 0) return "transparent";
+  const schritt = 360 / farben.length;
+  const stufen = farben.map((farbe, index) => `${farbe} ${Math.round(schritt * index * 10) / 10}deg`);
+  return `conic-gradient(from 0deg at 50% 50%, ${stufen.join(", ")}, ${farben[0]} 360deg)`;
 }
