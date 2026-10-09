@@ -80,6 +80,7 @@ async function reviewSlug(reviewId: string): Promise<string | null> {
 function bewertungPfadeNeuLaden(slug: string) {
   revalidiereSprachen("/admin");
   revalidiereSprachen("/");
+  revalidiereSprachen("/reviews", "layout");
   revalidiereSprachen(`/blueten/${slug}`);
 }
 

@@ -15,10 +15,10 @@ const band = readFileSync("app/[lang]/reviews/band/[band]/page.tsx", "utf8");
 const gross = readFileSync("components/review/GrossesBuch.tsx", "utf8");
 const buch = readFileSync("components/review/Buch.tsx", "utf8");
 
-test("/reviews und Bandseiten statisch, 300 s", () => {
+test("/reviews und Bandseiten statisch, täglich und auf Abruf (Tag-Cache)", () => {
   for (const q of [seite, band]) {
     assert.match(q, /export const dynamic = "force-static";/);
-    assert.match(q, /export const revalidate = 300;/);
+    assert.match(q, /export const revalidate = 86400;/);
   }
 });
 

@@ -131,6 +131,7 @@ export async function bewertungSpeichern(formData: FormData): Promise<BewertungE
 
   revalidiereSprachen(`/blueten/${strain.slug}`);
   revalidiereSprachen("/");
+  revalidiereSprachen("/reviews", "layout");
   revalidiereSprachen("/admin");
   revalidiereSprachen("/mitglied");
   revalidiereSprachen("/profil");

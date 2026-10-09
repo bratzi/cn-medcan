@@ -35,6 +35,15 @@
 			"database_id": "cdee3489-a940-4353-b164-c58e7a1226f7",
 			"preview_database_id": "PLATZHALTER-wrangler-d1-create-ausfuehren",
 			"migrations_dir": "migrations"
+		},
+		// Tag-Cache fuer On-Demand-Revalidierung (Session 54): eine Bewertung baut
+		// Startseite und /reviews gezielt neu, sonst nur einmal am Tag (spart CPU,
+		// Free-Plan 10 ms je Anfrage). Eigene Datenbank, Tabelle aus db/tag-cache.sql.
+		// Ohne "remote": true: das brach 2026-09-25 den Cloudflare-Build (8df8670).
+		{
+			"binding": "NEXT_TAG_CACHE_D1",
+			"database_name": "cn-medcan-tags",
+			"database_id": "c71695ff-7eee-4c05-af39-2f39f0865b60"
 		}
 	],
 

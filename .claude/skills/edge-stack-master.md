@@ -176,11 +176,11 @@ Nicht cachen: nutzerbezogene Antworten (§5), alles hinter Auth, alles mit `Set-
 - **Kein R2** (Nutzer 2026-09-25: Projekt strikt kostenfrei, R2 rechnet über dem Free-Tier ab). Incremental
   Cache stattdessen **KV** (Binding `NEXT_INC_CACHE_KV`) direkt, ohne Regional Cache (die Cache API wirkt
   nur auf Custom Domains, Entscheid 2026-10-01); Free-Plan-Grenzen sind hart (Fehler statt Rechnung), Revalidate-Intervalle so wählen,
-  dass 1000 KV-Schreibvorgänge/Tag nie erreicht werden. Tag-Cache über **D1** (`NEXT_TAG_CACHE_D1`, derzeit nicht eingerichtet),
+  dass 1000 KV-Schreibvorgänge/Tag nie erreicht werden. Tag-Cache über **D1** (`NEXT_TAG_CACHE_D1`, eigene Datenbank `cn-medcan-tags`, Tabelle aus `db/tag-cache.sql`, seit Session 54; ohne `"remote": true`, das brach 2026-09-25 den Build),
 - ein **Service-Binding `WORKER_SELF_REFERENCE`**, das auf den eigenen Worker (`cn-medcan`) zeigt,
 - für zeitbasierte Revalidation die **memoryQueue** über dieses Service-Binding (Entscheid 2026-10-01:
   keine Durable Objects; bei unserer Last reicht die Entdoppelung je Isolate), für On-Demand-Revalidation
-  zusätzlich ein Tag-Cache-Binding (derzeit keins: `revalidatePath` wirkt nicht auf den Cache),
+  zusätzlich das Tag-Cache-Binding (seit Session 54: `revalidiereSprachen` wirkt auf den KV-Cache; Startseite und `/reviews` revalidieren zeitbasiert nur täglich),
 - **so umgesetzt seit 2026-10-01**: `open-next.config.ts` (KV als Incremental Cache direkt, kein Regional Cache:
   die Cache API wirkt nur auf Custom Domains, siehe Entscheid 2026-10-01; memoryQueue, Cache-Interception),
   Seiten schalten je Seite per `dynamic = "force-static"` plus `revalidate` um, die Sprache steht im internen

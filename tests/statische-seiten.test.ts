@@ -11,9 +11,10 @@ const lies = (datei: string) => readFileSync(datei, "utf8");
  * Aufruf, nicht im Build: der Build hat weder D1 noch Secrets.
  */
 const STATISCH: Record<string, string> = {
-  "app/[lang]/page.tsx": "300",
-  "app/[lang]/reviews/page.tsx": "300",
-  "app/[lang]/reviews/band/[band]/page.tsx": "300",
+  // Täglich, dazu auf Abruf über den D1-Tag-Cache (Session 54).
+  "app/[lang]/page.tsx": "86400",
+  "app/[lang]/reviews/page.tsx": "86400",
+  "app/[lang]/reviews/band/[band]/page.tsx": "86400",
   "app/[lang]/impressum/page.tsx": "86400",
   "app/[lang]/datenschutz/page.tsx": "86400",
   "app/[lang]/zugang/page.tsx": "false",

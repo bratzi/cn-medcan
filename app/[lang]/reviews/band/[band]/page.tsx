@@ -5,7 +5,8 @@ import { BewertungenSeite } from "@/app/[lang]/reviews/seite";
 import { holeWoerterbuch } from "@/lib/i18n";
 
 export const dynamic = "force-static";
-export const revalidate = 300;
+// Wie /reviews: neu beim Speichern einer Bewertung (revalidiereSprachen("/reviews", "layout")), sonst täglich.
+export const revalidate = 86400;
 
 export async function generateMetadata(): Promise<Metadata> {
   const w = await holeWoerterbuch();

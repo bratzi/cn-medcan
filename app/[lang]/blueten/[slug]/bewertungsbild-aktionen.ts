@@ -21,6 +21,7 @@ function neuLaden(slug: string, oeffentlich: boolean) {
   revalidiereSprachen(`/blueten/${slug}`);
   revalidiereSprachen("/blueten");
   revalidiereSprachen("/");
+  revalidiereSprachen("/reviews", "layout");
 }
 
 /**

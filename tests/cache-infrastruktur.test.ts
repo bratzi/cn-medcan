@@ -18,7 +18,11 @@ test("ISR-Infrastruktur: KV, Service-Binding und OpenNext-Konfiguration gehören
   assert.doesNotMatch(config, /withRegionalCache/);
   assert.match(config, /queue: memoryQueue/);
   assert.match(config, /enableCacheInterception: true/);
-  assert.doesNotMatch(config, /r2IncrementalCache|doQueue|tagCache/);
+  assert.doesNotMatch(config, /r2IncrementalCache|doQueue/);
+  // Tag-Cache in eigener D1 (Session 54), ohne "remote": true (brach 2026-09-25 den Build).
+  assert.match(config, /tagCache: d1NextTagCache,/);
+  assert.match(wrangler, /"binding": "NEXT_TAG_CACHE_D1",\s*"database_name": "cn-medcan-tags"/);
+  assert.doesNotMatch(wrangler, /^\s*"remote": true/m);
 });
 
 test("next typegen startet kein lokales workerd", () => {
