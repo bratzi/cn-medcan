@@ -78,5 +78,5 @@ export type VerlaufSchritt = { anzahl: number; datum: string; geschmack: Geschma
 /** Veränderung einer Achse zwischen zwei Ständen; positiv heißt „stärker gemocht“. */
 export type NetzAenderung = { achse: GeschmacksKategorie; differenz: number };
 
-/** Hersteller mit dem höchsten Mittel ab 2 eigenen Bewertungen (Spec Profil 10). */
-export type Lieblingshersteller = { name: string; mittel: number; anzahl: number };
+/** Ein Hersteller mit eigenen Bewertungen (Spec 2026-10-09 C): Id für den Katalogfilter, Mittel und Anzahl. */
+export type HerstellerRang = { id: string; name: string; mittel: number; anzahl: number };

@@ -1,24 +1,26 @@
-import type { Lieblingshersteller } from "@/lib/profil-typen";
+import type { HerstellerRang } from "@/lib/profil-typen";
 
 /**
- * Lieblingshersteller (Spec Profil 10): der Hersteller mit dem höchsten Mittel
- * der eigenen Gesamtnoten, ab 2 eigenen Bewertungen. Gleichstand: mehr
- * Bewertungen zuerst, dann der Name. Verglichen wird ungerundet.
+ * Deine Hersteller (Spec 2026-10-09 C, vorher nur ein Liebling ab 2 Bewertungen): alle Hersteller mit
+ * eigener Bewertung, bestes Mittel zuerst, Gleichstand mehr Bewertungen, dann der Name. Getrennt nach Id,
+ * nicht nach Name. Verglichen wird ungerundet. Privat, keine Werbung (HWG).
  */
-export function lieblingshersteller(zeilen: readonly { hersteller: string | null; note: number }[]): Lieblingshersteller | null {
-  const je = new Map<string, { summe: number; anzahl: number }>();
+export function herstellerRangliste(
+  zeilen: readonly { herstellerId: string | null; hersteller: string | null; note: number }[],
+  hoechstens = 5,
+): HerstellerRang[] {
+  const je = new Map<string, { name: string; summe: number; anzahl: number }>();
   for (const z of zeilen) {
     const name = z.hersteller?.trim();
-    if (!name) continue;
-    const e = je.get(name) ?? { summe: 0, anzahl: 0 };
+    if (!z.herstellerId || !name) continue;
+    const e = je.get(z.herstellerId) ?? { name, summe: 0, anzahl: 0 };
     e.summe += z.note;
     e.anzahl += 1;
-    je.set(name, e);
+    je.set(z.herstellerId, e);
   }
-  const kandidaten = [...je]
-    .filter(([, e]) => e.anzahl >= 2)
-    .map(([name, e]) => ({ name, mittel: e.summe / e.anzahl, anzahl: e.anzahl }))
-    .sort((a, b) => b.mittel - a.mittel || b.anzahl - a.anzahl || a.name.localeCompare(b.name, "de"));
-  const erster = kandidaten[0];
-  return erster ? { name: erster.name, mittel: Math.round(erster.mittel * 10) / 10, anzahl: erster.anzahl } : null;
+  return [...je]
+    .map(([id, e]) => ({ id, name: e.name, roh: e.summe / e.anzahl, anzahl: e.anzahl }))
+    .sort((a, b) => b.roh - a.roh || b.anzahl - a.anzahl || a.name.localeCompare(b.name, "de"))
+    .slice(0, hoechstens)
+    .map(({ id, name, roh, anzahl }) => ({ id, name, mittel: Math.round(roh * 10) / 10, anzahl }));
 }
