@@ -28,6 +28,18 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 
 ## ⇢ Hier geht es weiter
 
+### ⇢ GROSSER PUNKT (Nutzer 2026-10-09, noch nicht begonnen): Hersteller und Vertreiber eigens bewerten
+
+Die Seite soll nicht nur Terpene und Geschmack einer Sorte beschreiben. Dieselbe Blüte kommt von verschiedenen
+Herstellern und Vertreibern (Importeuren), und die Qualität hängt von ihnen ab. Ziel: dem Nutzer beibringen, dass
+Hersteller und Vertreiber die Qualität prägen.
+- Hersteller und Vertreiber getrennt von Terpenen und Blüte bewerten (eigene Bewertung, an die Charge gebunden),
+  und je Charge Hersteller/Vertreiber vergleichen.
+- Weitere Hersteller/Vertreiber zu einer Blüte hinzufügen können, falls sie fehlen (Modell `Unternehmen` mit
+  Rolle Hersteller/Importeur, `Strain.herstellerId`/`importeurId` heute nur je eines).
+- Auf der Startseite deutlich bewerben und in der ganzen Seite sichtbarer einbauen (heute kaum durchschaubar).
+- Eigener Brainstorming-Durchgang mit Spec und Plan; vorher HWG-Grenze prüfen (keine Werbung für Hersteller).
+
 ### ⇢ SESSION 54
 
 **ACHTUNG CPU-Limit (Free-Plan, 10 ms je Anfrage):** Am 2026-10-09 ab 11:18 UTC lieferte der Worker auf
