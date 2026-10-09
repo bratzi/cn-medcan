@@ -102,21 +102,15 @@ export default async function ProfilPage({ searchParams }: { searchParams: Promi
           <Notizen id={id} />
         </ViewTransition>
       </Suspense>
+      {/* Reihenfolge (Nutzer 2026-10-09): Spur, Aromen, Auswertung, Bewertungen, zuletzt Ähnliches. */}
+      <Suspense fallback={<FeldSkelett spalten={10} />}>
+        <ViewTransition>
+          <ReiheAktivitaet id={id} />
+        </ViewTransition>
+      </Suspense>
       <Suspense fallback={<FeldSkelett spalten={10} hoehe="gross" />}>
         <ViewTransition>
           <ReiheNetz id={id} />
-        </ViewTransition>
-      </Suspense>
-      <Suspense
-        fallback={
-          <>
-            <FeldSkelett spalten={6} />
-            <FeldSkelett spalten={4} />
-          </>
-        }
-      >
-        <ViewTransition>
-          <ReiheVorschlaege id={id} />
         </ViewTransition>
       </Suspense>
       <Suspense fallback={<FeldSkelett spalten={10} />}>
@@ -127,6 +121,11 @@ export default async function ProfilPage({ searchParams }: { searchParams: Promi
       <Suspense fallback={<FeldSkelett spalten={10} hoehe="gross" />}>
         <ViewTransition>
           <ReiheRegister id={id} register={register} />
+        </ViewTransition>
+      </Suspense>
+      <Suspense fallback={<FeldSkelett spalten={10} />}>
+        <ViewTransition>
+          <ReiheVorschlaege id={id} />
         </ViewTransition>
       </Suspense>
     </KapitelRaster>
@@ -158,7 +157,7 @@ async function Notizen({ id }: { id: string }) {
   );
 }
 
-/** Reihe 1: das Aroma-Netz über die volle Breite; die Terpene stecken seit 2026-10-09 im Netz (Schalter). */
+/** Reihe 2: das Aroma-Netz über die volle Breite; die Terpene stecken seit 2026-10-09 im Netz (Schalter). */
 async function ReiheNetz({ id }: { id: string }) {
   const [{ w, sprache }, profil, zeilen] = await Promise.all([textLaden(), profilLaden(id), zeilenLaden(id)]);
   const texte = w.profil;
@@ -171,7 +170,7 @@ async function ReiheNetz({ id }: { id: string }) {
   const netzFehlt = profil === null && (zeilen === null || zeilen.length > 0);
   return (
     <>
-      <Feld id="netz" spalten={10} titel={texte.netzTitel} satz={!netzFehlt && werte.anzahl > 0 ? texte.netzSatz : undefined}>
+      <Feld id="netz" spalten={10} titel={texte.netzTitel} kopf={texte.koepfe.netz} ton="lila" satz={!netzFehlt && werte.anzahl > 0 ? texte.netzSatz : undefined}>
         {netzFehlt ? (
           <p className="max-w-[68ch] text-body text-text">{texte.fehler}</p>
         ) : (
@@ -191,7 +190,7 @@ async function ReiheNetz({ id }: { id: string }) {
   );
 }
 
-/** Reihe 2: bestätigte Vorschläge über die volle Breite (seit 2026-10-09 steckt der Verlauf im Netz). */
+/** Letzte Reihe: Ähnliches im Aroma über die volle Breite (Nutzer 2026-10-09: ganz unten). */
 async function ReiheVorschlaege({ id }: { id: string }) {
   const { w, sprache } = await textLaden();
   const texte = w.profil;
@@ -200,7 +199,7 @@ async function ReiheVorschlaege({ id }: { id: string }) {
   const empfehlungen = await ladeEmpfehlungen(id).catch(oderNull<Awaited<ReturnType<typeof ladeEmpfehlungen>>>("ladeEmpfehlungen"));
   return (
     <>
-      <Feld id="vorschlaege" spalten={10} titel={texte.vorschlaegeTitel}>
+      <Feld id="vorschlaege" spalten={10} titel={texte.vorschlaegeTitel} kopf={texte.koepfe.vorschlaege} ton="gruen">
         {empfehlungen === null ? (
           <p className="max-w-[68ch] text-body text-text">{w.empfehlung.fehler}</p>
         ) : empfehlungen.length === 0 ? (
@@ -224,10 +223,24 @@ async function ReiheVorschlaege({ id }: { id: string }) {
   );
 }
 
+/** Reihe 1: deine Spur, die Aktivität je Monat, direkt unter dem Kopf (Nutzer 2026-10-09). */
+async function ReiheAktivitaet({ id }: { id: string }) {
+  const [{ w, sprache }, zeilen] = await Promise.all([textLaden(), zeilenLaden(id)]);
+  const texte = w.profil;
+  return (
+    <Feld id="aktivitaet" spalten={10} titel={texte.aktivitaetTitel} kopf={texte.koepfe.aktivitaet} ton="gruen" satz={texte.aktivitaetSatz}>
+      {zeilen === null ? (
+        <p className="max-w-[68ch] text-body text-text">{texte.fehler}</p>
+      ) : (
+        <Aktivitaet monate={monatsReihe(zeilen.map((z) => z.erstelltAm), new Date(), sprache)} texte={texte} />
+      )}
+    </Feld>
+  );
+}
+
 /**
- * Reihen 3 bis 5: Aktivität (10); Notenverteilung (3), Top und Flop (4),
- * Lieblingshersteller (3); Community (6), Schnitte (4). Ohne Bewertung nur
- * die Aktivität mit ihrem Leersatz.
+ * Reihe 3: Top und Flop (10); Noten und Hersteller (je 5); Schnitte und Community (je 5).
+ * Ohne Bewertung oder bei Fehler nichts: die Aktivität darüber trägt dann Leersatz bzw. Fehler.
  */
 async function ReiheAuswertung({ id }: { id: string }) {
   const [{ w, sprache }, zeilen, liebling] = await Promise.all([
@@ -236,48 +249,36 @@ async function ReiheAuswertung({ id }: { id: string }) {
     ladeLieblingshersteller(id).catch(oderUndefined<Awaited<ReturnType<typeof ladeLieblingshersteller>>>("ladeLieblingshersteller")),
   ]);
   const texte = w.profil;
-  if (zeilen === null) {
-    return (
-      <Feld id="auswertung" spalten={10} titel={texte.aktivitaetTitel}>
-        <p className="max-w-[68ch] text-body text-text">{texte.fehler}</p>
-      </Feld>
-    );
-  }
+  if (zeilen === null) return null;
   const a = auswertungen(zeilen);
+  if (!a.schnitte) return null;
   return (
     <>
-      <Feld id="aktivitaet" spalten={10} titel={texte.aktivitaetTitel} satz={texte.aktivitaetSatz}>
-        <Aktivitaet monate={monatsReihe(zeilen.map((z) => z.erstelltAm), new Date(), sprache)} texte={texte} />
+      <Feld id="topflop" spalten={10} titel={texte.topFlopTitel} kopf={texte.koepfe.topFlop} ton="lila">
+        <TopFlop top={a.top} flop={a.flop} texte={texte} sprache={sprache} />
       </Feld>
-      {a.schnitte ? (
-        <>
-          <Feld id="verteilung" spalten={3} titel={texte.verteilungTitel} satz={texte.verteilungSatz}>
-            <NotenVerteilung stufen={notenVerteilung(zeilen)} texte={texte} />
-          </Feld>
-          <Feld id="topflop" spalten={4} titel={texte.topFlopTitel}>
-            <TopFlop top={a.top} flop={a.flop} texte={texte} sprache={sprache} />
-          </Feld>
-          <Feld id="hersteller" spalten={3} titel={texte.herstellerTitel}>
-            <Lieblingshersteller daten={liebling} texte={texte} sprache={sprache} />
-          </Feld>
-          <Feld id="community" spalten={6} titel={texte.communityTitel}>
-            <CommunityVergleich daten={a.community} texte={texte} sprache={sprache} />
-          </Feld>
-          <Feld id="schnitte" spalten={4} titel={texte.schnitteTitel} satz={texte.schnitteSatz}>
-            <Schnitte daten={a.schnitte} texte={texte} noten={w.schema.noten} sprache={sprache} />
-          </Feld>
-        </>
-      ) : null}
+      <Feld id="verteilung" spalten={5} titel={texte.verteilungTitel} kopf={texte.koepfe.noten} ton="gruen" satz={texte.verteilungSatz}>
+        <NotenVerteilung stufen={notenVerteilung(zeilen)} texte={texte} />
+      </Feld>
+      <Feld id="hersteller" spalten={5} titel={texte.herstellerTitel} kopf={texte.koepfe.hersteller} ton="lila">
+        <Lieblingshersteller daten={liebling} texte={texte} sprache={sprache} />
+      </Feld>
+      <Feld id="schnitte" spalten={5} titel={texte.schnitteTitel} kopf={texte.koepfe.schnitte} ton="gruen" satz={texte.schnitteSatz}>
+        <Schnitte daten={a.schnitte} texte={texte} noten={w.schema.noten} sprache={sprache} />
+      </Feld>
+      <Feld id="community" spalten={5} titel={texte.communityTitel} kopf={texte.koepfe.community} ton="lila">
+        <CommunityVergleich daten={a.community} texte={texte} sprache={sprache} />
+      </Feld>
     </>
   );
 }
 
-/** Reihe 6: deine Bewertungen als Register mit Bildern (10). */
+/** Reihe 4: deine Bewertungen als Register mit Bildern (10). */
 async function ReiheRegister({ id, register }: { id: string; register: ReturnType<typeof registerParameter> }) {
   const [{ w, sprache }, zeilen] = await Promise.all([textLaden(), zeilenLaden(id)]);
   const texte = w.profil;
   return (
-    <Feld id="bewertungen" spalten={10} titel={texte.registerTitel} satz={texte.registerSatz}>
+    <Feld id="bewertungen" spalten={10} titel={texte.registerTitel} kopf={texte.koepfe.register} ton="lila" satz={texte.registerSatz}>
       {zeilen === null ? (
         <p className="max-w-[68ch] text-body text-text">{texte.fehler}</p>
       ) : (

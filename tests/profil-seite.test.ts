@@ -16,21 +16,8 @@ test("/profil: nur angemeldet, nicht im Index, rechnet nur bei veraltetem Stand"
 
 test("/profil: Kapitel-Reihenfolge, Raster, kein Apothekenlink", () => {
   const q = seite();
-  const reihe = [
-    "<Kapitelkopf",
-    "<Randnotizen",
-    "<ProfilNetz",
-    "<EmpfehlungsListe",
-    "<Aktivitaet",
-    "<NotenVerteilung",
-    "<TopFlop",
-    "<Lieblingshersteller",
-    "<CommunityVergleich",
-    "<Schnitte",
-    "<BewertungsRegister",
-  ].map((s) => q.indexOf(s));
-  assert.ok(reihe.every((i) => i > 0), JSON.stringify(reihe));
-  assert.deepEqual([...reihe].sort((a, b) => a - b), reihe);
+  // Die Reihenfolge prüft tests/profil-reihenfolge.test.ts (Nutzer 2026-10-09).
+  for (const teil of ["<Kapitelkopf", "<Randnotizen", "<ProfilNetz", "<EmpfehlungsListe", "<Aktivitaet", "<NotenVerteilung", "<TopFlop", "<Lieblingshersteller", "<CommunityVergleich", "<Schnitte", "<BewertungsRegister"]) assert.ok(q.includes(teil), teil);
   assert.match(q, /<KapitelRaster/);
   assert.match(q, /<ViewTransition/);
   assert.match(q, /<Suspense/);
