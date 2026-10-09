@@ -3,7 +3,7 @@
 > Übergabemedium zwischen Sessions. Wird nach jedem Arbeitsblock aktualisiert und committet.
 > Wer hier weiterarbeitet, liest diese Datei zuerst und braucht den Chatverlauf nicht.
 
-**Letzte Aktualisierung:** 2026-10-09 (Session 52, Ende)
+**Letzte Aktualisierung:** 2026-10-09 (Session 53, Ende)
 **Repo:** https://github.com/bratzi/cn-medcan (public)
 **Branch:** `main` (Makeover „Grünes Buch“ Teilprojekt 1 ist seit 2026-09-24 auf `main`)
 
@@ -28,45 +28,46 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 
 ## ⇢ Hier geht es weiter
 
-### ⇢ SESSION 53 (Sessionstart)
+### ⇢ SESSION 54 (Sessionstart)
 
-**ALS ERSTES: diese Fragen in EINER AskUserQuestion stellen:**
-1. Terpenband-Tooltip: Entwurf unten (Karte außerhalb des Bands) so bauen? Oder andere Richtung?
-2. Chargen zurücknehmen: nur Texte und Gewichtung (Startseite, Blüten-, Reviewseite), Angabe und Anzeige bleiben. Auch das Bewertungsschema-Wort „Charge“ im Kolophon belassen?
-3. Hero-Übergang: unter dem Hero einen weichen Verlauf in den Seitengrund (nur Hintergrund, keine Inhalte). Höhe des Verlaufs: kurz (ca. 96 px) oder lang (ca. 25 % der Hero-Höhe)?
-4. Reihenfolge der großen Punkte: Tooltip, Chargen, Hero-Verlauf, dann Bewertungsformular mit Fazit und Live-Terpenprofil?
+**ALS ERSTES live nachsehen (nach Session 53 noch nicht gesehen):**
+1. Terpenband-Karte nach Fix `0026bb7`: liegt sie unter dem Namen, nicht mehr darüber? Pfeil sichtbar?
+2. Weicher Rand über dem Band (`0026bb7`, `.terpen-band::before`): schneidet das Band den gepinnten Auftakt beim
+   Scrollen noch hart? Hell und dunkel.
+3. Blütenseite `#bewerten` ab 118rem: Fazit-Spalte scrollt in sich (`d71bd53`), Live-Netz unten erreichbar;
+   Note ändern und Regler ziehen, Netz muss sich ändern. Unter 118rem: Leiste unten, Sheet zeigt Fazit und Netz.
+4. Profil `/profil`: Netz jetzt `max-w-xl`; heller Modus der Aroma-Blüte und der Marken (Kontrast der Icons).
+5. Mobil 494 px: Netz-Marken (44 px) am Rand, Zeitleiste, Karte im Band (nur Maus, mobil keine Karte).
+6. Aus Session 52 offen: Buch-Doppelseite neu (`242df55`, `937c34a`, `1b30c3a`) auf `/reviews`, Blütenseite,
+   Startseite, 1143 und 494 px, hell und dunkel; Notizen-Kürzung mit Zitatzeichen bei langem Text.
 
-Danach live nachsehen (noch nicht gesehen): Buch-Doppelseite neu (`242df55`, `937c34a`, `1b30c3a`) auf
-`/reviews`, Blütenseite, Startseite, 1143 und 494 px, hell und dunkel; Notizen-Kürzung mit Zitatzeichen bei langem
-Text (Review: schließendes Zeichen geht bei Kürzung verloren, ggf. KNOPF_PLATZ anpassen).
+**Danach fragen (eine AskUserQuestion):** gefällt das Aroma-Netz so (Farbe, Größe, Lesung in der Mitte), und was
+als Nächstes: offene Minors „Dein Kapitel“ unten, oder neue Wünsche?
 
-### ⇢ WARTELISTE (Stand Session-Ende)
+**Arbeitsweise seit Session 53 (Nutzer):** nach jeder erledigten Aufgabe sofort pushen; die Live-Prüfung
+gesammelt am Ende eines Durchgangs und dann korrigieren (Memory `immer-nach-github-pushen`).
 
-1. **Terpenband-Tooltip neu** (Nutzer: oft viel zu klein, awwwards-Niveau, alle Design-Skills).
-   Ursache: Infos hängen in der 160-px-Spalte des Eintrags, das Band beschneidet seitlich.
-   Entwurf (Skills emil-design-eng, animate geladen): eine Karte als Insel `TerpenBandKarte` per Portal in `body`,
-   `position: fixed`, 288 px, eckig, `bg-surface-raised border-border-strong shadow-lg p-6`, `pointer-events: none`;
-   Kopf mit Marke in Leitfarbe, Name `font-buch text-h3`, „in N Sorten“; voller Duftsatz; drei Noten mit Balken
-   (ohne Spur); Hinweis „Klick öffnet die Tafel“. Lage aus reiner Funktion `kartenLage` (lib/terpen-karte.ts):
-   mittig unter dem Symbol, am Fensterrand geklemmt (16 px), Pfeil zeigt aufs Symbol, ohne Platz nach oben.
-   Ereignisse per Delegation am Band (`data-terpen` am li, auch in der Kopie), nur `pointerType` Maus, Fokus per
-   Tastatur ebenso, Escape und Scroll schließen. Bewegung: `@starting-style` Deckkraft + `scale(0.97)` +
-   4 px, 150 ms, `cubic-bezier(0.23, 1, 0.32, 1)`, Ursprung am Pfeil; Wechsel zum Nachbarn sofort; reduziert nur
-   Deckkraft. Info-Span im li und die Tooltip-CSS im Laufmodus entfallen; Tests in `terpen-register.test.ts`
-   anpassen. Erster Testentwurf für `kartenLage` war geschrieben (Mitte, Ränder, nach oben), nicht committet.
-2. **Chargen zurücknehmen** (Nutzer): Angabe und Anzeige bleiben, aber Startseite und Unterseiten erwähnen sie
-   kaum noch, kein Hauptaugenmerk.
-3. **Hero-Übergang weich** (Nutzer): unter dem Hero den Hintergrund transparent verlaufen lassen, damit die Kante
-   beim Scrollen nicht hart wirkt; nur der Hintergrund.
-4. **Bewertungsformular mit Fazit und Live-Terpenprofil** (großer Punkt, alle Design-Skills, Agentur-Niveau):
-   Fazit wie auf der Startseite fehlt beim Bewerten; daneben das eigene Terpenprofil (Netz), das sich beim
-   Bewerten einer neuen Sorte live verändert.
+### ⇢ SESSION 53 (erledigt): Terpen-Karte, Chargen, Hero-Rand, Aroma-Netz, Live-Netz beim Bewerten
 
-Erledigt in Session 52 (alles gepusht): Dein Kapitel live; Profil/Konto entkoppelt (`b690830`); Kapitel hinter das
-Register (`66f5afe`); Auftakt-Kennzahlen in Mr Dafoe und klickbar (`2d126fd`); Terpenband-Tooltip nicht mehr
-abgeschnitten, Balken sichtbar, Einträge springen ins Register (`a4a03b2`, `ce112cb`, `fb5c2b8`); Buch-Doppelseite
-mit Exlibris, kursivem Zitat, Vermerk „meine notiz“/„von euch“, Urteil zentriert mit Note in Mr Dafoe
-(`242df55`, `937c34a`, Review-Fixes `1b30c3a`). Live geprüft: Kapitel, Menü, Sektionsposition, Kennzahlen, Band.
+- **Terpenband-Karte** (`7fb3902`, Fix `0026bb7`): `TerpenBandKarte` per Portal, Lage aus `kartenLage`
+  (`lib/terpen-karte.ts`), nur Maus und sichtbarer Fokus, Escape/Scroll schließen. Live: funktioniert, lag erst über
+  dem Namen (gefixt, Fix noch nicht live gesehen).
+- **Chargen zurückgenommen** (`88981a0`): nur Meta- und Einleitungssätze; Angabe, Tabelle, Kolophon bleiben.
+- **Hero-Übergang** (`c2ce881`, `0026bb7`): 96-px-Verlauf am Fuß der Bühne in `--color-seite` (auf `:root`
+  aufgelöster Seitengrund) und über dem Band (`.terpen-band::before`), weil der Auftakt gepinnt ist und das Band
+  über ihn schiebt.
+- **Aroma-Netz neu** (`c3ade9b`, Fix `152dc1f`, Nutzer: mehr Farbe, Icons statt Schrift, interaktiv):
+  `NetzGrafik` mit Aroma-Blüte (`bluetenKreis`, conic-gradient, clip-path), Icon-Marken je Achse (`vollFarbe`),
+  `AromaNetz` (Client) mit Lesung in der Mitte bei Hover/Fokus/Antippen, Morph per rAF, Zeitleiste mit Abspielen.
+  Profil: Feld „Dein Verlauf“ entfällt, Verlauf im Netz, Vorschläge über 10 Spalten. Startseite „Dein Kapitel“:
+  Verlauf aus `nutzer_profil.verlauf` (`KapitelDaten.verlauf`). Regel in `ui-design-engine.md` Abschnitt 4.
+  Achtung gelernt: `aromaNetzTexte` darf nicht aus einer `"use client"`-Datei kommen (liegt in `lib/aroma-netz-texte.ts`),
+  sonst bricht `/profil` und die Startseite (Test sichert das ab). Live geprüft: Profil, Kapitel, Hover, Abspielen.
+- **Bewertungsmaske** (`5317c34`, `82c6eee`, `d71bd53`): Fazit fehlte, weil die Fazit-Spalte ab 118rem
+  außerhalb von `#bewerten` steht und `overflow-x-clip` sie abschnitt; jetzt `min-[118rem]:overflow-x-visible`,
+  Schlagwort clippt selbst. Fazit steht auch ohne Community-Werte. Live-Netz daneben: `ladeLiveNetzBasis`
+  (Server, alle eigenen Bewertungen außer dieser Sorte) plus `liveGeschmack` im Browser (`lib/live-netz.ts`, Test
+  gegen `profilAnzeige`). Live geprüft: Spalte sichtbar, Netz drin; Scroll-Fix noch nicht live gesehen.
 
 ### ⇢ Offene Minors „Dein Kapitel“ (Gesamtreview, geparkt)
 
