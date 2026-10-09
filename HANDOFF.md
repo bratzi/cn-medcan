@@ -3,7 +3,7 @@
 > Übergabemedium zwischen Sessions. Wird nach jedem Arbeitsblock aktualisiert und committet.
 > Wer hier weiterarbeitet, liest diese Datei zuerst und braucht den Chatverlauf nicht.
 
-**Letzte Aktualisierung:** 2026-10-09 (Session 54)
+**Letzte Aktualisierung:** 2026-10-09 (Session 55)
 **Repo:** https://github.com/bratzi/cn-medcan (public)
 **Branch:** `main` (Makeover „Grünes Buch“ Teilprojekt 1 ist seit 2026-09-24 auf `main`)
 
@@ -67,8 +67,13 @@ Aromen, darunter groß das Netz (max 640 px), Zahlen zentriert, Zuletzt und Akti
 optional `rolle` und `seit`. „Wissen bündeln“-Zahlen und Runden-Schritte unter lg mittig. Desktop-Breite nicht
 live gesehen (Fenster ließ sich nicht ziehen).
 
-**Noch offen live:** Kapitel auf Desktop; dunkler Modus der Terpen-Karte; Buch-Doppelseite auf Blütenseite und Startseite, 1143 und
-494 px; Notizen-Kürzung mit Zitatzeichen bei langem Text.
+**Session 55 live geprüft** (Fenster bleibt 494 px; Breiten über ein gleich-origin-iframe mit `transform: scale`
+gemessen, `scrollIntoView` darin fror den Tab ein, `scrollTo` geht): Kapitel bei 1440 px hell gut, Säule mittig,
+kein Querscroll. Terpen-Karte dunkel gut. Doppelseite Startseite 1143 hell und 494 dunkel gut, Blütenseite 1143 gut.
+Gefunden und behoben: `187434a` dichte Aroma-Karte im Buch ab lg (Achsen 29 px auseinander): der Name stand 20 px
+über seiner Achse und wurde vom Balken der Achse darüber durchgestrichen; jetzt höchstens halber Achsabstand.
+
+**Noch offen live:** Notizen-Kürzung mit Zitatzeichen bei langem Text (keine lange Notiz in den Daten).
 
 **Danach fragen (eine AskUserQuestion):** gefällt das Aroma-Netz so (Farbe, Größe, Lesung in der Mitte), und was
 als Nächstes: offene Minors „Dein Kapitel“ unten, oder neue Wünsche?
