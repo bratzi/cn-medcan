@@ -362,7 +362,10 @@ async function ProduktInhalt({ slug, w, sprache }: { slug: string; w: Woerterbuc
       <section
         id="bewerten"
         aria-labelledby="bewerten-titel"
-        className={cn(SEKTION, "flex scroll-mt-[calc(var(--kopf-h,4rem)+2rem)] flex-col gap-4")}
+        // Ab 118rem steht das Fazit samt Live-Netz rechts neben der Maske, außerhalb der Sektion
+        // (FazitLauf); overflow-x-clip schnitt es ab (live 2026-10-09). Den Schlagwort-Satz
+        // beschneidet seither Schlagwort selbst.
+        className={cn(SEKTION, "flex scroll-mt-[calc(var(--kopf-h,4rem)+2rem)] flex-col gap-4 min-[118rem]:overflow-x-visible")}
       >
         <Schlagwort satz={texte.schlagwort.bewerten} ton="gruen" />
         <SektionsKopf

@@ -23,7 +23,7 @@ export function Schlagwort({
   return (
     <span
       aria-hidden="true"
-      className={`pointer-events-none absolute inset-x-0 -z-10 select-none whitespace-nowrap text-center flex justify-center font-hand text-kulisse opacity-15 ${TON[ton]} ${oben}`}
+      className={`pointer-events-none absolute inset-x-0 -z-10 overflow-x-clip select-none whitespace-nowrap text-center flex justify-center font-hand text-kulisse opacity-15 ${TON[ton]} ${oben}`}
     >
       {satz}
     </span>

@@ -190,6 +190,7 @@ async function ReiheNetz({ id }: { id: string }) {
               achsen={w.label.geschmack}
               sprache={sprache}
               verlauf={verlauf}
+              className="w-full max-w-xl"
             />
           </div>
         )}

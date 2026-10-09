@@ -34,3 +34,9 @@ test("Bewertungsmaske: Fazit steht auch ohne Community-Werte, Live-Netz daneben"
   const seite = readFileSync("app/[lang]/blueten/[slug]/page.tsx", "utf8");
   assert.match(seite, /ladeLiveNetzBasis\(mitglied\.mitgliedId, strain\.id\)\.catch/);
 });
+
+test("Blütenseite: Fazit-Spalte rechts neben der Maske wird nicht abgeschnitten (live 2026-10-09)", () => {
+  const seite = readFileSync("app/[lang]/blueten/[slug]/page.tsx", "utf8");
+  assert.match(seite, /min-\[118rem\]:overflow-x-visible/);
+  assert.match(readFileSync("components/story/Schlagwort.tsx", "utf8"), /absolute inset-x-0 -z-10 overflow-x-clip/);
+});
