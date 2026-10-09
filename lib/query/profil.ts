@@ -23,6 +23,7 @@ import {
 } from "@/lib/profil";
 import type { ProfilWerte, RegisterZeile, VerlaufSchritt } from "@/lib/profil-typen";
 import { profilVerlauf, verlaufAusDaten, verlaufDaten } from "@/lib/profil-verlauf";
+import { liveNetzBasis, type LiveNetzBasis } from "@/lib/live-netz";
 import { getPrisma } from "@/lib/prisma";
 import { parseGeschmacksMatrix, parseTerpenIntensitaet } from "@/lib/query/bewertung";
 
@@ -190,4 +191,41 @@ export async function ladeAuswertungsZeilen(mitgliedId: string): Promise<Registe
       ? { id: z.bilder[0].id, breite: z.bilder[0].breite, hoehe: z.bilder[0].hoehe, offen: z.bilder[0].status === "OFFEN" }
       : null,
   }));
+}
+
+/**
+ * Grundlage des Live-Netzes in der Bewertungsmaske (Nutzer 2026-10-09, lib/live-netz.ts):
+ * alle eigenen Bewertungen außer der dieser Sorte und das Aroma der Sorte. Läuft nur für
+ * freigeschaltete Mitglieder auf der Blütenseite; scheitert es, fehlt nur das Live-Netz.
+ */
+export async function ladeLiveNetzBasis(mitgliedId: string, strainId: string): Promise<LiveNetzBasis> {
+  const prisma = await getPrisma();
+  const [eigene, terpene] = await Promise.all([
+    prisma.review.findMany({
+      where: { autorId: mitgliedId },
+      orderBy: { erstelltAm: "desc" },
+      select: {
+        strainId: true,
+        gesamtnote: true,
+        aussehen: true,
+        geruch: true,
+        geschmack: true,
+        wirkung: true,
+        konsistenz: true,
+        terpenIntensitaet: true,
+        geschmacksMatrix: true,
+      },
+      take: BEWERTUNGEN_HOECHSTENS,
+    }),
+    prisma.$queryRawUnsafe<TerpenZeile[]>(TERPENE_SQL),
+  ]);
+  const bewertungen = eigene.map((r) => ({
+    strainId: r.strainId,
+    gesamtnote: noteOderErsatz(r),
+    terpene: parseTerpenIntensitaet(r.terpenIntensitaet),
+    geschmack: parseGeschmacksMatrix(r.geschmacksMatrix),
+  }));
+  const ids = JSON.stringify([...new Set([strainId, ...bewertungen.map((b) => b.strainId)])]);
+  const sorten = sortenAusZeilen(terpene, await prisma.$queryRawUnsafe<SortenAromaZeile[]>(SORTEN_AROMA_SQL, ids));
+  return liveNetzBasis(bewertungen, sorten, strainId);
 }

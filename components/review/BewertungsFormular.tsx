@@ -19,6 +19,7 @@ import type { Vorbelegung } from "@/lib/bewertung-vorbelegung";
 import { bilderSenden, type VorgemerktesBild } from "@/lib/bewertungsbilder-senden";
 import type { AromaTexte, Woerterbuch } from "@/lib/i18n/typen";
 import { t } from "@/lib/i18n/text";
+import type { LiveNetzBasis } from "@/lib/live-netz";
 import type { Geschmack } from "@/lib/profil-typen";
 
 type Props = {
@@ -48,6 +49,8 @@ type Props = {
   texte: Woerterbuch["bewerten"];
   /** budpicMeldungen(w): Fehlertexte für das Verkleinern der Bilder im Browser. */
   bildMeldungen: Record<string, string>;
+  /** Grundlage des Live-Netzes neben dem Fazit (lib/live-netz.ts); null, wenn sie fehlt. */
+  liveNetz?: LiveNetzBasis | null;
   /** Achsennamen für die Änderungszeile des Mini-Netzes (w.label.geschmack). */
   achsen: Woerterbuch["label"]["geschmack"];
 };

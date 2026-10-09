@@ -4,6 +4,9 @@ import { useId, useRef, useState } from "react";
 
 import { AromaKarte, type AromaSerie } from "@/components/review/AromaKarte";
 import { FazitLauf } from "@/components/review/FazitLauf";
+import { NetzGrafik, netzAusGeschmack } from "@/components/profil/NetzGrafik";
+import { bewertungsGewicht } from "@/lib/empfehlung";
+import { basisGeschmack, liveGeschmack, type LiveNetzBasis } from "@/lib/live-netz";
 import {
   BeschaffenheitsLeiste,
   type BeschaffenheitsSchluessel,
@@ -79,6 +82,7 @@ export function AromaErkundung({
   istBetreiber = false,
   zwischenruf,
   children,
+  liveNetz = null,
   texte,
 }: {
   titel: string;
@@ -131,6 +135,12 @@ export function AromaErkundung({
    */
   istBetreiber?: boolean;
   texte: AromaTexte;
+  /**
+   * Grundlage des Live-Netzes (Nutzer 2026-10-09, lib/live-netz.ts): nur in der Maske eines
+   * freigeschalteten Mitglieds. Neben dem Fazit steht dann das eigene Aroma-Netz und ändert sich
+   * mit Note und Reglern; die dünne Linie ist der Stand ohne diese Bewertung.
+   */
+  liveNetz?: LiveNetzBasis | null;
   /** Hintergrundsatz (Schlagwort) mittig zwischen Qualität und Fazit, nur auf der Startseite. */
   zwischenruf?: React.ReactNode;
   children?: React.ReactNode;
@@ -250,6 +260,21 @@ export function AromaErkundung({
   // Eigenes Chargenfazit nur, wenn die Beschaffenheit selbst bewegt wurde (nicht nur Terpene/Overall).
   const chargeBewegt = Object.keys(eigeneAchsen).length > 0;
   const eigenerChargenFazit = chargeBewegt ? chargenFazit({ ...(beschaffenheit?.werte ?? {}), ...eigeneAchsen }) : null;
+  // Live-Netz: Stand ohne diese Bewertung (Kontur) und mit ihr, aus Note, Geschmack und Terpenen.
+  const netzLive =
+    modus === "maske" && liveNetz
+      ? (() => {
+          const vorher = netzAusGeschmack(basisGeschmack(liveNetz));
+          const jetzt = netzAusGeschmack(
+            liveGeschmack(liveNetz, {
+              gesamtnote: eigeneGesamtnote,
+              geschmack: Object.fromEntries(GESCHMACKS_ACHSEN.map(({ key }) => [key, werte[key]])),
+              terpene: Object.fromEntries(Object.entries(eigeneIntensitaet).map(([name, wert]) => [name, terpenAnAus(wert)])),
+            }),
+          );
+          return { vorher, jetzt, geformt: bewertungsGewicht(eigeneGesamtnote) !== 0 };
+        })()
+      : null;
   const anzahlBewertungen = Math.max(treue?.anzahl ?? 0, gesamteindruck?.anzahl ?? 0, beschaffenheit?.anzahl ?? 0);
 
   /**
@@ -285,12 +310,17 @@ export function AromaErkundung({
     }
   };
 
-  const hatFazit = sortenFazitWert !== null || chargenFazitWert !== null;
+  // Auch ohne Community-Werte (neue Sorte) steht das Fazit, sobald die eigene Bewertung eines
+  // ergibt (Nutzer 2026-10-09: beim Bewerten fehlte es), und neben ihm das Live-Netz.
+  const hatFazit =
+    sortenFazitWert !== null || chargenFazitWert !== null || eigenerSortenFazit !== null || eigenerChargenFazit !== null || netzLive !== null;
   // Kurz-Fazit der mobilen Leiste (T16): eigene Sortennote, solange nichts bewegt wurde die der
   // Community; das Delta erst, wenn beide Werte stehen.
-  const kurzWert = eigenerSortenFazit ?? sortenFazitWert ?? chargenFazitWert;
+  const kurzWert = eigenerSortenFazit ?? sortenFazitWert ?? chargenFazitWert ?? eigenerChargenFazit;
   const kurzLabel =
-    eigenerSortenFazit !== null
+    kurzWert === null
+      ? texte.aroma.erkundung.liveNetzTitel
+      : eigenerSortenFazit !== null
       ? istBetreiber
         ? texte.aroma.erkundung.deinFazitBetreiber
         : texte.aroma.erkundung.deinFazit
@@ -463,14 +493,14 @@ export function AromaErkundung({
         ) : null}
       </div>
 
-      {hatFazit && kurzWert !== null ? (
+      {hatFazit ? (
         <FazitLauf
           id={fazitId}
           beobachte={wurzel}
           texte={texte}
           kurz={{
             label: kurzLabel,
-            wert: prozent(kurzWert, texte.sprache),
+            wert: kurzWert !== null ? prozent(kurzWert, texte.sprache) : "",
             delta: fazitDelta(eigenerSortenFazit, sortenFazitWert),
           }}
         >
@@ -540,6 +570,21 @@ export function AromaErkundung({
             <p className="max-w-[60ch] text-caption text-text-muted text-pretty">
               {texte.aroma.erkundung.fazitErklaerung}
             </p>
+            {netzLive ? (
+              <figure className="flex w-full flex-col items-center gap-4 border-t border-border pt-8">
+                <figcaption className="text-small uppercase tracking-wide text-text-muted">{texte.aroma.erkundung.liveNetzTitel}</figcaption>
+                <NetzGrafik
+                  mag={netzLive.jetzt.mag}
+                  magNicht={netzLive.jetzt.magNicht}
+                  kontur={netzLive.vorher.mag}
+                  marken
+                  className="w-full max-w-72"
+                />
+                <p aria-live="polite" className="max-w-[40ch] text-caption text-text-muted text-pretty">
+                  {netzLive.geformt ? texte.aroma.erkundung.liveNetzSatz : texte.aroma.erkundung.liveNetzOhneNote}
+                </p>
+              </figure>
+            ) : null}
           </div>
         </FazitLauf>
       ) : null}

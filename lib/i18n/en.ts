@@ -253,6 +253,9 @@ export const en: Woerterbuch = {
       deinFazitBetreiber: "Operator verdict",
       deineChargeBetreiber: "Operator batch",
       ausReglern: "from your sliders",
+      liveNetzTitel: "Your web",
+      liveNetzSatz: "How this review changes your web. The thin line is your state without it.",
+      liveNetzOhneNote: "From a rating of 3.5, or up to 2, this review shapes your web.",
       fazitErklaerung:
         "The strain verdict combines overall, terpz match and star rating. The batch verdict is the quality balance of this batch alone, kept separate from the strain. Each stage counts equally; 100 % means everything top and exactly as stated.",
       zuruecksetzen: "Reset",

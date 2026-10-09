@@ -1,3 +1,4 @@
+import { ladeLiveNetzBasis } from "@/lib/query/profil";
 import type { ReactNode } from "react";
 import type { Metadata } from "next";
 import Link from "next/link";
@@ -217,7 +218,16 @@ async function ProduktInhalt({ slug, w, sprache }: { slug: string; w: Woerterbuc
   const produkt = { handelsname: strain.handelsname, slug: strain.slug, terpene: strain.terpene, bildPfad: strain.herstellerBildPfad };
   const erkundung = erkundungsDaten(strain.terpene, strain.reviews, w.aroma.serien, strain.kennwerte);
   // Die eigene Bewertung (auch unfreigegeben) belegt die Maske vor; nur wer bewerten darf, braucht sie.
-  const eigeneBewertung = mitglied?.freigegeben ? await ladeEigeneBewertung(mitglied.mitgliedId, strain.id) : null;
+  const [eigeneBewertung, liveNetz] = mitglied?.freigegeben
+    ? await Promise.all([
+        ladeEigeneBewertung(mitglied.mitgliedId, strain.id),
+        // Live-Netz in der Maske (Nutzer 2026-10-09); ohne Grundlage fehlt nur das Netz, nie die Maske.
+        ladeLiveNetzBasis(mitglied.mitgliedId, strain.id).catch((fehler) => {
+          console.error("ladeLiveNetzBasis fehlgeschlagen", fehler);
+          return null;
+        }),
+      ])
+    : [null, null];
   const vorbelegung = eigeneBewertung ? vorbelegungAus(eigeneBewertung) : null;
   /**
    * Angaben zur Blüte (Nutzer 2026-10-03 und 2026-10-05): standen als eigene Sektion weit
@@ -391,6 +401,7 @@ async function ProduktInhalt({ slug, w, sprache }: { slug: string; w: Woerterbuc
                 texte={w.bewerten}
                 bildMeldungen={budpicMeldungen(w)}
                 achsen={w.label.geschmack}
+                liveNetz={liveNetz}
                 {...erkundung}
               />
             </div>

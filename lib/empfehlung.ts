@@ -144,6 +144,11 @@ function bewertungsVektor(bewertung: EigeneBewertung, sorte: SortenAroma | undef
   return aus;
 }
 
+/** Normierter Vektor einer Bewertung ohne Gewicht: Grundlage des Live-Netzes beim Bewerten (lib/live-netz.ts). */
+export function bewertungsRichtung(bewertung: EigeneBewertung, sorte: SortenAroma | undefined): Vektor {
+  return normiert(bewertungsVektor(bewertung, sorte));
+}
+
 /** Bis zu drei gemeinsame Aromen: zwei Terpene, ein Geschmack, stärkste Überschneidung zuerst. */
 function gemeinsameAromen(a: Vektor, b: Vektor): string[] {
   const paare: [string, number][] = [];

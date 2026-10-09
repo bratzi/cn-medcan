@@ -260,6 +260,9 @@ export const de = {
       deinFazitBetreiber: "Betreiber-Fazit",
       deineChargeBetreiber: "Betreiber-Charge",
       ausReglern: "aus deinen Reglern",
+      liveNetzTitel: "Dein Netz",
+      liveNetzSatz: "So verändert diese Bewertung dein Netz. Die dünne Linie ist dein Stand ohne sie.",
+      liveNetzOhneNote: "Ab einer Note von 3,5 oder bis 2 formt diese Bewertung dein Netz.",
       fazitErklaerung:
         "Das Sortenfazit fasst Overall, Terpen-Abgleich und Gesamtnote zusammen. Das Charge-Fazit zeigt allein die Qualitäts-Balance dieser Charge, getrennt von der Sorte. Jede Stufe zählt gleich viel; 100 % heißt: alles top und genau wie angegeben.",
       zuruecksetzen: "Zurücksetzen",
