@@ -6,7 +6,7 @@ description: Regelwerk "Edge-Optimierung" für diesen Medizinalcannabis-Produktk
 # Edge-Stack-Master
 
 Verbindliches Regelwerk für **diesen** Stack. Keine allgemeinen Edge-Ratschläge: alles hier bezieht sich auf
-Worker `cn-medcan`, `main: ".open-next/worker.js"`, `@opennextjs/cloudflare` ^1.20.6, Next.js 16.3.6 / React 19,
+Worker `cn-medcan`, `main: "worker.mjs"` (lädt `.open-next/worker.js` und den Next-Server schon beim Isolat-Start, siehe Datei), `@opennextjs/cloudflare` ^1.20.6, Next.js 16.3.6 / React 19,
 Tailwind v4, Daten aus **Cloudflare D1** via Prisma (`@prisma/adapter-d1`).
 
 Nicht Cloudflare Pages. Nicht `@cloudflare/next-on-pages` (deprecated). **Kein Supabase** — der Supabase-Pfad
