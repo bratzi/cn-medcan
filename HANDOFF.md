@@ -79,8 +79,9 @@ Gefunden und behoben: `187434a` dichte Aroma-Karte im Buch ab lg (Achsen 29 px a
 geladenes Kapitel sieht im Schaufenster „Zu deinem Kapitel“ statt „Konto anlegen“ (`istMitglied`, Insel bekommt
 Schaufenster-Daten statt Knoten); Fokus bleibt beim Umblättern im Kapitel; Insel serialisiert nur `ProfilNetzTexte`;
 Timeline im Cleanup gekillt; Kommentar zu inline-Randnotizen. Band-Link und `size-20` entfielen mit dem Säulen-Umbau.
-902 Tests grün. **Live noch nicht gesehen** (Browserfenster lag verdeckt, `visibilityState: hidden`, dann stehen rAF
-und Screenshots): `073f77c` Kapitel als Gast und Mitglied; Aroma-Fix `187434a` nur per Messung bestätigt.
+902 Tests grün. Live per DOM geprüft (Fenster verdeckt, keine Screenshots): als Mitglied bei 1143 px eigenes Kapitel,
+„Zu deinem Kapitel“, kein Querscroll; Gast-HTML mit Vermerk und „Konto anlegen“; Aroma-Karte im Buch ohne Überschneidung
+von Name und Balken. Nur das Aussehen ist noch nicht angesehen.
 **Offen, Nutzer fragen:** 374 Dateien liegen mit CRLF im Index. `.gitattributes` mit `eol=lf` hieße einen großen
 Commit nur mit Zeilenenden (`git add --renormalize .`); ohne Renormalisierung kippt jede Datei beim nächsten Anfassen.
 
