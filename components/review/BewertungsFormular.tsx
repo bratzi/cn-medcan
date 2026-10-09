@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 
 import { bewertungSpeichern } from "@/app/[lang]/blueten/[slug]/aktionen";
 import { bewertungsbildHochladen } from "@/app/[lang]/blueten/[slug]/bewertungsbild-aktionen";
+import { startSpeicherLeeren } from "@/components/layout/konto-zaehler-speicher";
 import type { AromaSerie } from "@/components/review/AromaKarte";
 import type { BeschaffenheitsWerte } from "@/components/review/BeschaffenheitsLeiste";
 import type { Gesamteindruck } from "@/components/review/GesamteindruckLeiste";
@@ -116,6 +117,8 @@ export function BewertungsFormular({
       setFehler(ergebnis.fehler);
       return;
     }
+    // Das Kapitel auf der Startseite zählt die neue Bewertung erst nach frischem Abruf.
+    startSpeicherLeeren();
     // Die Bewertung steht; erst jetzt die Bilder, eines nach dem anderen (Spec 2026-10-06).
     const mitBildern = vorgemerkt.length > 0;
     let bildFehler: string[] = [];

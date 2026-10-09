@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { stimmeAbgeben } from "@/app/[lang]/umfragen/aktionen";
+import { startSpeicherLeeren } from "@/components/layout/konto-zaehler-speicher";
 import { useStartSitzung } from "@/components/story/StartSitzung";
 import { Button } from "@/components/ui";
 import { useHydriert } from "@/components/ui/useHydriert";
@@ -49,6 +50,8 @@ export function StimmFormular({ umfrageId, optionen, texte }: Props) {
       return;
     }
 
+    // Auch von /umfragen aus: die gemerkte Startseiten-Antwort kennt die Stimme noch nicht.
+    startSpeicherLeeren();
     // Auf der statischen Startseite holt die Insel ihren Zustand neu; refresh()
     // brächte dort nur die gecachte Seite (Spec 2026-10-01, statische Seiten, 4.3).
     if (sitzung) sitzung.neuLaden();
