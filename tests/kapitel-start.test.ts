@@ -47,6 +47,11 @@ test("kapitelNotizen: Mitglied zeigt gestimmt", () => {
   assert.equal(n[2].zahl, "3");
 });
 
+test("kapitelNotizen: null gestimmt entfällt (Minor Dein Kapitel)", () => {
+  const n = kapitelNotizen(kapitelAus({ ...basis, dritte: { art: "gestimmt", zahl: 0 } }), de.start.kapitel, "de");
+  assert.ok(n.every((x) => x.wort !== de.start.kapitel.gestimmt));
+});
+
 test("Sitzung: Gast ohne Kapitel, Mitglied mit Kapitel, laden ohne Kapitel", () => {
   const kapitel = kapitelAus(basis);
   const gast = sitzungsAntwort({ mitglied: null, umfrageId: null, eigeneOptionId: null, empfehlungen: [], kapitel });

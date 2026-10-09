@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ProfilNetz } from "@/components/profil/ProfilNetz";
 import { BlattAnzeige } from "@/components/review/BlattAnzeige";
 import { Avatar, buttonKlassen, namenLinkKlassen } from "@/components/ui";
+import { cn } from "@/lib/cn";
 import { formatiereDatum, formatiereZahl } from "@/lib/format";
 import { kapitelNotizen, type KapitelDaten } from "@/lib/kapitel-start";
 import type { Sprache } from "@/lib/i18n/sprache-kern";
@@ -94,11 +95,13 @@ export function KapitelAufschlag({
               className="w-full max-w-96"
             />
           </div>
-        ) : (
+        ) : art === "schaufenster" || leer ? (
+          // Ohne gespeichertes Profil, aber mit Bewertungen, stimmt „entsteht mit deiner ersten
+          // Bewertung“ nicht; dann bleibt die Spalte leer, bis das Profil nachgerechnet ist.
           <p className="max-w-[48ch] text-body text-text-muted text-pretty">
             {art === "schaufenster" ? texte.satzGast : texte.leerNetz}
           </p>
-        )}
+        ) : null}
       </div>
 
       <div className="flex flex-col gap-6 border-t border-border pt-8 min-[1080px]:col-span-10 min-[1080px]:flex-row min-[1080px]:items-center min-[1080px]:justify-between">
@@ -120,10 +123,8 @@ export function KapitelAufschlag({
               <span className="numeric text-small text-text-muted">{formatiereDatum(daten.zuletzt.datum, sprache)}</span>
             </div>
           </div>
-        ) : (
-          <span />
-        )}
-        <Link prefetch={false} href={aktion.href} className={buttonKlassen("primary")}>
+        ) : null}
+        <Link prefetch={false} href={aktion.href} className={cn(buttonKlassen("primary"), "min-[1080px]:ms-auto")}>
           {aktion.text}
         </Link>
       </div>

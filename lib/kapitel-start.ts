@@ -57,6 +57,8 @@ export function kapitelNotizen(d: KapitelDaten, texte: Woerterbuch["start"]["kap
     notizen.push({ zahl, wort: texte.imSchnitt, satz: t(texte.satzSchnitt, { zahl }) });
   }
   const gestimmt = d.dritte.art === "gestimmt";
+  // „0 gestimmt“ sagt einem neuen Mitglied nichts; die Notiz kommt mit der ersten Stimme.
+  if (gestimmt && d.dritte.zahl === 0) return notizen;
   notizen.push({
     zahl: ganz(d.dritte.zahl),
     wort: gestimmt ? texte.gestimmt : texte.vonEuch,

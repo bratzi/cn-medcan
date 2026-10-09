@@ -62,6 +62,12 @@ test("Ohne Bewertung: Leer-Satz und Erste Bewertung statt Netz und Zuletzt", () 
   assert.doesNotMatch(html, new RegExp(t.zumKapitel));
 });
 
+test("Bewertet, aber ohne gespeichertes Netz: kein Satz von der ersten Bewertung (Minor Dein Kapitel)", () => {
+  const html = zeige("eigen", { ...daten, netz: null });
+  assert.doesNotMatch(html, new RegExp(t.leerNetz));
+  assert.match(html, new RegExp(t.zumKapitel));
+});
+
 test("Name bricht nicht mitten im Wort: Grad text-kapitel statt text-titel (live 2026-10-09, „GrünesBuc / h“ bei 1143 px)", () => {
   const html = zeige("eigen");
   const name = html.slice(html.lastIndexOf("<p", html.indexOf('data-story="kapitel-name"')), html.indexOf("GrünesBuch"));
