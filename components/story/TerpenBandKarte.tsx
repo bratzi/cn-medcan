@@ -51,9 +51,12 @@ export function TerpenBandKarte({ terpene, hinweis }: { terpene: readonly Karten
       const terpen = nachAnker.get(eintrag.dataset.terpen ?? "");
       const symbol = eintrag.querySelector("[data-terpen-marke]") ?? eintrag;
       if (!terpen) return;
+      // Waagrecht zählt das Symbol (der Pfeil zeigt darauf), senkrecht der ganze Eintrag samt
+      // Namen: sonst lag die Karte live über dem Namen (2026-10-09).
       const rechteck = symbol.getBoundingClientRect();
+      const unten = (eintrag.querySelector("a") ?? eintrag).getBoundingClientRect().bottom;
       const lage = kartenLage(
-        { links: rechteck.left, oben: rechteck.top, breite: rechteck.width, hoehe: rechteck.height },
+        { links: rechteck.left, oben: rechteck.top, breite: rechteck.width, hoehe: Math.max(rechteck.height, unten - rechteck.top) },
         document.documentElement.clientWidth,
       );
       setOffen({ terpen, lage });
