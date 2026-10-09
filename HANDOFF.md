@@ -38,7 +38,9 @@ geduldet und setzt das Limit jetzt zeitweise durch. Bezahlplan ist ausgeschlosse
 Nutzer (Session 54): Rechenzeit senken. Erledigt: `ca9778d` eigener Einstieg `worker.mjs` lädt den Next-Server
 beim Isolat-Start (OpenNext importierte ihn erst in der ersten Anfrage, ~115 ms); `c54cfd5` `/api/startseite`
 zwei Minuten im sessionStorage (`START_SPEICHER`, geleert bei Kontowechsel, Stimme, Bewertung); `544fc54`
-veraltete `/_next/static/`-Chunks bekommen im Einstieg direkt 404. Gemessen danach: Treffer auf `/` und
+veraltete `/_next/static/`-Chunks bekommen im Einstieg direkt 404 (live geprüft: 44 aktuelle Chunks 200,
+unbekannter Chunk 404 mit 9 Byte; zweiter Startseitenaufruf ohne API-Abruf, eigenes Kapitel steht). Dazu `8d6da54`
+Kapitel-Minors: Leer-Satz nur bei 0 Bewertungen, „0 gestimmt“ entfällt, leeres `<span />` weg. Gemessen danach: Treffer auf `/` und
 `/reviews` ~10 ms, kalte oder dynamische Seiten weiter 100 bis 400 ms (`/profil`, `/umfragen`, `/blueten/[slug]`,
 `/api/ranglisten`). Nächste Hebel: ISR-`revalidate` 300 s höher (jeder Neubau der Startseite 700 bis 1300 ms),
 oder On-Demand-Revalidierung mit D1-Tag-Cache; Render-CPU der Startseite senken.
