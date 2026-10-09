@@ -1,6 +1,7 @@
 import { GeschmackIcon } from "@/components/review/AromaIcon";
 import { bluetenKreis, vollFarbe } from "@/lib/aroma-farben";
 import { alsPolygon, netzPunkte, type NetzPunkt } from "@/lib/netz";
+import { NETZ_MAX } from "@/lib/netz-skala";
 import type { Geschmack } from "@/lib/profil-typen";
 import { GESCHMACKS_ACHSEN } from "@/lib/query/bewertung";
 
@@ -9,7 +10,7 @@ const MITTE = GROESSE / 2;
 const RADIUS = 110;
 /** Radius der Achsenmarken: außerhalb des äußeren Rings, innerhalb der Grafik. */
 const MARKEN_RADIUS = RADIUS + 30;
-export const NETZ_MAX = 5;
+export { NETZ_MAX };
 const RINGE = [1, 2, 3, 4, 5] as const;
 const BLUETE = bluetenKreis(GESCHMACKS_ACHSEN.map((a) => a.enumWert));
 
