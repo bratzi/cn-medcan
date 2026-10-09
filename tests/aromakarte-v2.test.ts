@@ -401,7 +401,7 @@ test("CSS: Fluss-Tempo per Variable, kein Puls der Bögen mehr, Sparmodus und re
   // Der Fluss läuft nur ohne reduzierte Bewegung; im Sparmodus verschwindet er ganz.
   const erlaubt = [...css.matchAll(/@media \(prefers-reduced-motion: no-preference\) \{([\s\S]*?)\n\}/g)].map(([, block]) => block);
   assert.ok(erlaubt.some((block) => /\.bogen-fluss\s*\{[^}]*animation:\s*bogen-fluss/.test(block)));
-  assert.match(css, /:root\[data-sparmodus\] :is\(\.bogen-fluss, \.bogen-voll, \.delta-funke\)\s*\{[^}]*visibility:\s*hidden/);
+  assert.match(css, /:root\[data-sparmodus\] :is\(\.bogen-fluss, \.bogen-voll, \.delta-funke\)\s*\{[^}]*display:\s*none/);
   assert.ok(erlaubt.some((block) => /\.bogen-voll\s*\{[^}]*animation:\s*bogen-voll/.test(block)));
   assert.ok(erlaubt.some((block) => /\.delta-funke\s*\{[^}]*animation:\s*delta-funke/.test(block)));
   // Das Fehlstück steht ohne Bewegung blass, damit es nicht wie ein Balken aussieht.
