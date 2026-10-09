@@ -40,6 +40,16 @@ Hersteller und Vertreiber die Qualität prägen.
 - Auf der Startseite deutlich bewerben und in der ganzen Seite sichtbarer einbauen (heute kaum durchschaubar).
 - Eigener Brainstorming-Durchgang mit Spec und Plan; vorher HWG-Grenze prüfen (keine Werbung für Hersteller).
 
+### ⇢ GROSSER PUNKT (Nutzer 2026-10-09, nicht angehen, kommende Session): Likes und Folgen
+
+- Mitglieder können andere Mitglieder liken und ihnen damit folgen.
+- Einzelne Bewertungen liken; die Anzahl der Likes steht öffentlich an der Bewertung. So sieht man, wer aktiv
+  ist, welche Bewertungen gemocht werden und welche Mitglieder wenig aktiv sind.
+- Blüten liken.
+- Alle Likes werden gespeichert und sind im Profil sichtbar (wem ich folge, was ich gemocht habe, wie oft
+  meine Bewertungen gemocht wurden).
+- Eigener Brainstorming-Durchgang mit Spec und Plan; Sichtbarkeit (privat/öffentlich) und HWG prüfen.
+
 ### ⇢ SESSION 54
 
 **ACHTUNG CPU-Limit (Free-Plan, 10 ms je Anfrage):** Am 2026-10-09 ab 11:18 UTC lieferte der Worker auf
