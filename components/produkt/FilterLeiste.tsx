@@ -383,7 +383,7 @@ export function FilterLeiste({ facetten, filter, gesamt, texte, titel, zurueckse
                 />
                 <span>
                   {hersteller.name}
-                  <span className="text-text-muted numeric"> {hersteller.anzahl}</span>
+                  {" "}<span className="numeric text-text-muted">({hersteller.anzahl})</span>
                 </span>
               </label>
             ))}
