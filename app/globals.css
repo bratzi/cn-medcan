@@ -529,6 +529,12 @@
    reduzierter Bewegung und im Sparmodus steht alles sofort.
    ========================================================================== */
 
+/* Das Wort einer Randnotiz bleibt ganz (live 2026-10-13: „Herstel-ler“ bei 1146 px): die Handschrift
+   schrumpft mit der Spalte (Container ist die Notiz), höchstens bis zur Notizgröße. */
+.kapitel-notiz-wort {
+  font-size: min(var(--text-notiz), 30cqi);
+}
+
 @media (prefers-reduced-motion: no-preference) {
   /* Hierarchie: das Kapitel beginnt mit deinem Namen. */
   :root:not([data-sparmodus]) .kapitel-name {

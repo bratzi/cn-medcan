@@ -4,7 +4,7 @@ import { BlattAnzeige } from "@/components/review/BlattAnzeige";
 import { namenLinkKlassen } from "@/components/ui";
 import { formatiereZahl } from "@/lib/format";
 import type { Sprache } from "@/lib/i18n/sprache-kern";
-import { t } from "@/lib/i18n/text";
+import { mehrzahl, t } from "@/lib/i18n/text";
 import type { Woerterbuch } from "@/lib/i18n/typen";
 import type { HerstellerRang } from "@/lib/profil-typen";
 
@@ -29,6 +29,7 @@ export function Lieblingshersteller({ daten, texte, sprache }: Props) {
           {/* Blätter mit Mittel, daneben die Zahl deiner Bewertungen von Hand; eine Zeile, die umbrechen darf. */}
           <span className="flex flex-wrap items-center gap-x-4 gap-y-1">
             <BlattAnzeige note={h.mittel} text={t(texte.herstellerZeile, { note: formatiereZahl(h.mittel, 1, sprache) })} />
+            <span className="sr-only">{mehrzahl(sprache, texte.anzahl, h.anzahl)}</span>
             <span aria-hidden="true" className="font-hand text-notiz text-logo numeric">
               {h.anzahl}×
             </span>

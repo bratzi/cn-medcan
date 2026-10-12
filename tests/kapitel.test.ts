@@ -1,5 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 
@@ -73,3 +74,11 @@ test("Kapitelkopf: Name als h1 gedruckt, bricht um, Schlagwort aria-hidden", () 
   assert.match(h, /text-h2[^"]*">Profil</);
 });
 
+
+test("Randnotiz-Wort schrumpft mit der Spalte statt mitten im Wort zu trennen (live 2026-10-13)", () => {
+  const h = renderToStaticMarkup(
+    createElement(Randnotizen, { notizen: [{ zahl: "5", wort: "Hersteller", satz: "5 Hersteller" }], beschriftung: "Zahlen" }),
+  );
+  assert.match(h, /<li[^>]*@container/);
+  assert.match(readFileSync("app/globals.css", "utf8"), /\.kapitel-notiz-wort\s*\{\s*font-size:\s*min\(var\(--text-notiz\),\s*\d+cqi\)/);
+});

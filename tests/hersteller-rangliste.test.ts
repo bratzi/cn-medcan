@@ -35,6 +35,8 @@ test("Komponente: Name verlinkt auf den gefilterten Katalog, leer zeigt den Leer
   );
   assert.match(html, /href="\/blueten\?hersteller=abc-1"/);
   assert.match(html, /Aurora/);
+  // Die Zahl von Hand ist aria-hidden; Screenreader hören sie als Satz.
+  assert.match(html, /class="sr-only">2 Bewertungen</);
   const leer = renderToStaticMarkup(createElement(Lieblingshersteller, { daten: [], texte: de.profil, sprache: "de" }));
   assert.match(leer, new RegExp(de.profil.herstellerLeer.slice(0, 20)));
 });

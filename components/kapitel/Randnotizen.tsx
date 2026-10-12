@@ -15,7 +15,7 @@ export function Randnotizen({ notizen, beschriftung }: { notizen: readonly Randn
       {notizen.map((n, i) => (
         <li
           key={n.wort}
-          className="col-span-2 flex min-w-0 flex-col gap-2 px-6 last:odd:col-span-4 min-[1080px]:px-8 min-[1080px]:last:odd:col-span-2"
+          className="@container col-span-2 flex min-w-0 flex-col gap-2 px-6 last:odd:col-span-4 min-[1080px]:px-8 min-[1080px]:last:odd:col-span-2"
         >
           <span className="sr-only">{n.satz}</span>
           <span aria-hidden="true" className="numeric text-display text-text">
