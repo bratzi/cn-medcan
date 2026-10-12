@@ -102,6 +102,8 @@ test("Schnitte: sechs Werte mit Beschriftung aus dem Schema, Wirkung privat dabe
     }),
   );
   for (const wort of ["Aussehen", "Geruch", "Geschmack", "Wirkung", "Konsistenz", "Gesamt", "3,9", "4,2"]) assert.match(html, new RegExp(wort));
+  // Der Satz steht im Feldkopf; hier zusätzlich stand er live doppelt (2026-10-13).
+  assert.ok(!html.includes(de.profil.schnitteSatz));
 });
 
 test("EmpfehlungsListe: Marke als Badge nur, wo gesetzt", () => {
