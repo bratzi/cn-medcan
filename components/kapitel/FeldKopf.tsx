@@ -5,13 +5,13 @@ const TON = { gruen: "text-accent", lila: "text-kopierstift" } as const;
 /**
  * Kopf eines Profilfelds wie die Sektionsköpfe der Startseite (Nutzer 2026-10-09: mehr Akzentschrift,
  * Güte der Startseite): Buchschrift mittig, ein Wort in Handschrift mit Farbverlauf, darüber das
- * Schlagwort als Vermerk von Hand wie in „Dein Kapitel“. Kein Riesenwort im Hintergrund: in einem Feld
- * überdeckte es die Überschrift und schnitt in halben Feldern ab (live 2026-10-13).
+ * Schlagwort gesperrt in Versalien wie „Terpen für Terpen“ im Hero (Nutzer 2026-10-13). Kein Riesenwort
+ * im Hintergrund: in einem Feld überdeckte es die Überschrift und schnitt in halben Feldern ab.
  */
 export function FeldKopf({ id, texte, ton = "gruen" }: { id: string; texte: FeldKopfTexte; ton?: keyof typeof TON }) {
   return (
     <>
-      <p aria-hidden="true" className={`font-hand text-vermerk ${TON[ton]}`}>
+      <p aria-hidden="true" className={`font-sans text-caption uppercase tracking-gesperrt ${TON[ton]}`}>
         {texte.schlagwort}
       </p>
       <h2 id={id} className="font-buch text-display font-normal text-text text-center text-balance">

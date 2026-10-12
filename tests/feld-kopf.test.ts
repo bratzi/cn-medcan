@@ -5,13 +5,13 @@ import { renderToStaticMarkup } from "react-dom/server";
 
 import { FELD_SPALTEN, Feld } from "@/components/kapitel/Feld";
 
-test("Feld mit Kopf: Buchschrift, betontes Wort in Handschrift, Schlagwort, mittig", () => {
+test("Feld mit Kopf: Buchschrift, betontes Wort in Handschrift, Schlagwort wie die Hero-Unterzeile, mittig", () => {
   const html = renderToStaticMarkup(
     createElement(Feld, { id: "netz", titel: "Deine Aromen", spalten: 10, kopf: { vor: "Deine", betont: "Aromen", schlagwort: "was dir schmeckt" } }),
   );
   assert.match(html, /<h2[^>]*id="netz-titel"[^>]*font-buch[^>]*text-center/);
   assert.match(html, /<em class="farbverlauf hand-betont">Aromen<\/em>/);
-  assert.match(html, /aria-hidden="true"[^>]*font-hand[^>]*>was dir schmeckt/);
+  assert.match(html, /aria-hidden="true"[^>]*font-sans text-caption uppercase tracking-gesperrt[^>]*>was dir schmeckt/);
   assert.doesNotMatch(html, /text-kulisse/);
 });
 
