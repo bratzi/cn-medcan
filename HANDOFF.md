@@ -3,7 +3,7 @@
 > Übergabemedium zwischen Sessions. Wird nach jedem Arbeitsblock aktualisiert und committet.
 > Wer hier weiterarbeitet, liest diese Datei zuerst und braucht den Chatverlauf nicht.
 
-**Letzte Aktualisierung:** 2026-10-13 (Session 55, Ende)
+**Letzte Aktualisierung:** 2026-10-13 (Session 56)
 **Repo:** https://github.com/bratzi/cn-medcan (public)
 **Branch:** `main` (Makeover „Grünes Buch“ Teilprojekt 1 ist seit 2026-09-24 auf `main`)
 
@@ -49,6 +49,28 @@ Hersteller und Vertreiber die Qualität prägen.
 - Alle Likes werden gespeichert und sind im Profil sichtbar (wem ich folge, was ich gemocht habe, wie oft
   meine Bewertungen gemocht wurden).
 - Eigener Brainstorming-Durchgang mit Spec und Plan; Sichtbarkeit (privat/öffentlich) und HWG prüfen.
+
+### ⇢ SESSION 56 (2026-10-13): Live-Prüfung Session 55, Minors erledigt
+
+**Lehre live:** Ein Wechsel auf `/profil` per Navigation zeigte erst den alten Stand aus dem Router-Cache
+des Clients; erst ein Aufruf mit Query (`/profil?f=1`) zeigte den Deploy. Vor „Fix fehlt live“ immer frisch laden.
+**Build hing:** der Workers Build für `5953211` stand 13 h auf „running“; der nächste Push (`b553cdc`) lief normal durch.
+
+Live gesehen und gut: Feldköpfe neu, Hersteller-Zeile, Zahl in Klammern. Gefunden und behoben:
+- `b553cdc` „Deine Schnitte“ zeigte den Satz doppelt (Feldkopf und Baustein); live bestätigt einmal.
+- `ca25739` Nutzer: Feldköpfe passen, Vermerk aber im Stil von „Terpen für Terpen“ (`font-sans text-caption
+  uppercase tracking-gesperrt`, Farbton Grün/Lila bleibt).
+- `1fe0077` Randnotiz-Wort schrumpft per `30cqi` mit der Spalte („Herstel-ler“ bei 1146 px), Notiz ist `@container`.
+
+Minors aus dem Review von Session 55 erledigt: `ee17e2a` Chip ohne rohe UUID (Namen fehlender Hersteller per
+`ladeUnternehmenNamen` nachgeladen, sonst „unbekannt“); gleichnamige Hersteller im Filter mit Land oder Rolle
+(`lib/hersteller-facette.ts`; live gibt es derzeit keine Doppelnamen). `b0cb140` Terpen-Modus fällt auf Geschmäcker
+zurück, wenn Terpene verschwinden; Lesung rechnet ihre Seite bei Resize neu; Live-Netz-Basis nur `g:`. `1fe0077`
+Hersteller-Anzahl als `sr-only`-Satz. Bewusst nicht: `lib/query/strains.ts` zurück auf CRLF (Nutzer: kein
+Renormalisieren; ein Rückwechsel wäre wieder eine Ganzdatei-Änderung). 939 Tests grün.
+
+**Noch nicht live gesehen:** Vermerk-Stil `ca25739`, `cqi`-Wort `1fe0077`, Chip „unbekannt“; 494 px und dunkel.
+**Nächste Aufgabe:** einer der großen Punkte oben (Hersteller/Vertreiber bewerten oder Likes und Folgen), Nutzer wählt.
 
 ### ⇢ SESSION 54
 
@@ -134,7 +156,7 @@ Critical, eine Important behoben (`5953211` Lesung spiegelt ab 204 px, gemessen 
   Prop-Wechsel verschwinden; Lesungsseite nur beim Überfahren gemessen, nicht bei Resize; Hersteller-Anzahl
   in Handschrift ist aria-hidden (Screenreader hört sie nicht).
 
-**ALS ERSTES: diese Fragen in EINER AskUserQuestion stellen:**
+**(Erledigt in Session 56, Antworten siehe dort) Fragen von Session 55:**
 1. Gefallen die neuen Feldköpfe im Profil (Vermerk von Hand über der Überschrift), oder lieber anders?
 2. Die zurückgestellten Minors oben jetzt abarbeiten, oder erst einen der großen Punkte (Hersteller/Vertreiber
    bewerten; Likes und Folgen) mit Brainstorming beginnen?
