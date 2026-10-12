@@ -69,7 +69,7 @@ zurück, wenn Terpene verschwinden; Lesung rechnet ihre Seite bei Resize neu; Li
 Hersteller-Anzahl als `sr-only`-Satz. Bewusst nicht: `lib/query/strains.ts` zurück auf CRLF (Nutzer: kein
 Renormalisieren; ein Rückwechsel wäre wieder eine Ganzdatei-Änderung). 939 Tests grün.
 
-**Noch nicht live gesehen:** Vermerk-Stil `ca25739`, `cqi`-Wort `1fe0077`, Chip „unbekannt“; 494 px und dunkel.
+**Live geprüft (nach Build `1fe0077`):** Vermerk gesperrt in Versalien; Notizwörter bei 1146 und 494 px einzeilig, ohne Trennung und Querscroll (gemessen im iframe); Chip bei unbekannter Id „Hersteller: unbekannt“. Dunkel nicht angesehen.
 **Nächste Aufgabe:** einer der großen Punkte oben (Hersteller/Vertreiber bewerten oder Likes und Folgen), Nutzer wählt.
 
 ### ⇢ SESSION 54
