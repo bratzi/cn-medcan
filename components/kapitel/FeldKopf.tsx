@@ -1,17 +1,20 @@
-import { Schlagwort } from "@/components/story/Schlagwort";
-
 export type FeldKopfTexte = { vor: string; betont: string; nach?: string; schlagwort: string };
+
+const TON = { gruen: "text-accent", lila: "text-kopierstift" } as const;
 
 /**
  * Kopf eines Profilfelds wie die Sektionsköpfe der Startseite (Nutzer 2026-10-09: mehr Akzentschrift,
- * Güte der Startseite): Buchschrift mittig, ein Wort in Handschrift mit Farbverlauf, dahinter blass das
- * Schlagwort. Das Feld trägt dafür `relative isolate overflow-x-clip`.
+ * Güte der Startseite): Buchschrift mittig, ein Wort in Handschrift mit Farbverlauf, darüber das
+ * Schlagwort als Vermerk von Hand wie in „Dein Kapitel“. Kein Riesenwort im Hintergrund: in einem Feld
+ * überdeckte es die Überschrift und schnitt in halben Feldern ab (live 2026-10-13).
  */
-export function FeldKopf({ id, texte, ton = "gruen" }: { id: string; texte: FeldKopfTexte; ton?: "gruen" | "lila" }) {
+export function FeldKopf({ id, texte, ton = "gruen" }: { id: string; texte: FeldKopfTexte; ton?: keyof typeof TON }) {
   return (
     <>
-      <Schlagwort satz={texte.schlagwort} ton={ton} oben="top-2" />
-      <h2 id={id} className="font-buch text-h2 font-normal text-text text-center text-balance">
+      <p aria-hidden="true" className={`font-hand text-vermerk ${TON[ton]}`}>
+        {texte.schlagwort}
+      </p>
+      <h2 id={id} className="font-buch text-display font-normal text-text text-center text-balance">
         {texte.vor} <em className="farbverlauf hand-betont">{texte.betont}</em>
         {texte.nach ? ` ${texte.nach}` : null}
       </h2>

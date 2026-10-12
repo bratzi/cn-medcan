@@ -1097,7 +1097,7 @@ export const de = {
       vorschlaege: { vor: "Ähnlich im", betont: "Aroma", nach: "wie deine Favoriten", schlagwort: "probier mal" },
     },
     herstellerTitel: "Deine Hersteller",
-    herstellerZeile: "{name}: im Schnitt {note} von 5 aus {anzahl}",
+    herstellerZeile: "im Schnitt {note} von 5",
     herstellerFehler: "Deine Hersteller lassen sich gerade nicht laden. Lade die Seite in ein paar Minuten neu.",
     herstellerLeer: "Sobald du eine Blüte mit bekanntem Hersteller bewertet hast, steht er hier.",
     kapitel: {

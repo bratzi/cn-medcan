@@ -1088,7 +1088,7 @@ export const en: Woerterbuch = {
       vorschlaege: { vor: "Similar in", betont: "aroma", nach: "to your favourites", schlagwort: "try this" },
     },
     herstellerTitel: "Your producers",
-    herstellerZeile: "{name}: {note} out of 5 on average across {anzahl}",
+    herstellerZeile: "{note} out of 5 on average",
     herstellerFehler: "Your producers cannot be loaded right now. Reload the page in a few minutes.",
     herstellerLeer: "Once you have reviewed a flower with a known producer, it shows up here.",
     kapitel: {

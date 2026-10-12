@@ -12,7 +12,7 @@ test("Feld mit Kopf: Buchschrift, betontes Wort in Handschrift, Schlagwort, mitt
   assert.match(html, /<h2[^>]*id="netz-titel"[^>]*font-buch[^>]*text-center/);
   assert.match(html, /<em class="farbverlauf hand-betont">Aromen<\/em>/);
   assert.match(html, /aria-hidden="true"[^>]*font-hand[^>]*>was dir schmeckt/);
-  assert.match(html, /overflow-x-clip/);
+  assert.doesNotMatch(html, /text-kulisse/);
 });
 
 test("Breite 5 vorhanden", () => {

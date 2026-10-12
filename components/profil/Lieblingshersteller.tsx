@@ -26,11 +26,9 @@ export function Lieblingshersteller({ daten, texte, sprache }: Props) {
           <Link prefetch={false} href={`/blueten?hersteller=${h.id}`} className={`${namenLinkKlassen()} wrap-break-word`}>
             {h.name}
           </Link>
-          <span className="flex items-center gap-3">
-            <BlattAnzeige
-              note={h.mittel}
-              text={t(texte.herstellerZeile, { name: h.name, note: formatiereZahl(h.mittel, 1, sprache), anzahl: h.anzahl })}
-            />
+          {/* Blätter mit Mittel, daneben die Zahl deiner Bewertungen von Hand; eine Zeile, die umbrechen darf. */}
+          <span className="flex flex-wrap items-center gap-x-4 gap-y-1">
+            <BlattAnzeige note={h.mittel} text={t(texte.herstellerZeile, { note: formatiereZahl(h.mittel, 1, sprache) })} />
             <span aria-hidden="true" className="font-hand text-notiz text-logo numeric">
               {h.anzahl}×
             </span>
