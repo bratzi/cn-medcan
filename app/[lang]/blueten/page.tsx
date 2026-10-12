@@ -11,7 +11,7 @@ import { EmptyState, Spinner, buttonKlassen, textLinkKlassen } from "@/component
 import { parseStrainFilter, serialisiereFilter } from "@/lib/query/filter";
 import type { StrainFilter } from "@/lib/query/filter";
 import { istFachkreis } from "@/lib/query/fachkreis";
-import { ladeFilterFacetten, ladeStrainListe } from "@/lib/query/strains";
+import { ladeFilterFacetten, ladeStrainListe, ladeUnternehmenNamen } from "@/lib/query/strains";
 import { holeSprache, holeWoerterbuch, type Sprache, type Woerterbuch } from "@/lib/i18n";
 import { mehrzahl, t } from "@/lib/i18n/text";
 
@@ -83,6 +83,8 @@ async function Ergebnisbereich({ filter, w, sprache }: { filter: StrainFilter; w
     facetten.apotheken.map((apotheke) => [apotheke.slug, apotheke.name]),
   );
   const herstellerNamen = new Map(facetten.hersteller.map((h) => [h.id, h.name]));
+  const fehlend = filter.hersteller.filter((id) => !herstellerNamen.has(id));
+  for (const [id, name] of await ladeUnternehmenNamen(fehlend)) herstellerNamen.set(id, name);
 
   return (
     <div className="mt-10 flex flex-col gap-10 lg:flex-row lg:gap-16">

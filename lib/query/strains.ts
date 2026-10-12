@@ -15,6 +15,7 @@ import {
 import type { KartenTerpen } from "@/lib/aromakarte";
 import { autorProfilAus } from "@/lib/autor-profil";
 import type { GespeicherteBewertung } from "@/lib/bewertung-vorbelegung";
+import { herstellerFacette } from "@/lib/hersteller-facette";
 import { getPrisma } from "@/lib/prisma";
 
 import { ladeAutorZahlen } from "./autoren";
@@ -811,6 +812,17 @@ const ALLE_GESCHMAECKER: GeschmacksKategorie[] = [
  * im Worker still um. Caching also gemeinsam mit den Bindings nachziehen,
  * dann diese Funktion in `unstable_cache` wickeln (Tag z. B. "facetten").
  */
+/**
+ * Namen gefilterter Hersteller, die nicht in der Facette stehen (keine aktiven Sorten mehr): sonst
+ * zeigte der Chip die rohe Id. Nur gerufen, wenn solche Ids im Filter stehen.
+ */
+export async function ladeUnternehmenNamen(ids: readonly string[]): Promise<Map<string, string>> {
+  if (ids.length === 0) return new Map();
+  const prisma = await getPrisma();
+  const zeilen = await prisma.unternehmen.findMany({ where: { id: { in: [...ids] } }, select: { id: true, name: true }, take: 50 });
+  return new Map(zeilen.map((z) => [z.id, z.name]));
+}
+
 export async function ladeFilterFacetten(
   fachkreis: boolean
 ): Promise<FilterFacetten> {
@@ -875,7 +887,7 @@ export async function ladeFilterFacetten(
     // Eine Abfrage mit Zählung je Hersteller statt groupBy plus Namensabfrage (Sub-Request-Grenze).
     prisma.unternehmen.findMany({
       where: { hergestellt: { some: { aktiv: true } } },
-      select: { id: true, name: true, _count: { select: { hergestellt: { where: { aktiv: true } } } } },
+      select: { id: true, name: true, land: true, rolle: true, _count: { select: { hergestellt: { where: { aktiv: true } } } } },
       orderBy: { name: "asc" },
       take: 400,
     }),
@@ -929,7 +941,7 @@ export async function ladeFilterFacetten(
       max: preisAggregat._max.preisProGrammCent ?? null,
     },
     apotheken,
-    hersteller: herstellerListe.map((h) => ({ id: h.id, name: h.name, anzahl: h._count.hergestellt })),
+    hersteller: herstellerFacette(herstellerListe),
   };
 }
 

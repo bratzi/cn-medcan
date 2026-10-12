@@ -18,6 +18,19 @@ test("Chip Hersteller mit Namen, Entfernen-Link ohne hersteller", () => {
   assert.doesNotMatch(html, /hersteller=/);
 });
 
+test("Chip Hersteller ohne bekannten Namen zeigt keine rohe Id", () => {
+  const html = renderToStaticMarkup(
+    createElement(AktiveFilter, { filter: { ...leererFilter(), hersteller: [id] }, herstellerNamen: new Map(), w: de, sprache: "de" }),
+  );
+  assert.match(html, /Hersteller: unbekannt/);
+  assert.doesNotMatch(html, new RegExp(`>[^<]*${id}`));
+});
+
+test("Katalogseite lädt Namen gefilterter Hersteller ohne aktive Sorten nach", () => {
+  const q = readFileSync("app/[lang]/blueten/page.tsx", "utf8");
+  assert.match(q, /ladeUnternehmenNamen\(/);
+});
+
 test("Filterleiste: Abschnitt Hersteller mit Suche", () => {
   const q = readFileSync("components/produkt/FilterLeiste.tsx", "utf8");
   assert.match(q, /facetten\.hersteller/);

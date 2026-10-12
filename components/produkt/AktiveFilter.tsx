@@ -122,7 +122,7 @@ export function AktiveFilter({ filter, apothekenNamen, herstellerNamen, w, sprac
   }
 
   for (const id of filter.hersteller) {
-    const name = herstellerNamen?.get(id) ?? id;
+    const name = herstellerNamen?.get(id) ?? texte.herstellerUnbekannt;
     chips.push({
       schluessel: `hersteller-${id}`,
       text: t(texte.hersteller, { wert: name }),

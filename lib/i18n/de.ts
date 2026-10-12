@@ -378,6 +378,7 @@ export const de = {
       apothekeBeschreibung: "Apotheke {wert}",
       hersteller: "Hersteller: {wert}",
       herstellerBeschreibung: "Hersteller {wert}",
+      herstellerUnbekannt: "unbekannt",
       entfernen: "Filter {wert} entfernen",
     },
     karte: {

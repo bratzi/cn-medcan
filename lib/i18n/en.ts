@@ -370,6 +370,7 @@ export const en: Woerterbuch = {
       apothekeBeschreibung: "Pharmacy {wert}",
       hersteller: "Manufacturer: {wert}",
       herstellerBeschreibung: "Manufacturer {wert}",
+      herstellerUnbekannt: "unknown",
       entfernen: "Remove filter {wert}",
     },
     karte: {
