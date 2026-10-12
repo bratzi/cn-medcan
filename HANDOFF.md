@@ -3,7 +3,7 @@
 > Übergabemedium zwischen Sessions. Wird nach jedem Arbeitsblock aktualisiert und committet.
 > Wer hier weiterarbeitet, liest diese Datei zuerst und braucht den Chatverlauf nicht.
 
-**Letzte Aktualisierung:** 2026-10-09 (Session 55)
+**Letzte Aktualisierung:** 2026-10-13 (Session 55, Ende)
 **Repo:** https://github.com/bratzi/cn-medcan (public)
 **Branch:** `main` (Makeover „Grünes Buch“ Teilprojekt 1 ist seit 2026-09-24 auf `main`)
 
@@ -112,12 +112,33 @@ Buchseiten lagen eingefroren über der aktiven Karte (sichtbar nach Karte zu Net
 `visibility: hidden` der verdeckten Seiten; jetzt `display`. Test `tests/buch-verdeckte-seiten.test.ts` verbietet
 `visibility: visible` in `globals.css`.
 
-**⇢ JETZT:** Spec `docs/superpowers/specs/2026-10-09-netz-terpene-profil-hersteller-design.md` (`ea82c52`): Aroma-Netz
-mit Schalter Geschmäcker/Terpene (10 feste Hauptterpene) und Lesung außen an der Marke, auf allen AromaNetz;
-Profil neu geordnet (Aktivität, Netz, Top/Flop, Noten+Hersteller, Schnitte+Community, Bewertungen, Ähnlich) mit
-Feldköpfen im Startseiten-Stil; Katalog-Filter Hersteller und Hersteller-Rangliste im Profil. Nutzer hat den
-Entwurf im Chat freigegeben; **wartet auf Durchsicht der Spec**, dann writing-plans (Stränge A und C parallel,
-B danach).
+**Erledigt (Session 55): Plan `docs/superpowers/plans/2026-10-09-netz-terpene-profil-hersteller.md` komplett**, nativ
+direkt auf `main`, jede Aufgabe gepusht (`93fdecd` bis `5953211`), 933 Tests grün. Gesamtreview (Opus): keine
+Critical, eine Important behoben (`5953211` Lesung spiegelt ab 204 px, gemessen ohne Scrollbalken).
+- Aroma-Netz: Schalter Geschmäcker/Terpene (10 feste Hauptterpene, `lib/terpen-achsen.ts`), Morph, Lesung außen an
+  der Marke (`lesungsLage`, `lib/netz-vektor.ts`), auf jedem AromaNetz. `ProfilWerte.terpene` (Liste) ist ersetzt durch
+  `terpenNetz`; alte Zeilen lesen sich weiter. Verlaufsschritte tragen `terpene`; alte Verläufe ohne: Terpen-Modus
+  ohne Zeitleiste, bis das Profil sich neu rechnet (24 h nach letztem Speichern).
+- Profil: Spur, Aromen, Top/Flop, Noten+Hersteller, Schnitte+Community, Bewertungen, Ähnlich. Feldköpfe `FeldKopf`
+  (Vermerk von Hand über Buchschrift-Überschrift mit betontem Handwort; erst als Hintergrundwort, live überdeckt,
+  `7bf2ac9`). Feld „Terpene“ und `TerpenRangliste` gelöscht.
+- Hersteller: Katalogfilter `hersteller` (Unternehmen-Ids), Abschnitt mit Suche, Chip; Profil-Rangliste bis 5,
+  verlinkt auf den gefilterten Katalog.
+- Live geprüft (Chrome, 1146 px hell): Reihenfolge, kein Querscroll, Schalter, Lesung links/rechts, Link aus der
+  Rangliste filtert (28 Treffer Four 20 Pharma), Chip, 84 Hersteller. **Noch nicht live gesehen:** neue Feldköpfe
+  (`7bf2ac9`), Hersteller-Zeile neu, Zahl in Klammern (`8f3a727`), Lesungsfix (`5953211`); „Dein Kapitel“ und
+  öffentliches Profil mit Schalter; 494 px und dunkel.
+- Zurückgestellte Minors aus dem Review: Chip zeigt rohe UUID bei Hersteller ohne aktive Sorten; gleichnamige
+  Unternehmen im Filter nicht unterscheidbar; `lib/query/strains.ts` ganz auf LF umgestellt (Blame); `geschmacksBeitraege`
+  liefert `t:`-Schlüssel auch an `live-netz` (Kommentar dort veraltet); Modus bleibt Terpene, wenn Terpene per
+  Prop-Wechsel verschwinden; Lesungsseite nur beim Überfahren gemessen, nicht bei Resize; Hersteller-Anzahl
+  in Handschrift ist aria-hidden (Screenreader hört sie nicht).
+
+**ALS ERSTES: diese Fragen in EINER AskUserQuestion stellen:**
+1. Gefallen die neuen Feldköpfe im Profil (Vermerk von Hand über der Überschrift), oder lieber anders?
+2. Die zurückgestellten Minors oben jetzt abarbeiten, oder erst einen der großen Punkte (Hersteller/Vertreiber
+   bewerten; Likes und Folgen) mit Brainstorming beginnen?
+Vorher live prüfen, was oben als „noch nicht live gesehen“ steht.
 
 **Arbeitsweise seit Session 53 (Nutzer):** nach jeder erledigten Aufgabe sofort pushen; die Live-Prüfung
 gesammelt am Ende eines Durchgangs und dann korrigieren (Memory `immer-nach-github-pushen`).
