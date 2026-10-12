@@ -39,3 +39,9 @@ test("Lesung nicht mehr mittig im Netz, sondern außen an der Marke", () => {
 test("Ansichtstaste liegt in lib, damit das Netz nicht die ganze Aroma-Karte lädt", () => {
   assert.doesNotMatch(readFileSync("components/profil/AromaNetz.tsx", "utf8"), /components\/review\/AromaKarte/);
 });
+
+test("Ohne Terpene fällt die Ansicht auf Geschmäcker zurück, Lesung folgt dem Fenster", () => {
+  const quelle = readFileSync("components/profil/AromaNetz.tsx", "utf8");
+  assert.match(quelle, /const modus: NetzModus = hatTerpene \? gewaehlt : "geschmack"/);
+  assert.match(quelle, /addEventListener\("resize"/);
+});

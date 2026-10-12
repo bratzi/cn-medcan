@@ -59,7 +59,7 @@ const MODI: readonly NetzModus[] = ["geschmack", "terpene"];
  * Stand im aria-valuetext; das SVG ist stumm. Nur Aroma, nie Wirkung (HWG).
  */
 export function AromaNetz({ staende, texte, achsen: achsenTexte, sprache, className = "w-full max-w-md" }: Props) {
-  const [modus, setModus] = useState<NetzModus>("geschmack");
+  const [gewaehlt, setModus] = useState<NetzModus>("geschmack");
   const [index, setIndex] = useState(staende.length - 1);
   const [aktiv, setAktiv] = useState<number | null>(null);
   const [lage, setLage] = useState<LesungsLage>({ seite: "oben" });
@@ -67,6 +67,8 @@ export function AromaNetz({ staende, texte, achsen: achsenTexte, sprache, classN
   const rahmen = useRef<HTMLDivElement>(null);
 
   const hatTerpene = Object.values(staende[staende.length - 1]?.terpene ?? {}).some((x) => x !== 0);
+  // Verschwinden die Terpene per Prop-Wechsel, fällt die Ansicht auf Geschmäcker zurück (der Schalter ist dann weg).
+  const modus: NetzModus = hatTerpene ? gewaehlt : "geschmack";
   // Verlauf vor 2026-10-09 trägt keine Terpene: dann zeigt der Terpen-Modus nur den heutigen Stand.
   const terpenVerlauf = staende.every((s) => s.terpene);
   const reihe = modus === "terpene" && !terpenVerlauf ? staende.slice(-1) : staende;
@@ -111,6 +113,32 @@ export function AromaNetz({ staende, texte, achsen: achsenTexte, sprache, classN
     const weiter = setTimeout(() => setIndex((n) => Math.min(n + 1, letzter)), TAKT_MS);
     return () => clearTimeout(weiter);
   }, [spielt, index, letzter]);
+
+  const achsenZahl = modus === "terpene" ? TERPEN_ACHSEN.length : GESCHMACKS_ACHSEN.length;
+  // Wohin die Lesung aufgeht: nach außen, gespiegelt, wenn der Viewport dort zu knapp ist.
+  const lageFuer = (achse: number): LesungsLage | null => {
+    if (!rahmen.current) return null;
+    const r = rahmen.current.getBoundingClientRect();
+    const x = r.left + (markenLage(achse, achsenZahl).x / 100) * r.width;
+    // clientWidth ohne Scrollbalken, minus 16 px Seitenrand (Review 2026-10-13: innerWidth zählte den Balken mit).
+    const rechterRand = document.documentElement.clientWidth - 16;
+    return lesungsLage(achse, achsenZahl, { links: x - 16, rechts: rechterRand - x });
+  };
+  const lageRef = useRef(lageFuer);
+  useEffect(() => {
+    lageRef.current = lageFuer;
+  });
+
+  // Offene Lesung folgt einer Größenänderung des Fensters, nicht nur dem Überfahren.
+  useEffect(() => {
+    if (aktiv === null) return;
+    const neu = () => {
+      const l = lageRef.current(aktiv);
+      if (l) setLage(l);
+    };
+    window.addEventListener("resize", neu);
+    return () => window.removeEventListener("resize", neu);
+  }, [aktiv]);
 
   if (!ziel || !anzeige) return null;
 
@@ -165,15 +193,9 @@ export function AromaNetz({ staende, texte, achsen: achsenTexte, sprache, classN
                 : null,
         };
 
-  // Wohin die Lesung aufgeht: nach außen, gespiegelt, wenn der Viewport dort zu knapp ist.
   const waehle = (achse: number | null) => {
-    if (achse !== null && rahmen.current) {
-      const r = rahmen.current.getBoundingClientRect();
-      const x = r.left + (markenLage(achse, achsen.length).x / 100) * r.width;
-      // clientWidth ohne Scrollbalken, minus 16 px Seitenrand (Review 2026-10-13: innerWidth zählte den Balken mit).
-      const rechterRand = document.documentElement.clientWidth - 16;
-      setLage(lesungsLage(achse, achsen.length, { links: x - 16, rechts: rechterRand - x }));
-    }
+    const l = achse === null ? null : lageFuer(achse);
+    if (l) setLage(l);
     setAktiv(achse);
   };
 

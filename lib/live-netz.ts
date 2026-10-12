@@ -23,7 +23,8 @@ export function liveNetzBasis(bewertungen: readonly EigeneBewertung[], sorten: r
   const andere = bewertungen.filter((b) => b.strainId !== strainId);
   const basis: Record<string, number> = {};
   for (const beitrag of geschmacksBeitraege(andere, sorten)) {
-    for (const [k, x] of beitrag) basis[k] = (basis[k] ?? 0) + x;
+    // geschmacksBeitraege liefert auch `t:`-Schlüssel; das Live-Netz braucht nur `g:`, der Rest wäre Ballast im Client.
+    for (const [k, x] of beitrag) if (k.startsWith("g:")) basis[k] = (basis[k] ?? 0) + x;
   }
   return { basis, sorte: sorten.find((s) => s.strainId === strainId) ?? null };
 }

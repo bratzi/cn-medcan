@@ -26,6 +26,12 @@ test("Live-Netz: ohne Gewicht (Mittelfeld) bleibt das Netz beim Stand ohne diese
   assert.deepEqual(basisGeschmack(basis), profilAnzeige([a], sorten).geschmack);
 });
 
+test("Live-Netz: Basis trägt nur Geschmacksachsen, keine Terpenschlüssel", () => {
+  const basis = liveNetzBasis([a, b], sorten, "x");
+  assert.ok(Object.keys(basis.basis).length > 0);
+  for (const k of Object.keys(basis.basis)) assert.ok(k.startsWith("g:"), k);
+});
+
 test("Bewertungsmaske: Fazit steht auch ohne Community-Werte, Live-Netz daneben", () => {
   const quelle = readFileSync("components/review/AromaErkundung.tsx", "utf8");
   assert.match(quelle, /eigenerSortenFazit !== null \|\| eigenerChargenFazit !== null \|\| netzLive !== null/);
