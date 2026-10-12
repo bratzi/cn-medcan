@@ -170,7 +170,9 @@ export function AromaNetz({ staende, texte, achsen: achsenTexte, sprache, classN
     if (achse !== null && rahmen.current) {
       const r = rahmen.current.getBoundingClientRect();
       const x = r.left + (markenLage(achse, achsen.length).x / 100) * r.width;
-      setLage(lesungsLage(achse, achsen.length, { links: x, rechts: window.innerWidth - x }));
+      // clientWidth ohne Scrollbalken, minus 16 px Seitenrand (Review 2026-10-13: innerWidth zählte den Balken mit).
+      const rechterRand = document.documentElement.clientWidth - 16;
+      setLage(lesungsLage(achse, achsen.length, { links: x - 16, rechts: rechterRand - x }));
     }
     setAktiv(achse);
   };

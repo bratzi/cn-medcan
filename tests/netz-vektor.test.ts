@@ -28,3 +28,8 @@ test("lesungsLage: zu wenig Platz außen spiegelt nach innen (Review Focus 3)", 
   assert.equal(lesungsLage(2, 10, { links: 400, rechts: 40 }).seite, "links");
   assert.equal(lesungsLage(8, 10, { links: 40, rechts: 400 }).seite, "rechts");
 });
+
+test("lesungsLage: rechnet den Abstand von 28 px zur Marke mit (Review: 190 px reichen nicht)", () => {
+  assert.equal(lesungsLage(2, 10, { links: 400, rechts: 190 }).seite, "links");
+  assert.equal(lesungsLage(2, 10, { links: 400, rechts: 210 }).seite, "rechts");
+});

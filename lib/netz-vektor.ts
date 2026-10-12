@@ -9,8 +9,11 @@ export type NetzModus = "geschmack" | "terpene";
 const zwei = (x: number) => Math.round(x * 100) / 100 + 0;
 /** Wie lib/netz-aenderung: kleine Schwankungen zählen nicht. */
 const SCHWELLE = 0.05;
-/** Mindestbreite der Lesung in px; weniger Platz außen spiegelt sie nach innen. */
+/** Breite der Lesung in px (w-44) und ihr Abstand zur Marke (globals.css .netz-lesung, 28 px). */
 export const LESUNG_BREITE = 176;
+export const LESUNG_ABSTAND = 28;
+/** So viel Platz braucht die Lesung außen; weniger spiegelt sie nach innen. */
+const LESUNG_PLATZ = LESUNG_BREITE + LESUNG_ABSTAND;
 
 export function geschmackVektor(g: Geschmack): number[] {
   return GESCHMACKS_ACHSEN.map((a) => g[a.enumWert] ?? 0);
@@ -49,7 +52,7 @@ export function lesungsLage(index: number, anzahl: number, platz?: { links: numb
   const winkel = ((index / anzahl) * 360) % 360;
   let seite: LesungsLage["seite"] =
     winkel < 20 || winkel > 340 ? "oben" : Math.abs(winkel - 180) < 20 ? "unten" : winkel < 180 ? "rechts" : "links";
-  if (platz && seite === "rechts" && platz.rechts < LESUNG_BREITE) seite = "links";
-  else if (platz && seite === "links" && platz.links < LESUNG_BREITE) seite = "rechts";
+  if (platz && seite === "rechts" && platz.rechts < LESUNG_PLATZ) seite = "links";
+  else if (platz && seite === "links" && platz.links < LESUNG_PLATZ) seite = "rechts";
   return { seite };
 }
