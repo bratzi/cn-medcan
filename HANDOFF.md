@@ -44,7 +44,7 @@ Befund: live hat noch kein Kultivar zwei Vertreiber mit bewerteter Charge; das S
 **Dauerregel neu geschärft (Memory `skills-einsatzregeln`):** in jeder Aufgabe Fach-Skills laden; jeder Plan-Task hat
 eine Zeile „Skills:“, jeder Subagent lädt sie vor dem ersten Edit.
 
-### ⇢ GROSSER PUNKT (Nutzer 2026-10-13, Session 58, noch nicht begonnen): Profil und Konto vereinen
+### ⇢ GROSSER PUNKT (Nutzer 2026-10-13, Session 58, erst nach Handoff und Clear): Profil und Konto vereinen
 
 - Kopf: ein Knopf statt „Profil“ und „Mein Konto“. Ohne Konto heißt er „Mein Profil“ und führt zur Anmeldung. Mit
   Konto zeigt er den Namen, höchstens so breit wie heute „Mein Konto“, sonst gekürzt mit „…“. Aussehen wie der
@@ -54,7 +54,7 @@ eine Zeile „Skills:“, jeder Subagent lädt sie vor dem ersten Edit.
   die Boxen in voller Breite und gut verteilt. (Der Anfang aus Session 56 gefällt.)
 - Eigener Brainstorming-Durchgang mit Spec und Plan.
 
-### ⇢ GROSSER PUNKT (Nutzer 2026-10-13, Session 58, noch nicht begonnen): Bewerten neu verknüpfen
+### ⇢ GROSSER PUNKT (Nutzer 2026-10-13, Session 58, erst nach Handoff und Clear): Bewerten neu verknüpfen
 
 - Felder „Charge“ und „Notizen“ in der Bewertung an die Gestaltung weiter oben angleichen; Textfelder wirken noch
   „0815“, ebenso der Bild-Upload.
