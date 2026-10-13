@@ -161,7 +161,6 @@ export type BlueteFreigabe = {
   cbdMax: number;
   vertreiber: string | null;
   hersteller: string | null;
-  kultivarId: string | null;
   terpene: string[];
   bestrahlung: Bestrahlung;
   anbauland: string | null;
@@ -214,7 +213,6 @@ export function blueteFreigabePruefen(
       cbdMax: cbd.wert,
       vertreiber: optional(formular.get("vertreiber")),
       hersteller: optional(formular.get("hersteller")),
-      kultivarId: idOderNull(formular.get("kultivarId")),
       terpene,
       bestrahlung: bestrahlungRoh,
       anbauland: optional(formular.get("anbauland")),
@@ -264,7 +262,6 @@ export type FreigabeVorbelegung = {
   cbd: string;
   vertreiber: string;
   hersteller: string;
-  kultivarId: string;
   terpene: string[];
 };
 
@@ -290,7 +287,6 @@ export function freigabeVorbelegen(gruppe: VorschlagGruppe): FreigabeVorbelegung
     cbd: cbd === null ? "" : String(cbd),
     vertreiber: erster(l, (v) => v.vertreiber) ?? "",
     hersteller: erster(l, (v) => v.hersteller) ?? "",
-    kultivarId: erster(l, (v) => v.kultivarId) ?? "",
     terpene: terpene ?? [],
   };
 }
@@ -327,8 +323,9 @@ export function vertreiberRolleNachFreigabe(rolle: string): "BEIDES" | null {
 }
 
 /** Pfad zu /vorschlagen, mit dem Namen als Vorbelegung (Katalogsuche, Anmeldung). */
-export function vorschlagPfad(name: string | undefined): string {
-  return name ? `/vorschlagen?name=${encodeURIComponent(name)}` : "/vorschlagen";
+export function vorschlagPfad(name: string | undefined, kultivarId?: string | null): string {
+  const teile = [name ? `name=${encodeURIComponent(name)}` : null, kultivarId ? `kultivar=${encodeURIComponent(kultivarId)}` : null].filter(Boolean);
+  return teile.length ? `/vorschlagen?${teile.join("&")}` : "/vorschlagen";
 }
 
 /** Nur http(s) wird verlinkt; alles andere bleibt Text. */

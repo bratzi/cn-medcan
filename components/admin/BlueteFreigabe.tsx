@@ -44,7 +44,6 @@ export function BlueteFreigabe({ schluessel, vorbelegung: v, terpene, katalog, u
     <div className="flex flex-col gap-8">
       <form onSubmit={senden(freigabe, blueteFreigeben)} className="flex flex-col gap-6">
         <input type="hidden" name="vorschlagSchluessel" value={schluessel} />
-        <input type="hidden" name="kultivarId" value={v.kultivarId} />
         <Input id={id("name")} name="handelsname" label="Handelsname" pflicht required defaultValue={v.handelsname} />
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
           <Input id={id("kultivar")} name="kultivarName" label="Kultivar" defaultValue={v.kultivarName} />

@@ -20,16 +20,17 @@ export default async function VorschlagenPage({ searchParams }: Props) {
   const roh = (await searchParams).name;
   const nameVorbelegt = (typeof roh === "string" ? roh : "").slice(0, 120);
 
+  // Der Suchbegriff aus dem Katalog soll die Anmeldung ueberleben.
+  const [mitglied, w, sprache] = await Promise.all([aktuellesMitglied(), holeWoerterbuch(), holeSprache()]);
   // Link „Vertreiber fehlt?“ von der Blütenseite: nur eine echte Kultivar-Id zählt.
   const kultivarRoh = (await searchParams).kultivar;
   const kultivarWert = typeof kultivarRoh === "string" ? kultivarRoh.trim().toLowerCase() : "";
-  const kultivar = /^[0-9a-f-]{32,36}$/.test(kultivarWert)
-    ? await (await getPrisma()).kultivar.findUnique({ where: { id: kultivarWert }, select: { id: true, name: true } })
+  const kultivarGueltig = /^[0-9a-f-]{32,36}$/.test(kultivarWert) ? kultivarWert : null;
+  if (!mitglied) redirect(`/anmelden?weiter=${encodeURIComponent(vorschlagPfad(nameVorbelegt, kultivarGueltig))}`);
+  // Erst nach der Anmeldeprüfung: anonyme Besucher lösen keine Abfrage aus.
+  const kultivar = kultivarGueltig
+    ? await (await getPrisma()).kultivar.findUnique({ where: { id: kultivarGueltig }, select: { id: true, name: true } })
     : null;
-
-  // Der Suchbegriff aus dem Katalog soll die Anmeldung ueberleben.
-  const [mitglied, w, sprache] = await Promise.all([aktuellesMitglied(), holeWoerterbuch(), holeSprache()]);
-  if (!mitglied) redirect(`/anmelden?weiter=${encodeURIComponent(vorschlagPfad(nameVorbelegt))}`);
 
   return (
     <div className="mx-auto w-full max-w-180 px-4 py-16 sm:px-8">

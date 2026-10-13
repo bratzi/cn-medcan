@@ -113,7 +113,7 @@ test("vorschlagPfad: Suchbegriff bleibt erhalten, auch ueber die Anmeldung", () 
   assert.equal(vorschlagPfad(""), "/vorschlagen");
   assert.equal(vorschlagPfad("Apples & Bananas"), "/vorschlagen?name=Apples%20%26%20Bananas");
   const seite = lies("app/[lang]/vorschlagen/page.tsx");
-  assert.match(seite, /redirect\(`\/anmelden\?weiter=\$\{encodeURIComponent\(vorschlagPfad\(nameVorbelegt\)\)\}`\)/);
+  assert.match(seite, /redirect\(`\/anmelden\?weiter=\$\{encodeURIComponent\(vorschlagPfad\(nameVorbelegt, kultivarGueltig\)\)\}`\)/);
 });
 
 test("Leeres Suchergebnis zeigt nur einen Vorschlags-Einstieg", () => {

@@ -64,6 +64,11 @@ export async function blueteVorschlagen(formData: FormData): Promise<VorschlagEr
     };
   }
 
+  // Gefälschte oder gelöschte Kultivar-Id: ohne Verweis speichern statt am Fremdschlüssel zu scheitern.
+  const kultivarId = w.kultivarId
+    ? ((await prisma.kultivar.findUnique({ where: { id: w.kultivarId }, select: { id: true } }))?.id ?? null)
+    : null;
+
   try {
     const angelegt = await prisma.sortenVorschlag.create({
       data: {
@@ -72,7 +77,7 @@ export async function blueteVorschlagen(formData: FormData): Promise<VorschlagEr
         schluessel: w.schluessel,
         vertreiber: w.vertreiber,
         hersteller: w.hersteller,
-        kultivarId: w.kultivarId,
+        kultivarId,
         kultivarName: w.kultivarName,
         kultivarTyp: w.kultivarTyp,
         thcProzent: w.thcProzent,

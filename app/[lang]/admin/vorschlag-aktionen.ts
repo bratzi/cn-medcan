@@ -171,7 +171,7 @@ export async function blueteFreigeben(formData: FormData): Promise<AdminVorschla
   if (!vorhanden) {
     const vertreiberId = w.vertreiber ? await unternehmenSichern(w.vertreiber, "IMPORTEUR") : null;
     const herstellerId = w.hersteller ? await unternehmenSichern(w.hersteller, "HERSTELLER") : null;
-    const kultivarId = w.kultivarId ?? (await kultivarSichern(w.kultivarName ?? w.handelsname));
+    const kultivarId = await kultivarSichern(w.kultivarName ?? w.handelsname);
     try {
       await prisma.strain.create({
         data: {
@@ -179,7 +179,8 @@ export async function blueteFreigeben(formData: FormData): Promise<AdminVorschla
           slug: w.slug,
           handelsname: w.handelsname,
           darreichungsform: "BLUETE",
-          kultivarName: w.kultivarName,
+          // Der Name, den der Admin sieht und bearbeitet, gilt: Kultivar und kultivarName bleiben gleich.
+          kultivarName: w.kultivarName ?? w.handelsname,
           kultivarTyp: w.kultivarTyp,
           thcMinProzent: w.thcMin,
           thcMaxProzent: w.thcMax,

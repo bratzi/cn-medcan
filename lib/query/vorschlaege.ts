@@ -45,7 +45,7 @@ export async function offeneVorschlaegeFuerAdmin(): Promise<OffenerVorschlag[]> 
     where: { status: "OFFEN" },
     orderBy: { erstelltAm: "asc" },
     take: MAX_ADMIN,
-    include: { mitglied: { select: { anzeigename: true, avatar: { select: { id: true } } } } },
+    include: { kultivar: { select: { name: true } }, mitglied: { select: { anzeigename: true, avatar: { select: { id: true } } } } },
   });
   return zeilen.map((z) => ({
     id: z.id,
@@ -57,7 +57,7 @@ export async function offeneVorschlaegeFuerAdmin(): Promise<OffenerVorschlag[]> 
     vertreiber: z.vertreiber,
     hersteller: z.hersteller,
     kultivarId: z.kultivarId,
-    kultivarName: z.kultivarName,
+    kultivarName: z.kultivarName ?? z.kultivar?.name ?? null,
     kultivarTyp: z.kultivarTyp,
     thcProzent: z.thcProzent,
     cbdProzent: z.cbdProzent,

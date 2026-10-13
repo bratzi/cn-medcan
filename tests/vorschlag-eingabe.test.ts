@@ -158,7 +158,6 @@ test("freigabeVorbelegen: erster Vorschlag zuerst, Luecken aus den weiteren, Ein
     cbd: "1",
     vertreiber: "",
     hersteller: "Aurora",
-    kultivarId: "",
     terpene: ["Myrcen"],
   });
 });
