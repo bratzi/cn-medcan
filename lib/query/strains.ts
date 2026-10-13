@@ -124,6 +124,9 @@ export type StrainListenEintrag = {
   anbauland: string | null;
   herstellerBildPfad: string | null;
   vertreiberName: string | null;
+  /** Blüte (Kultivar) dieses Handelsnamens, für „bei N Vertreibern“. */
+  kultivarId: string | null;
+  vertreiberId: string | null;
   /** Dominante Terpene, Rang 1 bis 3, aufsteigend nach Rang. */
   terpene: TerpenEintrag[];
   /** Guenstigster sichtbarer Preis in Cent pro Gramm, sonst null. */
@@ -344,7 +347,7 @@ const KENNWERTE_SELECT = { select: { terpenMedian: true, geschmackMedian: true, 
 //  Liste
 // ---------------------------------------------------------------------------
 
-function baueWhere(
+export function baueWhere(
   filter: StrainFilter,
   fachkreis: boolean
 ): Prisma.StrainWhereInput {
@@ -369,6 +372,7 @@ function baueWhere(
   if (filter.thcMax < 100) bedingungen.thcMinProzent = { lte: filter.thcMax };
 
   if (filter.vertreiber.length > 0) bedingungen.vertreiberId = { in: filter.vertreiber };
+  if (filter.kultivar) bedingungen.kultivarId = filter.kultivar;
 
   if (filter.geschmack.length > 0) {
     // Dominantes Terpen = Rang 1.
@@ -440,6 +444,8 @@ const listenSelect = (fachkreis: boolean) =>
     bestrahlung: true,
     anbauland: true,
     herstellerBildPfad: true,
+    kultivarId: true,
+    vertreiberId: true,
     vertreiber: { select: { name: true } },
     terpene: {
       where: { rang: { lte: 3 } },
@@ -477,6 +483,8 @@ type ListenZeile = {
   bestrahlung: string;
   anbauland: string | null;
   herstellerBildPfad: string | null;
+  kultivarId: string | null;
+  vertreiberId: string | null;
   vertreiber: { name: string } | null;
   terpene: {
     rang: number;
@@ -535,6 +543,8 @@ function zuListenEintrag(zeile: ListenZeile): StrainListenEintrag {
     anbauland: zeile.anbauland,
     herstellerBildPfad: zeile.herstellerBildPfad,
     vertreiberName: zeile.vertreiber?.name ?? null,
+    kultivarId: zeile.kultivarId,
+    vertreiberId: zeile.vertreiberId,
     terpene: zeile.terpene.map((eintrag) => ({
       name: eintrag.terpen.name,
       aromaProfil: eintrag.terpen.aromaProfil,

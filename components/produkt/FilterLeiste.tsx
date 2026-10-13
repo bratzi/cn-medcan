@@ -165,7 +165,7 @@ export function FilterLeiste({ facetten, filter, gesamt, texte, titel, zurueckse
           <Button
             variante="ghost"
             groesse="sm"
-            onClick={() => schreibe({ ...leererFilter(), sortierung: filter.sortierung })}
+            onClick={() => schreibe({ ...leererFilter(), sortierung: filter.sortierung, ansicht: filter.ansicht })}
           >
             {zuruecksetzen}
           </Button>
@@ -391,18 +391,20 @@ export function FilterLeiste({ facetten, filter, gesamt, texte, titel, zurueckse
         </fieldset>
       ) : null}
 
-      <Select
-        id={`${basisId}-sortierung`}
-        label={texte.sortierung}
-        value={filter.sortierung}
-        optionen={SORTIERUNGEN.map((wert) => ({
-          wert,
-          label: texte.sortierungen[wert],
-        }))}
-        onChange={(event) =>
-          setzeSofort({ sortierung: event.target.value as Sortierung })
-        }
-      />
+      {filter.ansicht === "bluete" ? null : (
+        <Select
+          id={`${basisId}-sortierung`}
+          label={texte.sortierung}
+          value={filter.sortierung}
+          optionen={SORTIERUNGEN.map((wert) => ({
+            wert,
+            label: texte.sortierungen[wert],
+          }))}
+          onChange={(event) =>
+            setzeSofort({ sortierung: event.target.value as Sortierung })
+          }
+        />
+      )}
     </div>
   );
 }

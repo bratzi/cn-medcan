@@ -118,7 +118,7 @@ test("vorschlagPfad: Suchbegriff bleibt erhalten, auch ueber die Anmeldung", () 
 
 test("Leeres Suchergebnis zeigt nur einen Vorschlags-Einstieg", () => {
   const katalog = lies("app/[lang]/blueten/page.tsx");
-  assert.match(katalog, /liste\.eintraege\.length > 0 \? \(\s*<p className="text-small text-text-muted">\s*\{texte\.fehlt\}/);
+  assert.match(katalog, /sichtbar > 0 \? \(\s*<p className="text-small text-text-muted">\s*\{texte\.fehlt\}/);
 });
 
 test("Schreibvarianten eines Namens landen in einer Gruppe", () => {

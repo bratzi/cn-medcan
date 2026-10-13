@@ -3,14 +3,17 @@ import Link from "next/link";
 import { Suspense } from "react";
 
 import { AktiveFilter } from "@/components/produkt/AktiveFilter";
+import { AnsichtUmschalter } from "@/components/produkt/AnsichtUmschalter";
 import { FilterLeiste } from "@/components/produkt/FilterLeiste";
 import { alsDiashow } from "@/lib/budpic-anzeige";
 import { budpicZugang, ladeFreieBudpics } from "@/lib/query/budpics";
+import { KultivarKarte } from "@/components/produkt/KultivarKarte";
 import { ProduktCard } from "@/components/produkt/ProduktCard";
 import { EmptyState, Spinner, buttonKlassen, textLinkKlassen } from "@/components/ui";
 import { parseStrainFilter, serialisiereFilter } from "@/lib/query/filter";
 import type { StrainFilter } from "@/lib/query/filter";
 import { istFachkreis } from "@/lib/query/fachkreis";
+import { ladeKultivarListe, ladeKultivarName, ladeVertreiberJeKultivar, weitereVertreiber } from "@/lib/query/kultivar-liste";
 import { ladeFilterFacetten, ladeStrainListe, ladeUnternehmenNamen } from "@/lib/query/strains";
 import { holeSprache, holeWoerterbuch, type Sprache, type Woerterbuch } from "@/lib/i18n";
 import { mehrzahl, t } from "@/lib/i18n/text";
@@ -70,14 +73,28 @@ function vorschlagLink(suche: string | undefined): string {
 async function Ergebnisbereich({ filter, w, sprache }: { filter: StrainFilter; w: Woerterbuch; sprache: Sprache }) {
   const texte = w.katalog;
   const fachkreis = await istFachkreis();
-  // Zwei parallele Abfragen: Liste und Facetten blockieren sich nicht.
-  const [liste, facetten, zugang] = await Promise.all([
-    ladeStrainListe(filter, fachkreis),
+  const bluetenAnsicht = filter.ansicht === "bluete";
+  // Parallele Abfragen: Liste (je Handelsname oder je Blüte), Facetten, Zugang und Blütenname blockieren sich nicht.
+  const [liste, kultivare, facetten, zugang, kultivarName] = await Promise.all([
+    bluetenAnsicht ? null : ladeStrainListe(filter, fachkreis),
+    bluetenAnsicht ? ladeKultivarListe(filter, fachkreis) : null,
     ladeFilterFacetten(fachkreis),
     budpicZugang(),
+    filter.kultivar ? ladeKultivarName(filter.kultivar) : Promise.resolve(null),
   ]);
+  const eintraege = liste?.eintraege ?? [];
   // Budpics (T9): eine Abfrage fuer alle Karten der Seite, danach je Sorte gezeigt.
-  const budpics = await ladeFreieBudpics(liste.eintraege.map((e) => e.id));
+  // Mit Filter kultivar sind alle Treffer dieselbe Blüte: dann kein Hinweis auf weitere Vertreiber.
+  const [budpics, jeKultivar] = await Promise.all([
+    ladeFreieBudpics(eintraege.map((e) => e.id)),
+    filter.kultivar
+      ? Promise.resolve(new Map<string, Set<string>>())
+      : ladeVertreiberJeKultivar(eintraege.flatMap((e) => (e.kultivarId ? [e.kultivarId] : []))),
+  ]);
+  const gesamt = liste?.gesamt ?? kultivare?.gesamt ?? 0;
+  const seite = liste?.seite ?? kultivare?.seite ?? 1;
+  const seitenAnzahl = liste?.seitenAnzahl ?? kultivare?.seitenAnzahl ?? 1;
+  const sichtbar = liste?.eintraege.length ?? kultivare?.eintraege.length ?? 0;
 
   const apothekenNamen = new Map(
     facetten.apotheken.map((apotheke) => [apotheke.slug, apotheke.name]),
@@ -92,7 +109,7 @@ async function Ergebnisbereich({ filter, w, sprache }: { filter: StrainFilter; w
         <FilterLeiste
           facetten={facetten}
           filter={filter}
-          gesamt={liste.gesamt}
+          gesamt={gesamt}
           texte={texte.leiste}
           titel={texte.filter}
           zuruecksetzen={texte.zuruecksetzen}
@@ -102,19 +119,30 @@ async function Ergebnisbereich({ filter, w, sprache }: { filter: StrainFilter; w
       </aside>
 
       <div className="flex min-w-0 flex-1 flex-col gap-6">
+        <AnsichtUmschalter filter={filter} texte={texte.ansicht} />
+
         <p className="text-small text-text-muted numeric">
-          {mehrzahl(sprache, texte.anzahl, liste.gesamt, { sichtbar: liste.eintraege.length })}
+          {bluetenAnsicht
+            ? mehrzahl(sprache, texte.kultivar.anzahl, gesamt)
+            : mehrzahl(sprache, texte.anzahl, gesamt, { sichtbar })}
         </p>
 
-        <AktiveFilter filter={filter} apothekenNamen={apothekenNamen} vertreiberNamen={vertreiberNamen} w={w} sprache={sprache} />
+        <AktiveFilter
+          filter={filter}
+          apothekenNamen={apothekenNamen}
+          vertreiberNamen={vertreiberNamen}
+          kultivarName={kultivarName}
+          w={w}
+          sprache={sprache}
+        />
 
-        {liste.eintraege.length === 0 ? (
+        {sichtbar === 0 ? (
           <EmptyState
             titel={texte.leerTitel}
             beschreibung={texte.leerText}
             aktion={
               <div className="flex flex-wrap gap-4">
-                <Link prefetch={false} href="/blueten" className={buttonKlassen("secondary")}>
+                <Link prefetch={false} href={bluetenAnsicht ? "/blueten?ansicht=bluete" : "/blueten"} className={buttonKlassen("secondary")}>
                   {texte.zuruecksetzen}
                 </Link>
                 <Link prefetch={false} href={vorschlagLink(filter.q)} className={buttonKlassen("secondary")}>
@@ -125,23 +153,30 @@ async function Ergebnisbereich({ filter, w, sprache }: { filter: StrainFilter; w
           />
         ) : (
           <ul className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
-            {liste.eintraege.map((strain) => (
-              <li key={strain.id} className="flex">
-                <ProduktCard
-                  strain={strain}
-                  w={w}
-                  sprache={sprache}
-                  className="w-full"
-                  budpics={alsDiashow(budpics.get(strain.id) ?? [], w, sprache)}
-                  zugang={zugang}
-                />
-              </li>
-            ))}
+            {kultivare
+              ? kultivare.eintraege.map((k) => (
+                  <li key={k.id} className="flex">
+                    <KultivarKarte kultivar={k} filter={filter} w={w} sprache={sprache} />
+                  </li>
+                ))
+              : eintraege.map((strain) => (
+                  <li key={strain.id} className="flex">
+                    <ProduktCard
+                      strain={strain}
+                      w={w}
+                      sprache={sprache}
+                      className="w-full"
+                      budpics={alsDiashow(budpics.get(strain.id) ?? [], w, sprache)}
+                      zugang={zugang}
+                      weitereVertreiber={weitereVertreiber(strain, jeKultivar)}
+                    />
+                  </li>
+                ))}
           </ul>
         )}
 
         {/* Im leeren Ergebnis steht der Einstieg schon im Leerzustand. */}
-        {liste.eintraege.length > 0 ? (
+        {sichtbar > 0 ? (
           <p className="text-small text-text-muted">
             {texte.fehlt}{" "}
             <Link prefetch={false} href={vorschlagLink(filter.q)} className={textLinkKlassen()}>
@@ -150,14 +185,14 @@ async function Ergebnisbereich({ filter, w, sprache }: { filter: StrainFilter; w
           </p>
         ) : null}
 
-        {liste.seitenAnzahl > 1 ? (
+        {seitenAnzahl > 1 ? (
           <nav
             aria-label={texte.seitennavigation}
             className="flex flex-wrap items-center justify-between gap-4 border-t border-border pt-6"
           >
-            {liste.seite > 1 ? (
+            {seite > 1 ? (
               <Link prefetch={false}
-                href={`/blueten?${serialisiereFilter({ ...filter, seite: liste.seite - 1 }).toString()}`}
+                href={`/blueten?${serialisiereFilter({ ...filter, seite: seite - 1 }).toString()}`}
                 className={buttonKlassen("secondary")}
                 rel="prev"
               >
@@ -168,12 +203,12 @@ async function Ergebnisbereich({ filter, w, sprache }: { filter: StrainFilter; w
             )}
 
             <p className="numeric text-small text-text-muted">
-              {t(texte.seiteVon, { seite: liste.seite, seiten: liste.seitenAnzahl })}
+              {t(texte.seiteVon, { seite, seiten: seitenAnzahl })}
             </p>
 
-            {liste.seite < liste.seitenAnzahl ? (
+            {seite < seitenAnzahl ? (
               <Link prefetch={false}
-                href={`/blueten?${serialisiereFilter({ ...filter, seite: liste.seite + 1 }).toString()}`}
+                href={`/blueten?${serialisiereFilter({ ...filter, seite: seite + 1 }).toString()}`}
                 className={buttonKlassen("secondary")}
                 rel="next"
               >
