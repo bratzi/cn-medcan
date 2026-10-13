@@ -58,7 +58,7 @@ test("notenVerteilung: fünf Stufen, gerundet, Ersatznote ohne Gesamtnote", () =
 test("profilNotizen: fünf Notizen; ohne Community-Abstand entfällt sie", () => {
   const zeilen = [z(4, "2026-10-02T10:00:00Z"), z(3, "2026-09-01T10:00:00Z")];
   const mit = profilNotizen({ zeilen, differenz: -0.4, hersteller: 2 }, de.profil.kapitel, "de");
-  assert.deepEqual(mit.map((n) => n.wort), ["bewertet", "im Schnitt", "zur Community", "Hersteller", "zuletzt"]);
+  assert.deepEqual(mit.map((n) => n.wort), ["bewertet", "im Schnitt", "zur Community", "Vertreiber", "zuletzt"]);
   assert.equal(mit[0].zahl, "2");
   assert.equal(mit[1].zahl, "3,5");
   assert.equal(mit[2].zahl, "−0,4");
@@ -105,11 +105,11 @@ test("profilNotizen: Vorlesesätze in Einzahl und Mehrzahl", () => {
   const eine = [z(4, "2026-10-02T10:00:00Z")];
   const eins = profilNotizen({ zeilen: eine, differenz: null, hersteller: 1 }, de.profil.kapitel, "de");
   assert.equal(eins[0].satz, "1 Bewertung");
-  assert.equal(eins.find((n) => n.wort === "Hersteller")?.satz, "Blüten von 1 Hersteller bewertet");
+  assert.equal(eins.find((n) => n.wort === "Vertreiber")?.satz, "Blüten von 1 Vertreiber bewertet");
   const zwei = [z(4, "2026-10-02T10:00:00Z"), z(3, "2026-09-01T10:00:00Z")];
   const mehr = profilNotizen({ zeilen: zwei, differenz: null, hersteller: 2 }, de.profil.kapitel, "de");
   assert.equal(mehr[0].satz, "2 Bewertungen");
-  assert.equal(mehr.find((n) => n.wort === "Hersteller")?.satz, "Blüten von 2 Herstellern bewertet");
+  assert.equal(mehr.find((n) => n.wort === "Vertreiber")?.satz, "Blüten von 2 Vertreibern bewertet");
 });
 
 test("Aktivitaet: Wertzahl ist Geschwister der Säule, nicht in ihr", () => {
@@ -121,5 +121,5 @@ test("Aktivitaet: Wertzahl ist Geschwister der Säule, nicht in ihr", () => {
 test("profilNotizen: Seitenleiste zeigt genau vier Zahlen, auch mit Community-Abstand", () => {
   const zeilen = [z(4, "2026-10-02T10:00:00Z"), z(3, "2026-09-01T10:00:00Z")];
   const n = profilNotizen({ zeilen, differenz: -0.4, hersteller: 2 }, de.profil.kapitel, "de", { ohneCommunity: true });
-  assert.deepEqual(n.map((x) => x.wort), ["bewertet", "im Schnitt", "Hersteller", "zuletzt"]);
+  assert.deepEqual(n.map((x) => x.wort), ["bewertet", "im Schnitt", "Vertreiber", "zuletzt"]);
 });

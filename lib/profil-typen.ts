@@ -79,4 +79,4 @@ export type VerlaufSchritt = { anzahl: number; datum: string; geschmack: Geschma
 export type NetzAenderung = { achse: GeschmacksKategorie; differenz: number };
 
 /** Ein Hersteller mit eigenen Bewertungen (Spec 2026-10-09 C): Id für den Katalogfilter, Mittel und Anzahl. */
-export type HerstellerRang = { id: string; name: string; mittel: number; anzahl: number };
+export type VertreiberRang = { id: string; name: string; mittel: number; anzahl: number };

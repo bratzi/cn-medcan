@@ -9,7 +9,7 @@ import { FeldSkelett } from "@/components/kapitel/FeldSkelett";
 import { Aktivitaet } from "@/components/profil/Aktivitaet";
 import { BewertungsRegister } from "@/components/profil/BewertungsRegister";
 import { CommunityVergleich } from "@/components/profil/CommunityVergleich";
-import { Lieblingshersteller } from "@/components/profil/Lieblingshersteller";
+import { Lieblingsvertreiber } from "@/components/profil/Lieblingsvertreiber";
 import { NotenVerteilung } from "@/components/profil/NotenVerteilung";
 import { ProfilNetz } from "@/components/profil/ProfilNetz";
 import { ProfilRahmen } from "@/components/profil/ProfilRahmen";
@@ -26,7 +26,7 @@ import { auswertungen, leereProfilWerte } from "@/lib/profil";
 import { ansichtAus, liebsteAromen, PROFIL_ANSICHTEN } from "@/lib/profil-ansicht";
 import { monatsReihe, notenVerteilung, profilNotizen } from "@/lib/profil-dashboard";
 import { ladeEmpfehlungen } from "@/lib/query/empfehlungen";
-import { ladeLieblingshersteller } from "@/lib/query/lieblingshersteller";
+import { ladeLieblingsvertreiber } from "@/lib/query/lieblingsvertreiber";
 import { aktuellesProfil, ladeAuswertungsZeilen } from "@/lib/query/profil";
 import { aktuellesMitglied } from "@/lib/session";
 
@@ -251,17 +251,17 @@ async function AnsichtUebersicht({ id }: { id: string }) {
   );
 }
 
-/** Vertreiber: Lieblingshersteller (über beide Spalten), Schnitte und Community. */
+/** Vertreiber: Lieblingsvertreiber (über beide Spalten), Schnitte und Community. */
 async function AnsichtVertreiber({ id }: { id: string }) {
   const [{ w, sprache }, zeilen, liebling] = await Promise.all([
     textLaden(),
     zeilenLaden(id),
-    ladeLieblingshersteller(id).catch(oderUndefined<Awaited<ReturnType<typeof ladeLieblingshersteller>>>("ladeLieblingshersteller")),
+    ladeLieblingsvertreiber(id).catch(oderUndefined<Awaited<ReturnType<typeof ladeLieblingsvertreiber>>>("ladeLieblingsvertreiber")),
   ]);
   const texte = w.profil;
   if (zeilen === null || zeilen.length === 0) {
     return (
-      <Feld id="hersteller" rahmen="karte" groesse="klein" titel={texte.herstellerTitel} kopf={texte.koepfe.hersteller} ton="lila">
+      <Feld id="vertreiber" rahmen="karte" groesse="klein" titel={texte.vertreiberTitel} kopf={texte.koepfe.vertreiber} ton="lila">
         <p className="max-w-[68ch] text-body text-text-muted">{zeilen === null ? texte.fehler : texte.leer}</p>
       </Feld>
     );
@@ -269,8 +269,8 @@ async function AnsichtVertreiber({ id }: { id: string }) {
   const a = auswertungen(zeilen);
   return (
     <div className="grid grid-cols-1 gap-8 min-[1280px]:grid-cols-2">
-      <Feld id="hersteller" rahmen="karte" groesse="klein" titel={texte.herstellerTitel} kopf={texte.koepfe.hersteller} ton="lila" className="min-[1280px]:col-span-2">
-        <Lieblingshersteller daten={liebling} texte={texte} sprache={sprache} />
+      <Feld id="vertreiber" rahmen="karte" groesse="klein" titel={texte.vertreiberTitel} kopf={texte.koepfe.vertreiber} ton="lila" className="min-[1280px]:col-span-2">
+        <Lieblingsvertreiber daten={liebling} texte={texte} sprache={sprache} />
       </Feld>
       {a.schnitte ? (
         <Feld id="schnitte" rahmen="karte" groesse="klein" titel={texte.schnitteTitel} kopf={texte.koepfe.schnitte} ton="gruen" satz={texte.schnitteSatz}>

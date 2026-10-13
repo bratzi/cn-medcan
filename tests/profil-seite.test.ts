@@ -17,7 +17,7 @@ test("/profil: nur angemeldet, nicht im Index, rechnet nur bei veraltetem Stand"
 test("/profil: Kapitel-Reihenfolge, Raster, kein Apothekenlink", () => {
   const q = seite();
   // Die Reihenfolge prüft tests/profil-reihenfolge.test.ts (Nutzer 2026-10-09).
-  for (const teil of ["<ProfilRahmen", "<ProfilSeitenleiste", "<ProfilReiter", "<ProfilNetz", "<EmpfehlungsListe", "<Aktivitaet", "<NotenVerteilung", "<TopFlop", "<Lieblingshersteller", "<CommunityVergleich", "<Schnitte", "<BewertungsRegister"]) assert.ok(q.includes(teil), teil);
+  for (const teil of ["<ProfilRahmen", "<ProfilSeitenleiste", "<ProfilReiter", "<ProfilNetz", "<EmpfehlungsListe", "<Aktivitaet", "<NotenVerteilung", "<TopFlop", "<Lieblingsvertreiber", "<CommunityVergleich", "<Schnitte", "<BewertungsRegister"]) assert.ok(q.includes(teil), teil);
   assert.doesNotMatch(q, /<KapitelRaster|<Kapitelkopf/);
   assert.match(q, /<Suspense/);
   assert.doesNotMatch(q, /apotheke/i);
@@ -32,7 +32,7 @@ test("/profil: Verlauf im Netz statt in eigenem Feld, nie auf dem öffentlichen 
   assert.doesNotMatch(q, /NetzVerlauf|id="verlauf"/);
   assert.match(q, /<Feld id="vorschlaege"/);
   const oeffentlich = readFileSync("app/[lang]/profil/[kurzId]/page.tsx", "utf8");
-  assert.doesNotMatch(oeffentlich, /verlauf=|NetzVerlauf|Lieblingshersteller/);
+  assert.doesNotMatch(oeffentlich, /verlauf=|NetzVerlauf|Lieblingsvertreiber/);
 });
 
 test("/mitglied: Titel ist der Reiter Konto, h1 ist der Name im Kapitelkopf", () => {

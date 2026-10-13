@@ -6,29 +6,29 @@ import { formatiereZahl } from "@/lib/format";
 import type { Sprache } from "@/lib/i18n/sprache-kern";
 import { mehrzahl, t } from "@/lib/i18n/text";
 import type { Woerterbuch } from "@/lib/i18n/typen";
-import type { HerstellerRang } from "@/lib/profil-typen";
+import type { VertreiberRang } from "@/lib/profil-typen";
 
-/** `undefined`: die Abfrage ist gescheitert; leer: noch keine Bewertung mit bekanntem Hersteller. */
-type Props = { daten: readonly HerstellerRang[] | undefined; texte: Woerterbuch["profil"]; sprache: Sprache };
+/** `undefined`: die Abfrage ist gescheitert; leer: noch keine Charge mit Qualität bewertet. */
+type Props = { daten: readonly VertreiberRang[] | undefined; texte: Woerterbuch["profil"]; sprache: Sprache };
 
 /**
- * Deine Hersteller (Spec 2026-10-09 C): bis zu fünf, bestes Mittel zuerst, je mit Blättern und der Zahl
- * deiner Bewertungen in Handschrift. Der Name führt in den Katalog, gefiltert nach diesem Hersteller.
+ * Deine Vertreiber (Spec 2026-10-13): bis zu fünf, bestes Mittel zuerst, je mit Blättern und der Zahl
+ * deiner Bewertungen in Handschrift. Der Name führt in den Katalog, gefiltert nach diesem Vertreiber.
  * Privat, kein Kauf- oder Apothekenlink, kein Logo (HWG).
  */
-export function Lieblingshersteller({ daten, texte, sprache }: Props) {
-  if (daten === undefined) return <p className="max-w-[68ch] text-body text-text text-pretty">{texte.herstellerFehler}</p>;
-  if (daten.length === 0) return <p className="max-w-[68ch] text-body text-text-muted text-pretty">{texte.herstellerLeer}</p>;
+export function Lieblingsvertreiber({ daten, texte, sprache }: Props) {
+  if (daten === undefined) return <p className="max-w-[68ch] text-body text-text text-pretty">{texte.vertreiberFehler}</p>;
+  if (daten.length === 0) return <p className="max-w-[68ch] text-body text-text-muted text-pretty">{texte.vertreiberLeer}</p>;
   return (
     <ol className="flex flex-col gap-4">
       {daten.map((h) => (
         <li key={h.id} className="flex min-w-0 flex-col gap-1">
-          <Link prefetch={false} href={`/blueten?hersteller=${h.id}`} className={`${namenLinkKlassen()} wrap-break-word`}>
+          <Link prefetch={false} href={`/blueten?vertreiber=${h.id}`} className={`${namenLinkKlassen()} wrap-break-word`}>
             {h.name}
           </Link>
           {/* Blätter mit Mittel, daneben die Zahl deiner Bewertungen von Hand; eine Zeile, die umbrechen darf. */}
           <span className="flex flex-wrap items-center gap-x-4 gap-y-1">
-            <BlattAnzeige note={h.mittel} text={t(texte.herstellerZeile, { note: formatiereZahl(h.mittel, 1, sprache) })} />
+            <BlattAnzeige note={h.mittel} text={t(texte.vertreiberZeile, { note: formatiereZahl(h.mittel, 1, sprache) })} />
             <span className="sr-only">{mehrzahl(sprache, texte.anzahl, h.anzahl)}</span>
             <span aria-hidden="true" className="font-hand text-notiz text-logo numeric">
               {h.anzahl}×

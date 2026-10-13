@@ -24,8 +24,8 @@ test("Aromen: Netz, dann Ähnliches im Aroma", () => {
   reihenfolge([lage("netz"), lage("vorschlaege")]);
 });
 
-test("Vertreiber: Hersteller, Schnitte, Community", () => {
-  reihenfolge(["hersteller", "schnitte", "community"].map(lage));
+test("Vertreiber: Vertreiber, Schnitte, Community", () => {
+  reihenfolge(["vertreiber", "schnitte", "community"].map(lage));
 });
 
 test("Kein Feld Terpene mehr, jedes Feld mit Kopf, klein und als Karte, ohne Rasterspalten", () => {

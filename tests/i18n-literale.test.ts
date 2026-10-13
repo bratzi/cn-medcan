@@ -118,11 +118,11 @@ const UMGESTELLT: string[] = [
   "components/profil/TopFlop.tsx",
   "components/profil/CommunityVergleich.tsx",
   "components/profil/Schnitte.tsx",
-  // Profil Stufe 3: Verlauf, Lieblingshersteller, Mini-Netz
+  // Profil Stufe 3: Verlauf, Lieblingsvertreiber, Mini-Netz
   "components/profil/NetzGrafik.tsx",
   "components/profil/AromaNetz.tsx",
   "components/profil/NetzLegende.tsx",
-  "components/profil/Lieblingshersteller.tsx",
+  "components/profil/Lieblingsvertreiber.tsx",
   "components/review/MiniNetz.tsx",
   // Profil Stufe 2: oeffentliches Profil
   "app/[lang]/profil/[kurzId]/page.tsx",
