@@ -28,7 +28,7 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 
 ## ⇢ Hier geht es weiter
 
-### ⇢ SESSION 58 (2026-10-13): Vertreiber sichtbar – Spec und Plan fertig, Umsetzung offen
+### ⇢ SESSION 58 (2026-10-13): Vertreiber sichtbar – umgesetzt, gemergt, gepusht (`1754a73`)
 
 Erledigt und live gepusht (`4d79e48`): „laut Datenblatt“ statt „laut Hersteller“ (de/en); `seitenRahmen` hält ab lg
 rechts 3,5rem für die Schalterleiste frei; Vertreiber-Dublette Adrex per `migrations/0022_adrex_dublette.sql` remote
@@ -38,8 +38,29 @@ Punch); die Zuordnung stimmt. Live noch nicht angesehen: Schalterleisten-Rand be
 
 Spec `docs/superpowers/specs/2026-10-13-vertreiber-sichtbar-design.md` (vom Nutzer freigegeben), Plan
 `docs/superpowers/plans/2026-10-13-vertreiber-sichtbar.md` (drei Stränge A Startseite, B Katalog, C Blütenseite und
-Reviews, je ein Worktree). **Ausführungsart noch nicht gewählt** (Subagent-driven oder Native).
-Befund: live hat noch kein Kultivar zwei Vertreiber mit bewerteter Charge; das Startseiten-Kapitel lädt daher ein.
+Reviews, je ein Worktree). Subagent-driven umgesetzt, je Task Review, je Strang Gesamtreview (Opus), Merge B, C, A
+nach `main`, 1045 Tests grün, tsc sauber. Befund: live hat noch kein Kultivar zwei Vertreiber mit bewerteter Charge;
+das Startseiten-Kapitel lädt daher ein.
+- **A Startseite:** Kapitel „Gleiche Blüte, andere Ware“ direkt nach TransparentMachen (`components/story/VertreiberKapitel.tsx`,
+  `VertreiberBeispielKarte.tsx`, `lib/query/vertreiber-beispiel.ts`). Beispiel = Kultivar mit mindestens zwei
+  **verschiedenen** Vertreibern (nicht nur Handelsnamen), Rangfolge nach Mengen, nie Qualität. Einladung nur auf einen
+  noch unbewerteten bekannten Vertreiber. Kandidaten auf 90 begrenzt (D1: 100 Parameter je Statement).
+- **B Katalog:** Filter `?kultivar=` (Chip „Blüte: …“), Umschalter „Handelsnamen | Blüten“ (`?ansicht=bluete`,
+  `KultivarKarte`, `lib/query/kultivar-liste.ts`), Karte „auch bei N weiteren Vertreibern“ (zählt verschiedene
+  Vertreiber), Trefferzeile zählt „Handelsnamen“, Slug-Listen im Filter auf 20 begrenzt, Fachkreis-Gate-Test.
+- **C Blütenseite/Reviews:** Vertreiber-Vergleich auch mit einem Vertreiber, immer „Vertreiber fehlt? Vorschlagen“;
+  Doppelseite nennt unter der Überschrift Beschaffenheit „Charge von {Vertreiber} · zählt für den Vertreiber“
+  (/reviews, Startseite; Blütenseite nicht, `alsEintrag` lässt `vertreiber` dort undefined).
+- Alleinstehende Links nutzen jetzt `einzelLinkKlassen()` (44 px); Fließtext-Links `textLinkKlassen()`.
+- **Lehre:** Ein Subagent schrieb per Python CRLF in LF-Dateien (2700-Zeilen-Diff). Seitdem steht in jeder
+  Implementer-Anweisung: Zeilenenden beibehalten, `git diff --stat` vor dem Commit prüfen.
+
+**Offene Minors (aus dem Ledger, nicht blockierend):** gleichlautende Links „N Handelsnamen ansehen“ ohne aria-label mit
+Blütennamen; „auch bei 1 weiteren Vertreiber“ besser „einem“; `strains take 50` in der Kultivarliste kappt still;
+groupBy ohne take an zwei Stellen (durch Id-Listen begrenzt); Regex-Tests statt Verhaltenstests an einigen Stellen;
+Titel „bei anderen Vertreibern“ auch bei nur einem; `titelKlasse` in BeschaffenheitsLeiste evtl. toter Code; weitere
+alleinstehende textLinkKlassen-Links (VorschlagFormular.tsx:71, BlueteVorschlagFormular.tsx:213/221, blueten/page.tsx:147);
+`GRUPPEN_MAX` 500 im Beispiel; Rückfall rankt nach Handelsnamen.
 
 **Dauerregel neu geschärft (Memory `skills-einsatzregeln`):** in jeder Aufgabe Fach-Skills laden; jeder Plan-Task hat
 eine Zeile „Skills:“, jeder Subagent lädt sie vor dem ersten Edit.
