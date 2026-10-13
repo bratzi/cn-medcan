@@ -308,8 +308,12 @@ export type StrainDetail = {
   beschreibung: string | null;
   verschreibungspflichtig: boolean;
   bfarmGelistet: boolean;
+  /** Die Blüte (Kultivar), unter der Aroma und Wirkung zählen (Spec 2026-10-13). */
+  kultivar: { id: string; name: string } | null;
+  /** Wer den Handelsnamen in Deutschland vertreibt; an ihm hängt die Chargenqualität. */
+  vertreiber: UnternehmenEintrag | null;
+  /** Der Anbauer (Hersteller), meist unbekannt. */
   hersteller: UnternehmenEintrag | null;
-  importeur: UnternehmenEintrag | null;
   /** Vollstaendiges Terpenprofil, alle Raenge. */
   terpene: TerpenEintrag[];
   bestaende: BestandEintrag[];
@@ -319,6 +323,10 @@ export type StrainDetail = {
   reviews: ReviewEintrag[];
   /** Community-Mediane (sorten_kennwerte, T3), beim Speichern vorberechnet; null ohne Bewertung. */
   kennwerte: KennwerteZeile | null;
+  /** Community-Mediane der Blüte über alle Handelsnamen; null ohne Kultivar oder Bewertung. */
+  kultivarKennwerte: KennwerteZeile | null;
+  /** Chargenqualität des Vertreibers über alle seine Handelsnamen. */
+  vertreiberQualitaet: { qualitaetMittel: number | null; restfeuchteMedian: number | null; anzahl: number } | null;
   aktualisiertAm: Date;
 };
 
@@ -632,7 +640,15 @@ export async function ladeStrainDetail(
       bfarmGelistet: true,
       aktualisiertAm: true,
       hersteller: { select: { name: true, land: true, website: true } },
-      importeur: { select: { name: true, land: true, website: true } },
+      kultivar: { select: { id: true, name: true, kennwerte: KENNWERTE_SELECT } },
+      vertreiber: {
+        select: {
+          name: true,
+          land: true,
+          website: true,
+          vertreiberKennwerte: { select: { qualitaetMittel: true, restfeuchteMedian: true, anzahl: true } },
+        },
+      },
       terpene: {
         orderBy: { rang: "asc" },
         select: {
@@ -727,8 +743,13 @@ export async function ladeStrainDetail(
     beschreibung: zeile.beschreibung,
     verschreibungspflichtig: zeile.verschreibungspflichtig,
     bfarmGelistet: zeile.bfarmGelistet,
+    kultivar: zeile.kultivar ? { id: zeile.kultivar.id, name: zeile.kultivar.name } : null,
+    vertreiber: zeile.vertreiber
+      ? { name: zeile.vertreiber.name, land: zeile.vertreiber.land, website: zeile.vertreiber.website }
+      : null,
     hersteller: zeile.hersteller,
-    importeur: zeile.importeur,
+    kultivarKennwerte: zeile.kultivar?.kennwerte ?? null,
+    vertreiberQualitaet: zeile.vertreiber?.vertreiberKennwerte ?? null,
     terpene: zeile.terpene.map((eintrag) => ({
       name: eintrag.terpen.name,
       aromaProfil: eintrag.terpen.aromaProfil,

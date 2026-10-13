@@ -20,6 +20,8 @@ import { Aufklaerung } from "@/components/review/Aufklaerung";
 import { AromaErkundung } from "@/components/review/AromaErkundung";
 import { BewertungsFormular } from "@/components/review/BewertungsFormular";
 import { BewertungsBuch } from "@/components/review/BewertungsBuch";
+import { VertreiberVergleich } from "@/components/review/VertreiberVergleich";
+import { VertreiberWahl } from "@/components/review/VertreiberWahl";
 import { erkundungsDaten } from "@/components/review/erkundung-daten";
 import { eintragAnker } from "@/components/review/eintrag";
 import {
@@ -56,6 +58,7 @@ import {
   type StrainDetail,
   type UnternehmenEintrag,
 } from "@/lib/query/strains";
+import { ladeVertreiberDerBluete } from "@/lib/query/vertreiber";
 import { aktuellesMitglied } from "@/lib/session";
 
 /**
@@ -118,7 +121,7 @@ function kernFakten(strain: StrainDetail, w: Woerterbuch): Fakt[] {
   return [
     { begriff: f.kultivar, wert: strain.kultivarName ?? ka },
     { begriff: f.kultivartyp, wert: w.label.kultivarTyp[strain.kultivarTyp] },
-    { begriff: f.hersteller, wert: strain.hersteller?.name ?? ka },
+    { begriff: f.vertreiber, wert: strain.vertreiber?.name ?? ka },
     { begriff: f.bestrahlung, wert: w.label.bestrahlung[strain.bestrahlung as Bestrahlung] ?? strain.bestrahlung },
   ];
 }
@@ -134,7 +137,7 @@ function produktFakten(strain: StrainDetail, w: Woerterbuch): Fakt[] {
     { begriff: f.pzn, wert: strain.pzn ? <span className="numeric">{strain.pzn}</span> : ka },
     { begriff: f.anbauland, wert: strain.anbauland ?? ka },
     { begriff: f.hersteller, wert: strain.hersteller ? unternehmenWert(strain.hersteller) : ka },
-    { begriff: f.importeur, wert: strain.importeur ? unternehmenWert(strain.importeur) : ka },
+    { begriff: f.vertreiber, wert: strain.vertreiber ? unternehmenWert(strain.vertreiber) : ka },
     {
       begriff: f.verschreibungspflicht,
       wert: strain.verschreibungspflichtig ? f.verschreibungspflichtig : f.nichtVerschreibungspflichtig,
@@ -199,12 +202,20 @@ async function ProduktInhalt({ slug, w, sprache }: { slug: string; w: Woerterbuc
   ]);
   if (!strain) notFound();
   // „Ähnlich im Aroma“ (T11) rechnet D1, nicht der Worker; ohne Terpene entfällt es.
-  const [budpicListe, aehnliche] = await Promise.all([
+  // Alle Vertreiber derselben Blüte (Spec 2026-10-13); ohne Liste fehlen nur Wahl und Vergleich.
+  const [budpicListe, aehnliche, vertreiberListe] = await Promise.all([
     ladeFreieBudpics([strain.id]),
     strain.terpene.length > 0
       ? aehnlichImAroma(strain.id).catch((fehler: unknown) => {
           unstable_rethrow(fehler);
           console.error("aehnlichImAroma fehlgeschlagen", fehler);
+          return [];
+        })
+      : Promise.resolve([]),
+    strain.kultivar
+      ? ladeVertreiberDerBluete(strain.kultivar.id, strain.id).catch((fehler: unknown) => {
+          unstable_rethrow(fehler);
+          console.error("ladeVertreiberDerBluete fehlgeschlagen", fehler);
           return [];
         })
       : Promise.resolve([]),
@@ -216,7 +227,9 @@ async function ProduktInhalt({ slug, w, sprache }: { slug: string; w: Woerterbuc
   const neuesteEigene = eigene[0];
   const geschmack = verdichteGeschmacksMatrix(strain.reviews);
   const produkt = { handelsname: strain.handelsname, slug: strain.slug, terpene: strain.terpene, bildPfad: strain.herstellerBildPfad };
-  const erkundung = erkundungsDaten(strain.terpene, strain.reviews, w.aroma.serien, strain.kennwerte);
+  // Das Aroma gilt der Blüte: die Mediane über alle Handelsnamen des Kultivars, sonst die eigenen.
+  const erkundung = erkundungsDaten(strain.terpene, strain.reviews, w.aroma.serien, strain.kultivarKennwerte ?? strain.kennwerte);
+  const zuordnung = { bluete: strain.kultivar?.name ?? strain.handelsname, vertreiber: strain.vertreiber?.name ?? null };
   // Die eigene Bewertung (auch unfreigegeben) belegt die Maske vor; nur wer bewerten darf, braucht sie.
   const [eigeneBewertung, liveNetz] = mitglied?.freigegeben
     ? await Promise.all([
@@ -303,6 +316,8 @@ async function ProduktInhalt({ slug, w, sprache }: { slug: string; w: Woerterbuc
       <Titelblatt
         handelsname={strain.handelsname}
         kultivarName={strain.kultivarName}
+        vertreiberZeile={strain.vertreiber ? t(texte.vertreiber.von, { name: strain.vertreiber.name }) : undefined}
+        herstellerZeile={strain.hersteller ? t(texte.vertreiber.angebautVon, { name: strain.hersteller.name }) : undefined}
         kultivarTyp={strain.kultivarTyp}
         darreichungsform={strain.darreichungsform}
         anzahlApothekenVerfuegbar={strain.anzahlApothekenVerfuegbar}
@@ -349,6 +364,13 @@ async function ProduktInhalt({ slug, w, sprache }: { slug: string; w: Woerterbuc
 
       {angabenZurBluete}
 
+      {/* Dieselbe Blüte bei anderen Vertreibern (Spec 2026-10-13): neutral, ohne Kauflink (HWG). */}
+      {vertreiberListe.length > 1 ? (
+        <div className={SEKTION}>
+          <VertreiberVergleich eintraege={vertreiberListe} texte={texte.vertreiber} sprache={sprache} />
+        </div>
+      ) : null}
+
       {/* Alle Bewertungen der Sorte als ein Buch zum Blättern (T7): Betreiber zuerst,
           dann die Community. Ersetzt die eigenen Doppelseiten untereinander und die Liste. */}
       <div className={SEKTION}>
@@ -393,6 +415,12 @@ async function ProduktInhalt({ slug, w, sprache }: { slug: string; w: Woerterbuc
         />
         {mitglied?.freigegeben ? (
           <>
+            {/* Erst die Ware zuordnen, dann bewerten: die Wahl führt auf den Handelsnamen des Vertreibers. */}
+            {strain.kultivar ? (
+              <div className="mt-8">
+                <VertreiberWahl eintraege={vertreiberListe} kultivarId={strain.kultivar.id} texte={texte.vertreiber} />
+              </div>
+            ) : null}
             <div className="mt-8">
               <BewertungsFormular
                 strainId={strain.id}
@@ -407,6 +435,7 @@ async function ProduktInhalt({ slug, w, sprache }: { slug: string; w: Woerterbuc
                 bildMeldungen={budpicMeldungen(w)}
                 achsen={w.label.geschmack}
                 liveNetz={liveNetz}
+                zuordnung={zuordnung}
                 {...erkundung}
               />
             </div>
@@ -420,6 +449,7 @@ async function ProduktInhalt({ slug, w, sprache }: { slug: string; w: Woerterbuc
                   terpene={strain.terpene}
                   katalog={katalog}
                   texte={aromaTexte(w, sprache)}
+                  zuordnung={zuordnung}
                   {...erkundung}
                 />
               </div>

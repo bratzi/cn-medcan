@@ -24,8 +24,20 @@ export type AromaTexte = {
   schema: Woerterbuch["schema"];
   geschmack: Woerterbuch["label"]["geschmack"];
   sprache: import("./sprache-kern").Sprache;
+  /** Vermerke in der Maske, wofür ein Teil zählt (Spec 2026-10-13). */
+  zuordnung: { bluete: string; vertreiber: string; vertreiberUnbekannt: string };
 };
 
 export function aromaTexte(w: Woerterbuch, sprache: import("./sprache-kern").Sprache): AromaTexte {
-  return { aroma: w.aroma, schema: w.schema, geschmack: w.label.geschmack, sprache };
+  return {
+    aroma: w.aroma,
+    schema: w.schema,
+    geschmack: w.label.geschmack,
+    sprache,
+    zuordnung: {
+      bluete: w.bluete.vertreiber.zaehltBluete,
+      vertreiber: w.bluete.vertreiber.zaehltVertreiber,
+      vertreiberUnbekannt: w.bluete.vertreiber.unbekannt,
+    },
+  };
 }

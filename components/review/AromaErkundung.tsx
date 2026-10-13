@@ -83,6 +83,7 @@ export function AromaErkundung({
   zwischenruf,
   children,
   liveNetz = null,
+  zuordnung,
   texte,
 }: {
   titel: string;
@@ -141,11 +142,19 @@ export function AromaErkundung({
    * mit Note und Reglern; die dünne Linie ist der Stand ohne diese Bewertung.
    */
   liveNetz?: LiveNetzBasis | null;
+  /**
+   * Wofür die Schritte zählen (Spec 2026-10-13): Overall und Terpz für die Blüte (Kultivar),
+   * die Qualität der Charge für den Vertreiber. Ohne Angabe entfallen die Vermerke.
+   */
+  zuordnung?: { bluete: string; vertreiber: string | null };
   /** Hintergrundsatz (Schlagwort) mittig zwischen Qualität und Fazit, nur auf der Startseite. */
   zwischenruf?: React.ReactNode;
   children?: React.ReactNode;
 }) {
   // Regler bedienbar in Maske und Example, nur lesend in der Anzeige.
+  const zaehltBluete = zuordnung ? (
+    <p className="text-caption text-text-muted">{t(texte.zuordnung.bluete, { name: zuordnung.bluete })}</p>
+  ) : null;
   const eingabe = modus !== "anzeige";
   // Start der eigenen Regler: leer oder die gespeicherte Bewertung. Die Startobjekte
   // bleiben als Referenz stehen: jede Änderung ersetzt sie, „Zurücksetzen“ setzt genau
@@ -362,6 +371,7 @@ export function AromaErkundung({
 
         {gesamteindruck ? (
           <Schritt nummer="1" titel={texte.aroma.erkundung.overall}>
+            {zaehltBluete}
             <GesamteindruckLeiste
               {...gesamteindruck}
               className="w-full"
@@ -378,6 +388,7 @@ export function AromaErkundung({
         ) : null}
 
         <Schritt nummer="2" titel={texte.aroma.erkundung.terpz}>
+          {zaehltBluete}
           {treue || eigeneTreue !== null ? (
             <p className="text-small text-text-muted">
               {treue ? (
@@ -447,6 +458,13 @@ export function AromaErkundung({
         {beschaffenheit ? (
           // In der Maske gilt die Qualität der eigenen Charge, nicht der Sorte (Bewertung v2, T4).
           <Schritt nummer="3" titel={eingabe ? texte.aroma.erkundung.dieseCharge : texte.aroma.erkundung.qualitaet}>
+            {zuordnung ? (
+              <p className="text-caption text-text-muted">
+                {zuordnung.vertreiber
+                  ? t(texte.zuordnung.vertreiber, { name: zuordnung.vertreiber })
+                  : texte.zuordnung.vertreiberUnbekannt}
+              </p>
+            ) : null}
             {eingabe ? (
               <p className="max-w-[60ch] text-small text-text-muted text-pretty">{texte.aroma.erkundung.chargeSatz}</p>
             ) : null}

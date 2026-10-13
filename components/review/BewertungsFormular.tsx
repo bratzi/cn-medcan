@@ -54,6 +54,8 @@ type Props = {
   liveNetz?: LiveNetzBasis | null;
   /** Achsennamen für die Änderungszeile des Mini-Netzes (w.label.geschmack). */
   achsen: Woerterbuch["label"]["geschmack"];
+  /** Wofür die Teile zählen (Spec 2026-10-13): Aroma für die Blüte, Qualität für den Vertreiber. */
+  zuordnung?: { bluete: string; vertreiber: string | null };
 };
 
 /**

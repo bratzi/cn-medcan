@@ -17,6 +17,10 @@ export type MeineBewertung = { note: number; erstelltAm: Date; chargenNr: string
 export type TitelblattProps = {
   handelsname: string;
   kultivarName: string | null;
+  /** „von {Vertreiber}“ unter dem Kultivarnamen (Spec 2026-10-13); fehlt ohne Vertreiber. */
+  vertreiberZeile?: string;
+  /** „angebaut von {Hersteller}“, nur wenn der Anbauer bekannt ist. */
+  herstellerZeile?: string;
   kultivarTyp: KultivarTyp;
   darreichungsform: Darreichungsform;
   anzahlApothekenVerfuegbar: number;
@@ -57,6 +61,9 @@ export function Titelblatt(props: TitelblattProps) {
         {props.kultivarName ? (
           <p className="font-buch text-h3 font-medium italic text-text">{props.kultivarName}</p>
         ) : null}
+        {/* text-small statt text-body: kein vierter Schriftgrad im Titelblatt (ui-design-engine 3). */}
+        {props.vertreiberZeile ? <p className="text-small text-text-muted">{props.vertreiberZeile}</p> : null}
+        {props.herstellerZeile ? <p className="text-small text-text-muted">{props.herstellerZeile}</p> : null}
         <div className="flex flex-wrap gap-2">
           <Badge variante="neutral">{props.w.label.kultivarTyp[props.kultivarTyp]}</Badge>
           <Badge variante="neutral">{props.w.label.darreichungsform[props.darreichungsform]}</Badge>
