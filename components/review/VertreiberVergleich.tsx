@@ -1,22 +1,32 @@
+import Link from "next/link";
+
 import { BlattAnzeige } from "@/components/review/BlattAnzeige";
+import { textLinkKlassen } from "@/components/ui/textlink";
 import { formatiereZahl } from "@/lib/format";
 import type { Sprache } from "@/lib/i18n/sprache-kern";
 import { mehrzahl, t } from "@/lib/i18n/text";
 import type { Woerterbuch } from "@/lib/i18n/typen";
 import type { VertreiberEintrag } from "@/lib/query/vertreiber";
 
-type Props = { eintraege: readonly VertreiberEintrag[]; texte: Woerterbuch["bluete"]["vertreiber"]; sprache: Sprache };
+type Props = { eintraege: readonly VertreiberEintrag[]; kultivarId: string; texte: Woerterbuch["bluete"]["vertreiber"]; sprache: Sprache };
 
-/** „Diese Blüte bei anderen Vertreibern“ (Spec 2026-10-13): neutral, ohne Kauf- oder Apothekenlink (HWG). */
-export function VertreiberVergleich({ eintraege, texte, sprache }: Props) {
-  if (eintraege.length < 2) return null;
+/**
+ * „Diese Blüte bei anderen Vertreibern“ (Spec 2026-10-13): neutral, ohne Kauf- oder Apothekenlink (HWG).
+ * Seit Spec „Vertreiber sichtbar“ 3 auch mit nur einem Vertreiber, damit fehlende vorgeschlagen werden.
+ */
+export function VertreiberVergleich({ eintraege, kultivarId, texte, sprache }: Props) {
+  if (eintraege.length === 0) return null;
+  const einer = eintraege.length === 1 ? eintraege[0] : null;
   return (
     <section aria-labelledby="vertreiber-vergleich-titel" className="flex flex-col gap-6">
       <h3 id="vertreiber-vergleich-titel" className="text-h3 text-text">
         {texte.vergleichTitel}
       </h3>
       <p className="max-w-[68ch] text-small text-text-muted text-pretty">{texte.vergleichSatz}</p>
-      <ul className="flex flex-col divide-y divide-border border-y border-border">
+      {einer ? (
+        <p className="text-body text-text wrap-break-word">{t(texte.nurEiner, { vertreiber: einer.vertreiberName ?? texte.unbekannt })}</p>
+      ) : (
+        <ul className="flex flex-col divide-y divide-border border-y border-border">
         {eintraege.map((e) => (
           <li key={e.slug} className="grid grid-cols-1 gap-2 py-4 sm:grid-cols-[minmax(0,1fr)_auto_auto] sm:items-center sm:gap-8">
             <span className="min-w-0">
@@ -37,7 +47,18 @@ export function VertreiberVergleich({ eintraege, texte, sprache }: Props) {
             </span>
           </li>
         ))}
-      </ul>
+        </ul>
+      )}
+      <p className="flex flex-wrap gap-x-8 gap-y-2 text-body">
+        <Link prefetch={false} href={`/vorschlagen?kultivar=${kultivarId}`} className={textLinkKlassen()}>
+          {texte.fehlt}
+        </Link>
+        {einer ? null : (
+          <Link prefetch={false} href={`/blueten?kultivar=${kultivarId}`} className={textLinkKlassen()}>
+            {texte.alleImKatalog}
+          </Link>
+        )}
+      </p>
     </section>
   );
 }

@@ -32,11 +32,19 @@ test("VertreiberWahl: nur ein Vertreiber steht als Text", () => {
   assert.match(html, /avaay/);
 });
 
-test("VertreiberVergleich: entfällt bei nur einem Handelsnamen, sonst Zeile je Vertreiber ohne Kauflink", () => {
-  assert.equal(renderToStaticMarkup(createElement(VertreiberVergleich, { eintraege: [eintraege[1]], texte: de.bluete.vertreiber, sprache: "de" })), "");
-  const html = renderToStaticMarkup(createElement(VertreiberVergleich, { eintraege, texte: de.bluete.vertreiber, sprache: "de" }));
+test("VertreiberVergleich: leer entfällt, ein Eintrag nennt den einen Vertreiber, sonst Zeile je Vertreiber ohne Kauflink", () => {
+  const p = { kultivarId: "k1", texte: de.bluete.vertreiber, sprache: "de" as const };
+  assert.equal(renderToStaticMarkup(createElement(VertreiberVergleich, { ...p, eintraege: [] })), "");
+  const einer = renderToStaticMarkup(createElement(VertreiberVergleich, { ...p, eintraege: [eintraege[1]] }));
+  assert.match(einer, /Bisher kennen wir sie nur von avaay\./);
+  assert.match(einer, /href="\/vorschlagen\?kultivar=k1"/);
+  assert.doesNotMatch(einer, /<ul/);
+  assert.doesNotMatch(einer, /href="\/blueten\?kultivar=k1"/);
+  const html = renderToStaticMarkup(createElement(VertreiberVergleich, { ...p, eintraege }));
   assert.match(html, /Enua Pharma GmbH/);
   assert.match(html, /11,5/);
+  assert.match(html, /href="\/vorschlagen\?kultivar=k1"/);
+  assert.match(html, /href="\/blueten\?kultivar=k1"/);
   assert.doesNotMatch(html, /apotheke|kaufen/i);
 });
 
@@ -44,6 +52,8 @@ test("Blütenseite: Vertreiber-Wahl über der Maske, Vergleich, Angaben Vertreib
   const q = readFileSync("app/[lang]/blueten/[slug]/page.tsx", "utf8");
   assert.match(q, /<VertreiberWahl/);
   assert.match(q, /<VertreiberVergleich/);
+  assert.match(q, /vertreiberListe\.length > 0 && strain\.kultivar/);
+  assert.match(q, /kultivarId=\{strain\.kultivar\.id\}/);
   assert.match(q, /f\.vertreiber/);
   assert.doesNotMatch(q, /f\.importeur/);
   assert.match(q, /zuordnung=\{/);
@@ -67,7 +77,7 @@ test("VertreiberWahl: leere Liste fällt auf den Vertreiber der Seite zurück", 
 });
 
 test("VertreiberVergleich: die Zeile der angezeigten Ware trägt „diese Ware“", () => {
-  const html = renderToStaticMarkup(createElement(VertreiberVergleich, { eintraege, texte: de.bluete.vertreiber, sprache: "de" }));
+  const html = renderToStaticMarkup(createElement(VertreiberVergleich, { eintraege, kultivarId: "k1", texte: de.bluete.vertreiber, sprache: "de" }));
   assert.equal(html.split(de.bluete.vertreiber.dieseWare).length - 1, 1);
   const zeile = html.split("<li").find((teil) => teil.includes("avaay 22/1 BCP")) ?? "";
   assert.ok(zeile.includes(de.bluete.vertreiber.dieseWare));
