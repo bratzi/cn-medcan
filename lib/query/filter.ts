@@ -115,6 +115,17 @@ export const strainFilterSchema = z.object({
   apotheke: slugListe,
   /** Unternehmen-Ids der Vertreiber (Spec 2026-10-13); alte Links mit `hersteller` liest parseStrainFilter mit. */
   vertreiber: slugListe,
+  /** Kultivar-Id (Spec 2026-10-13 Vertreiber sichtbar 2.1): alle Handelsnamen einer Blüte. */
+  kultivar: z
+    .unknown()
+    .transform((rohwert) => (ersterWert(rohwert) ?? "").trim().toLowerCase())
+    .transform((wert) => (/^[0-9a-f-]{32,36}$/.test(wert) ? wert : undefined))
+    .catch(undefined),
+  /** Ansicht der Liste: je Handelsname (Standard) oder je Blüte (2.3). Kein Filter. */
+  ansicht: z
+    .unknown()
+    .transform((rohwert): "ware" | "bluete" => (ersterWert(rohwert) === "bluete" ? "bluete" : "ware"))
+    .catch("ware" as const),
   sortierung: z
     .unknown()
     .transform((rohwert) => ersterWert(rohwert))
@@ -136,6 +147,8 @@ const LEERER_FILTER: StrainFilter = {
   nurVerfuegbar: false,
   apotheke: [],
   vertreiber: [],
+  kultivar: undefined,
+  ansicht: "ware",
   sortierung: "relevanz",
   seite: 1,
 };
@@ -198,6 +211,8 @@ export function serialisiereFilter(filter: StrainFilter): URLSearchParams {
     params.set("apotheke", filter.apotheke.join(","));
   if (filter.vertreiber.length > 0)
     params.set("vertreiber", filter.vertreiber.join(","));
+  if (filter.kultivar) params.set("kultivar", filter.kultivar);
+  if (filter.ansicht === "bluete") params.set("ansicht", "bluete");
   if (filter.sortierung !== "relevanz")
     params.set("sortierung", filter.sortierung);
   if (filter.seite > 1) params.set("seite", String(filter.seite));
@@ -219,7 +234,8 @@ export function istFilterLeer(filter: StrainFilter): boolean {
     filter.preisMax === undefined &&
     !filter.nurVerfuegbar &&
     filter.apotheke.length === 0 &&
-    filter.vertreiber.length === 0
+    filter.vertreiber.length === 0 &&
+    !filter.kultivar
   );
 }
 
