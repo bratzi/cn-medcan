@@ -53,6 +53,9 @@ model Unternehmen {
 
   hergestellt Strain[] @relation("Hersteller")
   importiert  Strain[] @relation("Importeur")
+  vertrieben  Strain[] @relation("Vertreiber")
+
+  vertreiberKennwerte VertreiberKennwerte?
 
   erstelltAm DateTime @default(now()) @map("erstellt_am")
 
@@ -105,10 +108,18 @@ model Strain {
   /// Sucheingabe ebenfalls kleingeschrieben verglichen.
   suchtext                String
 
+  /// Echter Hersteller (Anbauer, z. B. in Kanada); seit 0021 meist leer, wird nach und nach gepflegt.
   herstellerId String?      @map("hersteller_id")
   hersteller   Unternehmen? @relation("Hersteller", fields: [herstellerId], references: [id], onDelete: SetNull)
+  /// Veraltet seit 0021: geleert, nicht mehr lesen. Steht im Fremdschlüssel der Tabelle, SQLite kann sie nicht entfernen.
   importeurId  String?      @map("importeur_id")
   importeur    Unternehmen? @relation("Importeur", fields: [importeurId], references: [id], onDelete: SetNull)
+  /// Vertreiber in Deutschland (pharmazeutischer Unternehmer laut BfArM), Spec 2026-10-13.
+  vertreiberId String?      @map("vertreiber_id")
+  vertreiber   Unternehmen? @relation("Vertreiber", fields: [vertreiberId], references: [id], onDelete: SetNull)
+  /// Die „Blüte“ über alle Vertreiber (Spec 2026-10-13); nach 0021 immer gesetzt.
+  kultivarId   String?      @map("kultivar_id")
+  kultivar     Kultivar?    @relation(fields: [kultivarId], references: [id], onDelete: SetNull)
 
   terpene   StrainTerpen[]
   bestaende PharmacyStock[]
@@ -133,6 +144,8 @@ model Strain {
   @@index([darreichungsform])
   @@index([aktiv])
   @@index([suchtext])
+  @@index([kultivarId])
+  @@index([vertreiberId])
   @@map("strains")
 }
 
@@ -311,6 +324,10 @@ model SortenKennwerte {
   gesamtnoteMittel Float?   @map("gesamtnote_mittel")
   anzahl           Int
   aktualisiertAm   DateTime @updatedAt @map("aktualisiert_am")
+  /// Qualitäts-Schnitt 0-5 der Chargen dieses Handelsnamens (lib/qualitaet.ts), null ohne Beschaffenheit.
+  qualitaetMittel   Float? @map("qualitaet_mittel")
+  restfeuchteMedian Float? @map("restfeuchte_median")
+  qualitaetAnzahl   Int    @default(0) @map("qualitaet_anzahl")
 
   @@map("sorten_kennwerte")
 }
@@ -596,7 +613,12 @@ model SortenVorschlag {
   /// Slug des Handelsnamens nach der Regel aus scripts/stamm/sql-erzeugen.py.
   /// Buendelt gleiche Vorschlaege verschiedener Mitglieder.
   schluessel   String
+  /// Echter Hersteller, optional.
   hersteller   String?
+  /// Vertreiber in Deutschland (bis 0021 stand er in `hersteller`).
+  vertreiber   String?
+  kultivarId   String?   @map("kultivar_id")
+  kultivar     Kultivar? @relation(fields: [kultivarId], references: [id], onDelete: SetNull)
   kultivarName String? @map("kultivar_name")
   kultivarTyp  String? @map("kultivar_typ")
   thcProzent   Float?  @map("thc_prozent")
@@ -757,4 +779,45 @@ model SortenAehnlich {
   berechnetAm DateTime @map("berechnet_am")
 
   @@map("sorten_aehnlich")
+}
+
+/// Die Blüte über alle Vertreiber (Spec 2026-10-13). Name unique ohne Groß-/Kleinschreibung (COLLATE NOCASE in 0021).
+model Kultivar {
+  id         String   @id @default(uuid())
+  name       String   @unique
+  erstelltAm DateTime @default(now()) @map("erstellt_am")
+
+  strains     Strain[]
+  vorschlaege SortenVorschlag[]
+  kennwerte   KultivarKennwerte?
+
+  @@map("kultivare")
+}
+
+/// Community-Mediane je Kultivar über alle Handelsnamen; beim Speichern fortgeschrieben (lib/kennwerte.ts).
+model KultivarKennwerte {
+  kultivarId       String   @id @map("kultivar_id")
+  kultivar         Kultivar @relation(fields: [kultivarId], references: [id], onDelete: Cascade)
+  terpenMedian     String   @map("terpen_median")
+  geschmackMedian  String   @map("geschmack_median")
+  gesamtnoteMedian Float?   @map("gesamtnote_median")
+  gesamtnoteMittel Float?   @map("gesamtnote_mittel")
+  anzahl           Int
+  aktualisiertAm   DateTime @updatedAt @map("aktualisiert_am")
+
+  @@map("kultivar_kennwerte")
+}
+
+/// Chargenqualität je Vertreiber über alle seine Handelsnamen; beim Speichern fortgeschrieben.
+model VertreiberKennwerte {
+  vertreiberId      String      @id @map("vertreiber_id")
+  vertreiber        Unternehmen @relation(fields: [vertreiberId], references: [id], onDelete: Cascade)
+  qualitaetMittel   Float?      @map("qualitaet_mittel")
+  /// JSON: Beschaffenheitsachse zu Mittel 0-5.
+  achsenMittel      String      @map("achsen_mittel")
+  restfeuchteMedian Float?      @map("restfeuchte_median")
+  anzahl            Int
+  aktualisiertAm    DateTime    @updatedAt @map("aktualisiert_am")
+
+  @@map("vertreiber_kennwerte")
 }
