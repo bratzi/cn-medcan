@@ -27,13 +27,14 @@ export function waehleBeispiel(kandidaten: readonly BeispielKandidat[]): Beispie
   return tauglich[0] ?? null;
 }
 
-const KANDIDATEN_MAX = 200;
+const KANDIDATEN_MAX = 90; // D1: höchstens 100 gebundene Parameter je Statement, die Ids landen in `in:`
 
 async function bewerteteKandidaten(): Promise<BeispielKandidat[]> {
   const prisma = await getPrisma();
   const bewertet = await prisma.sortenKennwerte.findMany({
     where: { qualitaetAnzahl: { gt: 0 }, strain: { aktiv: true, kultivarId: { not: null } } },
     select: { qualitaetAnzahl: true, strain: { select: { kultivarId: true, vertreiberId: true } } },
+    orderBy: [{ qualitaetAnzahl: "desc" }, { strainId: "asc" }],
     take: KANDIDATEN_MAX,
   });
   const jeKultivar = new Map<string, { vertreiber: Set<string>; bewertungen: number }>();
