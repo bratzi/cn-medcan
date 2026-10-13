@@ -373,10 +373,10 @@ async function ProduktInhalt({ slug, w, sprache }: { slug: string; w: Woerterbuc
 
       {angabenZurBluete}
 
-      {/* Dieselbe Blüte bei anderen Vertreibern (Spec 2026-10-13): neutral, ohne Kauflink (HWG). */}
-      {vertreiberListe.length > 1 ? (
+      {/* Dieselbe Blüte bei anderen Vertreibern (Spec 2026-10-13): neutral, ohne Kauflink (HWG); seit Spec Vertreiber sichtbar 3 auch mit einem Vertreiber. */}
+      {vertreiberListe.length > 0 && strain.kultivar ? (
         <div className={SEKTION}>
-          <VertreiberVergleich eintraege={vertreiberListe} texte={texte.vertreiber} sprache={sprache} />
+          <VertreiberVergleich eintraege={vertreiberListe} kultivarId={strain.kultivar.id} texte={texte.vertreiber} sprache={sprache} />
         </div>
       ) : null}
 
