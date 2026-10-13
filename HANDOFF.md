@@ -55,6 +55,18 @@ das Startseiten-Kapitel lädt daher ein.
 - **Lehre:** Ein Subagent schrieb per Python CRLF in LF-Dateien (2700-Zeilen-Diff). Seitdem steht in jeder
   Implementer-Anweisung: Zeilenenden beibehalten, `git diff --stat` vor dem Commit prüfen.
 
+**Live geprüft (Deploy 20:27 UTC):** Startseite-Kapitel steht nach „Transparent machen“, Beispiel Strawberry OG
+(Cannamedical bewertet 2,8, Cannovum Health und IMC unbewertet, Einladung auf Cannovum Health, Links stimmen), kein
+Querscroll bei 1124 px. Katalog `?ansicht=bluete` (427 Blüten, Karten mit „bei N Vertreibern“), `?kultivar=` mit
+Chip „Blüte: Strawberry OG“ und „3 von 3 Handelsnamen“. Blütenseite: Vergleich mit drei Vertreibern, beide Links,
+keine Chargenzeile, „laut Datenblatt“ überall. **Offen:** `/reviews` lieferte beim ersten Aufruf nach dem Deploy
+Error 1102 (exceededCpu, 251 ms; Free-Plan 10 ms), der zweite Versuch kam nicht an (Chrome-Zulassen-Fenster).
+Als Erstes `/reviews` erneut laden; bleibt 1102, Telemetrie ansehen (Query im Abschnitt Session 54) und prüfen, ob
+die Chargenzeile die Render-CPU erhöht. Ebenfalls offen: hell/dunkel und 494 px nicht angesehen. Befund: die
+Beispielkarte reicht bei 1124 px rechts knapp unter die Schalterleiste (Startseiten-Sektionen nutzen nicht
+`seitenRahmen`). Datenbefund: Kultivare „8 Ball Kush“ und „8-Ball Kush“ getrennt; Spanne „25 bis 25 % THC“ bei
+gleichem Min und Max.
+
 **Offene Minors (aus dem Ledger, nicht blockierend):** gleichlautende Links „N Handelsnamen ansehen“ ohne aria-label mit
 Blütennamen; „auch bei 1 weiteren Vertreiber“ besser „einem“; `strains take 50` in der Kultivarliste kappt still;
 groupBy ohne take an zwei Stellen (durch Id-Listen begrenzt); Regex-Tests statt Verhaltenstests an einigen Stellen;
