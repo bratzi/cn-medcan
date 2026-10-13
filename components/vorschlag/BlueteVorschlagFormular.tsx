@@ -23,6 +23,9 @@ const RANG = ["eins", "zwei", "drei"] as const;
 type Props = {
   terpene: readonly string[];
   nameVorbelegt: string;
+  /** Kultivar aus dem Link „Vertreiber fehlt?“ (Id und Name), sonst leer. */
+  kultivarId?: string;
+  kultivarName?: string;
   texte: Woerterbuch["vorschlag"];
   typen: Woerterbuch["label"]["kultivarTyp"];
   sprache: Sprache;
@@ -39,7 +42,7 @@ type Props = {
  * dem Vorschlag raus und werden erst bei der Freigabe zu offenen Budpics. Der
  * Server prueft jede Datei erneut.
  */
-export function BlueteVorschlagFormular({ terpene, nameVorbelegt, texte, typen, sprache, meldungen }: Props) {
+export function BlueteVorschlagFormular({ terpene, nameVorbelegt, kultivarId, kultivarName, texte, typen, sprache, meldungen }: Props) {
   const TYPEN: SelectOption[] = KULTIVAR_TYPEN.map((typ) => ({ wert: typ, label: typen[typ] }));
   const router = useRouter();
   const hydriert = useHydriert();
@@ -120,12 +123,15 @@ export function BlueteVorschlagFormular({ terpene, nameVorbelegt, texte, typen, 
         maxLength={300}
         hinweis={texte.quelleHinweis}
       />
+      <Input id="vorschlag-vertreiber" name="vertreiber" label={texte.vertreiber} maxLength={120} hinweis={texte.vertreiberHinweis} />
       <Input id="vorschlag-hersteller" name="hersteller" label={texte.hersteller} maxLength={120} hinweis={texte.freiwillig} />
+      {kultivarId ? <input type="hidden" name="kultivarId" value={kultivarId} /> : null}
       <Input
         id="vorschlag-kultivar"
         name="kultivarName"
         label={texte.kultivar}
         maxLength={120}
+        defaultValue={kultivarName}
         hinweis={texte.kultivarHinweis}
       />
       <Select id="vorschlag-typ" name="kultivarTyp" label={texte.typ} optionen={TYPEN} platzhalter={texte.weissNicht} />

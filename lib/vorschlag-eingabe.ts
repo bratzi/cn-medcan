@@ -62,6 +62,12 @@ function terpeneAusFormular(
   return liste;
 }
 
+/** Kultivar-Id aus dem Link „Vertreiber fehlt?“; alles außer einer UUID fällt weg. */
+function idOderNull(roh: unknown): string | null {
+  const wert = typeof roh === "string" ? roh.trim().toLowerCase() : "";
+  return /^[0-9a-f-]{32,36}$/.test(wert) ? wert : null;
+}
+
 function istKultivarTyp(wert: string): wert is KultivarTyp {
   return (KULTIVAR_TYPEN as readonly string[]).includes(wert);
 }
@@ -73,7 +79,9 @@ function istBestrahlung(wert: string): wert is Bestrahlung {
 export type BlueteVorschlag = {
   handelsname: string;
   schluessel: string;
+  vertreiber: string | null;
   hersteller: string | null;
+  kultivarId: string | null;
   kultivarName: string | null;
   kultivarTyp: KultivarTyp | null;
   thcProzent: number | null;
@@ -127,7 +135,9 @@ export function blueteVorschlagPruefen(
     wert: {
       handelsname: name.wert.name,
       schluessel: name.wert.slug,
+      vertreiber: optional(formular.get("vertreiber")),
       hersteller: optional(formular.get("hersteller")),
+      kultivarId: idOderNull(formular.get("kultivarId")),
       kultivarName: optional(formular.get("kultivarName")),
       kultivarTyp: typRoh && istKultivarTyp(typRoh) ? typRoh : null,
       thcProzent: thc,
@@ -149,7 +159,9 @@ export type BlueteFreigabe = {
   thcMax: number;
   cbdMin: number;
   cbdMax: number;
+  vertreiber: string | null;
   hersteller: string | null;
+  kultivarId: string | null;
   terpene: string[];
   bestrahlung: Bestrahlung;
   anbauland: string | null;
@@ -200,7 +212,9 @@ export function blueteFreigabePruefen(
       thcMax: thc.wert,
       cbdMin: cbd.wert,
       cbdMax: cbd.wert,
+      vertreiber: optional(formular.get("vertreiber")),
       hersteller: optional(formular.get("hersteller")),
+      kultivarId: idOderNull(formular.get("kultivarId")),
       terpene,
       bestrahlung: bestrahlungRoh,
       anbauland: optional(formular.get("anbauland")),
@@ -216,7 +230,9 @@ export type OffenerVorschlag = {
   avatarId?: string | null;
   handelsname: string;
   schluessel: string;
+  vertreiber: string | null;
   hersteller: string | null;
+  kultivarId: string | null;
   kultivarName: string | null;
   kultivarTyp: string | null;
   thcProzent: number | null;
@@ -246,7 +262,9 @@ export type FreigabeVorbelegung = {
   kultivarTyp: string;
   thc: string;
   cbd: string;
+  vertreiber: string;
   hersteller: string;
+  kultivarId: string;
   terpene: string[];
 };
 
@@ -270,7 +288,9 @@ export function freigabeVorbelegen(gruppe: VorschlagGruppe): FreigabeVorbelegung
     kultivarTyp: erster(l, (v) => v.kultivarTyp) ?? "",
     thc: thc === null ? "" : String(thc),
     cbd: cbd === null ? "" : String(cbd),
+    vertreiber: erster(l, (v) => v.vertreiber) ?? "",
     hersteller: erster(l, (v) => v.hersteller) ?? "",
+    kultivarId: erster(l, (v) => v.kultivarId) ?? "",
     terpene: terpene ?? [],
   };
 }
@@ -299,6 +319,11 @@ export function freigabeKonflikt(
  */
 export function herstellerRolleNachFreigabe(rolle: string): "BEIDES" | null {
   return rolle === "IMPORTEUR" ? "BEIDES" : null;
+}
+
+/** Rolle eines gefundenen Unternehmens, das jetzt auch Vertreiber ist: war es nur Hersteller, wird es BEIDES. */
+export function vertreiberRolleNachFreigabe(rolle: string): "BEIDES" | null {
+  return rolle === "HERSTELLER" ? "BEIDES" : null;
 }
 
 /** Pfad zu /vorschlagen, mit dem Namen als Vorbelegung (Katalogsuche, Anmeldung). */

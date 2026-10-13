@@ -132,7 +132,9 @@ test("Schreibvarianten eines Namens landen in einer Gruppe", () => {
       anzeigename: `M${i}`,
       handelsname: e.wert.handelsname,
       schluessel: e.wert.schluessel,
+      vertreiber: null,
       hersteller: null,
+      kultivarId: null,
       kultivarName: null,
       kultivarTyp: null,
       thcProzent: null,
@@ -149,9 +151,9 @@ test("Schreibvarianten eines Namens landen in einer Gruppe", () => {
   assert.equal(gruppen[0].vorschlaege.length, 4);
 });
 
-test("Hersteller in der Freigabe: bestehende zur Auswahl, neuer Name moeglich", () => {
-  assert.match(lies("lib/query/vorschlaege.ts"), /export async function herstellerNamen\(/);
+test("Vertreiber und Hersteller in der Freigabe: bestehende zur Auswahl, neuer Name moeglich", () => {
+  assert.match(lies("lib/query/vorschlaege.ts"), /export async function unternehmenNamen\(/);
   const liste = lies("components/admin/BlueteVorschlaege.tsx");
-  assert.match(liste, /<datalist id=\{HERSTELLER_LISTE\}>/);
-  assert.match(lies("components/admin/BlueteFreigabe.tsx"), /list=\{herstellerListe\}/);
+  assert.match(liste, /<datalist id=\{UNTERNEHMEN_LISTE\}>/);
+  assert.match(lies("components/admin/BlueteFreigabe.tsx"), /list=\{unternehmenListe\}/);
 });

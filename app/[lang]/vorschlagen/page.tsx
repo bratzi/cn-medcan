@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 
 import { BlueteVorschlagFormular } from "@/components/vorschlag/BlueteVorschlagFormular";
+import { getPrisma } from "@/lib/prisma";
 import { terpenNamen } from "@/lib/query/vorschlaege";
 import { aktuellesMitglied } from "@/lib/session";
 import { vorschlagPfad } from "@/lib/vorschlag-eingabe";
@@ -19,6 +20,13 @@ export default async function VorschlagenPage({ searchParams }: Props) {
   const roh = (await searchParams).name;
   const nameVorbelegt = (typeof roh === "string" ? roh : "").slice(0, 120);
 
+  // Link „Vertreiber fehlt?“ von der Blütenseite: nur eine echte Kultivar-Id zählt.
+  const kultivarRoh = (await searchParams).kultivar;
+  const kultivarWert = typeof kultivarRoh === "string" ? kultivarRoh.trim().toLowerCase() : "";
+  const kultivar = /^[0-9a-f-]{32,36}$/.test(kultivarWert)
+    ? await (await getPrisma()).kultivar.findUnique({ where: { id: kultivarWert }, select: { id: true, name: true } })
+    : null;
+
   // Der Suchbegriff aus dem Katalog soll die Anmeldung ueberleben.
   const [mitglied, w, sprache] = await Promise.all([aktuellesMitglied(), holeWoerterbuch(), holeSprache()]);
   if (!mitglied) redirect(`/anmelden?weiter=${encodeURIComponent(vorschlagPfad(nameVorbelegt))}`);
@@ -33,6 +41,8 @@ export default async function VorschlagenPage({ searchParams }: Props) {
         <BlueteVorschlagFormular
           terpene={await terpenNamen()}
           nameVorbelegt={nameVorbelegt}
+          kultivarId={kultivar?.id}
+          kultivarName={kultivar?.name}
           texte={w.vorschlag}
           typen={w.label.kultivarTyp}
           sprache={sprache}

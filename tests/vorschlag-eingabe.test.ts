@@ -25,7 +25,9 @@ test("Vorschlag: nur Handelsname und Quelle sind Pflicht", () => {
     wert: {
       handelsname: "Apples & Bananas",
       schluessel: "apples-bananas",
+      vertreiber: null,
       hersteller: null,
+      kultivarId: null,
       kultivarName: null,
       kultivarTyp: null,
       thcProzent: null,
@@ -113,7 +115,9 @@ function vorschlag(teil: Partial<OffenerVorschlag>): OffenerVorschlag {
     anzeigename: "Mo",
     handelsname: "Apples & Bananas",
     schluessel: "apples-bananas",
+    vertreiber: null,
     hersteller: null,
+    kultivarId: null,
     kultivarName: null,
     kultivarTyp: null,
     thcProzent: null,
@@ -152,7 +156,9 @@ test("freigabeVorbelegen: erster Vorschlag zuerst, Luecken aus den weiteren, Ein
     kultivarTyp: "HYBRID",
     thc: "22",
     cbd: "1",
+    vertreiber: "",
     hersteller: "Aurora",
+    kultivarId: "",
     terpene: ["Myrcen"],
   });
 });

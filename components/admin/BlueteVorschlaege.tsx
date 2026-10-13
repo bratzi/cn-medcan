@@ -1,19 +1,19 @@
 import { BlueteFreigabe } from "@/components/admin/BlueteFreigabe";
 import { Avatar, Badge, Card, CardBody, CardHeader, EmptyState, textLinkKlassen } from "@/components/ui";
 import { ladeStrainAuswahl } from "@/lib/query/strains";
-import { herstellerNamen, offeneVorschlaegeFuerAdmin, terpenNamen } from "@/lib/query/vorschlaege";
+import { offeneVorschlaegeFuerAdmin, terpenNamen, unternehmenNamen } from "@/lib/query/vorschlaege";
 import { freigabeVorbelegen, quelleAlsLink, vorschlaegeBuendeln } from "@/lib/vorschlag-eingabe";
 
 const DATUM = new Intl.DateTimeFormat("de-DE", { dateStyle: "medium" });
-const HERSTELLER_LISTE = "freigabe-hersteller-liste";
+const UNTERNEHMEN_LISTE = "freigabe-unternehmen-liste";
 
 /** Offene Bluetenvorschlaege, gleiche gebuendelt, aelteste zuerst (Spec 4.2). */
 export async function BlueteVorschlaege() {
-  const [offene, terpene, strains, hersteller] = await Promise.all([
+  const [offene, terpene, strains, unternehmen] = await Promise.all([
     offeneVorschlaegeFuerAdmin(),
     terpenNamen(),
     ladeStrainAuswahl({ mitInaktiven: true }),
-    herstellerNamen(),
+    unternehmenNamen(),
   ]);
   const gruppen = vorschlaegeBuendeln(offene);
   const katalog = strains.map((s) => ({ wert: s.id, label: s.aktiv ? s.handelsname : `${s.handelsname} (inaktiv)` }));
@@ -27,9 +27,9 @@ export async function BlueteVorschlaege() {
           </h2>
         </CardHeader>
         <CardBody className="flex flex-col gap-8">
-          {/* Eine Liste fuer alle Formulare: bestehende Hersteller waehlen oder neuen Namen tippen (Spec 4.2). */}
-          <datalist id={HERSTELLER_LISTE}>
-            {hersteller.map((name) => (
+          {/* Eine Liste fuer alle Formulare: bestehende Unternehmen waehlen oder neuen Namen tippen (Spec 4.2). */}
+          <datalist id={UNTERNEHMEN_LISTE}>
+            {unternehmen.map((name) => (
               <option key={name} value={name} />
             ))}
           </datalist>
@@ -69,7 +69,7 @@ export async function BlueteVorschlaege() {
                   vorbelegung={freigabeVorbelegen(gruppe)}
                   terpene={terpene}
                   katalog={katalog}
-                  herstellerListe={HERSTELLER_LISTE}
+                  unternehmenListe={UNTERNEHMEN_LISTE}
                 />
               </article>
             ))

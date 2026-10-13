@@ -28,11 +28,10 @@ export async function blueteVorhanden(slug: string, handelsname: string) {
   });
 }
 
-/** Namen der Hersteller als Vorschlagsliste fuer das Freigabeformular. */
-export async function herstellerNamen(): Promise<string[]> {
+/** Namen aller Unternehmen (Vertreiber und Hersteller) als Vorschlagsliste fuer das Freigabeformular. */
+export async function unternehmenNamen(): Promise<string[]> {
   const prisma = await getPrisma();
   const zeilen = await prisma.unternehmen.findMany({
-    where: { rolle: { in: ["HERSTELLER", "BEIDES"] } },
     select: { name: true },
     orderBy: { name: "asc" },
     take: 200,
@@ -55,7 +54,9 @@ export async function offeneVorschlaegeFuerAdmin(): Promise<OffenerVorschlag[]> 
     avatarId: z.mitglied.avatar?.id ?? null,
     handelsname: z.handelsname,
     schluessel: z.schluessel,
+    vertreiber: z.vertreiber,
     hersteller: z.hersteller,
+    kultivarId: z.kultivarId,
     kultivarName: z.kultivarName,
     kultivarTyp: z.kultivarTyp,
     thcProzent: z.thcProzent,

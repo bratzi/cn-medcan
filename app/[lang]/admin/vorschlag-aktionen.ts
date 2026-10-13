@@ -13,6 +13,7 @@ import {
   freigabeKonflikt,
   herstellerRolleNachFreigabe,
   terpeneNachtragen,
+  vertreiberRolleNachFreigabe,
 } from "@/lib/vorschlag-eingabe";
 import type { VorschlagStatus } from "@/db/enums";
 
@@ -76,19 +77,43 @@ async function bilderUebernehmen(offene: { id: string; mitgliedId: string }[], s
   }
 }
 
-/** Hersteller finden oder mit der Id-Regel des Importskripts anlegen. */
-async function herstellerSichern(name: string): Promise<string | null> {
+/** Kultivar nach Name finden (COLLATE NOCASE) oder anlegen (Spec 2026-10-13). */
+async function kultivarSichern(name: string): Promise<string> {
+  const prisma = await getPrisma();
+  const sauber = name.trim();
+  const vorhanden = await prisma.kultivar.findFirst({ where: { name: sauber }, select: { id: true } });
+  if (vorhanden) return vorhanden.id;
+  try {
+    return (await prisma.kultivar.create({ data: { name: sauber }, select: { id: true } })).id;
+  } catch (fehler) {
+    // Zweiter Tab war schneller: der Name ist unique, also den vorhandenen nehmen.
+    if (!istEindeutigkeitsfehler(fehler)) throw fehler;
+    const dazwischen = await prisma.kultivar.findFirst({ where: { name: sauber }, select: { id: true } });
+    if (!dazwischen) throw fehler;
+    return dazwischen.id;
+  }
+}
+
+/**
+ * Unternehmen finden oder mit der Id-Regel des Importskripts anlegen. Die Rolle
+ * ist die, in der es hier auftritt: Anbauer (HERSTELLER) oder Vertreiber (IMPORTEUR).
+ */
+async function unternehmenSichern(name: string, auftritt: "HERSTELLER" | "IMPORTEUR"): Promise<string | null> {
   const schluessel = unternehmensSchluessel(name);
   if (!schluessel) return null;
   const prisma = await getPrisma();
   const id = await unternehmensIdAusSchluessel(schluessel);
+  const passend = auftritt === "HERSTELLER" ? ["HERSTELLER", "BEIDES"] : ["IMPORTEUR", "BEIDES"];
   const vorhanden = await prisma.unternehmen.findFirst({
-    where: { OR: [{ id }, { name: name.trim(), rolle: { in: ["HERSTELLER", "BEIDES"] } }] },
+    where: { OR: [{ id }, { name: name.trim(), rolle: { in: passend } }] },
     select: { id: true, rolle: true },
   });
   if (vorhanden) {
-    // Bisher nur Importeur: jetzt auch Hersteller, wie im Importskript.
-    const rolle = herstellerRolleNachFreigabe(vorhanden.rolle);
+    // Bisher nur die andere Rolle: jetzt beides, wie im Importskript.
+    const rolle =
+      auftritt === "HERSTELLER"
+        ? herstellerRolleNachFreigabe(vorhanden.rolle)
+        : vertreiberRolleNachFreigabe(vorhanden.rolle);
     if (rolle) {
       try {
         await prisma.unternehmen.update({ where: { id: vorhanden.id }, data: { rolle } });
@@ -100,7 +125,7 @@ async function herstellerSichern(name: string): Promise<string | null> {
     return vorhanden.id;
   }
   try {
-    await prisma.unternehmen.create({ data: { id, name: name.trim(), rolle: "HERSTELLER" } });
+    await prisma.unternehmen.create({ data: { id, name: name.trim(), rolle: auftritt } });
   } catch (fehler) {
     if (!istEindeutigkeitsfehler(fehler)) throw fehler;
   }
@@ -144,7 +169,9 @@ export async function blueteFreigeben(formData: FormData): Promise<AdminVorschla
     await prisma.strain.update({ where: { id: vorhanden.id }, data: { aktiv: true } });
   }
   if (!vorhanden) {
-    const herstellerId = w.hersteller ? await herstellerSichern(w.hersteller) : null;
+    const vertreiberId = w.vertreiber ? await unternehmenSichern(w.vertreiber, "IMPORTEUR") : null;
+    const herstellerId = w.hersteller ? await unternehmenSichern(w.hersteller, "HERSTELLER") : null;
+    const kultivarId = w.kultivarId ?? (await kultivarSichern(w.kultivarName ?? w.handelsname));
     try {
       await prisma.strain.create({
         data: {
@@ -160,7 +187,9 @@ export async function blueteFreigeben(formData: FormData): Promise<AdminVorschla
           cbdMaxProzent: w.cbdMax,
           bestrahlung: w.bestrahlung,
           anbauland: w.anbauland,
+          vertreiberId,
           herstellerId,
+          kultivarId,
           // wie das Importskript: Name, Kultivar, Genetik klein
           suchtext: [w.handelsname, w.kultivarName].filter(Boolean).join(" ").toLowerCase(),
         },

@@ -15,8 +15,8 @@ type Props = {
   vorbelegung: FreigabeVorbelegung;
   terpene: readonly string[];
   katalog: readonly SelectOption[];
-  /** Id einer datalist mit den bestehenden Herstellern. */
-  herstellerListe: string;
+  /** Id einer datalist mit den bestehenden Unternehmen (Vertreiber und Hersteller). */
+  unternehmenListe: string;
 };
 
 type AdminErgebnis = { ok: true } | { ok: false; fehler: string };
@@ -25,7 +25,7 @@ const TYPEN: SelectOption[] = KULTIVAR_TYPEN.map((t) => ({ wert: t, label: t }))
 const BESTRAHLUNG: SelectOption[] = BESTRAHLUNGEN.map((b) => ({ wert: b, label: b }));
 
 /** Drei Wege fuer eine Gruppe: freigeben (Bluete anlegen), zuordnen, ablehnen. */
-export function BlueteFreigabe({ schluessel, vorbelegung: v, terpene, katalog, herstellerListe }: Props) {
+export function BlueteFreigabe({ schluessel, vorbelegung: v, terpene, katalog, unternehmenListe }: Props) {
   const freigabe = useAktion();
   const zuordnung = useAktion();
   const ablehnung = useAktion();
@@ -44,6 +44,7 @@ export function BlueteFreigabe({ schluessel, vorbelegung: v, terpene, katalog, h
     <div className="flex flex-col gap-8">
       <form onSubmit={senden(freigabe, blueteFreigeben)} className="flex flex-col gap-6">
         <input type="hidden" name="vorschlagSchluessel" value={schluessel} />
+        <input type="hidden" name="kultivarId" value={v.kultivarId} />
         <Input id={id("name")} name="handelsname" label="Handelsname" pflicht required defaultValue={v.handelsname} />
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
           <Input id={id("kultivar")} name="kultivarName" label="Kultivar" defaultValue={v.kultivarName} />
@@ -59,12 +60,21 @@ export function BlueteFreigabe({ schluessel, vorbelegung: v, terpene, katalog, h
           <Input id={id("thc")} name="thc" label="THC in %" required inputMode="decimal" defaultValue={v.thc} />
           <Input id={id("cbd")} name="cbd" label="CBD in %" required inputMode="decimal" defaultValue={v.cbd} />
           <Input
+            id={id("vertreiber")}
+            name="vertreiber"
+            label="Vertreiber"
+            list={unternehmenListe}
+            autoComplete="off"
+            hinweis="Wer die Blüte in Deutschland vertreibt. Aus der Liste wählen oder neu eintragen."
+            defaultValue={v.vertreiber}
+          />
+          <Input
             id={id("hersteller")}
             name="hersteller"
-            label="Hersteller"
-            list={herstellerListe}
+            label="Hersteller (Anbauer)"
+            list={unternehmenListe}
             autoComplete="off"
-            hinweis="Aus der Liste wählen oder neu eintragen."
+            hinweis="Freiwillig. Aus der Liste wählen oder neu eintragen."
             defaultValue={v.hersteller}
           />
           <Input id={id("land")} name="anbauland" label="Anbauland" />
