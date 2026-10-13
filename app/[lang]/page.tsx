@@ -12,6 +12,7 @@ import { StoryBuehne } from "@/components/story/StoryBuehne";
 import { TerpenBand } from "@/components/story/TerpenBand";
 import { TerpenRegister } from "@/components/story/TerpenRegister";
 import { TransparentMachen } from "@/components/story/TransparentMachen";
+import { VertreiberKapitel } from "@/components/story/VertreiberKapitel";
 import { WissenBuendeln } from "@/components/story/WissenBuendeln";
 
 /**
@@ -39,6 +40,7 @@ export default function StartPage() {
         {/* Band der Terpene zwischen Hero und Story (Nutzer 2026-09-30). */}
         <TerpenBand />
         <TransparentMachen />
+        <VertreiberKapitel />
         {/* T12: Register der Terpene und Geschmäcker, vor der Aroma-Karte (Nutzer 2026-09-29). */}
         <TerpenRegister />
         {/* Direkt hinter dem Register: wer die Terpene kennt, sieht sein eigenes Kapitel (Nutzer 2026-10-09). */}
