@@ -47,7 +47,9 @@ export function RanglistenKarte({ karte, nach, texte, sprache }: Props) {
           </Link>
         </h3>
       </div>
-      {karte.vertreiber ? <p className="text-small text-text-muted">{karte.vertreiber}</p> : null}
+      <p className="text-small text-text-muted">
+        {t(texte.bluetenZeile, { bluete: karte.bluete, vertreiber: karte.vertreiber ?? texte.vertreiberUnbekannt })}
+      </p>
       <BlattAnzeige note={karte.schnitt} text={t(texte.schnitt, { zahl: schnitt })} />
       <p className="numeric text-small text-text-muted">{mehrzahl(sprache, texte.anzahl, karte.anzahl)}</p>
       <ul className="flex flex-col gap-2 text-small text-text-muted">

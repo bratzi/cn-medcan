@@ -7,6 +7,7 @@ export type RanglistenKarte = {
   rang: number;
   slug: string;
   handelsname: string;
+  bluete: string;
   vertreiber: string | null;
   bildId: string;
   schnitt: number;
@@ -69,7 +70,7 @@ export async function ladeRangliste(nach: Rangliste, seite: number): Promise<Ran
   const sorten = ids.length
     ? await prisma.strain.findMany({
         where: { id: { in: ids } },
-        select: { id: true, slug: true, handelsname: true, herstellerBildPfad: true, vertreiber: { select: { name: true } } },
+        select: { id: true, slug: true, handelsname: true, herstellerBildPfad: true, kultivar: { select: { name: true } }, vertreiber: { select: { name: true } } },
       })
     : [];
   const nachId = new Map(sorten.map((s) => [s.id, s]));
@@ -81,6 +82,7 @@ export async function ladeRangliste(nach: Rangliste, seite: number): Promise<Ran
         rang: p.rang,
         slug: s.slug,
         handelsname: s.handelsname,
+        bluete: s.kultivar?.name ?? s.handelsname,
         vertreiber: s.vertreiber?.name ?? null,
         bildId: blueteBild(s.herstellerBildPfad) ?? musterBildId(s.slug),
         schnitt: p.schnitt,

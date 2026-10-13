@@ -1016,6 +1016,8 @@ export const en: Woerterbuch = {
     },
   },
   rangliste: {
+    bluetenZeile: "{bluete} · {vertreiber}",
+    vertreiberUnbekannt: "Distributor unknown",
     schlagwort: "who leads",
     titel: "Rankings",
     satz: "Per strain, from all approved reviews. Ordered by a weighted average so that a single review does not lead the whole list. The real average is shown.",
