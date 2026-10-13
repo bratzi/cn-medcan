@@ -134,21 +134,41 @@ export async function bewertungVerwerfen(formData: FormData): Promise<AdminErgeb
 }
 
 /**
- * Nach 0021 und bei Bedarf: Kennwerte aller bewerteten Handelsnamen neu rechnen.
- * Das Gate steht als erste Zeile; die Aktion ist auch ohne die Seite aufrufbar.
- * Mehrfaches Ausfuehren ist harmlos (reines Neurechnen aus den Bewertungen).
+ * Kennwerte bewerteter Handelsnamen neu rechnen, in Stuecken zu 5.
+ *
+ * Auf dem Free-Plan gilt 10 ms CPU je Anfrage; je Handelsname laufen etwa
+ * sechs Abfragen nacheinander. Der Aufrufer ruft deshalb mit `weiter` erneut,
+ * bis es `null` ist. Das Gate steht als erste Zeile; mehrfaches Ausfuehren ist
+ * harmlos (reines Neurechnen aus den Bewertungen).
  */
-export async function kennwerteNeuRechnen(): Promise<{ ok: true; anzahl: number }> {
+export async function kennwerteNeuRechnen(
+  nach?: string | null,
+): Promise<{ ok: true; anzahl: number; weiter: string | null }> {
   await adminErforderlich();
 
   const prisma = await getPrisma();
-  const ids = await prisma.review.findMany({
-    where: { freigegeben: true },
-    select: { strainId: true },
-    distinct: ["strainId"],
-  });
-  for (const { strainId } of ids) await kennwerteFortschreiben(strainId);
-
-  revalidiereSprachen("/", "layout");
-  return { ok: true, anzahl: ids.length };
+  let weiter: string | null = null;
+  let fehler = false;
+  try {
+    const ids = await prisma.review.findMany({
+      where: { freigegeben: true, ...(nach ? { strainId: { gt: nach } } : {}) },
+      select: { strainId: true },
+      distinct: ["strainId"],
+      orderBy: { strainId: "asc" },
+      take: 5,
+    });
+    let anzahl = 0;
+    for (const { strainId } of ids) {
+      await kennwerteFortschreiben(strainId);
+      anzahl += 1;
+    }
+    if (ids.length === 5) weiter = ids[4].strainId;
+    return { ok: true, anzahl, weiter };
+  } catch (e) {
+    fehler = true;
+    throw e;
+  } finally {
+    // Nur im letzten Stueck oder bei Fehler neu laden, nicht fuenfmal.
+    if (weiter === null || fehler) revalidiereSprachen("/", "layout");
+  }
 }

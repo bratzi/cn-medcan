@@ -42,3 +42,15 @@ test("Admin-Aktion rechnet alle Kennwerte neu und prüft den Betreiber", () => {
   assert.match(teil, /kennwerteFortschreiben\(strainId\)/);
   assert.match(teil.slice(0, 400), /adminErforderlich\(|ADMIN/);
 });
+
+test("Admin-Aktion arbeitet in Stücken zu 5 und lädt am Ende neu", () => {
+  const q = readFileSync("app/[lang]/admin/aktionen.ts", "utf8");
+  const teil = q.slice(q.indexOf("export async function kennwerteNeuRechnen"));
+  assert.match(teil, /take: 5/);
+  assert.match(teil, /strainId: \{ gt: nach \}/);
+  assert.match(teil, /orderBy: \{ strainId: "asc" \}/);
+  assert.match(teil, /return \{ ok: true, anzahl, weiter \}/);
+  assert.match(teil, /finally \{[\s\S]*revalidiereSprachen/);
+  const k = readFileSync("components/admin/KennwerteNeuKnopf.tsx", "utf8");
+  assert.match(k, /while \(nach !== null\)/);
+});
