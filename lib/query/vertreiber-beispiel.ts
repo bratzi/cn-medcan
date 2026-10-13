@@ -72,6 +72,7 @@ async function vertreiberJeKultivar(ids: string[]): Promise<Map<string, number>>
   const gruppen = await prisma.strain.groupBy({
     by: ["kultivarId", "vertreiberId"],
     where: { aktiv: true, kultivarId: { in: ids }, vertreiberId: { not: null } },
+    orderBy: [{ kultivarId: "asc" }, { vertreiberId: "asc" }],
     take: GRUPPEN_MAX,
   });
   return zaehleVertreiberJeKultivar(gruppen);
