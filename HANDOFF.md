@@ -3,7 +3,7 @@
 > Übergabemedium zwischen Sessions. Wird nach jedem Arbeitsblock aktualisiert und committet.
 > Wer hier weiterarbeitet, liest diese Datei zuerst und braucht den Chatverlauf nicht.
 
-**Letzte Aktualisierung:** 2026-10-13 (Session 56)
+**Letzte Aktualisierung:** 2026-10-13 (Session 56, Teil 2)
 **Repo:** https://github.com/bratzi/cn-medcan (public)
 **Branch:** `main` (Makeover „Grünes Buch“ Teilprojekt 1 ist seit 2026-09-24 auf `main`)
 
@@ -49,6 +49,46 @@ Hersteller und Vertreiber die Qualität prägen.
 - Alle Likes werden gespeichert und sind im Profil sichtbar (wem ich folge, was ich gemocht habe, wie oft
   meine Bewertungen gemocht wurden).
 - Eigener Brainstorming-Durchgang mit Spec und Plan; Sichtbarkeit (privat/öffentlich) und HWG prüfen.
+
+### ⇢ SESSION 56, Teil 2: Vertreiber/Blüte/Charge und Profil am Desktop umgesetzt
+
+Nutzer 2026-10-13: Blüte = Kultivar über alle Vertreiber; der bisherige „Hersteller“ ist der deutsche Vertreiber;
+Overall/Terpene zählen für die Blüte, Qualität/Restfeuchte/Frische der Charge für den Vertreiber; Profil am PC
+neu (Kopf hässlich, Menü verloren). Specs und Pläne: `docs/superpowers/specs/2026-10-13-vertreiber-bewertung-design.md`,
+`…-profil-desktop-design.md`, Pläne gleichnamig unter `docs/superpowers/plans/`. Umgesetzt per Subagent-Driven
+Development in zwei Worktrees (`C:\cn-wtertreiber`, `C:\cn-wt\profil`), je Aufgabe Review, je Branch Gesamtreview.
+
+- **Plan B (Profil/Kopf) live seit `6a84d1b`:** Kopfleiste überall mit Fläche und Linie, über dem Hero der Startseite
+  durchsichtig (CSS `:has([data-story="auftakt"])`, ohne JS). Profil: Seitenleiste links (Avatar, Name, Rolle,
+  dabei seit, vier Zahlen 2×2, liebste Aromen, Blüte bewerten / Profil bearbeiten), Reiter rechts per `?ansicht=`
+  (Übersicht | Aromen | Bewertungen | Vertreiber), Server rendert nur den gewählten Reiter. Öffentliches Profil mit
+  zwei Reitern. Kapitelkopf (Hintergrundwort, Freisteller) auf dem Profil entfernt.
+- **Plan A (Vertreiber) gepusht `c54ee90`; Migration 0021 remote eingespielt (2026-10-13, vor dem Push):** neue
+  Tabelle `kultivare` (427), `strains.vertreiber_id` (673 gesetzt), `hersteller_id` = echter Anbauer (30), `importeur_id`
+  geleert (Spalte bleibt, FK). Kennwerte je Kultivar/Vertreiber, Achse Frische (ohne Sweet Spot), Filter `vertreiber`
+  (alte `?hersteller=` gehen weiter), Blütenseite mit „Deine Ware ist von …“ und „Diese Blüte bei anderen
+  Vertreibern“, Vorschlag/Admin mit Kultivar/Vertreiber/Hersteller, Profil „Deine Vertreiber“ (Qualität), Startseite
+  „Blüte · Vertreiber“. Backup vor 0021: `C:\cn-wtackup-0021\strains-vor-0021.json` (id, hersteller_id, importeur_id).
+  1002 Tests grün.
+
+**ALS ERSTES (offen):**
+1. Live prüfen (Browser war nicht verbunden): Profil 1440/1146/494 px hell+dunkel, Kopf auf `/` (kein Aufblitzen) und
+   Unterseiten, Sticky-Seitenleiste, Reiter; Blütenseite eines Black-Cherry-Punch-Handelsnamens (Vertreiber-Wahl,
+   Vergleich, Frische ohne Sweet Spot, „zählt für …“), Katalogfilter Vertreiber, Startseite „Blüte · Vertreiber“.
+2. Als Betreiber in `/admin` einmal **„Kennwerte neu rechnen“** klicken (erst nachdem `c54ee90` live ist), sonst zeigt
+   der Vergleich „noch keine Qualitätsangabe“.
+3. Keine Vorschlag-Freigaben, bevor `c54ee90` live ist (alter Code legt Blüten ohne Kultivar/Vertreiber an).
+
+**Merken:** 0021 lief per `wrangler d1 execute --file`, steht also nicht in `d1_migrations`; nicht per
+`migrations apply` erneut laufen lassen. Stamm-Import (`scripts/stamm/sql-erzeugen.py`) ist auf die neue Bedeutung
+umgestellt, aber noch nie gelaufen. Prisma kennt `COLLATE NOCASE` an `kultivare.name` nicht: bei einem
+Tabellen-Neuaufbau per Prisma von Hand erhalten.
+
+**Zurückgestellte Minors (Ledger):** Spur kompakt mit 1–2 Monaten breite Balken; Aromen-Reiter Netz wartet auf
+Vorschläge (ein Suspense); Fokusringe an der scrollenden Seitenleiste; Vergleich-h3 ohne eigenes h2; Zuordnungs-
+Vermerke auch in der Gast-Erkundung; Vergleich zählt `qualitaetAnzahl` als „Bewertungen“; Profil-Abfrage parst bis
+1000 Beschaffenheiten je Aufruf (CPU später); Kennwerte-Neurechnung ohne Dedup je Vertreiber/Kultivar;
+Extrakte können im Vertreiber-Vergleich einer Blüte auftauchen (Darreichungsform nicht gefiltert).
 
 ### ⇢ SESSION 56 (2026-10-13): Live-Prüfung Session 55, Minors erledigt
 
