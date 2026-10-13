@@ -3,7 +3,7 @@
 > Übergabemedium zwischen Sessions. Wird nach jedem Arbeitsblock aktualisiert und committet.
 > Wer hier weiterarbeitet, liest diese Datei zuerst und braucht den Chatverlauf nicht.
 
-**Letzte Aktualisierung:** 2026-10-13 (Session 56, Teil 2)
+**Letzte Aktualisierung:** 2026-10-13 (Session 57)
 **Repo:** https://github.com/bratzi/cn-medcan (public)
 **Branch:** `main` (Makeover „Grünes Buch“ Teilprojekt 1 ist seit 2026-09-24 auf `main`)
 
@@ -71,13 +71,19 @@ Development in zwei Worktrees (`C:\cn-wt\vertreiber`, `C:\cn-wt\profil`), je Auf
   „Blüte · Vertreiber“. Backup vor 0021: `C:\cn-wt\backup-0021\strains-vor-0021.json` (id, hersteller_id, importeur_id).
   1002 Tests grün.
 
-**ALS ERSTES (offen):**
-1. Live prüfen (Browser war nicht verbunden): Profil 1440/1146/494 px hell+dunkel, Kopf auf `/` (kein Aufblitzen) und
-   Unterseiten, Sticky-Seitenleiste, Reiter; Blütenseite eines Black-Cherry-Punch-Handelsnamens (Vertreiber-Wahl,
-   Vergleich, Frische ohne Sweet Spot, „zählt für …“), Katalogfilter Vertreiber, Startseite „Blüte · Vertreiber“.
-2. Als Betreiber in `/admin` einmal **„Kennwerte neu rechnen“** klicken (erst nachdem `c54ee90` live ist), sonst zeigt
-   der Vergleich „noch keine Qualitätsangabe“.
-3. Keine Vorschlag-Freigaben, bevor `c54ee90` live ist (alter Code legt Blüten ohne Kultivar/Vertreiber an).
+**Live geprüft (Session 57, 2026-10-13, Build `0aec825`):** „Kennwerte neu rechnen“ geklickt (13 Blüten).
+Profil 1440/1146/494 px hell und dunkel, alle vier Reiter, kein Querscroll. Gefunden und behoben in `0aec825`:
+Zahlwörter der Seitenleiste in voller Notizgröße („im Schnitt“ stieß an den Rand, Leiste mit breiter weißer
+Scrollspur) – jetzt höchstens 1,75rem, schmaler Scrollbalken; Top und Flop brachen in der schmalen Übersicht-Karte
+Wort für Wort um – jetzt zwei Spalten erst ab 28rem Kartenbreite (`@container`). Blütenseite Black Cherry Punch
+(Enua): Vertreiber-Wahl, Vergleich mit 7 Vertreibern, „zählt für …“, Frische ohne Sweet Spot gut. Katalogfilter
+Vertreiber gut. Startseite „MAC 1 · Four 20 Pharma“ und „Vertreiber MGF Via Medical“ gut; Kopf hell als 78-%-Streifen
+wie gewollt. Vorschlag-Freigaben sind wieder erlaubt.
+
+**Datenbefunde (offen, Nutzer entscheidet):** Im Vertreiber-Filter stehen „ADREXpharma (17)“ und „Adrex Pharma (1)“
+getrennt (Dublette); „Mediprocan African Ruby 30/1“ hängt am Kultivar Black Cherry Punch (Zuordnung prüfen). Auf der
+Blütenseite heißt die Terpen-Überschrift noch „Terpene laut Hersteller“, obwohl „Hersteller“ jetzt der Anbauer ist.
+Bei 1440 px überdeckt die rechte Schalterleiste das Ende von „Noch nicht von uns getestet.“ im Blütenkopf.
 
 **Merken:** 0021 lief per `wrangler d1 execute --file`, steht also nicht in `d1_migrations`; nicht per
 `migrations apply` erneut laufen lassen. Stamm-Import (`scripts/stamm/sql-erzeugen.py`) ist auf die neue Bedeutung
