@@ -435,7 +435,7 @@ export const de = {
       vergleichSatz: "Overall und Terpene zählen für die Blüte, Qualität, Restfeuchte und Frische für den Vertreiber. Erfahrungen der Mitglieder, keine Empfehlung.",
       nurEiner: "Bisher kennen wir sie nur von {vertreiber}.",
       nurEinerUnbekannt: "Bisher kennen wir sie nur von einem Vertreiber, dessen Name noch fehlt.",
-      alleImKatalog: "Alle im Katalog",
+      alleImKatalog: "Alle Handelsnamen dieser Blüte im Katalog",
       qualitaet: "Qualität {note} von 5",
       ohneQualitaet: "noch keine Qualitätsangabe",
       restfeuchte: "Restfeuchte {wert} %",

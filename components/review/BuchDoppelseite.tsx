@@ -97,6 +97,8 @@ export function BuchDoppelseite({ eintrag, ueberschrift: Ueberschrift, w, sprach
       // Ab lg nennt der Reiter die Tafel; die Überschrift bleibt für Screenreader und mobil sichtbar.
       inhalt: (
         <div className="flex flex-col gap-4">
+          {/* Überschrift vor der Chargenzeile, damit die Zeile unter ihr steht; ab lg nennt der Reiter die Tafel. */}
+          <h3 className="font-buch text-h3 font-medium text-text lg:sr-only">{texte.aroma.beschaffenheit.titel}</h3>
           {eintrag.vertreiber !== undefined ? (
             // Charge zählt für den Vertreiber (Spec Vertreiber sichtbar 4). Ohne Produktbezug (undefined, Blütenseite) entfällt die Zeile; null heißt Vertreiber unbekannt.
             <p className="flex flex-wrap items-baseline gap-x-4 gap-y-2">
@@ -106,7 +108,7 @@ export function BuchDoppelseite({ eintrag, ueberschrift: Ueberschrift, w, sprach
               <span className="font-sans text-caption uppercase tracking-gesperrt text-text-muted">{w.buch.zaehltVertreiber}</span>
             </p>
           ) : null}
-          <BeschaffenheitsLeiste werte={eintrag.beschaffenheit} feuchte={null} texte={texte} titelKlasse="lg:sr-only" />
+          <BeschaffenheitsLeiste werte={eintrag.beschaffenheit} feuchte={null} texte={texte} ohneTitel />
         </div>
       ),
     });

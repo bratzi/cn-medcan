@@ -15,6 +15,7 @@ export type EintragDaten = {
   handelsname: string;
   /** Kultivar und Vertreiber für die Zeile „Blüte · Vertreiber“; optional, ältere Aufrufer haben sie nicht. */
   bluete?: string | null;
+  /** undefined = kein Produktbezug (Blütenseite, keine Chargenzeile); null = Vertreiber unbekannt. */
   vertreiber?: string | null;
   slug: string;
   aussehen: number;
@@ -72,6 +73,7 @@ export function alsEintrag(
     id: review.id,
     handelsname: produkt.handelsname,
     bluete: produkt.bluete ?? null,
+    // Bewusst ohne `?? null`, anders als `bluete`: undefined heißt kein Produktbezug (Blütenseite, keine Chargenzeile), null Vertreiber unbekannt.
     vertreiber: produkt.vertreiber,
     slug: produkt.slug,
     aussehen: review.aussehen,

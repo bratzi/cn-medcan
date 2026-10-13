@@ -321,3 +321,11 @@ test("alsEintrag mit vertreiber: Chargenzeile nennt ihn", () => {
   const html = ueberAlsEintrag({ handelsname: "Nebelharz 22 (fiktiv)", slug: "nebelharz-22", vertreiber: "avaay" });
   assert.match(html, /Charge von avaay/);
 });
+
+test("Chargenzeile steht unter der Beschaffenheits-Überschrift, die nur einmal vorkommt", () => {
+  const html = zeige({ ...MIT_BESCHAFFENHEIT, vertreiber: "avaay" });
+  const titel = de.aroma.beschaffenheit.titel;
+  const stellen = [...html.matchAll(new RegExp(`<h3[^>]*>${titel}`, "g"))];
+  assert.equal(stellen.length, 1);
+  assert.ok(stellen[0].index! < html.indexOf("Charge von avaay"));
+});
