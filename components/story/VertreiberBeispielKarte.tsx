@@ -19,10 +19,17 @@ type Props = { beispiel: VertreiberBeispiel; texte: Woerterbuch["start"]["vertre
 export function VertreiberBeispielKarte({ beispiel, texte, sprache }: Props) {
   const { zeilen } = beispiel;
   const sichtbar = zeilen.slice(0, ZEILEN_MAX);
-  const rest = zeilen.length - sichtbar.length;
   const bewertet = zeilen.filter((z) => z.anzahl > 0);
   const meistBewertet = bewertet[0] ?? null;
-  const einladen = bewertet.length <= 1 ? (zeilen.find((z) => z.anzahl === 0) ?? null) : null;
+  // Gezählt werden Vertreiber, nicht Zeilen: ein Vertreiber kann mehrere Handelsnamen führen.
+  const bewerteteNamen = new Set(bewertet.map((z) => z.vertreiberName).filter((n): n is string => n !== null));
+  const alleNamen = new Set(zeilen.map((z) => z.vertreiberName).filter((n): n is string => n !== null));
+  const sichtbareNamen = new Set(sichtbar.map((z) => z.vertreiberName).filter((n): n is string => n !== null));
+  const rest = [...alleNamen].filter((n) => !sichtbareNamen.has(n)).length;
+  const einladen =
+    bewerteteNamen.size <= 1
+      ? (zeilen.find((z) => z.anzahl === 0 && z.vertreiberName !== null && !bewerteteNamen.has(z.vertreiberName)) ?? null)
+      : null;
 
   return (
     <div className="flex flex-col gap-6 border border-border-strong bg-surface-raised p-8 shadow-md sm:p-12">
@@ -61,7 +68,7 @@ export function VertreiberBeispielKarte({ beispiel, texte, sprache }: Props) {
           </Link>
         ) : null}
         <Link prefetch={false} href={`/blueten?kultivar=${beispiel.kultivarId}`} className={einzelLinkKlassen()}>
-          {mehrzahl(sprache, texte.alleImKatalog, zeilen.length)}
+          {mehrzahl(sprache, texte.alleImKatalog, alleNamen.size)}
         </Link>
       </p>
       <p className="text-small text-text-muted">{texte.hinweis}</p>

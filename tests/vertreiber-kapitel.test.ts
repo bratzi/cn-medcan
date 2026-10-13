@@ -78,3 +78,29 @@ test("VertreiberKapitel: eigene Suspense-Grenze, Schlagwort, Fehler mit unstable
   assert.match(q, /unstable_rethrow/);
   assert.match(q, /data-story="vertreiber"/);
 });
+
+test("Beispielkarte: zwei Zeilen desselben Vertreibers zählen als ein Vertreiber, keine Einladung auf ihn", () => {
+  const html = zeige([
+    zeile({ slug: "a", handelsname: "Enua 1", vertreiberName: "Enua", qualitaet: 4, anzahl: 2 }),
+    zeile({ slug: "b", handelsname: "Enua 2", vertreiberName: "Enua" }),
+  ]);
+  assert.doesNotMatch(html, new RegExp(maskiere(de.start.vertreiber.einladung)));
+  assert.match(html, /1 Vertreiber im Katalog/);
+  assert.doesNotMatch(html, /weitere/);
+});
+
+test("Beispielkarte: weitere zählt Vertreiber außerhalb der sichtbaren Zeilen", () => {
+  const html = zeige([
+    ...["a", "b", "c", "d"].map((s) => zeile({ slug: s, vertreiberName: "V" + s })),
+    zeile({ slug: "e", vertreiberName: "Va" }),
+    zeile({ slug: "f", vertreiberName: "Ve" }),
+    zeile({ slug: "g", vertreiberName: null }),
+  ]);
+  assert.match(html, /und 1 weiterer Vertreiber/);
+  assert.match(html, /Alle 5 Vertreiber im Katalog/);
+});
+
+test("Beispielkarte: unbekannter Vertreiber bekommt keine Einladung", () => {
+  const html = zeige([zeile({ slug: "a", vertreiberName: "Enua", qualitaet: 4, anzahl: 2 }), zeile({ slug: "b", vertreiberName: null })]);
+  assert.doesNotMatch(html, /#bewerten/);
+});
