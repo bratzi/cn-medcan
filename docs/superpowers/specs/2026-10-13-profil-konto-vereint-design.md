@@ -55,8 +55,8 @@ Seitenkopf (`top: var(--kopf-h)`), Fläche `surface` mit Linie unten wie der Sei
   bricht der Block in zwei Zeilen (Identität oben, Zahlen darunter), bleibt aber sticky.
 - Unter 1080 px nicht sticky **[eigene Entscheidung]**: auf dem Telefon nähme der Block zu viel Höhe. Er steht als
   Kopfblock oben, Zahlen in zwei Reihen zu vier.
-- Sprungziele bekommen `scroll-margin-top` in Höhe von Seitenkopf plus Profilkopf, damit kein Titel darunter
-  verschwindet.
+- Sprungziele bekommen `scroll-margin-top` (ab 1080 px 256 px, darunter 96 px), damit kein Titel unter Seitenkopf
+  und Profilkopf verschwindet.
 
 ### 3.2 Boxen
 
@@ -80,8 +80,9 @@ heute im Profil. Raster ab 1280 px 12 Spalten, Abstand 32 px; darunter eine Spal
   Auswertungsboxen entfallen). Fällt eine Box einer Reihe weg, nimmt die andere die volle Breite.
 - Die Konto-Boxen verlieren das Feldbuch-Raster, den Kapitelkopf „deine Stimme“ und den Freisteller: das Muster aus
   Session 56 (eckige Karten) gilt für die ganze Seite. `KapitelRaster` und `Kapitelkopf` nutzt sonst niemand: sie
-  entfallen samt ihren Tests und CSS-Regeln. `Randnotizen` bleibt (kompakt, im Profilkopf); das große Format
-  entfällt.
+  entfallen samt ihren Tests. Die CSS-Regeln bleiben vorerst stehen. `Randnotizen` bleibt (kompakt, im Profilkopf).
+- Genau eine gefüllte Primäraktion: „Blüte bewerten“ im Profilkopf. „Zur Abstimmung“ im Stimmzettel wird auf
+  `/profil` sekundär **[eigene Entscheidung]**.
 - Ids: die Empfehlungen heißen `aehnliches`, die eigenen Blüten-Vorschläge `meine-vorschlaege` (bisher beide
   `vorschlaege`).
 - `GelesenMarkieren` bleibt in der Nachrichten-Box: wer `/profil` öffnet, hat die Nachrichten gesehen.
@@ -99,8 +100,8 @@ heute im Profil. Raster ab 1280 px 12 Spalten, Abstand 32 px; darunter eine Spal
 
 ### 3.4 Öffentliches Profil `/profil/[kurzId]`
 
-Gleiches Muster **[eigene Entscheidung]**: Profilkopf (ohne Aktionen, ohne private Zahlen), darunter Netz und
-Top/Flop, dann die freigegebenen Bewertungen. Keine Reiter. Nicht sticky-pflichtig, aber dieselbe Komponente.
+Gleiches Muster **[eigene Entscheidung]**: Profilkopf (ohne Aktionen, nur die Zahl der Bewertungen), darunter
+Netz (12), dann die freigegebenen Bewertungen (12). Keine Reiter. Dieselbe Komponente, ab 1080 px ebenfalls sticky.
 
 ## 4. CPU (Free-Plan, 10 ms)
 
@@ -108,8 +109,8 @@ Die Reiter gab es auch, um CPU zu sparen: der Server rendert heute nur einen Rei
 mehr. Maßnahmen **[eigene Entscheidung]**:
 
 - Jede Reihe in eigenem `Suspense` mit Skelett, Abfragen per `cache()` je Quelle einmal (wie heute).
-- Das Register zeigt zuerst die ersten zwölf Einträge, „Alle zeigen“ lädt den Rest über den bestehenden Parameter.
-- Deine Stimmen zeigen die letzten sechs.
+- Das Register zeigt wie heute zuerst zehn Einträge (`REGISTER_ANFANG`), „Alle zeigen“ lädt den Rest.
+- Deine Stimmen bleiben bei höchstens zehn (`MEINE_STIMMEN`).
 - Nach dem Deploy CPU je Aufruf in der Workers-Telemetrie messen (Abfrage aus Session 54). Liegt `/profil`
   deutlich über `/reviews` oder kommt 1102, werden die Reihen ab „Mitbestimmen“ erst beim Scrollen
   nachgeladen (eigene Route je Reihe). Das wird nur gebaut, wenn die Messung es verlangt.
