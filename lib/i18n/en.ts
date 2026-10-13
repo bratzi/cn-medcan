@@ -1025,6 +1025,17 @@ export const en: Woerterbuch = {
   },
   profil: {
     titel: "My profile",
+    seite: {
+      betreiber: "Operator",
+      mitglied: "Member",
+      dabeiSeit: "member since {datum}",
+      aromen: "Likes most",
+      reiterLeiste: "Profile sections",
+      zahlen: "Your numbers",
+      reiter: { uebersicht: "Overview", aromen: "Aromas", bewertungen: "Ratings", vertreiber: "Distributors" },
+      bewerten: "Rate a flower",
+      bearbeiten: "Edit profile",
+    },
     reiterProfil: "Profile",
     reiterKonto: "Account",
     anzahl: { one: "{anzahl} review", other: "{anzahl} reviews" },
