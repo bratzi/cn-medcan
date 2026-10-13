@@ -426,6 +426,7 @@ export const en: Woerterbuch = {
       vergleichTitel: "This flower from other distributors",
       vergleichSatz: "Overall and terpenes count for the flower; quality, moisture and freshness count for the distributor. Members' experiences, not a recommendation.",
       nurEiner: "So far we only know it from {vertreiber}.",
+      nurEinerUnbekannt: "So far we only know it from one distributor whose name is still missing.",
       alleImKatalog: "All in the catalogue",
       qualitaet: "Quality {note} of 5",
       ohneQualitaet: "no quality rating yet",

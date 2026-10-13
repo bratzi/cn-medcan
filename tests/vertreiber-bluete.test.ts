@@ -39,6 +39,9 @@ test("VertreiberVergleich: leer entfällt, ein Eintrag nennt den einen Vertreibe
   assert.match(einer, /Bisher kennen wir sie nur von avaay\./);
   assert.match(einer, /href="\/vorschlagen\?kultivar=k1"/);
   assert.doesNotMatch(einer, /<ul/);
+  const ohneName = renderToStaticMarkup(createElement(VertreiberVergleich, { ...p, eintraege: [{ ...eintraege[1], vertreiberName: null }] }));
+  assert.match(ohneName, /dessen Name noch fehlt/);
+  assert.doesNotMatch(ohneName, /Vertreiber unbekannt/);
   assert.doesNotMatch(einer, /href="\/blueten\?kultivar=k1"/);
   const html = renderToStaticMarkup(createElement(VertreiberVergleich, { ...p, eintraege }));
   assert.match(html, /Enua Pharma GmbH/);

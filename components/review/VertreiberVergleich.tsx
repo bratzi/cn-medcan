@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 import { BlattAnzeige } from "@/components/review/BlattAnzeige";
-import { textLinkKlassen } from "@/components/ui/textlink";
+import { einzelLinkKlassen } from "@/components/ui/textlink";
 import { formatiereZahl } from "@/lib/format";
 import type { Sprache } from "@/lib/i18n/sprache-kern";
 import { mehrzahl, t } from "@/lib/i18n/text";
@@ -24,7 +24,7 @@ export function VertreiberVergleich({ eintraege, kultivarId, texte, sprache }: P
       </h3>
       <p className="max-w-[68ch] text-small text-text-muted text-pretty">{texte.vergleichSatz}</p>
       {einer ? (
-        <p className="text-body text-text wrap-break-word">{t(texte.nurEiner, { vertreiber: einer.vertreiberName ?? texte.unbekannt })}</p>
+        <p className="text-body text-text wrap-break-word">{einer.vertreiberName ? t(texte.nurEiner, { vertreiber: einer.vertreiberName }) : texte.nurEinerUnbekannt}</p>
       ) : (
         <ul className="flex flex-col divide-y divide-border border-y border-border">
         {eintraege.map((e) => (
@@ -50,11 +50,11 @@ export function VertreiberVergleich({ eintraege, kultivarId, texte, sprache }: P
         </ul>
       )}
       <p className="flex flex-wrap gap-x-8 gap-y-2 text-body">
-        <Link prefetch={false} href={`/vorschlagen?kultivar=${kultivarId}`} className={textLinkKlassen()}>
+        <Link prefetch={false} href={`/vorschlagen?kultivar=${kultivarId}`} className={einzelLinkKlassen()}>
           {texte.fehlt}
         </Link>
         {einer ? null : (
-          <Link prefetch={false} href={`/blueten?kultivar=${kultivarId}`} className={textLinkKlassen()}>
+          <Link prefetch={false} href={`/blueten?kultivar=${kultivarId}`} className={einzelLinkKlassen()}>
             {texte.alleImKatalog}
           </Link>
         )}
