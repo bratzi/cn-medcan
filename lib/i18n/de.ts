@@ -1054,6 +1054,18 @@ export const de = {
   },
   profil: {
     titel: "Mein Profil",
+    seite: {
+      betreiber: "Betreiber",
+      mitglied: "Mitglied",
+      dabeiSeit: "dabei seit {datum}",
+      aromen: "Mag am liebsten",
+      reiterLeiste: "Bereiche des Profils",
+      zahlen: "Deine Zahlen",
+      zahlenNeutral: "Zahlen",
+      reiter: { uebersicht: "Übersicht", aromen: "Aromen", bewertungen: "Bewertungen", vertreiber: "Vertreiber" },
+      bewerten: "Blüte bewerten",
+      bearbeiten: "Profil bearbeiten",
+    },
     reiterProfil: "Profil",
     reiterKonto: "Konto",
     anzahl: { one: "{anzahl} Bewertung", other: "{anzahl} Bewertungen" },

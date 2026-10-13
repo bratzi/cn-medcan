@@ -8,29 +8,34 @@ const lage = (id: string) => {
   assert.ok(i >= 0, `Feld ${id} fehlt`);
   return i;
 };
-// Die Reihen sind eigene Funktionen; ihre Reihenfolge steht in ProfilPage.
-const reihen = (namen: string[]) => namen.map((n) => quelle.indexOf(`<${n} `));
+const reihenfolge = (r: number[]) => assert.deepEqual([...r].sort((a, b) => a - b), r, JSON.stringify(r));
 
-test("Profil: Aktivität, Netz, Auswertung, Bewertungen, Ähnlich (Nutzer 2026-10-09)", () => {
-  const r = reihen(["Notizen", "ReiheAktivitaet", "ReiheNetz", "ReiheAuswertung", "ReiheRegister", "ReiheVorschlaege"]);
+test("Profil: Reiter Übersicht, Aromen, Bewertungen, Vertreiber stehen in dieser Reihenfolge (Spec 2026-10-13)", () => {
+  const r = ['ansicht === "uebersicht"', 'ansicht === "aromen"', 'ansicht === "bewertungen"', 'ansicht === "vertreiber"'].map((s) => quelle.indexOf(s));
   assert.ok(r.every((i) => i > 0), JSON.stringify(r));
-  assert.deepEqual([...r].sort((a, b) => a - b), r);
+  reihenfolge(r);
 });
 
-test("Auswertung: Top/Flop, dann Noten+Hersteller, dann Schnitte+Community", () => {
-  const r = ["topflop", "verteilung", "hersteller", "schnitte", "community"].map(lage);
-  assert.deepEqual([...r].sort((a, b) => a - b), r);
+test("Übersicht: Netz, Top und Flop, Spur, Noten", () => {
+  reihenfolge(["netz", "topflop", "aktivitaet", "verteilung"].map(lage));
 });
 
-test("Kein Feld Terpene mehr, jedes Feld mit Kopf", () => {
+test("Aromen: Netz, dann Ähnliches im Aroma", () => {
+  reihenfolge([lage("netz"), lage("vorschlaege")]);
+});
+
+test("Vertreiber: Hersteller, Schnitte, Community", () => {
+  reihenfolge(["hersteller", "schnitte", "community"].map(lage));
+});
+
+test("Kein Feld Terpene mehr, jedes Feld mit Kopf, klein und als Karte, ohne Rasterspalten", () => {
   assert.doesNotMatch(quelle, /id="terpene"/);
   const felder = quelle.match(/<Feld\b[^>]*>/g) ?? [];
   assert.ok(felder.length >= 9, String(felder.length));
-  for (const f of felder) assert.match(f, /kopf=/, f);
-});
-
-test("Noten und Hersteller, Schnitte und Community je halbe Breite", () => {
-  for (const id of ["verteilung", "hersteller", "schnitte", "community"]) {
-    assert.ok(quelle.includes(`id="${id}" spalten={5}`), id);
+  for (const f of felder) {
+    assert.match(f, /kopf=/, f);
+    assert.match(f, /groesse="klein"/, f);
+    assert.match(f, /rahmen="karte"/, f);
+    assert.doesNotMatch(f, /spalten=/, f);
   }
 });

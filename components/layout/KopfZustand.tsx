@@ -3,11 +3,19 @@
 import { usePathname } from "next/navigation";
 import { useEffect } from "react";
 
+import { SPRACHEN } from "@/lib/i18n/sprache-kern";
+
+/** Startseite: dort schwebt der Kopf oben durchsichtig über dem Hero (Spec Profil Desktop 2026-10-13). */
+export function istStartseite(pfad: string): boolean {
+  const teile = pfad.split("/").filter(Boolean);
+  return teile.length === 0 || (teile.length === 1 && (SPRACHEN as readonly string[]).includes(teile[0]));
+}
+
 /**
  * Zustand des festen Kopfs, ohne React-Renders: misst seine Höhe (--kopf-h,
  * für den Abstand von main), setzt data-gescrollt, sobald die Seite läuft,
  * und leiht sich die dunklen Tokens der Bühne (buehne-dunkel), solange er
- * transparent über dem Auftakt schwebt.
+ * transparent über dem Auftakt schwebt, und markiert die Startseite (data-start).
  */
 export function KopfZustand() {
   // Der Kopf bleibt im Root-Layout stehen: nach einem Seitenwechsel neu prüfen,
@@ -16,6 +24,7 @@ export function KopfZustand() {
   useEffect(() => {
     const kopf = document.querySelector<HTMLElement>("[data-kopf]");
     if (!kopf) return;
+    kopf.toggleAttribute("data-start", istStartseite(pfad));
     const wurzel = document.documentElement;
     let rahmen = 0;
 

@@ -9,7 +9,7 @@ import { cn } from "@/lib/cn";
  * Datencodierung, kein Abstand. Die Grafik ist aria-hidden, vorgelesen wird
  * die Tabelle.
  */
-export function Aktivitaet({ monate, texte }: { monate: readonly Monat[]; texte: Woerterbuch["profil"] }) {
+export function Aktivitaet({ monate, texte, kompakt = false }: { monate: readonly Monat[]; texte: Woerterbuch["profil"]; kompakt?: boolean }) {
   const hoechstens = Math.max(0, ...monate.map((m) => m.anzahl));
   if (hoechstens === 0) return <p className="max-w-[68ch] text-body text-text-muted">{texte.aktivitaetLeer}</p>;
   return (
@@ -18,7 +18,7 @@ export function Aktivitaet({ monate, texte }: { monate: readonly Monat[]; texte:
         {monate.map((m) => {
           const hoehe = (m.anzahl / hoechstens) * 100;
           return (
-            <div key={m.schluessel} className="relative h-48 min-w-0 flex-1">
+            <div key={m.schluessel} className={cn("relative min-w-0 flex-1", kompakt ? "h-32" : "h-48")}>
               <div
                 data-saeule=""
                 style={{ height: `${hoehe}%` }}

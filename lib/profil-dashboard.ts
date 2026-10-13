@@ -17,10 +17,22 @@ const MONATE: Record<Sprache, Intl.DateTimeFormat> = {
 
 const schluessel = (d: Date) => `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, "0")}`;
 
-/** Bewertungen je Monat, die letzten zwölf inklusive laufendem (Spec 6, Aktivität). */
-export function monatsReihe(daten: readonly Date[], jetzt: Date, sprache: Sprache): Monat[] {
+/**
+ * Bewertungen je Monat, die letzten zwölf inklusive laufendem (Spec 6, Aktivität).
+ * Mit `abErster` beginnt die Reihe beim Monat der ersten Bewertung (höchstens zwölf Monate);
+ * ohne Bewertung bleibt sie leer.
+ */
+export function monatsReihe(daten: readonly Date[], jetzt: Date, sprache: Sprache, optionen: { abErster?: boolean } = {}): Monat[] {
+  let monate = 12;
+  if (optionen.abErster) {
+    if (daten.length === 0) return [];
+    const frueh = Math.min(...daten.map((d) => d.getTime()));
+    const f = new Date(frueh);
+    const abstand = (jetzt.getUTCFullYear() - f.getUTCFullYear()) * 12 + jetzt.getUTCMonth() - f.getUTCMonth();
+    monate = Math.min(12, Math.max(1, abstand + 1));
+  }
   const reihe: Monat[] = [];
-  for (let i = 11; i >= 0; i--) {
+  for (let i = monate - 1; i >= 0; i--) {
     const d = new Date(Date.UTC(jetzt.getUTCFullYear(), jetzt.getUTCMonth() - i, 1));
     reihe.push({ schluessel: schluessel(d), kurz: MONATE[sprache].format(d).replace(".", ""), anzahl: 0, laufend: i === 0 });
   }
@@ -56,6 +68,8 @@ export function profilNotizen(
   { zeilen, differenz, hersteller }: { zeilen: readonly AuswertungsZeile[]; differenz: number | null; hersteller: number },
   texte: Woerterbuch["profil"]["kapitel"],
   sprache: Sprache,
+  /** Seitenleiste: vier Zahlen, der Abstand zur Community steht im Vertreiber-Reiter. */
+  { ohneCommunity = false }: { ohneCommunity?: boolean } = {},
 ): Randnotiz[] {
   const anzahl = String(zeilen.length);
   const notizen: Randnotiz[] = [{ zahl: anzahl, wort: texte.bewertet, satz: mehrzahl(sprache, texte.srBewertet, zeilen.length) }];
@@ -63,7 +77,7 @@ export function profilNotizen(
 
   const schnitt = formatiereZahl(zeilen.reduce((s, z) => s + noteOderErsatz(z), 0) / zeilen.length, 1, sprache);
   notizen.push({ zahl: schnitt, wort: texte.schnitt, satz: t(texte.srSchnitt, { zahl: schnitt }) });
-  if (differenz !== null) {
+  if (differenz !== null && !ohneCommunity) {
     // Vorzeichen am gerundeten Wert, damit nie „±0,0“ entsteht.
     const gerundet = Math.round(Math.abs(differenz) * 10) / 10;
     const betrag = formatiereZahl(gerundet, 1, sprache);
