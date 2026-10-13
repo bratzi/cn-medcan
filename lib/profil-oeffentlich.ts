@@ -20,6 +20,9 @@ export type OeffentlicheBewertung = {
 export type OeffentlichesProfil = {
   anzeigename: string;
   avatarId: string | null;
+  /** Mitglied seit (Seitenleiste). */
+  seit: Date;
+  rolle: "betreiber" | "mitglied";
   /** Freigegebene Bewertungen insgesamt, nicht nur die gezeigten. */
   anzahl: number;
   /** Gespeicherter Stand aus nutzer_profil; null, wenn noch nie gerechnet. */

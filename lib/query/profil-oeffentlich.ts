@@ -21,6 +21,8 @@ export const ladeOeffentlichesProfil = cache(async function ladeOeffentlichesPro
     select: {
       id: true,
       anzeigename: true,
+      erstelltAm: true,
+      rolle: true,
       avatar: { select: { id: true } },
       profil: { select: { oeffentlich: true } },
     },
@@ -39,6 +41,8 @@ export const ladeOeffentlichesProfil = cache(async function ladeOeffentlichesPro
   return {
     anzeigename: m.anzeigename,
     avatarId: m.avatar?.id ?? null,
+    seit: m.erstelltAm,
+    rolle: m.rolle === "ADMIN" ? "betreiber" : "mitglied",
     anzahl,
     werte: oeffentlicheWerte(m.profil?.oeffentlich ?? null),
     bewertungen: zeilen.map((z) => ({
