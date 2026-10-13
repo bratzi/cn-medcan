@@ -62,6 +62,7 @@ test("Beispielkarte: lange Namen brechen um, Einzellinks sind 44 px hoch", () =>
   const html = zeige([zeile({ handelsname: "X".repeat(120) }), zeile({ slug: "b" })]);
   assert.match(html, /wrap-break-word/);
   assert.match(html, /min-h-11/);
+  assert.doesNotMatch(html, /text-h2|text-caption/);
 });
 
 test("Startseite: Kapitel direkt nach TransparentMachen", () => {

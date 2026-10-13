@@ -26,13 +26,13 @@ export function VertreiberBeispielKarte({ beispiel, texte, sprache }: Props) {
 
   return (
     <div className="flex flex-col gap-6 border border-border-strong bg-surface-raised p-8 shadow-md sm:p-12">
-      <p className="font-buch text-h2 font-medium text-balance text-text wrap-break-word">{t(texte.beispiel, { name: beispiel.name })}</p>
+      <p className="font-buch text-body font-medium text-balance text-text wrap-break-word">{t(texte.beispiel, { name: beispiel.name })}</p>
       <ul aria-label={t(texte.liste, { name: beispiel.name })} className="flex flex-col divide-y divide-border border-y border-border">
         {sichtbar.map((z) => (
           <li key={z.slug} className="grid grid-cols-1 gap-2 py-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center sm:gap-8">
             <span className="min-w-0">
               <span className="block text-body text-text wrap-break-word">{z.vertreiberName ?? texte.unbekannt}</span>
-              <span className="block text-caption text-text-muted wrap-break-word">{z.handelsname}</span>
+              <span className="block text-small text-text-muted wrap-break-word">{z.handelsname}</span>
             </span>
             {z.qualitaet !== null && z.anzahl > 0 ? (
               <span className="flex flex-col gap-2">
@@ -64,7 +64,7 @@ export function VertreiberBeispielKarte({ beispiel, texte, sprache }: Props) {
           {mehrzahl(sprache, texte.alleImKatalog, zeilen.length)}
         </Link>
       </p>
-      <p className="text-caption text-text-muted">{texte.hinweis}</p>
+      <p className="text-small text-text-muted">{texte.hinweis}</p>
     </div>
   );
 }
