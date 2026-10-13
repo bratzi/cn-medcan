@@ -30,7 +30,7 @@ test("Terpenwahl: eine Wahl ohne Treffer in der Sorte blendet alle Terpene der S
 
 test("aromaSerien: Herstellerserie nur mit Terpenangaben, die Bewertung immer in lila", () => {
   const mit = aromaSerien(eintrag({ terpene: TERPENE }), de);
-  assert.deepEqual(mit.map((serie) => [serie.name, serie.ton]), [["Laut Hersteller", "gruen"], ["Diese Bewertung", "lila"]]);
+  assert.deepEqual(mit.map((serie) => [serie.name, serie.ton]), [["Laut Datenblatt", "gruen"], ["Diese Bewertung", "lila"]]);
   const ohne = aromaSerien(eintrag({ terpene: [] }), de);
   assert.deepEqual(ohne.map((serie) => [serie.name, serie.ton]), [["Diese Bewertung", "lila"]]);
 });

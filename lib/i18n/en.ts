@@ -181,7 +181,7 @@ export const en: Woerterbuch = {
     },
   },
   aroma: {
-    serien: { hersteller: "Per producer", community: "Per community", eigen: "Your impression", bewertung: "Your rating" },
+    serien: { hersteller: "Per data sheet", community: "Per community", eigen: "Your impression", bewertung: "Your rating" },
     karte: {
       titel: "Aroma map",
       ansicht: "View",
@@ -193,10 +193,10 @@ export const en: Woerterbuch = {
       stecktIn: "Mainly found in",
       traegt: "Mainly carries",
       hinweisRegler: "Drag the purple dots on the left: too little, just right or too much? The middle is the sweet spot.",
-      hinweisTerpenRegler: "On the right: how strongly you smell each terpene; above 0 for a terpene the producer does not state means added.",
+      hinweisTerpenRegler: "On the right: how strongly you smell each terpene; above 0 for a terpene the data sheet does not list means added.",
       hinweisErkunden: "Hover over a flavour or a terpene to see the connections.",
       reglerLegende: "Your impression per flavour, sweet spot in the middle",
-      terpenLegende: "How strongly you smell each terpene, 0 to 5. Above 0 for a terpene the producer does not state means: added by you.",
+      terpenLegende: "How strongly you smell each terpene, 0 to 5. Above 0 for a terpene the data sheet does not list means: added by you.",
       // Sweet spot scale of the flavours (user 2026-09-30): 0 too little, 2.5 just right, 5 too much.
       sweetSkala: {
         titel: "Sweet spot per flavour",
@@ -208,14 +208,14 @@ export const en: Woerterbuch = {
       geschmack: "Flavour",
       median: "Community median",
       keinMedian: "No community value yet",
-      streifen: "Producer information",
+      streifen: "Data sheet",
       ebenen: {
-        hersteller: "Stated by the producer",
+        hersteller: "Listed on the data sheet",
         ergaenzt: "Added",
         geist: "Linked by flavour only",
       },
-      geistHinweis: "Fits the flavour, not included according to the producer.",
-      ergaenztHinweis: "Added, not included according to the producer.",
+      geistHinweis: "Fits the flavour, not on the data sheet.",
+      ergaenztHinweis: "Added, not on the data sheet.",
       nase: "Your nose vs. the community:",
       delta: "Ø Δ {wert}",
       deltaVorgelesen: "average deviation {wert}",
@@ -242,7 +242,7 @@ export const en: Woerterbuch = {
       qualitaet: "Quality",
       dieseCharge: "This batch",
       chargeSatz: "Quality, moisture and freshness belong to the batch and the distributor, not to the flower. On the other axes the middle is the sweet spot.",
-      naehe: "Match with the producer's information:",
+      naehe: "Match with the data sheet:",
       deinEindruck: "Your impression:",
       anleitung: "Drag the purple dots on the left of the map: too little, just right or too much? The middle is the sweet spot. The terpenes of this strain that carry the flavour light up.",
       nichtsGespeichert: "Nothing is saved here.",
@@ -300,7 +300,7 @@ export const en: Woerterbuch = {
       dasBewertenWir: "What we are reviewing",
       vertreiber: "Distributor",
       genetik: "Genetics",
-      terpeneLautHersteller: "Terpenes per producer",
+      terpeneLautHersteller: "Terpenes per data sheet",
       rang: "Rank {rang}",
     },
     aufklaerung: {
@@ -397,8 +397,8 @@ export const en: Woerterbuch = {
     nochKeineCommunity: "No community review yet",
     profilFrage: "Does the profile match?",
     profilMitCommunity:
-      "The green mark shows what the producer's information suggests, the bars what {anzahl} reviews found: green up to it, purple beyond.",
-    profilOhneCommunity: "Green is what the producer's information suggests. The comparison appears with the first reviews.",
+      "The green mark shows what the data sheet suggests, the bars what {anzahl} reviews found: green up to it, purple beyond.",
+    profilOhneCommunity: "Green is what the data sheet suggests. The comparison appears with the first reviews.",
     deineBewertung: "Your review",
     communityLeer:
       "There is no community review for {handelsname} yet. Be the first: appearance, smell, taste, consistency, aroma and condition.",
@@ -410,7 +410,7 @@ export const en: Woerterbuch = {
     alleAngaben: "All details",
     wenigerAngaben: "Fewer details",
     schlagwort: { angaben: "fact sheet", bewertungen: "open book", bewerten: "your score", aehnlich: "kindred" },
-    herstellerangabe: "Producer's information: {thc} THC, {cbd} CBD.",
+    herstellerangabe: "Per data sheet: {thc} THC, {cbd} CBD.",
     terpenprofil: "Terpene profile",
     chargen: "Batches",
     chargenSatz: "Measured values of individual batches. They may differ from the declared range within the permitted tolerance.",
@@ -659,7 +659,7 @@ export const en: Woerterbuch = {
       ueberlauf: "terpene profile.",
       punkte: {
         overall: { titel: "Overall", text: "Appearance, smell, taste and consistency, each from 1 to 5. The first look at the flower." },
-        terpz: { titel: "Terpz", text: "Every terpene on its own, next to the producer's information. The deviation is shown alongside." },
+        terpz: { titel: "Terpz", text: "Every terpene on its own, next to the data sheet. The deviation is shown alongside." },
         qualitaet: {
           titel: "Quality",
           text: "Chlorophyll, bud density, terpene density, trichomes and residual moisture. Between 8 and 13 percent moisture is good.",
@@ -673,7 +673,7 @@ export const en: Woerterbuch = {
       absatz2: {
         vor: "Then the",
         buzz: "terpz:",
-        nach: "Every terpene gets its own score. Next to it is what the producer states, and how far the community differs from it.",
+        nach: "Every terpene gets its own score. Next to it is what the data sheet states, and how far the community differs from it.",
       },
       absatz3: {
         vor: "Finally the",
@@ -714,9 +714,9 @@ export const en: Woerterbuch = {
       },
     },
     aroma: {
-      titel: "What the producer promises,",
+      titel: "What the data sheet promises,",
       ueberlauf: "we check.",
-      text: "First the overall, then the terpz: green is the profile the producer's information suggests, purple is what we found when tasting. Finally the quality. Move the sliders and everything shows your impression.",
+      text: "First the overall, then the terpz: green is the profile the data sheet suggests, purple is what we found when tasting. Finally the quality. Move the sliders and everything shows your impression.",
       zwischenruf: "does it match?",
       zurSorte: "To the strain",
     },
@@ -999,7 +999,7 @@ export const en: Woerterbuch = {
     fehler: "Recommendations can't be loaded right now. Reload the page in a few minutes.",
     mitgliedTitel: "You might like",
     bluetenTitel: "Similar aroma",
-    bluetenSatz: "Strains with a similar terpene profile according to the manufacturer.",
+    bluetenSatz: "Strains with a similar terpene profile per data sheet.",
     hinweis: "Only the aroma is compared, not the effect.",
     weil: "because you liked {sorte}: shared {aromen}",
     gemeinsam: "shared {aromen}",

@@ -185,7 +185,7 @@ export const de = {
     },
   },
   aroma: {
-    serien: { hersteller: "Laut Hersteller", community: "Laut Community", eigen: "Dein Eindruck", bewertung: "Deine Bewertung" },
+    serien: { hersteller: "Laut Datenblatt", community: "Laut Community", eigen: "Dein Eindruck", bewertung: "Deine Bewertung" },
     karte: {
       titel: "Aroma-Karte",
       ansicht: "Ansicht",
@@ -214,14 +214,14 @@ export const de = {
       median: "Community-Median",
       keinMedian: "Noch kein Community-Wert",
       // Stiller Streifen hinter den Linien (T5b, Nutzer 2026-09-29).
-      streifen: "Herstellerangabe",
+      streifen: "Datenblattangabe",
       ebenen: {
-        hersteller: "Laut Hersteller enthalten",
+        hersteller: "Laut Datenblatt enthalten",
         ergaenzt: "Ergänzt",
         geist: "Nur über den Geschmack verbunden",
       },
-      geistHinweis: "Passt zum Geschmack, laut Hersteller nicht enthalten.",
-      ergaenztHinweis: "Ergänzt, laut Hersteller nicht enthalten.",
+      geistHinweis: "Passt zum Geschmack, laut Datenblatt nicht enthalten.",
+      ergaenztHinweis: "Ergänzt, laut Datenblatt nicht enthalten.",
       nase: "Deine Nase vs. Community:",
       delta: "Ø Δ {wert}",
       deltaVorgelesen: "mittlere Abweichung {wert}",
@@ -248,7 +248,7 @@ export const de = {
       qualitaet: "Qualität",
       dieseCharge: "Diese Charge",
       chargeSatz: "Qualität, Restfeuchte und Frische gehören zur Charge und zum Vertreiber, nicht zur Blüte. Bei den übrigen Achsen ist die Mitte der Sweet Spot.",
-      naehe: "Nähe zur Herstellerangabe:",
+      naehe: "Nähe zur Datenblattangabe:",
       deinEindruck: "Dein Eindruck:",
       anleitung: "Zieh die lila Punkte links in der Karte: zu wenig, genau richtig oder zu viel? Die Mitte ist der Sweet Spot. Dazu leuchten die Terpene dieser Sorte auf, die die Richtung tragen.",
       nichtsGespeichert: "Hier wird nichts gespeichert.",
@@ -308,7 +308,7 @@ export const de = {
       dasBewertenWir: "Das bewerten wir",
       vertreiber: "Vertreiber",
       genetik: "Genetik",
-      terpeneLautHersteller: "Terpene laut Hersteller",
+      terpeneLautHersteller: "Terpene laut Datenblatt",
       rang: "Rang {rang}",
     },
     aufklaerung: {
@@ -405,8 +405,8 @@ export const de = {
     nochKeineCommunity: "Noch keine Community-Bewertung",
     profilFrage: "Stimmt das Profil?",
     profilMitCommunity:
-      "Der grüne Strich zeigt, was die Herstellerangaben erwarten lassen, die Balken, was {anzahl} Bewertungen gefunden haben: grün bis dorthin, lila darüber.",
-    profilOhneCommunity: "Grün ist, was die Herstellerangaben erwarten lassen. Mit den ersten Bewertungen kommt der Vergleich dazu.",
+      "Der grüne Strich zeigt, was das Datenblatt erwarten lässt, die Balken, was {anzahl} Bewertungen gefunden haben: grün bis dorthin, lila darüber.",
+    profilOhneCommunity: "Grün ist, was das Datenblatt erwarten lässt. Mit den ersten Bewertungen kommt der Vergleich dazu.",
     deineBewertung: "Deine Bewertung",
     communityLeer:
       "Zu {handelsname} gibt es noch keine Bewertung aus der Community. Gib die erste ab: Aussehen, Geruch, Geschmack, Konsistenz, Aroma und Beschaffenheit.",
@@ -418,7 +418,7 @@ export const de = {
     alleAngaben: "Alle Angaben",
     wenigerAngaben: "Weniger Angaben",
     schlagwort: { angaben: "Steckbrief", bewertungen: "aufgeschlagen", bewerten: "deine Note", aehnlich: "verwandt" },
-    herstellerangabe: "Herstellerangabe: {thc} THC, {cbd} CBD.",
+    herstellerangabe: "Laut Datenblatt: {thc} THC, {cbd} CBD.",
     terpenprofil: "Terpenprofil",
     chargen: "Chargen",
     chargenSatz: "Gemessene Werte einzelner Chargen. Sie können innerhalb der zulässigen Toleranz von der deklarierten Spanne abweichen.",
@@ -668,7 +668,7 @@ export const de = {
       ueberlauf: "Terpenprofil.",
       punkte: {
         overall: { titel: "Overall", text: "Aussehen, Geruch, Geschmack und Konsistenz, jeweils von 1 bis 5. Der erste Blick auf die Blüte." },
-        terpz: { titel: "Terpz", text: "Jedes Terpen einzeln, neben der Angabe des Herstellers. Die Abweichung steht daneben." },
+        terpz: { titel: "Terpz", text: "Jedes Terpen einzeln, neben der Angabe im Datenblatt. Die Abweichung steht daneben." },
         qualitaet: {
           titel: "Qualität",
           text: "Chlorophyll, Bud-Dichte, Terpendichte, Trichome und Restfeuchte. Zwischen 8 und 13 Prozent Feuchte ist gut.",
@@ -682,7 +682,7 @@ export const de = {
       absatz2: {
         vor: "Dann die",
         buzz: "Terpz:",
-        nach: "Jedes Terpen bekommt seine eigene Note. Daneben steht, was der Hersteller angibt, und wie weit die Community davon abweicht.",
+        nach: "Jedes Terpen bekommt seine eigene Note. Daneben steht, was das Datenblatt angibt, und wie weit die Community davon abweicht.",
       },
       absatz3: {
         vor: "Zum Schluss die",
@@ -723,9 +723,9 @@ export const de = {
       },
     },
     aroma: {
-      titel: "Was der Hersteller verspricht,",
+      titel: "Was das Datenblatt verspricht,",
       ueberlauf: "prüfen wir nach.",
-      text: "Erst das Overall, dann die Terpz: Grün ist das Profil, das die Herstellerangaben erwarten lassen, Lila ist, was wir beim Probieren gefunden haben. Zum Schluss die Qualität. Zieh an den Reglern, und alles zeigt deinen Eindruck.",
+      text: "Erst das Overall, dann die Terpz: Grün ist das Profil, das das Datenblatt erwarten lässt, Lila ist, was wir beim Probieren gefunden haben. Zum Schluss die Qualität. Zieh an den Reglern, und alles zeigt deinen Eindruck.",
       zwischenruf: "stimmt das?",
       zurSorte: "Zur Sorte",
     },
@@ -1008,7 +1008,7 @@ export const de = {
     fehler: "Die Empfehlungen lassen sich gerade nicht laden. Lade die Seite in ein paar Minuten neu.",
     mitgliedTitel: "Könnte dir gefallen",
     bluetenTitel: "Ähnlich im Aroma",
-    bluetenSatz: "Sorten mit ähnlichem Terpenprofil laut Herstellerangaben.",
+    bluetenSatz: "Sorten mit ähnlichem Terpenprofil laut Datenblatt.",
     hinweis: "Verglichen wird nur das Aroma, nicht die Wirkung.",
     weil: "weil dir {sorte} gefiel: gemeinsam {aromen}",
     gemeinsam: "gemeinsam {aromen}",

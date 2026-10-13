@@ -6,7 +6,13 @@ import { cn } from "@/lib/cn";
 
 /** Seitenrahmen der Unterseiten: breit fuer Inhalt, schmal fuer Konto und Formulare. */
 export function seitenRahmen(schmal = false): string {
-  return cn("mx-auto w-full px-4 sm:px-8", schmal ? "max-w-120" : "max-w-360");
+  // Ab lg steht die Schalterleiste fest am rechten Rand (3,25rem breit). Breit reicht der
+  // Rand bis 1488 px nicht: beidseitig 3,5rem, damit rechts nichts darunter liegt und die
+  // Mitte bleibt (live 2026-10-13: "Noch nicht von uns getestet." bei 1440 px verdeckt).
+  return cn(
+    "mx-auto w-full px-4 sm:px-8",
+    schmal ? "max-w-120" : "max-w-360 lg:px-[max(2rem,calc(3.5rem_-_max(0px,(100vw_-_90rem)_/_2)))]",
+  );
 }
 
 /** Abschnittsueberschrift (h2) der Unterseiten: Newsreader 500, weil 200 erst ab 40 px traegt. */
