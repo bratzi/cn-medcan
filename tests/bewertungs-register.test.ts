@@ -21,7 +21,7 @@ const r = (slug: string, note: number, tag: number, community: RegisterZeile["co
   konsistenz: 3,
   community,
   strainId: `id-${slug}`,
-  hersteller: null,
+  vertreiber: null,
   bildPfad: null,
   eigenesBild: eigen ? { id: "b1", breite: 800, hoehe: 1000, offen: true } : null,
 });
@@ -96,7 +96,7 @@ test("ladeAuswertungsZeilen: eigenes Bild, Hersteller und Bildpfad in derselben 
   assert.match(teil, /bilder:\s*\{/);
   assert.match(teil, /take:\s*1/);
   assert.match(teil, /herstellerBildPfad:\s*true/);
-  assert.match(teil, /hersteller:\s*\{\s*select:\s*\{\s*name:\s*true/);
+  assert.match(teil, /vertreiber:\s*\{\s*select:\s*\{\s*name:\s*true/);
 });
 
 test("BewertungsRegister: Abstand 0,04 wird zu 0,0 ohne Vorzeichen, 0,4 zu +0,4", () => {

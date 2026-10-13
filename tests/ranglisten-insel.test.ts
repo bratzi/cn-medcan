@@ -8,7 +8,7 @@ import { Ranglisten } from "@/components/rangliste/Ranglisten";
 import { de } from "@/lib/i18n/de";
 
 const karte = {
-  rang: 1, slug: "remexian", handelsname: "Remexian 30/1 PGF CIS", hersteller: "Purplefarm", bildId: "bluete-02",
+  rang: 1, slug: "remexian", handelsname: "Remexian 30/1 PGF CIS", vertreiber: "Purplefarm", bildId: "bluete-02",
   schnitt: 4.5, anzahl: 3, betreiber: 4.5, zuletzt: "2026-10-08T00:00:00.000Z", abstand: null,
 };
 

@@ -173,7 +173,7 @@ test("Sortenkopf: Handelsname in Logoschrift (Nutzerausnahme zu Leitplanke 4), V
       kultivarName: null,
       kultivarTyp: "INDICA",
       genetik: null,
-      herstellerName: null,
+      vertreiberName: null,
       thcMin: 20,
       thcMax: 24,
       cbdMin: 0,

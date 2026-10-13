@@ -113,8 +113,8 @@ export const strainFilterSchema = z.object({
     })
     .catch(false),
   apotheke: slugListe,
-  /** Unternehmen-Ids der Hersteller (Spec 2026-10-09 C); Namen haben keinen Slug. */
-  hersteller: slugListe,
+  /** Unternehmen-Ids der Vertreiber (Spec 2026-10-13); alte Links mit `hersteller` liest parseStrainFilter mit. */
+  vertreiber: slugListe,
   sortierung: z
     .unknown()
     .transform((rohwert) => ersterWert(rohwert))
@@ -135,7 +135,7 @@ const LEERER_FILTER: StrainFilter = {
   preisMax: undefined,
   nurVerfuegbar: false,
   apotheke: [],
-  hersteller: [],
+  vertreiber: [],
   sortierung: "relevanz",
   seite: 1,
 };
@@ -160,7 +160,10 @@ function alsRecord(
 
 /** Liest den Filterzustand aus den Suchparametern. Wirft nie. */
 export function parseStrainFilter(searchParams: SuchParameter): StrainFilter {
-  const ergebnis = strainFilterSchema.safeParse(alsRecord(searchParams));
+  const roh = { ...alsRecord(searchParams) };
+  // Alte Links (bis 2026-10-13): ?hersteller= meinte schon den Vertreiber, die Ids sind dieselben.
+  if (roh.hersteller !== undefined && roh.vertreiber === undefined) roh.vertreiber = roh.hersteller;
+  const ergebnis = strainFilterSchema.safeParse(roh);
   if (!ergebnis.success) {
     // Sollte durch die `.catch`-Kette nicht vorkommen - doppelte Absicherung.
     return { ...LEERER_FILTER };
@@ -193,8 +196,8 @@ export function serialisiereFilter(filter: StrainFilter): URLSearchParams {
   if (filter.nurVerfuegbar) params.set("nurVerfuegbar", "1");
   if (filter.apotheke.length > 0)
     params.set("apotheke", filter.apotheke.join(","));
-  if (filter.hersteller.length > 0)
-    params.set("hersteller", filter.hersteller.join(","));
+  if (filter.vertreiber.length > 0)
+    params.set("vertreiber", filter.vertreiber.join(","));
   if (filter.sortierung !== "relevanz")
     params.set("sortierung", filter.sortierung);
   if (filter.seite > 1) params.set("seite", String(filter.seite));
@@ -216,7 +219,7 @@ export function istFilterLeer(filter: StrainFilter): boolean {
     filter.preisMax === undefined &&
     !filter.nurVerfuegbar &&
     filter.apotheke.length === 0 &&
-    filter.hersteller.length === 0
+    filter.vertreiber.length === 0
   );
 }
 

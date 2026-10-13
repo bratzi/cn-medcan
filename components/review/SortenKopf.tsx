@@ -14,7 +14,7 @@ export type SortenKopfProps = {
   kultivarName: string | null;
   kultivarTyp: KultivarTyp;
   genetik: string | null;
-  herstellerName: string | null;
+  vertreiberName: string | null;
   thcMin: number;
   thcMax: number;
   cbdMin: number;
@@ -34,7 +34,7 @@ export function SortenKopf(props: SortenKopfProps) {
   const bildId = blueteBild(props.bildPfad);
   const texte = props.w.aroma.sortenKopf;
   const fakten = [
-    { label: texte.hersteller, wert: props.herstellerName },
+    { label: texte.vertreiber, wert: props.vertreiberName },
     { label: texte.genetik, wert: props.genetik },
   ].filter((fakt): fakt is { label: string; wert: string } => Boolean(fakt.wert));
 

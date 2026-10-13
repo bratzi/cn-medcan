@@ -15,7 +15,7 @@ import {
 import type { KartenTerpen } from "@/lib/aromakarte";
 import { autorProfilAus } from "@/lib/autor-profil";
 import type { GespeicherteBewertung } from "@/lib/bewertung-vorbelegung";
-import { herstellerFacette } from "@/lib/hersteller-facette";
+import { vertreiberFacette } from "@/lib/vertreiber-facette";
 import { getPrisma } from "@/lib/prisma";
 
 import { ladeAutorZahlen } from "./autoren";
@@ -123,7 +123,7 @@ export type StrainListenEintrag = {
   bestrahlung: string;
   anbauland: string | null;
   herstellerBildPfad: string | null;
-  herstellerName: string | null;
+  vertreiberName: string | null;
   /** Dominante Terpene, Rang 1 bis 3, aufsteigend nach Rang. */
   terpene: TerpenEintrag[];
   /** Guenstigster sichtbarer Preis in Cent pro Gramm, sonst null. */
@@ -360,7 +360,7 @@ function baueWhere(
   if (filter.thcMin > 0) bedingungen.thcMaxProzent = { gte: filter.thcMin };
   if (filter.thcMax < 100) bedingungen.thcMinProzent = { lte: filter.thcMax };
 
-  if (filter.hersteller.length > 0) bedingungen.herstellerId = { in: filter.hersteller };
+  if (filter.vertreiber.length > 0) bedingungen.vertreiberId = { in: filter.vertreiber };
 
   if (filter.geschmack.length > 0) {
     // Dominantes Terpen = Rang 1.
@@ -432,7 +432,7 @@ const listenSelect = (fachkreis: boolean) =>
     bestrahlung: true,
     anbauland: true,
     herstellerBildPfad: true,
-    hersteller: { select: { name: true } },
+    vertreiber: { select: { name: true } },
     terpene: {
       where: { rang: { lte: 3 } },
       orderBy: { rang: "asc" },
@@ -469,7 +469,7 @@ type ListenZeile = {
   bestrahlung: string;
   anbauland: string | null;
   herstellerBildPfad: string | null;
-  hersteller: { name: string } | null;
+  vertreiber: { name: string } | null;
   terpene: {
     rang: number;
     konzentrationProzent: number | null;
@@ -526,7 +526,7 @@ function zuListenEintrag(zeile: ListenZeile): StrainListenEintrag {
     bestrahlung: alsBestrahlung(zeile.bestrahlung),
     anbauland: zeile.anbauland,
     herstellerBildPfad: zeile.herstellerBildPfad,
-    herstellerName: zeile.hersteller?.name ?? null,
+    vertreiberName: zeile.vertreiber?.name ?? null,
     terpene: zeile.terpene.map((eintrag) => ({
       name: eintrag.terpen.name,
       aromaProfil: eintrag.terpen.aromaProfil,
@@ -779,8 +779,8 @@ export type FilterFacetten = {
   thcSpanne: { min: number; max: number };
   preisSpanneCent: { min: number | null; max: number | null };
   apotheken: { slug: string; name: string; ort: string }[];
-  /** Hersteller aktiver Sorten mit Sortenzahl, nach Name (Spec 2026-10-09 C). */
-  hersteller: { id: string; name: string; anzahl: number }[];
+  /** Vertreiber aktiver Sorten mit Sortenzahl, nach Name (Spec 2026-10-13). */
+  vertreiber: { id: string; name: string; anzahl: number }[];
 };
 
 const ALLE_GESCHMAECKER: GeschmacksKategorie[] = [
@@ -813,7 +813,7 @@ const ALLE_GESCHMAECKER: GeschmacksKategorie[] = [
  * dann diese Funktion in `unstable_cache` wickeln (Tag z. B. "facetten").
  */
 /**
- * Namen gefilterter Hersteller, die nicht in der Facette stehen (keine aktiven Sorten mehr): sonst
+ * Namen gefilterter Vertreiber, die nicht in der Facette stehen (keine aktiven Sorten mehr): sonst
  * zeigte der Chip die rohe Id. Nur gerufen, wenn solche Ids im Filter stehen.
  */
 export async function ladeUnternehmenNamen(ids: readonly string[]): Promise<Map<string, string>> {
@@ -837,7 +837,7 @@ export async function ladeFilterFacetten(
     thcAggregat,
     preisAggregat,
     apotheken,
-    herstellerListe,
+    vertreiberListe,
     // `Promise.all` statt `$transaction`: gleiche Zahl an Sub-Requests (acht,
     // parallel), aber Prisma behaelt die genaue Typinferenz der `groupBy`-
     // Aggregate, die ein `$transaction`-Array verliert.
@@ -884,10 +884,10 @@ export async function ladeFilterFacetten(
       orderBy: { name: "asc" },
       take: 200,
     }),
-    // Eine Abfrage mit Zählung je Hersteller statt groupBy plus Namensabfrage (Sub-Request-Grenze).
+    // Eine Abfrage mit Zählung je Vertreiber statt groupBy plus Namensabfrage (Sub-Request-Grenze).
     prisma.unternehmen.findMany({
-      where: { hergestellt: { some: { aktiv: true } } },
-      select: { id: true, name: true, land: true, rolle: true, _count: { select: { hergestellt: { where: { aktiv: true } } } } },
+      where: { vertrieben: { some: { aktiv: true } } },
+      select: { id: true, name: true, land: true, rolle: true, _count: { select: { vertrieben: { where: { aktiv: true } } } } },
       orderBy: { name: "asc" },
       take: 400,
     }),
@@ -941,7 +941,7 @@ export async function ladeFilterFacetten(
       max: preisAggregat._max.preisProGrammCent ?? null,
     },
     apotheken,
-    hersteller: herstellerFacette(herstellerListe),
+    vertreiber: vertreiberFacette(vertreiberListe),
   };
 }
 
@@ -1162,7 +1162,7 @@ export type AromaVorzeige = {
   kultivarName: string | null;
   kultivarTyp: KultivarTyp;
   genetik: string | null;
-  herstellerName: string | null;
+  vertreiberName: string | null;
   thcMinProzent: number;
   thcMaxProzent: number;
   cbdMinProzent: number;
@@ -1204,7 +1204,7 @@ export async function ladeAromaVorzeige(): Promise<AromaVorzeige | null> {
       thcMaxProzent: true,
       cbdMinProzent: true,
       cbdMaxProzent: true,
-      hersteller: { select: { name: true } },
+      vertreiber: { select: { name: true } },
       herstellerBildPfad: true,
       terpene: {
         orderBy: { rang: "asc" },
@@ -1238,7 +1238,7 @@ export async function ladeAromaVorzeige(): Promise<AromaVorzeige | null> {
     kultivarName: zeile.kultivarName,
     kultivarTyp: alsKultivarTyp(zeile.kultivarTyp),
     genetik: zeile.genetik,
-    herstellerName: zeile.hersteller?.name ?? null,
+    vertreiberName: zeile.vertreiber?.name ?? null,
     thcMinProzent: zuZahlPflicht(zeile.thcMinProzent),
     thcMaxProzent: zuZahlPflicht(zeile.thcMaxProzent),
     cbdMinProzent: zuZahlPflicht(zeile.cbdMinProzent),

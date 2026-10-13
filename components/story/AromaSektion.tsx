@@ -37,7 +37,7 @@ async function Inhalt() {
             kultivarName={sorte.kultivarName}
             kultivarTyp={sorte.kultivarTyp}
             genetik={sorte.genetik}
-            herstellerName={sorte.herstellerName}
+            vertreiberName={sorte.vertreiberName}
             thcMin={sorte.thcMinProzent}
             thcMax={sorte.thcMaxProzent}
             cbdMin={sorte.cbdMinProzent}

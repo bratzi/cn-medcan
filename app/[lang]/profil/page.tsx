@@ -148,7 +148,7 @@ async function Notizen({ id }: { id: string }) {
   const [{ w, sprache }, zeilen] = await Promise.all([textLaden(), zeilenLaden(id)]);
   if (zeilen === null) return null;
   const a = auswertungen(zeilen);
-  const hersteller = new Set(zeilen.map((z) => z.hersteller).filter(Boolean)).size;
+  const hersteller = new Set(zeilen.map((z) => z.vertreiber).filter(Boolean)).size;
   return (
     <Randnotizen
       beschriftung={w.profil.kapitel.notizenLeiste}

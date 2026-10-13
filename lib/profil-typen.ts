@@ -31,10 +31,10 @@ export type AuswertungsZeile = {
   community: { mittel: number | null; anzahl: number } | null;
 };
 
-/** Eine eigene Bewertung für das Register (Spec Profil und Konto 6): mit Bild und Hersteller. */
+/** Eine eigene Bewertung für das Register (Spec Profil und Konto 6): mit Bild und Vertreiber. */
 export type RegisterZeile = AuswertungsZeile & {
   strainId: string;
-  hersteller: string | null;
+  vertreiber: string | null;
   /** `strains.hersteller_bild_pfad`, für `ersatzBildId`. */
   bildPfad: string | null;
   /** Dein erstes Bild zu dieser Bewertung (offen oder freigegeben), sonst null. */

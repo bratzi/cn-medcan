@@ -99,7 +99,7 @@ export function ProduktCard({ strain, w, sprache, className, budpics = [], zugan
 
       <CardFooter className="flex flex-wrap items-center justify-between gap-4">
         <span className="text-small text-text-muted">
-          {strain.herstellerName ?? w.katalog.karte.herstellerUnbekannt}
+          {strain.vertreiberName ?? w.katalog.karte.vertreiberUnbekannt}
         </span>
         {zugang === "im-browser" ? (
           <BudpicBeitragenImBrowser

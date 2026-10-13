@@ -1,23 +1,23 @@
-export type HerstellerZeile = {
+export type VertreiberZeile = {
   id: string;
   name: string;
   land: string | null;
   rolle: string;
-  _count: { hergestellt: number };
+  _count: { vertrieben: number };
 };
 
 const schluessel = (name: string) => name.trim().toLowerCase();
 
 /**
- * Hersteller-Facette des Katalogs. Gleichnamige Unternehmen (eindeutig ist nur Name plus Rolle) wären im
+ * Vertreiber-Facette des Katalogs. Gleichnamige Unternehmen (eindeutig ist nur Name plus Rolle) wären im
  * Filter nicht zu unterscheiden; sie bekommen das Land, ohne Land die Rolle in Klammern.
  */
-export function herstellerFacette(liste: readonly HerstellerZeile[]): { id: string; name: string; anzahl: number }[] {
+export function vertreiberFacette(liste: readonly VertreiberZeile[]): { id: string; name: string; anzahl: number }[] {
   const zaehler = new Map<string, number>();
   for (const h of liste) zaehler.set(schluessel(h.name), (zaehler.get(schluessel(h.name)) ?? 0) + 1);
   return liste.map((h) => {
     const name = h.name.trim();
     const doppelt = (zaehler.get(schluessel(h.name)) ?? 0) > 1;
-    return { id: h.id, name: doppelt ? `${name} (${h.land ?? h.rolle})` : name, anzahl: h._count.hergestellt };
+    return { id: h.id, name: doppelt ? `${name} (${h.land ?? h.rolle})` : name, anzahl: h._count.vertrieben };
   });
 }

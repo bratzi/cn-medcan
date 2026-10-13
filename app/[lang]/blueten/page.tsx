@@ -82,9 +82,9 @@ async function Ergebnisbereich({ filter, w, sprache }: { filter: StrainFilter; w
   const apothekenNamen = new Map(
     facetten.apotheken.map((apotheke) => [apotheke.slug, apotheke.name]),
   );
-  const herstellerNamen = new Map(facetten.hersteller.map((h) => [h.id, h.name]));
-  const fehlend = filter.hersteller.filter((id) => !herstellerNamen.has(id));
-  for (const [id, name] of await ladeUnternehmenNamen(fehlend)) herstellerNamen.set(id, name);
+  const vertreiberNamen = new Map(facetten.vertreiber.map((h) => [h.id, h.name]));
+  const fehlend = filter.vertreiber.filter((id) => !vertreiberNamen.has(id));
+  for (const [id, name] of await ladeUnternehmenNamen(fehlend)) vertreiberNamen.set(id, name);
 
   return (
     <div className="mt-10 flex flex-col gap-10 lg:flex-row lg:gap-16">
@@ -106,7 +106,7 @@ async function Ergebnisbereich({ filter, w, sprache }: { filter: StrainFilter; w
           {mehrzahl(sprache, texte.anzahl, liste.gesamt, { sichtbar: liste.eintraege.length })}
         </p>
 
-        <AktiveFilter filter={filter} apothekenNamen={apothekenNamen} herstellerNamen={herstellerNamen} w={w} sprache={sprache} />
+        <AktiveFilter filter={filter} apothekenNamen={apothekenNamen} vertreiberNamen={vertreiberNamen} w={w} sprache={sprache} />
 
         {liste.eintraege.length === 0 ? (
           <EmptyState
