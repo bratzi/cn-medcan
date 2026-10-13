@@ -36,3 +36,9 @@ test("Chargenfazit: Sweet Spot in der Mitte der Skala, nicht „mehr ist besser�
 test("Chargenfazit: ohne Werte null, nie 0 oder NaN vortäuschen", () => {
   assert.equal(chargenFazit({}), null);
 });
+
+test("Chargenfazit: Frische zählt linear, Sweet-Spot-Achse in der Mitte voll", () => {
+  assert.equal(chargenFazit({ frische: 5 }), 1);
+  assert.equal(chargenFazit({ frische: 0 }), 0);
+  assert.equal(chargenFazit({ chlorophyll: 2.5 }), 1);
+});

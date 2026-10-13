@@ -3,6 +3,11 @@ import { BESCHAFFENHEIT_ACHSEN, type Beschaffenheit } from "@/lib/query/bewertun
 
 const OHNE_SWEET_SPOT = new Set<string>(BESCHAFFENHEIT_ACHSEN.filter((a) => !a.sweetSpot).map((a) => a.key));
 
+/** Eine Regel je Achse (0 bis 1): Sweet Spot in der Mitte, bei Achsen ohne Sweet Spot (Frische) linear. */
+export function achsenScore(key: string, wert: number): number {
+  return OHNE_SWEET_SPOT.has(key) ? wert / 5 : qualitaetsScore(wert);
+}
+
 const eineStelle = (x: number) => Math.round(x * 10) / 10;
 
 /**
@@ -12,7 +17,7 @@ const eineStelle = (x: number) => Math.round(x * 10) / 10;
 export function qualitaetAusBeschaffenheit(b: Beschaffenheit): number | null {
   const werte = Object.entries(b).filter((e): e is [string, number] => typeof e[1] === "number");
   if (werte.length === 0) return null;
-  const summe = werte.reduce((s, [key, wert]) => s + (OHNE_SWEET_SPOT.has(key) ? wert / 5 : qualitaetsScore(wert)), 0);
+  const summe = werte.reduce((s, [key, wert]) => s + achsenScore(key, wert), 0);
   return eineStelle((summe / werte.length) * 5);
 }
 

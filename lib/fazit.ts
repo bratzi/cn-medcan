@@ -12,7 +12,7 @@
  * nie 0 oder NaN. Reine Funktionen, keine Wirkungsaussage (HWG): sie fassen
  * nur Bewertungen zusammen.
  */
-import { qualitaetsScore } from "@/lib/bewertung-v2";
+import { achsenScore } from "@/lib/qualitaet";
 
 type Werte = Partial<Record<string, number>>;
 
@@ -56,9 +56,10 @@ export function sortenFazit(stufen: SortenStufen): number | null {
 
 /**
  * Fazit der Charge: Qualitäts-Balance der Beschaffenheit (chlorophyll,
- * budDichte, terpenDichte, trichomFarbe, je 0 bis 5), mit dem Sweet Spot in
- * der Mitte der Skala statt "mehr ist besser". Ohne Werte kein Fazit.
+ * budDichte, terpenDichte, trichomFarbe, frische, je 0 bis 5), mit dem Sweet
+ * Spot in der Mitte der Skala statt "mehr ist besser"; nur Frische zählt
+ * linear (achsenScore, lib/qualitaet.ts). Ohne Werte kein Fazit.
  */
 export function chargenFazit(beschaffenheit: Werte): number | null {
-  return alsAnteil(mittel(zahlenAus(beschaffenheit).map(qualitaetsScore)));
+  return alsAnteil(mittel(Object.entries(beschaffenheit).filter((e): e is [string, number] => typeof e[1] === "number" && Number.isFinite(e[1])).map(([key, wert]) => achsenScore(key, wert))));
 }
