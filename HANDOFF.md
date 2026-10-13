@@ -3,7 +3,7 @@
 > Übergabemedium zwischen Sessions. Wird nach jedem Arbeitsblock aktualisiert und committet.
 > Wer hier weiterarbeitet, liest diese Datei zuerst und braucht den Chatverlauf nicht.
 
-**Letzte Aktualisierung:** 2026-10-13 (Session 57)
+**Letzte Aktualisierung:** 2026-10-13 (Session 58)
 **Repo:** https://github.com/bratzi/cn-medcan (public)
 **Branch:** `main` (Makeover „Grünes Buch“ Teilprojekt 1 ist seit 2026-09-24 auf `main`)
 
@@ -27,6 +27,44 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 ---
 
 ## ⇢ Hier geht es weiter
+
+### ⇢ SESSION 58 (2026-10-13): Vertreiber sichtbar – Spec und Plan fertig, Umsetzung offen
+
+Erledigt und live gepusht (`4d79e48`): „laut Datenblatt“ statt „laut Hersteller“ (de/en); `seitenRahmen` hält ab lg
+rechts 3,5rem für die Schalterleiste frei; Vertreiber-Dublette Adrex per `migrations/0022_adrex_dublette.sql` remote
+zusammengelegt (ADREXpharma 18). **Nicht** geändert: „Mediprocan African Ruby 30/1“ – die Quell-URLs belegen,
+dass African Ruby eine Produktlinie mit drei Kultivaren ist (20/1 Mimosa, 22/1 Gorilla Glue, 30/1 Black Cherry
+Punch); die Zuordnung stimmt. Live noch nicht angesehen: Schalterleisten-Rand bei 1440 px.
+
+Spec `docs/superpowers/specs/2026-10-13-vertreiber-sichtbar-design.md` (vom Nutzer freigegeben), Plan
+`docs/superpowers/plans/2026-10-13-vertreiber-sichtbar.md` (drei Stränge A Startseite, B Katalog, C Blütenseite und
+Reviews, je ein Worktree). **Ausführungsart noch nicht gewählt** (Subagent-driven oder Native).
+Befund: live hat noch kein Kultivar zwei Vertreiber mit bewerteter Charge; das Startseiten-Kapitel lädt daher ein.
+
+**Dauerregel neu geschärft (Memory `skills-einsatzregeln`):** in jeder Aufgabe Fach-Skills laden; jeder Plan-Task hat
+eine Zeile „Skills:“, jeder Subagent lädt sie vor dem ersten Edit.
+
+### ⇢ GROSSER PUNKT (Nutzer 2026-10-13, Session 58, noch nicht begonnen): Profil und Konto vereinen
+
+- Kopf: ein Knopf statt „Profil“ und „Mein Konto“. Ohne Konto heißt er „Mein Profil“ und führt zur Anmeldung. Mit
+  Konto zeigt er den Namen, höchstens so breit wie heute „Mein Konto“, sonst gekürzt mit „…“. Aussehen wie der
+  heutige Konto-Knopf (Avatar im schönen Rahmen).
+- Darunter beide Menüs vereint; das Profilmenü wird das (erweiterte) Menü.
+- Profilseite: keine Reiter mehr, alles auf einem Bildschirm, Profil mit Kennzahlen und Zusatzinfos oben sticky,
+  die Boxen in voller Breite und gut verteilt. (Der Anfang aus Session 56 gefällt.)
+- Eigener Brainstorming-Durchgang mit Spec und Plan.
+
+### ⇢ GROSSER PUNKT (Nutzer 2026-10-13, Session 58, noch nicht begonnen): Bewerten neu verknüpfen
+
+- Felder „Charge“ und „Notizen“ in der Bewertung an die Gestaltung weiter oben angleichen; Textfelder wirken noch
+  „0815“, ebenso der Bild-Upload.
+- Bild-Upload gibt es oben bei der Blüte und unten in der Bewertung: vereinheitlichen, nur noch ein Upload.
+- Beim Bewerten andere Vertreiber wählen können: die Blüte zeigt nur die Blüte und die verfügbaren Vertreiber, die
+  Charge bewertet man je Vertreiber. Stärker verknüpfen.
+- **Überschneidung:** Strang C des Plans „Vertreiber sichtbar“ (Vergleich auf der Blütenseite) und die bestehende
+  `VertreiberWahl` berühren denselben Bereich. Vor Strang C klären, ob die Blütenseite künftig je Kultivar statt je
+  Handelsname steht; sonst wird C doppelt gebaut.
+- Eigener Brainstorming-Durchgang mit Spec und Plan.
 
 ### ⇢ GROSSER PUNKT (Nutzer 2026-10-09, noch nicht begonnen): Hersteller und Vertreiber eigens bewerten
 
