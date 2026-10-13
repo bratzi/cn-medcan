@@ -8,7 +8,7 @@ import { KopfZustand } from "@/components/layout/KopfZustand";
 import { SchalterLeiste } from "@/components/layout/SchalterLeiste";
 import type { Sprache } from "@/lib/i18n/sprache-kern";
 import type { Woerterbuch } from "@/lib/i18n/typen";
-import { HAUPTNAVIGATION, KONTO_LINK } from "@/lib/navigation";
+import { HAUPTNAVIGATION, PROFIL_LINK } from "@/lib/navigation";
 
 /**
  * Hauptnavigation, Kern zuerst (Spec TP2 3.1). Seit 2026-09-25 ohne Kapitelnummern
@@ -18,6 +18,8 @@ import { HAUPTNAVIGATION, KONTO_LINK } from "@/lib/navigation";
  * Bewusst ein fester Link "Mein Profil" statt "Anmelden"/"Mein Profil" je nach
  * Sitzung: das Layout müsste dafür die Sitzung lesen und wäre auf jeder
  * Seite dynamisch. /profil leitet ohne Anmeldung selbst auf /anmelden weiter.
+ * Den Namen setzt KontoZaehler nach dem Laden ein (seit 2026-10-13 ein Knopf
+ * für Profil und Konto).
  *
  * Bis lg (Nutzer 2026-09-27, vorher eine wischbare Leiste): eine Zeile mit
  * Menüknopf links, Logo mittig und Konto als Symbol rechts; Navigation, Zelt und Sprache
@@ -75,17 +77,16 @@ export function Kopf({ sprache, w }: Props) {
         </nav>
 
         <NavLink
-          href={KONTO_LINK.href}
+          href={PROFIL_LINK.href}
           className="konto-pille relative col-start-3 row-start-1 inline-flex size-11 justify-self-end items-center justify-center rounded-full font-sans text-[0.75rem] font-medium uppercase tracking-gesperrt text-text lg:w-auto lg:px-5"
           aktivKlasse={AKTIV}
         >
-          <span className="max-lg:sr-only">{w.kopf.navigation[KONTO_LINK.schluessel]}</span>
           {/* Schmal nur das Symbol (Nutzer 2026-09-27): Kopf und Schultern. */}
           <svg aria-hidden="true" viewBox="0 0 24 24" className="konto-symbol lg:hidden">
             <circle cx="12" cy="8.5" r="3.5" />
             <path d="M5 20c.8-3.6 3.6-5.5 7-5.5s6.2 1.9 7 5.5" />
           </svg>
-          <KontoZaehler texte={w.kopf.ungelesen} sprache={sprache} />
+          <KontoZaehler texte={w.kopf.ungelesen} sprache={sprache} beschriftung={w.kopf.navigation[PROFIL_LINK.schluessel]} />
         </NavLink>
 
         <KopfMenue texte={w.kopf.menue}>
@@ -99,8 +100,8 @@ export function Kopf({ sprache, w }: Props) {
                 </li>
               ))}
               <li>
-                <NavLink href={KONTO_LINK.href} className={MENUE_LINK} aktivKlasse={MENUE_AKTIV}>
-                  {w.kopf.navigation[KONTO_LINK.schluessel]}
+                <NavLink href={PROFIL_LINK.href} className={MENUE_LINK} aktivKlasse={MENUE_AKTIV}>
+                  {w.kopf.navigation[PROFIL_LINK.schluessel]}
                 </NavLink>
               </li>
             </ul>

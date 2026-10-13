@@ -3,11 +3,11 @@ import Link from "next/link";
 import { Logo } from "@/components/marke/Logo";
 import { Unterzeile } from "@/components/marke/Wortmarke";
 import { MEDIEN, type MedienArt } from "@/lib/medien";
-import { HAUPTNAVIGATION, KONTO_LINK } from "@/lib/navigation";
+import { HAUPTNAVIGATION, PROFIL_LINK } from "@/lib/navigation";
 import { RECHTLICHE_LINKS } from "@/lib/rechtliches";
 import type { Woerterbuch } from "@/lib/i18n/typen";
 
-const LINKS = [...HAUPTNAVIGATION, KONTO_LINK];
+const LINKS = [...HAUPTNAVIGATION, PROFIL_LINK];
 
 // Wie im Kopf: Kapitel mit Handschrift-Nummer und Stiftstrich (globals.css).
 const KAPITEL =

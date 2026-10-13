@@ -38,7 +38,7 @@ export async function Empfehlungen() {
         </h2>
         {/* Statische Seite (Spec 2026-10-01, statische Seiten, 4.3): die Liste holt der Browser. */}
         <EmpfehlungenImBrowser
-          texte={{ startSatz: texte.startSatz, hinweis: texte.hinweis, konto: w.kopf.navigation.konto }}
+          texte={{ startSatz: texte.startSatz, hinweis: texte.hinweis, konto: w.kopf.navigation.profil }}
           varianten={{
             laedt: <EmpfehlungenSkelett ansage={texte.laden} />,
             fehler: <p className="border border-border bg-surface-raised p-8 text-body text-text">{texte.fehler}</p>,

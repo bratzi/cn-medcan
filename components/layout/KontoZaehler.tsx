@@ -19,9 +19,11 @@ const LEER: Stand = { ungelesen: 0, name: null, avatarId: null };
  * Root-Layout und bleibt bei Client-Navigation stehen; deshalb fragt der
  * Zaehler bei jedem Seitenwechsel neu, gedeckt von 60 s sessionStorage, damit
  * nicht jede Seite eine Anfrage kostet. An- und Abmelden leeren den Speicher
- * und loesen ZAEHLER_NEU aus; /mitglied loest "benachrichtigungen-gelesen" aus.
+ * und loesen ZAEHLER_NEU aus; /profil loest "benachrichtigungen-gelesen" aus.
+ * Seit 2026-10-13 auch der Text des Knopfs: ohne Sitzung `beschriftung`, mit
+ * Sitzung der Anzeigename.
  */
-export function KontoZaehler({ texte, sprache }: { texte: Mehrzahl; sprache: Sprache }) {
+export function KontoZaehler({ texte, sprache, beschriftung }: { texte: Mehrzahl; sprache: Sprache; beschriftung: string }) {
   const pfad = usePathname();
   const [konto, setKonto] = useState<Stand>(LEER);
   const anzahl = konto.ungelesen;
@@ -97,6 +99,12 @@ export function KontoZaehler({ texte, sprache }: { texte: Mehrzahl; sprache: Spr
 
   return (
     <>
+      {/* Ein Knopf fuer Profil und Konto (Nutzer 2026-10-13): angemeldet der Name, hoechstens so
+          breit wie frueher "Mein Konto" (max-w-28), sonst mit "..."; der volle Name steht im title
+          und bleibt fuer Screenreader im Text. Schmal nur das Symbol beziehungsweise der Avatar. */}
+      <span className="max-lg:sr-only inline-block max-w-28 truncate align-bottom" title={konto.name ?? undefined}>
+        {konto.name ?? beschriftung}
+      </span>
       {konto.name ? (
         // Schmal fuellt der Avatar die Pille (44 px) und ersetzt das Symbol,
         // ab lg steht er hinter dem Wort. Dekoration: das Wort traegt den Namen.

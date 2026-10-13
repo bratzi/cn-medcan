@@ -17,7 +17,7 @@ export type VorschlagErgebnis =
       ok: false;
       fehler: string;
       vorhanden?: { slug: string; handelsname: string };
-      /** Eigener offener oder entschiedener Vorschlag mit demselben Schluessel: Link auf Mein Konto. */
+      /** Eigener offener oder entschiedener Vorschlag mit demselben Schluessel: Link auf Mein Profil. */
       schonVorgeschlagen?: true;
     };
 
