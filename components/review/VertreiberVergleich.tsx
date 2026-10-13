@@ -21,7 +21,10 @@ export function VertreiberVergleich({ eintraege, texte, sprache }: Props) {
           <li key={e.slug} className="grid grid-cols-1 gap-2 py-4 sm:grid-cols-[minmax(0,1fr)_auto_auto] sm:items-center sm:gap-8">
             <span className="min-w-0">
               <span className="block text-body text-text wrap-break-word">{e.vertreiberName ?? texte.unbekannt}</span>
-              <span className="block text-caption text-text-muted wrap-break-word">{e.handelsname}</span>
+              <span className="block text-caption text-text-muted wrap-break-word">
+                {e.handelsname}
+                {e.aktuell ? <span className="text-text"> · {texte.dieseWare}</span> : null}
+              </span>
             </span>
             {e.qualitaet !== null ? (
               <BlattAnzeige note={e.qualitaet} text={t(texte.qualitaet, { note: formatiereZahl(e.qualitaet, 1, sprache) })} />

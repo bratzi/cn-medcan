@@ -10,11 +10,14 @@ export type VertreiberEintrag = {
   aktuell: boolean;
 };
 
-/** Alle aktiven Handelsnamen derselben Blüte (Kultivar) mit Chargenqualität (Spec 2026-10-13). */
+/**
+ * Alle aktiven Handelsnamen derselben Blüte (Kultivar) mit Chargenqualität (Spec 2026-10-13).
+ * Die angezeigte Ware ist immer dabei, auch inaktiv; bei mehr als 30 entscheidet der Name.
+ */
 export async function ladeVertreiberDerBluete(kultivarId: string, aktuelleId: string): Promise<VertreiberEintrag[]> {
   const prisma = await getPrisma();
   const zeilen = await prisma.strain.findMany({
-    where: { kultivarId, aktiv: true },
+    where: { kultivarId, OR: [{ aktiv: true }, { id: aktuelleId }] },
     select: {
       id: true,
       slug: true,
@@ -22,6 +25,7 @@ export async function ladeVertreiberDerBluete(kultivarId: string, aktuelleId: st
       vertreiber: { select: { name: true } },
       kennwerte: { select: { qualitaetMittel: true, restfeuchteMedian: true, qualitaetAnzahl: true } },
     },
+    orderBy: { handelsname: "asc" },
     take: 30,
   });
   return zeilen

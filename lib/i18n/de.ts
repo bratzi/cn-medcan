@@ -441,6 +441,7 @@ export const de = {
       zaehltVertreiber: "zählt für den Vertreiber {name}",
       von: "von {name}",
       angebautVon: "angebaut von {name}",
+      dieseWare: "diese Ware",
     },
     fakten: {
       handelsname: "Handelsname",

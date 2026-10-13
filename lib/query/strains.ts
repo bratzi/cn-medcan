@@ -325,8 +325,8 @@ export type StrainDetail = {
   kennwerte: KennwerteZeile | null;
   /** Community-Mediane der Blüte über alle Handelsnamen; null ohne Kultivar oder Bewertung. */
   kultivarKennwerte: KennwerteZeile | null;
-  /** Chargenqualität des Vertreibers über alle seine Handelsnamen. */
-  vertreiberQualitaet: { qualitaetMittel: number | null; restfeuchteMedian: number | null; anzahl: number } | null;
+  /** Chargenqualität des Vertreibers über alle seine Handelsnamen; achsenMittel roh (JSON). */
+  vertreiberQualitaet: { qualitaetMittel: number | null; achsenMittel: string; restfeuchteMedian: number | null; anzahl: number } | null;
   aktualisiertAm: Date;
 };
 
@@ -646,7 +646,7 @@ export async function ladeStrainDetail(
           name: true,
           land: true,
           website: true,
-          vertreiberKennwerte: { select: { qualitaetMittel: true, restfeuchteMedian: true, anzahl: true } },
+          vertreiberKennwerte: { select: { qualitaetMittel: true, achsenMittel: true, restfeuchteMedian: true, anzahl: true } },
         },
       },
       terpene: {

@@ -433,6 +433,7 @@ export const en: Woerterbuch = {
       zaehltVertreiber: "counts for the distributor {name}",
       von: "from {name}",
       angebautVon: "grown by {name}",
+      dieseWare: "this product",
     },
     fakten: {
       handelsname: "Trade name",

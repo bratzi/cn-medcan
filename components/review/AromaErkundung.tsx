@@ -284,7 +284,11 @@ export function AromaErkundung({
           return { vorher, jetzt, geformt: bewertungsGewicht(eigeneGesamtnote) !== 0 };
         })()
       : null;
-  const anzahlBewertungen = Math.max(treue?.anzahl ?? 0, gesamteindruck?.anzahl ?? 0, beschaffenheit?.anzahl ?? 0);
+  // Steht der Community-Median (auf der Blütenseite der des Kultivars), zählt dessen Anzahl; die
+  // Beschaffenheit gehört dann zum Vertreiber und zählt nicht für die Blüte (Spec 2026-10-13).
+  const anzahlBewertungen = median
+    ? median.anzahl
+    : Math.max(treue?.anzahl ?? 0, gesamteindruck?.anzahl ?? 0, beschaffenheit?.anzahl ?? 0);
 
   /**
    * Ein Terpen an- oder abschalten (Nutzer 2026-10-03). Schaltet man eines der Kandidaten an,

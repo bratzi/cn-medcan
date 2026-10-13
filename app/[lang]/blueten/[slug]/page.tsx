@@ -228,7 +228,16 @@ async function ProduktInhalt({ slug, w, sprache }: { slug: string; w: Woerterbuc
   const geschmack = verdichteGeschmacksMatrix(strain.reviews);
   const produkt = { handelsname: strain.handelsname, slug: strain.slug, terpene: strain.terpene, bildPfad: strain.herstellerBildPfad };
   // Das Aroma gilt der Blüte: die Mediane über alle Handelsnamen des Kultivars, sonst die eigenen.
-  const erkundung = erkundungsDaten(strain.terpene, strain.reviews, w.aroma.serien, strain.kultivarKennwerte ?? strain.kennwerte);
+  // Die Qualität gilt dem Vertreiber: das Charge-Fazit vergleicht mit seinem Schnitt (Spec 2026-10-13).
+  const erkundung = erkundungsDaten(
+    strain.terpene,
+    strain.reviews,
+    w.aroma.serien,
+    strain.kultivarKennwerte ?? strain.kennwerte,
+    strain.vertreiberQualitaet,
+  );
+  // Wie viele Bewertungen hinter dem Aroma stehen: mit Median dessen Anzahl, sonst die der Ware.
+  const aromaAnzahl = erkundung.median?.anzahl ?? geschmack.anzahlBewertungen;
   const zuordnung = { bluete: strain.kultivar?.name ?? strain.handelsname, vertreiber: strain.vertreiber?.name ?? null };
   // Die eigene Bewertung (auch unfreigegeben) belegt die Maske vor; nur wer bewerten darf, braucht sie.
   const [eigeneBewertung, liveNetz] = mitglied?.freigegeben
@@ -407,8 +416,8 @@ async function ProduktInhalt({ slug, w, sprache }: { slug: string; w: Woerterbuc
             mitglied?.freigegeben
               ? w.bewerten.satz
               : erkundung.serien.length > 0
-                ? geschmack.anzahlBewertungen >= 1
-                  ? t(texte.profilMitCommunity, { anzahl: geschmack.anzahlBewertungen })
+                ? aromaAnzahl >= 1
+                  ? t(texte.profilMitCommunity, { anzahl: aromaAnzahl })
                   : texte.profilOhneCommunity
                 : undefined
           }
@@ -418,7 +427,12 @@ async function ProduktInhalt({ slug, w, sprache }: { slug: string; w: Woerterbuc
             {/* Erst die Ware zuordnen, dann bewerten: die Wahl führt auf den Handelsnamen des Vertreibers. */}
             {strain.kultivar ? (
               <div className="mt-8">
-                <VertreiberWahl eintraege={vertreiberListe} kultivarId={strain.kultivar.id} texte={texte.vertreiber} />
+                <VertreiberWahl
+                  eintraege={vertreiberListe}
+                  kultivarId={strain.kultivar.id}
+                  texte={texte.vertreiber}
+                  eigenerVertreiber={strain.vertreiber?.name ?? null}
+                />
               </div>
             ) : null}
             <div className="mt-8">
