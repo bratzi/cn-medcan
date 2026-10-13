@@ -29,16 +29,20 @@ export function TopFlop({ top, flop, texte, sprache }: Props) {
       ))}
     </ol>
   );
+  // Zwei Spalten erst, wenn die Karte breit genug ist (live 2026-10-13: in der schmalen Übersicht-Karte
+  // brachen die Namen Wort für Wort um).
   return (
-    <div className="grid grid-cols-1 gap-8 sm:grid-cols-2">
-      <section className="flex flex-col gap-2">
-        <h3 className="text-small font-medium text-text">{texte.top}</h3>
-        {liste(top)}
-      </section>
-      <section className="flex flex-col gap-2">
-        <h3 className="text-small font-medium text-text">{texte.flop}</h3>
-        {flop.length > 0 ? liste(flop) : <p className="text-small text-text-muted text-pretty">{texte.flopLeer}</p>}
-      </section>
+    <div className="@container">
+      <div className="grid grid-cols-1 gap-8 @md:grid-cols-2">
+        <section className="flex flex-col gap-2">
+          <h3 className="text-small font-medium text-text">{texte.top}</h3>
+          {liste(top)}
+        </section>
+        <section className="flex flex-col gap-2">
+          <h3 className="text-small font-medium text-text">{texte.flop}</h3>
+          {flop.length > 0 ? liste(flop) : <p className="text-small text-text-muted text-pretty">{texte.flopLeer}</p>}
+        </section>
+      </div>
     </div>
   );
 }

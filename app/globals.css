@@ -535,6 +535,12 @@
   font-size: min(var(--text-notiz), 30cqi);
 }
 
+/* In der Profil-Seitenleiste (20rem, zwei Notizen je Reihe) wäre die Notizgröße zu laut und die Leiste
+   höher als der Bildschirm (live 2026-10-13: „im Schnitt“ stieß an den Rand). */
+.kapitel-notiz-wort--kompakt {
+  font-size: min(1.75rem, 30cqi);
+}
+
 @media (prefers-reduced-motion: no-preference) {
   /* Hierarchie: das Kapitel beginnt mit deinem Namen. */
   :root:not([data-sparmodus]) .kapitel-name {

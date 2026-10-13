@@ -43,7 +43,7 @@ export function Randnotizen({
           <span
             aria-hidden="true"
             style={{ "--i": i } as CSSProperties}
-            className="kapitel-notiz-wort font-hand text-notiz text-logo wrap-break-word hyphens-auto"
+            className={`kapitel-notiz-wort font-hand text-notiz text-logo wrap-break-word hyphens-auto ${kompakt ? "kapitel-notiz-wort--kompakt" : ""}`}
           >
             {n.wort}
           </span>
