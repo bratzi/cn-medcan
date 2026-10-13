@@ -6,6 +6,7 @@ import { notFound, redirect } from "next/navigation";
 import { BudpicFreigabe } from "@/components/admin/BudpicFreigabe";
 import { BewertungFreigabe } from "@/components/admin/BewertungFreigabe";
 import { ErgebnisListe } from "@/components/admin/ErgebnisListe";
+import { KennwerteNeuKnopf } from "@/components/admin/KennwerteNeuKnopf";
 import { MitgliedAktionen } from "@/components/admin/MitgliedAktionen";
 import { RundeAnlegenFormular } from "@/components/admin/RundeAnlegenFormular";
 import { RundeSteuerung } from "@/components/admin/RundeSteuerung";
@@ -493,6 +494,19 @@ export default async function AdminPage() {
         <Suspense fallback={<Spinner text="Vorschläge werden gezählt" />}>
           <VorschlaegeKarte />
         </Suspense>
+
+        <section aria-labelledby="kennwerte-titel">
+          <Card>
+            <CardHeader>
+              <h2 id="kennwerte-titel" className="text-h3 text-text">
+                Kennwerte
+              </h2>
+            </CardHeader>
+            <CardBody>
+              <KennwerteNeuKnopf />
+            </CardBody>
+          </Card>
+        </section>
 
         <Suspense fallback={<Spinner text="Ergebnisse werden geladen" />}>
           <ErgebnisBereich />

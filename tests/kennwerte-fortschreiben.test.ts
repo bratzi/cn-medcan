@@ -35,3 +35,10 @@ test("kennwerteFortschreiben schreibt Kultivar und Vertreiber, überspringt fehl
   assert.match(q, /vertreiberKennwerte\.upsert/);
   assert.match(q, /if \(strain\.vertreiberId\)/);
 });
+
+test("Admin-Aktion rechnet alle Kennwerte neu und prüft den Betreiber", () => {
+  const q = readFileSync("app/[lang]/admin/aktionen.ts", "utf8");
+  const teil = q.slice(q.indexOf("export async function kennwerteNeuRechnen"));
+  assert.match(teil, /kennwerteFortschreiben\(strainId\)/);
+  assert.match(teil.slice(0, 400), /adminErforderlich\(|ADMIN/);
+});

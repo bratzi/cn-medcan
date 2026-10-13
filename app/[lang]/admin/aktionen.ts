@@ -132,3 +132,23 @@ export async function bewertungVerwerfen(formData: FormData): Promise<AdminErgeb
   bewertungPfadeNeuLaden(slug);
   return { ok: true };
 }
+
+/**
+ * Nach 0021 und bei Bedarf: Kennwerte aller bewerteten Handelsnamen neu rechnen.
+ * Das Gate steht als erste Zeile; die Aktion ist auch ohne die Seite aufrufbar.
+ * Mehrfaches Ausfuehren ist harmlos (reines Neurechnen aus den Bewertungen).
+ */
+export async function kennwerteNeuRechnen(): Promise<{ ok: true; anzahl: number }> {
+  await adminErforderlich();
+
+  const prisma = await getPrisma();
+  const ids = await prisma.review.findMany({
+    where: { freigegeben: true },
+    select: { strainId: true },
+    distinct: ["strainId"],
+  });
+  for (const { strainId } of ids) await kennwerteFortschreiben(strainId);
+
+  revalidiereSprachen("/", "layout");
+  return { ok: true, anzahl: ids.length };
+}
