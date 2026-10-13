@@ -98,7 +98,7 @@ export function BuchDoppelseite({ eintrag, ueberschrift: Ueberschrift, w, sprach
       inhalt: (
         <div className="flex flex-col gap-4">
           {eintrag.vertreiber !== undefined ? (
-            // Charge zählt für den Vertreiber (Spec Vertreiber sichtbar 4); auf der Blütenseite steht er im Titelblatt.
+            // Charge zählt für den Vertreiber (Spec Vertreiber sichtbar 4). Ohne Produktbezug (undefined, Blütenseite) entfällt die Zeile; null heißt Vertreiber unbekannt.
             <p className="flex flex-wrap items-baseline gap-x-4 gap-y-2">
               <span className="text-small text-text wrap-break-word">
                 {eintrag.vertreiber ? t(w.buch.chargeVon, { vertreiber: eintrag.vertreiber }) : w.buch.chargeUnbekannt}

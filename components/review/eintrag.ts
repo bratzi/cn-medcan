@@ -72,7 +72,7 @@ export function alsEintrag(
     id: review.id,
     handelsname: produkt.handelsname,
     bluete: produkt.bluete ?? null,
-    vertreiber: produkt.vertreiber ?? null,
+    vertreiber: produkt.vertreiber,
     slug: produkt.slug,
     aussehen: review.aussehen,
     geruch: review.geruch,

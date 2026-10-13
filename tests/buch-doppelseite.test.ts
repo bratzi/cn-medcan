@@ -11,6 +11,7 @@ import type { EintragDaten } from "@/components/review/eintrag";
 import type { KartenTerpen } from "@/lib/aromakarte";
 import { musterBildId } from "@/lib/budpics";
 import { de } from "@/lib/i18n/de";
+import { alsEintrag } from "@/components/review/eintrag";
 import { eintrag } from "./hilfen/eintrag";
 
 type Ueberschrift = "h2" | "h3";
@@ -279,4 +280,44 @@ test("Beschaffenheit: unbekannter Vertreiber hat einen eigenen Satz", () => {
 test("Beschaffenheit ohne Produktbezug (Blütenseite) ohne Chargenzeile", () => {
   const html = zeige(MIT_BESCHAFFENHEIT);
   assert.doesNotMatch(html, /Charge von|Vertreiber unbekannt/);
+});
+
+// Der Weg der Seiten: Bewertung -> alsEintrag -> Doppelseite; ohne vertreiber am Produkt (Blütenseite) keine Chargenzeile.
+const ROHE_BEWERTUNG = {
+  id: "r1",
+  istRedaktionell: false,
+  autorName: "Mia",
+  gesamtnote: 4,
+  aussehen: 4,
+  geruch: 4,
+  geschmack: 4,
+  wirkung: 4,
+  konsistenz: 4,
+  feuchtigkeitProzent: null,
+  geschmacksMatrix: null,
+  terpenIntensitaet: null,
+  beschaffenheit: { budDichte: 3 },
+  notiz: null,
+  instagramReelUrl: null,
+  chargenNr: null,
+  erstelltAm: new Date("2026-09-12T12:00:00Z"),
+} as unknown as Parameters<typeof alsEintrag>[0];
+const ueberAlsEintrag = (produkt: Parameters<typeof alsEintrag>[1]) =>
+  renderToStaticMarkup(
+    createElement(
+      KarteSofortKontext.Provider,
+      { value: true },
+      createElement(BuchDoppelseite, { eintrag: alsEintrag(ROHE_BEWERTUNG, produkt), ueberschrift: "h3", w: de, sprache: "de" as const }),
+    ),
+  );
+
+test("alsEintrag ohne vertreiber (Blütenseite): keine Chargenzeile", () => {
+  const html = ueberAlsEintrag({ handelsname: "Nebelharz 22 (fiktiv)", slug: "nebelharz-22" });
+  assert.match(html, /Beschaffenheit/);
+  assert.doesNotMatch(html, /Charge von|Vertreiber unbekannt/);
+});
+
+test("alsEintrag mit vertreiber: Chargenzeile nennt ihn", () => {
+  const html = ueberAlsEintrag({ handelsname: "Nebelharz 22 (fiktiv)", slug: "nebelharz-22", vertreiber: "avaay" });
+  assert.match(html, /Charge von avaay/);
 });
