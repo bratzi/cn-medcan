@@ -95,7 +95,20 @@ export function BuchDoppelseite({ eintrag, ueberschrift: Ueberschrift, w, sprach
       schluessel: "beschaffenheit",
       titel: w.buch.reiterBeschaffenheit,
       // Ab lg nennt der Reiter die Tafel; die Überschrift bleibt für Screenreader und mobil sichtbar.
-      inhalt: <BeschaffenheitsLeiste werte={eintrag.beschaffenheit} feuchte={null} texte={texte} titelKlasse="lg:sr-only" />,
+      inhalt: (
+        <div className="flex flex-col gap-4">
+          {eintrag.vertreiber !== undefined ? (
+            // Charge zählt für den Vertreiber (Spec Vertreiber sichtbar 4); auf der Blütenseite steht er im Titelblatt.
+            <p className="flex flex-wrap items-baseline gap-x-4 gap-y-2">
+              <span className="text-small text-text wrap-break-word">
+                {eintrag.vertreiber ? t(w.buch.chargeVon, { vertreiber: eintrag.vertreiber }) : w.buch.chargeUnbekannt}
+              </span>
+              <span className="font-sans text-caption uppercase tracking-gesperrt text-text-muted">{w.buch.zaehltVertreiber}</span>
+            </p>
+          ) : null}
+          <BeschaffenheitsLeiste werte={eintrag.beschaffenheit} feuchte={null} texte={texte} titelKlasse="lg:sr-only" />
+        </div>
+      ),
     });
   }
   if (reel) {

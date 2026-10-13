@@ -263,3 +263,20 @@ test("Name verlinkt nur bei öffentlichem Profil", () => {
   const ohneAutor = zeige({ istBetreiber: false, autorName: null, autorProfil: "abcd2345" });
   assert.doesNotMatch(ohneAutor, /\/profil\//);
 });
+
+const MIT_BESCHAFFENHEIT = { beschaffenheit: { budDichte: 3 } as EintragDaten["beschaffenheit"] };
+
+test("Beschaffenheit nennt die Charge des Vertreibers, wenn der Eintrag ihn kennt", () => {
+  const html = zeige({ ...MIT_BESCHAFFENHEIT, vertreiber: "avaay" });
+  assert.match(html, /Charge von avaay/);
+  assert.match(html, /zählt für den Vertreiber/);
+});
+
+test("Beschaffenheit: unbekannter Vertreiber hat einen eigenen Satz", () => {
+  assert.match(zeige({ ...MIT_BESCHAFFENHEIT, vertreiber: null }), /Charge, Vertreiber unbekannt/);
+});
+
+test("Beschaffenheit ohne Produktbezug (Blütenseite) ohne Chargenzeile", () => {
+  const html = zeige(MIT_BESCHAFFENHEIT);
+  assert.doesNotMatch(html, /Charge von|Vertreiber unbekannt/);
+});
