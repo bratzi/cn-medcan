@@ -328,7 +328,7 @@ export const de = {
     einleitung: "Alle hier gelisteten Blüten sind verschreibungspflichtig und nur mit ärztlicher Verordnung über eine Apotheke beziehbar.",
     laedt: "Blüten werden geladen",
     filter: "Filter",
-    anzahl: { one: "{sichtbar} von {anzahl} Blüte", other: "{sichtbar} von {anzahl} Blüten" },
+    anzahl: { one: "{sichtbar} von {anzahl} Handelsname", other: "{sichtbar} von {anzahl} Handelsnamen" },
     leerTitel: "Keine Blüten gefunden",
     leerText:
       "Zu dieser Filterkombination ist keine Blüte gelistet. Weniger Kriterien führen meist zu Treffern. Fehlt dir eine Blüte, schlag sie vor.",

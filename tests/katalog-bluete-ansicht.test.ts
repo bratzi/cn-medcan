@@ -77,3 +77,19 @@ test("FilterLeiste: Sortierwahl nicht in der Blüten-Ansicht, Zurücksetzen beh�
   assert.match(q, /filter\.ansicht === "bluete" \? null :/);
   assert.match(q, /ansicht: filter\.ansicht/);
 });
+
+test("KultivarKarte: ohne Vertreiber keine Zählzeile „bei 0“", () => {
+  const html = renderToStaticMarkup(
+    createElement(KultivarKarte, { kultivar: { ...kultivar, vertreiber: [] }, filter: parseStrainFilter({}), w: de, sprache: "de" }),
+  );
+  assert.doesNotMatch(html, /bei 0/);
+});
+
+test("Katalogseite: Zurücksetzen im Leerzustand behält die Blüten-Ansicht", () => {
+  const seite = readFileSync("app/[lang]/blueten/page.tsx", "utf8");
+  assert.match(seite, /bluetenAnsicht \? "\/blueten\?ansicht=bluete" : "\/blueten"/);
+});
+
+test("Trefferzeile der Handelsnamen-Ansicht zählt Handelsnamen", () => {
+  assert.match(de.katalog.anzahl.other, /Handelsnamen/);
+});

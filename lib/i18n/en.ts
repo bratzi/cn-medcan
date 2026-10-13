@@ -320,7 +320,7 @@ export const en: Woerterbuch = {
     einleitung: "All flowers listed here are prescription-only and can only be obtained from a pharmacy with a doctor's prescription.",
     laedt: "Loading flowers",
     filter: "Filters",
-    anzahl: { one: "{sichtbar} of {anzahl} flower", other: "{sichtbar} of {anzahl} flowers" },
+    anzahl: { one: "{sichtbar} of {anzahl} product", other: "{sichtbar} of {anzahl} products" },
     leerTitel: "No flowers found",
     leerText:
       "No flower is listed for this combination of filters. Fewer criteria usually lead to results. If a flower is missing, suggest it.",

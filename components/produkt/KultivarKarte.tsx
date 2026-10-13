@@ -33,14 +33,16 @@ export function KultivarKarte({ kultivar, filter, w, sprache }: Props) {
           </p>
         ) : null}
         <div className="flex flex-col gap-2">
-          <p className="text-small text-text-muted">{mehrzahl(sprache, texte.vertreiber, kultivar.vertreiber.length)}</p>
           {sichtbar.length > 0 ? (
-            <ul className="flex flex-wrap gap-x-4 gap-y-2 text-small text-text">
-              {sichtbar.map((name) => (
-                <li key={name} className="wrap-break-word">{name}</li>
-              ))}
-              {rest > 0 ? <li className="text-text-muted">{t(texte.mehrVertreiber, { anzahl: rest })}</li> : null}
-            </ul>
+            <>
+              <p className="text-small text-text-muted">{mehrzahl(sprache, texte.vertreiber, kultivar.vertreiber.length)}</p>
+              <ul className="flex flex-wrap gap-x-4 gap-y-2 text-small text-text">
+                {sichtbar.map((name) => (
+                  <li key={name} className="wrap-break-word">{name}</li>
+                ))}
+                {rest > 0 ? <li className="text-text-muted">{t(texte.mehrVertreiber, { anzahl: rest })}</li> : null}
+              </ul>
+            </>
           ) : (
             <p className="text-small text-text-muted">{texte.vertreiberUnbekannt}</p>
           )}
