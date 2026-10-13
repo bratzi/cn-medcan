@@ -18,3 +18,13 @@ test("Feld mit Kopf: Buchschrift, betontes Wort in Handschrift, Schlagwort wie d
 test("Breite 5 vorhanden", () => {
   assert.equal(FELD_SPALTEN[5], "min-[1080px]:col-span-5");
 });
+
+test("Feld klein: h2 in text-h2, Karte mit Rand, ohne Spalten keine col-span-Klasse", () => {
+  const html = renderToStaticMarkup(
+    createElement(Feld, { id: "netz", titel: "Deine Aromen", groesse: "klein", rahmen: "karte", kopf: { vor: "Deine", betont: "Aromen", schlagwort: "was dir schmeckt" } }),
+  );
+  assert.match(html, /<h2[^>]*text-h2/);
+  assert.doesNotMatch(html, /text-display/);
+  assert.match(html, /rounded-lg border border-border/);
+  assert.doesNotMatch(html, /col-span-4|min-\[1080px\]:col-span/);
+});

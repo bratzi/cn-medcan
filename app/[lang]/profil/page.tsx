@@ -1,28 +1,28 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { redirect, unstable_rethrow } from "next/navigation";
-import { cache, Suspense, ViewTransition } from "react";
+import { cache, Suspense } from "react";
 
 import { EmpfehlungsListe } from "@/components/empfehlung/EmpfehlungsListe";
 import { Feld } from "@/components/kapitel/Feld";
 import { FeldSkelett } from "@/components/kapitel/FeldSkelett";
-import { Kapitelkopf } from "@/components/kapitel/Kapitelkopf";
-import { KapitelRaster } from "@/components/kapitel/KapitelRaster";
-import { Randnotizen } from "@/components/kapitel/Randnotizen";
-import { Bild, BudpicBild } from "@/components/medien/Bild";
 import { Aktivitaet } from "@/components/profil/Aktivitaet";
 import { BewertungsRegister } from "@/components/profil/BewertungsRegister";
 import { CommunityVergleich } from "@/components/profil/CommunityVergleich";
 import { Lieblingshersteller } from "@/components/profil/Lieblingshersteller";
 import { NotenVerteilung } from "@/components/profil/NotenVerteilung";
 import { ProfilNetz } from "@/components/profil/ProfilNetz";
+import { ProfilRahmen } from "@/components/profil/ProfilRahmen";
+import { ProfilReiter } from "@/components/profil/ProfilReiter";
+import { ProfilSeitenleiste } from "@/components/profil/ProfilSeitenleiste";
 import { Schnitte } from "@/components/profil/Schnitte";
 import { TopFlop } from "@/components/profil/TopFlop";
+import { buttonKlassen } from "@/components/ui";
 import { registerAnsicht, registerParameter } from "@/lib/bewertungs-register";
-import { ersatzBildId } from "@/lib/bewertungsbilder";
-import { musterBildId } from "@/lib/budpics";
 import { begruendungText } from "@/lib/empfehlung-text";
 import { holeSprache, holeWoerterbuch } from "@/lib/i18n";
-import { auswertungen, leereProfilWerte, noteOderErsatz } from "@/lib/profil";
+import { auswertungen, leereProfilWerte } from "@/lib/profil";
+import { ansichtAus, liebsteAromen, PROFIL_ANSICHTEN } from "@/lib/profil-ansicht";
 import { monatsReihe, notenVerteilung, profilNotizen } from "@/lib/profil-dashboard";
 import { ladeEmpfehlungen } from "@/lib/query/empfehlungen";
 import { ladeLieblingshersteller } from "@/lib/query/lieblingshersteller";
@@ -67,98 +67,217 @@ const textLaden = cache(async () => {
 type SuchParameter = Record<string, string | string[] | undefined>;
 
 /**
- * Dein Kapitel im Grünen Buch (Spec Profil und Konto 3 bis 6): Kopf und Reiter
- * stehen sofort, die Feldreihen streamen je mit einem Skelett. Profilwerte
- * kommen vorberechnet aus nutzer_profil; neu gerechnet wird nur, wenn der
- * Stand fehlt oder älter als 24 h ist (CPU-Limit 10 ms). Nur Aroma in Netz
- * und Vorschlägen (HWG).
+ * Dein Profil (Spec Profil Desktop 2026-10-13): links die Seitenleiste, rechts Reiter und je Ansicht
+ * ihre Felder. Seitenleiste und Reiter stehen sofort, die Felder streamen je Ansicht mit einem
+ * Skelett. Profilwerte kommen vorberechnet aus nutzer_profil; neu gerechnet wird nur, wenn der Stand
+ * fehlt oder älter als 24 h ist (CPU-Limit 10 ms). Nur Aroma in Netz und Vorschlägen (HWG).
  */
 export default async function ProfilPage({ searchParams }: { searchParams: Promise<SuchParameter> }) {
   const mitglied = await aktuellesMitglied();
-  const { w } = await textLaden();
+  const { w, sprache } = await textLaden();
   if (!mitglied) redirect("/anmelden?weiter=%2Fprofil");
-  const texte = w.profil;
+  const parameter = await searchParams;
+  const ansicht = ansichtAus(parameter.ansicht);
+  const register = registerParameter(parameter);
   const id = mitglied.mitgliedId;
-  const register = registerParameter(await searchParams);
+  const s = w.profil.seite;
 
   return (
-    <KapitelRaster>
-      <ViewTransition name="kapitel-kopf">
-        <Kapitelkopf
-          name={mitglied.anzeigename}
-          avatarId={mitglied.avatarId}
-          schlagwort={texte.kapitel.schlagwort}
-          ton="gruen"
-          bild={
-            <Suspense fallback={null}>
-              <KopfBild id={id} />
-            </Suspense>
+    <ProfilRahmen
+      seitenleiste={
+        <Suspense
+          fallback={
+            <ProfilSeitenleiste
+              name={mitglied.anzeigename}
+              avatarId={mitglied.avatarId}
+              rolle={null}
+              seit={mitglied.erstelltAm}
+              notizen={[]}
+              aromen={[]}
+              aktionen={[]}
+              texte={s}
+              sprache={sprache}
+            />
           }
-          seite={texte.reiterProfil}
+        >
+          <Seitenleiste
+            id={id}
+            name={mitglied.anzeigename}
+            avatarId={mitglied.avatarId}
+            rolle={mitglied.rolle === "ADMIN" ? "betreiber" : "mitglied"}
+            seit={mitglied.erstelltAm}
+          />
+        </Suspense>
+      }
+      reiter={
+        <ProfilReiter
+          basis="/profil"
+          aktiv={ansicht}
+          beschriftung={s.reiterLeiste}
+          reiter={PROFIL_ANSICHTEN.map((a) => ({ ansicht: a, text: s.reiter[a] }))}
         />
-      </ViewTransition>
-      <Suspense fallback={<FeldSkelett spalten={10} hoehe="klein" />}>
-        <ViewTransition>
-          <Notizen id={id} />
-        </ViewTransition>
-      </Suspense>
-      {/* Reihenfolge (Nutzer 2026-10-09): Spur, Aromen, Auswertung, Bewertungen, zuletzt Ähnliches. */}
-      <Suspense fallback={<FeldSkelett spalten={10} />}>
-        <ViewTransition>
-          <ReiheAktivitaet id={id} />
-        </ViewTransition>
-      </Suspense>
-      <Suspense fallback={<FeldSkelett spalten={10} hoehe="gross" />}>
-        <ViewTransition>
-          <ReiheNetz id={id} />
-        </ViewTransition>
-      </Suspense>
-      <Suspense fallback={<FeldSkelett spalten={10} />}>
-        <ViewTransition>
-          <ReiheAuswertung id={id} />
-        </ViewTransition>
-      </Suspense>
-      <Suspense fallback={<FeldSkelett spalten={10} hoehe="gross" />}>
-        <ViewTransition>
+      }
+    >
+      {ansicht === "uebersicht" ? (
+        <Suspense fallback={<FeldSkelett rahmen="karte" hoehe="gross" />}>
+          <AnsichtUebersicht id={id} />
+        </Suspense>
+      ) : null}
+      {ansicht === "aromen" ? (
+        <Suspense fallback={<FeldSkelett rahmen="karte" hoehe="gross" />}>
+          <div className="flex flex-col gap-8">
+            <ReiheNetz id={id} />
+            <ReiheVorschlaege id={id} />
+          </div>
+        </Suspense>
+      ) : null}
+      {ansicht === "bewertungen" ? (
+        <Suspense fallback={<FeldSkelett rahmen="karte" hoehe="gross" />}>
           <ReiheRegister id={id} register={register} />
-        </ViewTransition>
-      </Suspense>
-      <Suspense fallback={<FeldSkelett spalten={10} />}>
-        <ViewTransition>
-          <ReiheVorschlaege id={id} />
-        </ViewTransition>
-      </Suspense>
-    </KapitelRaster>
+        </Suspense>
+      ) : null}
+      {ansicht === "vertreiber" ? (
+        <Suspense fallback={<FeldSkelett rahmen="karte" />}>
+          <AnsichtVertreiber id={id} />
+        </Suspense>
+      ) : null}
+    </ProfilRahmen>
   );
 }
 
-/** Freisteller im Kopf: deine bestbewertete Sorte, ohne Bewertung ein festes Musterbild. */
-async function KopfBild({ id }: { id: string }) {
-  const zeilen = await zeilenLaden(id);
-  const beste = zeilen?.length ? zeilen.reduce((a, b) => (noteOderErsatz(b) > noteOderErsatz(a) ? b : a)) : null;
-  if (beste?.eigenesBild) {
-    const { id: bildId, breite, hoehe, offen } = beste.eigenesBild;
-    return <BudpicBild id={bildId} breite={breite} hoehe={hoehe} offen={offen} alt="" className="h-auto w-full object-contain" />;
+/** Identität links: Zahlen als Randnotizen und die liebsten Aromen aus dem gespeicherten Profil. */
+async function Seitenleiste({
+  id,
+  name,
+  avatarId,
+  rolle,
+  seit,
+}: {
+  id: string;
+  name: string;
+  avatarId: string | null;
+  rolle: "betreiber" | "mitglied";
+  seit: Date;
+}) {
+  const [{ w, sprache }, zeilen, profil] = await Promise.all([textLaden(), zeilenLaden(id), profilLaden(id)]);
+  const s = w.profil.seite;
+  let notizen: ReturnType<typeof profilNotizen> = [];
+  if (zeilen !== null) {
+    const a = auswertungen(zeilen);
+    const hersteller = new Set(zeilen.map((z) => z.hersteller).filter(Boolean)).size;
+    notizen = profilNotizen({ zeilen, differenz: a.community.differenz, hersteller }, w.profil.kapitel, sprache);
   }
-  const bildId = beste ? ersatzBildId(beste.bildPfad, beste.slug) : musterBildId("profil");
-  return <Bild id={bildId} sizes="(min-width: 1080px) 224px, 0px" dekorativ />;
-}
-
-async function Notizen({ id }: { id: string }) {
-  const [{ w, sprache }, zeilen] = await Promise.all([textLaden(), zeilenLaden(id)]);
-  if (zeilen === null) return null;
-  const a = auswertungen(zeilen);
-  const hersteller = new Set(zeilen.map((z) => z.hersteller).filter(Boolean)).size;
+  const aromen = liebsteAromen((profil?.werte ?? leereProfilWerte()).geschmack).map((a) => w.label.geschmack[a]);
   return (
-    <Randnotizen
-      beschriftung={w.profil.kapitel.notizenLeiste}
-      notizen={profilNotizen({ zeilen, differenz: a.community.differenz, hersteller }, w.profil.kapitel, sprache)}
+    <ProfilSeitenleiste
+      name={name}
+      avatarId={avatarId}
+      rolle={rolle}
+      seit={seit}
+      notizen={notizen}
+      aromen={aromen}
+      aktionen={[
+        { href: "/blueten", text: s.bewerten, art: "primary" },
+        { href: "/mitglied", text: s.bearbeiten, art: "secondary" },
+      ]}
+      texte={s}
+      sprache={sprache}
     />
   );
 }
 
-/** Reihe 2: das Aroma-Netz über die volle Breite; die Terpene stecken seit 2026-10-09 im Netz (Schalter). */
-async function ReiheNetz({ id }: { id: string }) {
+/** Übersicht: Netz und Top/Flop, darunter die Spur seit der ersten Bewertung und die Noten. */
+async function AnsichtUebersicht({ id }: { id: string }) {
+  const [{ w, sprache }, zeilen] = await Promise.all([textLaden(), zeilenLaden(id)]);
+  const texte = w.profil;
+  if (zeilen === null) {
+    return (
+      <Feld id="netz" rahmen="karte" groesse="klein" titel={texte.netzTitel} kopf={texte.koepfe.netz} ton="lila">
+        <p className="max-w-[68ch] text-body text-text">{texte.fehler}</p>
+      </Feld>
+    );
+  }
+  if (zeilen.length === 0) {
+    return (
+      <Feld id="netz" rahmen="karte" groesse="klein" titel={texte.netzTitel} kopf={texte.koepfe.netz} ton="lila">
+        <p className="max-w-[68ch] text-body text-text-muted">{texte.leer}</p>
+        {/* Die gefüllte Primäraktion steht schon in der Seitenleiste: hier die zweite Stufe. */}
+        <Link prefetch={false} href="/blueten" className={`${buttonKlassen("secondary", "md")} self-start`}>
+          {texte.seite.bewerten}
+        </Link>
+      </Feld>
+    );
+  }
+  const a = auswertungen(zeilen);
+  return (
+    <div className="grid grid-cols-1 gap-8 min-[1280px]:grid-cols-12">
+      <ReiheNetz id={id} netzKlasse="min-[1280px]:col-span-7" />
+      <Feld id="topflop" rahmen="karte" groesse="klein" titel={texte.topFlopTitel} kopf={texte.koepfe.topFlop} ton="lila" className="min-[1280px]:col-span-5">
+        <TopFlop top={a.top} flop={a.flop} texte={texte} sprache={sprache} />
+      </Feld>
+      <Feld
+        id="aktivitaet"
+        rahmen="karte"
+        groesse="klein"
+        titel={texte.aktivitaetTitel}
+        kopf={texte.koepfe.aktivitaet}
+        ton="gruen"
+        satz={texte.aktivitaetSatz}
+        className="min-[1280px]:col-span-7"
+      >
+        <Aktivitaet monate={monatsReihe(zeilen.map((z) => z.erstelltAm), new Date(), sprache, { abErster: true })} texte={texte} kompakt />
+      </Feld>
+      <Feld
+        id="verteilung"
+        rahmen="karte"
+        groesse="klein"
+        titel={texte.verteilungTitel}
+        kopf={texte.koepfe.noten}
+        ton="lila"
+        satz={texte.verteilungSatz}
+        className="min-[1280px]:col-span-5"
+      >
+        <NotenVerteilung stufen={notenVerteilung(zeilen)} texte={texte} />
+      </Feld>
+    </div>
+  );
+}
+
+/** Vertreiber: Lieblingshersteller (über beide Spalten), Schnitte und Community. */
+async function AnsichtVertreiber({ id }: { id: string }) {
+  const [{ w, sprache }, zeilen, liebling] = await Promise.all([
+    textLaden(),
+    zeilenLaden(id),
+    ladeLieblingshersteller(id).catch(oderUndefined<Awaited<ReturnType<typeof ladeLieblingshersteller>>>("ladeLieblingshersteller")),
+  ]);
+  const texte = w.profil;
+  if (zeilen === null || zeilen.length === 0) {
+    return (
+      <Feld id="hersteller" rahmen="karte" groesse="klein" titel={texte.herstellerTitel} kopf={texte.koepfe.hersteller} ton="lila">
+        <p className="max-w-[68ch] text-body text-text-muted">{zeilen === null ? texte.fehler : texte.leer}</p>
+      </Feld>
+    );
+  }
+  const a = auswertungen(zeilen);
+  return (
+    <div className="grid grid-cols-1 gap-8 min-[1280px]:grid-cols-2">
+      <Feld id="hersteller" rahmen="karte" groesse="klein" titel={texte.herstellerTitel} kopf={texte.koepfe.hersteller} ton="lila" className="min-[1280px]:col-span-2">
+        <Lieblingshersteller daten={liebling} texte={texte} sprache={sprache} />
+      </Feld>
+      {a.schnitte ? (
+        <Feld id="schnitte" rahmen="karte" groesse="klein" titel={texte.schnitteTitel} kopf={texte.koepfe.schnitte} ton="gruen" satz={texte.schnitteSatz}>
+          <Schnitte daten={a.schnitte} texte={texte} noten={w.schema.noten} sprache={sprache} />
+        </Feld>
+      ) : null}
+      <Feld id="community" rahmen="karte" groesse="klein" titel={texte.communityTitel} kopf={texte.koepfe.community} ton="lila">
+        <CommunityVergleich daten={a.community} texte={texte} sprache={sprache} />
+      </Feld>
+    </div>
+  );
+}
+
+/** Das Aroma-Netz; die Terpene stecken seit 2026-10-09 im Netz (Schalter). */
+async function ReiheNetz({ id, netzKlasse }: { id: string; netzKlasse?: string }) {
   const [{ w, sprache }, profil, zeilen] = await Promise.all([textLaden(), profilLaden(id), zeilenLaden(id)]);
   const texte = w.profil;
   const werte = profil?.werte ?? leereProfilWerte();
@@ -169,28 +288,35 @@ async function ReiheNetz({ id }: { id: string }) {
   // prüfen lässt: dann nie die Leerskizze „Erste Bewertung abgeben“ zeigen.
   const netzFehlt = profil === null && (zeilen === null || zeilen.length > 0);
   return (
-    <>
-      <Feld id="netz" spalten={10} titel={texte.netzTitel} kopf={texte.koepfe.netz} ton="lila" satz={!netzFehlt && werte.anzahl > 0 ? texte.netzSatz : undefined}>
-        {netzFehlt ? (
-          <p className="max-w-[68ch] text-body text-text">{texte.fehler}</p>
-        ) : (
-          <div data-netz-erscheinen="" className="mx-auto w-full max-w-160">
-            <ProfilNetz
-              werte={werte}
-              texte={texte}
-              achsen={w.label.geschmack}
-              sprache={sprache}
-              verlauf={verlauf}
-              className="w-full max-w-xl"
-            />
-          </div>
-        )}
-      </Feld>
-    </>
+    <Feld
+      id="netz"
+      rahmen="karte"
+      groesse="klein"
+      titel={texte.netzTitel}
+      kopf={texte.koepfe.netz}
+      ton="lila"
+      satz={!netzFehlt && werte.anzahl > 0 ? texte.netzSatz : undefined}
+      className={netzKlasse}
+    >
+      {netzFehlt ? (
+        <p className="max-w-[68ch] text-body text-text">{texte.fehler}</p>
+      ) : (
+        <div data-netz-erscheinen="" className="mx-auto w-full max-w-160">
+          <ProfilNetz
+            werte={werte}
+            texte={texte}
+            achsen={w.label.geschmack}
+            sprache={sprache}
+            verlauf={verlauf}
+            className="w-full max-w-xl"
+          />
+        </div>
+      )}
+    </Feld>
   );
 }
 
-/** Letzte Reihe: Ähnliches im Aroma über die volle Breite (Nutzer 2026-10-09: ganz unten). */
+/** Aromen: Ähnliches im Aroma (Nutzer 2026-10-09: unter dem Netz). */
 async function ReiheVorschlaege({ id }: { id: string }) {
   const { w, sprache } = await textLaden();
   const texte = w.profil;
@@ -198,87 +324,35 @@ async function ReiheVorschlaege({ id }: { id: string }) {
   await profilLaden(id);
   const empfehlungen = await ladeEmpfehlungen(id).catch(oderNull<Awaited<ReturnType<typeof ladeEmpfehlungen>>>("ladeEmpfehlungen"));
   return (
-    <>
-      <Feld id="vorschlaege" spalten={10} titel={texte.vorschlaegeTitel} kopf={texte.koepfe.vorschlaege} ton="gruen">
-        {empfehlungen === null ? (
-          <p className="max-w-[68ch] text-body text-text">{w.empfehlung.fehler}</p>
-        ) : empfehlungen.length === 0 ? (
-          <p className="max-w-[68ch] text-body text-text-muted">{w.empfehlung.leer}</p>
-        ) : (
-          <EmpfehlungsListe
-            className="w-full"
-            eintraege={empfehlungen.map((e) => ({
-              slug: e.slug,
-              handelsname: e.handelsname,
-              begruendung: begruendungText(e, w, sprache),
-              marke: e.bestaetigt ? undefined : texte.nichtBestaetigt,
-            }))}
-          />
-        )}
-        <p className="text-caption text-text-muted">
-          {texte.bestaetigtHinweis} {w.empfehlung.hinweis}
-        </p>
-      </Feld>
-    </>
-  );
-}
-
-/** Reihe 1: deine Spur, die Aktivität je Monat, direkt unter dem Kopf (Nutzer 2026-10-09). */
-async function ReiheAktivitaet({ id }: { id: string }) {
-  const [{ w, sprache }, zeilen] = await Promise.all([textLaden(), zeilenLaden(id)]);
-  const texte = w.profil;
-  return (
-    <Feld id="aktivitaet" spalten={10} titel={texte.aktivitaetTitel} kopf={texte.koepfe.aktivitaet} ton="gruen" satz={texte.aktivitaetSatz}>
-      {zeilen === null ? (
-        <p className="max-w-[68ch] text-body text-text">{texte.fehler}</p>
+    <Feld id="vorschlaege" rahmen="karte" groesse="klein" titel={texte.vorschlaegeTitel} kopf={texte.koepfe.vorschlaege} ton="gruen">
+      {empfehlungen === null ? (
+        <p className="max-w-[68ch] text-body text-text">{w.empfehlung.fehler}</p>
+      ) : empfehlungen.length === 0 ? (
+        <p className="max-w-[68ch] text-body text-text-muted">{w.empfehlung.leer}</p>
       ) : (
-        <Aktivitaet monate={monatsReihe(zeilen.map((z) => z.erstelltAm), new Date(), sprache)} texte={texte} />
+        <EmpfehlungsListe
+          className="w-full"
+          eintraege={empfehlungen.map((e) => ({
+            slug: e.slug,
+            handelsname: e.handelsname,
+            begruendung: begruendungText(e, w, sprache),
+            marke: e.bestaetigt ? undefined : texte.nichtBestaetigt,
+          }))}
+        />
       )}
+      <p className="text-caption text-text-muted">
+        {texte.bestaetigtHinweis} {w.empfehlung.hinweis}
+      </p>
     </Feld>
   );
 }
 
-/**
- * Reihe 3: Top und Flop (10); Noten und Hersteller (je 5); Schnitte und Community (je 5).
- * Ohne Bewertung oder bei Fehler nichts: die Aktivität darüber trägt dann Leersatz bzw. Fehler.
- */
-async function ReiheAuswertung({ id }: { id: string }) {
-  const [{ w, sprache }, zeilen, liebling] = await Promise.all([
-    textLaden(),
-    zeilenLaden(id),
-    ladeLieblingshersteller(id).catch(oderUndefined<Awaited<ReturnType<typeof ladeLieblingshersteller>>>("ladeLieblingshersteller")),
-  ]);
-  const texte = w.profil;
-  if (zeilen === null) return null;
-  const a = auswertungen(zeilen);
-  if (!a.schnitte) return null;
-  return (
-    <>
-      <Feld id="topflop" spalten={10} titel={texte.topFlopTitel} kopf={texte.koepfe.topFlop} ton="lila">
-        <TopFlop top={a.top} flop={a.flop} texte={texte} sprache={sprache} />
-      </Feld>
-      <Feld id="verteilung" spalten={5} titel={texte.verteilungTitel} kopf={texte.koepfe.noten} ton="gruen" satz={texte.verteilungSatz}>
-        <NotenVerteilung stufen={notenVerteilung(zeilen)} texte={texte} />
-      </Feld>
-      <Feld id="hersteller" spalten={5} titel={texte.herstellerTitel} kopf={texte.koepfe.hersteller} ton="lila">
-        <Lieblingshersteller daten={liebling} texte={texte} sprache={sprache} />
-      </Feld>
-      <Feld id="schnitte" spalten={5} titel={texte.schnitteTitel} kopf={texte.koepfe.schnitte} ton="gruen" satz={texte.schnitteSatz}>
-        <Schnitte daten={a.schnitte} texte={texte} noten={w.schema.noten} sprache={sprache} />
-      </Feld>
-      <Feld id="community" spalten={5} titel={texte.communityTitel} kopf={texte.koepfe.community} ton="lila">
-        <CommunityVergleich daten={a.community} texte={texte} sprache={sprache} />
-      </Feld>
-    </>
-  );
-}
-
-/** Reihe 4: deine Bewertungen als Register mit Bildern (10). */
+/** Bewertungen: deine Bewertungen als Register mit Bildern. */
 async function ReiheRegister({ id, register }: { id: string; register: ReturnType<typeof registerParameter> }) {
   const [{ w, sprache }, zeilen] = await Promise.all([textLaden(), zeilenLaden(id)]);
   const texte = w.profil;
   return (
-    <Feld id="bewertungen" spalten={10} titel={texte.registerTitel} kopf={texte.koepfe.register} ton="lila" satz={texte.registerSatz}>
+    <Feld id="bewertungen" rahmen="karte" groesse="klein" titel={texte.registerTitel} kopf={texte.koepfe.register} ton="lila" satz={texte.registerSatz}>
       {zeilen === null ? (
         <p className="max-w-[68ch] text-body text-text">{texte.fehler}</p>
       ) : (

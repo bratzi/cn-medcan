@@ -17,10 +17,22 @@ const MONATE: Record<Sprache, Intl.DateTimeFormat> = {
 
 const schluessel = (d: Date) => `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, "0")}`;
 
-/** Bewertungen je Monat, die letzten zwölf inklusive laufendem (Spec 6, Aktivität). */
-export function monatsReihe(daten: readonly Date[], jetzt: Date, sprache: Sprache): Monat[] {
+/**
+ * Bewertungen je Monat, die letzten zwölf inklusive laufendem (Spec 6, Aktivität).
+ * Mit `abErster` beginnt die Reihe beim Monat der ersten Bewertung (höchstens zwölf Monate);
+ * ohne Bewertung bleibt sie leer.
+ */
+export function monatsReihe(daten: readonly Date[], jetzt: Date, sprache: Sprache, optionen: { abErster?: boolean } = {}): Monat[] {
+  let monate = 12;
+  if (optionen.abErster) {
+    if (daten.length === 0) return [];
+    const frueh = Math.min(...daten.map((d) => d.getTime()));
+    const f = new Date(frueh);
+    const abstand = (jetzt.getUTCFullYear() - f.getUTCFullYear()) * 12 + jetzt.getUTCMonth() - f.getUTCMonth();
+    monate = Math.min(12, Math.max(1, abstand + 1));
+  }
   const reihe: Monat[] = [];
-  for (let i = 11; i >= 0; i--) {
+  for (let i = monate - 1; i >= 0; i--) {
     const d = new Date(Date.UTC(jetzt.getUTCFullYear(), jetzt.getUTCMonth() - i, 1));
     reihe.push({ schluessel: schluessel(d), kurz: MONATE[sprache].format(d).replace(".", ""), anzahl: 0, laufend: i === 0 });
   }

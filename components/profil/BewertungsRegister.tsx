@@ -18,12 +18,13 @@ type Props = {
 };
 
 const ziel = (sortierung: Sortierung, alle: boolean) => {
-  const p = new URLSearchParams();
+  // Ohne die Ansicht spränge die Seite beim Sortieren zurück in die Übersicht.
+  const p = new URLSearchParams({ ansicht: "bewertungen" });
   if (sortierung !== "datum") p.set("sortierung", sortierung);
   if (alle) p.set("alle", "1");
   const q = p.toString();
   // Sprungziel ist die Überschrift des Felds (Feld id="bewertungen").
-  return `/profil${q ? `?${q}` : ""}#bewertungen-titel`;
+  return `/profil?${q}#bewertungen-titel`;
 };
 
 /** Vorzeichen erst nach der Rundung auf 0,1, damit nie „+0,0“ oder „−0,0“ entsteht. */

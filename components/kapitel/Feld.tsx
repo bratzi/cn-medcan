@@ -18,7 +18,12 @@ type Props = {
   id: string;
   titel: string;
   satz?: string;
-  spalten: FeldSpalten;
+  /** Breite im Feldbuch-Raster; ohne bestimmt das Raster der umgebenden Ansicht die Breite (className). */
+  spalten?: FeldSpalten;
+  /** `klein` in den Reitern des Profils: Überschrift in text-h2 statt text-display. */
+  groesse?: "gross" | "klein";
+  /** `raster` = Kanten im Feldbuch-Raster; `karte` = eckiger Rahmen ringsum (Reiter im Profil). */
+  rahmen?: "raster" | "karte";
   /** Kopf im Stil der Startseite (Nutzer 2026-10-09); ohne bleibt die schlichte Überschrift aus `titel`. */
   kopf?: FeldKopfTexte;
   /** Farbe des Schlagworts; Grün und Lila wechseln von Feld zu Feld. */
@@ -34,14 +39,15 @@ type Props = {
  * sich abdeckt, links die Rasterlinie als Kante, oben der Kapitelstrich.
  * Unter 1080 px über alle 4 Spalten.
  */
-export function Feld({ id, titel, satz, spalten, kopf, ton, stimmzettel = false, className, children }: Props) {
+export function Feld({ id, titel, satz, spalten, groesse = "gross", rahmen = "raster", kopf, ton, stimmzettel = false, className, children }: Props) {
   return (
     <section
       data-feld=""
       aria-labelledby={`${id}-titel`}
       className={cn(
-        "col-span-4 flex min-w-0 flex-col gap-6 border-t border-l border-t-border-strong border-l-border p-6 min-[1080px]:p-8",
-        FELD_SPALTEN[spalten],
+        "flex min-w-0 flex-col gap-6 p-6 min-[1080px]:p-8",
+        rahmen === "karte" ? "rounded-lg border border-border" : "border-t border-l border-t-border-strong border-l-border",
+        spalten ? `col-span-4 ${FELD_SPALTEN[spalten]}` : null,
         // cn mischt nicht (ohne tailwind-merge): der Grund steht je Zustand genau einmal.
         stimmzettel ? "bg-surface-raised shadow-md" : "bg-surface",
         className,
@@ -49,7 +55,7 @@ export function Feld({ id, titel, satz, spalten, kopf, ton, stimmzettel = false,
     >
       {kopf ? (
         <div className="flex flex-col items-center gap-2">
-          <FeldKopf id={`${id}-titel`} texte={kopf} ton={ton} />
+          <FeldKopf id={`${id}-titel`} texte={kopf} ton={ton} groesse={groesse} />
           {satz ? <p className="mx-auto max-w-[68ch] text-center text-small text-text-muted text-pretty">{satz}</p> : null}
         </div>
       ) : (

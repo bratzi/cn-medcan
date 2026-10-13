@@ -17,22 +17,20 @@ test("/profil: nur angemeldet, nicht im Index, rechnet nur bei veraltetem Stand"
 test("/profil: Kapitel-Reihenfolge, Raster, kein Apothekenlink", () => {
   const q = seite();
   // Die Reihenfolge prüft tests/profil-reihenfolge.test.ts (Nutzer 2026-10-09).
-  for (const teil of ["<Kapitelkopf", "<Randnotizen", "<ProfilNetz", "<EmpfehlungsListe", "<Aktivitaet", "<NotenVerteilung", "<TopFlop", "<Lieblingshersteller", "<CommunityVergleich", "<Schnitte", "<BewertungsRegister"]) assert.ok(q.includes(teil), teil);
-  assert.match(q, /<KapitelRaster/);
-  assert.match(q, /<ViewTransition/);
+  for (const teil of ["<ProfilRahmen", "<ProfilSeitenleiste", "<ProfilReiter", "<ProfilNetz", "<EmpfehlungsListe", "<Aktivitaet", "<NotenVerteilung", "<TopFlop", "<Lieblingshersteller", "<CommunityVergleich", "<Schnitte", "<BewertungsRegister"]) assert.ok(q.includes(teil), teil);
+  assert.doesNotMatch(q, /<KapitelRaster|<Kapitelkopf/);
   assert.match(q, /<Suspense/);
   assert.doesNotMatch(q, /apotheke/i);
   assert.doesNotMatch(q, /max-w-180/);
-  // Seit 2026-10-09 (Nutzer) keine Reiter mehr: Profil und Konto sind eigene Seiten.
-  assert.doesNotMatch(q, /ProfilReiter/);
-  assert.match(q, /seite=\{texte\.reiterProfil\}/);
+  // Seit 2026-10-13: Reiter innerhalb des Profils (Ansichten), Konto bleibt eigene Seite.
+  assert.match(q, /<ProfilReiter/);
 });
 
 test("/profil: Verlauf im Netz statt in eigenem Feld, nie auf dem öffentlichen Profil (Nutzer 2026-10-09)", () => {
   const q = seite();
   assert.match(q, /verlauf=\{verlauf\}/);
   assert.doesNotMatch(q, /NetzVerlauf|id="verlauf"/);
-  assert.match(q, /<Feld id="vorschlaege" spalten=\{10\}/);
+  assert.match(q, /<Feld id="vorschlaege"/);
   const oeffentlich = readFileSync("app/[lang]/profil/[kurzId]/page.tsx", "utf8");
   assert.doesNotMatch(oeffentlich, /verlauf=|NetzVerlauf|Lieblingshersteller/);
 });
@@ -76,12 +74,6 @@ test("/profil: kein Feld Terpene mehr, die Terpene stecken im Netz (Nutzer 2026-
   assert.doesNotMatch(q, /id="terpene"|TerpenRangliste/);
   const oeffentlich = readFileSync("app/[lang]/profil/[kurzId]/page.tsx", "utf8");
   assert.doesNotMatch(oeffentlich, /TerpenRangliste/);
-});
-
-test("/profil: Kopfbild nimmt das eigene Bild der besten Bewertung über BudpicBild", () => {
-  const q = seite();
-  assert.match(q, /beste\?\.eigenesBild/);
-  assert.match(q, /<BudpicBild[^>]*alt=""/);
 });
 
 test("Randnotizen und Vorhang: Wort bricht um, Schatten wird nicht abgeschnitten", () => {

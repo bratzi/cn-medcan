@@ -8,13 +8,13 @@ const TON = { gruen: "text-accent", lila: "text-kopierstift" } as const;
  * Schlagwort gesperrt in Versalien wie „Terpen für Terpen“ im Hero (Nutzer 2026-10-13). Kein Riesenwort
  * im Hintergrund: in einem Feld überdeckte es die Überschrift und schnitt in halben Feldern ab.
  */
-export function FeldKopf({ id, texte, ton = "gruen" }: { id: string; texte: FeldKopfTexte; ton?: keyof typeof TON }) {
+export function FeldKopf({ id, texte, ton = "gruen", groesse = "gross" }: { id: string; texte: FeldKopfTexte; ton?: keyof typeof TON; groesse?: "gross" | "klein" }) {
   return (
     <>
       <p aria-hidden="true" className={`font-sans text-caption uppercase tracking-gesperrt ${TON[ton]}`}>
         {texte.schlagwort}
       </p>
-      <h2 id={id} className="font-buch text-display font-normal text-text text-center text-balance">
+      <h2 id={id} className={`font-buch ${groesse === "klein" ? "text-h2" : "text-display"} font-normal text-text text-center text-balance`}>
         {texte.vor} <em className="farbverlauf hand-betont">{texte.betont}</em>
         {texte.nach ? ` ${texte.nach}` : null}
       </h2>
