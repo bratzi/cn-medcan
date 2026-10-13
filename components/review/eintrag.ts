@@ -13,6 +13,9 @@ import type { ReviewBild, ReviewEintrag } from "@/lib/query/strains";
 export type EintragDaten = {
   id: string;
   handelsname: string;
+  /** Kultivar und Vertreiber für die Zeile „Blüte · Vertreiber“; optional, ältere Aufrufer haben sie nicht. */
+  bluete?: string | null;
+  vertreiber?: string | null;
   slug: string;
   aussehen: number;
   geruch: number;
@@ -63,11 +66,13 @@ export function eintragHref(slug: string, id: string): string {
  */
 export function alsEintrag(
   review: ReviewEintrag,
-  produkt: { handelsname: string; slug: string; terpene?: KartenTerpen[]; bildPfad?: string | null },
+  produkt: { handelsname: string; bluete?: string | null; vertreiber?: string | null; slug: string; terpene?: KartenTerpen[]; bildPfad?: string | null },
 ): EintragDaten {
   return {
     id: review.id,
     handelsname: produkt.handelsname,
+    bluete: produkt.bluete ?? null,
+    vertreiber: produkt.vertreiber ?? null,
     slug: produkt.slug,
     aussehen: review.aussehen,
     geruch: review.geruch,

@@ -16,6 +16,7 @@ import { eintragAnker, eintragHref, type EintragDaten } from "@/components/revie
 import { ablauf } from "@/components/review/eintritt";
 import { FALZ_LINKS, FALZ_RECHTS } from "@/components/review/falz";
 import { Avatar, Badge, namenLinkKlassen } from "@/components/ui";
+import { bluetenZeile } from "@/lib/bluete-zeile";
 import { cn } from "@/lib/cn";
 import { profilHref } from "@/lib/kurz-id";
 import type { Sprache } from "@/lib/i18n/sprache-kern";
@@ -123,11 +124,18 @@ export function BuchDoppelseite({ eintrag, ueberschrift: Ueberschrift, w, sprach
     >
       <div data-buchseite="links" className={cn(SEITE, FALZ_LINKS)}>
         {sorte ? (
-          <p className="font-buch text-h3 text-text">
-            <Link prefetch={false} href={eintragHref(eintrag.slug, eintrag.id)} className={namenLinkKlassen()}>
-              {eintrag.handelsname}
-            </Link>
-          </p>
+          <div className="flex flex-col gap-1">
+            <p className="font-buch text-h3 text-text">
+              <Link prefetch={false} href={eintragHref(eintrag.slug, eintrag.id)} className={namenLinkKlassen()}>
+                {eintrag.handelsname}
+              </Link>
+            </p>
+            {eintrag.bluete !== undefined ? (
+              <p className="text-small text-text-muted">
+                {bluetenZeile(w.start.bluetenZeile, w.bluete.vertreiber.unbekannt, eintrag)}
+              </p>
+            ) : null}
+          </div>
         ) : null}
         {/* Exlibris (Nutzer 2026-10-09): die Person klein und eingefasst, damit der erste Blick
             beim Urteil rechts landet und nicht beim Bild der Person. */}

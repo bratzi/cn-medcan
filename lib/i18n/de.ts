@@ -650,6 +650,7 @@ export const de = {
     },
   },
   start: {
+    bluetenZeile: "{bluete} · {vertreiber}",
     video: { anhalten: "Video anhalten", abspielen: "Video abspielen" },
     auftakt: {
       oberzeile: "Cannabis, offen gelegt.",
@@ -1025,8 +1026,6 @@ export const de = {
     },
   },
   rangliste: {
-    bluetenZeile: "{bluete} · {vertreiber}",
-    vertreiberUnbekannt: "Vertreiber unbekannt",
     schlagwort: "wer vorn liegt",
     titel: "Ranglisten",
     satz: "Je Sorte, aus allen freigegebenen Bewertungen. Geordnet wird nach einem gewichteten Schnitt, damit eine einzelne Bewertung nicht die ganze Liste anführt. Angezeigt wird der echte Schnitt.",

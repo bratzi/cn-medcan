@@ -58,7 +58,10 @@ export async function BewertungenSeite({ band }: { band: number }) {
             <p className="max-w-[56ch] text-body text-pretty text-text-muted">{w.rangliste.satz}</p>
           </div>
           <div className="mt-12">
-            <Ranglisten texte={w.rangliste} sprache={sprache} />
+            <Ranglisten
+              texte={{ ...w.rangliste, bluetenZeile: w.start.bluetenZeile, vertreiberUnbekannt: w.bluete.vertreiber.unbekannt }}
+              sprache={sprache}
+            />
           </div>
         </section>
       </div>

@@ -9,7 +9,7 @@ import { BEWERTUNG_SELECT, alsKartenTerpen, alsReviewEintrag, type ReviewEintrag
 
 export type BandEintrag = {
   review: ReviewEintrag;
-  produkt: { handelsname: string; slug: string; terpene: KartenTerpen[]; bildPfad: string | null };
+  produkt: { handelsname: string; bluete: string; vertreiber: string | null; slug: string; terpene: KartenTerpen[]; bildPfad: string | null };
 };
 export type Band = { band: number; baende: number; gesamt: number; basis: number; eintraege: BandEintrag[] };
 
@@ -20,6 +20,8 @@ const SELECT = {
   strain: {
     select: {
       handelsname: true,
+      kultivar: { select: { name: true } },
+      vertreiber: { select: { name: true } },
       slug: true,
       herstellerBildPfad: true,
       terpene: {
@@ -64,6 +66,8 @@ function alsBandEintrag(z: Zeile, autorZahlen: Awaited<ReturnType<typeof ladeAut
     review: alsReviewEintrag(z, autorZahlen),
     produkt: {
       handelsname: z.strain.handelsname,
+      bluete: z.strain.kultivar?.name ?? z.strain.handelsname,
+      vertreiber: z.strain.vertreiber?.name ?? null,
       slug: z.strain.slug,
       bildPfad: z.strain.herstellerBildPfad,
       terpene: z.strain.terpene.map(alsKartenTerpen),

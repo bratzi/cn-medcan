@@ -4,6 +4,7 @@ import { ProfilNetz } from "@/components/profil/ProfilNetz";
 import { BlattAnzeige } from "@/components/review/BlattAnzeige";
 import { Avatar, Badge, buttonKlassen, namenLinkKlassen } from "@/components/ui";
 import { profilNetzTexte, type ProfilNetzTexte } from "@/lib/aroma-netz-texte";
+import { bluetenZeile } from "@/lib/bluete-zeile";
 import { formatiereDatum, formatiereZahl } from "@/lib/format";
 import { kapitelNotizen, type KapitelDaten } from "@/lib/kapitel-start";
 import type { Sprache } from "@/lib/i18n/sprache-kern";
@@ -17,6 +18,8 @@ export type KapitelTexte = {
   profil: ProfilNetzTexte;
   profilOeffentlich: ProfilNetzTexte;
   achsen: Woerterbuch["label"]["geschmack"];
+  bluetenZeile: string;
+  vertreiberUnbekannt: string;
 };
 
 export function kapitelTexte(w: Woerterbuch): KapitelTexte {
@@ -25,6 +28,8 @@ export function kapitelTexte(w: Woerterbuch): KapitelTexte {
     profil: profilNetzTexte(w.profil),
     profilOeffentlich: profilNetzTexte(netzTexte(w)),
     achsen: w.label.geschmack,
+    bluetenZeile: w.start.bluetenZeile,
+    vertreiberUnbekannt: w.bluete.vertreiber.unbekannt,
   };
 }
 
@@ -149,6 +154,9 @@ export function KapitelAufschlag({
               <Link prefetch={false} href={`/blueten/${daten.zuletzt.slug}`} className={namenLinkKlassen()}>
                 {daten.zuletzt.handelsname}
               </Link>
+            </p>
+            <p className="text-small text-text-muted">
+              {bluetenZeile(alle.bluetenZeile, alle.vertreiberUnbekannt,daten.zuletzt)}
             </p>
             <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
               {daten.zuletzt.gesamtnote !== null ? (

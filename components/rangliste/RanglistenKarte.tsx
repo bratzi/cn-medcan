@@ -3,6 +3,7 @@ import Link from "next/link";
 import { BlattAnzeige } from "@/components/review/BlattAnzeige";
 import { Bild } from "@/components/medien/Bild";
 import { namenLinkKlassen } from "@/components/ui";
+import { bluetenZeile } from "@/lib/bluete-zeile";
 import { formatiereDatum, formatiereZahl } from "@/lib/format";
 import type { Sprache } from "@/lib/i18n/sprache-kern";
 import { mehrzahl, t } from "@/lib/i18n/text";
@@ -10,10 +11,13 @@ import type { Woerterbuch } from "@/lib/i18n/typen";
 import type { RanglistenKarte as Karte } from "@/lib/query/rangliste";
 import type { Rangliste } from "@/lib/rangliste";
 
+/** Die Texte der Rangliste plus die geteilte Zeilenvorlage der Startseite („Blüte · Vertreiber“). */
+export type RanglistenTexte = Woerterbuch["rangliste"] & { bluetenZeile: string; vertreiberUnbekannt: string };
+
 type Props = {
   karte: Karte;
   nach: Rangliste;
-  texte: Woerterbuch["rangliste"];
+  texte: RanglistenTexte;
   sprache: Sprache;
 };
 
@@ -48,7 +52,7 @@ export function RanglistenKarte({ karte, nach, texte, sprache }: Props) {
         </h3>
       </div>
       <p className="text-small text-text-muted">
-        {t(texte.bluetenZeile, { bluete: karte.bluete, vertreiber: karte.vertreiber ?? texte.vertreiberUnbekannt })}
+        {bluetenZeile(texte.bluetenZeile, texte.vertreiberUnbekannt, karte)}
       </p>
       <BlattAnzeige note={karte.schnitt} text={t(texte.schnitt, { zahl: schnitt })} />
       <p className="numeric text-small text-text-muted">{mehrzahl(sprache, texte.anzahl, karte.anzahl)}</p>

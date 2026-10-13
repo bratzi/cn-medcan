@@ -12,16 +12,19 @@ const karte = {
   schnitt: 4.5, anzahl: 3, betreiber: 4.5, zuletzt: "2026-10-08T00:00:00.000Z", abstand: null,
 };
 
+const texte = { ...de.rangliste, bluetenZeile: de.start.bluetenZeile, vertreiberUnbekannt: de.bluete.vertreiber.unbekannt };
+
 test("Karte: Link zur Blüte, Schnitt de-DE, Anzahl in Mehrzahl", () => {
-  const html = renderToStaticMarkup(createElement(RanglistenKarte, { karte, nach: "hoechste", texte: de.rangliste, sprache: "de" }));
+  const html = renderToStaticMarkup(createElement(RanglistenKarte, { karte, nach: "hoechste", texte, sprache: "de" }));
   assert.match(html, /href="\/blueten\/remexian"/);
+  assert.match(html, /Remexian · Purplefarm/);
   assert.match(html, /4,5/);
   assert.match(html, /3 Bewertungen/);
   assert.doesNotMatch(html, /Abstand/);
 });
 
 test("Insel: ohne JavaScript steht der Anmelde-Hinweis", () => {
-  const html = renderToStaticMarkup(createElement(Ranglisten, { texte: de.rangliste, sprache: "de" }));
+  const html = renderToStaticMarkup(createElement(Ranglisten, { texte, sprache: "de" }));
   assert.match(html, /angemeldete Mitglieder/);
   assert.match(html, /\/anmelden\?weiter=/);
 });

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore, type KeyboardEvent } from "react";
 
-import { RanglistenKarte } from "@/components/rangliste/RanglistenKarte";
+import { RanglistenKarte, type RanglistenTexte } from "@/components/rangliste/RanglistenKarte";
 import { buttonKlassen } from "@/components/ui";
 import { cn } from "@/lib/cn";
 import type { Sprache } from "@/lib/i18n/sprache-kern";
@@ -12,7 +12,7 @@ import type { Woerterbuch } from "@/lib/i18n/typen";
 import type { RanglistenAntwort } from "@/lib/query/rangliste";
 import { parameter, RANGLISTEN, type Rangliste } from "@/lib/rangliste";
 
-type Props = { texte: Woerterbuch["rangliste"]; sprache: Sprache };
+type Props = { texte: RanglistenTexte; sprache: Sprache };
 
 type Ladung =
   | { art: "gast"; schluessel: string }
