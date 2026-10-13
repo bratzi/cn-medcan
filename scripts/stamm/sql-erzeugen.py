@@ -88,7 +88,7 @@ def firma(name, rolle, firmen):
 
 def main():
     produkte = json.load(open(QUELLE, encoding="utf8"))["produkte"]
-    firmen, terpene, zeilen, raus, zuordnungen = {}, {}, [], [], []
+    firmen, terpene, zeilen, raus, zuordnungen, kultivare = {}, {}, [], [], [], []
     for p in produkte:
         name = p["handelsname"].strip()
         thc_max, cbd_max = p.get("thcMaxProzent"), p.get("cbdMaxProzent")
@@ -109,24 +109,37 @@ def main():
         typ = p.get("kultivarTyp") if p.get("kultivarTyp") in TYPEN else "HYBRID"
         form = p.get("darreichungsform") if p.get("darreichungsform") in FORMEN else "BLUETE"
         bestr = p.get("bestrahlung") if p.get("bestrahlung") in BESTRAHLUNG else "UNBEKANNT"
+        # Bedeutung seit Migration 0021: Vertreiber = pharmazeutischer Unternehmer (Marke),
+        # also der Importeur, sonst das bisherige Feld "hersteller". hersteller_id nur,
+        # wenn ein davon verschiedener echter Anbauer bekannt ist. importeur_id wird nie geschrieben.
         hid = firma(p.get("hersteller"), "HERSTELLER", firmen)
         iid = firma(p.get("importeur"), "IMPORTEUR", firmen)
+        vid = iid or hid
+        hid = hid if iid and hid and iid != hid else None
+        kname = (p.get("kultivarName") or "").strip() or name
+        kultivare.append(
+            f"INSERT OR IGNORE INTO kultivare (id, name) VALUES (lower(hex(randomblob(16))), {q(kname)});"
+        )
         such = " ".join(x for x in (name, p.get("kultivarName"), p.get("genetik")) if x).lower()
         zeilen.append(
             "INSERT INTO strains (id, slug, handelsname, pzn, darreichungsform, kultivar_name, kultivar_typ, genetik,"
             " thc_min_prozent, thc_max_prozent, cbd_min_prozent, cbd_max_prozent, bestrahlung, anbauland, suchtext,"
-            " hersteller_id, importeur_id, aktiv, aktualisiert_am) VALUES ("
+            " hersteller_id, vertreiber_id, kultivar_id, aktiv, aktualisiert_am) VALUES ("
             + ", ".join(
                 q(v)
                 for v in (sid, s, name, p.get("pzn"), form, p.get("kultivarName"), typ, p.get("genetik"),
-                          thc_min, thc_max, cbd_min, cbd_max, bestr, p.get("anbauland"), such, hid, iid)
+                          thc_min, thc_max, cbd_min, cbd_max, bestr, p.get("anbauland"), such, hid, vid)
             )
-            + ", 1, CURRENT_TIMESTAMP) ON CONFLICT(id) DO UPDATE SET handelsname=excluded.handelsname,"
+            + f", (SELECT id FROM kultivare WHERE name = {q(kname)}), 1, CURRENT_TIMESTAMP) ON CONFLICT(id) DO UPDATE SET handelsname=excluded.handelsname,"
             " pzn=excluded.pzn, darreichungsform=excluded.darreichungsform, kultivar_name=excluded.kultivar_name,"
             " kultivar_typ=excluded.kultivar_typ, genetik=excluded.genetik, thc_min_prozent=excluded.thc_min_prozent,"
             " thc_max_prozent=excluded.thc_max_prozent, cbd_min_prozent=excluded.cbd_min_prozent,"
             " cbd_max_prozent=excluded.cbd_max_prozent, bestrahlung=excluded.bestrahlung, anbauland=excluded.anbauland,"
-            " suchtext=excluded.suchtext, hersteller_id=excluded.hersteller_id, importeur_id=excluded.importeur_id,"
+            " suchtext=excluded.suchtext,"
+            # coalesce: ein unbekannter Wert im Import loescht nie einen von Hand gesetzten Vertreiber/Hersteller/Kultivar.
+            " hersteller_id=coalesce(excluded.hersteller_id, strains.hersteller_id),"
+            " vertreiber_id=coalesce(excluded.vertreiber_id, strains.vertreiber_id),"
+            " kultivar_id=coalesce(strains.kultivar_id, excluded.kultivar_id),"
             " aktualisiert_am=CURRENT_TIMESTAMP;"
         )
         rang = 0
@@ -153,7 +166,7 @@ def main():
             f"INSERT INTO terpene (id, name, aroma_profil, geschmack) VALUES ({q(tid)}, {q(name)}, {q(aroma)}, {q(geschmack)})"
             " ON CONFLICT(name) DO UPDATE SET aroma_profil=excluded.aroma_profil, geschmack=excluded.geschmack;"
         )
-    aus += zeilen
+    aus += kultivare + zeilen
     for sid, tid, konz, rang in zuordnungen:
         if tid is None:
             continue

@@ -32,3 +32,13 @@ test("unternehmensSchluessel und Id wie firma() im Importskript", async () => {
   assert.equal(await unternehmensIdAusSchluessel("tilray"), "ed08922a-5136-55b3-8750-b1ba5aad8fee");
   assert.equal(await unternehmensIdAusSchluessel("bedrocan"), "6fe95d01-4deb-5ead-9614-1317775000db");
 });
+
+test("sql-erzeugen.py schreibt Vertreiber und Kultivar, nie importeur_id", async () => {
+  const { readFileSync } = await import("node:fs");
+  const py = readFileSync("scripts/stamm/sql-erzeugen.py", "utf8");
+  assert.match(py, /vertreiber_id/);
+  assert.match(py, /kultivar_id/);
+  assert.match(py, /INSERT OR IGNORE INTO kultivare/);
+  assert.doesNotMatch(py, /importeur_id\s*=/);
+  assert.doesNotMatch(py, /hersteller_id, importeur_id/);
+});

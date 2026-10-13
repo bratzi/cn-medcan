@@ -16,8 +16,11 @@ CREATE UNIQUE INDEX "kultivare_name_key" ON "kultivare"("name");
 ALTER TABLE "strains" ADD COLUMN "kultivar_id" TEXT REFERENCES "kultivare" ("id") ON DELETE SET NULL ON UPDATE CASCADE;
 ALTER TABLE "strains" ADD COLUMN "vertreiber_id" TEXT REFERENCES "unternehmen" ("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
+-- Ab hier Datenschritte. Sie sind wiederholbar (INSERT OR IGNORE, WHERE-Wächter),
+-- damit ein halb gelaufener Lauf beim erneuten Einspielen nichts zerstört:
+-- ein zweiter Lauf der Umschreibung würde sonst Vertreiber und Hersteller verlieren.
 -- Ein Kultivar je getrimmtem, kleingeschriebenem Namen; ohne Namen zählt der Handelsname.
-INSERT INTO "kultivare" ("id", "name")
+INSERT OR IGNORE INTO "kultivare" ("id", "name")
 SELECT lower(hex(randomblob(16))), min(trim(coalesce(nullif(trim("kultivar_name"), ''), "handelsname")))
 FROM "strains"
 GROUP BY lower(trim(coalesce(nullif(trim("kultivar_name"), ''), "handelsname")));
@@ -25,13 +28,16 @@ GROUP BY lower(trim(coalesce(nullif(trim("kultivar_name"), ''), "handelsname")))
 UPDATE "strains" SET "kultivar_id" = (
     SELECT k."id" FROM "kultivare" k
     WHERE k."name" = trim(coalesce(nullif(trim("strains"."kultivar_name"), ''), "strains"."handelsname"))
-);
+) WHERE "kultivar_id" IS NULL;
 
-UPDATE "strains" SET "vertreiber_id" = coalesce("importeur_id", "hersteller_id");
-UPDATE "strains" SET "hersteller_id" = CASE
-    WHEN "importeur_id" IS NOT NULL AND "hersteller_id" IS NOT NULL AND "importeur_id" <> "hersteller_id" THEN "hersteller_id"
-    ELSE NULL END;
-UPDATE "strains" SET "importeur_id" = NULL;
+-- Eine Anweisung: SQLite wertet alle SET-Ausdrücke gegen die alte Zeile aus.
+UPDATE "strains" SET
+    "vertreiber_id" = coalesce("importeur_id", "hersteller_id"),
+    "hersteller_id" = CASE
+        WHEN "importeur_id" IS NOT NULL AND "hersteller_id" IS NOT NULL AND "importeur_id" <> "hersteller_id" THEN "hersteller_id"
+        ELSE NULL END,
+    "importeur_id" = NULL
+WHERE "vertreiber_id" IS NULL;
 
 CREATE INDEX "strains_kultivar_id_idx" ON "strains"("kultivar_id");
 CREATE INDEX "strains_vertreiber_id_idx" ON "strains"("vertreiber_id");
@@ -64,4 +70,5 @@ ALTER TABLE "sorten_kennwerte" ADD COLUMN "qualitaet_anzahl" INTEGER NOT NULL DE
 -- Vorschläge: das bisherige Feld „Hersteller“ meinte die Marke, also den Vertreiber.
 ALTER TABLE "sorten_vorschlaege" ADD COLUMN "vertreiber" TEXT;
 ALTER TABLE "sorten_vorschlaege" ADD COLUMN "kultivar_id" TEXT REFERENCES "kultivare" ("id") ON DELETE SET NULL ON UPDATE CASCADE;
-UPDATE "sorten_vorschlaege" SET "vertreiber" = "hersteller", "hersteller" = NULL;
+UPDATE "sorten_vorschlaege" SET "vertreiber" = "hersteller", "hersteller" = NULL
+WHERE "vertreiber" IS NULL AND "hersteller" IS NOT NULL;

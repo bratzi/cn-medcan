@@ -156,7 +156,7 @@ export function KapitelAufschlag({
               </Link>
             </p>
             <p className="text-small text-text-muted">
-              {bluetenZeile(alle.bluetenZeile, alle.vertreiberUnbekannt,daten.zuletzt)}
+              {bluetenZeile(alle.bluetenZeile, alle.vertreiberUnbekannt, daten.zuletzt)}
             </p>
             <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
               {daten.zuletzt.gesamtnote !== null ? (

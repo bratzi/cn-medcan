@@ -59,3 +59,18 @@ test("0021: Kennwerte-Tabellen und Vorschlag-Felder", () => {
   assert.deepEqual(db.prepare(`SELECT vertreiber v, hersteller h, kultivar_id k FROM sorten_vorschlaege`).get(), { v: "Remexian", h: null, k: null });
   assert.throws(() => db.prepare(`INSERT INTO kultivare (id, name) VALUES ('x', 'BLACK CHERRY PUNCH')`).run(), /UNIQUE/);
 });
+
+test("0021: Datenschritte sind wiederholbar, ein zweiter Lauf ändert nichts", () => {
+  const db = alteDb();
+  const sql = readFileSync(join(process.cwd(), "migrations", "0021_vertreiber_kultivar.sql"), "utf8");
+  const daten = sql.match(/^(?:INSERT OR IGNORE INTO|UPDATE) [\s\S]*?;$/gm) ?? [];
+  assert.equal(daten.length, 4);
+  const stand = () => ({
+    strains: db.prepare(`SELECT s.id, s.hersteller_id h, s.importeur_id i, s.vertreiber_id v, k.name k FROM strains s LEFT JOIN kultivare k ON k.id = s.kultivar_id ORDER BY s.id`).all(),
+    kultivare: db.prepare(`SELECT name FROM kultivare ORDER BY name`).all(),
+    vorschlaege: db.prepare(`SELECT vertreiber v, hersteller h FROM sorten_vorschlaege`).all(),
+  });
+  const vorher = stand();
+  db.exec(daten.join("\n"));
+  assert.deepEqual(stand(), vorher);
+});
