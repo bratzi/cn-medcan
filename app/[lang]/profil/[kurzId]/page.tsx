@@ -66,6 +66,7 @@ export default async function OeffentlichesProfilPage({ params, searchParams }: 
           aktionen={[]}
           texte={s}
           sprache={sprache}
+          zahlenLabel={s.zahlenNeutral}
         />
       }
       reiter={

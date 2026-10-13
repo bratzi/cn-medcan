@@ -16,16 +16,21 @@ type Props = {
   aktionen: readonly { href: string; text: string; art: "primary" | "secondary" }[];
   texte: Woerterbuch["profil"]["seite"];
   sprache: Sprache;
+  /** Beschriftung der Zahlenliste; ohne Angabe „Deine Zahlen“ (eigenes Profil). */
+  zahlenLabel?: string;
 };
 
-const MONAT = { de: "de-DE", en: "en-GB" } as const;
+const MONAT = {
+  de: new Intl.DateTimeFormat("de-DE", { month: "long", year: "numeric", timeZone: "UTC" }),
+  en: new Intl.DateTimeFormat("en-GB", { month: "long", year: "numeric", timeZone: "UTC" }),
+};
 
 /**
  * Identität des Profils (Spec Profil Desktop 2026-10-13): ab 1080 px eine feste Spalte links,
  * darunter ein Kopfblock. Kein Hintergrundwort, keine Freisteller-Blüte.
  */
-export function ProfilSeitenleiste({ name, avatarId, rolle, seit, notizen, aromen, aktionen, texte, sprache }: Props) {
-  const datum = seit ? new Intl.DateTimeFormat(MONAT[sprache], { month: "long", year: "numeric", timeZone: "UTC" }).format(seit) : null;
+export function ProfilSeitenleiste({ name, avatarId, rolle, seit, notizen, aromen, aktionen, texte, sprache, zahlenLabel }: Props) {
+  const datum = seit ? MONAT[sprache].format(seit) : null;
   return (
     <div className="flex flex-col gap-8">
       <div className="flex items-center gap-6 min-[1080px]:flex-col min-[1080px]:items-start">
@@ -38,7 +43,7 @@ export function ProfilSeitenleiste({ name, avatarId, rolle, seit, notizen, arome
           </div>
         </div>
       </div>
-      <Randnotizen notizen={notizen} beschriftung={texte.zahlen} kompakt />
+      {notizen.length > 0 ? <Randnotizen notizen={notizen} beschriftung={zahlenLabel ?? texte.zahlen} kompakt /> : null}
       {aromen.length > 0 ? (
         <div className="flex flex-col gap-2">
           <p className="text-small text-text-muted">{texte.aromen}</p>

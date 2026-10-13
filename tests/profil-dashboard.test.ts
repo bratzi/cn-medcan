@@ -117,3 +117,9 @@ test("Aktivitaet: Wertzahl ist Geschwister der Säule, nicht in ihr", () => {
   const h = renderToStaticMarkup(createElement(Aktivitaet, { monate, texte: de.profil }));
   assert.match(h, /data-saeule=""[^>]*><\/div><span data-wert=""[^>]*bottom:calc\(100% \+ 8px\)/);
 });
+
+test("profilNotizen: Seitenleiste zeigt genau vier Zahlen, auch mit Community-Abstand", () => {
+  const zeilen = [z(4, "2026-10-02T10:00:00Z"), z(3, "2026-09-01T10:00:00Z")];
+  const n = profilNotizen({ zeilen, differenz: -0.4, hersteller: 2 }, de.profil.kapitel, "de", { ohneCommunity: true });
+  assert.deepEqual(n.map((x) => x.wort), ["bewertet", "im Schnitt", "Hersteller", "zuletzt"]);
+});

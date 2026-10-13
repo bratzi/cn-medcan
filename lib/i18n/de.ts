@@ -1041,6 +1041,7 @@ export const de = {
       aromen: "Mag am liebsten",
       reiterLeiste: "Bereiche des Profils",
       zahlen: "Deine Zahlen",
+      zahlenNeutral: "Zahlen",
       reiter: { uebersicht: "Übersicht", aromen: "Aromen", bewertungen: "Bewertungen", vertreiber: "Vertreiber" },
       bewerten: "Blüte bewerten",
       bearbeiten: "Profil bearbeiten",

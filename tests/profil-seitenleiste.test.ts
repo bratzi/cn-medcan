@@ -1,5 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 
@@ -69,4 +70,45 @@ test("Reiter: Links, aktiver mit aria-current, Übersicht ohne Query", () => {
   assert.match(html, /<nav[^>]*aria-label="Bereiche des Profils"/);
   assert.match(html, /href="\/profil"[^>]*>Übersicht/);
   assert.match(html, /href="\/profil\?ansicht=aromen"[^>]*aria-current="page"|aria-current="page"[^>]*href="\/profil\?ansicht=aromen"/);
+});
+
+test("Seitenleiste: eigene Beschriftung der Zahlen, leere Notizen ohne Liste, Identität ohne aside", () => {
+  const basis = {
+    name: "Anna",
+    avatarId: null,
+    rolle: "mitglied" as const,
+    seit: null,
+    aromen: [],
+    aktionen: [],
+    texte: de.profil.seite,
+    sprache: "de" as const,
+  };
+  const mit = renderToStaticMarkup(
+    createElement(ProfilSeitenleiste, { ...basis, notizen: [{ zahl: "1", wort: "bewertet", satz: "1 Bewertung" }], zahlenLabel: de.profil.seite.zahlenNeutral }),
+  );
+  assert.match(mit, /aria-label="Zahlen"/);
+  assert.doesNotMatch(mit, /Deine Zahlen/);
+  assert.doesNotMatch(renderToStaticMarkup(createElement(ProfilSeitenleiste, { ...basis, notizen: [] })), /<ul/);
+});
+
+test("ProfilRahmen: Spalte scrollt in sich und ist keine unbeschriftete aside", () => {
+  const q = readFileSync("components/profil/ProfilRahmen.tsx", "utf8");
+  assert.match(q, /min-\[1080px\]:sticky/);
+  assert.match(q, /min-\[1080px\]:max-h-\[calc\(100svh-var\(--kopf-h,4rem\)-4rem\)\]/);
+  assert.match(q, /min-\[1080px\]:overflow-y-auto/);
+  assert.match(q, /min-\[1080px\]:overscroll-contain/);
+  assert.doesNotMatch(q, /<aside/);
+});
+
+test("Profil: Fallback der Seitenleiste kennt Rolle und Aktionen, Community füllt die Reihe ohne Schnitte", () => {
+  const q = readFileSync("app/[lang]/profil/page.tsx", "utf8");
+  assert.doesNotMatch(q, /rolle=\{null\}/);
+  assert.doesNotMatch(q, /aktionen=\{\[\]\}/);
+  assert.match(q, /ohneCommunity: true/);
+  assert.match(q, /a\.schnitte \? undefined : "min-\[1280px\]:col-span-2"/);
+});
+
+test("Öffentliches Profil: neutrale Beschriftung der Zahlen", () => {
+  const q = readFileSync("app/[lang]/profil/[kurzId]/page.tsx", "utf8");
+  assert.match(q, /zahlenLabel=\{s\.zahlenNeutral\}/);
 });

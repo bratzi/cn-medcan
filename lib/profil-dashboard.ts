@@ -68,6 +68,8 @@ export function profilNotizen(
   { zeilen, differenz, hersteller }: { zeilen: readonly AuswertungsZeile[]; differenz: number | null; hersteller: number },
   texte: Woerterbuch["profil"]["kapitel"],
   sprache: Sprache,
+  /** Seitenleiste: vier Zahlen, der Abstand zur Community steht im Vertreiber-Reiter. */
+  { ohneCommunity = false }: { ohneCommunity?: boolean } = {},
 ): Randnotiz[] {
   const anzahl = String(zeilen.length);
   const notizen: Randnotiz[] = [{ zahl: anzahl, wort: texte.bewertet, satz: mehrzahl(sprache, texte.srBewertet, zeilen.length) }];
@@ -75,7 +77,7 @@ export function profilNotizen(
 
   const schnitt = formatiereZahl(zeilen.reduce((s, z) => s + noteOderErsatz(z), 0) / zeilen.length, 1, sprache);
   notizen.push({ zahl: schnitt, wort: texte.schnitt, satz: t(texte.srSchnitt, { zahl: schnitt }) });
-  if (differenz !== null) {
+  if (differenz !== null && !ohneCommunity) {
     // Vorzeichen am gerundeten Wert, damit nie „±0,0“ entsteht.
     const gerundet = Math.round(Math.abs(differenz) * 10) / 10;
     const betrag = formatiereZahl(gerundet, 1, sprache);

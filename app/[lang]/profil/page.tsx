@@ -21,6 +21,7 @@ import { buttonKlassen } from "@/components/ui";
 import { registerAnsicht, registerParameter } from "@/lib/bewertungs-register";
 import { begruendungText } from "@/lib/empfehlung-text";
 import { holeSprache, holeWoerterbuch } from "@/lib/i18n";
+import type { Woerterbuch } from "@/lib/i18n/typen";
 import { auswertungen, leereProfilWerte } from "@/lib/profil";
 import { ansichtAus, liebsteAromen, PROFIL_ANSICHTEN } from "@/lib/profil-ansicht";
 import { monatsReihe, notenVerteilung, profilNotizen } from "@/lib/profil-dashboard";
@@ -81,6 +82,8 @@ export default async function ProfilPage({ searchParams }: { searchParams: Promi
   const register = registerParameter(parameter);
   const id = mitglied.mitgliedId;
   const s = w.profil.seite;
+  const rolleKennung = mitglied.rolle === "ADMIN" ? "betreiber" : "mitglied";
+  const aktionen = seitenAktionen(s);
 
   return (
     <ProfilRahmen
@@ -90,11 +93,11 @@ export default async function ProfilPage({ searchParams }: { searchParams: Promi
             <ProfilSeitenleiste
               name={mitglied.anzeigename}
               avatarId={mitglied.avatarId}
-              rolle={null}
+              rolle={rolleKennung}
               seit={mitglied.erstelltAm}
               notizen={[]}
               aromen={[]}
-              aktionen={[]}
+              aktionen={aktionen}
               texte={s}
               sprache={sprache}
             />
@@ -104,7 +107,7 @@ export default async function ProfilPage({ searchParams }: { searchParams: Promi
             id={id}
             name={mitglied.anzeigename}
             avatarId={mitglied.avatarId}
-            rolle={mitglied.rolle === "ADMIN" ? "betreiber" : "mitglied"}
+            rolle={rolleKennung}
             seit={mitglied.erstelltAm}
           />
         </Suspense>
@@ -145,6 +148,14 @@ export default async function ProfilPage({ searchParams }: { searchParams: Promi
   );
 }
 
+/** Die zwei Wege der Seitenleiste; auch im Suspense-Fallback bekannt. */
+function seitenAktionen(s: Woerterbuch["profil"]["seite"]) {
+  return [
+    { href: "/blueten", text: s.bewerten, art: "primary" },
+    { href: "/mitglied", text: s.bearbeiten, art: "secondary" },
+  ] as const;
+}
+
 /** Identität links: Zahlen als Randnotizen und die liebsten Aromen aus dem gespeicherten Profil. */
 async function Seitenleiste({
   id,
@@ -165,7 +176,7 @@ async function Seitenleiste({
   if (zeilen !== null) {
     const a = auswertungen(zeilen);
     const hersteller = new Set(zeilen.map((z) => z.hersteller).filter(Boolean)).size;
-    notizen = profilNotizen({ zeilen, differenz: a.community.differenz, hersteller }, w.profil.kapitel, sprache);
+    notizen = profilNotizen({ zeilen, differenz: a.community.differenz, hersteller }, w.profil.kapitel, sprache, { ohneCommunity: true });
   }
   const aromen = liebsteAromen((profil?.werte ?? leereProfilWerte()).geschmack).map((a) => w.label.geschmack[a]);
   return (
@@ -176,10 +187,7 @@ async function Seitenleiste({
       seit={seit}
       notizen={notizen}
       aromen={aromen}
-      aktionen={[
-        { href: "/blueten", text: s.bewerten, art: "primary" },
-        { href: "/mitglied", text: s.bearbeiten, art: "secondary" },
-      ]}
+      aktionen={seitenAktionen(s)}
       texte={s}
       sprache={sprache}
     />
@@ -269,7 +277,7 @@ async function AnsichtVertreiber({ id }: { id: string }) {
           <Schnitte daten={a.schnitte} texte={texte} noten={w.schema.noten} sprache={sprache} />
         </Feld>
       ) : null}
-      <Feld id="community" rahmen="karte" groesse="klein" titel={texte.communityTitel} kopf={texte.koepfe.community} ton="lila">
+      <Feld id="community" rahmen="karte" groesse="klein" titel={texte.communityTitel} kopf={texte.koepfe.community} ton="lila" className={a.schnitte ? undefined : "min-[1280px]:col-span-2"}>
         <CommunityVergleich daten={a.community} texte={texte} sprache={sprache} />
       </Feld>
     </div>
