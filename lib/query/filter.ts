@@ -52,7 +52,9 @@ const slugListe = z
       .flatMap((teil) => teil.split(","))
       .map((teil) => teil.trim().toLowerCase())
       .filter((teil) => /^[a-z0-9-]{1,80}$/.test(teil));
-    return [...new Set(teile)];
+    // D1 erlaubt hoechstens 100 gebundene Parameter je Statement; eine manipulierte URL mit
+    // vielen Slugs darf die Bluetenansicht nicht in einen Fehler laufen lassen.
+    return [...new Set(teile)].slice(0, 20);
   })
   .catch([] as string[]);
 

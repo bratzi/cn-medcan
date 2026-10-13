@@ -36,3 +36,9 @@ test("strains.ts: baueWhere exportiert, filtert kultivarId, Liste trägt kultiva
   assert.match(q, /kultivarId: zeile\.kultivarId/);
   assert.match(q, /vertreiberId: zeile\.vertreiberId/);
 });
+
+test("Slug-Listen: höchstens 20 Einträge, damit D1 nicht über 100 Parameter kommt", () => {
+  const viele = Array.from({ length: 30 }, (_, i) => `v${i}`).join(",");
+  assert.equal(parseStrainFilter({ vertreiber: viele }).vertreiber.length, 20);
+  assert.equal(parseStrainFilter({ apotheke: viele }).apotheke.length, 20);
+});
