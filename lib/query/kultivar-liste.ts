@@ -113,3 +113,10 @@ export async function ladeKultivarListe(filter: StrainFilter, fachkreis: boolean
     seitenAnzahl: Math.max(1, Math.ceil(gesamt / TREFFER_PRO_SEITE)),
   };
 }
+
+/** Name einer Blüte für den Filter-Chip; null, wenn die Id unbekannt ist. */
+export async function ladeKultivarName(id: string): Promise<string | null> {
+  const prisma = await getPrisma();
+  const k = await prisma.kultivar.findUnique({ where: { id }, select: { name: true } });
+  return k?.name ?? null;
+}

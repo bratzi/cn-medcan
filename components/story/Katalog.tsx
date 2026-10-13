@@ -7,6 +7,7 @@ import { ProduktCard } from "@/components/produkt/ProduktCard";
 import { KatalogSkelett } from "@/components/story/Skelette";
 import { EmptyState, buttonKlassen } from "@/components/ui";
 import { leererFilter } from "@/lib/query/filter";
+import { ladeVertreiberJeKultivar, weitereVertreiber } from "@/lib/query/kultivar-liste";
 import { ladeStrainListe } from "@/lib/query/strains";
 import { sicher } from "@/lib/sicher";
 import { holeSprache, holeWoerterbuch, type Woerterbuch } from "@/lib/i18n";
@@ -44,6 +45,13 @@ async function Reihe() {
   // Budpics (T9): fehlt die Abfrage, bleiben die Karten mit Musterbild stehen.
   const budpics = await sicher(() => ladeFreieBudpics(eintraege.map((e) => e.id)), new Map(), "Katalog-Budpics");
 
+  // Fehlt die Abfrage, bleiben die Karten ohne den Link auf weitere Vertreiber stehen.
+  const jeKultivar = await sicher(
+    () => ladeVertreiberJeKultivar(eintraege.flatMap((e) => (e.kultivarId ? [e.kultivarId] : []))),
+    new Map<string, Set<string>>(),
+    "Katalog-Vertreiber",
+  );
+
   if (eintraege.length === 0) {
     return (
       // Kasten wie die Leerzustaende der Nachbar-Sektionen, bis Welle 2 den Katalog umbaut.
@@ -69,6 +77,7 @@ async function Reihe() {
             className="w-full"
             budpics={alsDiashow(budpics.get(strain.id) ?? [], w, sprache)}
             zugang="im-browser"
+            weitereVertreiber={weitereVertreiber(strain, jeKultivar)}
           />
         </li>
       ))}

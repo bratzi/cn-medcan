@@ -2,10 +2,12 @@ import Link from "next/link";
 
 import { Bild } from "@/components/medien/Bild";
 import { Badge, Card, CardBody, CardFooter } from "@/components/ui";
+import { einzelLinkKlassen } from "@/components/ui/textlink";
 import { CannabinoidBar } from "@/components/produkt/CannabinoidBar";
 import { TerpenChips } from "@/components/produkt/TerpenChips";
 import { cn } from "@/lib/cn";
 import type { Sprache } from "@/lib/i18n/sprache-kern";
+import { mehrzahl } from "@/lib/i18n/text";
 import type { Woerterbuch } from "@/lib/i18n/typen";
 import { BudpicBeitragen, type BudpicZugang } from "@/components/produkt/BudpicBeitragen";
 import { BudpicBeitragenImBrowser } from "@/components/produkt/BudpicBeitragenImBrowser";
@@ -24,13 +26,15 @@ type Props = {
   budpics?: readonly DiashowBild[];
   /** Wer schaut, fuer "Bild beitragen". "im-browser": statische Startseite, aus /api/startseite. */
   zugang?: BudpicZugang | "im-browser";
+  /** Andere Vertreiber derselben Blüte (Spec 2.2); 0 oder fehlend: kein Link. */
+  weitereVertreiber?: number;
 };
 
 /**
  * Produktkarte der Uebersicht. Server Component - keine Interaktivitaet
  * ausser dem umschliessenden Link.
  */
-export function ProduktCard({ strain, w, sprache, className, budpics = [], zugang = "gast" }: Props) {
+export function ProduktCard({ strain, w, sprache, className, budpics = [], zugang = "gast", weitereVertreiber = 0 }: Props) {
   // Apotheken und Preise seit 2026-09-25 nur in Aussicht (Nutzer): keine Badges, kein Preis.
   // Ohne echtes Bild ein Musterbild: das gesetzte, sonst eines je Sorte stabil ueber den Slug (T9).
   const bild = blueteBild(strain.herstellerBildPfad) ?? musterBildId(strain.slug);
@@ -98,8 +102,15 @@ export function ProduktCard({ strain, w, sprache, className, budpics = [], zugan
       </CardBody>
 
       <CardFooter className="flex flex-wrap items-center justify-between gap-4">
-        <span className="text-small text-text-muted">
-          {strain.vertreiberName ?? w.katalog.karte.vertreiberUnbekannt}
+        <span className="flex min-w-0 flex-col gap-2">
+          <span className="text-small text-text-muted wrap-break-word">
+            {strain.vertreiberName ?? w.katalog.karte.vertreiberUnbekannt}
+          </span>
+          {weitereVertreiber > 0 && strain.kultivarId ? (
+            <Link prefetch={false} href={`/blueten?kultivar=${strain.kultivarId}`} className={einzelLinkKlassen()}>
+              {mehrzahl(sprache, w.katalog.karte.weitereVertreiber, weitereVertreiber)}
+            </Link>
+          ) : null}
         </span>
         {zugang === "im-browser" ? (
           <BudpicBeitragenImBrowser

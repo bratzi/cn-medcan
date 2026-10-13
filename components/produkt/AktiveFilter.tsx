@@ -13,6 +13,8 @@ type Props = {
   apothekenNamen?: ReadonlyMap<string, string>;
   /** Id zu Name der Vertreiber (Spec 2026-10-13). */
   vertreiberNamen?: ReadonlyMap<string, string>;
+  /** Name der Blüte zum Filter kultivar; null: unbekannt. */
+  kultivarName?: string | null;
   w: Woerterbuch;
   sprache: Sprache;
 };
@@ -33,7 +35,7 @@ const STANDARD = leererFilter();
  * Aktive Filter als entfernbare Chips. Server Component: jeder Chip ist ein
  * normaler Link auf die Query ohne diesen Wert — funktioniert ohne JavaScript.
  */
-export function AktiveFilter({ filter, apothekenNamen, vertreiberNamen, w, sprache }: Props) {
+export function AktiveFilter({ filter, apothekenNamen, vertreiberNamen, kultivarName, w, sprache }: Props) {
   if (istFilterLeer(filter)) return null;
   const texte = w.katalog.aktiv;
 
@@ -128,6 +130,16 @@ export function AktiveFilter({ filter, apothekenNamen, vertreiberNamen, w, sprac
       text: t(texte.vertreiber, { wert: name }),
       beschreibung: t(texte.vertreiberBeschreibung, { wert: name }),
       ziel: ohne({ vertreiber: filter.vertreiber.filter((wert) => wert !== id) }),
+    });
+  }
+
+  if (filter.kultivar) {
+    const name = kultivarName ?? texte.vertreiberUnbekannt;
+    chips.push({
+      schluessel: "kultivar",
+      text: t(texte.kultivar, { wert: name }),
+      beschreibung: t(texte.kultivarBeschreibung, { wert: name }),
+      ziel: ohne({ kultivar: undefined }),
     });
   }
 
