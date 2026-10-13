@@ -56,7 +56,7 @@ Nutzer 2026-10-13: Blüte = Kultivar über alle Vertreiber; der bisherige „Her
 Overall/Terpene zählen für die Blüte, Qualität/Restfeuchte/Frische der Charge für den Vertreiber; Profil am PC
 neu (Kopf hässlich, Menü verloren). Specs und Pläne: `docs/superpowers/specs/2026-10-13-vertreiber-bewertung-design.md`,
 `…-profil-desktop-design.md`, Pläne gleichnamig unter `docs/superpowers/plans/`. Umgesetzt per Subagent-Driven
-Development in zwei Worktrees (`C:\cn-wtertreiber`, `C:\cn-wt\profil`), je Aufgabe Review, je Branch Gesamtreview.
+Development in zwei Worktrees (`C:\cn-wt\vertreiber`, `C:\cn-wt\profil`), je Aufgabe Review, je Branch Gesamtreview.
 
 - **Plan B (Profil/Kopf) live seit `6a84d1b`:** Kopfleiste überall mit Fläche und Linie, über dem Hero der Startseite
   durchsichtig (CSS `:has([data-story="auftakt"])`, ohne JS). Profil: Seitenleiste links (Avatar, Name, Rolle,
@@ -68,7 +68,7 @@ Development in zwei Worktrees (`C:\cn-wtertreiber`, `C:\cn-wt\profil`), je Aufg
   geleert (Spalte bleibt, FK). Kennwerte je Kultivar/Vertreiber, Achse Frische (ohne Sweet Spot), Filter `vertreiber`
   (alte `?hersteller=` gehen weiter), Blütenseite mit „Deine Ware ist von …“ und „Diese Blüte bei anderen
   Vertreibern“, Vorschlag/Admin mit Kultivar/Vertreiber/Hersteller, Profil „Deine Vertreiber“ (Qualität), Startseite
-  „Blüte · Vertreiber“. Backup vor 0021: `C:\cn-wtackup-0021\strains-vor-0021.json` (id, hersteller_id, importeur_id).
+  „Blüte · Vertreiber“. Backup vor 0021: `C:\cn-wt\backup-0021\strains-vor-0021.json` (id, hersteller_id, importeur_id).
   1002 Tests grün.
 
 **ALS ERSTES (offen):**
