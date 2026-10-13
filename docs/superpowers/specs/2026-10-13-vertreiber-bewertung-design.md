@@ -37,7 +37,8 @@ den Vertreiber, von dem die Ware stammt.
 
 Migration `0021_vertreiber_kultivar.sql`, vorwärts gerichtet, ohne Datenverlust:
 
-- **Neue Tabelle `kultivare`**: `id`, `slug` (unique), `name` (unique, getrimmt), `erstellt_am`.
+- **Neue Tabelle `kultivare`**: `id`, `name` (unique, `COLLATE NOCASE`, getrimmt), `erstellt_am`. Kein Slug:
+  es gibt keine eigene Kultivar-Seite (siehe „Nicht in diesem Teilprojekt“).
 - **`strains.kultivar_id`** (nullable in der Migration, danach im Code als gesetzt behandelt):
   Rückfüllung je `lower(trim(kultivar_name))`. Handelsnamen ohne Kultivarnamen bekommen einen eigenen
   Kultivar mit ihrem Handelsnamen. Index auf `kultivar_id`.
@@ -45,8 +46,9 @@ Migration `0021_vertreiber_kultivar.sql`, vorwärts gerichtet, ohne Datenverlust
   Rückfüllung: `coalesce(importeur_id, hersteller_id)`.
 - **`strains.hersteller_id`** bleibt die Spalte für den echten Hersteller. Rückfüllung: nur behalten,
   wenn `importeur_id` gesetzt war und sich von `hersteller_id` unterscheidet, sonst `NULL`.
-- **`strains.importeur_id`** entfällt nach der Rückfüllung. SQLite: Spalte per `ALTER TABLE … DROP
-  COLUMN`, vorher den Index entfernen.
+- **`strains.importeur_id`** wird nach der Rückfüllung geleert und nicht mehr gelesen. Die Spalte bleibt
+  stehen: sie steckt im Fremdschlüssel der Tabellendefinition, SQLite kann sie nicht per `DROP COLUMN`
+  entfernen. Im Prisma-Schema als veraltet kommentiert.
 - **`unternehmen.rolle`** bleibt als Hinweis, steuert aber nichts mehr. Ein Unternehmen kann Hersteller
   und Vertreiber zugleich sein. `@@unique([name, rolle])` bleibt bestehen, damit die Migration keine
   Zusammenführung braucht.
@@ -54,8 +56,11 @@ Migration `0021_vertreiber_kultivar.sql`, vorwärts gerichtet, ohne Datenverlust
   Ware wirkt: alt und heuig oder frisch verpackt“). JSON-Feld, keine Migration.
 - **Kennwerte:** `SortenKennwerte` (Mediane je Handelsname) bleibt. Neu ist `kultivar_kennwerte` mit
   denselben Medianen für Terpene und Geschmack, über alle Handelsnamen des Kultivars. Neu ist
-  `vertreiber_kennwerte` mit Mittel je Beschaffenheitsachse, Median der Restfeuchte und Anzahl der
-  Bewertungen. Beide werden beim Speichern und Freigeben einer Bewertung fortgeschrieben, wie heute
+  `vertreiber_kennwerte` mit Qualitäts-Schnitt (0 bis 5), Mittel je Beschaffenheitsachse, Median der Restfeuchte
+  und Anzahl der Bewertungen. Dieselben drei Werte bekommt `sorten_kennwerte` je Handelsname
+  (Spalten `qualitaet_mittel`, `restfeuchte_median`, `qualitaet_anzahl`). Qualitäts-Schnitt: je Achse
+  `qualitaetsScore` (Sweet Spot in der Mitte), für Frische `wert / 5` (mehr ist besser), gemittelt
+  und mal 5. Beide werden beim Speichern und Freigeben einer Bewertung fortgeschrieben, wie heute
   `SortenKennwerte` (Rechnung in Schreibschicht, kein Cron).
 
 Einspielen: Claude selbst mit `npx wrangler d1 execute cn-medcan-db --remote --file` (Memory
@@ -69,7 +74,7 @@ Die Bewertung findet weiter auf der Blütenseite eines Handelsnamens statt (`/bl
   Handelsnamen desselben Kultivars, je mit Vertreibername und Handelsname. Die Wahl führt auf die
   Blütenseite dieses Handelsnamens (Link, kein Formularwechsel, damit Charge und Kennwerte stimmen).
   Gibt es nur einen, steht der Vertreiber als Text.
-- **„Vertreiber fehlt?“** führt auf `/vorschlagen?kultivar=<slug>`. Der Sortenvorschlag bekommt das
+- **„Vertreiber fehlt?“** führt auf `/vorschlagen?kultivar=<kultivarId>`. Der Sortenvorschlag bekommt das
   Feld Kultivar (vorbelegt) und die Felder Vertreiber und Hersteller (Hersteller optional). Die
   Freigabe im Admin legt den Handelsnamen unter diesem Kultivar an.
 - **Schritte der Maske** bekommen sichtbare Zuordnung:
@@ -81,15 +86,16 @@ Die Bewertung findet weiter auf der Blütenseite eines Handelsnamens statt (`/bl
 
 ## Anzeige
 
-- **Blütenseite:** Kopf zeigt Kultivar als Blüte, darunter „von <Vertreiber>“, Hersteller nur wenn
-  bekannt („angebaut von <Hersteller>“). Neuer Abschnitt **„Diese Blüte bei anderen Vertreibern“**:
+- **Blütenseite:** Das Titelblatt behält den Handelsnamen als Titel und den Kultivar darunter. Neu ist
+  die Zeile „von <Vertreiber>“, der Hersteller nur, wenn bekannt („angebaut von <Hersteller>“). In den
+  Angaben heißen die Zeilen Vertreiber und Hersteller (statt Hersteller und Importeur). Neuer Abschnitt **„Diese Blüte bei anderen Vertreibern“**:
   je Handelsname des Kultivars eine Zeile mit Vertreiber, Qualitäts-Schnitt (Blätter), Restfeuchte
   (Median) und Zahl der Bewertungen, sortiert nach Zahl der Bewertungen. Neutral, kein Kauf- oder
   Apothekenlink (HWG).
 - **Community-Werte auf der Blütenseite:** Aroma und Terpene aus `kultivar_kennwerte`, Qualität aus
   `vertreiber_kennwerte` des angezeigten Handelsnamens.
 - **Katalog:** bleibt je Handelsname (eine Karte je Ware). Filter „Hersteller“ wird zu „Vertreiber“,
-  URL-Parameter `vertreiber`. Alte Links mit `hersteller=` leiten auf `vertreiber=` um (gleiche Ids).
+  URL-Parameter `vertreiber`. Alte Links mit `hersteller=` werden weiter gelesen und filtern nach Vertreiber (gleiche Ids).
   Karte zeigt den Vertreiber.
 - **Profil:** „Deine Hersteller“ wird „Deine Vertreiber“: Qualitäts-Schnitt deiner Chargen je
   Vertreiber statt Gesamtnote, verlinkt auf den gefilterten Katalog. Teilprojekt B setzt das Feld in

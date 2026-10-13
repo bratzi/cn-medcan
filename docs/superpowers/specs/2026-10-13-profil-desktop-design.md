@@ -42,7 +42,7 @@ nicht wie ein Profil aus.
 Rahmen `max-w-360 mx-auto`, Raster `grid-cols-[20rem_1fr]` mit `gap-12`.
 
 **Seitenleiste** (`components/profil/ProfilSeitenleiste.tsx`, `sticky top-<Kopfhöhe>`):
-- Avatar 160 px, Name in Buchschrift (`text-h1`), Rolle als Badge, „dabei seit <Monat Jahr>“.
+- Avatar 128 px (Größe `lg`), Name in Buchschrift (`text-h1`), Rolle als Badge, „dabei seit <Monat Jahr>“.
 - Die vier Zahlen als 2×2-Raster: Zahl gedruckt, Wort von Hand darunter (bestehende
   `Randnotizen`, neue Variante `kompakt` mit fester Spaltenbreite).
 - Zwei liebste Aromen als Chips mit Icon.
