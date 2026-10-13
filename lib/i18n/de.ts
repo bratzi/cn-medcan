@@ -175,6 +175,7 @@ export const de = {
       budDichte: { label: "Bud-Dichte", links: "weich", rechts: "fest", hinweis: "Wie fest die Blüte ist: weich und luftig oder dicht und hart." },
       terpenDichte: { label: "Terpendichte", links: "wenig", rechts: "viel", hinweis: "Wie dicht das Aroma sitzt: kaum Duft oder satt beim Öffnen." },
       trichomFarbe: { label: "Trichomfarbe", links: "klar", rechts: "bernstein", hinweis: "Reife der Trichome: klar, milchig, bernstein." },
+      frische: { label: "Frische", links: "abgestanden", rechts: "frisch", hinweis: "Wie frisch die Ware wirkt: alt und heuig oder frisch verpackt." },
     },
     feuchte: {
       unbekannt: "Keine Angabe zur Restfeuchte vorhanden.",
@@ -246,7 +247,7 @@ export const de = {
       terpz: "Terpz",
       qualitaet: "Qualität",
       dieseCharge: "Diese Charge",
-      chargeSatz: "Die Qualität gehört zur Charge, nicht zur Sorte. Die Mitte ist der Sweet Spot.",
+      chargeSatz: "Qualität, Restfeuchte und Frische gehören zur Charge und zum Vertreiber, nicht zur Blüte. Bei den übrigen Achsen ist die Mitte der Sweet Spot.",
       naehe: "Nähe zur Herstellerangabe:",
       deinEindruck: "Dein Eindruck:",
       anleitung: "Zieh die lila Punkte links in der Karte: zu wenig, genau richtig oder zu viel? Die Mitte ist der Sweet Spot. Dazu leuchten die Terpene dieser Sorte auf, die die Richtung tragen.",

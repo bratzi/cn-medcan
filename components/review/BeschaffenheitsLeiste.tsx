@@ -236,6 +236,7 @@ export function BeschaffenheitsLeiste({
         {achsen.map((achse) => {
           const mittel = werte[achse.key];
           const wert = bedienung?.eigen[achse.key] ?? mittel ?? 2.5;
+          const mitSweetSpot = sweetSpot && achse.sweetSpot;
           return (
             <div key={achse.key} className="flex flex-col gap-1.5">
               <div className="flex items-baseline justify-between gap-4">
@@ -249,13 +250,13 @@ export function BeschaffenheitsLeiste({
                 schritt={0.1}
                 ring={bedienung ? mittel : undefined}
                 wertText={(wert) => t(texte.aroma.vonFuenf, { wert: formatiereWert(wert, texte.sprache) })}
-                mitte={sweetSpot ? QUALITAET_MITTE : undefined}
+                mitte={mitSweetSpot ? QUALITAET_MITTE : undefined}
                 aendern={bedienung ? (neu) => bedienung.aendern(achse.key, neu) : undefined}
               />
               {/* Drei gleiche Spalten: die Mittenmarke steht genau unter der Skalenmitte (2,5 von 5). */}
-              <div aria-hidden="true" className={cn("text-caption text-text-muted", sweetSpot ? "grid grid-cols-3" : "flex justify-between")}>
+              <div aria-hidden="true" className={cn("text-caption text-text-muted", mitSweetSpot ? "grid grid-cols-3" : "flex justify-between")}>
                 <span>{texte.schema.beschaffenheit[achse.key].links}</span>
-                {sweetSpot ? <span className="text-center font-medium text-text">{texte.aroma.sweetSpot.marke}</span> : null}
+                {mitSweetSpot ? <span className="text-center font-medium text-text">{texte.aroma.sweetSpot.marke}</span> : null}
                 <span className="text-right">{texte.schema.beschaffenheit[achse.key].rechts}</span>
               </div>
             </div>

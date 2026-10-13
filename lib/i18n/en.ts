@@ -171,6 +171,7 @@ export const en: Woerterbuch = {
       budDichte: { label: "Bud density", links: "soft", rechts: "firm", hinweis: "How firm the flower is: soft and airy or dense and hard." },
       terpenDichte: { label: "Terpene density", links: "little", rechts: "a lot", hinweis: "How dense the aroma is: barely any scent or rich on opening." },
       trichomFarbe: { label: "Trichome colour", links: "clear", rechts: "amber", hinweis: "Maturity of the trichomes: clear, milky, amber." },
+      frische: { label: "Freshness", links: "stale", rechts: "fresh", hinweis: "How fresh the product feels: old and hay-like or freshly packed." },
     },
     feuchte: {
       unbekannt: "No information on residual moisture.",
@@ -240,7 +241,7 @@ export const en: Woerterbuch = {
       terpz: "Terpz",
       qualitaet: "Quality",
       dieseCharge: "This batch",
-      chargeSatz: "Quality belongs to the batch, not to the strain. The middle is the sweet spot.",
+      chargeSatz: "Quality, moisture and freshness belong to the batch and the distributor, not to the flower. On the other axes the middle is the sweet spot.",
       naehe: "Match with the producer's information:",
       deinEindruck: "Your impression:",
       anleitung: "Drag the purple dots on the left of the map: too little, just right or too much? The middle is the sweet spot. The terpenes of this strain that carry the flavour light up.",
