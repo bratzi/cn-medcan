@@ -541,6 +541,18 @@
   font-size: min(1.75rem, 30cqi);
 }
 
+/* Sprungziele im Profil (Spec Profil und Konto vereint 3.1): Feldtitel landen unter Seitenkopf und
+   Profilkopf statt darunter. Ab 1080 px klebt der Profilkopf (bis rund 176 px) unter dem Seitenkopf. */
+[data-feld] [id$="-titel"] {
+  scroll-margin-top: 6rem;
+}
+
+@media (width >= 67.5rem) {
+  [data-feld] [id$="-titel"] {
+    scroll-margin-top: 16rem;
+  }
+}
+
 @media (prefers-reduced-motion: no-preference) {
   /* Hierarchie: das Kapitel beginnt mit deinem Namen. */
   :root:not([data-sparmodus]) .kapitel-name {

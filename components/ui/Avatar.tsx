@@ -2,12 +2,13 @@ import { NutzerBild } from "@/components/medien/Bild";
 import { avatarFarbe, initialen } from "@/lib/avatar";
 import { cn } from "@/lib/cn";
 
-export type AvatarGroesse = "sm" | "md" | "lg";
+export type AvatarGroesse = "sm" | "md" | "kopf" | "lg";
 
-/** Feste Kantenlaengen im 8px-Raster: 32, 40 und 128 px (die Quelle ist 128 px). */
+/** Feste Kantenlaengen im 8px-Raster: 32, 40, 64 (Profilkopf) und 128 px (die Quelle ist 128 px). */
 const GROESSE: Record<AvatarGroesse, { klasse: string; seite: number; schrift: string }> = {
   sm: { klasse: "size-8", seite: 32, schrift: "text-caption" },
   md: { klasse: "size-10", seite: 40, schrift: "text-small" },
+  kopf: { klasse: "size-16", seite: 64, schrift: "text-h3" },
   lg: { klasse: "size-32", seite: 128, schrift: "text-h1" },
 };
 
