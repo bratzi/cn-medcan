@@ -3,7 +3,7 @@
 > Übergabemedium zwischen Sessions. Wird nach jedem Arbeitsblock aktualisiert und committet.
 > Wer hier weiterarbeitet, liest diese Datei zuerst und braucht den Chatverlauf nicht.
 
-**Letzte Aktualisierung:** 2026-10-14 (Session 60)
+**Letzte Aktualisierung:** 2026-10-14 (Session 61)
 **Repo:** https://github.com/bratzi/cn-medcan (public)
 **Branch:** `main` (Makeover „Grünes Buch“ Teilprojekt 1 ist seit 2026-09-24 auf `main`)
 
@@ -27,6 +27,25 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 ---
 
 ## ⇢ Hier geht es weiter
+
+### ⇢ SESSION 61 (2026-10-14): Instagram-Entwürfe per Skript, Live-Fixes (`077eceb..01933b6`)
+
+Spec `docs/superpowers/specs/2026-10-14-ig-karten-cowork-design.md`, Plan `docs/superpowers/plans/2026-10-14-ig-karten-cowork.md`
+(beide freigegeben, native ausgeführt). 1108 Tests grün, tsc sauber.
+- **IG-Feed:** Umfragen vorerst raus (Nutzer). Jede Review hat Feld `karte` = `/api/ig-karte/<id>` (ohne Schlüssel).
+- **Karte:** `GET /api/ig-karte/<id>?key=…` liefert HTML 1080 × 1350 (Logo mit „of“, Name, Vertreiber, Note in Handschrift,
+  Aromen, Zitat, Charge). Kein PNG im Worker (10 ms CPU). Proxy-Regel `igFeedSchluessel` gilt für Feed und Karte.
+  Zitat entfällt bei HWG-Treffer oder strengerer `IG_SPERRE` (Wirkung, Rausch, Konsum, THC/CBD).
+- **Publora:** Konto eingerichtet, Instagram `bookofterpz` verbunden (Token bis 2026-12-13, dann Reconnect), Free 15 Posts/Monat.
+  `PUBLORA_API_KEY` und `INSTAGRAM_PLATFORM_ID` in `.env` (lokal).
+- **Cowork geht auf dem Firmen-PC nicht:** Windows-Feature VirtualMachinePlatform aus, Nutzer ohne Admin. Anweisung liegt
+  trotzdem in `docs/instagram/cowork-anweisung.md`. Stattdessen **Skript** `scripts/ig-entwuerfe.ts` (Edge headless Screenshot,
+  Caption-Vorlage `lib/ig-caption.ts`, Publora-Entwurf ohne Termin), Doku `docs/instagram/skript.md`. Probe-Lauf mit allen 7
+  Reviews erzeugte saubere PNGs.
+- **Live-Fixes:** Seitenzählung im Buch über alle Bände, Link „Kommentare (n)“ ohne Umbruch, Abstand Zahl/Einheit in der Statistik.
+- **Offen:** Erster echter Lauf: Nutzer entscheidet, ob `--nur-merken` (bestehende 7 nicht posten) oder Entwürfe. Live noch
+  prüfen: Karte nach Deploy (Logo mit „of“), Herz und Kommentar live, HWG-Ablehnung, Pinnwand, 390 px, hell/dunkel.
+  Kleinkram aus Session 60 bleibt (Filter-Beugungen, Pinnwand-Test, Zähler bei manueller Löschung).
 
 ### ⇢ SESSION 60 (2026-10-14): Kommentare, Likes/Folgen, Statistik, IG-Feed – umgesetzt, gemergt, gepusht (`ec2bfed..95a20ba`)
 
