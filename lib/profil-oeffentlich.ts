@@ -18,6 +18,8 @@ export type OeffentlicheBewertung = {
 };
 
 export type OeffentlichesProfil = {
+  /** Mitglieds-Id für das Folgen (Zähler, LikeKnopf); nie in der URL. */
+  id: string;
   anzeigename: string;
   avatarId: string | null;
   /** Mitglied seit (Seitenleiste). */

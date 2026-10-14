@@ -10,15 +10,16 @@ import { NotenVerteilung } from "@/components/profil/NotenVerteilung";
 import { ProfilNetz } from "@/components/profil/ProfilNetz";
 import { Schnitte } from "@/components/profil/Schnitte";
 import { TopFlop } from "@/components/profil/TopFlop";
-import { buttonKlassen } from "@/components/ui";
+import { buttonKlassen, textLinkKlassen } from "@/components/ui";
 import { registerAnsicht, type registerParameter } from "@/lib/bewertungs-register";
+import { profilHref } from "@/lib/kurz-id";
 import { begruendungText } from "@/lib/empfehlung-text";
 import { auswertungen, leereProfilWerte } from "@/lib/profil";
 import { monatsReihe, notenVerteilung } from "@/lib/profil-dashboard";
 import { ladeEmpfehlungen } from "@/lib/query/empfehlungen";
 import { ladeLieblingsvertreiber } from "@/lib/query/lieblingsvertreiber";
 
-import { oderNull, oderUndefined, profilLaden, textLaden, zeilenLaden } from "./laden";
+import { gemochtLaden, oderNull, oderUndefined, profilLaden, textLaden, zeilenLaden } from "./laden";
 import { SPALTEN } from "./spalten";
 
 /*
@@ -206,5 +207,62 @@ export async function ReiheVertreiber({ id }: { id: string }) {
         <CommunityVergleich daten={a.community} texte={texte} sprache={sprache} />
       </Feld>
     </>
+  );
+}
+
+/** Reihe 7b: was das Mitglied gemocht hat und wem es folgt (eigene Daten; Fremde nur mit öffentlichem Profil). */
+export async function ReiheGemocht({ id }: { id: string }) {
+  const [{ w }, gemocht] = await Promise.all([textLaden(), gemochtLaden(id)]);
+  const texte = w.reaktionen.gemocht;
+  const gruppen = gemocht
+    ? [
+        {
+          titel: texte.bewertungen,
+          leer: texte.leerBewertungen,
+          zeilen: gemocht.bewertungen.map((b) => ({ key: b.id, text: b.handelsname, href: `/blueten/${b.slug}#bewertung-${b.id}` })),
+        },
+        {
+          titel: texte.bluete,
+          leer: texte.leerBluete,
+          zeilen: gemocht.bluete.map((b) => ({ key: b.id, text: b.name, href: b.slug ? `/blueten/${b.slug}` : null })),
+        },
+        {
+          titel: texte.mitglieder,
+          leer: texte.leerMitglieder,
+          zeilen: gemocht.mitglieder.map((m) => ({ key: m.id, text: m.name, href: profilHref(m.kurzId) })),
+        },
+      ]
+    : [];
+  return (
+    <Feld id="gemocht" rahmen="karte" groesse="klein" titel={texte.titel} kopf={w.profil.koepfe.gemocht} ton="gruen" satz={texte.satz} className={SPALTEN[12]}>
+      {gemocht === null ? (
+        <p className="max-w-[68ch] text-body text-text">{texte.fehler}</p>
+      ) : (
+        <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
+          {gruppen.map((g) => (
+            <section key={g.titel} aria-label={g.titel} className="flex min-w-0 flex-col gap-4">
+              <h3 className="font-buch text-h3 text-text">{g.titel}</h3>
+              {g.zeilen.length === 0 ? (
+                <p className="text-body text-text-muted">{g.leer}</p>
+              ) : (
+                <ul className="flex flex-col gap-2">
+                  {g.zeilen.map((z) => (
+                    <li key={z.key} className="min-w-0">
+                      {z.href ? (
+                        <Link prefetch={false} href={z.href} className={`${textLinkKlassen()} wrap-break-word`}>
+                          {z.text}
+                        </Link>
+                      ) : (
+                        <span className="text-body text-text wrap-break-word">{z.text}</span>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </section>
+          ))}
+        </div>
+      )}
+    </Feld>
   );
 }

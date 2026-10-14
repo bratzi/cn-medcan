@@ -2,6 +2,7 @@ import Link from "next/link";
 import { unstable_rethrow } from "next/navigation";
 import { Suspense } from "react";
 
+import { EigeneLikes } from "@/components/reaktionen/EigeneLikes";
 import { Buch } from "@/components/review/Buch";
 import { BuchDoppelseite } from "@/components/review/BuchDoppelseite";
 import { alsEintrag, eintragAnker } from "@/components/review/eintrag";
@@ -10,6 +11,7 @@ import { holeSprache, holeWoerterbuch } from "@/lib/i18n";
 import { Schlagwort } from "@/components/story/Schlagwort";
 import { buttonKlassen } from "@/components/ui";
 import { ladeNeuestenBetreiberEintrag, type BandEintrag } from "@/lib/query/buch-band";
+import { likeZahlenFuer } from "@/lib/query/reaktionen";
 import { ladeTerpenKatalog } from "@/lib/query/strains";
 
 /** Lädt den Eintrag; leer und Fehler haben eigene Sätze (Spec 5.2). */
@@ -45,7 +47,9 @@ async function EintragInhalt() {
 
   // Dieselbe Doppelseite wie im großen Buch auf /reviews, mit Bild und Sorte (Nutzer 2026-10-09).
   const { review, produkt } = neuester;
+  const likes = await likeZahlenFuer("BEWERTUNG", [review.id]);
   return (
+    <EigeneLikes>
     <Buch
       bezeichnung={`${w.start.eintrag.vor} ${w.start.eintrag.betont} ${w.start.eintrag.nach}`}
       texte={{
@@ -60,11 +64,12 @@ async function EintragInhalt() {
         {
           anker: eintragAnker(review.id),
           inhalt: (
-            <BuchDoppelseite eintrag={alsEintrag(review, produkt)} ueberschrift="h3" w={w} sprache={sprache} katalog={katalog} sorte auszug />
+            <BuchDoppelseite eintrag={alsEintrag(review, produkt, likes.get(review.id))} ueberschrift="h3" w={w} sprache={sprache} katalog={katalog} sorte auszug />
           ),
         },
       ]}
     />
+    </EigeneLikes>
   );
 }
 

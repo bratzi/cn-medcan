@@ -19,6 +19,16 @@ export function zaehlerUpsert(prisma: Db, art: ZielArt, id: string, feld: "likes
   return prisma.zaehler.updateMany({ where: { zielArt: art, zielId: id, [feld]: { gt: 0 } }, data: { [feld]: { decrement: 1 } } });
 }
 
+/**
+ * Setzt den Like-Zähler aus der echten Zeilenzahl neu. D1 hat keine interaktiven Transaktionen,
+ * ein bedingtes Senken ("nur wenn eine Zeile gelöscht wurde") geht im Batch nicht. Das Neuzählen
+ * ist dagegen ein einziges Statement, korrigiert sich bei Rennen selbst und läuft nur auf dem
+ * Schreibpfad (Abmelden eines Likes), nie beim Lesen. Parameter immer als Template-Werte.
+ */
+export function zaehlerLikesNeu(prisma: Pick<PrismaClient, "$executeRaw">, art: ZielArt, id: string) {
+  return prisma.$executeRaw`INSERT INTO "zaehler" ("ziel_art","ziel_id","likes") VALUES (${art}, ${id}, (SELECT COUNT(*) FROM "likes" WHERE "ziel_art" = ${art} AND "ziel_id" = ${id})) ON CONFLICT ("ziel_art","ziel_id") DO UPDATE SET "likes" = excluded."likes"`;
+}
+
 export function kommentarZaehlerZiele(ziel: KommentarZiel, zielId: string, kultivarId: string | null): Array<{ art: ZielArt; id: string }> {
   if (ziel === "PROFIL") return [{ art: "MITGLIED", id: zielId }];
   return kultivarId ? [{ art: "BEWERTUNG", id: zielId }, { art: "BLUETE", id: kultivarId }] : [{ art: "BEWERTUNG", id: zielId }];

@@ -87,6 +87,8 @@ export function ankerSeite(hash: string, anker: readonly string[]): number | nul
   } catch {
     return null;
   }
+  // Benachrichtigungen und Statistik verlinken #bewertung-<id>; im Buch heißt die Seite eintrag-<id>.
+  if (ziel.startsWith("bewertung-")) ziel = `eintrag-${ziel.slice("bewertung-".length)}`;
   const seite = anker.indexOf(ziel);
   return seite >= 0 ? seite : null;
 }

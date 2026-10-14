@@ -11,6 +11,7 @@ import { BuchKolophon } from "@/components/review/BuchKolophon";
 import { BuchNotiz } from "@/components/review/BuchNotiz";
 import { BuchReiter, ReiterLeiste, type BuchReiterEintrag } from "@/components/review/BuchReiter";
 import { NotenLeiste } from "@/components/review/NotenLeiste";
+import { LikeKnopf } from "@/components/reaktionen/LikeKnopf";
 import { NurAufgeschlagen } from "@/components/review/NurAufgeschlagen";
 import { eintragAnker, eintragHref, type EintragDaten } from "@/components/review/eintrag";
 import { ablauf } from "@/components/review/eintritt";
@@ -155,9 +156,10 @@ export function BuchDoppelseite({ eintrag, ueberschrift: Ueberschrift, w, sprach
         {/* Exlibris (Nutzer 2026-10-09): die Person klein und eingefasst, damit der erste Blick
             beim Urteil rechts landet und nicht beim Bild der Person. */}
         <header
+          id={`bewertung-${eintrag.id}`}
           data-eintritt="auf"
           style={ablauf(0)}
-          className="flex w-fit max-w-full items-center gap-4 rounded-full border border-border-strong py-2 pr-6 pl-2"
+          className="flex w-fit max-w-full scroll-mt-8 items-center gap-4 rounded-full border border-border-strong py-2 pr-6 pl-2"
         >
           {hatPerson ? <Avatar name={name} bildId={eintrag.autorAvatarId} groesse="md" /> : null}
           <div className="flex min-w-0 flex-wrap items-center gap-x-4 gap-y-2">
@@ -191,6 +193,9 @@ export function BuchDoppelseite({ eintrag, ueberschrift: Ueberschrift, w, sprach
               </Badge>
             </p>
           </div>
+          {eintrag.likes !== undefined ? (
+            <LikeKnopf art="BEWERTUNG" zielId={eintrag.id} anzahl={eintrag.likes} text={w.reaktionen.knopf} />
+          ) : null}
         </header>
 
         {eintrag.notiz ? (

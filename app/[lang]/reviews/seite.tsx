@@ -3,12 +3,16 @@ import { notFound } from "next/navigation";
 
 import { Seitenkopf, seitenRahmen } from "@/components/layout/Seitenkopf";
 import { Ranglisten } from "@/components/rangliste/Ranglisten";
+import { BuchStatistik } from "@/components/review/BuchStatistik";
+import { EigeneLikes } from "@/components/reaktionen/EigeneLikes";
 import { GrossesBuch } from "@/components/review/GrossesBuch";
 import { Schlagwort } from "@/components/story/Schlagwort";
 import { EmptyState, buttonKlassen } from "@/components/ui";
 import { cn } from "@/lib/cn";
 import { holeSprache, holeWoerterbuch } from "@/lib/i18n";
 import { ladeBand } from "@/lib/query/buch-band";
+import { ladeBuchStatistik } from "@/lib/query/buch-statistik";
+import { likeZahlenFuer } from "@/lib/query/reaktionen";
 import { ladeTerpenKatalog } from "@/lib/query/strains";
 
 /**
@@ -18,13 +22,16 @@ import { ladeTerpenKatalog } from "@/lib/query/strains";
  * (Spec 5): eine Insel, die nur für angemeldete Mitglieder Daten holt; die Seite bleibt statisch.
  */
 export async function BewertungenSeite({ band }: { band: number }) {
-  const [daten, w, sprache, katalog] = await Promise.all([
+  const [daten, w, sprache, katalog, statistik] = await Promise.all([
     ladeBand(band),
     holeWoerterbuch(),
     holeSprache(),
     ladeTerpenKatalog(),
+    ladeBuchStatistik(),
   ]);
   if (!daten) notFound();
+  // Ein Aufruf für alle Herzen des Bandes (höchstens 24 Ids, Zähler statt COUNT).
+  const likes = await likeZahlenFuer("BEWERTUNG", daten.eintraege.map(({ review }) => review.id));
 
   return (
     <>
@@ -42,8 +49,11 @@ export async function BewertungenSeite({ band }: { band: number }) {
             }
           />
         ) : (
-          <GrossesBuch band={daten} w={w} sprache={sprache} katalog={katalog} />
+          <EigeneLikes>
+            <GrossesBuch band={daten} w={w} sprache={sprache} katalog={katalog} likes={likes} />
+          </EigeneLikes>
         )}
+        <BuchStatistik daten={statistik} texte={w.reviews.statistik} sprache={sprache} />
         {/* Anker #ranglisten: dorthin führt das Anmelden aus der Insel zurück. */}
         <section
           id="ranglisten"

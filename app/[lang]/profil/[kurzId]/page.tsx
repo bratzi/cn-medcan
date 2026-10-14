@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
+import { EigeneLikes } from "@/components/reaktionen/EigeneLikes";
+import { LikeKnopf } from "@/components/reaktionen/LikeKnopf";
 import { Feld } from "@/components/kapitel/Feld";
 import { OeffentlicheBewertungen } from "@/components/profil/OeffentlicheBewertungen";
 import { ProfilNetz } from "@/components/profil/ProfilNetz";
@@ -11,6 +13,7 @@ import { istKurzId } from "@/lib/kurz-id";
 import { liebsteAromen } from "@/lib/profil-ansicht";
 import { netzTexte } from "@/lib/profil-oeffentlich";
 import { ladeOeffentlichesProfil } from "@/lib/query/profil-oeffentlich";
+import { likeZahlenFuer } from "@/lib/query/reaktionen";
 
 import { SPALTEN } from "../spalten";
 
@@ -40,12 +43,15 @@ export default async function OeffentlichesProfilPage({ params }: Params) {
   if (!istKurzId(kurzId)) notFound();
   const [profil, w, sprache] = await Promise.all([ladeOeffentlichesProfil(kurzId), holeWoerterbuch(), holeSprache()]);
   if (!profil) notFound();
+  // Folgende aus dem Zähler; ob ich folge, lädt die Insel nach.
+  const folgende = (await likeZahlenFuer("MITGLIED", [profil.id])).get(profil.id) ?? 0;
   const texte = w.profilOeffentlich;
   const s = w.profil.seite;
   const werte = profil.werte;
   const netz = netzTexte(w);
 
   return (
+    <EigeneLikes>
     <div className="pb-16">
       <ProfilKopf
         name={profil.anzeigename}
@@ -55,6 +61,7 @@ export default async function OeffentlichesProfilPage({ params }: Params) {
         gruppen={[{ titel: s.zahlenNeutral, notizen: [{ zahl: String(profil.anzahl), wort: s.reiter.bewertungen, satz: mehrzahl(sprache, w.profil.anzahl, profil.anzahl), href: "#bewertungen-titel" }] }]}
         aromen={werte ? liebsteAromen(werte.geschmack).map((a) => w.label.geschmack[a]) : []}
         aktionen={[]}
+        folgen={<LikeKnopf art="MITGLIED" zielId={profil.id} anzahl={folgende} text={w.reaktionen.knopf} />}
         texte={s}
         sprache={sprache}
       />
@@ -85,5 +92,6 @@ export default async function OeffentlichesProfilPage({ params }: Params) {
         </Feld>
       </div>
     </div>
+    </EigeneLikes>
   );
 }
