@@ -171,16 +171,9 @@ export default async function ProfilPage({
   );
 }
 
-/** Die zwei Wege im Profilkopf; auch im Suspense-Fallback bekannt. */
+/** Der Weg im Profilkopf; auch im Suspense-Fallback bekannt. „Profil bearbeiten“ steht nur im Reiter. */
 function seitenAktionen(s: Woerterbuch["profil"]["seite"]) {
-  return [
-    { href: "/blueten", text: s.bewerten, art: "primary" },
-    {
-      href: "/profil?ansicht=bearbeiten",
-      text: s.bearbeiten,
-      art: "secondary",
-    },
-  ] as const;
+  return [{ href: "/blueten", text: s.bewerten, art: "primary" }] as const;
 }
 
 /** Zahlen und liebste Aromen; die Quellen teilen sich Kopf und Boxen über laden.ts. */
