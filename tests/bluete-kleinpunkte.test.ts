@@ -47,7 +47,7 @@ test("Gelesen gilt nur fuer die angezeigten Benachrichtigungen", () => {
   const aktion = lies("app/[lang]/mitglied/aktionen.ts");
   assert.match(aktion, /export async function benachrichtigungenGelesen\(roh: unknown\)/);
   assert.match(aktion, /id: \{ in: ids \}, mitgliedId: mitglied\.mitgliedId, gelesenAm: null/);
-  const seite = lies("app/[lang]/mitglied/page.tsx");
+  const seite = lies("app/[lang]/profil/konto-reihen.tsx");
   assert.match(seite, /<GelesenMarkieren ids=\{ungelesen\} \/>/);
   assert.match(lies("lib/query/benachrichtigungen.ts"), /take: MAX_BENACHRICHTIGUNGEN/);
 });
@@ -104,9 +104,9 @@ test("Inaktive Blueten: kein Link ins Leere, Freigabe schaltet sie wieder an", (
   assert.match(lies("app/[lang]/admin/vorschlag-aktionen.ts"), /data: \{ aktiv: true \}/);
 });
 
-test("Doppelvorschlag verlinkt auf Mein Konto", () => {
+test("Doppelvorschlag verlinkt auf Mein Profil, Feld Vorschläge", () => {
   assert.match(lies("app/[lang]/vorschlagen/aktionen.ts"), /schonVorgeschlagen: true/);
-  assert.match(lies("components/vorschlag/BlueteVorschlagFormular.tsx"), /href="\/mitglied"/);
+  assert.match(lies("components/vorschlag/BlueteVorschlagFormular.tsx"), /href="\/profil#meine-vorschlaege-titel"/);
 });
 
 test("vorschlagPfad: Suchbegriff bleibt erhalten, auch ueber die Anmeldung", () => {

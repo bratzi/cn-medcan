@@ -14,6 +14,8 @@ type Props = {
   texte: Woerterbuch["mitglied"];
   phasen: Woerterbuch["umfrage"]["phasen"];
   sprache: Sprache;
+  /** Auf /profil sekundär: dort ist „Blüte bewerten“ die eine Primäraktion. */
+  aktion?: "primary" | "secondary";
 };
 
 /**
@@ -21,7 +23,7 @@ type Props = {
  * gedruckt mit Vermerk von Hand, sonst die eine Primäraktion der Seite. Ohne
  * Freigabe keine Primäraktion, sondern der Hinweis.
  */
-export function UmfrageJetzt({ umfrage, eigeneOptionId, freigegeben, texte, phasen, sprache }: Props) {
+export function UmfrageJetzt({ umfrage, eigeneOptionId, freigegeben, texte, phasen, sprache, aktion = "primary" }: Props) {
   if (!umfrage) {
     return (
       <div className="flex flex-col items-start gap-4">
@@ -59,7 +61,7 @@ export function UmfrageJetzt({ umfrage, eigeneOptionId, freigegeben, texte, phas
         freigegeben ? (
           <>
             <p className="text-body text-text">{texte.nochNichtGestimmt}</p>
-            <Link prefetch={false} href="/umfragen" className={buttonKlassen("primary")}>
+            <Link prefetch={false} href="/umfragen" className={buttonKlassen(aktion)}>
               {texte.zurAbstimmung}
             </Link>
           </>

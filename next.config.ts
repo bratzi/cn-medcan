@@ -1,11 +1,11 @@
 import type { NextConfig } from "next";
 
-import { ALTE_KATALOG_WEITERLEITUNGEN } from "./lib/alte-adressen";
+import { ALTE_KATALOG_WEITERLEITUNGEN, ALTE_KONTO_WEITERLEITUNGEN } from "./lib/alte-adressen";
 
 const nextConfig: NextConfig = {
-  // /produkte -> /blueten (308, Query bleibt), siehe lib/alte-adressen.ts.
+  // /produkte -> /blueten und /mitglied -> /profil (308, Query bleibt), siehe lib/alte-adressen.ts.
   async redirects() {
-    return [...ALTE_KATALOG_WEITERLEITUNGEN];
+    return [...ALTE_KATALOG_WEITERLEITUNGEN, ...ALTE_KONTO_WEITERLEITUNGEN];
   },
   // Der Prisma-Client (runtime = "cloudflare") importiert seinen Query-Compiler
   // als `.wasm?module`. Turbopacks Lader dafuer loest den Pfad dynamisch auf,

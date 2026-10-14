@@ -42,7 +42,7 @@ export async function profilSpeichern(formData: FormData): Promise<ProfilErgebni
     data: geprueft.wert,
   });
 
-  revalidiereSprachen("/mitglied");
+  revalidiereSprachen("/profil");
   return { ok: true };
 }
 
@@ -94,7 +94,7 @@ export async function avatarSpeichern(formData: FormData): Promise<ProfilErgebni
     prisma.nutzerAvatar.create({ data: { mitgliedId: mitglied.mitgliedId, bild: bytes } }),
   ]);
 
-  revalidiereSprachen("/mitglied");
+  revalidiereSprachen("/profil");
   return { ok: true };
 }
 
@@ -103,7 +103,7 @@ export async function avatarEntfernen(): Promise<ProfilErgebnis> {
   const mitglied = await mitgliedErforderlich();
   const prisma = await getPrisma();
   await prisma.nutzerAvatar.deleteMany({ where: { mitgliedId: mitglied.mitgliedId } });
-  revalidiereSprachen("/mitglied");
+  revalidiereSprachen("/profil");
   return { ok: true };
 }
 
@@ -136,7 +136,7 @@ export async function profilSichtbarkeitSetzen(an: boolean): Promise<ProfilErgeb
       if (count === 0) {
         await prisma.mitglied.update({ where: { id: mitglied.mitgliedId }, data: { profilOeffentlich: daten.profilOeffentlich } });
       }
-      for (const pfad of ["/mitglied", "/", "/reviews"]) revalidiereSprachen(pfad);
+      for (const pfad of ["/profil", "/", "/reviews"]) revalidiereSprachen(pfad);
       return { ok: true };
     } catch (fehler) {
       if (!istEindeutigkeitsfehler(fehler)) throw fehler;

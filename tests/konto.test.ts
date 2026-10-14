@@ -142,11 +142,8 @@ test("ProfilFormular: Speichern ist sekundär, die Primäraktion bleibt dem Stim
 });
 
 test("Seiten: Teilfehler werden geloggt statt still geschluckt", () => {
-  const m = readFileSync("app/[lang]/mitglied/page.tsx", "utf8");
-  const p = readFileSync("app/[lang]/profil/page.tsx", "utf8");
-  assert.doesNotMatch(m, /\.catch\(\(\) =>/);
-  assert.doesNotMatch(p, /\.catch\(\(\) =>/);
-  assert.match(m, /oderNull<.*>\("eigeneStimme"\)/);
-  // Die ungelesene Zahl hing am Reiter Konto; seit 2026-10-09 trägt sie nur der Knopf „Mein Konto“.
-  assert.match(p, /oderNull<.*>\("aktuellesProfil"\)/);
+  const dateien = ["laden.ts", "page.tsx", "profil-reihen.tsx", "konto-reihen.tsx"].map((d) => readFileSync(`app/[lang]/profil/${d}`, "utf8"));
+  for (const q of dateien) assert.doesNotMatch(q, /\.catch\(\(\) =>/);
+  assert.match(dateien[3], /oderNull<.*>\("eigeneStimme"\)/);
+  assert.match(dateien[0], /oderNull<.*>\("aktuellesProfil"\)/);
 });

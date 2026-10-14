@@ -2,7 +2,8 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 
-const quelle = readFileSync("app/[lang]/profil/page.tsx", "utf8");
+// Seit 2026-10-13 eine Seite ohne Reiter: die Reihen stehen in profil-reihen.tsx und konto-reihen.tsx.
+const quelle = readFileSync("app/[lang]/profil/profil-reihen.tsx", "utf8") + readFileSync("app/[lang]/profil/konto-reihen.tsx", "utf8");
 const lage = (id: string) => {
   const i = quelle.indexOf(`id="${id}"`);
   assert.ok(i >= 0, `Feld ${id} fehlt`);
@@ -10,28 +11,18 @@ const lage = (id: string) => {
 };
 const reihenfolge = (r: number[]) => assert.deepEqual([...r].sort((a, b) => a - b), r, JSON.stringify(r));
 
-test("Profil: Reiter Übersicht, Aromen, Bewertungen, Vertreiber stehen in dieser Reihenfolge (Spec 2026-10-13)", () => {
-  const r = ['ansicht === "uebersicht"', 'ansicht === "aromen"', 'ansicht === "bewertungen"', 'ansicht === "vertreiber"'].map((s) => quelle.indexOf(s));
-  assert.ok(r.every((i) => i > 0), JSON.stringify(r));
-  reihenfolge(r);
+test("Profil-Reihen: Netz, Top und Flop, Spur, Noten, Register, Ähnliches, Vertreiber", () => {
+  reihenfolge(["netz", "topflop", "aktivitaet", "verteilung", "bewertungen", "aehnliches", "vertreiber", "schnitte", "community"].map(lage));
 });
 
-test("Übersicht: Netz, Top und Flop, Spur, Noten", () => {
-  reihenfolge(["netz", "topflop", "aktivitaet", "verteilung"].map(lage));
-});
-
-test("Aromen: Netz, dann Ähnliches im Aroma", () => {
-  reihenfolge([lage("netz"), lage("vorschlaege")]);
-});
-
-test("Vertreiber: Vertreiber, Schnitte, Community", () => {
-  reihenfolge(["vertreiber", "schnitte", "community"].map(lage));
+test("Konto-Reihen: Umfrage, Vorschläge, Stimmen, Nachrichten, Status, Einstellungen", () => {
+  reihenfolge(["umfrage", "meine-vorschlaege", "stimmen", "nachrichten", "status", "einstellungen", "verwaltung"].map(lage));
 });
 
 test("Kein Feld Terpene mehr, jedes Feld mit Kopf, klein und als Karte, ohne Rasterspalten", () => {
   assert.doesNotMatch(quelle, /id="terpene"/);
   const felder = quelle.match(/<Feld\b[^>]*>/g) ?? [];
-  assert.ok(felder.length >= 9, String(felder.length));
+  assert.ok(felder.length >= 16, String(felder.length));
   for (const f of felder) {
     assert.match(f, /kopf=/, f);
     assert.match(f, /groesse="klein"/, f);

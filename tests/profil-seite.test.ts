@@ -3,65 +3,41 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 
 const seite = () => readFileSync("app/[lang]/profil/page.tsx", "utf8");
+// Seit 2026-10-13 stehen die Reihen in eigenen Dateien neben der Seite.
+const reihen = () => readFileSync("app/[lang]/profil/profil-reihen.tsx", "utf8") + readFileSync("app/[lang]/profil/konto-reihen.tsx", "utf8");
 
 test("/profil: nur angemeldet, nicht im Index, rechnet nur bei veraltetem Stand", () => {
   const q = seite();
   assert.match(q, /redirect\("\/anmelden\?weiter=%2Fprofil"\)/);
   assert.match(q, /index: false/);
-  assert.match(q, /aktuellesProfil\(/);
+  assert.match(readFileSync("app/[lang]/profil/laden.ts", "utf8"), /aktuellesProfil\(/);
   const query = readFileSync("lib/query/profil.ts", "utf8");
   assert.match(query, /profilNeuRechnen\(/);
   assert.match(query, /await profilFortschreiben\(/);
 });
 
-test("/profil: Kapitel-Reihenfolge, Raster, kein Apothekenlink", () => {
-  const q = seite();
-  // Die Reihenfolge prüft tests/profil-reihenfolge.test.ts (Nutzer 2026-10-09).
-  for (const teil of ["<ProfilRahmen", "<ProfilSeitenleiste", "<ProfilReiter", "<ProfilNetz", "<EmpfehlungsListe", "<Aktivitaet", "<NotenVerteilung", "<TopFlop", "<Lieblingsvertreiber", "<CommunityVergleich", "<Schnitte", "<BewertungsRegister"]) assert.ok(q.includes(teil), teil);
-  assert.doesNotMatch(q, /<KapitelRaster|<Kapitelkopf/);
-  assert.match(q, /<Suspense/);
+test("/profil: Bausteine, Streaming, kein Apothekenlink", () => {
+  const q = seite() + reihen();
+  for (const teil of ["<ProfilKopf", "<ProfilNetz", "<EmpfehlungsListe", "<Aktivitaet", "<NotenVerteilung", "<TopFlop", "<Lieblingsvertreiber", "<CommunityVergleich", "<Schnitte", "<BewertungsRegister"]) assert.ok(q.includes(teil), teil);
+  assert.doesNotMatch(q, /<KapitelRaster|<Kapitelkopf|<ProfilReiter/);
+  assert.match(seite(), /<Suspense/);
   assert.doesNotMatch(q, /apotheke/i);
   assert.doesNotMatch(q, /max-w-180/);
-  // Seit 2026-10-13: Reiter innerhalb des Profils (Ansichten), Konto bleibt eigene Seite.
-  assert.match(q, /<ProfilReiter/);
 });
 
 test("/profil: Verlauf im Netz statt in eigenem Feld, nie auf dem öffentlichen Profil (Nutzer 2026-10-09)", () => {
-  const q = seite();
+  const q = reihen();
   assert.match(q, /verlauf=\{verlauf\}/);
   assert.doesNotMatch(q, /NetzVerlauf|id="verlauf"/);
-  assert.match(q, /<Feld id="vorschlaege"/);
+  assert.match(q, /<Feld id="aehnliches"/);
   const oeffentlich = readFileSync("app/[lang]/profil/[kurzId]/page.tsx", "utf8");
   assert.doesNotMatch(oeffentlich, /verlauf=|NetzVerlauf|Lieblingsvertreiber/);
 });
 
-test("/mitglied: Titel ist der Reiter Konto, h1 ist der Name im Kapitelkopf", () => {
-  const q = readFileSync("app/[lang]/mitglied/page.tsx", "utf8");
-  assert.match(q, /title: \(await holeWoerterbuch\(\)\)\.profil\.reiterKonto/);
-  assert.match(q, /name=\{mitglied\.anzeigename\}/);
-  assert.doesNotMatch(q, /kopf\.navigation\.konto/);
-  assert.doesNotMatch(q, /ProfilReiter/);
-  assert.match(q, /seite=\{w\.profil\.reiterKonto\}/);
-});
-
-test("/mitglied: erst Konto (Angaben, Avatar, Sichtbarkeit, Status, Nachrichten), dann Umfrage und Stimmen; ein Primärknopf", () => {
-  const q = readFileSync("app/[lang]/mitglied/page.tsx", "utf8");
-  const koerper = q.slice(q.indexOf("export default async function MitgliedPage"), q.indexOf("async function KopfBild"));
-  const reihe = ["<Kapitelkopf", "<Notizen", "<ProfilFormular", "<AvatarFormular", "<ProfilSichtbarkeit", "<Status", "<ReiheNachrichten", "<ReiheUmfrage", "<ReiheStimmen"].map((s) =>
-    koerper.indexOf(s),
-  );
-  assert.ok(reihe.every((i) => i > 0), JSON.stringify(reihe));
-  assert.deepEqual([...reihe].sort((a, b) => a - b), reihe);
-  for (const s of ["<Randnotizen", "<UmfrageJetzt", "<MeineStimmen", "<GelesenMarkieren"]) assert.ok(q.includes(s), s);
-  assert.doesNotMatch(q, /buttonKlassen\("primary"\)/, "die Primäraktion steht nur in UmfrageJetzt");
-  assert.doesNotMatch(q, /max-w-180/);
-  assert.match(q, /<KapitelRaster/);
-});
-
 test("/profil: ohne ladbaren Stand nie die Leerskizze, Name im Kopf", () => {
-  const q = seite();
+  assert.match(seite(), /name: mitglied\.anzeigename/);
+  const q = reihen();
   assert.match(q, /const netzFehlt = profil === null && \(zeilen === null \|\| zeilen\.length > 0\);/);
-  assert.match(q, /\{mitglied\.anzeigename\}/);
 });
 
 test("Startseite: unbestätigte Vorschläge tragen dieselbe Marke wie im Profil", () => {

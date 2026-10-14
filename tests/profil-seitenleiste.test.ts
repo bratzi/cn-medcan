@@ -100,14 +100,14 @@ test("ProfilRahmen: Spalte scrollt in sich und ist keine unbeschriftete aside", 
   assert.doesNotMatch(q, /<aside/);
 });
 
-test("Profil: Fallback der Seitenleiste kennt Rolle und Aktionen, Community füllt die Reihe ohne Schnitte", () => {
+test("Profil: Fallback des Profilkopfs kennt Rolle und Aktionen, Community füllt die Reihe ohne Schnitte", () => {
   const q = readFileSync("app/[lang]/profil/page.tsx", "utf8");
-  assert.doesNotMatch(q, /rolle=\{null\}/);
-  assert.doesNotMatch(q, /aktionen=\{\[\]\}/);
+  assert.match(q, /<ProfilKopf \{\.\.\.kopf\} notizen=\{\[\]\} aromen=\{\[\]\} \/>/);
+  assert.match(q, /aktionen: seitenAktionen\(s\)/);
   assert.match(q, /ohneCommunity: true/);
-  assert.match(q, /a\.schnitte \? undefined : "min-\[1280px\]:col-span-2"/);
+  const r = readFileSync("app/[lang]/profil/profil-reihen.tsx", "utf8");
+  assert.match(r, /a\.schnitte \? SPALTEN\[6\] : SPALTEN\[12\]/);
 });
-
 test("Öffentliches Profil: neutrale Beschriftung der Zahlen", () => {
   const q = readFileSync("app/[lang]/profil/[kurzId]/page.tsx", "utf8");
   assert.match(q, /zahlenLabel=\{s\.zahlenNeutral\}/);

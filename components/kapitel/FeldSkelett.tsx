@@ -5,7 +5,18 @@ import { FELD_SPALTEN, type FeldSpalten } from "./Feld";
 const HOEHE = { klein: "h-40", mittel: "h-80", gross: "h-120" } as const;
 
 /** Platzhalter in der Form des Felds, solange es streamt (Spec 9). */
-export function FeldSkelett({ spalten, hoehe = "mittel", rahmen = "raster" }: { spalten?: FeldSpalten; hoehe?: keyof typeof HOEHE; rahmen?: "raster" | "karte" }) {
+export function FeldSkelett({
+  spalten,
+  hoehe = "mittel",
+  rahmen = "raster",
+  className,
+}: {
+  spalten?: FeldSpalten;
+  hoehe?: keyof typeof HOEHE;
+  rahmen?: "raster" | "karte";
+  /** Breite im Raster der umgebenden Seite (Profil: 12er-Raster). */
+  className?: string;
+}) {
   return (
     <div
       aria-hidden="true"
@@ -13,6 +24,7 @@ export function FeldSkelett({ spalten, hoehe = "mittel", rahmen = "raster" }: { 
         "flex flex-col gap-6 bg-surface p-6 min-[1080px]:p-8",
         rahmen === "karte" ? "rounded-lg border border-border" : "border-t border-l border-t-border-strong border-l-border",
         spalten ? `col-span-4 ${FELD_SPALTEN[spalten]}` : null,
+        className,
       )}
     >
       <div className="h-6 w-40 bg-surface-sunken" />

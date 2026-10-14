@@ -218,7 +218,7 @@ export function BlueteVorschlagFormular({ terpene, nameVorbelegt, kultivarId, ku
           {antwort.schonVorgeschlagen ? (
             <>
               {" "}
-              <Link prefetch={false} href="/mitglied" className={textLinkKlassen()}>
+              <Link prefetch={false} href="/profil#meine-vorschlaege-titel" className={textLinkKlassen()}>
                 {texte.zuKonto}
               </Link>
             </>

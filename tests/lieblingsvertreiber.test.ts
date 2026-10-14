@@ -23,6 +23,6 @@ test("Lieblingsvertreiber: ohne Daten (undefined) eine Fehlermeldung statt „no
 test("ladeLieblingsvertreiber: neueste Bewertungen zuerst; die Seite unterscheidet Fehler von „keiner“", () => {
   const q = readFileSync("lib/query/lieblingsvertreiber.ts", "utf8");
   assert.match(q, /orderBy: \{ erstelltAm: "desc" \}/);
-  const seite = readFileSync("app/[lang]/profil/page.tsx", "utf8");
+  const seite = readFileSync("app/[lang]/profil/profil-reihen.tsx", "utf8");
   assert.match(seite, /ladeLieblingsvertreiber\(id\)\.catch\(\s*oderUndefined/);
 });

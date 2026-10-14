@@ -21,6 +21,11 @@ export const ALTE_KATALOG_WEITERLEITUNGEN = [
   { source: "/produkte/:slug", destination: "/blueten/:slug", permanent: true },
 ] as const satisfies ReadonlyArray<{ source: string; destination: string; permanent: boolean }>;
 
+/** /mitglied war bis 2026-10-13 die Konto-Seite; seitdem steht alles auf /profil (Spec Profil und Konto vereint 3.3). */
+export const ALTE_KONTO_WEITERLEITUNGEN = [
+  { source: "/mitglied", destination: "/profil", permanent: true },
+] as const satisfies ReadonlyArray<{ source: string; destination: string; permanent: boolean }>;
+
 /** Ziel fuer /bewerten/:slug mit Query vor dem Fragment; null bei anderen Pfaden. */
 export function bewertenWeiterleitung(pfad: string, suche: string): string | null {
   const treffer = /^\/bewerten\/([^/]+)$/.exec(pfad);

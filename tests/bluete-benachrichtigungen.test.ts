@@ -17,9 +17,10 @@ test("Zaehler: Kopf bleibt statisch, Zahl kommt aus der API", () => {
 });
 
 test("Mitgliederbereich: Benachrichtigungen und eigene Vorschlaege", () => {
-  const seite = lies("app/[lang]/mitglied/page.tsx");
-  assert.match(seite, /benachrichtigungenLaden\(id\)/);
-  assert.match(seite, /eigeneVorschlaege\(id\)/);
-  assert.match(seite, /<GelesenMarkieren/);
+  // Seit 2026-10-13 auf /profil: Lader in laden.ts, Boxen in konto-reihen.tsx.
+  const laden = lies("app/[lang]/profil/laden.ts");
+  assert.match(laden, /benachrichtigungenLaden\(id\)/);
+  assert.match(laden, /eigeneVorschlaege\(id\)/);
+  assert.match(lies("app/[lang]/profil/konto-reihen.tsx"), /<GelesenMarkieren/);
   assert.match(lies("app/[lang]/mitglied/aktionen.ts"), /export async function benachrichtigungenGelesen/);
 });

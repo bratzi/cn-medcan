@@ -133,7 +133,6 @@ export async function bewertungSpeichern(formData: FormData): Promise<BewertungE
   revalidiereSprachen("/");
   revalidiereSprachen("/reviews", "layout");
   revalidiereSprachen("/admin");
-  revalidiereSprachen("/mitglied");
   revalidiereSprachen("/profil");
   return { ok: true, sofortSichtbar: istBetreiber, slug: strain.slug, netz };
 }

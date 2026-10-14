@@ -1,24 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
 
 import { monatsReihe } from "@/lib/profil-dashboard";
-
-const q = () => readFileSync("app/[lang]/profil/page.tsx", "utf8");
-
-test("Profilseite: Rahmen, Seitenleiste, Reiter, kein Kapitelkopf mehr", () => {
-  const s = q();
-  for (const teil of ["<ProfilRahmen", "<ProfilSeitenleiste", "<ProfilReiter", "ansichtAus("]) assert.ok(s.includes(teil), teil);
-  assert.doesNotMatch(s, /<Kapitelkopf|<KapitelRaster|KopfBild/);
-});
-
-test("Profilseite: je Ansicht nur deren Reihen", () => {
-  const s = q();
-  assert.match(s, /ansicht === "uebersicht"/);
-  assert.match(s, /ansicht === "aromen"/);
-  assert.match(s, /ansicht === "bewertungen"/);
-  assert.match(s, /ansicht === "vertreiber"/);
-});
 
 test("Spur kompakt: beginnt beim Monat der ersten Bewertung", () => {
   const heute = new Date("2026-10-13T00:00:00Z");

@@ -97,7 +97,10 @@ const UMGESTELLT: string[] = [
   "app/[lang]/apotheken/page.tsx",
   "app/[lang]/apotheken/[slug]/page.tsx",
   // Welle 5: Mitgliederbereich, Vorschlagen
-  "app/[lang]/mitglied/page.tsx",
+  "app/[lang]/profil/profil-reihen.tsx",
+  "app/[lang]/profil/konto-reihen.tsx",
+  "app/[lang]/profil/laden.ts",
+  "components/profil/ProfilKopf.tsx",
   "app/[lang]/mitglied/aktionen.ts",
   "components/auth/ProfilFormular.tsx",
   "lib/mitglied-eingabe.ts",

@@ -135,7 +135,7 @@ async function unternehmenSichern(name: string, auftritt: "HERSTELLER" | "IMPORT
 function neuLaden(slug?: string) {
   revalidiereSprachen("/admin");
   revalidiereSprachen("/admin/vorschlaege");
-  revalidiereSprachen("/mitglied");
+  revalidiereSprachen("/profil");
   revalidiereSprachen("/blueten");
   if (slug) revalidiereSprachen(`/blueten/${slug}`);
 }
@@ -266,7 +266,7 @@ export async function blueteAblehnen(formData: FormData): Promise<AdminVorschlag
   await abschliessen(
     offene,
     "ABGELEHNT",
-    { ...vorlageAbgelehnt(offene[0].handelsname, begruendung), link: "/mitglied" },
+    { ...vorlageAbgelehnt(offene[0].handelsname, begruendung), link: "/profil#meine-vorschlaege-titel" },
     { begruendung },
   );
   neuLaden();

@@ -106,7 +106,7 @@ export async function blueteVorschlagen(formData: FormData): Promise<VorschlagEr
     throw fehler;
   }
 
-  revalidiereSprachen("/mitglied");
+  revalidiereSprachen("/profil");
   revalidiereSprachen("/admin");
   revalidiereSprachen("/admin/vorschlaege");
   return { ok: true };

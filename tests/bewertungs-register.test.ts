@@ -76,7 +76,7 @@ const render = (zeilen: RegisterZeile[], alle = false) =>
 test("BewertungsRegister: Sortier-Links mit aria-current, Name bricht um, Link auf die Blüte", () => {
   const lang = "X".repeat(60);
   const h = render([r(lang.toLowerCase(), 4, 1, { mittel: 3.2, anzahl: 4 })]);
-  assert.match(h, /href="\/profil\?ansicht=bewertungen&amp;sortierung=note#bewertungen-titel"/);
+  assert.match(h, /href="\/profil\?sortierung=note#bewertungen-titel"/);
   assert.match(h, /aria-current="true"[^>]*>Neueste/);
   assert.match(h, /href="\/blueten\/x{60}"/);
   assert.match(h, /wrap-break-word/);
