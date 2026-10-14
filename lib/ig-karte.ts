@@ -12,9 +12,11 @@ const ZITAT_MAX = 140;
 
 /**
  * Strenger als der Kommentar-Filter: Instagram ist Werbung im Sinne des HWG. Alles, was nach Wirkung,
- * Rausch, Konsum oder Beschwerden klingt, nimmt das Zitat ganz heraus (Live-Probe 2026-10-14: „ballert“).
+ * Rausch, Konsum oder Beschwerden klingt, nimmt das Zitat ganz heraus (Live-Probe 2026-10-14: „ballert“)
+ * und sperrt Captions des Themen-Agenten (`igCaptionPruefen`).
  */
-const IG_SPERRE = /ballert|knallt|bal+ern|\bhigh\b|stoned|breit\b|wirk|rausch|rauch|kiff|dröhn|entspann|beruhig|schlaf|schmerz|angst|\bdaily\b|dosis|dosier|\bthc\b|\bcbd\b/i;
+export const IG_SPERRE =
+  /ballert|knallt|bal+ern|\bhigh\b|stoned|breit\b|wirk|rausch|rauch|kiff|dröhn|entspann|beruhig|schlaf|schmerz|angst|\bdaily\b|dosis|dosier|\bthc\b|\bcbd\b|hilft|lindert|gegen\s+(stress|schmerz|angst|übelkeit)|stimmungs|euphor|therap|heil/i;
 
 export function kartenZitat(notiz: string | null): string | null {
   if (!notiz) return null;
@@ -26,8 +28,22 @@ export function kartenZitat(notiz: string | null): string | null {
   return `${(grenze > 0 ? schnitt.slice(0, grenze) : schnitt).replace(/[\s,.;:–-]+$/, "")}…`;
 }
 
-function maske(s: string): string {
+export function maske(s: string): string {
   return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
+
+/** Grundgerüst aller Instagram-Karten: Fläche, Farbwelt, Logo, Fußzeile. */
+export const KARTEN_STIL = `
+html,body{margin:0;background:#0d1210}
+.karte{width:1080px;height:1350px;box-sizing:border-box;padding:96px;display:flex;flex-direction:column;gap:40px;
+background:radial-gradient(120% 80% at 50% 0%,#17221d 0%,#0d1210 70%);color:#e9efec;font-family:Newsreader,Georgia,serif}
+.logo{position:relative;width:256px;aspect-ratio:1726/1242}
+.logo i{position:absolute;inset:0;-webkit-mask:var(--m) center/contain no-repeat;mask:var(--m) center/contain no-repeat}
+.fuss{margin:auto 0 0;font-size:32px;color:#93a39b;letter-spacing:0.08em}`;
+
+/** Pinsel-Logo wie auf der Website: Schrift in Blattgrün, „of“ in Kopierstift-Violett. */
+export function logoHtml(ursprung: string): string {
+  return `<div class="logo" role="img" aria-label="Book of Terpz"><i style="--m:url(${ursprung}/marke/pinsel.webp);background:#3fbf94"></i><i style="--m:url(${ursprung}/marke/pinsel-of.webp);background:#b48cf0"></i></div>`;
 }
 
 const note = (n: number) => n.toLocaleString("de-DE", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
@@ -45,12 +61,7 @@ export function igKarteHtml(r: IgReview, ursprung: string): string {
   return `<!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="robots" content="noindex">
 <title>${maske(r.bluete)}</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Mr+Dafoe&family=Newsreader:ital,opsz,wght@0,6..72,200;0,6..72,400;1,6..72,400&display=block">
-<style>
-html,body{margin:0;background:#0d1210}
-.karte{width:1080px;height:1350px;box-sizing:border-box;padding:96px;display:flex;flex-direction:column;gap:40px;
-background:radial-gradient(120% 80% at 50% 0%,#17221d 0%,#0d1210 70%);color:#e9efec;font-family:Newsreader,Georgia,serif}
-.logo{position:relative;width:256px;aspect-ratio:1726/1242}
-.logo i{position:absolute;inset:0;-webkit-mask:var(--m) center/contain no-repeat;mask:var(--m) center/contain no-repeat}
+<style>${KARTEN_STIL}
 h1{font-weight:200;font-size:96px;line-height:1.05;margin:24px 0 0;letter-spacing:-0.01em;text-wrap:balance}
 .vertreiber{font-size:40px;color:#93a39b;margin:-16px 0 0}
 .note{font-size:40px;color:#93a39b;margin:0;display:flex;align-items:baseline;gap:24px}
@@ -58,9 +69,8 @@ h1{font-weight:200;font-size:96px;line-height:1.05;margin:24px 0 0;letter-spacin
 .aromen{font-size:40px;letter-spacing:0.08em;text-transform:uppercase;margin:0}
 blockquote{margin:0;padding-left:32px;border-left:4px solid #3fbf94;font-style:italic;font-size:40px;line-height:1.4;text-wrap:pretty}
 .charge{font-size:32px;color:#93a39b;margin:0}
-.fuss{margin:auto 0 0;font-size:32px;color:#93a39b;letter-spacing:0.08em}
 </style></head><body><main class="karte">
-<div class="logo" role="img" aria-label="Book of Terpz"><i style="--m:url(${ursprung}/marke/pinsel.webp);background:#3fbf94"></i><i style="--m:url(${ursprung}/marke/pinsel-of.webp);background:#b48cf0"></i></div>
+${logoHtml(ursprung)}
 <h1>${maske(r.bluete)}</h1>${zeilen}
 <p class="fuss">Bewertung im Book of Terpz · Link in Bio</p>
 </main></body></html>`;

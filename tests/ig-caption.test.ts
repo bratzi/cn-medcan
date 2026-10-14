@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { igCaption } from "@/lib/ig-caption";
+import { igCaption, igCaptionPruefen } from "@/lib/ig-caption";
 import type { IgReview } from "@/lib/ig-feed";
 
 const r: IgReview = { id: "r1", url: "https://x.dev/blueten/s", karte: "https://x.dev/api/ig-karte/r1", bluete: "Apples & Bananas", vertreiber: "MGF", charge: "C1", gesamtnote: 4.5, aromen: ["ZITRUS", "SUESS"], notiz: "Zitrus vorne", bilder: [], datum: "2026-10-01T00:00:00.000Z" };
@@ -25,4 +25,22 @@ test("fehlende Felder: keine Lücken, kein null", () => {
 
 test("Notiz mit Wirkversprechen erscheint nicht", () => {
   assert.ok(!igCaption({ ...r, notiz: "hilft bei Migräne" }).includes("Migräne"));
+});
+
+test("Caption-Prüfung: gültig ergibt leere Liste", () => {
+  const c = "Limonen riecht nach frischer Zitronenschale.\n\nWelches Terpen kommt als Nächstes? Link in Bio\n\n#bookofterpz #terpene #limonen";
+  assert.deepEqual(igCaptionPruefen(c), []);
+});
+
+test("Caption-Prüfung: Wirkung, auch gebeugt, und Hashtag-Zahl", () => {
+  assert.ok(igCaptionPruefen("Myrcen wirkt entspannend. #a #b #c").length > 0);
+  assert.ok(igCaptionPruefen("Eine beruhigende Sorte. #a #b #c").length > 0);
+  assert.ok(igCaptionPruefen("Hilft gegen Stress. #a #b #c").length > 0);
+  assert.ok(igCaptionPruefen("Duftet nach Kiefer. #a #b").length > 0);
+  assert.ok(igCaptionPruefen("Duftet nach Kiefer. #a #b #c #d #e #f").length > 0);
+  assert.ok(igCaptionPruefen(`${"x".repeat(2201)} #a #b #c`).length > 0);
+});
+
+test("Bewertungs-Caption hat höchstens 5 Hashtags", () => {
+  assert.ok((igCaption(r).match(/#/g) ?? []).length <= 5);
 });
