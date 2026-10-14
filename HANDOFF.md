@@ -28,6 +28,22 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 
 ## ⇢ Hier geht es weiter
 
+### ⇢ SESSION 61b (2026-10-14 abends): Instagram-Themen-Agent in der Cloud läuft (`83fe99f..`)
+
+Spec `docs/superpowers/specs/2026-10-14-ig-themen-agent-design.md`, Plan `docs/superpowers/plans/2026-10-14-ig-themen-agent.md`.
+1117 Tests grün.
+- **Routine** „Book of Terpz Instagram-Agent“ `trig_01AhFzavSK5zreuGEASsz5Ws`, Cron `0 16 * * 1,3,5` (Mo/Mi/Fr 18:00 Sommer,
+  17:00 Winter), Sonnet 5.5, Umgebung Default (`env_01GF1VY9UqxLgGhViv5AvwNJ`, Variablen und Netz für Publora/Website gesetzt).
+  Anweisung `docs/instagram/agent-anweisung.md`, Themen `docs/instagram/themen.md`. Nur Entwürfe, schreibt nie ins Repo.
+- **Skripte:** `scripts/ig-gemeinsam.ts` (Umgebung, Edge/Chromium, Publora, Marken aus `mediaUrls`), `ig-entwuerfe.ts`,
+  `ig-thema.ts` (Themenkarte `lib/ig-themen-karte.ts`, Caption-Prüfung `igCaptionPruefen`), `ig-lage.ts`.
+  Marke = Bild-Dateiname (`<reviewId>.png`, `bot-thema-<art>-<schluessel>.png`). Testbewertungen in
+  `docs/instagram/ausgeschlossen.txt`.
+- **Publora-Stand:** 4 Bewertungs-Entwürfe (Nutzer: noch nicht posten) und 1 Themen-Entwurf Limonen vom ersten Lauf.
+- **Offen:** Live-Prüfung der Website von Session 60/61 (Herz, Kommentar, HWG-Ablehnung, Pinnwand, 390 px, hell/dunkel).
+  Probe-Routine `trig_01JCDBCA2XfUgMEbPA2BiWTF` und Test-Routine `trig_01VaJwiq3EciVA6FhZd5dq3L` sind aus; löschen nur
+  über claude.ai/code/routines.
+
 ### ⇢ SESSION 61 (2026-10-14): Instagram-Entwürfe per Skript, Live-Fixes (`077eceb..01933b6`)
 
 Spec `docs/superpowers/specs/2026-10-14-ig-karten-cowork-design.md`, Plan `docs/superpowers/plans/2026-10-14-ig-karten-cowork.md`

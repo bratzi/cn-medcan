@@ -37,7 +37,8 @@ Du schreibst nichts ins Repo: kein Commit, kein Push, keine Dateien außer unter
 8. **Bericht** per Push-Nachricht, auf Deutsch, höchstens 5 Zeilen: angelegte Bewertungs-Entwürfe, angelegtes Thema
    mit Titel, übersprungen und warum, Fehler.
 
-Beispiel für `/tmp/thema.json`:
+Beispiel für `/tmp/thema.json` (nur das Format: Texte immer selbst neu schreiben, nie aus diesem Beispiel kopieren;
+Limonen ist schon als Entwurf angelegt):
 
 ```json
 {
