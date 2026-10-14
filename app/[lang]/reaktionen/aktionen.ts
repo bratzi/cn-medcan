@@ -5,7 +5,7 @@ import { textFolgt, textLike } from "@/lib/benachrichtigung";
 import { likeErlaubt } from "@/lib/like-regeln";
 import { getPrisma } from "@/lib/prisma";
 import { eigeneLikes } from "@/lib/query/reaktionen";
-import { istDoppelt, zaehlerUpsert } from "@/lib/reaktionen";
+import { istDoppelt, zaehlerLikesNeu, zaehlerUpsert } from "@/lib/reaktionen";
 import { aktuellesMitglied } from "@/lib/session";
 
 export type LikeErgebnis =
@@ -53,8 +53,11 @@ export async function schalteLike(art: ZielArt, zielId: string): Promise<LikeErg
   try {
     if (vorhanden) {
       // deleteMany statt delete: ein zweiter, gleichzeitiger Klick wirft kein P2025, sondern löscht 0 Zeilen.
-      const weg = await prisma.like.deleteMany({ where: { mitgliedId: ich.mitgliedId, zielArt: art, zielId } });
-      if (weg.count > 0) await prisma.zaehler.updateMany({ where: { zielArt: art, zielId, likes: { gt: 0 } }, data: { likes: { decrement: 1 } } });
+      // Der Zähler wird im selben Batch aus der echten Zeilenzahl neu gesetzt (atomar, selbstkorrigierend).
+      await prisma.$transaction([
+        prisma.like.deleteMany({ where: { mitgliedId: ich.mitgliedId, zielArt: art, zielId } }),
+        zaehlerLikesNeu(prisma, art, zielId),
+      ]);
     } else {
       await prisma.$transaction([
         prisma.like.create({ data: { mitgliedId: ich.mitgliedId, zielArt: art, zielId } }),
