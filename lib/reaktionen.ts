@@ -34,6 +34,14 @@ export function raeumeZielAb(prisma: Db, art: ZielArt, id: string) {
   ];
 }
 
+/**
+ * Kommentarzähler eines Ziels um n senken, nie unter 0. Für Zähler, deren Kommentare
+ * ohne Einzelentscheidung wegfallen (z. B. Blüte, wenn eine Bewertung verworfen wird).
+ */
+export function zaehlerKommentareSenken(prisma: Pick<PrismaClient, "$executeRaw">, art: ZielArt, id: string, n: number) {
+  return prisma.$executeRaw`UPDATE "zaehler" SET "kommentare" = MAX("kommentare" - ${n}, 0) WHERE "ziel_art" = ${art} AND "ziel_id" = ${id}`;
+}
+
 export function istDoppelt(e: unknown): boolean {
   return typeof e === "object" && e !== null && (e as { code?: unknown }).code === "P2002";
 }

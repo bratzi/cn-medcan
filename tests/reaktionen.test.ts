@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { kommentarZaehlerZiele, zaehlerUpsert, raeumeZielAb, istDoppelt } from "@/lib/reaktionen";
+import { kommentarZaehlerZiele, zaehlerUpsert, raeumeZielAb, zaehlerKommentareSenken, istDoppelt } from "@/lib/reaktionen";
 
 function attrappe() {
   const rufe: Array<[string, string, unknown]> = [];
@@ -35,4 +35,13 @@ test("Abräumen löscht Likes, Kommentare und Zähler des Ziels", () => {
 test("P2002 gilt als doppelt", () => {
   assert.equal(istDoppelt({ code: "P2002" }), true);
   assert.equal(istDoppelt(new Error("x")), false);
+});
+
+test("Kommentarzähler senken: parametrisiert, nie unter 0", () => {
+  let texte: readonly string[] = [];
+  let werte: unknown[] = [];
+  const prisma = { $executeRaw: (t: readonly string[], ...w: unknown[]) => ((texte = t), (werte = w), Promise.resolve(1)) } as never;
+  zaehlerKommentareSenken(prisma, "BLUETE", "k1", 3);
+  assert.ok(texte.join("?").includes('MAX("kommentare" - ?, 0)'));
+  assert.deepEqual(werte, [3, "BLUETE", "k1"]);
 });

@@ -14,7 +14,7 @@ export function GemeldeterKommentar({ id }: { id: string }) {
   function los(wahl: "freigeben" | "loeschen") {
     aktion.ausfuehren(async () => {
       const r = await adminEntscheide(id, wahl);
-      return r.ok ? { ok: true } : { ok: false, fehler: "Die Entscheidung konnte nicht gespeichert werden." };
+      return r.ok ? { ok: true } : { ok: false, fehler: "Schon erledigt oder nicht mehr vorhanden." };
     });
   }
 
