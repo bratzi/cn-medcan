@@ -9,14 +9,17 @@ const seite = () => lies("app/[lang]/profil/page.tsx");
 const profilReihen = () => lies("app/[lang]/profil/profil-reihen.tsx");
 const kontoReihen = () => lies("app/[lang]/profil/konto-reihen.tsx");
 
-test("/profil: keine Reiter, Profilkopf, alle Reihen in fester Reihenfolge", () => {
+test("/profil: Reiter Profil und Profil bearbeiten, Profilkopf, alle Reihen in fester Reihenfolge (Nutzer 2026-10-14)", () => {
   const q = seite();
   assert.doesNotMatch(q, /ProfilReiter|ProfilRahmen|ProfilSeitenleiste|ansichtAus|\?ansicht=/);
-  const reihe = ["<ProfilKopf", "<ReiheGeschmack", "<ReiheVerlauf", "<ReiheRegister", "<ReiheAehnliches", "<ReiheVertreiber", "<ReiheMitbestimmen", "<ReiheStimmen", "<ReiheNachrichten", "<ReiheEinstellungen"].map((s) => q.indexOf(s));
+  const reihe = ["<ProfilKopf", "<ReiheGeschmack", "<ReiheVerlauf", "<ReiheRegister", "<ReiheAehnliches", "<ReiheVertreiber", "<ReiheMitbestimmen", "<ReiheStimmen", "<ReiheNachrichten"].map((s) => q.indexOf(s));
   assert.ok(reihe.every((i) => i > 0), JSON.stringify(reihe));
   assert.deepEqual([...reihe].sort((a, b) => a - b), reihe);
   assert.match(q, /redirect\("\/anmelden\?weiter=%2Fprofil"\)/);
   assert.match(q, /index: false/);
+  // Einstellungen nur im Reiter „Profil bearbeiten“.
+  assert.match(q, /bearbeiten \? \(\s*<Suspense fallback=\{skelett\}>\s*<ReiheEinstellungen/);
+  assert.match(q, /href: "\/profil\?ansicht=bearbeiten"/);
 });
 
 test("/profil: Boxen mit eindeutigen Ids und den Sprungzielen des Profilkopfs", () => {
