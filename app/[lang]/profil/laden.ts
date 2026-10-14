@@ -6,6 +6,7 @@ import { benachrichtigungenLaden } from "@/lib/query/benachrichtigungen";
 import { ladeStimmen, stimmZahlen } from "@/lib/query/konto";
 import { aktuellesProfil, ladeAuswertungsZeilen } from "@/lib/query/profil";
 import { aktiveUmfrage } from "@/lib/query/umfragen";
+import { ladeGemocht, ladeReaktionsZahlen } from "@/lib/query/reaktionen";
 import { eigeneVorschlaege } from "@/lib/query/vorschlaege";
 
 /** Fehler eines Teils reißen die Seite nicht mit; Redirects gehen durch. */
@@ -41,3 +42,6 @@ export const vorschlaegeLaden = cache((id: string) => eigeneVorschlaege(id).catc
 export const stimmenLaden = cache((id: string) => ladeStimmen(id).catch(oderNull<Ergebnis<typeof ladeStimmen>>("ladeStimmen")));
 export const stimmZahlenLaden = cache((id: string) => stimmZahlen(id).catch(oderNull<Ergebnis<typeof stimmZahlen>>("stimmZahlen")));
 export const umfrageLaden = cache(() => aktiveUmfrage().catch(oderNull<Ergebnis<typeof aktiveUmfrage>>("aktiveUmfrage")));
+/** Folgende und erhaltene Likes für den Profilkopf: Summe der Zähler (aggregate), je Aufruf einmal. */
+export const reaktionsZahlenLaden = cache((id: string) => ladeReaktionsZahlen(id).catch(oderNull<Ergebnis<typeof ladeReaktionsZahlen>>("ladeReaktionsZahlen")));
+export const gemochtLaden = cache((id: string) => ladeGemocht(id).catch(oderNull<Ergebnis<typeof ladeGemocht>>("ladeGemocht")));

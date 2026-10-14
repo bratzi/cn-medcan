@@ -50,6 +50,8 @@ export type EintragDaten = {
   bildPfad?: string | null;
   /** Freigegebene Bilder zur Bewertung (Spec 2026-10-06); leer: Ersatzbild ab lg. */
   bilder?: ReviewBild[];
+  /** Likes laut Zähler (Strang A); fehlt = kein Herz an dieser Stelle. */
+  likes?: number;
 };
 
 /** Sprungziel des vollstaendigen Eintrags auf der Produktseite. */
@@ -68,6 +70,7 @@ export function eintragHref(slug: string, id: string): string {
 export function alsEintrag(
   review: ReviewEintrag,
   produkt: { handelsname: string; bluete?: string | null; vertreiber?: string | null; slug: string; terpene?: KartenTerpen[]; bildPfad?: string | null },
+  likes?: number,
 ): EintragDaten {
   return {
     id: review.id,
@@ -98,5 +101,6 @@ export function alsEintrag(
     beschaffenheit: parseBeschaffenheit(review.beschaffenheit),
     bildPfad: produkt.bildPfad ?? null,
     bilder: review.bilder ?? [],
+    ...(likes === undefined ? {} : { likes }),
   };
 }

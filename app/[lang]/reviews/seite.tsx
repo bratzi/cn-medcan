@@ -9,6 +9,7 @@ import { EmptyState, buttonKlassen } from "@/components/ui";
 import { cn } from "@/lib/cn";
 import { holeSprache, holeWoerterbuch } from "@/lib/i18n";
 import { ladeBand } from "@/lib/query/buch-band";
+import { likeZahlenFuer } from "@/lib/query/reaktionen";
 import { ladeTerpenKatalog } from "@/lib/query/strains";
 
 /**
@@ -25,6 +26,8 @@ export async function BewertungenSeite({ band }: { band: number }) {
     ladeTerpenKatalog(),
   ]);
   if (!daten) notFound();
+  // Ein Aufruf für alle Herzen des Bandes (höchstens 24 Ids, Zähler statt COUNT).
+  const likes = await likeZahlenFuer("BEWERTUNG", daten.eintraege.map(({ review }) => review.id));
 
   return (
     <>
@@ -42,7 +45,7 @@ export async function BewertungenSeite({ band }: { band: number }) {
             }
           />
         ) : (
-          <GrossesBuch band={daten} w={w} sprache={sprache} katalog={katalog} />
+          <GrossesBuch band={daten} w={w} sprache={sprache} katalog={katalog} likes={likes} />
         )}
         {/* Anker #ranglisten: dorthin führt das Anmelden aus der Insel zurück. */}
         <section

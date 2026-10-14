@@ -39,6 +39,7 @@ export const ladeOeffentlichesProfil = cache(async function ladeOeffentlichesPro
     }),
   ]);
   return {
+    id: m.id,
     anzeigename: m.anzeigename,
     avatarId: m.avatar?.id ?? null,
     seit: m.erstelltAm,

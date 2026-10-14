@@ -1,4 +1,5 @@
 import { Bild } from "@/components/medien/Bild";
+import { LikeKnopf } from "@/components/reaktionen/LikeKnopf";
 import { Badge } from "@/components/ui";
 import type { KultivarTyp } from "@/db/enums";
 import { formatiereAnteil, formatiereProzentSpanne } from "@/lib/format";
@@ -22,6 +23,8 @@ export type SortenKopfProps = {
   terpene: readonly { name: string; konzentrationProzent: number | null; rang: number; aromaProfil?: string | null }[];
   w: Woerterbuch;
   sprache: Sprache;
+  /** Herz an der Blüte (Kultivar-Id und Likes aus dem Zähler); ohne Angabe kein Herz. */
+  like?: { kultivarId: string; anzahl: number };
 };
 
 /**
@@ -67,6 +70,7 @@ export function SortenKopf(props: SortenKopfProps) {
           ) : null}
           <div className="flex flex-wrap gap-2">
             <Badge variante="neutral">{props.w.label.kultivarTyp[props.kultivarTyp]}</Badge>
+            {props.like ? <LikeKnopf art="BLUETE" zielId={props.like.kultivarId} anzahl={props.like.anzahl} text={props.w.reaktionen.knopf} /> : null}
           </div>
           <p className="numeric text-h3 font-normal text-text">
             <span className="whitespace-nowrap">{`THC ${formatiereProzentSpanne(props.thcMin, props.thcMax, 1, props.sprache)}`}</span>

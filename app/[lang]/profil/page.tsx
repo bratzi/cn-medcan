@@ -8,6 +8,7 @@ import { FeldSkelett } from "@/components/kapitel/FeldSkelett";
 import { ProfilKopf } from "@/components/profil/ProfilKopf";
 import { registerParameter } from "@/lib/bewertungs-register";
 import { holeWoerterbuch } from "@/lib/i18n";
+import { mehrzahl } from "@/lib/i18n/text";
 import type { Woerterbuch } from "@/lib/i18n/typen";
 import { kontoNotizen } from "@/lib/konto";
 import { leereProfilWerte } from "@/lib/profil";
@@ -25,6 +26,7 @@ import {
 import {
   nachrichtenLaden,
   profilLaden,
+  reaktionsZahlenLaden,
   stimmZahlenLaden,
   textLaden,
   vorschlaegeLaden,
@@ -32,6 +34,7 @@ import {
 } from "./laden";
 import {
   ReiheAehnliches,
+  ReiheGemocht,
   ReiheGeschmack,
   ReiheRegister,
   ReiheVertreiber,
@@ -158,6 +161,9 @@ export default async function ProfilPage({
               <ReiheStimmen id={id} />
             </Suspense>
             <Suspense fallback={skelett}>
+              <ReiheGemocht id={id} />
+            </Suspense>
+            <Suspense fallback={skelett}>
               <ReiheNachrichten
                 id={id}
                 freigegeben={mitglied.freigegeben}
@@ -184,7 +190,7 @@ async function Kopf({
   Parameters<typeof ProfilKopf>[0],
   "gruppen" | "aromen"
 >) {
-  const [{ w, sprache }, zeilen, profil, zahlen, vorschlaege, nachrichten] =
+  const [{ w, sprache }, zeilen, profil, zahlen, vorschlaege, nachrichten, reaktionen] =
     await Promise.all([
       textLaden(),
       zeilenLaden(id),
@@ -192,6 +198,7 @@ async function Kopf({
       stimmZahlenLaden(id),
       vorschlaegeLaden(id),
       nachrichtenLaden(id),
+      reaktionsZahlenLaden(id),
     ]);
   // Ohne auswertungen(): die Community-Zahl steht nicht im Kopf (ohneCommunity), das spart CPU.
   const profilZahlen: Randnotiz[] =
@@ -224,12 +231,30 @@ async function Kopf({
   ).map((a) => w.label.geschmack[a]);
   const z = kopfNotizen(profilZahlen, kontoZahlen);
   const s = w.profil.seite;
+  // Folgende und erhaltene Likes aus dem Zähler; bei Ladefehler entfallen die zwei Zahlen still.
+  const reaktionsZahlen: Randnotiz[] = reaktionen
+    ? [
+        {
+          zahl: String(reaktionen.folgende),
+          wort: mehrzahl(sprache, w.profil.kopf.folgende.wort, reaktionen.folgende),
+          satz: mehrzahl(sprache, w.profil.kopf.folgende.sr, reaktionen.folgende),
+          href: "#gemocht-titel",
+        },
+        {
+          zahl: String(reaktionen.likesErhalten),
+          wort: mehrzahl(sprache, w.profil.kopf.likesErhalten.wort, reaktionen.likesErhalten),
+          satz: mehrzahl(sprache, w.profil.kopf.likesErhalten.sr, reaktionen.likesErhalten),
+          href: "#bewertungen-titel",
+        },
+      ]
+    : [];
   return (
     <ProfilKopf
       {...kopf}
       gruppen={[
         { titel: s.gruppeBewertungen, notizen: z.profil },
         { titel: s.gruppeMitbestimmung, notizen: z.konto },
+        { titel: s.gruppeReaktionen, notizen: reaktionsZahlen },
       ]}
       aromen={aromen}
     />
