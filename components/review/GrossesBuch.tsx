@@ -18,6 +18,7 @@ export function GrossesBuch({
   sprache,
   katalog,
   likes,
+  kommentare,
 }: {
   band: Band;
   w: Woerterbuch;
@@ -25,6 +26,8 @@ export function GrossesBuch({
   katalog: readonly KatalogTerpen[];
   /** Likes je Bewertungs-Id aus dem Zähler (likeZahlenFuer, eine Abfrage je Seite); fehlt = keine Herzen. */
   likes?: ReadonlyMap<string, number>;
+  /** Kommentare je Bewertungs-Id aus demselben Zähler; fehlt = kein Link „Kommentare (n)“. */
+  kommentare?: ReadonlyMap<string, number>;
 }) {
   return (
     <Buch
@@ -42,7 +45,7 @@ export function GrossesBuch({
       seiten={band.eintraege.map(({ review, produkt }) => ({
         anker: eintragAnker(review.id),
         inhalt: (
-          <BuchDoppelseite eintrag={alsEintrag(review, produkt, likes?.get(review.id))} ueberschrift="h3" w={w} sprache={sprache} katalog={katalog} sorte />
+          <BuchDoppelseite eintrag={alsEintrag(review, produkt, likes?.get(review.id), kommentare?.get(review.id))} ueberschrift="h3" w={w} sprache={sprache} katalog={katalog} sorte />
         ),
       }))}
     />

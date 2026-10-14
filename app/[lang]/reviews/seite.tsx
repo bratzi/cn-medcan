@@ -12,7 +12,7 @@ import { cn } from "@/lib/cn";
 import { holeSprache, holeWoerterbuch } from "@/lib/i18n";
 import { ladeBand } from "@/lib/query/buch-band";
 import { ladeBuchStatistik } from "@/lib/query/buch-statistik";
-import { likeZahlenFuer } from "@/lib/query/reaktionen";
+import { reaktionenFuer, teileZaehler } from "@/lib/query/reaktionen";
 import { ladeTerpenKatalog } from "@/lib/query/strains";
 
 /**
@@ -31,7 +31,7 @@ export async function BewertungenSeite({ band }: { band: number }) {
   ]);
   if (!daten) notFound();
   // Ein Aufruf für alle Herzen des Bandes (höchstens 24 Ids, Zähler statt COUNT).
-  const likes = await likeZahlenFuer("BEWERTUNG", daten.eintraege.map(({ review }) => review.id));
+  const { likes, kommentare } = teileZaehler(await reaktionenFuer("BEWERTUNG", daten.eintraege.map(({ review }) => review.id)));
 
   return (
     <>
@@ -50,7 +50,7 @@ export async function BewertungenSeite({ band }: { band: number }) {
           />
         ) : (
           <EigeneLikes>
-            <GrossesBuch band={daten} w={w} sprache={sprache} katalog={katalog} likes={likes} />
+            <GrossesBuch band={daten} w={w} sprache={sprache} katalog={katalog} likes={likes} kommentare={kommentare} />
           </EigeneLikes>
         )}
         <BuchStatistik daten={statistik} texte={w.reviews.statistik} sprache={sprache} />

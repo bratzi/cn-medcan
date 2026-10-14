@@ -60,7 +60,7 @@ import {
   type StrainDetail,
   type UnternehmenEintrag,
 } from "@/lib/query/strains";
-import { likeZahlenFuer } from "@/lib/query/reaktionen";
+import { likeZahlenFuer, reaktionenFuer, teileZaehler } from "@/lib/query/reaktionen";
 import { ladeVertreiberDerBluete } from "@/lib/query/vertreiber";
 import { aktuellesMitglied } from "@/lib/session";
 
@@ -206,7 +206,7 @@ async function ProduktInhalt({ slug, w, sprache }: { slug: string; w: Woerterbuc
   if (!strain) notFound();
   // „Ähnlich im Aroma“ (T11) rechnet D1, nicht der Worker; ohne Terpene entfällt es.
   // Alle Vertreiber derselben Blüte (Spec 2026-10-13); ohne Liste fehlen nur Wahl und Vergleich.
-  const [budpicListe, aehnliche, vertreiberListe, blueteLikeZahlen, reviewLikes] = await Promise.all([
+  const [budpicListe, aehnliche, vertreiberListe, blueteLikeZahlen, reviewZaehler] = await Promise.all([
     ladeFreieBudpics([strain.id]),
     strain.terpene.length > 0
       ? aehnlichImAroma(strain.id).catch((fehler: unknown) => {
@@ -225,8 +225,9 @@ async function ProduktInhalt({ slug, w, sprache }: { slug: string; w: Woerterbuc
     // Likes der Blüte aus dem Zähler; ob ich geliket habe, lädt erst die Insel (Seite bleibt statisch).
     strain.kultivar ? likeZahlenFuer("BLUETE", [strain.kultivar.id]) : Promise.resolve(new Map<string, number>()),
     // Ein Aufruf für alle Herzen im Bewertungsbuch (Zähler, kein COUNT über Likes).
-    likeZahlenFuer("BEWERTUNG", strain.reviews.map((r) => r.id)),
+    reaktionenFuer("BEWERTUNG", strain.reviews.map((r) => r.id)),
   ]);
+  const { likes: reviewLikes, kommentare: reviewKommentare } = teileZaehler(reviewZaehler);
   const blueteLikes = strain.kultivar ? (blueteLikeZahlen.get(strain.kultivar.id) ?? 0) : 0;
   const budpics = budpicListe.get(strain.id) ?? [];
   const eigeneTerpene = strain.terpene.map((terpen) => terpen.name);
@@ -395,7 +396,7 @@ async function ProduktInhalt({ slug, w, sprache }: { slug: string; w: Woerterbuc
           dann die Community. Ersetzt die eigenen Doppelseiten untereinander und die Liste. */}
       <div className={SEKTION}>
         <Schlagwort satz={texte.schlagwort.bewertungen} ton="lila" />
-        <BewertungsBuch reviews={strain.reviews} kennwerte={strain.kennwerte} produkt={produkt} w={w} sprache={sprache} katalog={katalog} likes={reviewLikes} />
+        <BewertungsBuch reviews={strain.reviews} kennwerte={strain.kennwerte} produkt={produkt} w={w} sprache={sprache} katalog={katalog} likes={reviewLikes} kommentare={reviewKommentare} />
       </div>
 
       {/* Bewerten an der Stelle der Erkundung (Masterplan Bewertung v2, T4; /bewerten entfällt):

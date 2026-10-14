@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import { EigeneLikes } from "@/components/reaktionen/EigeneLikes";
+import { Kommentare } from "@/components/reaktionen/Kommentare";
 import { LikeKnopf } from "@/components/reaktionen/LikeKnopf";
 import { Feld } from "@/components/kapitel/Feld";
 import { OeffentlicheBewertungen } from "@/components/profil/OeffentlicheBewertungen";
@@ -13,7 +14,8 @@ import { istKurzId } from "@/lib/kurz-id";
 import { liebsteAromen } from "@/lib/profil-ansicht";
 import { netzTexte } from "@/lib/profil-oeffentlich";
 import { ladeOeffentlichesProfil } from "@/lib/query/profil-oeffentlich";
-import { likeZahlenFuer } from "@/lib/query/reaktionen";
+import { ladeKommentare } from "@/lib/query/kommentare";
+import { reaktionenFuer } from "@/lib/query/reaktionen";
 
 import { SPALTEN } from "../spalten";
 
@@ -43,8 +45,15 @@ export default async function OeffentlichesProfilPage({ params }: Params) {
   if (!istKurzId(kurzId)) notFound();
   const [profil, w, sprache] = await Promise.all([ladeOeffentlichesProfil(kurzId), holeWoerterbuch(), holeSprache()]);
   if (!profil) notFound();
-  // Folgende aus dem Zähler; ob ich folge, lädt die Insel nach.
-  const folgende = (await likeZahlenFuer("MITGLIED", [profil.id])).get(profil.id) ?? 0;
+  // Folgende und Kommentare der Pinnwand aus demselben Zähler (eine Abfrage); ob ich folge, lädt die Insel nach.
+  const zaehler = (await reaktionenFuer("MITGLIED", [profil.id])).get(profil.id);
+  const folgende = zaehler?.likes ?? 0;
+  const pinnwandZahl = zaehler?.kommentare ?? 0;
+  // Die Seite ist ohnehin dynamisch: die erste Seite Kommentare steht gleich da. Ein Fehler lässt sie auf Abruf laden.
+  const pinnwand = await ladeKommentare("PROFIL", profil.id).catch((fehler: unknown) => {
+    console.error("ladeKommentare fehlgeschlagen", fehler);
+    return undefined;
+  });
   const texte = w.profilOeffentlich;
   const s = w.profil.seite;
   const werte = profil.werte;
@@ -88,6 +97,18 @@ export default async function OeffentlichesProfilPage({ params }: Params) {
             texte={texte}
             w={w}
             sprache={sprache}
+          />
+        </Feld>
+        <Feld id="pinnwand" rahmen="karte" groesse="klein" titel={w.reaktionen.kommentare.pinnwand} className={SPALTEN[12]}>
+          {/* Nur bei profilOeffentlich: sonst 404 oben. */}
+          <Kommentare
+            ziel="PROFIL"
+            zielId={profil.id}
+            anzahl={pinnwandZahl}
+            text={w.reaktionen.kommentare}
+            sprache={sprache}
+            start={pinnwand}
+            offen={Boolean(pinnwand)}
           />
         </Feld>
       </div>

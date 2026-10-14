@@ -9,7 +9,7 @@ import { kommentarZaehlerZiele, istDoppelt, zaehlerUpsert } from "@/lib/reaktion
 import { KOMMENTAR_ZIELE, type KommentarStatus, type KommentarZiel } from "@/db/enums";
 import { getPrisma } from "@/lib/prisma";
 import { adminErforderlich, aktuellesMitglied } from "@/lib/session";
-import { inhaberVon, KOMMENTAR_KOPF, KOMMENTAR_SELECT, REVIEW_ZIEL, zuAnsicht, type KommentarAnsicht, type KommentarZeile } from "@/lib/query/kommentare";
+import { inhaberVon, ladeKommentare, KOMMENTAR_KOPF, KOMMENTAR_SELECT, REVIEW_ZIEL, zuAnsicht, type KommentarAnsicht, type KommentarZeile } from "@/lib/query/kommentare";
 
 /**
  * Kommentare schreiben, löschen, melden, entscheiden (Spec 2026-10-14).
@@ -217,4 +217,28 @@ export async function gemeldeteKommentare(): Promise<Array<KommentarAnsicht & { 
     meldungen: z.meldungen.length,
     gruende: z.meldungen.map((m) => m.grund).filter((g): g is string => !!g),
   }));
+}
+
+/**
+ * Eine Seite Kommentare für die Insel, die erst beim Aufklappen lädt. ladeKommentare prüft das Ziel nicht:
+ * hier gilt dieselbe Öffentlichkeit wie beim Schreiben (freigegebene Bewertung, öffentliches Profil).
+ */
+export async function ladeKommentareSeite(
+  ziel: KommentarZiel,
+  zielId: string,
+  vor?: string,
+): Promise<{ ok: true; eintraege: KommentarAnsicht[]; weitere: boolean } | { ok: false }> {
+  if (!istZiel(ziel) || typeof zielId !== "string" || !zielId || (vor !== undefined && typeof vor !== "string")) return { ok: false };
+  const prisma = await getPrisma();
+  let oeffentlich = false;
+  if (ziel === "BEWERTUNG") {
+    const review = await prisma.review.findUnique({ where: { id: zielId }, select: { freigegeben: true } });
+    oeffentlich = Boolean(review?.freigegeben);
+  } else {
+    const m = await prisma.mitglied.findUnique({ where: { id: zielId }, select: { profilOeffentlich: true, freigegeben: true } });
+    oeffentlich = Boolean(m?.profilOeffentlich && m.freigegeben);
+  }
+  if (!oeffentlich) return { ok: false };
+  const r = await ladeKommentare(ziel, zielId, vor);
+  return { ok: true, ...r };
 }

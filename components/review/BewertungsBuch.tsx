@@ -1,3 +1,4 @@
+import { Kommentare } from "@/components/reaktionen/Kommentare";
 import { Buch } from "@/components/review/Buch";
 import { BuchDoppelseite } from "@/components/review/BuchDoppelseite";
 import { alsEintrag, eintragAnker } from "@/components/review/eintrag";
@@ -27,6 +28,7 @@ export function BewertungsBuch({
   sprache,
   katalog,
   likes,
+  kommentare,
 }: {
   reviews: readonly ReviewEintrag[];
   kennwerte: Pick<KennwerteZeile, "gesamtnoteMedian" | "anzahl"> | null;
@@ -36,6 +38,8 @@ export function BewertungsBuch({
   katalog?: readonly KatalogTerpen[];
   /** Likes je Bewertungs-Id aus dem Zähler (eine Abfrage der Seite, likeZahlenFuer); fehlt = keine Herzen. */
   likes?: ReadonlyMap<string, number>;
+  /** Kommentare je Bewertungs-Id aus demselben Zähler; fehlt = keine Kommentare unter der Bewertung. */
+  kommentare?: ReadonlyMap<string, number>;
 }) {
   const { community } = teileBewertungen(reviews);
   const median = kennwerte?.gesamtnoteMedian ?? null;
@@ -79,7 +83,15 @@ export function BewertungsBuch({
           seiten={seiten.map((review) => ({
             anker: eintragAnker(review.id),
             inhalt: (
-              <BuchDoppelseite eintrag={alsEintrag(review, produkt, likes?.get(review.id))} ueberschrift="h3" w={w} sprache={sprache} katalog={katalog} />
+              <div className="flex flex-col gap-4">
+                <BuchDoppelseite eintrag={alsEintrag(review, produkt, likes?.get(review.id), kommentare?.get(review.id))} ueberschrift="h3" w={w} sprache={sprache} katalog={katalog} />
+                {/* Die Liste lädt erst beim Aufklappen: die Seite bleibt statisch und macht keine Abfrage je Bewertung. */}
+                {kommentare ? (
+                  <div className="px-2 sm:px-4">
+                    <Kommentare ziel="BEWERTUNG" zielId={review.id} anzahl={kommentare.get(review.id) ?? 0} text={w.reaktionen.kommentare} sprache={sprache} />
+                  </div>
+                ) : null}
+              </div>
             ),
           }))}
         />

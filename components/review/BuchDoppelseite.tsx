@@ -196,6 +196,16 @@ export function BuchDoppelseite({ eintrag, ueberschrift: Ueberschrift, w, sprach
           {eintrag.likes !== undefined ? (
             <LikeKnopf art="BEWERTUNG" zielId={eintrag.id} anzahl={eintrag.likes} text={w.reaktionen.knopf} />
           ) : null}
+          {/* Im großen Buch (alle Sorten) führt der Link zur Blütenseite, wo die Kommentare unter der Bewertung stehen. */}
+          {sorte && eintrag.kommentare !== undefined ? (
+            <Link
+              prefetch={false}
+              href={`/blueten/${eintrag.slug}#bewertung-${eintrag.id}`}
+              className={namenLinkKlassen("inline-flex min-h-11 items-center text-small")}
+            >
+              {w.reaktionen.kommentare.titel} (<span className="numeric">{eintrag.kommentare}</span>)
+            </Link>
+          ) : null}
         </header>
 
         {eintrag.notiz ? (
