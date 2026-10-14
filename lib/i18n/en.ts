@@ -1023,6 +1023,8 @@ export const en: Woerterbuch = {
     freigegeben: "The flower you suggested, {handelsname}, is now in the catalogue.",
     abgelehnt: "We are not adding the flower you suggested, {handelsname}, to the catalogue.",
     abgelehntMitGrund: "{satz} Reason: {begruendung}",
+    like: "{name} likes your review.",
+    folgt: "{name} now follows you.",
   },
   empfehlung: {
     startVor: "What you",

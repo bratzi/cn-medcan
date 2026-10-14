@@ -1,11 +1,12 @@
 import "server-only";
 
 import type { ZielArt } from "@/db/enums";
+import { D1_HAEPPCHEN } from "@/lib/haeppchen";
 import { getPrisma } from "@/lib/prisma";
 import { aktuellesMitglied } from "@/lib/session";
 
 /** D1 nimmt je Abfrage nur rund 100 Bind-Werte; Listen werden vorher gekürzt. */
-const MAX_IDS = 100;
+const MAX_IDS = D1_HAEPPCHEN;
 
 export async function zaehlerFuer(art: ZielArt, ids: string[]): Promise<Map<string, { likes: number; kommentare: number }>> {
   const karte = new Map<string, { likes: number; kommentare: number }>();

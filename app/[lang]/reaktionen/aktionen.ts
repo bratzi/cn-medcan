@@ -26,11 +26,13 @@ export async function schalteLike(art: ZielArt, zielId: string): Promise<LikeErg
   const prisma = await getPrisma();
   let zielAutorId: string | null = null;
   let oeffentlich = false;
+  let strainSlug: string | null = null;
   if (art === "BEWERTUNG") {
-    const r = await prisma.review.findUnique({ where: { id: zielId }, select: { autorId: true, freigegeben: true } });
+    const r = await prisma.review.findUnique({ where: { id: zielId }, select: { autorId: true, freigegeben: true, strain: { select: { slug: true } } } });
     if (r) {
       zielAutorId = r.autorId;
       oeffentlich = r.freigegeben;
+      strainSlug = r.strain.slug;
     }
   } else if (art === "BLUETE") {
     oeffentlich = (await prisma.kultivar.findUnique({ where: { id: zielId }, select: { id: true } })) !== null;
@@ -50,7 +52,9 @@ export async function schalteLike(art: ZielArt, zielId: string): Promise<LikeErg
   let neu = !vorhanden;
   try {
     if (vorhanden) {
-      await prisma.$transaction([prisma.like.delete({ where: schluessel }), zaehlerUpsert(prisma, art, zielId, "likes", -1)]);
+      // deleteMany statt delete: ein zweiter, gleichzeitiger Klick wirft kein P2025, sondern löscht 0 Zeilen.
+      const weg = await prisma.like.deleteMany({ where: { mitgliedId: ich.mitgliedId, zielArt: art, zielId } });
+      if (weg.count > 0) await prisma.zaehler.updateMany({ where: { zielArt: art, zielId, likes: { gt: 0 } }, data: { likes: { decrement: 1 } } });
     } else {
       await prisma.$transaction([
         prisma.like.create({ data: { mitgliedId: ich.mitgliedId, zielArt: art, zielId } }),
@@ -66,12 +70,21 @@ export async function schalteLike(art: ZielArt, zielId: string): Promise<LikeErg
 
   if (neu && zielAutorId) {
     const folgt = art === "MITGLIED";
-    const link = folgt ? "/profil" : `/profil#bewertung-${zielId}`;
+    const link = folgt
+      ? ich.profilOeffentlich && ich.kurzId
+        ? `/profil/${ich.kurzId}`
+        : null
+      : strainSlug
+        ? `/blueten/${strainSlug}#bewertung-${zielId}`
+        : null;
     const nachrichtArt = folgt ? "FOLGT" : "LIKE";
+    // Tagesgrenze in UTC (Workers laufen in UTC).
     const heute = new Date();
-    heute.setHours(0, 0, 0, 0);
+    heute.setUTCHours(0, 0, 0, 0);
+    const text = folgt ? textFolgt(ich.anzeigename) : textLike(ich.anzeigename);
+    // Ohne Link (privates Profil) trennt der Text, wer folgt.
     const schon = await prisma.benachrichtigung.findFirst({
-      where: { mitgliedId: zielAutorId, art: nachrichtArt, link, erstelltAm: { gte: heute } },
+      where: { mitgliedId: zielAutorId, art: nachrichtArt, link, text, erstelltAm: { gte: heute } },
       select: { id: true },
     });
     if (!schon) {
@@ -79,7 +92,7 @@ export async function schalteLike(art: ZielArt, zielId: string): Promise<LikeErg
         data: {
           mitgliedId: zielAutorId,
           art: nachrichtArt,
-          text: folgt ? textFolgt(ich.anzeigename) : textLike(ich.anzeigename),
+          text,
           parameter: JSON.stringify({ name: ich.anzeigename }),
           link,
         },

@@ -1036,6 +1036,8 @@ export const de = {
     freigegeben: "Deine vorgeschlagene Blüte {handelsname} steht jetzt im Katalog.",
     abgelehnt: "Deine vorgeschlagene Blüte {handelsname} nehmen wir nicht in den Katalog auf.",
     abgelehntMitGrund: "{satz} Grund: {begruendung}",
+    like: "{name} gefällt deine Bewertung.",
+    folgt: "{name} folgt dir jetzt.",
   },
   empfehlung: {
     startVor: "Was dir",

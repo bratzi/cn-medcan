@@ -25,6 +25,14 @@ test("alte Zeile ohne parameter und kaputtes JSON zeigen den gespeicherten Text"
   assert.equal(benachrichtigungSatz(en.benachrichtigung, { art: "UNBEKANNT", text: "Alt.", parameter: "{\"handelsname\":\"X\"}" }), "Alt.");
 });
 
+test("LIKE und FOLGT: Satz aus dem Wörterbuch in de und en", () => {
+  const zeile = (art: string) => ({ art, text: "Alt.", parameter: JSON.stringify({ name: "Mia" }) });
+  assert.equal(benachrichtigungSatz(de.benachrichtigung, zeile("LIKE")), "Mia gefällt deine Bewertung.");
+  assert.equal(benachrichtigungSatz(en.benachrichtigung, zeile("LIKE")), "Mia likes your review.");
+  assert.equal(benachrichtigungSatz(de.benachrichtigung, zeile("FOLGT")), "Mia folgt dir jetzt.");
+  assert.equal(benachrichtigungSatz(en.benachrichtigung, zeile("FOLGT")), "Mia now follows you.");
+});
+
 test("deutscher Rueckfall-Text bleibt wie bisher", () => {
   assert.equal(vorlageFreigegeben("X").text, "Deine vorgeschlagene Blüte X steht jetzt im Katalog.");
   assert.equal(vorlageAbgelehnt("X", "Y").text, "Deine vorgeschlagene Blüte X nehmen wir nicht in den Katalog auf. Grund: Y");

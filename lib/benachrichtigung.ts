@@ -41,7 +41,7 @@ export function textAbgelehnt(handelsname: string, begruendung: string | null): 
   return begruendung ? `${satz} Grund: ${begruendung}` : satz;
 }
 
-export type BenachrichtigungParameter = { handelsname: string; begruendung?: string | null };
+export type BenachrichtigungParameter = { handelsname: string; begruendung?: string | null; name?: string };
 
 export function vorlageFreigegeben(handelsname: string): Omit<Nachricht, "mitgliedId" | "link"> {
   return {
@@ -63,8 +63,10 @@ function parameterLesen(roh: string | null): BenachrichtigungParameter | null {
   if (!roh) return null;
   try {
     const wert: unknown = JSON.parse(roh);
-    if (wert && typeof wert === "object" && typeof (wert as { handelsname?: unknown }).handelsname === "string") {
-      return wert as BenachrichtigungParameter;
+    if (wert && typeof wert === "object") {
+      const w = wert as { handelsname?: unknown; name?: unknown };
+      if (typeof w.handelsname === "string") return wert as BenachrichtigungParameter;
+      if (typeof w.name === "string") return { handelsname: "", name: w.name };
     }
   } catch {
     // Kaputtes JSON: Rueckfall auf den gespeicherten Satz.
@@ -84,6 +86,8 @@ export function benachrichtigungSatz(
     const satz = t(w.abgelehnt, { handelsname: p.handelsname });
     return p.begruendung ? t(w.abgelehntMitGrund, { satz, begruendung: p.begruendung }) : satz;
   }
+  if (zeile.art === "LIKE" && p.name) return t(w.like, { name: p.name });
+  if (zeile.art === "FOLGT" && p.name) return t(w.folgt, { name: p.name });
   return zeile.text;
 }
 
