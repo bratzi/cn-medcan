@@ -18,12 +18,12 @@ export function istOhneGate(pfad: string): boolean {
 }
 
 /**
- * Der Instagram-Feed für Cowork (Nutzer 2026-10-14): bleibt hinter dem Gate, außer die
+ * Instagram-Feed und -Karten für Cowork (Nutzer 2026-10-14): bleiben hinter dem Gate, außer die
  * Anfrage trägt ?key=. Liefert den Schlüssel zum Prüfen gegen IG_FEED_KEY, sonst null.
- * Gilt nur für genau /api/ig-feed, nie für Seiten oder andere Routen.
+ * Gilt nur für genau /api/ig-feed und /api/ig-karte/<id>, nie für Seiten oder andere Routen.
  */
 export function igFeedSchluessel(pfad: string, suche: string): string | null {
-  if (pfad !== "/api/ig-feed") return null;
+  if (pfad !== "/api/ig-feed" && !/^\/api\/ig-karte\/[^/]+$/.test(pfad)) return null;
   return new URLSearchParams(suche).get("key") || null;
 }
 

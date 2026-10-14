@@ -65,3 +65,11 @@ test("IG-Feed: Schlüssel nur auf /api/ig-feed, sonst nichts", () => {
   assert.equal(igFeedSchluessel("/reviews", "?key=abc"), null);
   assert.equal(istOhneGate("/api/ig-feed"), false);
 });
+
+test("IG-Karte: Schlüssel nur auf /api/ig-karte/<id>", () => {
+  assert.equal(igFeedSchluessel("/api/ig-karte/abc-1", "?key=k"), "k");
+  assert.equal(igFeedSchluessel("/api/ig-karte/", "?key=k"), null);
+  assert.equal(igFeedSchluessel("/api/ig-karte", "?key=k"), null);
+  assert.equal(igFeedSchluessel("/api/ig-karte/a/b", "?key=k"), null);
+  assert.equal(igFeedSchluessel("/ig-karte/a", "?key=k"), null);
+});
