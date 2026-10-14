@@ -41,6 +41,14 @@ export function textAbgelehnt(handelsname: string, begruendung: string | null): 
   return begruendung ? `${satz} Grund: ${begruendung}` : satz;
 }
 
+export function textKommentar(name: string): string {
+  return `${name} hat dich kommentiert.`;
+}
+
+export function textKommentarGemeldet(): string {
+  return "Ein Kommentar wurde mehrfach gemeldet und wartet auf deine Entscheidung.";
+}
+
 export type BenachrichtigungParameter = { handelsname: string; begruendung?: string | null };
 
 export function vorlageFreigegeben(handelsname: string): Omit<Nachricht, "mitgliedId" | "link"> {
