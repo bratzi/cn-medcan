@@ -5,6 +5,7 @@ import { revalidiereSprachen } from "@/lib/i18n/revalidiere";
 import { adminErforderlich } from "@/lib/session";
 import { kennwerteFortschreiben } from "@/lib/kennwerte";
 import { getPrisma } from "@/lib/prisma";
+import { raeumeZielAb } from "@/lib/reaktionen";
 import { profilFortschreiben } from "@/lib/query/profil";
 import { freigabeEingabePruefen, reviewIdPruefen, rolleEingabePruefen } from "@/lib/admin-eingabe";
 
@@ -125,7 +126,11 @@ export async function bewertungVerwerfen(formData: FormData): Promise<AdminErgeb
   if (!slug) return { ok: false, fehler: "Die Bewertung gibt es nicht mehr." };
 
   const prisma = await getPrisma();
-  const review = await prisma.review.delete({ where: { id: geprueft.wert }, select: { strainId: true, autorId: true } });
+  // Likes, Kommentare und Zaehler der Bewertung gehen im selben Batch mit.
+  const [review] = await prisma.$transaction([
+    prisma.review.delete({ where: { id: geprueft.wert }, select: { strainId: true, autorId: true } }),
+    ...raeumeZielAb(prisma, "BEWERTUNG", geprueft.wert),
+  ]);
   await kennwerteFortschreiben(review.strainId);
   await oeffentlichesNetzFortschreiben(review.autorId);
 
