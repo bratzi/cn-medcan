@@ -13,6 +13,7 @@ import type { Sprache } from "@/lib/i18n/sprache-kern";
 import { t } from "@/lib/i18n/text";
 import type { Woerterbuch } from "@/lib/i18n/typen";
 import { cursorKodieren } from "@/lib/kommentar-cursor";
+import { MAX_MELDEGRUND } from "@/lib/kommentar-eingabe";
 import { profilHref } from "@/lib/kurz-id";
 import type { KommentarAnsicht } from "@/lib/query/kommentare";
 
@@ -240,7 +241,7 @@ function Eintrag({ k, text, sprache, beiWeg }: { k: KommentarAnsicht; text: Text
                     type="text"
                     value={grund}
                     onChange={(e) => setGrund(e.target.value)}
-                    maxLength={200}
+                    maxLength={MAX_MELDEGRUND}
                     className="mt-1 h-11 w-full rounded-md border border-border-strong bg-surface px-4 text-body text-text focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring"
                   />
                 </label>

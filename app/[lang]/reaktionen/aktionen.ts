@@ -12,6 +12,8 @@ export type LikeErgebnis =
   | { ok: true; geliket: boolean; likes: number }
   | { ok: false; fehler: "anmelden" | "freigabe" | "selbst" | "weg" };
 
+/** Obergrenze je Abfrage; der Client schickt Häppchen zu D1_HAEPPCHEN (90). */
+const MAX_IDS = 100;
 const ARTEN: readonly string[] = ["BEWERTUNG", "BLUETE", "MITGLIED"];
 
 /** Schaltet Like (Blüte, Bewertung) bzw. Folgen (Mitglied) um. Wer handelt, kommt aus der Sitzung. */
@@ -37,17 +39,17 @@ export async function schalteLike(art: ZielArt, zielId: string): Promise<LikeErg
   } else if (art === "BLUETE") {
     oeffentlich = (await prisma.kultivar.findUnique({ where: { id: zielId }, select: { id: true } })) !== null;
   } else {
-    const m = await prisma.mitglied.findUnique({ where: { id: zielId }, select: { id: true, profilOeffentlich: true } });
+    const m = await prisma.mitglied.findUnique({ where: { id: zielId }, select: { id: true, profilOeffentlich: true, freigegeben: true } });
     if (m) {
       zielAutorId = m.id;
-      oeffentlich = m.profilOeffentlich;
+      oeffentlich = m.profilOeffentlich && m.freigegeben;
     }
   }
-  const urteil = likeErlaubt({ art, zielId, ichId: ich.mitgliedId, zielAutorId, oeffentlich });
-  if (urteil !== "ok") return { ok: false, fehler: urteil };
-
   const schluessel = { mitgliedId_zielArt_zielId: { mitgliedId: ich.mitgliedId, zielArt: art, zielId } };
   const vorhanden = await prisma.like.findUnique({ where: schluessel, select: { mitgliedId: true } });
+  // Zurücknehmen geht immer; nur ein neues Like braucht ein öffentliches Ziel.
+  const urteil = likeErlaubt({ art, zielId, ichId: ich.mitgliedId, zielAutorId, oeffentlich, vorhanden: !!vorhanden });
+  if (urteil !== "ok") return { ok: false, fehler: urteil };
   let geliket = !vorhanden;
   let neu = !vorhanden;
   try {
@@ -109,5 +111,6 @@ export async function schalteLike(art: ZielArt, zielId: string): Promise<LikeErg
 
 export async function ladeEigeneLikes(art: ZielArt, ids: string[]): Promise<string[]> {
   if (!Array.isArray(ids)) return [];
-  return [...(await eigeneLikes(art, ids.filter((i): i is string => typeof i === "string")))];
+  const gueltig = ids.filter((i): i is string => typeof i === "string").slice(0, MAX_IDS);
+  return [...(await eigeneLikes(art, gueltig))];
 }

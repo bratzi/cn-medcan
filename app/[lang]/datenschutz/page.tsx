@@ -246,8 +246,18 @@ export default async function DatenschutzPage() {
               unserer Datenbank (Cloudflare D1, EU); er erscheint mit deinem Anzeigenamen. Du kannst
               eigene Kommentare jederzeit löschen, ebenso der Inhaber der Bewertung oder des Profils.
               Jedes freigeschaltete Mitglied kann einen Kommentar melden, optional mit einem Grund;
-              gemeldete Kommentare prüfen wir und löschen sie bei Verstößen. Gelöschte Texte räumen wir
-              nach 30 Tagen endgültig ab. Beim Löschen deines Kontos verschwinden auch deine Kommentare.
+              gemeldete Kommentare prüfen wir und löschen sie bei Verstößen. Gelöschte Kommentare sind
+              sofort unsichtbar; den Text entfernen wir endgültig beim nächsten Aufräumlauf,
+              frühestens 30 Tage nach dem Schreiben. Beim Löschen deines Kontos verschwinden auch
+              deine Kommentare.
+            </p>
+            <p className="text-pretty">
+              Freigeschaltete Mitglieder können Bewertungen und Blüten liken und anderen Mitgliedern
+              folgen. Wir speichern, welches Mitglied was geliket hat oder wem es folgt, mit dem
+              Datum. Die Zahl der Likes ist öffentlich. Das betroffene Mitglied oder der Autor der
+              Bewertung erhält eine Nachricht mit deinem Anzeigenamen. In öffentlichen Profilen
+              zeigen die Listen nur Mitglieder mit öffentlichem Profil. Ein Like oder Folgen
+              verschwindet, wenn du es zurücknimmst oder dein Konto löschst.
             </p>
             <p className="text-pretty">
               Rechtsgrundlage ist die Mitgliedschaft, die du mit der Registrierung eingehst (Art. 6
@@ -348,7 +358,8 @@ export default async function DatenschutzPage() {
           <Abschnitt id="ds-dauer" titel="Wie lange wir speichern">
             <p className="text-pretty">
               Kontodaten speichern wir, bis du dein Konto löschen lässt. Schreib uns dafür eine
-              E-Mail. Mit dem Konto löschen wir Sitzungen, Stimmen, Vorschläge und Nachrichten.
+              E-Mail. Mit dem Konto löschen wir Sitzungen, Stimmen, Vorschläge, Nachrichten,
+              Kommentare sowie Likes und Folgen.
               Deine Bewertungen bleiben ohne deinen Namen erhalten.
             </p>
           </Abschnitt>

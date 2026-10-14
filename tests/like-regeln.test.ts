@@ -8,4 +8,6 @@ test("fremde, öffentliche Bewertung darf geliket werden", () => assert.equal(li
 test("eigene Bewertung nicht", () => assert.equal(likeErlaubt({ ...basis, zielAutorId: "m1" }), "selbst"));
 test("sich selbst folgen nicht", () => assert.equal(likeErlaubt({ ...basis, art: "MITGLIED", zielId: "m1", zielAutorId: "m1" }), "selbst"));
 test("unfreigegebene Bewertung oder privates Profil gilt als weg", () => assert.equal(likeErlaubt({ ...basis, oeffentlich: false }), "weg"));
+test("vorhandenes Like lässt sich auch bei nicht öffentlichem Ziel zurücknehmen", () => assert.equal(likeErlaubt({ ...basis, oeffentlich: false, vorhanden: true }), "ok"));
+test("neues Like auf nicht öffentliches Ziel bleibt weg", () => assert.equal(likeErlaubt({ ...basis, oeffentlich: false, vorhanden: false }), "weg"));
 test("Blüte hat keinen Autor", () => assert.equal(likeErlaubt({ ...basis, art: "BLUETE", zielAutorId: null }), "ok"));

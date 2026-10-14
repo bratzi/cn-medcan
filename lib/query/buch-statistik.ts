@@ -1,5 +1,5 @@
 import { getPrisma } from "@/lib/prisma";
-import { ordneNoten, STATISTIK_MAX, type BuchStatistik, type StatistikEintrag } from "@/lib/buch-statistik";
+import { MIN_BEWERTUNGEN, ordneNoten, STATISTIK_MAX, type BuchStatistik, type StatistikEintrag } from "@/lib/buch-statistik";
 
 const KENNWERTE_MAX = 200;
 const ZAEHLER_PUFFER = 20; // nicht freigegebene Bewertungen fallen nachträglich raus
@@ -18,7 +18,7 @@ export async function ladeBuchStatistik(): Promise<BuchStatistik> {
       select: { kultivarId: true, anzahl: true, kultivar: { select: { name: true } } },
     }),
     prisma.kultivarKennwerte.findMany({
-      where: { anzahl: { gte: 3 } },
+      where: { anzahl: { gte: MIN_BEWERTUNGEN } },
       select: { kultivarId: true, anzahl: true, gesamtnoteMittel: true, kultivar: { select: { name: true } } },
       orderBy: { anzahl: "desc" },
       take: KENNWERTE_MAX,
