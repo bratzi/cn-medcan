@@ -67,6 +67,18 @@ export function vorlageAbgelehnt(handelsname: string, begruendung: string | null
   };
 }
 
+/** Parameter mit {name} (Kommentar): Objekt mit Textfeld name. */
+function nameLesen(roh: string | null): string | null {
+  if (!roh) return null;
+  try {
+    const wert: unknown = JSON.parse(roh);
+    const name = wert && typeof wert === "object" ? (wert as { name?: unknown }).name : null;
+    return typeof name === "string" && name ? name : null;
+  } catch {
+    return null;
+  }
+}
+
 function parameterLesen(roh: string | null): BenachrichtigungParameter | null {
   if (!roh) return null;
   try {
@@ -85,6 +97,11 @@ export function benachrichtigungSatz(
   w: Woerterbuch["benachrichtigung"],
   zeile: { art: string; text: string; parameter: string | null },
 ): string {
+  if (zeile.art === "KOMMENTAR_GEMELDET") return w.kommentarGemeldet;
+  if (zeile.art === "KOMMENTAR") {
+    const name = nameLesen(zeile.parameter);
+    return name ? t(w.kommentar, { name }) : zeile.text;
+  }
   const p = parameterLesen(zeile.parameter);
   if (!p) return zeile.text;
   if (zeile.art === "VORSCHLAG_FREIGEGEBEN") return t(w.freigegeben, { handelsname: p.handelsname });

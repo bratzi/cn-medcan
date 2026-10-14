@@ -66,6 +66,7 @@ export async function schreibeKommentar(
   let zielOeffentlich = false;
   let inhaberId = "";
   let kultivarId: string | null = null;
+  let link: string | null = null;
   if (ziel === "BEWERTUNG") {
     const review = await prisma.review.findUnique({
       where: { id: zielId },
@@ -75,12 +76,14 @@ export async function schreibeKommentar(
     zielOeffentlich = review.freigegeben;
     inhaberId = review.autorId ?? "";
     kultivarId = review.strain?.kultivarId ?? null;
+    link = review.strain?.slug ? `/blueten/${review.strain.slug}#bewertung-${zielId}` : null;
   } else {
     const m = await prisma.mitglied.findUnique({ where: { id: zielId }, select: { id: true, profilOeffentlich: true, freigegeben: true } });
     if (!m) return { ok: false, fehler: "weg" };
     // Wie das öffentliche Profil selbst: nur freigegebene Mitglieder mit eingeschaltetem Profil.
     zielOeffentlich = m.profilOeffentlich && m.freigegeben;
     inhaberId = m.id;
+    link = "/profil";
   }
   if (!darfSchreiben({ ziel, zielOeffentlich })) return { ok: false, fehler: "weg" };
 
@@ -107,7 +110,7 @@ export async function schreibeKommentar(
 
   if (inhaberId && inhaberId !== ich.mitgliedId) {
     await benachrichtigen(
-      nachrichtenFuer([inhaberId], { art: "KOMMENTAR", text: textKommentar(ich.anzeigename), parameter: null, link: null }),
+      nachrichtenFuer([inhaberId], { art: "KOMMENTAR", text: textKommentar(ich.anzeigename), parameter: JSON.stringify({ name: ich.anzeigename }), link }),
     );
   }
   revalidiereSprachen("/reviews", "layout");

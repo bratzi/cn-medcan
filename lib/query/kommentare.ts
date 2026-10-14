@@ -1,11 +1,12 @@
 import { getPrisma } from "@/lib/prisma";
 import { aktuellesMitglied } from "@/lib/session";
+import { cursorLesen } from "@/lib/kommentar-cursor";
 import { darfLoeschen } from "@/lib/kommentar-rechte";
 import type { KommentarZiel } from "@/db/enums";
 
 /**
  * Kommentare lesen (Spec 2026-10-14). Nur SICHTBAR, älteste zuerst, 20 je Seite.
- * Der Cursor `vor` ist die ISO-Zeit des letzten bisher gezeigten Eintrags.
+ * Der Cursor `vor` ist cursorKodieren(letzter Eintrag): "<ISO>|<id>" (siehe lib/kommentar-cursor.ts).
  */
 export const KOMMENTARE_JE_SEITE = 20;
 
@@ -38,7 +39,7 @@ export const KOMMENTAR_SELECT = {
 export const KOMMENTAR_KOPF = { autorId: true, zielArt: true, zielId: true, status: true } as const;
 
 /** Was beim Schreiben von einer Bewertung gebraucht wird. */
-export const REVIEW_ZIEL = { freigegeben: true, autorId: true, strain: { select: { kultivarId: true } } } as const;
+export const REVIEW_ZIEL = { freigegeben: true, autorId: true, strain: { select: { kultivarId: true, slug: true } } } as const;
 
 export function zuAnsicht(z: KommentarZeile, darf: boolean): KommentarAnsicht {
   return {
@@ -68,15 +69,15 @@ export async function ladeKommentare(
   vor?: string,
 ): Promise<{ eintraege: KommentarAnsicht[]; weitere: boolean }> {
   const prisma = await getPrisma();
-  const ab = vor ? new Date(vor) : null;
+  const c = cursorLesen(vor);
   const zeilen = await prisma.kommentar.findMany({
     where: {
       zielArt: ziel,
       zielId,
       status: "SICHTBAR",
-      ...(ab && !Number.isNaN(ab.getTime()) ? { erstelltAm: { gt: ab } } : {}),
+      ...(c ? { OR: [{ erstelltAm: { gt: c.erstelltAm } }, { erstelltAm: c.erstelltAm, id: { gt: c.id } }] } : {}),
     },
-    orderBy: { erstelltAm: "asc" },
+    orderBy: [{ erstelltAm: "asc" }, { id: "asc" }],
     take: KOMMENTARE_JE_SEITE + 1,
     select: KOMMENTAR_SELECT,
   });

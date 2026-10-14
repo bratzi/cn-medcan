@@ -1036,6 +1036,8 @@ export const de = {
     freigegeben: "Deine vorgeschlagene Blüte {handelsname} steht jetzt im Katalog.",
     abgelehnt: "Deine vorgeschlagene Blüte {handelsname} nehmen wir nicht in den Katalog auf.",
     abgelehntMitGrund: "{satz} Grund: {begruendung}",
+    kommentar: "{name} hat dich kommentiert.",
+    kommentarGemeldet: "Ein Kommentar wurde mehrfach gemeldet und wartet auf deine Entscheidung.",
   },
   empfehlung: {
     startVor: "Was dir",
