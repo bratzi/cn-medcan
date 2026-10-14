@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 
-import { internerPfad, istApiPfad, istOhneGate, ohneSprachPraefix } from "@/lib/proxy-regeln";
+import { igFeedSchluessel, internerPfad, istApiPfad, istOhneGate, ohneSprachPraefix } from "@/lib/proxy-regeln";
 
 test("Ohne Passwort: Login, Rechtsseiten, Sprachwechsel", () => {
   for (const pfad of ["/zugang", "/impressum", "/datenschutz", "/api/zugang", "/api/sprache"]) {
@@ -54,4 +54,14 @@ test("ohneSprachPraefix kehrt internerPfad um und lässt Wörter in Ruhe", () =>
   assert.equal(ohneSprachPraefix("/english"), "/english");
   assert.equal(ohneSprachPraefix("/reviews"), "/reviews");
   assert.equal(ohneSprachPraefix(""), "");
+});
+
+test("IG-Feed: Schlüssel nur auf /api/ig-feed, sonst nichts", () => {
+  assert.equal(igFeedSchluessel("/api/ig-feed", "?key=abc"), "abc");
+  assert.equal(igFeedSchluessel("/api/ig-feed", "?x=1&key=abc"), "abc");
+  assert.equal(igFeedSchluessel("/api/ig-feed", ""), null);
+  assert.equal(igFeedSchluessel("/api/ig-feed", "?key="), null);
+  assert.equal(igFeedSchluessel("/api/ig-feed/x", "?key=abc"), null);
+  assert.equal(igFeedSchluessel("/reviews", "?key=abc"), null);
+  assert.equal(istOhneGate("/api/ig-feed"), false);
 });

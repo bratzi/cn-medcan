@@ -1,10 +1,10 @@
 import { NextResponse, type NextRequest } from "next/server";
 
 import { bewertenWeiterleitung } from "@/lib/alte-adressen";
-import { COOKIE_NAME, tokenPruefen } from "@/lib/gate";
+import { COOKIE_NAME, passwortPruefen, tokenPruefen } from "@/lib/gate";
 import { I18N_OEFFENTLICH } from "@/lib/i18n/schalter";
 import { bestimmeSprache, SPRACH_COOKIE } from "@/lib/i18n/sprache-kern";
-import { internerPfad, istApiPfad, istOhneGate } from "@/lib/proxy-regeln";
+import { igFeedSchluessel, internerPfad, istApiPfad, istOhneGate } from "@/lib/proxy-regeln";
 
 /**
  * Zwei Aufgaben vor jeder Seite (Spec 2026-10-01, statische Seiten, 4.1):
@@ -28,7 +28,7 @@ export async function proxy(request: NextRequest) {
   const bewerten = bewertenWeiterleitung(pathname, search);
   if (bewerten) return NextResponse.redirect(new URL(bewerten, request.url), 308);
 
-  if (!istOhneGate(pathname) && !(await gateOffen(request))) {
+  if (!istOhneGate(pathname) && !(await feedSchluesselOk(pathname, search)) && !(await gateOffen(request))) {
     const ziel = new URL("/zugang", request.url);
     ziel.searchParams.set("weiter", pathname + search);
     return NextResponse.redirect(ziel);
@@ -44,6 +44,14 @@ export async function proxy(request: NextRequest) {
   const intern = request.nextUrl.clone();
   intern.pathname = internerPfad(sprache, pathname);
   return NextResponse.rewrite(intern);
+}
+
+/** IG-Feed mit eigenem Schlüssel (Secret IG_FEED_KEY); ohne Secret nie offen. */
+async function feedSchluesselOk(pfad: string, suche: string): Promise<boolean> {
+  const schluessel = igFeedSchluessel(pfad, suche);
+  const erwartet = process.env.IG_FEED_KEY;
+  if (!schluessel || !erwartet) return false;
+  return passwortPruefen(erwartet, schluessel);
 }
 
 async function gateOffen(request: NextRequest): Promise<boolean> {
