@@ -21,3 +21,7 @@ test("nur freigegebene Bilder, keine Wirkung, Note gerundet", () => {
 test("Notiz mit Wirkversprechen fällt weg", () => {
   assert.equal(igReview({ ...basis, notiz: "hilft bei Migräne" }, ursprung)!.notiz, null);
 });
+
+test("Feld karte ohne Schlüssel", () => {
+  assert.equal(igReview(basis, ursprung)!.karte, "https://x.dev/api/ig-karte/r1");
+});
