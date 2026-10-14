@@ -1107,6 +1107,8 @@ export const de = {
       reiterLeiste: "Bereiche des Profils",
       zahlen: "Deine Zahlen",
       zahlenNeutral: "Zahlen",
+      gruppeBewertungen: "Deine Bewertungen",
+      gruppeMitbestimmung: "Deine Mitbestimmung",
       reiter: { uebersicht: "Übersicht", aromen: "Aromen", bewertungen: "Bewertungen", vertreiber: "Vertreiber" },
       bewerten: "Blüte bewerten",
       bearbeiten: "Profil bearbeiten",

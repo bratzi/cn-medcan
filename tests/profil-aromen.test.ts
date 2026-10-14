@@ -15,7 +15,7 @@ test("liebsteAromen: nur positive, stärkste zuerst", () => {
 
 test("Profil: Fallback des Profilkopfs kennt Rolle und Aktionen, Community füllt die Reihe ohne Schnitte", () => {
   const q = readFileSync("app/[lang]/profil/page.tsx", "utf8");
-  assert.match(q, /<ProfilKopf \{\.\.\.kopf\} notizen=\{\[\]\} aromen=\{\[\]\} \/>/);
+  assert.match(q, /<ProfilKopf \{\.\.\.kopf\} gruppen=\{\[\]\} aromen=\{\[\]\} \/>/);
   assert.match(q, /aktionen: seitenAktionen\(s\)/);
   assert.match(q, /ohneCommunity: true/);
   const r = readFileSync("app/[lang]/profil/profil-reihen.tsx", "utf8");
@@ -24,5 +24,5 @@ test("Profil: Fallback des Profilkopfs kennt Rolle und Aktionen, Community füll
 
 test("Öffentliches Profil: neutrale Beschriftung der Zahlen", () => {
   const q = readFileSync("app/[lang]/profil/[kurzId]/page.tsx", "utf8");
-  assert.match(q, /zahlenLabel=\{s\.zahlenNeutral\}/);
+  assert.match(q, /titel: s\.zahlenNeutral/);
 });

@@ -52,7 +52,7 @@ export default async function ProfilPage({ searchParams }: { searchParams: Promi
 
   return (
     <div className="pb-16">
-      <Suspense fallback={<ProfilKopf {...kopf} notizen={[]} aromen={[]} />}>
+      <Suspense fallback={<ProfilKopf {...kopf} gruppen={[]} aromen={[]} />}>
         <Kopf id={id} {...kopf} />
       </Suspense>
       <div className="mx-auto grid w-full max-w-360 grid-cols-1 gap-8 px-4 pt-8 sm:px-8 min-[1080px]:pt-12 min-[1280px]:grid-cols-12">
@@ -97,7 +97,7 @@ function seitenAktionen(s: Woerterbuch["profil"]["seite"]) {
 }
 
 /** Zahlen und liebste Aromen; die Quellen teilen sich Kopf und Boxen über laden.ts. */
-async function Kopf({ id, ...kopf }: { id: string } & Omit<Parameters<typeof ProfilKopf>[0], "notizen" | "aromen">) {
+async function Kopf({ id, ...kopf }: { id: string } & Omit<Parameters<typeof ProfilKopf>[0], "gruppen" | "aromen">) {
   const [{ w, sprache }, zeilen, profil, zahlen, vorschlaege, nachrichten] = await Promise.all([
     textLaden(),
     zeilenLaden(id),
@@ -128,5 +128,16 @@ async function Kopf({ id, ...kopf }: { id: string } & Omit<Parameters<typeof Pro
     sprache,
   );
   const aromen = liebsteAromen((profil?.werte ?? leereProfilWerte()).geschmack).map((a) => w.label.geschmack[a]);
-  return <ProfilKopf {...kopf} notizen={kopfNotizen(profilZahlen, kontoZahlen)} aromen={aromen} />;
+  const z = kopfNotizen(profilZahlen, kontoZahlen);
+  const s = w.profil.seite;
+  return (
+    <ProfilKopf
+      {...kopf}
+      gruppen={[
+        { titel: s.gruppeBewertungen, notizen: z.profil },
+        { titel: s.gruppeMitbestimmung, notizen: z.konto },
+      ]}
+      aromen={aromen}
+    />
+  );
 }

@@ -12,10 +12,10 @@ const KONTO_ZIELE = ["#stimmen-titel", "#stimmen-titel", "#meine-vorschlaege-tit
  * gibt es nur „0 bewertet“; Register, Top/Flop und Vertreiber werden dann nicht gerendert, darum
  * springt die Zahl zum Netz, das zur ersten Bewertung einlädt.
  */
-export function kopfNotizen(profil: readonly Randnotiz[], konto: readonly Randnotiz[]): Randnotiz[] {
+export function kopfNotizen(profil: readonly Randnotiz[], konto: readonly Randnotiz[]): { profil: Randnotiz[]; konto: Randnotiz[] } {
   const ohneBewertung = profil.length === 1;
-  return [
-    ...profil.slice(0, PROFIL_ZIELE.length).map((n, i) => ({ ...n, href: ohneBewertung ? "#netz-titel" : PROFIL_ZIELE[i] })),
-    ...konto.slice(1, 1 + KONTO_ZIELE.length).map((n, i) => ({ ...n, href: KONTO_ZIELE[i] })),
-  ];
+  return {
+    profil: profil.slice(0, PROFIL_ZIELE.length).map((n, i) => ({ ...n, href: ohneBewertung ? "#netz-titel" : PROFIL_ZIELE[i] })),
+    konto: konto.slice(1, 1 + KONTO_ZIELE.length).map((n, i) => ({ ...n, href: KONTO_ZIELE[i] })),
+  };
 }

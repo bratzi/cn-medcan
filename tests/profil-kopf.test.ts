@@ -13,7 +13,8 @@ const n = (wort: string) => ({ zahl: "1", wort, satz: `Satz ${wort}` });
 const konto = [n("dabei seit"), n("Stimmen"), n("gewonnen"), n("Vorschläge"), n("ungelesen")];
 
 test("kopfNotizen: vier Profilzahlen und vier Kontozahlen, jede mit Sprungziel; dabei seit entfällt", () => {
-  const z = kopfNotizen([n("bewertet"), n("im Schnitt"), n("Vertreiber"), n("zuletzt")], konto);
+  const g = kopfNotizen([n("bewertet"), n("im Schnitt"), n("Vertreiber"), n("zuletzt")], konto);
+  const z = [...g.profil, ...g.konto];
   assert.deepEqual(z.map((x) => x.wort), ["bewertet", "im Schnitt", "Vertreiber", "zuletzt", "Stimmen", "gewonnen", "Vorschläge", "ungelesen"]);
   assert.deepEqual(z.map((x) => x.href), [
     "#bewertungen-titel", "#topflop-titel", "#vertreiber-titel", "#bewertungen-titel",
@@ -23,17 +24,17 @@ test("kopfNotizen: vier Profilzahlen und vier Kontozahlen, jede mit Sprungziel; 
 
 test("kopfNotizen: ohne Bewertung springt „0 bewertet“ zum Netz, nie ins Leere (Review Focus)", () => {
   const z = kopfNotizen([n("bewertet")], konto);
-  assert.equal(z[0].href, "#netz-titel");
-  assert.equal(z.length, 5);
+  assert.equal(z.profil[0].href, "#netz-titel");
+  assert.equal(z.profil.length + z.konto.length, 5);
 });
 
 test("kopfNotizen: Profil nicht ladbar, dann nur die Kontozahlen", () => {
-  assert.deepEqual(kopfNotizen([], konto).map((x) => x.wort), ["Stimmen", "gewonnen", "Vorschläge", "ungelesen"]);
+  assert.deepEqual(kopfNotizen([], konto).konto.map((x) => x.wort), ["Stimmen", "gewonnen", "Vorschläge", "ungelesen"]);
 });
 
-test("Randnotizen: mit href ein Link samt Vorlesesatz, als Leiste eine umbrechende Reihe ohne Container-Query", () => {
+test("Randnotizen: mit href ein Link samt Vorlesesatz, als Leiste vier Spalten nach Inhalt, ohne Container-Query", () => {
   const html = renderToStaticMarkup(createElement(Randnotizen, { notizen: [{ ...n("bewertet"), href: "#netz-titel" }], beschriftung: "Deine Zahlen", leiste: true }));
-  assert.match(html, /<ul aria-label="Deine Zahlen" class="flex flex-wrap gap-x-8 gap-y-2">/);
+  assert.match(html, /<ul aria-label="Deine Zahlen" class="grid grid-cols-\[repeat\(4,auto\)\] justify-start gap-x-6 gap-y-2">/);
   assert.doesNotMatch(html, /@container/);
   assert.match(html, /<a href="#netz-titel"[^>]*min-h-11[^>]*><span class="sr-only">Satz bewertet<\/span>/);
 });
@@ -43,7 +44,7 @@ const basis = {
   avatarId: null,
   rolle: "betreiber" as const,
   seit: new Date("2026-09-01T00:00:00Z"),
-  notizen: [{ ...n("bewertet"), href: "#bewertungen-titel" }],
+  gruppen: [{ titel: "Deine Bewertungen", notizen: [{ ...n("bewertet"), href: "#bewertungen-titel" }] }],
   aromen: ["Blumig", "Zitrus"],
   aktionen: [
     { href: "/blueten", text: "Blüte bewerten", art: "primary" as const },
@@ -79,4 +80,12 @@ test("Profilkopf-Leiste: Zahl von Hand im Akzent (mindestens 32 px), Wort gedruc
   const html = renderToStaticMarkup(createElement(Randnotizen, { notizen: [n("bewertet")], beschriftung: "Deine Zahlen", leiste: true }));
   assert.match(html, /class="font-hand text-vermerk text-logo[^"]*">1<\/span>/);
   assert.match(html, /class="text-caption text-text-muted[^"]*">bewertet<\/span>/);
+});
+
+test("ProfilKopf: Zahlen in beschrifteten Gruppen, leere Gruppe entfällt (Nutzer 2026-10-14: wirkte unsortiert)", () => {
+  const html = renderToStaticMarkup(
+    createElement(ProfilKopf, { ...basis, gruppen: [{ titel: "Deine Bewertungen", notizen: [n("bewertet")] }, { titel: "Deine Mitbestimmung", notizen: [] }] }),
+  );
+  assert.match(html, /aria-label="Deine Bewertungen"/);
+  assert.doesNotMatch(html, /Deine Mitbestimmung/);
 });

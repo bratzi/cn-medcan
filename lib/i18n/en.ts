@@ -1094,6 +1094,8 @@ export const en: Woerterbuch = {
       reiterLeiste: "Profile sections",
       zahlen: "Your numbers",
       zahlenNeutral: "Numbers",
+      gruppeBewertungen: "Your reviews",
+      gruppeMitbestimmung: "Your say",
       reiter: { uebersicht: "Overview", aromen: "Aromas", bewertungen: "Ratings", vertreiber: "Distributors" },
       bewerten: "Rate a flower",
       bearbeiten: "Edit profile",

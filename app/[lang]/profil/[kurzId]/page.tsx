@@ -52,12 +52,11 @@ export default async function OeffentlichesProfilPage({ params }: Params) {
         avatarId={profil.avatarId}
         rolle={profil.rolle}
         seit={profil.seit}
-        notizen={[{ zahl: String(profil.anzahl), wort: s.reiter.bewertungen, satz: mehrzahl(sprache, w.profil.anzahl, profil.anzahl), href: "#bewertungen-titel" }]}
+        gruppen={[{ titel: s.zahlenNeutral, notizen: [{ zahl: String(profil.anzahl), wort: s.reiter.bewertungen, satz: mehrzahl(sprache, w.profil.anzahl, profil.anzahl), href: "#bewertungen-titel" }] }]}
         aromen={werte ? liebsteAromen(werte.geschmack).map((a) => w.label.geschmack[a]) : []}
         aktionen={[]}
         texte={s}
         sprache={sprache}
-        zahlenLabel={s.zahlenNeutral}
       />
       <div className="mx-auto grid w-full max-w-360 grid-cols-1 gap-8 px-4 pt-8 sm:px-8 min-[1080px]:pt-12 min-[1280px]:grid-cols-12">
         <Feld id="netz" rahmen="karte" groesse="klein" titel={texte.netzTitel} className={SPALTEN[12]}>
