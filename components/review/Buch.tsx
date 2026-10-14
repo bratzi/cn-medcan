@@ -537,7 +537,10 @@ export function Buch({
               aria-atomic="true"
               className="text-small whitespace-nowrap text-text-muted tabular-nums"
             >
-              {t(texte.seite, { seite: stand.index + 1, anzahl })}
+              {/* Mit Seitenleiste zählt die Anzeige über alle Bände, wie die Nummern darunter. */}
+              {leiste
+                ? t(texte.seite, { seite: leiste.basis + stand.index + 1, anzahl: leiste.gesamt })
+                : t(texte.seite, { seite: stand.index + 1, anzahl })}
             </p>
             <button
               type="button"

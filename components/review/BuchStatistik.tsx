@@ -83,7 +83,7 @@ function StatistikKarte({
               </Link>
               <span className="shrink-0 whitespace-nowrap">
                 <span className="font-hand text-notiz text-logo numeric">{formatiereZahl(e.wert, nachkomma, sprache)}</span>{" "}
-                <span className="text-caption text-text-muted">{einheit}</span>
+                <span className="ms-2 text-caption text-text-muted">{einheit}</span>
               </span>
             </li>
           ))}

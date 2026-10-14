@@ -201,7 +201,7 @@ export function BuchDoppelseite({ eintrag, ueberschrift: Ueberschrift, w, sprach
             <Link
               prefetch={false}
               href={`/blueten/${eintrag.slug}#bewertung-${eintrag.id}`}
-              className={namenLinkKlassen("inline-flex min-h-11 items-center text-small")}
+              className={namenLinkKlassen("inline-flex min-h-11 items-center whitespace-nowrap text-small")}
             >
               {w.reaktionen.kommentare.titel} (<span className="numeric">{eintrag.kommentare}</span>)
             </Link>
