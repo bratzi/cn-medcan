@@ -1,91 +1,30 @@
 /**
- * Instagram-Entwürfe ohne Cowork (Nutzer 2026-10-14, Weg 2): holt neue Betreiber-Bewertungen aus dem
- * IG-Feed, macht mit Edge headless einen Screenshot der Karte (1080 × 1350) und legt je Bewertung einen
- * Publora-Entwurf mit Bild an. Veröffentlicht nie selbst: der Betreiber plant in Publora.
+ * Instagram-Entwürfe für neue Betreiber-Bewertungen (Nutzer 2026-10-14): holt sie aus dem IG-Feed, macht
+ * einen Screenshot der Karte (1080 × 1350) und legt je Bewertung einen Publora-Entwurf mit Bild an.
+ * Veröffentlicht nie selbst: der Betreiber plant in Publora. Läuft lokal (Edge) und in der Cloud-Routine.
  *
  * Aufruf:
  *   npx tsx scripts/ig-entwuerfe.ts               neue Bewertungen als Entwurf (höchstens 3)
  *   npx tsx scripts/ig-entwuerfe.ts --probe       nur PNG und Caption nach tmp/ig/, nichts an Publora
- *   npx tsx scripts/ig-entwuerfe.ts --nur-merken  alle aktuellen Bewertungen als erledigt merken
+ *   npx tsx scripts/ig-entwuerfe.ts --nur-merken  alle aktuellen Bewertungen lokal als erledigt merken
  *   npx tsx scripts/ig-entwuerfe.ts --max=1       Obergrenze je Lauf
  *
- * Braucht .env (PUBLORA_API_KEY, INSTAGRAM_PLATFORM_ID) und .env.ig-feed (IG_FEED_KEY, IG_FEED_URL).
- * Erledigte Ids stehen in .ig-gepostet.txt (gitignored). Bei einem Fehler bricht der Lauf ab, ohne Wiederholung.
+ * Braucht PUBLORA_API_KEY, INSTAGRAM_PLATFORM_ID, IG_FEED_URL (Umgebung, .env oder .env.ig-feed).
+ * Erledigt ist eine Bewertung, wenn ihre Id in .ig-gepostet.txt (lokal, gitignored) steht oder ein
+ * Publora-Post ein Bild <id>.png trägt. Bei einem Fehler bricht der Lauf ab, ohne Wiederholung.
  */
-import { execFileSync } from "node:child_process";
-import { existsSync, mkdirSync, readFileSync, writeFileSync, appendFileSync } from "node:fs";
+import { appendFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 
 import { igCaption } from "../lib/ig-caption";
 import type { IgReview } from "../lib/ig-feed";
+import { entwurf, feedSchluessel, markenAus, pflicht, publoraPosts, screenshot, umgebung } from "./ig-gemeinsam";
 
-const PUBLORA = "https://api.publora.com/api/v1";
 const GEPOSTET = ".ig-gepostet.txt";
 const AUSGABE = resolve("tmp/ig");
-const EDGE = ["C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe", "C:\\Program Files\\Microsoft\\Edge\\Application\\msedge.exe"];
-
-function envLesen(datei: string): Record<string, string> {
-  if (!existsSync(datei)) return {};
-  return Object.fromEntries(
-    readFileSync(datei, "utf8")
-      .split(/\r?\n/)
-      .map((z) => /^([A-Z0-9_]+)=(.*)$/.exec(z.trim()))
-      .filter((t): t is RegExpExecArray => t !== null)
-      .map((t) => [t[1], t[2].replace(/^["']|["']$/g, "")]),
-  );
-}
-
-function pflicht(env: Record<string, string>, name: string): string {
-  const wert = env[name];
-  if (!wert) throw new Error(`${name} fehlt in .env oder .env.ig-feed`);
-  return wert;
-}
 
 function gepostet(): Set<string> {
   return new Set(existsSync(GEPOSTET) ? readFileSync(GEPOSTET, "utf8").split(/\r?\n/).filter(Boolean) : []);
-}
-
-function screenshot(url: string, ziel: string): void {
-  const edge = EDGE.find((p) => existsSync(p));
-  if (!edge) throw new Error("Microsoft Edge nicht gefunden");
-  execFileSync(edge, [
-    "--headless",
-    "--disable-gpu",
-    "--hide-scrollbars",
-    "--force-device-scale-factor=1",
-    "--window-size=1080,1350",
-    "--virtual-time-budget=8000",
-    `--screenshot=${ziel}`,
-    url,
-  ], { stdio: "ignore", timeout: 60_000 });
-  if (!existsSync(ziel)) throw new Error(`Screenshot fehlt: ${ziel}`);
-}
-
-async function publora<T>(schluessel: string, pfad: string, body: unknown): Promise<T> {
-  const antwort = await fetch(`${PUBLORA}/${pfad}`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json", "x-publora-key": schluessel },
-    body: JSON.stringify(body),
-  });
-  const daten = (await antwort.json().catch(() => ({}))) as T & { success?: boolean; error?: string };
-  if (!antwort.ok || daten.success === false) throw new Error(`Publora ${pfad}: ${antwort.status} ${daten.error ?? ""}`.trim());
-  return daten;
-}
-
-async function entwurf(schluessel: string, plattform: string, caption: string, png: string, id: string): Promise<string> {
-  const { postGroupId } = await publora<{ postGroupId: string }>(schluessel, "create-post", { content: caption, platforms: [plattform] });
-  const { uploadUrl, mediaId } = await publora<{ uploadUrl: string; mediaId: string }>(schluessel, "get-upload-url", {
-    fileName: `${id}.png`,
-    contentType: "image/png",
-    type: "image",
-    postGroupId,
-  });
-  const hoch = await fetch(uploadUrl, { method: "PUT", headers: { "Content-Type": "image/png" }, body: readFileSync(png) });
-  if (!hoch.ok) throw new Error(`Bild-Upload: ${hoch.status}`);
-  // Ohne diesen Schritt bleibt das Bild in Publora auf „uploading“ (Live 2026-10-14).
-  const { mediaFile } = await publora<{ mediaFile?: { status?: string } }>(schluessel, `complete-media/${mediaId}`, {});
-  if (mediaFile?.status !== "ready") throw new Error(`Bild nicht bereit: ${mediaFile?.status ?? "unbekannt"} (Entwurf ${postGroupId})`);
-  return postGroupId;
 }
 
 async function main() {
@@ -93,14 +32,14 @@ async function main() {
   const probe = args.includes("--probe");
   const nurMerken = args.includes("--nur-merken");
   const max = Number(args.find((a) => a.startsWith("--max="))?.slice(6) ?? 3);
-  const env = { ...envLesen(".env"), ...envLesen(".env.ig-feed") };
+  const env = umgebung();
 
-  const feedUrl = pflicht(env, "IG_FEED_URL");
-  const key = pflicht(env, "IG_FEED_KEY");
-  const antwort = await fetch(feedUrl);
+  const key = feedSchluessel(env);
+  const antwort = await fetch(pflicht(env, "IG_FEED_URL"));
   if (!antwort.ok) throw new Error(`Feed: ${antwort.status}`);
   const { reviews } = (await antwort.json()) as { reviews: IgReview[] };
   const erledigt = gepostet();
+  if (!probe && !nurMerken) for (const m of markenAus(await publoraPosts())) erledigt.add(m);
   const neu = reviews.filter((r) => !erledigt.has(r.id));
 
   if (nurMerken) {
@@ -114,9 +53,6 @@ async function main() {
   }
 
   mkdirSync(AUSGABE, { recursive: true });
-  const schluessel = probe ? "" : pflicht(env, "PUBLORA_API_KEY");
-  const plattform = probe ? "" : pflicht(env, "INSTAGRAM_PLATFORM_ID");
-
   for (const r of neu.slice(0, max)) {
     const png = join(AUSGABE, `${r.id}.png`);
     const caption = igCaption(r);
@@ -126,7 +62,7 @@ async function main() {
       console.log(`Probe: ${r.bluete} -> ${png}`);
       continue;
     }
-    const gruppe = await entwurf(schluessel, plattform, caption, png, r.id);
+    const gruppe = await entwurf(caption, png, `${r.id}.png`);
     appendFileSync(GEPOSTET, `${r.id}\n`);
     console.log(`Entwurf angelegt: ${r.bluete} (Publora ${gruppe})`);
   }
