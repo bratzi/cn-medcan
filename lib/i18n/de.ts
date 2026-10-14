@@ -1050,6 +1050,8 @@ export const de = {
     freigegeben: "Deine vorgeschlagene Blüte {handelsname} steht jetzt im Katalog.",
     abgelehnt: "Deine vorgeschlagene Blüte {handelsname} nehmen wir nicht in den Katalog auf.",
     abgelehntMitGrund: "{satz} Grund: {begruendung}",
+    like: "{name} gefällt deine Bewertung.",
+    folgt: "{name} folgt dir jetzt.",
   },
   empfehlung: {
     startVor: "Was dir",
@@ -1111,6 +1113,26 @@ export const de = {
     leerUneins: "Sobald eine Sorte unsere und eure Bewertung hat, steht sie hier.",
     laedt: "Rangliste lädt",
   },
+  reaktionen: {
+    knopf: {
+      moegen: "Gefällt mir",
+      folgen: "Folgen",
+      anmelden: "Melde dich an und lass dich freischalten, um mitzumachen.",
+      selbst: "Eigenes kannst du nicht mögen.",
+      weg: "Nicht mehr verfügbar.",
+    },
+    gemocht: {
+      titel: "Gemocht und gefolgt",
+      satz: "Was dir gefallen hat und wem du folgst. Das siehst nur du.",
+      bewertungen: "Bewertungen",
+      bluete: "Blüten",
+      mitglieder: "Mitglieder",
+      leerBewertungen: "Noch keine Bewertung gemocht.",
+      leerBluete: "Noch keine Blüte gemocht.",
+      leerMitglieder: "Noch niemandem gefolgt.",
+      fehler: "Die Liste lässt sich gerade nicht laden. Lade die Seite in ein paar Minuten neu.",
+    },
+  },
   profil: {
     titel: "Mein Profil",
     seite: {
@@ -1122,6 +1144,7 @@ export const de = {
       zahlen: "Deine Zahlen",
       zahlenNeutral: "Zahlen",
       gruppeBewertungen: "Deine Bewertungen",
+      gruppeReaktionen: "Reaktionen",
       gruppeMitbestimmung: "Deine Mitbestimmung",
       reiter: { uebersicht: "Übersicht", aromen: "Aromen", bewertungen: "Bewertungen", vertreiber: "Vertreiber" },
       bewerten: "Blüte bewerten",
@@ -1129,6 +1152,10 @@ export const de = {
     },
     reiterProfil: "Profil",
     reiterKonto: "Konto",
+    kopf: {
+      folgende: { wort: { one: "Folgender", other: "Folgende" }, sr: { one: "{anzahl} Mitglied folgt dir", other: "{anzahl} Mitglieder folgen dir" } },
+      likesErhalten: { wort: { one: "Like erhalten", other: "Likes erhalten" }, sr: { one: "{anzahl} Like auf deine Bewertungen", other: "{anzahl} Likes auf deine Bewertungen" } },
+    },
     anzahl: { one: "{anzahl} Bewertung", other: "{anzahl} Bewertungen" },
     fehler: "Dein Profil lässt sich gerade nicht laden. Lade die Seite in ein paar Minuten neu.",
     netzTitel: "Deine Aromen",
@@ -1192,6 +1219,7 @@ export const de = {
       umfrage: { vor: "Die Umfrage", betont: "jetzt", schlagwort: "wähl mit" },
       meineVorschlaege: { vor: "Deine", betont: "Vorschläge", schlagwort: "was noch fehlt" },
       stimmen: { vor: "Deine", betont: "Stimmen", schlagwort: "was daraus wurde" },
+      gemocht: { vor: "Gemocht und", betont: "gefolgt", schlagwort: "dein herz" },
       nachrichten: { vor: "Deine", betont: "Nachrichten", schlagwort: "post für dich" },
       status: { vor: "Dein", betont: "Status", schlagwort: "stimmrecht" },
       einstellungen: { vor: "Deine", betont: "Einstellungen", schlagwort: "nur für dich" },

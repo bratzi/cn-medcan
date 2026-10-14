@@ -1,4 +1,5 @@
 import Link from "next/link";
+import type { ReactNode } from "react";
 
 import { Randnotizen, type Randnotiz } from "@/components/kapitel/Randnotizen";
 import { Avatar, Badge, buttonKlassen } from "@/components/ui";
@@ -20,6 +21,8 @@ type Props = {
   aktionen: readonly { href: string; text: string; art: "primary" | "secondary" }[];
   texte: Woerterbuch["profil"]["seite"];
   sprache: Sprache;
+  /** Öffentliches Profil: der Folgen-Knopf (Client-Insel) neben Rolle und Datum. */
+  folgen?: ReactNode;
 };
 
 const MONAT = {
@@ -33,7 +36,7 @@ const MONAT = {
  * je vier (Bewertungen | Mitbestimmung, getrennt durch eine Linie), rechts die Aktionen. Klebt ab
  * 1080 px unter dem Seitenkopf; von 1080 bis 1279 px stehen die Zahlen in einer zweiten Reihe.
  */
-export function ProfilKopf({ name, avatarId, rolle, seit, gruppen, aromen, aktionen, texte, sprache }: Props) {
+export function ProfilKopf({ name, avatarId, rolle, seit, gruppen, aromen, aktionen, texte, sprache, folgen }: Props) {
   const datum = seit ? MONAT[sprache].format(seit) : null;
   const sichtbar = gruppen.filter((g) => g.notizen.length > 0);
   return (
@@ -46,6 +49,7 @@ export function ProfilKopf({ name, avatarId, rolle, seit, gruppen, aromen, aktio
             <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
               {rolle ? <Badge variante={rolle === "betreiber" ? "accent" : "neutral"}>{texte[rolle]}</Badge> : null}
               {datum ? <span className="text-small text-text-muted">{t(texte.dabeiSeit, { datum })}</span> : null}
+              {folgen}
             </div>
             {aromen.length > 0 ? (
               <ul aria-label={texte.aromen} className="flex flex-wrap gap-2">

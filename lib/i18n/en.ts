@@ -1037,6 +1037,8 @@ export const en: Woerterbuch = {
     freigegeben: "The flower you suggested, {handelsname}, is now in the catalogue.",
     abgelehnt: "We are not adding the flower you suggested, {handelsname}, to the catalogue.",
     abgelehntMitGrund: "{satz} Reason: {begruendung}",
+    like: "{name} likes your review.",
+    folgt: "{name} now follows you.",
   },
   empfehlung: {
     startVor: "What you",
@@ -1098,6 +1100,26 @@ export const en: Woerterbuch = {
     leerUneins: "As soon as a strain has our review and yours, it appears here.",
     laedt: "Loading ranking",
   },
+  reaktionen: {
+    knopf: {
+      moegen: "Like",
+      folgen: "Follow",
+      anmelden: "Sign in and get approved to take part.",
+      selbst: "You can't like your own.",
+      weg: "No longer available.",
+    },
+    gemocht: {
+      titel: "Liked and followed",
+      satz: "What you liked and whom you follow. Only you can see this.",
+      bewertungen: "Reviews",
+      bluete: "Flowers",
+      mitglieder: "Members",
+      leerBewertungen: "No review liked yet.",
+      leerBluete: "No flower liked yet.",
+      leerMitglieder: "Not following anyone yet.",
+      fehler: "The list cannot be loaded right now. Reload the page in a few minutes.",
+    },
+  },
   profil: {
     titel: "My profile",
     seite: {
@@ -1109,6 +1131,7 @@ export const en: Woerterbuch = {
       zahlen: "Your numbers",
       zahlenNeutral: "Numbers",
       gruppeBewertungen: "Your reviews",
+      gruppeReaktionen: "Reactions",
       gruppeMitbestimmung: "Your say",
       reiter: { uebersicht: "Overview", aromen: "Aromas", bewertungen: "Ratings", vertreiber: "Distributors" },
       bewerten: "Rate a flower",
@@ -1116,6 +1139,10 @@ export const en: Woerterbuch = {
     },
     reiterProfil: "Profile",
     reiterKonto: "Account",
+    kopf: {
+      folgende: { wort: { one: "follower", other: "followers" }, sr: { one: "{anzahl} member follows you", other: "{anzahl} members follow you" } },
+      likesErhalten: { wort: { one: "like received", other: "likes received" }, sr: { one: "{anzahl} like on your reviews", other: "{anzahl} likes on your reviews" } },
+    },
     anzahl: { one: "{anzahl} review", other: "{anzahl} reviews" },
     fehler: "Your profile cannot be loaded right now. Reload the page in a few minutes.",
     netzTitel: "Your aromas",
@@ -1179,6 +1206,7 @@ export const en: Woerterbuch = {
       umfrage: { vor: "The poll", betont: "now", schlagwort: "have your say" },
       meineVorschlaege: { vor: "Your", betont: "suggestions", schlagwort: "still missing" },
       stimmen: { vor: "Your", betont: "votes", schlagwort: "what came of them" },
+      gemocht: { vor: "Liked and", betont: "followed", schlagwort: "your heart" },
       nachrichten: { vor: "Your", betont: "messages", schlagwort: "post for you" },
       status: { vor: "Your", betont: "status", schlagwort: "voting rights" },
       einstellungen: { vor: "Your", betont: "settings", schlagwort: "just for you" },

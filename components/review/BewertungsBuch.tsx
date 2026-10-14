@@ -26,6 +26,7 @@ export function BewertungsBuch({
   w,
   sprache,
   katalog,
+  likes,
 }: {
   reviews: readonly ReviewEintrag[];
   kennwerte: Pick<KennwerteZeile, "gesamtnoteMedian" | "anzahl"> | null;
@@ -33,6 +34,8 @@ export function BewertungsBuch({
   w: Woerterbuch;
   sprache: Sprache;
   katalog?: readonly KatalogTerpen[];
+  /** Likes je Bewertungs-Id aus dem Zähler (eine Abfrage der Seite, likeZahlenFuer); fehlt = keine Herzen. */
+  likes?: ReadonlyMap<string, number>;
 }) {
   const { community } = teileBewertungen(reviews);
   const median = kennwerte?.gesamtnoteMedian ?? null;
@@ -76,7 +79,7 @@ export function BewertungsBuch({
           seiten={seiten.map((review) => ({
             anker: eintragAnker(review.id),
             inhalt: (
-              <BuchDoppelseite eintrag={alsEintrag(review, produkt)} ueberschrift="h3" w={w} sprache={sprache} katalog={katalog} />
+              <BuchDoppelseite eintrag={alsEintrag(review, produkt, likes?.get(review.id))} ueberschrift="h3" w={w} sprache={sprache} katalog={katalog} />
             ),
           }))}
         />

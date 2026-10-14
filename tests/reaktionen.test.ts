@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { kommentarZaehlerZiele, zaehlerUpsert, raeumeZielAb, istDoppelt } from "@/lib/reaktionen";
+import { kommentarZaehlerZiele, zaehlerUpsert, raeumeZielAb, istDoppelt, zaehlerLikesNeu } from "@/lib/reaktionen";
 
 function attrappe() {
   const rufe: Array<[string, string, unknown]> = [];
@@ -30,6 +30,16 @@ test("Abräumen löscht Likes, Kommentare und Zähler des Ziels", () => {
   assert.deepEqual(rufe.map((r) => r[0] + "." + r[1]), ["like.deleteMany", "kommentar.deleteMany", "zaehler.deleteMany"]);
   raeumeZielAb(prisma, "MITGLIED", "m1");
   assert.deepEqual((rufe[4][2] as { where: unknown }).where, { zielArt: "PROFIL", zielId: "m1" });
+});
+
+test("zaehlerLikesNeu zählt per $executeRaw mit Parametern neu", () => {
+  const aufrufe: unknown[][] = [];
+  const prisma = { $executeRaw: (...a: unknown[]) => (aufrufe.push(a), Promise.resolve(1)) } as never;
+  zaehlerLikesNeu(prisma, "BEWERTUNG", "r1");
+  assert.equal(aufrufe.length, 1);
+  const [teile, ...werte] = aufrufe[0] as [string[], ...unknown[]];
+  assert.deepEqual(werte, ["BEWERTUNG", "r1", "BEWERTUNG", "r1"]);
+  assert.match(teile.join("?"), /COUNT\(\*\) FROM "likes".*ON CONFLICT.*DO UPDATE SET "likes" = excluded\."likes"/);
 });
 
 test("P2002 gilt als doppelt", () => {
