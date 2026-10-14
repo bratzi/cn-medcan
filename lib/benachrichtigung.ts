@@ -104,3 +104,11 @@ export async function benachrichtigen(nachrichten: readonly Nachricht[]): Promis
   const prisma = await getPrisma();
   await prisma.benachrichtigung.createMany({ data: [...nachrichten] });
 }
+
+export function textLike(name: string): string {
+  return `${name} gefällt deine Bewertung.`;
+}
+
+export function textFolgt(name: string): string {
+  return `${name} folgt dir jetzt.`;
+}
