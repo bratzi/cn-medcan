@@ -22,7 +22,8 @@ Alle drei Dateien bleiben lokal und sind gitignored, ebenso `.ig-gepostet.txt` u
 | `npx tsx scripts/ig-entwuerfe.ts --max=1` | eigene Obergrenze |
 
 Bei einem Fehler bricht das Skript ab und wiederholt nichts. Erledigte Ids stehen in `.ig-gepostet.txt`; wer eine
-Bewertung erneut posten will, löscht ihre Zeile dort.
+Bewertung erneut posten will, löscht ihre Zeile dort. Test- und Beispielbewertungen stehen dauerhaft in
+`docs/instagram/ausgeschlossen.txt` (gilt auch in der Cloud).
 
 ## HWG
 

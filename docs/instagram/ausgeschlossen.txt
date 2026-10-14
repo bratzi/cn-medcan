@@ -1,0 +1,5 @@
+# Bewertungen, die nie als Instagram-Entwurf kommen (Test- und Beispieleinträge, Nutzer 2026-10-14).
+# Eine Id je Zeile; gilt lokal und in der Cloud-Routine.
+5bdcfa85-575e-4032-88b7-33f1d8b1e1b4
+ab217a77-cf52-48e9-aa9b-d9a0d67d5fc8
+ac2dff82-78f3-5344-8a50-4ccbbc7de204

@@ -10,8 +10,9 @@
  *   npx tsx scripts/ig-entwuerfe.ts --max=1       Obergrenze je Lauf
  *
  * Braucht PUBLORA_API_KEY, INSTAGRAM_PLATFORM_ID, IG_FEED_URL (Umgebung, .env oder .env.ig-feed).
- * Erledigt ist eine Bewertung, wenn ihre Id in .ig-gepostet.txt (lokal, gitignored) steht oder ein
- * Publora-Post ein Bild <id>.png trägt. Bei einem Fehler bricht der Lauf ab, ohne Wiederholung.
+ * Erledigt ist eine Bewertung, wenn ihre Id in .ig-gepostet.txt (lokal, gitignored) oder
+ * docs/instagram/ausgeschlossen.txt steht oder ein Publora-Post ein Bild <id>.png trägt.
+ * Bei einem Fehler bricht der Lauf ab, ohne Wiederholung.
  */
 import { appendFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
@@ -21,10 +22,20 @@ import type { IgReview } from "../lib/ig-feed";
 import { entwurf, feedSchluessel, markenAus, pflicht, publoraPosts, screenshot, umgebung } from "./ig-gemeinsam";
 
 const GEPOSTET = ".ig-gepostet.txt";
+/** Im Repo, damit auch die Cloud-Routine Test- und Beispielbewertungen auslässt. */
+const AUSGESCHLOSSEN = "docs/instagram/ausgeschlossen.txt";
 const AUSGABE = resolve("tmp/ig");
 
+function idsAus(datei: string): string[] {
+  if (!existsSync(datei)) return [];
+  return readFileSync(datei, "utf8")
+    .split(/\r?\n/)
+    .map((z) => z.trim())
+    .filter((z) => z && !z.startsWith("#"));
+}
+
 function gepostet(): Set<string> {
-  return new Set(existsSync(GEPOSTET) ? readFileSync(GEPOSTET, "utf8").split(/\r?\n/).filter(Boolean) : []);
+  return new Set([...idsAus(GEPOSTET), ...idsAus(AUSGESCHLOSSEN)]);
 }
 
 async function main() {
@@ -39,7 +50,7 @@ async function main() {
   if (!antwort.ok) throw new Error(`Feed: ${antwort.status}`);
   const { reviews } = (await antwort.json()) as { reviews: IgReview[] };
   const erledigt = gepostet();
-  if (!probe && !nurMerken) for (const m of markenAus(await publoraPosts())) erledigt.add(m);
+  if (!nurMerken) for (const m of markenAus(await publoraPosts())) erledigt.add(m);
   const neu = reviews.filter((r) => !erledigt.has(r.id));
 
   if (nurMerken) {
