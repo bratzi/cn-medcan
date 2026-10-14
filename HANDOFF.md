@@ -28,6 +28,18 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 
 ## ⇢ Hier geht es weiter
 
+### ⇢ GROSSER PUNKT (Nutzer 2026-10-14, Session 59): Kommentare, Likes und Bewertungs-Statistiken – als Nächstes, eigener Brainstorming-Durchgang
+
+Der Nutzer will das zusammen bauen („die Likes sowieso mit rein“):
+- **Kommentare** zu Bewertungen und in Profilen anderer Mitglieder (jeder kann bei anderen kommentieren: in den
+  Bewertungen, im Profil und so weiter).
+- **Likes**: überall Bewertungen liken, Strains liken, Mitglieder liken (und damit folgen); siehe den älteren Punkt
+  „Likes und Folgen“ weiter unten (Anzahl öffentlich, im Profil sichtbar).
+- **Reiter Bewertungen (`/reviews`) mit mehr allgemeinen Infos**: meistbewertete Blüten, schlechtestbewertete,
+  bestbewertete, Blüten mit den meisten Kommentaren, Bewertungen mit den meisten Kommentaren, „solche Sachen“.
+- Vor dem Spec klären: Moderation/Melden von Kommentaren (Betreiber haftet), HWG (keine Wirkversprechen in
+  Kommentaren), Sichtbarkeit privater Profile, D1-CPU (Zähler vorberechnen statt beim Aufruf zählen).
+
 ### ⇢ SESSION 59 (2026-10-13/14): Profil und Konto vereint – umgesetzt und gepusht (`9030cb7..d83151a`)
 
 Spec `docs/superpowers/specs/2026-10-13-profil-konto-vereint-design.md`, Plan
@@ -51,6 +63,10 @@ Spec `docs/superpowers/specs/2026-10-13-profil-konto-vereint-design.md`, Plan
   Spec-Reihenfolge, Sprunglinks landen unter dem Kopf, kein Querscroll; 494 px Kopfblock mit 2×4 Zahlen.
   Befund dabei: Zahlenleiste in acht festen Spalten ließ „12.10.“ in die „3“ laufen und die Handschrift schrumpfen;
   Fix `c393802` (Leiste umbrechend, ohne Container-Query), **Fix live noch nicht angesehen**.
+- **Nachträge 2026-10-14:** Name im Knopf 11 px (`628c587`); im Profilkopf Zahl von Hand im Akzent, Wort gedruckt
+  (`c01f0cf`); Profilkopf in drei Zonen mit zwei beschrifteten Gruppen „Deine Bewertungen | Deine Mitbestimmung“
+  (`9e89429`); „Profil bearbeiten“ als eigener Reiter `/profil?ansicht=bearbeiten` (`bc933af`). Der Nutzer erklärte
+  die Regel „Handschrift nie unter 32 px“ für **obsolet**.
 - **Offen:** Fix `c393802` bei 1440 und 1124 px ansehen (bricht die Leiste zweizeilig um, Kopfhöhe?), hell/dunkel,
   öffentliches Profil `/profil/un5cmk9r`, CPU von `/profil` in der Telemetrie (Spec 4). Selbstreview statt
   Subagent-Review (Nutzerwunsch). Name im Knopf kürzt schon bei „GrünesBuch“ (Versalien breiter als „MEIN KONTO“);

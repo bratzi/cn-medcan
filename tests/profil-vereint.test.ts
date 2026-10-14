@@ -11,7 +11,7 @@ const kontoReihen = () => lies("app/[lang]/profil/konto-reihen.tsx");
 
 test("/profil: Reiter Profil und Profil bearbeiten, Profilkopf, alle Reihen in fester Reihenfolge (Nutzer 2026-10-14)", () => {
   const q = seite();
-  assert.doesNotMatch(q, /ProfilReiter|ProfilRahmen|ProfilSeitenleiste|ansichtAus|\?ansicht=/);
+  assert.doesNotMatch(q, /ProfilReiter|ProfilRahmen|ProfilSeitenleiste|ansichtAus|\?ansicht=(?!bearbeiten)/);
   const reihe = ["<ProfilKopf", "<ReiheGeschmack", "<ReiheVerlauf", "<ReiheRegister", "<ReiheAehnliches", "<ReiheVertreiber", "<ReiheMitbestimmen", "<ReiheStimmen", "<ReiheNachrichten"].map((s) => q.indexOf(s));
   assert.ok(reihe.every((i) => i > 0), JSON.stringify(reihe));
   assert.deepEqual([...reihe].sort((a, b) => a - b), reihe);

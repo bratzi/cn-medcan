@@ -55,8 +55,8 @@ Schleife).
 - Auftakt (Referenz choreograffiti): die h1 ist die Wortmarke in `text-plakat` von Rand zu Rand.
 - Jede Startseiten-Sektion trägt einen Buzz-Satz (höchstens drei Wörter) über `components/story/Schlagwort` in `text-kulisse`, `text-border`, aria-hidden; Sektion `relative isolate overflow-x-clip`.
 - Ausnahme seit 2026-09-25 (Nutzer): das Community-Fazit (Prozentzahl) steht in `font-hand` mit `.farbverlauf`, weil es die Stimme der Community ist. Ausnahme seit 2026-10-09 (Nutzer): die Kennzahlen im Auftakt (`AuftaktZahlen`) stehen in `font-hand text-notiz text-logo` und sind Links ins passende Menü; ebenso die Gesamtnote im Buch (`BlattUrteil`), zentriert über den gedruckten Einzelnoten. Sonst bleiben Zahlen gedruckt.
-- Mr Dafoe nur 400 (`.font-hand` setzt `font-synthesis: none`) und **nie unter 32 px**: `font-hand`
-  steht immer zusammen mit einem der vier Handschrift-Grade in derselben Zeile (Test `tests/marke.test.ts`).
+- Mr Dafoe nur 400 (`.font-hand` setzt `font-synthesis: none`). Die frühere Untergrenze 32 px ist seit 2026-10-14
+  aufgehoben (Nutzer). `font-hand` steht weiter zusammen mit einem Handschrift-Grad in derselben Zeile (Test `tests/marke.test.ts`).
 - Handschrift ohne Versalien, ohne Laufweite, ohne Drehung, in natürlicher Schreibung.
 - Betonung im Druck über die Kursive derselben Familie.
 - `text-balance` auf Überschriften, `text-pretty` auf Beschreibungen, `wrap-break-word` wo lange
@@ -156,7 +156,7 @@ Komponenten nutzen nur semantische Tokens:
 ## 11. Checkliste vor Abschluss einer UI-Aufgabe
 1. Abstände auf der Leiter, jedes 4 px begründet, arbitrary values nur nach Regel 2?
 2. Nur semantische Farbtokens, kein `dark:`, `npm run farben` grün?
-3. Gedruckt und Handschrift richtig verteilt, Handelsnamen nie in Handschrift, Handschrift nie unter 32 px?
+3. Gedruckt und Handschrift richtig verteilt, Handelsnamen nie in Handschrift?
 4. Schriftrollen und Gewichte nach Regel 3, höchstens drei Grade je Sektion?
 5. Pillen und eckige Flächen nach Regel 5?
 6. Hell und dunkel geprüft (`prefers-color-scheme` und `data-theme="dark"`), live per Browser-MCP?
