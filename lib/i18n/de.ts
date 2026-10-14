@@ -548,6 +548,20 @@ export const de = {
     leerTitel: "Das erste Kapitel wird gerade geschrieben.",
     leerText: "Welche Sorte ich zuerst teste, entscheidet die Abstimmung.",
     zurAbstimmung: "Zur Abstimmung",
+    statistik: {
+      vor: "Zahlen aus dem",
+      betont: "Buch",
+      leer: "Noch zu wenig Bewertungen.",
+      titel: {
+        meistBewertet: "Meistbewertet",
+        best: "Am besten bewertet",
+        niedrigst: "Am niedrigsten bewertet",
+        bluetenKommentare: "Meistkommentierte Blüten",
+        bewertungenKommentare: "Meistkommentierte Bewertungen",
+        bewertungenLikes: "Meistgemocht",
+      },
+      einheit: { bewertungen: "Bewertungen", mittel: "Ø", kommentare: "Kommentare", likes: "Likes" },
+    },
   },
   bewerten: {
     satz: "Nach festem Schema. Damit wir vergleichen können.",
