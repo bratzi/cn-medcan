@@ -1091,6 +1091,8 @@ export const en: Woerterbuch = {
       moegen: "Like",
       folgen: "Follow",
       anmelden: "Sign in and get approved to take part.",
+      selbst: "You can't like your own.",
+      weg: "No longer available.",
     },
     gemocht: {
       titel: "Liked and followed",

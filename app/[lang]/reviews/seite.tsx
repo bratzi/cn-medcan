@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 
 import { Seitenkopf, seitenRahmen } from "@/components/layout/Seitenkopf";
 import { Ranglisten } from "@/components/rangliste/Ranglisten";
+import { EigeneLikes } from "@/components/reaktionen/EigeneLikes";
 import { GrossesBuch } from "@/components/review/GrossesBuch";
 import { Schlagwort } from "@/components/story/Schlagwort";
 import { EmptyState, buttonKlassen } from "@/components/ui";
@@ -45,7 +46,9 @@ export async function BewertungenSeite({ band }: { band: number }) {
             }
           />
         ) : (
-          <GrossesBuch band={daten} w={w} sprache={sprache} katalog={katalog} likes={likes} />
+          <EigeneLikes>
+            <GrossesBuch band={daten} w={w} sprache={sprache} katalog={katalog} likes={likes} />
+          </EigeneLikes>
         )}
         {/* Anker #ranglisten: dorthin führt das Anmelden aus der Insel zurück. */}
         <section

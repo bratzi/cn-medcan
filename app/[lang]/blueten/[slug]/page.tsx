@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound, unstable_rethrow } from "next/navigation";
 
+import { EigeneLikes } from "@/components/reaktionen/EigeneLikes";
 import { LikeKnopf } from "@/components/reaktionen/LikeKnopf";
 import { seitenRahmen } from "@/components/layout/Seitenkopf";
 import { Schlagwort } from "@/components/story/Schlagwort";
@@ -328,7 +329,7 @@ async function ProduktInhalt({ slug, w, sprache }: { slug: string; w: Woerterbuc
   const anmelden = `/anmelden?weiter=${encodeURIComponent(`/blueten/${strain.slug}#bewerten`)}`;
 
   return (
-    <>
+    <EigeneLikes>
       <Titelblatt
         handelsname={strain.handelsname}
         kultivarName={strain.kultivarName}
@@ -532,7 +533,7 @@ async function ProduktInhalt({ slug, w, sprache }: { slug: string; w: Woerterbuc
       <p className={cn(ABSTAND, "text-caption text-text-muted")}>
         {t(texte.aussicht, { datum: formatiereDatum(strain.aktualisiertAm, sprache) })}
       </p>
-    </>
+    </EigeneLikes>
   );
 }
 

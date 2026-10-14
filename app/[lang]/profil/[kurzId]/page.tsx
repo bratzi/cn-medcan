@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
+import { EigeneLikes } from "@/components/reaktionen/EigeneLikes";
 import { LikeKnopf } from "@/components/reaktionen/LikeKnopf";
 import { Feld } from "@/components/kapitel/Feld";
 import { OeffentlicheBewertungen } from "@/components/profil/OeffentlicheBewertungen";
@@ -50,6 +51,7 @@ export default async function OeffentlichesProfilPage({ params }: Params) {
   const netz = netzTexte(w);
 
   return (
+    <EigeneLikes>
     <div className="pb-16">
       <ProfilKopf
         name={profil.anzeigename}
@@ -90,5 +92,6 @@ export default async function OeffentlichesProfilPage({ params }: Params) {
         </Feld>
       </div>
     </div>
+    </EigeneLikes>
   );
 }

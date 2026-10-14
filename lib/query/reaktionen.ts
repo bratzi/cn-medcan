@@ -5,17 +5,19 @@ import { D1_HAEPPCHEN, inHaeppchen } from "@/lib/haeppchen";
 import { getPrisma } from "@/lib/prisma";
 import { aktuellesMitglied } from "@/lib/session";
 
-/** D1 nimmt je Abfrage nur rund 100 Bind-Werte; Listen werden vorher gekürzt. */
+/** D1 nimmt je Abfrage nur rund 100 Bind-Werte; eigeneLikes kürzt die Liste vorher (Zähler lesen in Häppchen). */
 const MAX_IDS = D1_HAEPPCHEN;
 
 export async function zaehlerFuer(art: ZielArt, ids: string[]): Promise<Map<string, { likes: number; kommentare: number }>> {
   const karte = new Map<string, { likes: number; kommentare: number }>();
-  const liste = ids.slice(0, MAX_IDS);
-  for (const id of liste) karte.set(id, { likes: 0, kommentare: 0 });
-  if (liste.length === 0) return karte;
+  for (const id of ids) karte.set(id, { likes: 0, kommentare: 0 });
+  if (ids.length === 0) return karte;
   const prisma = await getPrisma();
-  const zeilen = await prisma.zaehler.findMany({ where: { zielArt: art, zielId: { in: liste } } });
-  for (const z of zeilen) karte.set(z.zielId, { likes: z.likes, kommentare: z.kommentare });
+  // Häppchenweise statt Abschneiden: ab der 91. Id fehlte sonst das Herz. Fehlende Zähler bleiben 0.
+  const teile = await Promise.all(
+    inHaeppchen(ids).map((teil) => prisma.zaehler.findMany({ where: { zielArt: art, zielId: { in: teil } } })),
+  );
+  for (const z of teile.flat()) karte.set(z.zielId, { likes: z.likes, kommentare: z.kommentare });
   return karte;
 }
 

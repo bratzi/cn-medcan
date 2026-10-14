@@ -244,7 +244,8 @@ async function Kopf({
           zahl: String(reaktionen.likesErhalten),
           wort: mehrzahl(sprache, w.profil.kopf.likesErhalten.wort, reaktionen.likesErhalten),
           satz: mehrzahl(sprache, w.profil.kopf.likesErhalten.sr, reaktionen.likesErhalten),
-          href: "#bewertungen-titel",
+          // Die Register-Box (id „bewertungen“) gibt es nur mit Bewertungen; sonst das Netz, wie kopfNotizen.
+          href: zeilen && zeilen.length > 0 ? "#bewertungen-titel" : "#netz-titel",
         },
       ]
     : [];

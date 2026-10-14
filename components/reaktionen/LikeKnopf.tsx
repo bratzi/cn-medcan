@@ -1,14 +1,15 @@
 "use client";
 
-import { useEffect, useState, useTransition } from "react";
+import { useState, useTransition } from "react";
 
 import type { ZielArt } from "@/db/enums";
-import { ladeEigeneLikes, schalteLike } from "@/app/[lang]/reaktionen/aktionen";
+import { useEigeneLikes } from "@/components/reaktionen/EigeneLikes";
+import { schalteLike } from "@/app/[lang]/reaktionen/aktionen";
 
 /**
  * Herz mit Zahl (Spec Strang A). Die Zahl kommt statisch aus dem Zähler der Elternseite; ob ich
  * geliket habe, lädt nur diese Insel nach, damit die Seite statisch bleibt. Optimistisch mit
- * Rücksprung bei Fehler. Bei `art="MITGLIED"` heißt der Knopf „Folgen“.
+ * Rücksprung bei Fehler mit kurzer Meldung. Bei `art="MITGLIED"` heißt der Knopf „Folgen“.
  */
 export function LikeKnopf({
   art,
@@ -19,24 +20,15 @@ export function LikeKnopf({
   art: ZielArt;
   zielId: string;
   anzahl: number;
-  text: { moegen: string; folgen: string; anmelden: string };
+  text: { moegen: string; folgen: string; anmelden: string; selbst: string; weg: string };
 }) {
   const [anzahl, setAnzahl] = useState(start);
-  const [an, setAn] = useState(false);
+  // Ob ich schon gemocht habe, liefert der Sammler der Seite (eine Abfrage für alle Herzen); null = noch nicht angefasst.
+  const aus = useEigeneLikes(art, zielId);
+  const [lokal, setAn] = useState<boolean | null>(null);
+  const an = lokal ?? aus;
   const [hinweis, setHinweis] = useState<string | null>(null);
   const [laeuft, starte] = useTransition();
-
-  useEffect(() => {
-    let aktuell = true;
-    ladeEigeneLikes(art, [zielId])
-      .then((ids) => {
-        if (aktuell) setAn(ids.includes(zielId));
-      })
-      .catch(() => {});
-    return () => {
-      aktuell = false;
-    };
-  }, [art, zielId]);
 
   const klick = () => {
     const vorher = anzahl;
@@ -54,7 +46,7 @@ export function LikeKnopf({
         }
         setAn(warAn);
         setAnzahl(vorher);
-        setHinweis(r.fehler === "anmelden" || r.fehler === "freigabe" ? text.anmelden : null);
+        setHinweis(r.fehler === "selbst" ? text.selbst : r.fehler === "weg" ? text.weg : text.anmelden);
       } catch {
         setAn(warAn);
         setAnzahl(vorher);

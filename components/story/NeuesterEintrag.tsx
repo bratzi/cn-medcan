@@ -2,6 +2,7 @@ import Link from "next/link";
 import { unstable_rethrow } from "next/navigation";
 import { Suspense } from "react";
 
+import { EigeneLikes } from "@/components/reaktionen/EigeneLikes";
 import { Buch } from "@/components/review/Buch";
 import { BuchDoppelseite } from "@/components/review/BuchDoppelseite";
 import { alsEintrag, eintragAnker } from "@/components/review/eintrag";
@@ -48,6 +49,7 @@ async function EintragInhalt() {
   const { review, produkt } = neuester;
   const likes = await likeZahlenFuer("BEWERTUNG", [review.id]);
   return (
+    <EigeneLikes>
     <Buch
       bezeichnung={`${w.start.eintrag.vor} ${w.start.eintrag.betont} ${w.start.eintrag.nach}`}
       texte={{
@@ -67,6 +69,7 @@ async function EintragInhalt() {
         },
       ]}
     />
+    </EigeneLikes>
   );
 }
 

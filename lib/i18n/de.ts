@@ -1104,6 +1104,8 @@ export const de = {
       moegen: "Gefällt mir",
       folgen: "Folgen",
       anmelden: "Melde dich an und lass dich freischalten, um mitzumachen.",
+      selbst: "Eigenes kannst du nicht mögen.",
+      weg: "Nicht mehr verfügbar.",
     },
     gemocht: {
       titel: "Gemocht und gefolgt",
