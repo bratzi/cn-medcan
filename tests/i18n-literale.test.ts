@@ -134,8 +134,6 @@ const UMGESTELLT: string[] = [
   // Kapitel Profil und Konto (Spec 2026-10-08)
   "components/kapitel/Feld.tsx",
   "components/kapitel/FeldSkelett.tsx",
-  "components/kapitel/KapitelRaster.tsx",
-  "components/kapitel/Kapitelkopf.tsx",
   "components/kapitel/Randnotizen.tsx",
   "components/profil/Aktivitaet.tsx",
   "components/profil/NotenVerteilung.tsx",

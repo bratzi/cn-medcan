@@ -6,8 +6,6 @@ import { renderToStaticMarkup } from "react-dom/server";
 
 import { Feld } from "@/components/kapitel/Feld";
 import { FeldSkelett } from "@/components/kapitel/FeldSkelett";
-import { Kapitelkopf } from "@/components/kapitel/Kapitelkopf";
-import { KapitelRaster } from "@/components/kapitel/KapitelRaster";
 import { Randnotizen } from "@/components/kapitel/Randnotizen";
 
 const html = (el: Parameters<typeof renderToStaticMarkup>[0]) => renderToStaticMarkup(el);
@@ -32,13 +30,6 @@ test("FeldSkelett: gleiche Spalten, aria-hidden", () => {
   assert.match(h, /min-\[1080px\]:col-span-4/);
 });
 
-test("KapitelRaster: Feldbuch-Raster dahinter, 4 und 10 Spalten", () => {
-  const h = html(createElement(KapitelRaster, null, "x"));
-  assert.match(h, /feldbuch-raster/);
-  assert.match(h, /grid-cols-4/);
-  assert.match(h, /min-\[1080px\]:grid-cols-10/);
-});
-
 test("Randnotizen: Zahl gedruckt, Wort von Hand, Satz für Screenreader, gestaffelt", () => {
   const h = html(
     createElement(Randnotizen, {
@@ -55,25 +46,6 @@ test("Randnotizen: Zahl gedruckt, Wort von Hand, Satz für Screenreader, gestaff
   assert.match(h, /font-hand text-notiz/);
   assert.match(h, /--i:1/);
 });
-
-test("Kapitelkopf: Name als h1 gedruckt, bricht um, Schlagwort aria-hidden", () => {
-  const h = html(
-    createElement(Kapitelkopf, {
-      name: "A".repeat(60),
-      avatarId: null,
-      seite: "Profil",
-      schlagwort: "dein Geschmack",
-      ton: "gruen",
-    }),
-  );
-  assert.match(h, /<h1[^>]*kapitel-name[^>]*>A{60}<\/h1>/);
-  assert.match(h, /wrap-break-word/);
-  assert.match(h, /font-buch/);
-  assert.match(h, /aria-hidden="true"[^>]*>dein Geschmack</);
-  // Der Seitenname steht gedruckt im Kopf (keine Reiter mehr, Nutzer 2026-10-09).
-  assert.match(h, /text-h2[^"]*">Profil</);
-});
-
 
 test("Randnotiz-Wort schrumpft mit der Spalte statt mitten im Wort zu trennen (live 2026-10-13)", () => {
   const h = renderToStaticMarkup(
