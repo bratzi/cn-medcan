@@ -28,8 +28,9 @@ Betreiber.
   (Linux, dann mit `--no-sandbox`).
 - Schlüssel: `IG_FEED_KEY` oder aus dem `key`-Parameter von `IG_FEED_URL`.
 - Variablen aus der Umgebung haben Vorrang vor `.env`-Dateien.
-- „Schon gepostet“ zusätzlich aus Publora: Eine Bewertung gilt als erledigt, wenn ein Post in `list-posts` ihre Marke
-  `[bot:review:<id>]` am Ende der Caption trägt. `.ig-gepostet.txt` bleibt lokal als zweite Quelle.
+- „Schon gepostet“ zusätzlich aus Publora: Eine Bewertung gilt als erledigt, wenn ein Post in `list-posts` ein Bild mit
+  `sourceFileName` `<reviewId>.png` trägt (so heißen die Bilder schon). `.ig-gepostet.txt` bleibt lokal als zweite Quelle.
+- **Marke = Bild-Dateiname**, nie Text in der Caption: auf Instagram unsichtbar, in Publora dauerhaft lesbar.
 
 ### 2. Themenkarte `lib/ig-themen-karte.ts`
 
@@ -42,8 +43,8 @@ Alle Texte werden maskiert. Der Agent rendert sie als lokale Datei (`file://`), 
 
 `npx tsx scripts/ig-thema.ts <thema.json>`: liest `{ thema: IgThema, caption: string, schluessel: string }`, prüft die
 Caption mit `igCaptionPruefen` (HWG-Filter plus `IG_SPERRE`, Länge ≤ 2200, 3–5 Hashtags), rendert die Karte, legt den
-Publora-Entwurf mit Bild an (`create-post`, `get-upload-url`, `PUT`, `complete-media`) und hängt die Marke
-`[bot:thema:<schluessel>]` an. `--probe` nur PNG. Bricht bei Prüffehler ab.
+Publora-Entwurf mit Bild an (`create-post`, `get-upload-url`, `PUT`, `complete-media`); das Bild heißt
+`bot-thema-<art>-<schluessel>.png` (Marke). `--probe` nur PNG. Bricht bei Prüffehler ab.
 
 `igCaptionPruefen(caption): string[]` (leer = ok) liegt in `lib/ig-caption.ts`; `IG_SPERRE` wird dafür aus
 `lib/ig-karte.ts` exportiert.
@@ -63,10 +64,10 @@ Die Routine startet mit einem kurzen Prompt, der auf diese Datei verweist. Ablau
 1. Kein `npm ci`: Die Skripte importieren nur abhängigkeitsfreie Module aus `lib/`; `npx --yes tsx` holt tsx aus der
    npm-Registry (erreichbar). Plan prüft das mit einem Lauf in frischem Klon ohne `node_modules`.
 2. Bewertungen: `npx tsx scripts/ig-entwuerfe.ts --max=2`.
-3. Lage lesen: `list-posts` – eigene Posts erkennen an `[bot:…]`. Zählen: offene Entwürfe des Agents, veröffentlichte,
+3. Lage lesen: `list-posts` – eigene Posts erkennen am Bildnamen `bot-thema-…` bzw. `<reviewId>.png`. Zählen: offene Entwürfe des Agents, veröffentlichte,
    gelöschte (fehlen gegenüber früher nicht feststellbar, daher nur: was ist veröffentlicht, was liegt noch).
 4. Wenn ≥ 3 eigene Themen-Entwürfe offen liegen: keinen neuen anlegen, nur berichten.
-5. Sonst ein Thema wählen: nicht wiederholen, was in den letzten 20 Posts (Marke) vorkam; Arten abwechseln; Arten
+5. Sonst ein Thema wählen: nicht wiederholen, was in den letzten 20 Posts (Bildnamen) vorkam; Arten abwechseln; Arten
    bevorzugen, deren Entwürfe der Betreiber veröffentlicht hat.
 6. Caption nach den Regeln aus dem Instagram-Skill-Bündel (in der Anweisung zusammengefasst): Hook in den ersten 125
    Zeichen, kurzer Körper, Frage oder Hinweis „Link in Bio“ am Ende, 3–5 Hashtags (Nische/mittel/breit), kein KI-Ton
