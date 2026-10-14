@@ -74,7 +74,7 @@ async function publora<T>(schluessel: string, pfad: string, body: unknown): Prom
 
 async function entwurf(schluessel: string, plattform: string, caption: string, png: string, id: string): Promise<string> {
   const { postGroupId } = await publora<{ postGroupId: string }>(schluessel, "create-post", { content: caption, platforms: [plattform] });
-  const { uploadUrl } = await publora<{ uploadUrl: string }>(schluessel, "get-upload-url", {
+  const { uploadUrl, mediaId } = await publora<{ uploadUrl: string; mediaId: string }>(schluessel, "get-upload-url", {
     fileName: `${id}.png`,
     contentType: "image/png",
     type: "image",
@@ -82,6 +82,9 @@ async function entwurf(schluessel: string, plattform: string, caption: string, p
   });
   const hoch = await fetch(uploadUrl, { method: "PUT", headers: { "Content-Type": "image/png" }, body: readFileSync(png) });
   if (!hoch.ok) throw new Error(`Bild-Upload: ${hoch.status}`);
+  // Ohne diesen Schritt bleibt das Bild in Publora auf „uploading“ (Live 2026-10-14).
+  const { mediaFile } = await publora<{ mediaFile?: { status?: string } }>(schluessel, `complete-media/${mediaId}`, {});
+  if (mediaFile?.status !== "ready") throw new Error(`Bild nicht bereit: ${mediaFile?.status ?? "unbekannt"} (Entwurf ${postGroupId})`);
   return postGroupId;
 }
 
