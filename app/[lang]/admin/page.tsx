@@ -4,6 +4,7 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 
 import { BudpicFreigabe } from "@/components/admin/BudpicFreigabe";
+import { GemeldeterKommentar } from "@/components/admin/GemeldeterKommentar";
 import { BewertungFreigabe } from "@/components/admin/BewertungFreigabe";
 import { ErgebnisListe } from "@/components/admin/ErgebnisListe";
 import { KennwerteNeuKnopf } from "@/components/admin/KennwerteNeuKnopf";
@@ -38,6 +39,7 @@ import {
   beendeteRundenMitGewinnern,
   vorschlaegeLaden,
 } from "@/lib/query/umfragen";
+import { gemeldeteKommentare } from "@/app/[lang]/reaktionen/kommentar-aktionen";
 import { aktuellesMitglied } from "@/lib/session";
 import { getPrisma } from "@/lib/prisma";
 import { istMitgliedRolle, type MitgliedRolle } from "@/db/enums";
@@ -148,6 +150,54 @@ async function ErgebnisBereich() {
   }
 
   return <ErgebnisListe runden={runden} reviewsJeStrain={reviewsJeStrain} />;
+}
+
+/** Von Mitgliedern gemeldete Kommentare: freigeben oder löschen. */
+async function GemeldeteBereich() {
+  const kommentare = await gemeldeteKommentare();
+
+  return (
+    <section aria-labelledby="gemeldet-titel">
+      <Card>
+        <CardHeader className="flex flex-wrap items-center justify-between gap-4">
+          <h2 id="gemeldet-titel" className="text-h3 text-text">
+            Gemeldete Kommentare
+          </h2>
+          {kommentare.length > 0 ? <Badge variante="warning">{kommentare.length} offen</Badge> : null}
+        </CardHeader>
+        <CardBody>
+          {kommentare.length === 0 ? (
+            <p className="text-body text-text-muted">Nichts gemeldet.</p>
+          ) : (
+            <ul className="flex flex-col divide-y divide-border">
+              {kommentare.map((k) => (
+                <li
+                  key={k.id}
+                  className="flex flex-wrap items-start justify-between gap-4 py-4 first:pt-0 last:pb-0"
+                >
+                  <div className="flex min-w-0 flex-col gap-2">
+                    <p className="max-w-[68ch] text-body text-text">{k.text}</p>
+                    <p className="text-small text-text-muted">
+                      {k.autor.name} · {DATUM.format(new Date(k.erstelltAm))} ·{" "}
+                      <span className="numeric">{k.meldungen}</span> {k.meldungen === 1 ? "Meldung" : "Meldungen"}
+                    </p>
+                    {k.gruende.length > 0 ? (
+                      <ul className="flex flex-col gap-1 text-small text-text-muted">
+                        {k.gruende.map((g, i) => (
+                          <li key={i}>Grund: {g}</li>
+                        ))}
+                      </ul>
+                    ) : null}
+                  </div>
+                  <GemeldeterKommentar id={k.id} />
+                </li>
+              ))}
+            </ul>
+          )}
+        </CardBody>
+      </Card>
+    </section>
+  );
 }
 
 /** Community-Bewertungen, die auf Freigabe warten. */
@@ -522,6 +572,10 @@ export default async function AdminPage() {
 
         <Suspense fallback={<Spinner text="Bewertungen werden geladen" />}>
           <BewertungenBereich />
+        </Suspense>
+
+        <Suspense fallback={<Spinner text="Gemeldete Kommentare werden geladen" />}>
+          <GemeldeteBereich />
         </Suspense>
 
         <Suspense fallback={<Spinner text="Mitglieder werden geladen" />}>

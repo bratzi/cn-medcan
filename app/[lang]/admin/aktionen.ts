@@ -5,6 +5,7 @@ import { revalidiereSprachen } from "@/lib/i18n/revalidiere";
 import { adminErforderlich } from "@/lib/session";
 import { kennwerteFortschreiben } from "@/lib/kennwerte";
 import { getPrisma } from "@/lib/prisma";
+import { raeumeZielAb, zaehlerKommentareSenken } from "@/lib/reaktionen";
 import { profilFortschreiben } from "@/lib/query/profil";
 import { freigabeEingabePruefen, reviewIdPruefen, rolleEingabePruefen } from "@/lib/admin-eingabe";
 
@@ -125,7 +126,18 @@ export async function bewertungVerwerfen(formData: FormData): Promise<AdminErgeb
   if (!slug) return { ok: false, fehler: "Die Bewertung gibt es nicht mehr." };
 
   const prisma = await getPrisma();
-  const review = await prisma.review.delete({ where: { id: geprueft.wert }, select: { strainId: true, autorId: true } });
+  // Likes, Kommentare und Zaehler der Bewertung gehen im selben Batch mit.
+  // Jeder sichtbare Kommentar hat auch den Blueten-Zaehler erhoeht; der faellt hier mit weg.
+  const [ziel, sichtbar] = await Promise.all([
+    prisma.review.findUnique({ where: { id: geprueft.wert }, select: { strain: { select: { kultivarId: true } } } }),
+    prisma.kommentar.count({ where: { zielArt: "BEWERTUNG", zielId: geprueft.wert, status: "SICHTBAR" } }),
+  ]);
+  const kultivarId = ziel?.strain.kultivarId ?? null;
+  const [review] = await prisma.$transaction([
+    prisma.review.delete({ where: { id: geprueft.wert }, select: { strainId: true, autorId: true } }),
+    ...raeumeZielAb(prisma, "BEWERTUNG", geprueft.wert),
+    ...(kultivarId && sichtbar > 0 ? [zaehlerKommentareSenken(prisma, "BLUETE", kultivarId, sichtbar)] : []),
+  ]);
   await kennwerteFortschreiben(review.strainId);
   await oeffentlichesNetzFortschreiben(review.autorId);
 

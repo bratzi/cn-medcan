@@ -20,8 +20,8 @@ test("LikeKnopf steht an Bewertung, Blüte und öffentlichem Profil", () => {
 });
 
 test("Zahlen kommen aus dem Zähler, eine Abfrage je Seite; Anker bewertung-<id>", () => {
-  assert.match(lies("app/[lang]/blueten/[slug]/page.tsx"), /likeZahlenFuer\("BEWERTUNG"/);
-  assert.match(lies("app/[lang]/reviews/seite.tsx"), /likeZahlenFuer\("BEWERTUNG"/);
+  assert.match(lies("app/[lang]/blueten/[slug]/page.tsx"), /reaktionenFuer\("BEWERTUNG"/);
+  assert.match(lies("app/[lang]/reviews/seite.tsx"), /reaktionenFuer\("BEWERTUNG"/);
   assert.match(lies("components/review/BewertungsBuch.tsx"), /likes\?\.get\(review\.id\)/);
   assert.match(lies("components/review/BuchDoppelseite.tsx"), /id=\{`bewertung-\$\{eintrag\.id\}`\}/);
   assert.match(lies("lib/buch.ts"), /bewertung-/);

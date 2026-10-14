@@ -52,6 +52,8 @@ export type EintragDaten = {
   bilder?: ReviewBild[];
   /** Likes laut Zähler (Strang A); fehlt = kein Herz an dieser Stelle. */
   likes?: number;
+  /** Kommentare laut Zähler (Strang B); fehlt = kein Kommentar-Link an dieser Stelle. */
+  kommentare?: number;
 };
 
 /** Sprungziel des vollstaendigen Eintrags auf der Produktseite. */
@@ -71,6 +73,7 @@ export function alsEintrag(
   review: ReviewEintrag,
   produkt: { handelsname: string; bluete?: string | null; vertreiber?: string | null; slug: string; terpene?: KartenTerpen[]; bildPfad?: string | null },
   likes?: number,
+  kommentare?: number,
 ): EintragDaten {
   return {
     id: review.id,
@@ -102,5 +105,6 @@ export function alsEintrag(
     bildPfad: produkt.bildPfad ?? null,
     bilder: review.bilder ?? [],
     ...(likes === undefined ? {} : { likes }),
+    ...(kommentare === undefined ? {} : { kommentare }),
   };
 }

@@ -241,6 +241,15 @@ export default async function DatenschutzPage() {
               keine persönlichen Angaben zu sehen sind.
             </p>
             <p className="text-pretty">
+              Freigeschaltete Mitglieder können Bewertungen und öffentliche Profile kommentieren. Wir
+              speichern den Text (höchstens 1000 Zeichen) zusammen mit deinem Konto und dem Datum in
+              unserer Datenbank (Cloudflare D1, EU); er erscheint mit deinem Anzeigenamen. Du kannst
+              eigene Kommentare jederzeit löschen, ebenso der Inhaber der Bewertung oder des Profils.
+              Jedes freigeschaltete Mitglied kann einen Kommentar melden, optional mit einem Grund;
+              gemeldete Kommentare prüfen wir und löschen sie bei Verstößen. Gelöschte Texte räumen wir
+              nach 30 Tagen endgültig ab. Beim Löschen deines Kontos verschwinden auch deine Kommentare.
+            </p>
+            <p className="text-pretty">
               Rechtsgrundlage ist die Mitgliedschaft, die du mit der Registrierung eingehst (Art. 6
               Abs. 1 lit. b DSGVO), beim Profilbild, bei Budpics und bei Bildern zu deiner Bewertung
               deine Einwilligung durch das Hochladen (Art. 6 Abs. 1 lit. a DSGVO).

@@ -49,6 +49,30 @@ export async function likeZahlenFuer(art: ZielArt, ids: string[]): Promise<Map<s
 }
 
 /**
+ * Likes und Kommentare je Id aus derselben Zählerabfrage (eine je Seite). Wie likeZahlenFuer:
+ * ein Fehler lässt Herzen und Kommentarzahlen weg, statt die Seite zu kippen.
+ */
+export async function reaktionenFuer(art: ZielArt, ids: string[]): Promise<Map<string, { likes: number; kommentare: number }>> {
+  try {
+    return await zaehlerFuer(art, ids);
+  } catch (fehler) {
+    console.error("reaktionenFuer fehlgeschlagen", fehler);
+    return new Map();
+  }
+}
+
+/** Teilt die Zähler in zwei Karten, wie die Bücher sie als Props nehmen (Herzen, Kommentarzahlen). */
+export function teileZaehler(zaehler: ReadonlyMap<string, { likes: number; kommentare: number }>): {
+  likes: Map<string, number>;
+  kommentare: Map<string, number>;
+} {
+  return {
+    likes: new Map([...zaehler].map(([id, z]) => [id, z.likes])),
+    kommentare: new Map([...zaehler].map(([id, z]) => [id, z.kommentare])),
+  };
+}
+
+/**
  * Zahlen im Profilkopf: Folgende (Zähler des Mitglieds) und Likes auf die eigenen freigegebenen
  * Bewertungen (Summe der Zähler, nie COUNT über die Likes-Zeilen). Die Id-Liste wird in D1-Häppchen
  * geschnitten, die Summen addiert.
