@@ -3,7 +3,7 @@
 > Übergabemedium zwischen Sessions. Wird nach jedem Arbeitsblock aktualisiert und committet.
 > Wer hier weiterarbeitet, liest diese Datei zuerst und braucht den Chatverlauf nicht.
 
-**Letzte Aktualisierung:** 2026-10-14 (Session 59)
+**Letzte Aktualisierung:** 2026-10-14 (Session 60)
 **Repo:** https://github.com/bratzi/cn-medcan (public)
 **Branch:** `main` (Makeover „Grünes Buch“ Teilprojekt 1 ist seit 2026-09-24 auf `main`)
 
@@ -28,7 +28,37 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 
 ## ⇢ Hier geht es weiter
 
-### ⇢ GROSSER PUNKT (Nutzer 2026-10-14, Session 59): Kommentare, Likes und Bewertungs-Statistiken – als Nächstes, eigener Brainstorming-Durchgang
+### ⇢ SESSION 60 (2026-10-14): Kommentare, Likes/Folgen, Statistik, IG-Feed – umgesetzt, gemergt, gepusht (`ec2bfed..95a20ba`)
+
+Spec `docs/superpowers/specs/2026-10-14-kommentare-likes-statistik-design.md`, Plan
+`docs/superpowers/plans/2026-10-14-kommentare-likes-statistik.md` (beide vom Nutzer freigegeben). Subagent-driven in
+Strängen F (Fundament auf main), A Likes, B Kommentare, C Statistik, D IG-Feed (je Worktree), je Task Review, Gesamtreview
+(Opus) plus Fixwelle. 1098 Tests grün, tsc sauber. Migration `0023_kommentare_likes.sql` und Constraints **remote
+eingespielt** (lokal per execute, `db:migrate:local` scheitert an Altdaten einer früheren Migration).
+- **Likes/Folgen:** Herz an Bewertung (großes Buch, Blütenseite, Startseite), Blüte (Kultivar) und öffentlichem Profil
+  (= Folgen). Zähler in `zaehler`, Entliken als ein Batch mit Neuzählen (`zaehlerLikesNeu`). „Habe ich geliket“ lädt eine
+  Insel (`EigeneLikes`) einmal je Seite. `/profil`: Feld „Gemocht und gefolgt“ (`#gemocht`), Kopfgruppe „Reaktionen“.
+  Benachrichtigungen LIKE/FOLGT/KOMMENTAR/KOMMENTAR_GEMELDET de+en.
+- **Kommentare:** unter Bewertungen der Blütenseite (aufklappbar, lädt erst beim Öffnen), Pinnwand im öffentlichen
+  Profil. HWG-Wortfilter `lib/hwg-filter.ts`, 1000 Zeichen, 10/Stunde, Melden (ab 3 Meldungen ausgeblendet), `/admin`
+  Abschnitt „Gemeldete Kommentare“. Verwerfen einer Bewertung räumt Likes/Kommentare/Zähler ab. Datenschutz um
+  Kommentare, Likes, Folgen ergänzt (Stand 14. Oktober 2026).
+- **Statistik:** `/reviews` Abschnitt „Zahlen aus dem Buch“ (sechs Listen, ab 3 Bewertungen). Kein cacheTag: Seite ist
+  force-static (24 h), Kommentar-Aktionen revalidieren `/reviews`, Likes nicht („Meistgemocht“ bis 24 h alt).
+- **IG-Feed:** `GET /api/ig-feed?key=…` (JSON: letzte 10 freigegebene Betreiber-Reviews mit freigegebenen Bildern,
+  letzte 3 Umfrage-Ergebnisse). Liegt hinter dem Gate; nur mit Schlüssel offen (Nutzerentscheidung). Secret
+  `IG_FEED_KEY` per `wrangler secret put` gesetzt; Schlüssel und fertige URL lokal in `.env.ig-feed` (gitignored) für
+  das Cowork-Projekt.
+- **Entscheidungen des Controllers (bei Bedarf korrigieren):** Stimmenzählung `stimme.groupBy` im Feed bleibt (≤3 Runden);
+  Kommentar-Zähler als bedingte Einzelschritte (nach Abbruch ggf. um 1 daneben); LIKE-Link `/blueten/<slug>#bewertung-<id>`,
+  FOLGT-Link öffentliches Profil des Folgenden oder keiner; Dedupe-Tagesgrenze UTC.
+- **Offen:** Live-Prüfung im Browser (Browser-Erweiterung war nicht verbunden): Herz klicken und Reload, Kommentar schreiben,
+  HWG-Ablehnung („hilft bei Migräne“), Pinnwand, `/reviews` Statistik, `/api/ig-feed?key=…`, hell/dunkel, 390 px,
+  CPU-Telemetrie. Kleinkram aus dem Gesamtreview: Filter fängt keine Beugungen; Pinnwand-Test prüft nur Quelltext;
+  Link „Kommentare (n)“ öffnet den Bereich nicht; Statistik auch auf Bandseiten; manuelle Mitgliedslöschung lässt
+  Zähler zu hoch. Instagram: Publora-Konto anlegen, Cowork-Projekt mit Feed-URL einrichten (Memory `instagram-verwaltung`).
+
+### ✓ ERLEDIGT in Session 60 (siehe oben): Kommentare, Likes und Bewertungs-Statistiken
 
 Der Nutzer will das zusammen bauen („die Likes sowieso mit rein“):
 - **Kommentare** zu Bewertungen und in Profilen anderer Mitglieder (jeder kann bei anderen kommentieren: in den
