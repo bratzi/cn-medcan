@@ -46,7 +46,15 @@ Spec `docs/superpowers/specs/2026-10-13-profil-konto-vereint-design.md`, Plan
 - **B3 (`d83151a`):** öffentliches Profil mit Profilkopf, Netz, Bewertungen; ProfilRahmen/Reiter/Seitenleiste,
   Kapitelkopf, KapitelRaster gelöscht (CSS-Regeln `.kapitel-name`/`.kapitel-tiefe` bleiben vorerst).
 - **Nach `git rm` einer Seite:** `npx next typegen`, sonst meldet tsc die alte Route aus `.next/types/validator.ts`.
-- Live-Prüfung und CPU-Messung siehe unten (Abschnitt wird nach der Prüfung ergänzt).
+- **Live geprüft (2026-10-14, Deploy `838dca4`/`d83151a`):** Knopf „GRÜNESBU…“ mit Avatar; `/mitglied` → `/profil`
+  (ohne Query zeigte Chrome einmal die alte Seite aus dem eigenen Cache); Profilkopf klebt bei 1418 px, 16 Boxen in
+  Spec-Reihenfolge, Sprunglinks landen unter dem Kopf, kein Querscroll; 494 px Kopfblock mit 2×4 Zahlen.
+  Befund dabei: Zahlenleiste in acht festen Spalten ließ „12.10.“ in die „3“ laufen und die Handschrift schrumpfen;
+  Fix `c393802` (Leiste umbrechend, ohne Container-Query), **Fix live noch nicht angesehen**.
+- **Offen:** Fix `c393802` bei 1440 und 1124 px ansehen (bricht die Leiste zweizeilig um, Kopfhöhe?), hell/dunkel,
+  öffentliches Profil `/profil/un5cmk9r`, CPU von `/profil` in der Telemetrie (Spec 4). Selbstreview statt
+  Subagent-Review (Nutzerwunsch). Name im Knopf kürzt schon bei „GrünesBuch“ (Versalien breiter als „MEIN KONTO“);
+  falls zu knapp, `max-w-28` auf `max-w-32` heben.
 
 ### ⇢ SESSION 58 (2026-10-13): Vertreiber sichtbar – umgesetzt, gemergt, gepusht (`1754a73`)
 
