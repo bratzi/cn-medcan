@@ -36,7 +36,18 @@ export function Randnotizen({
       }
     >
       {notizen.map((n, i) => {
-        const inhalt = (
+        // Profilkopf (Nutzer 2026-10-14): Stile gedreht, die Zahl von Hand im Akzent, das Wort gedruckt.
+        const inhalt = leiste ? (
+          <>
+            <span className="sr-only">{n.satz}</span>
+            <span aria-hidden="true" className="font-hand text-vermerk text-logo whitespace-nowrap">
+              {n.zahl}
+            </span>
+            <span aria-hidden="true" className="text-caption text-text-muted whitespace-nowrap">
+              {n.wort}
+            </span>
+          </>
+        ) : (
           <>
             <span className="sr-only">{n.satz}</span>
             <span aria-hidden="true" className={`numeric text-text ${klein ? "text-h2" : "text-display"}`}>

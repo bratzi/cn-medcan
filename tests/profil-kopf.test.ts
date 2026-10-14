@@ -74,3 +74,9 @@ test("Sprungziele landen unter Seitenkopf und Profilkopf", () => {
   assert.match(css, /\[data-feld\] \[id\$="-titel"\] \{\s*scroll-margin-top: 6rem;/);
   assert.match(css, /@media \(width >= 67\.5rem\) \{\s*\[data-feld\] \[id\$="-titel"\] \{\s*scroll-margin-top: 16rem;/);
 });
+
+test("Profilkopf-Leiste: Zahl von Hand im Akzent (mindestens 32 px), Wort gedruckt (Nutzer 2026-10-14)", () => {
+  const html = renderToStaticMarkup(createElement(Randnotizen, { notizen: [n("bewertet")], beschriftung: "Deine Zahlen", leiste: true }));
+  assert.match(html, /class="font-hand text-vermerk text-logo[^"]*">1<\/span>/);
+  assert.match(html, /class="text-caption text-text-muted[^"]*">bewertet<\/span>/);
+});
