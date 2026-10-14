@@ -30,8 +30,11 @@ export function LikeKnopf({
   const [hinweis, setHinweis] = useState<string | null>(null);
   const [laeuft, starte] = useTransition();
 
+  // Statische Zahl kann älter sein als mein Herz (Likes bauen die Seite nicht neu): gesetztes Herz zählt mindestens 1.
+  const zeige = an ? Math.max(anzahl, 1) : anzahl;
+
   const klick = () => {
-    const vorher = anzahl;
+    const vorher = zeige;
     const warAn = an;
     setHinweis(null);
     setAn(!warAn);
@@ -67,7 +70,7 @@ export function LikeKnopf({
         <svg aria-hidden="true" viewBox="0 0 24 24" className="size-5" fill={an ? "currentColor" : "none"} stroke="currentColor" strokeWidth="1.5">
           <path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z" />
         </svg>
-        <span className="numeric">{anzahl}</span>
+        <span className="numeric">{zeige}</span>
       </button>
       {hinweis ? (
         <span role="status" className="text-small text-text-muted">

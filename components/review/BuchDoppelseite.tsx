@@ -159,7 +159,7 @@ export function BuchDoppelseite({ eintrag, ueberschrift: Ueberschrift, w, sprach
           id={`bewertung-${eintrag.id}`}
           data-eintritt="auf"
           style={ablauf(0)}
-          className="flex w-fit max-w-full scroll-mt-8 items-center gap-4 rounded-full border border-border-strong py-2 pr-6 pl-2"
+          className="flex w-fit max-w-full scroll-mt-8 flex-wrap items-center gap-x-4 gap-y-1 rounded-full border border-border-strong py-2 pr-6 pl-2"
         >
           {hatPerson ? <Avatar name={name} bildId={eintrag.autorAvatarId} groesse="md" /> : null}
           <div className="flex min-w-0 flex-wrap items-center gap-x-4 gap-y-2">
