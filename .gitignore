@@ -68,3 +68,7 @@ __pycache__/
 
 # Arbeitsverzeichnisse der Agenten (eigene Git-Repos, nie mitcommitten)
 .claude/worktrees/
+
+# Instagram-Entwürfe (scripts/ig-entwuerfe.ts)
+.ig-gepostet.txt
+/tmp/ig/

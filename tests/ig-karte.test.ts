@@ -40,3 +40,10 @@ test("fehlende Felder erzeugen keine Lücken", () => {
   assert.ok(!h.includes("undefined"));
   assert.ok(!h.includes("Charge"));
 });
+
+test("Zitat: Wirkung, Rausch und Konsum nehmen es ganz heraus", () => {
+  assert.equal(kartenZitat("Sehr süß. 25% THC, ballert einen nicht aus dem Leben."), null);
+  assert.equal(kartenZitat("Sehr gutes Raucherlebnis"), null);
+  assert.equal(kartenZitat("Gutes daily für den Tag"), null);
+  assert.equal(kartenZitat("Mega gassy, zitronig."), "Mega gassy, zitronig.");
+});

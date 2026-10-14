@@ -1,5 +1,8 @@
 # Cowork-Projekt „Book of Terpz Instagram“ – Anweisung
 
+> **Hinweis:** Cowork läuft auf diesem Rechner nicht (Windows-Feature VirtualMachinePlatform aus). Bis dahin
+> übernimmt `scripts/ig-entwuerfe.ts` den Ablauf, siehe `docs/instagram/skript.md`.
+
 Diesen Text als Projektanweisung in Cowork einfügen. Die Geheimnisse (`IG_FEED_KEY`, `PUBLORA_API_KEY`,
 `INSTAGRAM_PLATFORM_ID`) trägst du im Cowork-Projekt selbst ein; sie stehen nicht in diesem Repo.
 
