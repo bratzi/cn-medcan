@@ -11,7 +11,7 @@ import { holeSprache, holeWoerterbuch } from "@/lib/i18n";
 import { Schlagwort } from "@/components/story/Schlagwort";
 import { buttonKlassen } from "@/components/ui";
 import { ladeNeuestenBetreiberEintrag, type BandEintrag } from "@/lib/query/buch-band";
-import { likeZahlenFuer } from "@/lib/query/reaktionen";
+import { reaktionenFuer } from "@/lib/query/reaktionen";
 import { ladeTerpenKatalog } from "@/lib/query/strains";
 
 /** Lädt den Eintrag; leer und Fehler haben eigene Sätze (Spec 5.2). */
@@ -47,7 +47,7 @@ async function EintragInhalt() {
 
   // Dieselbe Doppelseite wie im großen Buch auf /reviews, mit Bild und Sorte (Nutzer 2026-10-09).
   const { review, produkt } = neuester;
-  const likes = await likeZahlenFuer("BEWERTUNG", [review.id]);
+  const zaehler = (await reaktionenFuer("BEWERTUNG", [review.id])).get(review.id);
   return (
     <EigeneLikes>
     <Buch
@@ -64,7 +64,7 @@ async function EintragInhalt() {
         {
           anker: eintragAnker(review.id),
           inhalt: (
-            <BuchDoppelseite eintrag={alsEintrag(review, produkt, likes.get(review.id))} ueberschrift="h3" w={w} sprache={sprache} katalog={katalog} sorte auszug />
+            <BuchDoppelseite eintrag={alsEintrag(review, produkt, zaehler?.likes, zaehler?.kommentare)} ueberschrift="h3" w={w} sprache={sprache} katalog={katalog} sorte auszug />
           ),
         },
       ]}
