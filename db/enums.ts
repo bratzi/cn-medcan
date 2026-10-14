@@ -123,5 +123,16 @@ export type VorschlagStatus = (typeof VORSCHLAG_STATUS)[number];
 export const istVorschlagStatus = istWert(VORSCHLAG_STATUS);
 
 /** Arten von Benachrichtigungen im Mitgliederbereich. Erweiterbar (Umfragen, Mail). */
-export const BENACHRICHTIGUNG_ARTEN = ["VORSCHLAG_FREIGEGEBEN", "VORSCHLAG_ABGELEHNT"] as const;
+export const BENACHRICHTIGUNG_ARTEN = ["VORSCHLAG_FREIGEGEBEN", "VORSCHLAG_ABGELEHNT", "LIKE", "FOLGT", "KOMMENTAR", "KOMMENTAR_GEMELDET"] as const;
 export type BenachrichtigungArt = (typeof BENACHRICHTIGUNG_ARTEN)[number];
+
+/** Ziele eines Likes (Spec Kommentare/Likes 2026-10-14). MITGLIED liken heißt folgen. */
+export const ZIEL_ARTEN = ["BEWERTUNG", "BLUETE", "MITGLIED"] as const;
+export type ZielArt = (typeof ZIEL_ARTEN)[number];
+
+/** Wo kommentiert wird: unter einer Bewertung oder auf der Pinnwand eines öffentlichen Profils. */
+export const KOMMENTAR_ZIELE = ["BEWERTUNG", "PROFIL"] as const;
+export type KommentarZiel = (typeof KOMMENTAR_ZIELE)[number];
+
+export const KOMMENTAR_STATUS = ["SICHTBAR", "GEMELDET", "GELOESCHT"] as const;
+export type KommentarStatus = (typeof KOMMENTAR_STATUS)[number];

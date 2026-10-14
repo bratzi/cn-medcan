@@ -453,6 +453,9 @@ model Mitglied {
   budpics            Budpic[]
   empfehlungen       NutzerEmpfehlung[]
   profil             NutzerProfil?
+  likes              Like[]             @relation("LikesVon")
+  kommentare         Kommentar[]        @relation("KommentareVon")
+  meldungen          KommentarMeldung[] @relation("MeldungenVon")
 
   @@index([freigegeben])
   @@map("mitglied")
@@ -820,4 +823,66 @@ model VertreiberKennwerte {
   aktualisiertAm    DateTime    @updatedAt @map("aktualisiert_am")
 
   @@map("vertreiber_kennwerte")
+}
+
+// ---------------------------------------------------------------------------
+//  Likes, Kommentare, Zaehler (Spec 2026-10-14)
+// ---------------------------------------------------------------------------
+
+/// Like eines Mitglieds auf eine Bewertung, Blüte (Kultivar) oder ein Mitglied (= folgen). Spec 2026-10-14.
+model Like {
+  mitgliedId String   @map("mitglied_id")
+  mitglied   Mitglied @relation("LikesVon", fields: [mitgliedId], references: [id], onDelete: Cascade)
+  /// Werte nach ZIEL_ARTEN in db/enums.ts.
+  zielArt    String   @map("ziel_art")
+  zielId     String   @map("ziel_id")
+  erstelltAm DateTime @default(now()) @map("erstellt_am")
+
+  @@id([mitgliedId, zielArt, zielId])
+  @@index([zielArt, zielId], map: "likes_ziel_idx")
+  @@index([mitgliedId, zielArt], map: "likes_mitglied_idx")
+  @@map("likes")
+}
+
+/// Kommentar an einer Bewertung oder einer Profil-Pinnwand. Sofort sichtbar, ab 3 Meldungen ausgeblendet.
+model Kommentar {
+  id         String   @id @default(uuid())
+  autorId    String   @map("autor_id")
+  autor      Mitglied @relation("KommentareVon", fields: [autorId], references: [id], onDelete: Cascade)
+  /// Werte nach KOMMENTAR_ZIELE.
+  zielArt    String   @map("ziel_art")
+  zielId     String   @map("ziel_id")
+  text       String
+  /// Werte nach KOMMENTAR_STATUS.
+  status     String   @default("SICHTBAR")
+  erstelltAm DateTime @default(now()) @map("erstellt_am")
+
+  meldungen KommentarMeldung[]
+
+  @@index([zielArt, zielId, status, erstelltAm], map: "kommentare_ziel_idx")
+  @@index([autorId], map: "kommentare_autor_idx")
+  @@map("kommentare")
+}
+
+model KommentarMeldung {
+  kommentarId String    @map("kommentar_id")
+  kommentar   Kommentar @relation(fields: [kommentarId], references: [id], onDelete: Cascade)
+  mitgliedId  String    @map("mitglied_id")
+  mitglied    Mitglied  @relation("MeldungenVon", fields: [mitgliedId], references: [id], onDelete: Cascade)
+  grund       String?
+  erstelltAm  DateTime  @default(now()) @map("erstellt_am")
+
+  @@id([kommentarId, mitgliedId])
+  @@map("kommentar_meldungen")
+}
+
+/// Vorberechnete Zähler je Ziel (CPU-Limit 10 ms). kommentare zählt nur SICHTBAR.
+model Zaehler {
+  zielArt    String @map("ziel_art")
+  zielId     String @map("ziel_id")
+  likes      Int    @default(0)
+  kommentare Int    @default(0)
+
+  @@id([zielArt, zielId])
+  @@map("zaehler")
 }

@@ -350,5 +350,42 @@ create trigger benachrichtigungen_insert_chk
 before insert on benachrichtigungen
 for each row
 begin
-  select case when NEW.art not in ('VORSCHLAG_FREIGEGEBEN','VORSCHLAG_ABGELEHNT') then raise(abort, 'benachrichtigungen.art: unbekannter Wert') end;
+  select case when NEW.art not in ('VORSCHLAG_FREIGEGEBEN','VORSCHLAG_ABGELEHNT','LIKE','FOLGT','KOMMENTAR','KOMMENTAR_GEMELDET') then raise(abort, 'benachrichtigungen.art: unbekannter Wert') end;
+end;
+
+-- ---------------------------------------------------------------------------
+--  likes / kommentare / zaehler (Spec Kommentare, Likes, Statistik 2026-10-14)
+-- ---------------------------------------------------------------------------
+drop trigger if exists likes_insert_chk;
+create trigger likes_insert_chk
+before insert on likes
+for each row
+begin
+  select case when NEW.ziel_art not in ('BEWERTUNG','BLUETE','MITGLIED') then raise(abort, 'likes.ziel_art: unbekannter Wert') end;
+end;
+
+drop trigger if exists kommentare_insert_chk;
+create trigger kommentare_insert_chk
+before insert on kommentare
+for each row
+begin
+  select case when NEW.ziel_art not in ('BEWERTUNG','PROFIL') then raise(abort, 'kommentare.ziel_art: unbekannter Wert') end;
+  select case when NEW.status not in ('SICHTBAR','GEMELDET','GELOESCHT') then raise(abort, 'kommentare.status: unbekannter Wert') end;
+end;
+
+drop trigger if exists kommentare_update_chk;
+create trigger kommentare_update_chk
+before update on kommentare
+for each row
+begin
+  select case when NEW.ziel_art not in ('BEWERTUNG','PROFIL') then raise(abort, 'kommentare.ziel_art: unbekannter Wert') end;
+  select case when NEW.status not in ('SICHTBAR','GEMELDET','GELOESCHT') then raise(abort, 'kommentare.status: unbekannter Wert') end;
+end;
+
+drop trigger if exists zaehler_insert_chk;
+create trigger zaehler_insert_chk
+before insert on zaehler
+for each row
+begin
+  select case when NEW.ziel_art not in ('BEWERTUNG','BLUETE','MITGLIED') then raise(abort, 'zaehler.ziel_art: unbekannter Wert') end;
 end;
