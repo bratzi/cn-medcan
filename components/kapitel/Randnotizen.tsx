@@ -19,7 +19,8 @@ export function Randnotizen({
   notizen: readonly Randnotiz[];
   beschriftung: string;
   kompakt?: boolean;
-  /** Profilkopf: eine Reihe, vier Spalten, ab 1080 px acht; Typografie wie kompakt. */
+  /** Profilkopf: eine umbrechende Reihe; jede Notiz so breit wie ihr Inhalt (live 2026-10-14: feste Spalten
+   *  ließen „12.10.“ in die Nachbarzahl laufen und die Handschrift schrumpfen). Typografie wie kompakt. */
   leiste?: boolean;
 }) {
   const klein = kompakt || leiste;
@@ -28,7 +29,7 @@ export function Randnotizen({
       aria-label={beschriftung}
       className={
         leiste
-          ? "grid grid-cols-4 gap-x-6 gap-y-4 min-[1080px]:grid-cols-8"
+          ? "flex flex-wrap gap-x-8 gap-y-2"
           : kompakt
             ? "grid grid-cols-2 gap-x-6 gap-y-6 max-[1079px]:grid-cols-4"
             : "col-span-4 grid grid-cols-subgrid gap-y-8 min-[1080px]:col-span-10"
@@ -54,8 +55,10 @@ export function Randnotizen({
           <li
             key={`${i}-${n.wort}`}
             className={
-              klein
-                ? "@container flex min-w-0 flex-col gap-1"
+              leiste
+                ? "flex flex-col gap-1"
+                : kompakt
+                  ? "@container flex min-w-0 flex-col gap-1"
                 : "@container col-span-2 flex min-w-0 flex-col gap-2 px-6 last:odd:col-span-4 min-[1080px]:px-8 min-[1080px]:last:odd:col-span-2"
             }
           >

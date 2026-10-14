@@ -31,9 +31,10 @@ test("kopfNotizen: Profil nicht ladbar, dann nur die Kontozahlen", () => {
   assert.deepEqual(kopfNotizen([], konto).map((x) => x.wort), ["Stimmen", "gewonnen", "Vorschläge", "ungelesen"]);
 });
 
-test("Randnotizen: mit href ein Link samt Vorlesesatz, als Leiste acht Spalten ab 1080 px", () => {
+test("Randnotizen: mit href ein Link samt Vorlesesatz, als Leiste eine umbrechende Reihe ohne Container-Query", () => {
   const html = renderToStaticMarkup(createElement(Randnotizen, { notizen: [{ ...n("bewertet"), href: "#netz-titel" }], beschriftung: "Deine Zahlen", leiste: true }));
-  assert.match(html, /grid-cols-4[^"]*min-\[1080px\]:grid-cols-8/);
+  assert.match(html, /<ul aria-label="Deine Zahlen" class="flex flex-wrap gap-x-8 gap-y-2">/);
+  assert.doesNotMatch(html, /@container/);
   assert.match(html, /<a href="#netz-titel"[^>]*min-h-11[^>]*><span class="sr-only">Satz bewertet<\/span>/);
 });
 

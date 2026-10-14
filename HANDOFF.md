@@ -3,7 +3,7 @@
 > Übergabemedium zwischen Sessions. Wird nach jedem Arbeitsblock aktualisiert und committet.
 > Wer hier weiterarbeitet, liest diese Datei zuerst und braucht den Chatverlauf nicht.
 
-**Letzte Aktualisierung:** 2026-10-13 (Session 58)
+**Letzte Aktualisierung:** 2026-10-14 (Session 59)
 **Repo:** https://github.com/bratzi/cn-medcan (public)
 **Branch:** `main` (Makeover „Grünes Buch“ Teilprojekt 1 ist seit 2026-09-24 auf `main`)
 
@@ -27,6 +27,26 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 ---
 
 ## ⇢ Hier geht es weiter
+
+### ⇢ SESSION 59 (2026-10-13/14): Profil und Konto vereint – umgesetzt und gepusht (`9030cb7..d83151a`)
+
+Spec `docs/superpowers/specs/2026-10-13-profil-konto-vereint-design.md`, Plan
+`docs/superpowers/plans/2026-10-13-profil-konto-vereint.md` (vom Nutzer freigegeben). Ausführung auf Nutzerwunsch
+**inline auf main, ohne Subagents, Push nach jedem Teil** (Memory `ausfuehrung-native-teilpush`); Ledger
+`.superpowers/sdd/2026-10-13-profil-konto-vereint/progress.md`. 1047 Tests grün, tsc sauber.
+- **A Kopf (`9030cb7`):** Menüpunkt „Profil“ weg, ein Knopf `PROFIL_LINK` → `/profil`. Ohne Sitzung „Mein Profil“,
+  mit Sitzung der Name aus `KontoZaehler` (`max-w-28 truncate`, voller Name im `title`). Fuß, Empfehlungen und
+  Vorschlagstexte sagen jetzt „Mein Profil“.
+- **B1 (`d2a3f57`):** `ProfilKopf` (ab 1080 px sticky unter dem Seitenkopf), `kopfNotizen` (acht Zahlen als
+  Sprunglinks `#…-titel`; ohne Bewertung springt „bewertet“ zu `#netz-titel`), Avatar-Größe `kopf` (64 px),
+  `scroll-margin-top` für `[data-feld] [id$="-titel"]` (6rem, ab 1080 px 16rem).
+- **B2 (`838dca4`):** `/profil` ohne Reiter: `page.tsx` + `laden.ts` (cache je Quelle) + `profil-reihen.tsx` +
+  `konto-reihen.tsx` + `spalten.ts` (12er-Raster ab 1280 px). „Zur Abstimmung“ dort sekundär. `/mitglied` → 308 auf
+  `/profil` (`lib/alte-adressen.ts`), `app/[lang]/mitglied/aktionen.ts` bleibt. Neue Feldköpfe `profil.koepfe.*`.
+- **B3 (`d83151a`):** öffentliches Profil mit Profilkopf, Netz, Bewertungen; ProfilRahmen/Reiter/Seitenleiste,
+  Kapitelkopf, KapitelRaster gelöscht (CSS-Regeln `.kapitel-name`/`.kapitel-tiefe` bleiben vorerst).
+- **Nach `git rm` einer Seite:** `npx next typegen`, sonst meldet tsc die alte Route aus `.next/types/validator.ts`.
+- Live-Prüfung und CPU-Messung siehe unten (Abschnitt wird nach der Prüfung ergänzt).
 
 ### ⇢ SESSION 58 (2026-10-13): Vertreiber sichtbar – umgesetzt, gemergt, gepusht (`1754a73`)
 
@@ -77,7 +97,7 @@ alleinstehende textLinkKlassen-Links (VorschlagFormular.tsx:71, BlueteVorschlagF
 **Dauerregel neu geschärft (Memory `skills-einsatzregeln`):** in jeder Aufgabe Fach-Skills laden; jeder Plan-Task hat
 eine Zeile „Skills:“, jeder Subagent lädt sie vor dem ersten Edit.
 
-### ⇢ GROSSER PUNKT (Nutzer 2026-10-13, Session 58, erst nach Handoff und Clear): Profil und Konto vereinen
+### ✓ ERLEDIGT in Session 59: Profil und Konto vereinen (Auftrag aus Session 58)
 
 - Kopf: ein Knopf statt „Profil“ und „Mein Konto“. Ohne Konto heißt er „Mein Profil“ und führt zur Anmeldung. Mit
   Konto zeigt er den Namen, höchstens so breit wie heute „Mein Konto“, sonst gekürzt mit „…“. Aussehen wie der
