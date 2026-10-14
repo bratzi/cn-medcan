@@ -45,3 +45,9 @@ schtasks /Create /SC DAILY /ST 19:00 /TN "Book of Terpz IG-Entwuerfe" /TR "cmd /
 ```
 
 Wieder entfernen: `schtasks /Delete /TN "Book of Terpz IG-Entwuerfe" /F`.
+
+## Cloud-Agent
+
+Seit 2026-10-14 läuft zusätzlich eine Claude-Code-Routine in der Cloud (Mo, Mi, Fr). Sie nutzt dieselben Skripte
+und legt auch Themen-Posts an. Anweisung: `docs/instagram/agent-anweisung.md`, Themen: `docs/instagram/themen.md`,
+Lagebericht: `npx tsx scripts/ig-lage.ts`.
