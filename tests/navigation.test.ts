@@ -45,7 +45,7 @@ test("Kopf: Leiste erst ab lg, darunter Menüknopf mit Popover und Konto als Sym
   assert.match(html, /<div id="kopf-menue" popover="auto"/);
   assert.match(html, /Menü öffnen/);
   // Ein Knopf statt Profil und Konto (Nutzer 2026-10-13); ohne Sitzung „Mein Profil“.
-  assert.match(html, /<span class="max-lg:sr-only inline-block max-w-28 truncate align-bottom">Mein Profil<\/span>/);
+  assert.match(html, /<span class="max-lg:sr-only inline-block max-w-28 truncate align-bottom ">Mein Profil<\/span>/);
   assert.doesNotMatch(html, /Mein Konto/);
   assert.equal((html.match(/href="\/profil"/g) ?? []).length, 2, "Knopf und Eintrag im Aufklappmenü");
 });
@@ -80,4 +80,5 @@ test("Kopfknopf: langer Name wird gekürzt, voller Name bleibt lesbar (Review Fo
   assert.match(q, /max-w-28 truncate/);
   assert.match(q, /title=\{konto\.name \?\? undefined\}/);
   assert.match(q, /\{konto\.name \?\? beschriftung\}/);
+  assert.match(q, /konto\.name \? "text-\[0\.6875rem\]"/);
 });

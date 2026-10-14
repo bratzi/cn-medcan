@@ -102,7 +102,8 @@ export function KontoZaehler({ texte, sprache, beschriftung }: { texte: Mehrzahl
       {/* Ein Knopf fuer Profil und Konto (Nutzer 2026-10-13): angemeldet der Name, hoechstens so
           breit wie frueher "Mein Konto" (max-w-28), sonst mit "..."; der volle Name steht im title
           und bleibt fuer Screenreader im Text. Schmal nur das Symbol beziehungsweise der Avatar. */}
-      <span className="max-lg:sr-only inline-block max-w-28 truncate align-bottom" title={konto.name ?? undefined}>
+      {/* Namen eine Stufe kleiner als „Mein Profil“ (Nutzer 2026-10-14), damit sie seltener gekürzt werden. */}
+      <span className={`max-lg:sr-only inline-block max-w-28 truncate align-bottom ${konto.name ? "text-[0.6875rem]" : ""}`} title={konto.name ?? undefined}>
         {konto.name ?? beschriftung}
       </span>
       {konto.name ? (
