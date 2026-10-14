@@ -3,12 +3,14 @@ import { notFound } from "next/navigation";
 
 import { Seitenkopf, seitenRahmen } from "@/components/layout/Seitenkopf";
 import { Ranglisten } from "@/components/rangliste/Ranglisten";
+import { BuchStatistik } from "@/components/review/BuchStatistik";
 import { GrossesBuch } from "@/components/review/GrossesBuch";
 import { Schlagwort } from "@/components/story/Schlagwort";
 import { EmptyState, buttonKlassen } from "@/components/ui";
 import { cn } from "@/lib/cn";
 import { holeSprache, holeWoerterbuch } from "@/lib/i18n";
 import { ladeBand } from "@/lib/query/buch-band";
+import { ladeBuchStatistik } from "@/lib/query/buch-statistik";
 import { ladeTerpenKatalog } from "@/lib/query/strains";
 
 /**
@@ -18,11 +20,12 @@ import { ladeTerpenKatalog } from "@/lib/query/strains";
  * (Spec 5): eine Insel, die nur für angemeldete Mitglieder Daten holt; die Seite bleibt statisch.
  */
 export async function BewertungenSeite({ band }: { band: number }) {
-  const [daten, w, sprache, katalog] = await Promise.all([
+  const [daten, w, sprache, katalog, statistik] = await Promise.all([
     ladeBand(band),
     holeWoerterbuch(),
     holeSprache(),
     ladeTerpenKatalog(),
+    ladeBuchStatistik(),
   ]);
   if (!daten) notFound();
 
@@ -44,6 +47,7 @@ export async function BewertungenSeite({ band }: { band: number }) {
         ) : (
           <GrossesBuch band={daten} w={w} sprache={sprache} katalog={katalog} />
         )}
+        <BuchStatistik daten={statistik} texte={w.reviews.statistik} sprache={sprache} />
         {/* Anker #ranglisten: dorthin führt das Anmelden aus der Insel zurück. */}
         <section
           id="ranglisten"

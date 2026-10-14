@@ -535,6 +535,20 @@ export const en: Woerterbuch = {
     leerTitel: "The first chapter is being written.",
     leerText: "The vote decides which strain I test first.",
     zurAbstimmung: "To the vote",
+    statistik: {
+      vor: "Numbers from the",
+      betont: "Book",
+      leer: "Not enough reviews yet.",
+      titel: {
+        meistBewertet: "Most reviewed",
+        best: "Highest rated",
+        niedrigst: "Lowest rated",
+        bluetenKommentare: "Most commented flowers",
+        bewertungenKommentare: "Most commented reviews",
+        bewertungenLikes: "Most liked",
+      },
+      einheit: { bewertungen: "reviews", mittel: "avg.", kommentare: "comments", likes: "likes" },
+    },
   },
   bewerten: {
     satz: "Following a fixed scheme. So that we can compare.",
