@@ -9,7 +9,7 @@ import { de } from "@/lib/i18n/de";
 
 const karte = {
   rang: 1, slug: "remexian", handelsname: "Remexian 30/1 PGF CIS", bluete: "Remexian", vertreiber: "Purplefarm", bildId: "bluete-02",
-  schnitt: 4.5, anzahl: 3, betreiber: 4.5, zuletzt: "2026-10-08T00:00:00.000Z", abstand: null,
+  schnitt: 4.5, anzahl: 3, betreiber: 4.5, zuletzt: "2026-10-08T00:00:00.000Z", abstand: null, jeSorte: false,
 };
 
 const texte = { ...de.rangliste, bluetenZeile: de.start.bluetenZeile, vertreiberUnbekannt: de.bluete.vertreiber.unbekannt };

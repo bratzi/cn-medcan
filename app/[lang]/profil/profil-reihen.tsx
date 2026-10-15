@@ -138,7 +138,7 @@ export async function ReiheRegister({ id, register }: { id: string; register: Re
   const texte = w.profil;
   return (
     <Feld id="bewertungen" rahmen="karte" groesse="klein" titel={texte.registerTitel} kopf={texte.koepfe.register} ton="lila" satz={texte.registerSatz} className={SPALTEN[12]}>
-      <BewertungsRegister ansicht={registerAnsicht(zeilen, register)} sortierung={register.sortierung} alle={register.alle} texte={texte} sprache={sprache} />
+      <BewertungsRegister ansicht={registerAnsicht(zeilen, register)} sortierung={register.sortierung} alle={register.alle} texte={texte} ueber={w.buch.ueber} sprache={sprache} />
     </Feld>
   );
 }

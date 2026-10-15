@@ -204,6 +204,8 @@ export type ReviewEintrag = {
   notiz: string | null;
   instagramReelUrl: string | null;
   chargenNr: string | null;
+  /** Sorte und Ware der Bewertung (Spec Sorte im Fokus 2); null bei Altdaten ohne Kultivar. */
+  sorte?: { name: string; slug: string; vertreiberId: string | null; vertreiberName: string | null; wareGenau: boolean } | null;
   erstelltAm: Date;
   /** Freigegebene Bilder der Bewertung, älteste zuerst, höchstens drei; fehlt außerhalb der Blütenseite. */
   bilder?: ReviewBild[];
@@ -231,6 +233,10 @@ export const BEWERTUNG_SELECT = {
     erstelltAm: true,
     gesamtnote: true,
     charge: { select: { chargenNr: true } },
+    wareGenau: true,
+    vertreiberId: true,
+    vertreiber: { select: { name: true } },
+    kultivar: { select: { name: true, slug: true } },
     // Der Name steht öffentlich im Buch (Profil: "Unter diesem Namen erscheinen deine Bewertungen").
     autor: { select: { anzeigename: true, profilOeffentlich: true, kurzId: true, avatar: { select: { id: true } } } },
     // Nur freigegebene, nie mit BLOB; Prisma lädt sie in einer Abfrage mit IN über höchstens 20 Ids.
@@ -267,6 +273,15 @@ export function alsReviewEintrag(review: BewertungZeile, autorZahlen: ReadonlyMa
     notiz: review.notiz,
     instagramReelUrl: review.instagramReelUrl,
     chargenNr: review.charge?.chargenNr ?? null,
+    sorte: review.kultivar?.slug
+      ? {
+          name: review.kultivar.name,
+          slug: review.kultivar.slug,
+          vertreiberId: review.vertreiberId,
+          vertreiberName: review.vertreiber?.name ?? null,
+          wareGenau: review.wareGenau,
+        }
+      : null,
     erstelltAm: review.erstelltAm,
     bilder: review.bilder,
   };

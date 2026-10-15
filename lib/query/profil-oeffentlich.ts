@@ -35,7 +35,16 @@ export const ladeOeffentlichesProfil = cache(async function ladeOeffentlichesPro
       where: nurFrei,
       orderBy: { erstelltAm: "desc" },
       take: OEFFENTLICHE_BEWERTUNGEN,
-      select: { id: true, gesamtnote: true, erstelltAm: true, strain: { select: { slug: true, handelsname: true } } },
+      select: {
+        id: true,
+        gesamtnote: true,
+        erstelltAm: true,
+        wareGenau: true,
+        vertreiberId: true,
+        vertreiber: { select: { name: true } },
+        kultivar: { select: { name: true, slug: true } },
+        strain: { select: { slug: true, handelsname: true } },
+      },
     }),
   ]);
   return {
@@ -48,8 +57,12 @@ export const ladeOeffentlichesProfil = cache(async function ladeOeffentlichesPro
     werte: oeffentlicheWerte(m.profil?.oeffentlich ?? null),
     bewertungen: zeilen.map((z) => ({
       id: z.id,
-      slug: z.strain.slug,
-      handelsname: z.strain.handelsname,
+      // Titel und Link zeigen die Sorte, die Ware steht darunter (Spec Sorte im Fokus 2).
+      slug: z.kultivar?.slug ?? z.strain.slug,
+      handelsname: z.kultivar?.name ?? z.strain.handelsname,
+      ware: z.kultivar?.slug
+        ? { vertreiberName: z.vertreiber?.name ?? null, wareGenau: z.wareGenau, handelsname: z.strain.handelsname, vertreiberId: z.vertreiberId }
+        : null,
       gesamtnote: z.gesamtnote,
       erstelltAm: z.erstelltAm,
     })),

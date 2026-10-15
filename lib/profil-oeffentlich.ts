@@ -13,6 +13,8 @@ export type OeffentlicheBewertung = {
   id: string;
   slug: string;
   handelsname: string;
+  /** Ware hinter der Sorte; null bei Altdaten ohne Kultivar (dann ist handelsname das Produkt). */
+  ware?: { vertreiberName: string | null; wareGenau: boolean; handelsname: string; vertreiberId: string | null } | null;
   gesamtnote: number | null;
   erstelltAm: Date;
 };

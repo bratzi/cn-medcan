@@ -504,6 +504,7 @@ export const en: Woerterbuch = {
     community: "Community",
     ohneName: "Member",
     betreiberName: "Book of Terpz",
+    ueber: "via {vertreiber}",
     median: { one: "Median from one review:", other: "Median of all {anzahl} reviews:" },
     reiter: "Values of this review",
     reiterKarte: "Terpene rating",

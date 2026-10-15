@@ -151,6 +151,9 @@ export async function ladeAuswertungsZeilen(mitgliedId: string): Promise<Registe
       wirkung: true,
       konsistenz: true,
       strainId: true,
+      wareGenau: true,
+      kultivar: { select: { name: true, slug: true } },
+      vertreiber: { select: { name: true } },
       strain: { select: { slug: true, handelsname: true, herstellerBildPfad: true, vertreiber: { select: { name: true } } } },
       // Dein erstes Bild zur Bewertung (Spec 2026-10-06): offene sieht der Eigentümer über /api/bild/offen.
       bilder: {
@@ -186,6 +189,9 @@ export async function ladeAuswertungsZeilen(mitgliedId: string): Promise<Registe
     community: fremde.get(z.strainId) ?? null,
     strainId: z.strainId,
     vertreiber: z.strain.vertreiber?.name ?? null,
+    sorte: z.kultivar?.slug
+      ? { name: z.kultivar.name, slug: z.kultivar.slug, vertreiberName: z.vertreiber?.name ?? null, wareGenau: z.wareGenau }
+      : null,
     bildPfad: z.strain.herstellerBildPfad,
     eigenesBild: z.bilder[0]
       ? { id: z.bilder[0].id, breite: z.bilder[0].breite, hoehe: z.bilder[0].hoehe, offen: z.bilder[0].status === "OFFEN" }
