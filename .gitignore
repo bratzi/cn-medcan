@@ -72,3 +72,7 @@ __pycache__/
 # Instagram-Entwürfe (scripts/ig-entwuerfe.ts)
 .ig-gepostet.txt
 /tmp/ig/
+
+# Video-Paket (video/)
+video/node_modules/
+video/out/
