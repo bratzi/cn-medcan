@@ -75,7 +75,7 @@ export const dynamic = "force-dynamic";
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
   // ladeSorte ist je Request gecacht (React cache): die Seite liest dieselbe Zeile ohne zweite Abfrage.
-  const [sorte, w] = await Promise.all([ladeSorte(slug, false), holeWoerterbuch()]);
+  const [sorte, w] = await Promise.all([ladeSorte(slug), holeWoerterbuch()]);
   if (!sorte) return { title: w.bluete.nichtGefunden };
   return {
     title: sorte.kultivar.name,
@@ -213,9 +213,14 @@ function Chargentabelle({ chargen, w, sprache }: { chargen: StrainDetail["charge
  * Leerzustand zu zeigen (Spec 13.3).
  */
 async function SorteInhalt({ slug, suche, w, sprache }: { slug: string; suche: SuchParameter; w: Woerterbuch; sprache: Sprache }) {
-  const fachkreis = await istFachkreis();
   const texte = w.bluete;
-  const [sorte, katalog, mitglied] = await Promise.all([ladeSorte(slug, false), ladeTerpenKatalog(), aktuellesMitglied()]);
+  // Drei Runden: Sorte und Kontext, dann alles, was nur Sorte, Ware und Mitglied braucht, zuletzt was an Terpenen und Bewertungen hängt.
+  const [sorte, katalog, mitglied, fachkreis] = await Promise.all([
+    ladeSorte(slug),
+    ladeTerpenKatalog(),
+    aktuellesMitglied(),
+    istFachkreis(),
+  ]);
   if (!sorte) {
     // Alte Produktadresse: dauerhaft auf die Sorte mit ?ware=, nur wenn der Slug keine Sorte ist (eine Abfrage).
     const ziel = await produktZuSorte(`/blueten/${slug}`, alsSuche(suche));
@@ -226,14 +231,29 @@ async function SorteInhalt({ slug, suche, w, sprache }: { slug: string; suche: S
   const aktive = waehleAktiveWare(sorte.waren, wahl);
   if (!aktive) notFound();
   const alleVertreiber = ersterWert(suche.alle) === "1" || !aktive.ware.vertreiberId;
-  const [strain, reviews] = await Promise.all([
-    ladeStrainDetail(aktive.produkt.slug, fachkreis),
+  const freigegeben = mitglied?.freigegeben ? mitglied : null;
+  const [strain, reviews, budpicListe, blueteLikeZahlen, eigeneBewertung, liveNetz] = await Promise.all([
+    // Nur Angaben, Terpene, Chargen: das Buch lädt ladeSortenBewertungen.
+    ladeStrainDetail(aktive.produkt.slug, fachkreis, { ohneBewertungen: true }),
     ladeSortenBewertungen(sorte.kultivar.id, alleVertreiber ? null : aktive.ware.vertreiberId),
+    ladeFreieBudpics([aktive.produkt.id]),
+    // Likes der Blüte aus dem Zähler; ob ich geliket habe, lädt erst die Insel (Seite bleibt statisch).
+    likeZahlenFuer("BLUETE", [sorte.kultivar.id]),
+    // Die eigene Bewertung je Sorte und Vertreiber (auch unfreigegeben) belegt die Maske vor; nur wer bewerten darf, braucht sie.
+    freigegeben && aktive.ware.vertreiberId
+      ? ladeEigeneBewertung(freigegeben.mitgliedId, sorte.kultivar.id, aktive.ware.vertreiberId)
+      : Promise.resolve(null),
+    // Live-Netz in der Maske (Nutzer 2026-10-09); ohne Grundlage fehlt nur das Netz, nie die Maske.
+    freigegeben
+      ? ladeLiveNetzBasis(freigegeben.mitgliedId, aktive.produkt.id).catch((fehler) => {
+          console.error("ladeLiveNetzBasis fehlgeschlagen", fehler);
+          return null;
+        })
+      : Promise.resolve(null),
   ]);
   if (!strain) notFound();
   // „Ähnlich im Aroma“ (T11) rechnet D1, nicht der Worker; ohne Terpene entfällt es.
-  const [budpicListe, aehnliche, blueteLikeZahlen, reviewZaehler] = await Promise.all([
-    ladeFreieBudpics([strain.id]),
+  const [aehnliche, reviewZaehler] = await Promise.all([
     strain.terpene.length > 0
       ? aehnlichImAroma(strain.id).catch((fehler: unknown) => {
           unstable_rethrow(fehler);
@@ -241,8 +261,6 @@ async function SorteInhalt({ slug, suche, w, sprache }: { slug: string; suche: S
           return [];
         })
       : Promise.resolve([]),
-    // Likes der Blüte aus dem Zähler; ob ich geliket habe, lädt erst die Insel (Seite bleibt statisch).
-    likeZahlenFuer("BLUETE", [sorte.kultivar.id]),
     // Ein Aufruf für alle Herzen im Bewertungsbuch (Zähler, kein COUNT über Likes).
     reaktionenFuer("BEWERTUNG", reviews.map((r) => r.id)),
   ]);
@@ -267,19 +285,6 @@ async function SorteInhalt({ slug, suche, w, sprache }: { slug: string; suche: S
   // Wie viele Bewertungen hinter dem Aroma stehen: mit Median dessen Anzahl, sonst die der Ware.
   const aromaAnzahl = erkundung.median?.anzahl ?? geschmack.anzahlBewertungen;
   const zuordnung = { bluete: sorte.kultivar.name, vertreiber: aktive.ware.vertreiberName || null };
-  // Die eigene Bewertung je Sorte und Vertreiber (auch unfreigegeben) belegt die Maske vor; nur wer bewerten darf, braucht sie.
-  const [eigeneBewertung, liveNetz] = mitglied?.freigegeben
-    ? await Promise.all([
-        aktive.ware.vertreiberId
-          ? ladeEigeneBewertung(mitglied.mitgliedId, sorte.kultivar.id, aktive.ware.vertreiberId)
-          : Promise.resolve(null),
-        // Live-Netz in der Maske (Nutzer 2026-10-09); ohne Grundlage fehlt nur das Netz, nie die Maske.
-        ladeLiveNetzBasis(mitglied.mitgliedId, strain.id).catch((fehler) => {
-          console.error("ladeLiveNetzBasis fehlgeschlagen", fehler);
-          return null;
-        }),
-      ])
-    : [null, null];
   const vorbelegung = eigeneBewertung ? vorbelegungAus(eigeneBewertung) : null;
   // Stärke vorwählen: die eigene, sonst die per ?ware gewählte, sonst die einzige; offen bleibt „Weiß ich nicht“.
   const vorgewaehlt = {

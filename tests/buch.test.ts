@@ -140,9 +140,12 @@ test("CPU-Budget: die rechte Hälfte rendert der Server nur für die offene Seit
 
 test("Abfrage: Bewertungen des Betreibers zuerst, damit er bei mehr als 20 nicht aus dem Buch fällt", () => {
   const quelle = readFileSync(join(process.cwd(), "lib/query/strains.ts"), "utf8");
-  const reviews = /reviews: \{\s*where: \{ freigegeben: true \},\s*(?:\/\/[^\n]*\s*)?orderBy: ([^\n]*),\s*take: 20/.exec(quelle);
+  const reviews = /reviews: \{\s*where: \{ freigegeben: true \},\s*(?:\/\/[^\n]*\s*)?orderBy: ([^\n]*),\s*take: (?:ohneBewertungen \? 0 : )?20/.exec(quelle);
   assert.ok(reviews, "Abfrage der Bewertungen nicht gefunden");
   assert.equal(reviews[1], '[{ istRedaktionell: "desc" }, { erstelltAm: "desc" }]');
+  // Die Sortenseite lädt ihr Buch selbst, in derselben Reihenfolge.
+  const sorte = readFileSync(join(process.cwd(), "lib/query/sorte.ts"), "utf8");
+  assert.match(sorte, /orderBy: \[\{ istRedaktionell: "desc" \}, \{ erstelltAm: "desc" \}\],\s*take: 20/);
 });
 test("Höhe: der Rahmen wächst mit dem Inhalt, Untergrenze 51rem, Obergrenze 54rem", () => {
   assert.match(css, /--buch-h:\s*clamp\(51rem,\s*calc\(100svh - var\(--kopf-h, 4rem\) - 5rem\),\s*54rem\);/);

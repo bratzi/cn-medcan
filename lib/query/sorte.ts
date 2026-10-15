@@ -88,10 +88,8 @@ function spanneAus(produkte: readonly WareProdukt[]): SorteDetail["spanne"] {
 /**
  * Die Sortenseite in einer Abfrage: Kultivar mit aktiven Produkten samt Vertreiber,
  * Kennwerten und Note je Vertreiber. Gruppiert wird im Code (höchstens 30 Produkte).
- * `fachkreis` bleibt in der Signatur für spätere Bestandsdaten; Sortendaten sind öffentlich.
  */
-export const ladeSorte = cache(async function ladeSorte(slug: string, fachkreis: boolean): Promise<SorteDetail | null> {
-  void fachkreis;
+export const ladeSorte = cache(async function ladeSorte(slug: string): Promise<SorteDetail | null> {
   const prisma = await getPrisma();
   const k = await prisma.kultivar.findUnique({
     where: { slug },

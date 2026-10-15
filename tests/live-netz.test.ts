@@ -38,7 +38,7 @@ test("Bewertungsmaske: Fazit steht auch ohne Community-Werte, Live-Netz daneben"
   assert.match(quelle, /liveGeschmack\(liveNetz/);
   assert.match(quelle, /kontur=\{netzLive\.vorher\.mag\}/);
   const seite = readFileSync("app/[lang]/blueten/[slug]/page.tsx", "utf8");
-  assert.match(seite, /ladeLiveNetzBasis\(mitglied\.mitgliedId, strain\.id\)\.catch/);
+  assert.match(seite, /ladeLiveNetzBasis\(freigegeben\.mitgliedId, aktive\.produkt\.id\)\.catch/);
 });
 
 test("Blütenseite: Fazit-Spalte rechts neben der Maske wird nicht abgeschnitten (live 2026-10-09)", () => {

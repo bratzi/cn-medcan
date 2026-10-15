@@ -622,10 +622,15 @@ export async function ladeStrainTitel(slug: string): Promise<string | null> {
   return zeile?.handelsname ?? null;
 }
 
-/** Ein Produkt mit vollem Profil. `null`, wenn unbekannt oder inaktiv. */
+/**
+ * Ein Produkt mit vollem Profil. `null`, wenn unbekannt oder inaktiv. `ohneBewertungen`: die
+ * Sortenseite lädt ihr Buch selbst (ladeSortenBewertungen), dann bleiben `reviews` leer und die
+ * Autorenzahlen werden nicht gelesen.
+ */
 export async function ladeStrainDetail(
   slug: string,
-  fachkreis: boolean
+  fachkreis: boolean,
+  { ohneBewertungen = false }: { ohneBewertungen?: boolean } = {},
 ): Promise<StrainDetail | null> {
   const prisma = await getPrisma();
 
@@ -715,7 +720,7 @@ export async function ladeStrainDetail(
         where: { freigegeben: true },
         // Betreiber zuerst: bei mehr als 20 Bewertungen fiele er sonst aus dem Buch (T7-Review, Nutzer 2026-09-29).
         orderBy: [{ istRedaktionell: "desc" }, { erstelltAm: "desc" }],
-        take: 20,
+        take: ohneBewertungen ? 0 : 20,
         select: BEWERTUNG_SELECT,
       },
       kennwerte: KENNWERTE_SELECT,
