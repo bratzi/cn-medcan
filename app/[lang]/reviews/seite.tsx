@@ -16,7 +16,7 @@ import { reaktionenFuer, teileZaehler } from "@/lib/query/reaktionen";
 import { ladeTerpenKatalog } from "@/lib/query/strains";
 
 /**
- * Das große Buch (Spec Bewertungsbuch 4): ein Band mit bis zu 24 Bewertungen über alle Sorten.
+ * Das große Buch (Spec Bewertungsbuch 4): ein Band mit bis zu BAND_GROESSE (8) Bewertungen über alle Sorten.
  * Gemeinsamer Inhalt von /reviews (Band 1) und /reviews/band/[band]; beide Routen sind statisch.
  * Ein Band, den es nicht gibt, ist 404, nie ein leeres Buch. Darunter die Ranglisten je Sorte
  * (Spec 5): eine Insel, die nur für angemeldete Mitglieder Daten holt; die Seite bleibt statisch.
@@ -30,7 +30,7 @@ export async function BewertungenSeite({ band }: { band: number }) {
     ladeBuchStatistik(),
   ]);
   if (!daten) notFound();
-  // Ein Aufruf für alle Herzen des Bandes (höchstens 24 Ids, Zähler statt COUNT).
+  // Ein Aufruf für alle Herzen des Bandes (höchstens BAND_GROESSE Ids, Zähler statt COUNT).
   const { likes, kommentare } = teileZaehler(await reaktionenFuer("BEWERTUNG", daten.eintraege.map(({ review }) => review.id)));
 
   return (

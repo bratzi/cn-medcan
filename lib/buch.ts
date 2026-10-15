@@ -148,8 +148,11 @@ export function blaetterPlan(richtung: Richtung): {
   };
 }
 
-/** Ein Band des großen Buchs auf /reviews (Spec Bewertungsbuch 4): jede Doppelseite trägt eine Aroma-Karte. */
-export const BAND_GROESSE = 24;
+/**
+ * Ein Band des großen Buchs auf /reviews (Spec Bewertungsbuch 4): jede Doppelseite trägt eine Aroma-Karte.
+ * 8 statt 24 (2026-10-15): der Neubau eines Bandes kostete ~250 ms CPU und lief in Error 1102.
+ */
+export const BAND_GROESSE = 8;
 
 export function bandAnzahl(gesamt: number): number {
   return Math.max(1, Math.ceil(gesamt / BAND_GROESSE));
