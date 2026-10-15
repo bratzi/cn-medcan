@@ -36,7 +36,9 @@ export type RegisterZeile = AuswertungsZeile & {
   strainId: string;
   vertreiber: string | null;
   /** Sorte und Ware der Bewertung (Spec Sorte im Fokus 2): Titel und Link zeigen die Sorte; fehlt bei Altdaten. */
-  sorte?: { name: string; slug: string; vertreiberName: string | null; wareGenau: boolean } | null;
+  sorte?: { name: string; slug: string; vertreiberId: string | null; vertreiberName: string | null; wareGenau: boolean } | null;
+  /** Id der Bewertung, für den Sprung auf ihren Eintrag. */
+  reviewId?: string;
   /** `strains.hersteller_bild_pfad`, für `ersatzBildId`. */
   bildPfad: string | null;
   /** Dein erstes Bild zu dieser Bewertung (offen oder freigegeben), sonst null. */

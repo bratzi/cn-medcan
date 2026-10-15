@@ -24,12 +24,12 @@ type RohZeile = {
   strainId: unknown;
   anzahl: unknown;
   summe: unknown;
-  betreiber: unknown;
+  /** Zeitpunkt und Note der neuesten Betreiber-Bewertung als "ISO|Note", eine Unterabfrage je Produkt. */
+  betreiberStand: unknown;
   communityAnzahl: unknown;
   communitySumme: unknown;
   zuletzt: unknown;
   kultivarId: unknown;
-  betreiberAm: unknown;
 };
 
 /**
@@ -41,11 +41,9 @@ type RohZeile = {
 const SORTEN_SQL = `SELECT r.strain_id AS strainId,
        COUNT(*) AS anzahl,
        SUM(r.gesamtnote) AS summe,
-       (SELECT b.gesamtnote FROM reviews b
+       (SELECT strftime('%Y-%m-%dT%H:%M:%fZ', b.erstellt_am) || '|' || b.gesamtnote FROM reviews b
          WHERE b.strain_id = r.strain_id AND b.freigegeben = 1 AND b.ist_redaktionell = 1 AND b.gesamtnote IS NOT NULL
-         ORDER BY strftime('%Y-%m-%dT%H:%M:%fZ', b.erstellt_am) DESC, b.id DESC LIMIT 1) AS betreiber,
-       (SELECT MAX(strftime('%Y-%m-%dT%H:%M:%fZ', b.erstellt_am)) FROM reviews b
-         WHERE b.strain_id = r.strain_id AND b.freigegeben = 1 AND b.ist_redaktionell = 1 AND b.gesamtnote IS NOT NULL) AS betreiberAm,
+         ORDER BY strftime('%Y-%m-%dT%H:%M:%fZ', b.erstellt_am) DESC, b.id DESC LIMIT 1) AS betreiberStand,
        s.kultivar_id AS kultivarId,
        SUM(CASE WHEN r.ist_redaktionell = 0 THEN 1 ELSE 0 END) AS communityAnzahl,
        SUM(CASE WHEN r.ist_redaktionell = 0 THEN r.gesamtnote ELSE 0 END) AS communitySumme,
@@ -56,16 +54,18 @@ WHERE r.freigegeben = 1 AND r.gesamtnote IS NOT NULL
 GROUP BY r.strain_id`;
 
 function alsZeile(z: RohZeile): SortenZeile {
+  const [betreiberAm, note] = z.betreiberStand ? String(z.betreiberStand).split("|") : [null, null];
+  const betreiber = note === null || note === undefined ? null : Number(note);
   return {
     strainId: String(z.strainId),
     anzahl: Number(z.anzahl) || 0,
     summe: Number(z.summe) || 0,
-    betreiber: z.betreiber === null || z.betreiber === undefined ? null : Number(z.betreiber),
+    betreiber: betreiber !== null && Number.isFinite(betreiber) ? betreiber : null,
     communityAnzahl: Number(z.communityAnzahl) || 0,
     communitySumme: Number(z.communitySumme) || 0,
     zuletzt: String(z.zuletzt ?? ""),
     kultivarId: z.kultivarId ? String(z.kultivarId) : null,
-    betreiberAm: z.betreiberAm ? String(z.betreiberAm) : null,
+    betreiberAm: betreiberAm ?? null,
   };
 }
 

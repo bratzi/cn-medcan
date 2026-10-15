@@ -23,6 +23,14 @@ test("Karte: Link zur Blüte, Schnitt de-DE, Anzahl in Mehrzahl", () => {
   assert.doesNotMatch(html, /Abstand/);
 });
 
+test("Karte je Sorte: Sortenseite als Link, keine Zeile mit Vertreiber", () => {
+  const sorte = { ...karte, slug: "remexian-sorte", handelsname: "Remexian", vertreiber: null, jeSorte: true };
+  const html = renderToStaticMarkup(createElement(RanglistenKarte, { karte: sorte, nach: "hoechste", texte, sprache: "de" }));
+  assert.match(html, /href="[/]blueten[/]remexian-sorte"/);
+  assert.doesNotMatch(html, /Remexian · /);
+  assert.doesNotMatch(html, /unbekannt/);
+});
+
 test("Insel: ohne JavaScript steht der Anmelde-Hinweis", () => {
   const html = renderToStaticMarkup(createElement(Ranglisten, { texte, sprache: "de" }));
   assert.match(html, /angemeldete Mitglieder/);

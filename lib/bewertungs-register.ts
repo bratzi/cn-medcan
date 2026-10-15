@@ -13,6 +13,8 @@ export type RegisterEintrag = {
   handelsname: string;
   /** Unterzeile „über <Vertreiber> · <Produkt>“ nur mit Sorte; die Vorlage steht in der Anzeige. */
   ware: { vertreiberName: string | null; wareGenau: boolean; handelsname: string } | null;
+  /** Sprungziel auf den Eintrag der Sortenseite; null ohne Sorte oder Id. */
+  eintrag: { id: string; vertreiberId: string | null } | null;
   note: number;
   datum: Date;
   community: { mittel: number; anzahl: number } | null;
@@ -45,6 +47,7 @@ export function registerAnsicht(
       slug: z.sorte?.slug ?? z.slug,
       handelsname: z.sorte?.name ?? z.handelsname,
       ware: z.sorte ? { vertreiberName: z.sorte.vertreiberName, wareGenau: z.sorte.wareGenau, handelsname: z.handelsname } : null,
+      eintrag: z.sorte && z.reviewId ? { id: z.reviewId, vertreiberId: z.sorte.vertreiberId } : null,
       note,
       datum: z.erstelltAm,
       community: c,

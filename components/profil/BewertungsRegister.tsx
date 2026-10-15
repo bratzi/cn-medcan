@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { Bild, BudpicBild } from "@/components/medien/Bild";
+import { sortenEintragHref } from "@/components/review/eintrag";
 import { textLinkKlassen } from "@/components/ui";
 import { SORTIERUNGEN, type registerAnsicht, type Sortierung } from "@/lib/bewertungs-register";
 import { cn } from "@/lib/cn";
@@ -86,7 +87,7 @@ export function BewertungsRegister({ ansicht, sortierung, alle, texte, sprache, 
               )}
             </div>
             <div className="flex flex-col gap-2">
-              <Link prefetch={false} href={`/blueten/${e.slug}`} className={cn(textLinkKlassen(), "font-buch text-body wrap-break-word")}>
+              <Link prefetch={false} href={e.eintrag ? sortenEintragHref({ slug: e.slug, vertreiberId: e.eintrag.vertreiberId }, e.eintrag.id) : `/blueten/${e.slug}`} className={cn(textLinkKlassen(), "font-buch text-body wrap-break-word")}>
                 {e.handelsname}
               </Link>
               {ueber && e.ware && wareZeile(e.ware, { ueber }) ? (

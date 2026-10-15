@@ -79,7 +79,7 @@ export function BuchDoppelseite({ eintrag, ueberschrift: Ueberschrift, w, sprach
     ? wareZeile({ vertreiberName: eintrag.sorte.vertreiberName, wareGenau: eintrag.sorte.wareGenau, handelsname: eintrag.handelsname }, { ueber: w.buch.ueber })
     : "";
 
-  const bildfeld =<BuchBildfeld eintrag={eintrag} name={name} w={w} sprache={sprache} />;
+  const bildfeld = <BuchBildfeld eintrag={eintrag} name={name} w={w} sprache={sprache} />;
   // Ohne eigenes Bild steht ein Ersatzbild, das unter lg entfällt (Nutzer 2026-10-06).
   const nurErsatz = (eintrag.bilder ?? []).length === 0;
 
@@ -209,7 +209,7 @@ export function BuchDoppelseite({ eintrag, ueberschrift: Ueberschrift, w, sprach
           {sorte && eintrag.kommentare !== undefined ? (
             <Link
               prefetch={false}
-              href={`/blueten/${eintrag.sorte?.slug ?? eintrag.slug}#bewertung-${eintrag.id}`}
+              href={`/blueten/${eintrag.sorte?.slug ?? eintrag.slug}${eintrag.sorte?.vertreiberId ? `?vertreiber=${encodeURIComponent(eintrag.sorte.vertreiberId)}` : ""}#bewertung-${eintrag.id}`}
               className={namenLinkKlassen("inline-flex min-h-11 items-center whitespace-nowrap text-small")}
             >
               {w.reaktionen.kommentare.titel} (<span className="numeric">{eintrag.kommentare}</span>)
