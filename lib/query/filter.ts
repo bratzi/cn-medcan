@@ -123,11 +123,17 @@ export const strainFilterSchema = z.object({
     .transform((rohwert) => (ersterWert(rohwert) ?? "").trim().toLowerCase())
     .transform((wert) => (/^[0-9a-f-]{32,36}$/.test(wert) ? wert : undefined))
     .catch(undefined),
-  /** Ansicht der Liste: je Handelsname (Standard) oder je Blüte (2.3). Kein Filter. */
+  /**
+   * Ansicht der Liste: je Blüte (Standard seit Spec Sorte im Fokus, 3) oder je Handelsname. Kein
+   * Filter. Ohne Angabe gilt `standardAnsicht`: mit gewählter Blüte die Handelsnamen, sonst die Sorten.
+   */
   ansicht: z
     .unknown()
-    .transform((rohwert): "ware" | "bluete" => (ersterWert(rohwert) === "bluete" ? "bluete" : "ware"))
-    .catch("ware" as const),
+    .transform((rohwert): "ware" | "bluete" | undefined => {
+      const wert = ersterWert(rohwert);
+      return wert === "bluete" || wert === "ware" ? wert : undefined;
+    })
+    .catch(undefined),
   sortierung: z
     .unknown()
     .transform((rohwert) => ersterWert(rohwert))
@@ -136,7 +142,12 @@ export const strainFilterSchema = z.object({
   seite: ganzzahl(1, 1),
 });
 
-export type StrainFilter = z.infer<typeof strainFilterSchema>;
+export type StrainFilter = Omit<z.infer<typeof strainFilterSchema>, "ansicht"> & { ansicht: "ware" | "bluete" };
+
+/** Ansicht ohne Angabe in der URL: eine gewählte Blüte zeigt ihre Handelsnamen, sonst je Sorte ein Eintrag. */
+export function standardAnsicht(filter: Pick<StrainFilter, "kultivar">): "ware" | "bluete" {
+  return filter.kultivar ? "ware" : "bluete";
+}
 
 const LEERER_FILTER: StrainFilter = {
   q: undefined,
@@ -150,7 +161,7 @@ const LEERER_FILTER: StrainFilter = {
   apotheke: [],
   vertreiber: [],
   kultivar: undefined,
-  ansicht: "ware",
+  ansicht: "bluete",
   sortierung: "relevanz",
   seite: 1,
 };
@@ -183,7 +194,7 @@ export function parseStrainFilter(searchParams: SuchParameter): StrainFilter {
     // Sollte durch die `.catch`-Kette nicht vorkommen - doppelte Absicherung.
     return { ...LEERER_FILTER };
   }
-  const filter = ergebnis.data;
+  const filter: StrainFilter = { ...ergebnis.data, ansicht: ergebnis.data.ansicht ?? standardAnsicht(ergebnis.data) };
   // Verdrehte Spanne (?thcMin=30&thcMax=10) still korrigieren statt fehlschlagen.
   if (filter.thcMin > filter.thcMax) {
     return { ...filter, thcMin: filter.thcMax, thcMax: filter.thcMin };
@@ -214,7 +225,7 @@ export function serialisiereFilter(filter: StrainFilter): URLSearchParams {
   if (filter.vertreiber.length > 0)
     params.set("vertreiber", filter.vertreiber.join(","));
   if (filter.kultivar) params.set("kultivar", filter.kultivar);
-  if (filter.ansicht === "bluete") params.set("ansicht", "bluete");
+  if (filter.ansicht !== standardAnsicht(filter)) params.set("ansicht", filter.ansicht);
   if (filter.sortierung !== "relevanz")
     params.set("sortierung", filter.sortierung);
   if (filter.seite > 1) params.set("seite", String(filter.seite));

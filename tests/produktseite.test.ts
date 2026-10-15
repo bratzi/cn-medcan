@@ -16,7 +16,7 @@ test("Produktseite: die Bewertungsmaske sitzt am Anker #bewerten, kein Link füh
   assert.equal(QUELLE.match(/href="#bewerten"/g)?.length, 1);
   assert.doesNotMatch(QUELLE, /["`]\/bewerten\//);
   // Gäste kommen nach dem Anmelden zurück an die Maske: das Fragment steckt kodiert im Ziel.
-  assert.match(QUELLE, /\/anmelden\?weiter=\$\{encodeURIComponent\(`\/blueten\/\$\{strain\.slug\}#bewerten`\)\}/);
+  assert.match(QUELLE, /\/anmelden\?weiter=\$\{encodeURIComponent\(`\$\{basis\}\?\$\{auswahlQuery\}#bewerten`\)\}/);
 });
 
 test("Produktseite: keine Hilfszeile, die auf nicht gezeigte Ränge verweist", () => {

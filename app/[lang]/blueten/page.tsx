@@ -142,7 +142,7 @@ async function Ergebnisbereich({ filter, w, sprache }: { filter: StrainFilter; w
             beschreibung={texte.leerText}
             aktion={
               <div className="flex flex-wrap gap-4">
-                <Link prefetch={false} href={bluetenAnsicht ? "/blueten?ansicht=bluete" : "/blueten"} className={buttonKlassen("secondary")}>
+                <Link prefetch={false} href={bluetenAnsicht ? "/blueten" : "/blueten?ansicht=ware"} className={buttonKlassen("secondary")}>
                   {texte.zuruecksetzen}
                 </Link>
                 <Link prefetch={false} href={vorschlagLink(filter.q)} className={buttonKlassen("secondary")}>

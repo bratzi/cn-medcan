@@ -14,7 +14,7 @@ const VERTREIBER_MAX = 5;
 
 type Props = { kultivar: KultivarListenEintrag; filter: StrainFilter; w: Woerterbuch; sprache: Sprache };
 
-/** Karte je Blüte (Spec 2.3), ohne Bild: es gibt kein Bild je Kultivar. */
+/** Karte je Blüte (Spec 2.3), ohne Bild: es gibt kein Bild je Kultivar. Der Name führt auf die Sortenseite. */
 export function KultivarKarte({ kultivar, filter, w, sprache }: Props) {
   const texte = w.katalog.kultivar;
   const sichtbar = kultivar.vertreiber.slice(0, VERTREIBER_MAX);
@@ -23,7 +23,15 @@ export function KultivarKarte({ kultivar, filter, w, sprache }: Props) {
   return (
     <Card className="flex w-full flex-col">
       <CardBody className="flex flex-1 flex-col gap-4">
-        <h3 className="font-buch text-h3 text-text wrap-break-word">{kultivar.name}</h3>
+        <h3 className="font-buch text-h3 text-text wrap-break-word">
+          {kultivar.slug ? (
+            <Link prefetch={false} href={`/blueten/${kultivar.slug}`} className={einzelLinkKlassen()}>
+              {kultivar.name}
+            </Link>
+          ) : (
+            kultivar.name
+          )}
+        </h3>
         <div className="flex flex-wrap gap-2">
           <Badge variante="neutral">{w.label.kultivarTyp[kultivar.typ]}</Badge>
         </div>

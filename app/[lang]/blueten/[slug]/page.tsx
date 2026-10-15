@@ -2,7 +2,7 @@ import { ladeLiveNetzBasis } from "@/lib/query/profil";
 import type { ReactNode } from "react";
 import type { Metadata } from "next";
 import Link from "next/link";
-import { notFound, unstable_rethrow } from "next/navigation";
+import { notFound, permanentRedirect, unstable_rethrow } from "next/navigation";
 
 import { EigeneLikes } from "@/components/reaktionen/EigeneLikes";
 import { LikeKnopf } from "@/components/reaktionen/LikeKnopf";
@@ -22,8 +22,8 @@ import { Aufklaerung } from "@/components/review/Aufklaerung";
 import { AromaErkundung } from "@/components/review/AromaErkundung";
 import { BewertungsFormular } from "@/components/review/BewertungsFormular";
 import { BewertungsBuch } from "@/components/review/BewertungsBuch";
-import { VertreiberVergleich } from "@/components/review/VertreiberVergleich";
-import { VertreiberWahl } from "@/components/review/VertreiberWahl";
+import { BlattAnzeige } from "@/components/review/BlattAnzeige";
+import { WareLeiste } from "@/components/sorte/WareLeiste";
 import { erkundungsDaten } from "@/components/review/erkundung-daten";
 import { eintragAnker } from "@/components/review/eintrag";
 import {
@@ -45,6 +45,7 @@ import {
   formatiereDatum,
   formatiereProzent,
   formatiereProzentSpanne,
+  formatiereZahl,
 } from "@/lib/format";
 import { holeSprache, holeWoerterbuch, type Sprache, type Woerterbuch } from "@/lib/i18n";
 import { mehrzahl, t } from "@/lib/i18n/text";
@@ -55,13 +56,12 @@ import { istFachkreis } from "@/lib/query/fachkreis";
 import {
   ladeEigeneBewertung,
   ladeStrainDetail,
-  ladeStrainTitel,
   ladeTerpenKatalog,
   type StrainDetail,
   type UnternehmenEintrag,
 } from "@/lib/query/strains";
 import { likeZahlenFuer, reaktionenFuer, teileZaehler } from "@/lib/query/reaktionen";
-import { ladeVertreiberDerBluete } from "@/lib/query/vertreiber";
+import { ladeSorte, ladeSortenBewertungen, produktZuSorte, waehleAktiveWare } from "@/lib/query/sorte";
 import { aktuellesMitglied } from "@/lib/session";
 
 /**
@@ -74,12 +74,30 @@ export const dynamic = "force-dynamic";
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
-  const [handelsname, w] = await Promise.all([ladeStrainTitel(slug), holeWoerterbuch()]);
-  if (!handelsname) return { title: w.bluete.nichtGefunden };
+  // ladeSorte ist je Request gecacht (React cache): die Seite liest dieselbe Zeile ohne zweite Abfrage.
+  const [sorte, w] = await Promise.all([ladeSorte(slug), holeWoerterbuch()]);
+  if (!sorte) return { title: w.bluete.nichtGefunden };
   return {
-    title: handelsname,
-    description: t(w.bluete.metaBeschreibung, { handelsname }),
+    title: sorte.kultivar.name,
+    description: t(w.bluete.metaBeschreibung, { handelsname: sorte.kultivar.name }),
   };
+}
+
+type SuchParameter = Record<string, string | string[] | undefined>;
+
+function ersterWert(wert: string | string[] | undefined): string | undefined {
+  const roh = Array.isArray(wert) ? wert[0] : wert;
+  return roh?.trim() || undefined;
+}
+
+/** Query-String ohne `?` für die Umleitung alter Produktadressen. */
+function alsSuche(suche: SuchParameter): string {
+  const params = new URLSearchParams();
+  for (const [schluessel, wert] of Object.entries(suche)) {
+    for (const einzeln of Array.isArray(wert) ? wert : wert === undefined ? [] : [wert]) params.append(schluessel, einzeln);
+  }
+  const text = params.toString();
+  return text ? `?${text}` : "";
 }
 
 const ABSTAND = "mt-16 sm:mt-24";
@@ -189,25 +207,53 @@ function Chargentabelle({ chargen, w, sprache }: { chargen: StrainDetail["charge
 }
 
 /**
- * Der vollstaendige Eintrag (Spec TP2 4.3): der Kern vorn. Titelblatt, das
- * Buch mit allen Bewertungen (seit T7: Betreiber, dann Community), das
- * Geschmacksprofil mit der Bewertungsmaske (#bewerten), dann die
- * Produktdaten. Leere Abschnitte entfallen, statt einen Leerzustand zu zeigen
- * (Spec 13.3).
+ * Die Sortenseite (Spec Sorte im Fokus, 3): Kopf der Sorte, darunter die Ware-Leiste je Vertreiber.
+ * Die gewählte Ware (`?ware=` vor `?vertreiber=`, sonst die meistbewertete) filtert das Buch und
+ * liefert die Produktangaben (Angaben, Terpene, Chargen). Leere Abschnitte entfallen, statt einen
+ * Leerzustand zu zeigen (Spec 13.3).
  */
-async function ProduktInhalt({ slug, w, sprache }: { slug: string; w: Woerterbuch; sprache: Sprache }) {
-  const fachkreis = await istFachkreis();
+async function SorteInhalt({ slug, suche, w, sprache }: { slug: string; suche: SuchParameter; w: Woerterbuch; sprache: Sprache }) {
   const texte = w.bluete;
-  const [strain, katalog, mitglied] = await Promise.all([
-    ladeStrainDetail(slug, fachkreis),
+  // Drei Runden: Sorte und Kontext, dann alles, was nur Sorte, Ware und Mitglied braucht, zuletzt was an Terpenen und Bewertungen hängt.
+  const [sorte, katalog, mitglied, fachkreis] = await Promise.all([
+    ladeSorte(slug),
     ladeTerpenKatalog(),
     aktuellesMitglied(),
+    istFachkreis(),
+  ]);
+  if (!sorte) {
+    // Alte Produktadresse: dauerhaft auf die Sorte mit ?ware=, nur wenn der Slug keine Sorte ist (eine Abfrage).
+    const ziel = await produktZuSorte(`/blueten/${slug}`, alsSuche(suche));
+    if (ziel) permanentRedirect(ziel);
+    notFound();
+  }
+  const wahl = { ware: ersterWert(suche.ware), vertreiber: ersterWert(suche.vertreiber) };
+  const aktive = waehleAktiveWare(sorte.waren, wahl);
+  if (!aktive) notFound();
+  const alleVertreiber = ersterWert(suche.alle) === "1" || !aktive.ware.vertreiberId;
+  const freigegeben = mitglied?.freigegeben ? mitglied : null;
+  const [strain, reviews, budpicListe, blueteLikeZahlen, eigeneBewertung, liveNetz] = await Promise.all([
+    // Nur Angaben, Terpene, Chargen: das Buch lädt ladeSortenBewertungen.
+    ladeStrainDetail(aktive.produkt.slug, fachkreis, { ohneBewertungen: true }),
+    ladeSortenBewertungen(sorte.kultivar.id, alleVertreiber ? null : aktive.ware.vertreiberId),
+    ladeFreieBudpics([aktive.produkt.id]),
+    // Likes der Blüte aus dem Zähler; ob ich geliket habe, lädt erst die Insel (Seite bleibt statisch).
+    likeZahlenFuer("BLUETE", [sorte.kultivar.id]),
+    // Die eigene Bewertung je Sorte und Vertreiber (auch unfreigegeben) belegt die Maske vor; nur wer bewerten darf, braucht sie.
+    freigegeben && aktive.ware.vertreiberId
+      ? ladeEigeneBewertung(freigegeben.mitgliedId, sorte.kultivar.id, aktive.ware.vertreiberId)
+      : Promise.resolve(null),
+    // Live-Netz in der Maske (Nutzer 2026-10-09); ohne Grundlage fehlt nur das Netz, nie die Maske.
+    freigegeben
+      ? ladeLiveNetzBasis(freigegeben.mitgliedId, aktive.produkt.id).catch((fehler) => {
+          console.error("ladeLiveNetzBasis fehlgeschlagen", fehler);
+          return null;
+        })
+      : Promise.resolve(null),
   ]);
   if (!strain) notFound();
   // „Ähnlich im Aroma“ (T11) rechnet D1, nicht der Worker; ohne Terpene entfällt es.
-  // Alle Vertreiber derselben Blüte (Spec 2026-10-13); ohne Liste fehlen nur Wahl und Vergleich.
-  const [budpicListe, aehnliche, vertreiberListe, blueteLikeZahlen, reviewZaehler] = await Promise.all([
-    ladeFreieBudpics([strain.id]),
+  const [aehnliche, reviewZaehler] = await Promise.all([
     strain.terpene.length > 0
       ? aehnlichImAroma(strain.id).catch((fehler: unknown) => {
           unstable_rethrow(fehler);
@@ -215,51 +261,46 @@ async function ProduktInhalt({ slug, w, sprache }: { slug: string; w: Woerterbuc
           return [];
         })
       : Promise.resolve([]),
-    strain.kultivar
-      ? ladeVertreiberDerBluete(strain.kultivar.id, strain.id).catch((fehler: unknown) => {
-          unstable_rethrow(fehler);
-          console.error("ladeVertreiberDerBluete fehlgeschlagen", fehler);
-          return [];
-        })
-      : Promise.resolve([]),
-    // Likes der Blüte aus dem Zähler; ob ich geliket habe, lädt erst die Insel (Seite bleibt statisch).
-    strain.kultivar ? likeZahlenFuer("BLUETE", [strain.kultivar.id]) : Promise.resolve(new Map<string, number>()),
     // Ein Aufruf für alle Herzen im Bewertungsbuch (Zähler, kein COUNT über Likes).
-    reaktionenFuer("BEWERTUNG", strain.reviews.map((r) => r.id)),
+    reaktionenFuer("BEWERTUNG", reviews.map((r) => r.id)),
   ]);
   const { likes: reviewLikes, kommentare: reviewKommentare } = teileZaehler(reviewZaehler);
-  const blueteLikes = strain.kultivar ? (blueteLikeZahlen.get(strain.kultivar.id) ?? 0) : 0;
+  const blueteLikes = blueteLikeZahlen.get(sorte.kultivar.id) ?? 0;
   const budpics = budpicListe.get(strain.id) ?? [];
   const eigeneTerpene = strain.terpene.map((terpen) => terpen.name);
 
-  const { eigene, community, meineNote } = teileBewertungen(strain.reviews);
+  const { eigene, community, meineNote } = teileBewertungen(reviews);
   const neuesteEigene = eigene[0];
-  const geschmack = verdichteGeschmacksMatrix(strain.reviews);
-  const produkt = { handelsname: strain.handelsname, slug: strain.slug, terpene: strain.terpene, bildPfad: strain.herstellerBildPfad };
+  const geschmack = verdichteGeschmacksMatrix(reviews);
+  const produkt = { handelsname: sorte.kultivar.name, slug: sorte.kultivar.slug, terpene: strain.terpene, bildPfad: strain.herstellerBildPfad };
   // Das Aroma gilt der Blüte: die Mediane über alle Handelsnamen des Kultivars, sonst die eigenen.
   // Die Qualität gilt dem Vertreiber: das Charge-Fazit vergleicht mit seinem Schnitt (Spec 2026-10-13).
   const erkundung = erkundungsDaten(
     strain.terpene,
-    strain.reviews,
+    reviews,
     w.aroma.serien,
     strain.kultivarKennwerte ?? strain.kennwerte,
     strain.vertreiberQualitaet,
   );
   // Wie viele Bewertungen hinter dem Aroma stehen: mit Median dessen Anzahl, sonst die der Ware.
   const aromaAnzahl = erkundung.median?.anzahl ?? geschmack.anzahlBewertungen;
-  const zuordnung = { bluete: strain.kultivar?.name ?? strain.handelsname, vertreiber: strain.vertreiber?.name ?? null };
-  // Die eigene Bewertung (auch unfreigegeben) belegt die Maske vor; nur wer bewerten darf, braucht sie.
-  const [eigeneBewertung, liveNetz] = mitglied?.freigegeben
-    ? await Promise.all([
-        ladeEigeneBewertung(mitglied.mitgliedId, strain.id),
-        // Live-Netz in der Maske (Nutzer 2026-10-09); ohne Grundlage fehlt nur das Netz, nie die Maske.
-        ladeLiveNetzBasis(mitglied.mitgliedId, strain.id).catch((fehler) => {
-          console.error("ladeLiveNetzBasis fehlgeschlagen", fehler);
-          return null;
-        }),
-      ])
-    : [null, null];
+  const zuordnung = { bluete: sorte.kultivar.name, vertreiber: aktive.ware.vertreiberName || null };
   const vorbelegung = eigeneBewertung ? vorbelegungAus(eigeneBewertung) : null;
+  // Stärke vorwählen: die eigene, sonst die per ?ware gewählte, sonst die einzige; offen bleibt „Weiß ich nicht“.
+  const vorgewaehlt = {
+    vertreiberId: aktive.ware.vertreiberId || null,
+    strainId: vorbelegung
+      ? vorbelegung.strainId
+      : wahl.ware === aktive.produkt.slug || aktive.ware.produkte.length === 1
+        ? aktive.produkt.id
+        : null,
+  };
+  const hauptnote = sorte.kennwerte?.gesamtnoteMittel ?? sorte.kennwerte?.gesamtnoteMedian ?? null;
+  const sortenAnzahl = sorte.kennwerte?.anzahl ?? 0;
+  const basis = `/blueten/${sorte.kultivar.slug}`;
+  const auswahlQuery = aktive.ware.vertreiberId
+    ? `vertreiber=${encodeURIComponent(aktive.ware.vertreiberId)}`
+    : `ware=${encodeURIComponent(aktive.produkt.slug)}`;
   /**
    * Angaben zur Blüte (Nutzer 2026-10-03 und 2026-10-05): standen als eigene Sektion weit
    * unter der Erkundung. Sie stehen jetzt als ein Block oben, direkt hinter dem Titelblatt,
@@ -270,7 +311,7 @@ async function ProduktInhalt({ slug, w, sprache }: { slug: string; w: Woerterbuc
   const angabenZurBluete = (
     <section aria-labelledby="daten-titel" className={SEKTION}>
       <Schlagwort satz={texte.schlagwort.angaben} ton="gruen" />
-      <SektionsKopf id="daten-titel" titel={texte.angaben} />
+      <SektionsKopf id="daten-titel" titel={t(texte.sorte.angabenZu, { handelsname: strain.handelsname })} />
       {/* Zugeklappt nur die vier Kernangaben (Nutzer 2026-10-08): die volle Liste
           zog die Seite in die Länge. Der Rest liegt in <details>, ohne JavaScript. */}
       <dl className="mx-auto mt-12 grid max-w-4xl grid-cols-2 gap-8 text-center sm:grid-cols-4">
@@ -327,22 +368,22 @@ async function ProduktInhalt({ slug, w, sprache }: { slug: string; w: Woerterbuc
     </section>
   );
   // Nach dem Anmelden zurück an die Maske; das Fragment kodiert, sonst gehört es zu /anmelden.
-  const anmelden = `/anmelden?weiter=${encodeURIComponent(`/blueten/${strain.slug}#bewerten`)}`;
+  const anmelden = `/anmelden?weiter=${encodeURIComponent(`${basis}?${auswahlQuery}#bewerten`)}`;
 
   return (
     <EigeneLikes>
+      {/* Kopf der Sorte (Spec Sorte im Fokus, 3): Name, Genetik, Typ, Spanne über alle Vertreiber. */}
       <Titelblatt
-        handelsname={strain.handelsname}
-        kultivarName={strain.kultivarName}
-        vertreiberZeile={strain.vertreiber ? t(texte.vertreiber.von, { name: strain.vertreiber.name }) : undefined}
-        herstellerZeile={strain.hersteller ? t(texte.vertreiber.angebautVon, { name: strain.hersteller.name }) : undefined}
-        kultivarTyp={strain.kultivarTyp}
+        handelsname={sorte.kultivar.name}
+        kultivarName={sorte.kultivar.genetik}
+        vertreiberZeile={texte.sorte.spanne}
+        kultivarTyp={sorte.kultivar.typ}
         darreichungsform={strain.darreichungsform}
         anzahlApothekenVerfuegbar={strain.anzahlApothekenVerfuegbar}
-        thcMin={strain.thcMinProzent}
-        thcMax={strain.thcMaxProzent}
-        cbdMin={strain.cbdMinProzent}
-        cbdMax={strain.cbdMaxProzent}
+        thcMin={sorte.spanne.thcMin ?? strain.thcMinProzent}
+        thcMax={sorte.spanne.thcMax ?? strain.thcMaxProzent}
+        cbdMin={sorte.spanne.cbdMin ?? strain.cbdMinProzent}
+        cbdMax={sorte.spanne.cbdMax ?? strain.cbdMaxProzent}
         bild={blueteBild(strain.herstellerBildPfad) ?? musterBildId(strain.slug)}
         budpic={{
           strainId: strain.id,
@@ -359,6 +400,18 @@ async function ProduktInhalt({ slug, w, sprache }: { slug: string; w: Woerterbuc
         }
       />
 
+      {/* Hauptnote der Sorte über alle Vertreiber (KultivarKennwerte), mit Anzahl. */}
+      <div className="mt-8 flex flex-col gap-2">
+        {hauptnote !== null && sortenAnzahl > 0 ? (
+          <>
+            <BlattAnzeige note={hauptnote} text={t(texte.sorte.hauptnote, { note: formatiereZahl(hauptnote, 1, sprache) })} />
+            <p className="numeric text-small text-text-muted">{mehrzahl(sprache, texte.sorte.anzahl, sortenAnzahl)}</p>
+          </>
+        ) : (
+          <p className="text-small text-text-muted">{texte.sorte.ohneNote}</p>
+        )}
+      </div>
+
       {/* Jede Sorte ist bewertbar, unabhängig von einer Umfrage; die Umfrage rückt
           eine Sorte nur zeitweise nach vorn. */}
       <p className="mt-8 flex flex-wrap items-center gap-4">
@@ -374,10 +427,20 @@ async function ProduktInhalt({ slug, w, sprache }: { slug: string; w: Woerterbuc
             ? mehrzahl(sprache, texte.communityLesen, community.length)
             : texte.nochKeineCommunity}
         </a>
-        {strain.kultivar ? (
-          <LikeKnopf art="BLUETE" zielId={strain.kultivar.id} anzahl={blueteLikes} text={w.reaktionen.knopf} />
-        ) : null}
+        <LikeKnopf art="BLUETE" zielId={sorte.kultivar.id} anzahl={blueteLikes} text={w.reaktionen.knopf} />
       </p>
+
+      {/* Ware-Leiste (Spec Sorte im Fokus, 3): je Vertreiber eine Karte, neutral, ohne Kauflink (HWG),
+          gereiht nach Anzahl der Bewertungen. Die Wahl filtert das Buch und die Angaben darunter. */}
+      <div className={SEKTION}>
+        <WareLeiste
+          waren={sorte.waren}
+          aktiveVertreiberId={aktive.ware.vertreiberId}
+          slug={sorte.kultivar.slug}
+          texte={texte.vertreiber}
+          sprache={sprache}
+        />
+      </div>
 
       {strain.beschreibung ? (
         <p className="mt-8 max-w-[68ch] text-body text-pretty text-text">{strain.beschreibung}</p>
@@ -385,18 +448,33 @@ async function ProduktInhalt({ slug, w, sprache }: { slug: string; w: Woerterbuc
 
       {angabenZurBluete}
 
-      {/* Dieselbe Blüte bei anderen Vertreibern (Spec 2026-10-13): neutral, ohne Kauflink (HWG); seit Spec Vertreiber sichtbar 3 auch mit einem Vertreiber. */}
-      {vertreiberListe.length > 0 && strain.kultivar ? (
-        <div className={SEKTION}>
-          <VertreiberVergleich eintraege={vertreiberListe} kultivarId={strain.kultivar.id} texte={texte.vertreiber} sprache={sprache} />
-        </div>
-      ) : null}
-
-      {/* Alle Bewertungen der Sorte als ein Buch zum Blättern (T7): Betreiber zuerst,
-          dann die Community. Ersetzt die eigenen Doppelseiten untereinander und die Liste. */}
+      {/* Bewertungen der Sorte als ein Buch zum Blättern (T7): Betreiber zuerst, dann die Community;
+          gefiltert auf den Vertreiber der Auswahl, umschaltbar auf alle Vertreiber. */}
       <div className={SEKTION}>
         <Schlagwort satz={texte.schlagwort.bewertungen} ton="lila" />
-        <BewertungsBuch reviews={strain.reviews} kennwerte={strain.kennwerte} produkt={produkt} w={w} sprache={sprache} katalog={katalog} likes={reviewLikes} kommentare={reviewKommentare} />
+        {aktive.ware.vertreiberId ? (
+          <nav aria-label={texte.vertreiber.bewertungenFilter} className="mb-8 flex flex-wrap justify-center gap-2">
+            <Link
+              prefetch={false}
+              scroll={false}
+              href={`${basis}?${auswahlQuery}`}
+              aria-current={alleVertreiber ? undefined : "true"}
+              className={buttonKlassen(alleVertreiber ? "secondary" : "primary", "md")}
+            >
+              {t(texte.vertreiber.nurAuswahl, { name: aktive.ware.vertreiberName || texte.vertreiber.unbekannt })}
+            </Link>
+            <Link
+              prefetch={false}
+              scroll={false}
+              href={`${basis}?${auswahlQuery}&${new URLSearchParams({ alle: "1" })}`}
+              aria-current={alleVertreiber ? "true" : undefined}
+              className={buttonKlassen(alleVertreiber ? "primary" : "secondary", "md")}
+            >
+              {texte.vertreiber.alleVertreiber}
+            </Link>
+          </nav>
+        ) : null}
+        <BewertungsBuch reviews={reviews} kennwerte={sorte.kennwerte} produkt={produkt} w={w} sprache={sprache} katalog={katalog} likes={reviewLikes} kommentare={reviewKommentare} />
       </div>
 
       {/* Bewerten an der Stelle der Erkundung (Masterplan Bewertung v2, T4; /bewerten entfällt):
@@ -436,23 +514,14 @@ async function ProduktInhalt({ slug, w, sprache }: { slug: string; w: Woerterbuc
         />
         {mitglied?.freigegeben ? (
           <>
-            {/* Erst die Ware zuordnen, dann bewerten: die Wahl führt auf den Handelsnamen des Vertreibers. */}
-            {strain.kultivar ? (
-              <div className="mt-8">
-                <VertreiberWahl
-                  eintraege={vertreiberListe}
-                  kultivarId={strain.kultivar.id}
-                  texte={texte.vertreiber}
-                  eigenerVertreiber={strain.vertreiber?.name ?? null}
-                />
-              </div>
-            ) : null}
             <div className="mt-8">
               <BewertungsFormular
                 strainId={strain.id}
-                kultivarId={strain.kultivar?.id ?? null}
-                vertreiberId={strain.vertreiberId}
-                handelsname={strain.handelsname}
+                kultivarId={sorte.kultivar.id}
+                waren={sorte.waren}
+                vorgewaehlt={vorgewaehlt}
+                wareTexte={texte.vertreiber}
+                handelsname={sorte.kultivar.name}
                 terpene={strain.terpene}
                 chargen={strain.chargen.map((charge) => charge.chargenNr)}
                 istBetreiber={mitglied.rolle === "ADMIN"}
@@ -473,7 +542,7 @@ async function ProduktInhalt({ slug, w, sprache }: { slug: string; w: Woerterbuc
             {erkundung.serien.length > 0 ? (
               <div className="mt-8">
                 <AromaErkundung
-                  titel={strain.handelsname}
+                  titel={sorte.kultivar.name}
                   terpene={strain.terpene}
                   katalog={katalog}
                   texte={aromaTexte(w, sprache)}
@@ -540,9 +609,14 @@ async function ProduktInhalt({ slug, w, sprache }: { slug: string; w: Woerterbuc
   );
 }
 
-export default async function ProduktDetailPage({ params }: { params: Promise<{ slug: string }> }) {
-  const { slug } = await params;
-  const [w, sprache] = await Promise.all([holeWoerterbuch(), holeSprache()]);
+export default async function SortenSeite({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ slug: string }>;
+  searchParams: Promise<SuchParameter>;
+}) {
+  const [{ slug }, suche, w, sprache] = await Promise.all([params, searchParams, holeWoerterbuch(), holeSprache()]);
   return (
     <div className={cn(seitenRahmen(), "pt-16 pb-24 sm:pt-24")}>
       <p className="mb-8">
@@ -551,7 +625,7 @@ export default async function ProduktDetailPage({ params }: { params: Promise<{ 
         </Link>
       </p>
       {/* Bewusst ohne Suspense-Grenze: notFound() antwortet so mit 404, der Inhalt ist ohne JavaScript lesbar und #eintrag-… existiert beim Sprung. */}
-      <ProduktInhalt slug={slug} w={w} sprache={sprache} />
+      <SorteInhalt slug={slug} suche={suche} w={w} sprache={sprache} />
     </div>
   );
 }

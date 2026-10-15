@@ -19,13 +19,15 @@ test("kultivar: Müll fällt still weg", () => {
   }
 });
 
-test("ansicht: nur bluete umschaltet, Standard ware, nicht in der URL und kein Filter", () => {
-  assert.equal(parseStrainFilter({}).ansicht, "ware");
-  assert.equal(parseStrainFilter({ ansicht: "quatsch" }).ansicht, "ware");
-  const f = parseStrainFilter({ ansicht: "bluete" });
-  assert.equal(f.ansicht, "bluete");
-  assert.equal(serialisiereFilter(f).get("ansicht"), "bluete");
+test("ansicht: Standard je Sorte, mit gewählter Blüte die Handelsnamen; der Standard steht nicht in der URL und ist kein Filter", () => {
+  assert.equal(parseStrainFilter({}).ansicht, "bluete");
+  assert.equal(parseStrainFilter({ ansicht: "quatsch" }).ansicht, "bluete");
+  assert.equal(parseStrainFilter({ kultivar: ID }).ansicht, "ware");
+  const f = parseStrainFilter({ ansicht: "ware" });
+  assert.equal(f.ansicht, "ware");
+  assert.equal(serialisiereFilter(f).get("ansicht"), "ware");
   assert.equal(serialisiereFilter(parseStrainFilter({})).has("ansicht"), false);
+  assert.equal(serialisiereFilter(parseStrainFilter({ kultivar: ID })).has("ansicht"), false);
   assert.equal(istFilterLeer(f), true);
 });
 

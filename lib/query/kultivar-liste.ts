@@ -40,6 +40,7 @@ export function weitereVertreiber(
 export type KultivarZeile = {
   id: string;
   name: string;
+  slug?: string | null;
   kennwerte: { gesamtnoteMittel: number | null; anzahl: number } | null;
   strains: { kultivarTyp: string; thcMinProzent: number; thcMaxProzent: number; vertreiber: { name: string } | null }[];
 };
@@ -47,6 +48,8 @@ export type KultivarZeile = {
 export type KultivarListenEintrag = {
   id: string;
   name: string;
+  /** Adresse der Sortenseite /blueten/<slug>; null, solange kein Slug vergeben ist. */
+  slug?: string | null;
   typ: KultivarTyp;
   thcMin: number | null;
   thcMax: number | null;
@@ -71,6 +74,7 @@ export function verdichteKultivar(zeile: KultivarZeile): KultivarListenEintrag {
   return {
     id: zeile.id,
     name: zeile.name,
+    slug: zeile.slug ?? null,
     typ,
     thcMin: zeile.strains.length > 0 ? Math.min(...zeile.strains.map((s) => s.thcMinProzent)) : null,
     thcMax: zeile.strains.length > 0 ? Math.max(...zeile.strains.map((s) => s.thcMaxProzent)) : null,
@@ -96,6 +100,7 @@ export async function ladeKultivarListe(filter: StrainFilter, fachkreis: boolean
       select: {
         id: true,
         name: true,
+        slug: true,
         kennwerte: { select: { gesamtnoteMittel: true, anzahl: true } },
         strains: {
           where: strainWhere,

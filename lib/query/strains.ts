@@ -637,10 +637,15 @@ export async function ladeStrainTitel(slug: string): Promise<string | null> {
   return zeile?.handelsname ?? null;
 }
 
-/** Ein Produkt mit vollem Profil. `null`, wenn unbekannt oder inaktiv. */
+/**
+ * Ein Produkt mit vollem Profil. `null`, wenn unbekannt oder inaktiv. `ohneBewertungen`: die
+ * Sortenseite lädt ihr Buch selbst (ladeSortenBewertungen), dann bleiben `reviews` leer und die
+ * Autorenzahlen werden nicht gelesen.
+ */
 export async function ladeStrainDetail(
   slug: string,
-  fachkreis: boolean
+  fachkreis: boolean,
+  { ohneBewertungen = false }: { ohneBewertungen?: boolean } = {},
 ): Promise<StrainDetail | null> {
   const prisma = await getPrisma();
 
@@ -730,7 +735,7 @@ export async function ladeStrainDetail(
         where: { freigegeben: true },
         // Betreiber zuerst: bei mehr als 20 Bewertungen fiele er sonst aus dem Buch (T7-Review, Nutzer 2026-09-29).
         orderBy: [{ istRedaktionell: "desc" }, { erstelltAm: "desc" }],
-        take: 20,
+        take: ohneBewertungen ? 0 : 20,
         select: BEWERTUNG_SELECT,
       },
       kennwerte: KENNWERTE_SELECT,
@@ -1307,16 +1312,19 @@ export async function ladeAromaVorzeige(): Promise<AromaVorzeige | null> {
 }
 
 /**
- * Die eigene Bewertung eines Mitglieds zu einer Sorte, auch solange sie noch
- * nicht freigegeben ist (Vorbelegung der Maske, Bewertung v2 T4). Je Mitglied
- * und Sorte gibt es höchstens eine (Unique-Index autorId × strainId), also
- * ein Zugriff über den Index, nicht aus der öffentlichen Liste.
+ * Die eigene Bewertung eines Mitglieds zu einer Sorte bei einem Vertreiber, auch solange sie noch
+ * nicht freigegeben ist (Vorbelegung der Maske). Seit Spec 2026-10-15 gilt eine Bewertung je Sorte
+ * und Vertreiber; aus der Zeit „eine je Produkt“ kann es mehrere geben, dann die kleinste id wie
+ * beim Speichern (waehleZielBewertung).
  */
-export async function ladeEigeneBewertung(autorId: string, strainId: string): Promise<GespeicherteBewertung | null> {
+export async function ladeEigeneBewertung(autorId: string, kultivarId: string, vertreiberId: string): Promise<GespeicherteBewertung | null> {
   const prisma = await getPrisma();
-  const zeile = await prisma.review.findUnique({
-    where: { autorId_strainId: { autorId, strainId } },
+  const zeile = await prisma.review.findFirst({
+    where: { autorId, kultivarId, vertreiberId },
+    orderBy: { id: "asc" },
     select: {
+      strainId: true,
+      wareGenau: true,
       aussehen: true,
       geruch: true,
       geschmack: true,
