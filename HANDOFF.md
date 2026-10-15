@@ -3,7 +3,7 @@
 > Übergabemedium zwischen Sessions. Wird nach jedem Arbeitsblock aktualisiert und committet.
 > Wer hier weiterarbeitet, liest diese Datei zuerst und braucht den Chatverlauf nicht.
 
-**Letzte Aktualisierung:** 2026-10-14 (Session 61)
+**Letzte Aktualisierung:** 2026-10-15 (Session 62)
 **Repo:** https://github.com/bratzi/cn-medcan (public)
 **Branch:** `main` (Makeover „Grünes Buch“ Teilprojekt 1 ist seit 2026-09-24 auf `main`)
 
@@ -27,6 +27,19 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 ---
 
 ## ⇢ Hier geht es weiter
+
+### ⇢ SESSION 62 (2026-10-15): Live-Prüfung Teil 1, zwei Fixes (`66631c2`)
+
+Live geprüft (Browser 1): `/reviews` lädt (Adressen ohne `/de`-Präfix!), Herz bei fremder Bewertung setzt sich und
+bleibt nach Reload, eigenes Herz meldet „Eigenes kannst du nicht mögen.“, HWG-Ablehnung („hilft bei Migräne“) greift,
+Kommentarbereich lädt erst beim Aufklappen, Blütenseite ohne Querscroll (Fenster geht nur bis 494 px).
+- **Fix `66631c2`:** gesetztes Herz zeigt mindestens 1 (statische Zahl hinkte bis 24 h hinterher); Autorkasten im Buch
+  bricht um (`flex-wrap`), statt den Namen „GrünesBu/ch“ zu trennen. 1117 Tests grün (`npm test`, nicht vitest).
+- **Offen für den Sessionstart:**
+  - Fix `66631c2` live ansehen (Herz-Zahl, Autorkasten bei voller Breite auf `/reviews`).
+  - Test-Like von GrünesBuch bei TerpzTester#1 (Band 1, 8. Eintrag) wieder entfernen? Nutzer fragen.
+  - Echten Kommentar posten (öffentlich unter Nutzerkonto): nur mit Freigabe des Nutzers.
+  - Pinnwand im öffentlichen Profil, hell/dunkel noch ungeprüft.
 
 ### ⇢ SESSION 61b (2026-10-14 abends): Instagram-Themen-Agent in der Cloud läuft (`83fe99f..`)
 
