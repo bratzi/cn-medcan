@@ -90,3 +90,38 @@ export function BudpicBild({
     />
   );
 }
+
+/**
+ * Bild einer Sorte mit fertiger Quelle (Sorten-Explorer, Startseite): Budpic aus
+ * /api/bild oder Pipeline-Foto, auf dem Server aufgelöst, damit der Client
+ * lib/medien nicht laden muss. Immer ganz im Rahmen (object-contain).
+ */
+export function SortenBild({
+  src,
+  srcSet,
+  breite,
+  hoehe,
+  alt,
+  className,
+}: {
+  src: string;
+  srcSet?: string;
+  breite: number;
+  hoehe: number;
+  alt: string;
+  className?: string;
+}) {
+  return (
+    <img
+      src={src}
+      srcSet={srcSet}
+      sizes={srcSet ? "(min-width: 1024px) 36vw, 90vw" : undefined}
+      width={breite}
+      height={hoehe}
+      alt={alt}
+      loading="lazy"
+      decoding="async"
+      className={cn("block size-full object-contain", className)}
+    />
+  );
+}

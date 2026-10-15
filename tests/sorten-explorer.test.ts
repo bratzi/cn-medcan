@@ -68,3 +68,12 @@ test("verdichteExplorerSorte: fasst Strains je Vertreiber zu einer Ware zusammen
 test("verdichteExplorerSorte: ohne Slug keine Sorte", () => {
   assert.equal(verdichteExplorerSorte({ slug: null, name: "X", kennwerte: null, vertreiberKennwerte: [], strains: [] }), null);
 });
+
+test("explorerBild: Budpic vor Musterbild, Musterbild als Symbolbild", () => {
+  const budpic = explorerBild({ id: "b1", breite: 800, hoehe: 600 }, [{ slug: "gelato-a" }]);
+  assert.deepEqual(budpic, { src: "/api/bild/b1", breite: 800, hoehe: 600, symbol: false });
+  const muster = explorerBild(undefined, [{ slug: "gelato-a", herstellerBildPfad: null }]);
+  assert.equal(muster?.symbol, true);
+  assert.match(muster?.src ?? "", /^\/medien\/.+\.webp$/);
+  assert.equal(explorerBild(undefined, []), null);
+});

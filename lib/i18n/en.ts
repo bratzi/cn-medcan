@@ -877,6 +877,8 @@ export const en: Woerterbuch = {
       zurSorte: "To the strain",
       wareBewerten: "Rate this product",
       sorteGewechselt: "{name}, {waren}.",
+      bildAlt: "Flower of the strain {name}",
+      symbolbild: "Symbolic image",
       hinweis: "Members' experiences, not a recommendation.",
     },
     skelett: {

@@ -1,4 +1,6 @@
 import { istKultivarTyp, type KultivarTyp } from "@/db/enums";
+import { musterBildId } from "@/lib/budpics";
+import { bildQuelle, blueteBild, medium } from "@/lib/medien";
 import { getPrisma } from "@/lib/prisma";
 
 /** Eine Ware: dieselbe Sorte bei einem Vertreiber (Spec 2026-10-15 Abschnitt 4). */
@@ -13,7 +15,10 @@ export type ExplorerWare = {
   note: number | null;
 };
 
-export type ExplorerSorte = { slug: string; name: string; typ: KultivarTyp; anzahl: number; waren: ExplorerWare[] };
+/** Bild der Sorte links im Kapitel: das neueste Budpic, sonst das Musterbild (symbol: true). */
+export type ExplorerBild = { src: string; srcSet?: string; breite: number; hoehe: number; symbol: boolean };
+
+export type ExplorerSorte = { slug: string; name: string; typ: KultivarTyp; anzahl: number; waren: ExplorerWare[]; bild?: ExplorerBild | null };
 
 const SORTEN_MAX = 12;
 const WAREN_MAX = 8;
@@ -89,6 +94,7 @@ export async function ladeSortenExplorer(): Promise<ExplorerSorte[]> {
   const zeilen = await prisma.kultivar.findMany({
     where: { slug: { not: null }, strains: { some: { aktiv: true, vertreiberId: { not: null } } } },
     select: {
+      id: true,
       slug: true,
       name: true,
       kennwerte: { select: { anzahl: true } },
@@ -96,6 +102,8 @@ export async function ladeSortenExplorer(): Promise<ExplorerSorte[]> {
       strains: {
         where: { aktiv: true, vertreiberId: { not: null } },
         select: {
+          slug: true,
+          herstellerBildPfad: true,
           kultivarTyp: true,
           thcMinProzent: true,
           thcMaxProzent: true,
@@ -108,5 +116,26 @@ export async function ladeSortenExplorer(): Promise<ExplorerSorte[]> {
     orderBy: [{ kennwerte: { anzahl: "desc" } }, { name: "asc" }],
     take: KANDIDATEN_MAX,
   });
-  return waehleExplorerSorten(zeilen.flatMap((z) => verdichteExplorerSorte(z) ?? []));
+  const gewaehlt = waehleExplorerSorten(zeilen.flatMap((z) => verdichteExplorerSorte(z) ?? []));
+  const zeileJeSlug = new Map(zeilen.map((z) => [z.slug, z]));
+  // Dynamisch: lib/query/budpics zieht die Sitzung (server-only), die Tests laden diese Datei ohne sie.
+  const { ladeFreieBudpicsJeKultivar } = await import("@/lib/query/budpics");
+  const budpics = await ladeFreieBudpicsJeKultivar(gewaehlt.flatMap((s) => zeileJeSlug.get(s.slug)?.id ?? []));
+  return gewaehlt.map((s) => {
+    const zeile = zeileJeSlug.get(s.slug);
+    return { ...s, bild: zeile ? explorerBild(budpics.get(zeile.id)?.[0], zeile.strains) : null };
+  });
+}
+
+/** Budpic vor Herstellerbild vor Musterbild, wie auf den Katalogkarten. */
+export function explorerBild(
+  budpic: { id: string; breite: number; hoehe: number } | undefined,
+  strains: readonly { slug?: string; herstellerBildPfad?: string | null }[],
+): ExplorerBild | null {
+  if (budpic) return { src: `/api/bild/${budpic.id}`, breite: budpic.breite, hoehe: budpic.hoehe, symbol: false };
+  const ersterSlug = strains.find((s) => s.slug)?.slug;
+  const id = blueteBild(strains.find((s) => s.herstellerBildPfad)?.herstellerBildPfad) ?? (ersterSlug ? musterBildId(ersterSlug) : null);
+  if (!id) return null;
+  const m = medium(id);
+  return { ...bildQuelle(id), breite: m.breite, hoehe: m.hoehe, symbol: true };
 }

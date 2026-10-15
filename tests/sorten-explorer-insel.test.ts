@@ -54,7 +54,7 @@ test("differenz: Vorzeichen und Stoff als Text", () => {
 
 const zeige = () =>
   renderToStaticMarkup(
-    createElement(SortenExplorer, { sorten, texte: de.start.vertreiber, typen: de.label.kultivarTyp, sprache: "de" }),
+    createElement(SortenExplorer, { kopf: null, sorten, texte: de.start.vertreiber, typen: de.label.kultivarTyp, sprache: "de" }),
   );
 
 test("SortenExplorer: Server rendert die erste Sorte vollständig", () => {

@@ -1,7 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { useId, useReducer, useRef, useState, type KeyboardEvent } from "react";
+import { useId, useReducer, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
+
+import { SortenBild } from "@/components/medien/Bild";
 
 import { ExplorerWareKarte } from "@/components/story/ExplorerWareKarte";
 import { differenz, explorerStart, explorerZustand, filtereSorten } from "@/components/story/explorer-zustand";
@@ -16,11 +18,16 @@ import { mehrzahl, t } from "@/lib/i18n/text";
 import type { Woerterbuch } from "@/lib/i18n/typen";
 import type { ExplorerSorte, ExplorerWare } from "@/lib/query/sorten-explorer";
 
+/** Raster des Kapitels: links Kopf und Bild der Sorte, rechts der Explorer. */
+export const KAPITEL_RASTER = "mx-auto grid w-full max-w-360 grid-cols-1 gap-12 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:items-start lg:gap-16";
+
 type Props = {
   sorten: ExplorerSorte[];
   texte: Woerterbuch["start"]["vertreiber"];
   typen: Record<KultivarTyp, string>;
   sprache: Sprache;
+  /** Überschrift und Absatz der linken Spalte; das Bild der gewählten Sorte steht darunter. */
+  kopf: ReactNode;
 };
 
 /**
@@ -28,9 +35,11 @@ type Props = {
  * Daten kommen statisch mit der Startseite; die Reihenfolge stammt aus waehleExplorerSorten
  * (Menge, dann Name), nie aus der Note (HWG). Ohne JavaScript steht die erste Sorte vollständig.
  */
-export function SortenExplorer({ sorten, texte, typen, sprache }: Props) {
+export function SortenExplorer({ sorten, texte, typen, sprache, kopf }: Props) {
   const [zustand, senden] = useReducer((z: ReturnType<typeof explorerStart>, a: Parameters<typeof explorerZustand>[0]) => explorerZustand(a, z), sorten, explorerStart);
   const [meldung, setMeldung] = useState("");
+  // Die eben verlassene Sorte bleibt kurz stehen und geht ab, während die neue auftritt.
+  const [vorher, setVorher] = useState<ExplorerSorte | null>(null);
   const chips = useRef<Map<string, HTMLButtonElement>>(new Map());
   const suchId = useId();
 
@@ -48,6 +57,7 @@ export function SortenExplorer({ sorten, texte, typen, sprache }: Props) {
 
   function waehleSorte(neu: ExplorerSorte) {
     if (neu.slug === sorte?.slug) return;
+    setVorher(sorte?.bild ? sorte : null);
     senden({ typ: "sorte", slug: neu.slug, ersteWare: neu.waren[0]?.vertreiberId ?? null });
     setMeldung(t(texte.sorteGewechselt, { name: neu.name, waren: mehrzahl(sprache, texte.waren, neu.waren.length) }));
   }
@@ -68,6 +78,25 @@ export function SortenExplorer({ sorten, texte, typen, sprache }: Props) {
   }
 
   return (
+    <div className={KAPITEL_RASTER}>
+      <div className="flex flex-col gap-8">
+        {kopf}
+        {sorte.bild ? (
+          <div className="sorten-buehne relative h-72 w-full max-w-md max-md:mx-auto sm:h-96">
+            {vorher?.bild && vorher.slug !== sorte.slug ? (
+              <figure key={`raus-${vorher.slug}`} aria-hidden="true" className="sorten-bild-raus" onAnimationEnd={() => setVorher(null)}>
+                <SortenBild {...vorher.bild} alt="" />
+              </figure>
+            ) : null}
+            <figure key={sorte.slug} className="sorten-bild-rein relative">
+              <SortenBild {...sorte.bild} alt={sorte.bild.symbol ? "" : t(texte.bildAlt, { name: sorte.name })} />
+              {sorte.bild.symbol ? (
+                <figcaption className="absolute right-0 bottom-0 text-caption text-text-muted">{texte.symbolbild}</figcaption>
+              ) : null}
+            </figure>
+          </div>
+        ) : null}
+      </div>
     <div className="flex min-w-0 flex-col gap-8">
       <div className="flex flex-col gap-4">
         <label htmlFor={suchId} className="text-small text-text-muted">
@@ -179,6 +208,7 @@ export function SortenExplorer({ sorten, texte, typen, sprache }: Props) {
         {meldung}
       </p>
       <p className="text-small text-text-muted">{texte.hinweis}</p>
+    </div>
     </div>
   );
 }

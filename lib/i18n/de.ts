@@ -890,6 +890,8 @@ export const de = {
       zurSorte: "Zur Sorte",
       wareBewerten: "Diese Ware bewerten",
       sorteGewechselt: "{name}, {waren}.",
+      bildAlt: "Blüte der Sorte {name}",
+      symbolbild: "Symbolbild",
       hinweis: "Erfahrungen der Mitglieder, keine Empfehlung.",
     },
     skelett: {

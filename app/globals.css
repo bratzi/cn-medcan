@@ -201,6 +201,8 @@
   --ease-standard: cubic-bezier(0.2, 0, 0.2, 1);
   --ease-out: cubic-bezier(0, 0, 0.2, 1);
   --ease-in: cubic-bezier(0.4, 0, 1, 1);
+  /* Kräftiges ease-out für Auftritte (Emil Kowalski); nur wo ein Element sichtbar ankommt. */
+  --ease-auftritt: cubic-bezier(0.23, 1, 0.32, 1);
   --duration-fast: 180ms;
   --duration-normal: 250ms;
   --duration-slow: 350ms;
@@ -647,6 +649,68 @@
   }
   to {
     scale: 1 1;
+  }
+}
+
+/* Bild der gewählten Sorte (Nutzer 2026-10-16): beide Bilder liegen übereinander, das Bild passt
+   immer ganz in den Rahmen. Ohne Bewegung steht nur das neue Bild da. */
+.sorten-buehne {
+  display: grid;
+}
+.sorten-buehne > figure {
+  grid-area: 1 / 1;
+  min-height: 0;
+  height: 100%;
+}
+.sorten-bild-raus {
+  display: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  /* Abgang 200 ms, Auftritt 600 ms: die neue Blüte wächst von unten auf, dreht sich gerade und
+     wird dabei von unten nach oben freigelegt. Nur transform, opacity, clip-path. */
+  :root:not([data-sparmodus]) .sorten-bild-raus {
+    display: block;
+    animation: sorten-bild-raus 200ms var(--ease-out) both;
+  }
+  :root:not([data-sparmodus]) .sorten-bild-rein {
+    animation: sorten-bild-rein 600ms var(--ease-auftritt) both;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* Weniger, nicht null: nur Überblenden, keine Bewegung. */
+  .sorten-bild-rein {
+    animation: sorten-bild-blende 200ms var(--ease-out) both;
+  }
+}
+
+@keyframes sorten-bild-rein {
+  from {
+    opacity: 0;
+    transform: translateY(32px) scale(0.9) rotate(-6deg);
+    clip-path: inset(40% 0 0 0 round 48px);
+  }
+  60% {
+    opacity: 1;
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    clip-path: inset(0 0 0 0 round 0);
+  }
+}
+
+@keyframes sorten-bild-raus {
+  to {
+    opacity: 0;
+    transform: translateY(-24px) scale(1.05) rotate(4deg);
+  }
+}
+
+@keyframes sorten-bild-blende {
+  from {
+    opacity: 0;
   }
 }
 
