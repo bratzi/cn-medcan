@@ -8,7 +8,7 @@ const k: IgKarussell = {
   slides: [
     { typ: "cover", kicker: "Wissen", titel: "Terpene & <Aroma>" },
     { typ: "inhalt", titel: "Was sind Terpene?", text: "Duftstoffe der Pflanze.", punkte: ["Zitrus", "Kiefer"] },
-    { typ: "cta", titel: "Mehr im Buch", text: "Link in Bio" },
+    { typ: "cta", titel: "Mehr im Buch", text: "Alle Bewertungen zum Blättern." },
   ],
 };
 
@@ -47,6 +47,12 @@ test("Slide-HTML maskiert, zeigt Seitenzahl und Säulenfarbe", () => {
   const mitte = igSlideHtml(k, 1, "https://x.dev");
   assert.ok(mitte.includes("<li>Zitrus</li>") && mitte.includes("2 / 3"));
   assert.ok(!mitte.includes("undefined"));
+});
+
+test("karussellPruefen: CTA-Text darf Link in Bio nicht wiederholen", () => {
+  const slides = [...k.slides.slice(0, -1), { typ: "cta" as const, titel: "Mehr im Buch", text: "Alle Noten. LINK IN BIO." }];
+  const fehler = karussellPruefen({ ...k, slides });
+  assert.ok(fehler.some((f) => f.includes("steht schon fest auf der CTA")), fehler.join("; "));
 });
 
 test("Marke", () => {

@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { browserPfad, feedSchluessel, istThemenMarke, markenAus } from "../scripts/ig-gemeinsam";
+import { browserPfad, entwurfMedien, feedSchluessel, istThemenMarke, markenAus } from "../scripts/ig-gemeinsam";
 
 test("Schlüssel aus IG_FEED_KEY oder IG_FEED_URL", () => {
   assert.equal(feedSchluessel({ IG_FEED_KEY: "a" }), "a");
@@ -33,6 +33,27 @@ test("Themen-Marken: Themenkarte und Karussell zählen, Bewertungen nicht", () =
   assert.equal(istThemenMarke("bot-thema-terpen-limonen"), true);
   assert.equal(istThemenMarke("bot-k-wissen-myrcen"), true);
   assert.equal(istThemenMarke("f7932866-c769"), false);
+});
+
+test("entwurfMedien: Fehler nach create-post nennt den halben Entwurf", async () => {
+  const echt = globalThis.fetch;
+  process.env.PUBLORA_API_KEY = "x";
+  process.env.INSTAGRAM_PLATFORM_ID = "instagram-1";
+  const antwort = (daten: unknown, status = 200) => new Response(JSON.stringify(daten), { status });
+  globalThis.fetch = (async (url: string | URL | Request) => {
+    const u = String(url);
+    if (u.endsWith("/create-post")) return antwort({ postGroupId: "pg1" });
+    if (u.endsWith("/get-upload-url")) return antwort({ error: "kaputt" }, 500);
+    return antwort({});
+  }) as typeof fetch;
+  try {
+    await assert.rejects(
+      entwurfMedien("c", [{ pfad: "x.png", name: "x.png", typ: "image/png" }]),
+      /get-upload-url.*\(Entwurf pg1 unvollständig, in Publora löschen\)/,
+    );
+  } finally {
+    globalThis.fetch = echt;
+  }
 });
 
 test("markenAus: Karussell-Slides ergeben eine Marke, Videos zählen mit", () => {

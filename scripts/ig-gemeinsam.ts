@@ -102,18 +102,24 @@ type Medium = { pfad: string; name: string; typ: "image/png" | "video/mp4" };
 export async function entwurfMedien(caption: string, medien: Medium[]): Promise<string> {
   const plattform = pflicht(umgebung(), "INSTAGRAM_PLATFORM_ID");
   const { postGroupId } = await publora<{ postGroupId: string }>("create-post", { content: caption, platforms: [plattform] });
-  for (const m of medien) {
-    const { uploadUrl, mediaId } = await publora<{ uploadUrl: string; mediaId: string }>("get-upload-url", {
-      fileName: m.name,
-      contentType: m.typ,
-      type: m.typ === "video/mp4" ? "video" : "image",
-      postGroupId,
-    });
-    const hoch = await fetch(uploadUrl, { method: "PUT", headers: { "Content-Type": m.typ }, body: readFileSync(m.pfad) });
-    if (!hoch.ok) throw new Error(`Upload ${m.name}: ${hoch.status}`);
-    // Ohne diesen Schritt bleibt das Medium in Publora auf „uploading“ (Live 2026-10-14).
-    const { mediaFile } = await publora<{ mediaFile?: { status?: string } }>(`complete-media/${mediaId}`, {});
-    if (mediaFile?.status !== "ready") throw new Error(`${m.name} nicht bereit: ${mediaFile?.status ?? "unbekannt"} (Entwurf ${postGroupId})`);
+  try {
+    for (const m of medien) {
+      const { uploadUrl, mediaId } = await publora<{ uploadUrl: string; mediaId: string }>("get-upload-url", {
+        fileName: m.name,
+        contentType: m.typ,
+        type: m.typ === "video/mp4" ? "video" : "image",
+        postGroupId,
+      });
+      const hoch = await fetch(uploadUrl, { method: "PUT", headers: { "Content-Type": m.typ }, body: readFileSync(m.pfad) });
+      if (!hoch.ok) throw new Error(`Upload ${m.name}: ${hoch.status}`);
+      // Ohne diesen Schritt bleibt das Medium in Publora auf „uploading“ (Live 2026-10-14).
+      const { mediaFile } = await publora<{ mediaFile?: { status?: string } }>(`complete-media/${mediaId}`, {});
+      if (mediaFile?.status !== "ready") throw new Error(`${m.name} nicht bereit: ${mediaFile?.status ?? "unbekannt"}`);
+    }
+  } catch (f) {
+    // Kein Auto-Löschen: der halbe Entwurf bleibt in Publora und muss von Hand weg.
+    const grund = f instanceof Error ? f.message : String(f);
+    throw new Error(`${grund} (Entwurf ${postGroupId} unvollständig, in Publora löschen)`);
   }
   return postGroupId;
 }

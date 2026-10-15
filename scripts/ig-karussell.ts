@@ -21,14 +21,16 @@ async function main() {
 
   const marke = karussellMarke(karussell);
   const ursprung = new URL(umgebung().IG_FEED_URL ?? "https://cn-medcan.w-helwich.workers.dev").origin;
+  const probe = rest.includes("--probe");
+  if (!probe && markenAus(await publoraPosts()).has(marke)) throw new Error(`Karussell schon vorhanden: ${marke}`);
   const ordner = resolve("tmp/ig");
   mkdirSync(ordner, { recursive: true });
   const medien = karussell.slides.map((_, i) => {
     const name = `${marke}-${i + 1}`;
     // Aus file:// lädt Chromium Masken fremder Herkunft nicht (CORS): Logo direkt einbetten.
     const html = ["pinsel.webp", "pinsel-of.webp"].reduce(
-      (h, datei) =>
-        h.replaceAll(`${ursprung}/marke/${datei}`, `data:image/webp;base64,${readFileSync(resolve("public/marke", datei)).toString("base64")}`),
+      (h, logo) =>
+        h.replaceAll(`${ursprung}/marke/${logo}`, `data:image/webp;base64,${readFileSync(resolve("public/marke", logo)).toString("base64")}`),
       igSlideHtml(karussell, i, ursprung),
     );
     const htmlPfad = join(ordner, `${name}.html`);
@@ -37,11 +39,10 @@ async function main() {
     screenshot(pathToFileURL(htmlPfad).href, png);
     return { pfad: png, name: `${name}.png`, typ: "image/png" as const };
   });
-  if (rest.includes("--probe")) {
+  if (probe) {
     console.log(`Probe: ${medien.map((m) => m.pfad).join(", ")}`);
     return;
   }
-  if (markenAus(await publoraPosts()).has(marke)) throw new Error(`Karussell schon vorhanden: ${marke}`);
   const gruppe = await entwurfMedien(caption, medien);
   console.log(`Entwurf angelegt: ${karussell.slides[0].titel} (${medien.length} Slides, Publora ${gruppe})`);
 }

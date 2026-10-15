@@ -44,6 +44,7 @@ export function karussellPruefen(k: IgKarussell): string[] {
     if (s.typ !== "cover" && (s.text ?? "").length > TEXT_MAX) fehler.push(`Slide ${i + 1}: Text länger als ${TEXT_MAX}`);
     if (s.typ === "inhalt" && s.punkte && (s.punkte.length > 4 || s.punkte.some((p) => p.length > PUNKT_MAX)))
       fehler.push(`Slide ${i + 1}: höchstens 4 Punkte zu je ${PUNKT_MAX}`);
+    if (s.typ === "cta" && /link in bio/i.test(s.text ?? "")) fehler.push(`Slide ${i + 1}: „Link in Bio“ steht schon fest auf der CTA`);
     const alles = texte(s).join(" ");
     const sperre = IG_SPERRE.exec(alles);
     if (hwgTreffer(alles)) fehler.push(`Slide ${i + 1}: HWG-Filter schlägt an`);
