@@ -54,7 +54,7 @@ function Szene({ szene, farbe }: { szene: ErklaerSzene; farbe: string }) {
     extrapolateRight: "clamp",
   });
   return (
-    <AbsoluteFill style={{ justifyContent: "center", padding: "0 96px", opacity: aus }}>
+    <AbsoluteFill style={{ justifyContent: "center", alignItems: "center", textAlign: "center", padding: "0 96px", opacity: aus }}>
       <div style={{ opacity: ein, transform: `translateY(${(1 - ein) * 48}px)` }}>
         {szene.kicker ? (
           <p style={{ margin: "0 0 32px", fontSize: 44, letterSpacing: "0.08em", textTransform: "uppercase", color: farbe }}>
@@ -76,15 +76,17 @@ function Szene({ szene, farbe }: { szene: ErklaerSzene; farbe: string }) {
         </h1>
       </div>
       {szene.text ? (
+        <div style={{ width: 48, height: 4, margin: "48px auto 0", background: farbe, opacity: textEin }} />
+      ) : null}
+      {szene.text ? (
         <p
           style={{
-            margin: "48px 0 0",
-            paddingLeft: 32,
-            borderLeft: `4px solid ${farbe}`,
+            margin: "32px auto 0",
+            maxWidth: 820,
             fontSize: 52,
             lineHeight: 1.35,
             color: LEISE,
-            textWrap: "pretty",
+            textWrap: "balance",
             opacity: textEin,
             transform: `translateY(${(1 - textEin) * 48}px)`,
           }}
@@ -108,7 +110,7 @@ export function ErklaerReel({ szenen, farbe }: ErklaerReelProps) {
       }}
     >
       <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 16, background: farbe }} />
-      <div style={{ position: "absolute", top: 160, left: 96 }}>
+      <div style={{ position: "absolute", top: 160, left: 0, right: 0, display: "flex", justifyContent: "center" }}>
         <Logo />
       </div>
       {szenen.map((z, i) => {
@@ -131,6 +133,7 @@ export function ErklaerReel({ szenen, farbe }: ErklaerReelProps) {
           fontSize: 36,
           letterSpacing: "0.08em",
           color: LEISE,
+          textAlign: "center",
         }}
       >
         Book of Terpz · <span style={{ fontFamily: dafoe, fontSize: 64, color: farbe, letterSpacing: 0 }}>Link in Bio</span>

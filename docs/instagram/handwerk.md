@@ -32,6 +32,12 @@ Formen (nach Ziel wählen): **Liste** (Speichern), **Mythos und Wahrheit** (Weit
 (Speichern, Folgen), **Rahmenwerk zum Mitnehmen** (Speichern). 5 bis 8 Slides sind üblich; nie auf eine runde Zahl
 auffüllen. Kicker höchstens 30 Zeichen, Titel höchstens 60.
 
+## Layout
+
+Alle Bilder und Reels sind **zentriert**: Logo oben mittig, Inhalt auf der Mittelachse, Fußzeile mittig. Akzente
+als kurzer Strich (48 × 4 px) in Säulenfarbe über Punkten oder Absätzen, nie als linke Kante. Großzügiger Weißraum,
+eine Idee pro Bild (critique-composition, critique-visual-hierarchy).
+
 ## Caption
 
 - **Erste Zeile ist der Hook**, höchstens 125 Zeichen, muss allein funktionieren (danach kommt „mehr“).

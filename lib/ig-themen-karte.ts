@@ -23,8 +23,9 @@ export function igThemenKarteHtml(t: IgThema, ursprung: string): string {
 .kicker{font-family:"Mr Dafoe",cursive;font-size:72px;color:${farbe};margin:24px 0 0;line-height:1}
 h1{font-weight:200;font-size:104px;line-height:1.05;margin:0;letter-spacing:-0.01em;text-wrap:balance}
 .text{font-size:44px;line-height:1.4;margin:0;text-wrap:pretty}
-ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:16px}
-li{font-size:36px;color:#93a39b;padding-left:32px;border-left:4px solid ${farbe}}
+ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;align-items:center;gap:24px}
+li{font-size:36px;color:#93a39b}
+li::before{content:"";display:block;width:48px;height:4px;margin:0 auto 12px;background:${farbe}}
 </style></head><body><main class="karte">
 ${logoHtml(ursprung)}
 <p class="kicker">${maske(t.kicker)}</p><h1>${maske(t.titel)}</h1><p class="text">${maske(t.text)}</p>${punkte}

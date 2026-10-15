@@ -35,9 +35,9 @@ export function maske(s: string): string {
 /** Grundgerüst aller Instagram-Karten: Fläche, Farbwelt, Logo, Fußzeile. */
 export const KARTEN_STIL = `
 html,body{margin:0;background:#0d1210}
-.karte{width:1080px;height:1350px;box-sizing:border-box;padding:96px;display:flex;flex-direction:column;gap:40px;
+.karte{width:1080px;height:1350px;box-sizing:border-box;padding:96px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:40px;
 background:radial-gradient(120% 80% at 50% 0%,#17221d 0%,#0d1210 70%);color:#e9efec;font-family:Newsreader,Georgia,serif}
-.logo{position:relative;width:256px;aspect-ratio:1726/1242}
+.logo{position:relative;flex:none;width:256px;aspect-ratio:1726/1242}
 .logo i{position:absolute;inset:0;-webkit-mask:var(--m) center/contain no-repeat;mask:var(--m) center/contain no-repeat}
 .fuss{margin:auto 0 0;font-size:32px;color:#93a39b;letter-spacing:0.08em}`;
 
@@ -64,10 +64,10 @@ export function igKarteHtml(r: IgReview, ursprung: string): string {
 <style>${KARTEN_STIL}
 h1{font-weight:200;font-size:96px;line-height:1.05;margin:24px 0 0;letter-spacing:-0.01em;text-wrap:balance}
 .vertreiber{font-size:40px;color:#93a39b;margin:-16px 0 0}
-.note{font-size:40px;color:#93a39b;margin:0;display:flex;align-items:baseline;gap:24px}
+.note{font-size:40px;color:#93a39b;margin:0;display:flex;align-items:baseline;justify-content:center;gap:24px}
 .note span{font-family:"Mr Dafoe",cursive;font-size:160px;color:#3fbf94;line-height:1}
 .aromen{font-size:40px;letter-spacing:0.08em;text-transform:uppercase;margin:0}
-blockquote{margin:0;padding-left:32px;border-left:4px solid #3fbf94;font-style:italic;font-size:40px;line-height:1.4;text-wrap:pretty}
+blockquote{margin:0;padding:32px 0 0;border-top:4px solid #3fbf94;max-width:800px;font-style:italic;font-size:40px;line-height:1.4;text-wrap:pretty}
 .charge{font-size:32px;color:#93a39b;margin:0}
 </style></head><body><main class="karte">
 ${logoHtml(ursprung)}

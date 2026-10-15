@@ -77,17 +77,19 @@ export function igSlideHtml(k: IgKarussell, index: number, ursprung: string): st
 <style>${KARTEN_STIL}
 .karte{border-top:16px solid ${farbe}}
 .kicker{font-family:"Mr Dafoe",cursive;font-size:80px;color:${farbe};margin:auto 0 0;line-height:1}
+h1,.text{max-width:888px}
 h1{font-weight:200;font-size:88px;line-height:1.05;margin:0;letter-spacing:-0.01em;text-wrap:balance}
 h1:not(.gross){margin-top:auto}
 h1.gross{font-size:120px;margin-bottom:auto}
 .text{font-size:44px;line-height:1.4;margin:0;text-wrap:pretty}
-ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:24px}
-li{font-size:40px;padding-left:32px;border-left:4px solid ${farbe}}
-.cta{font-family:"Mr Dafoe",cursive;font-size:96px;color:${farbe};margin:0 0 0 16px}
-.fuss{display:flex;justify-content:space-between}
+ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;align-items:center;gap:32px}
+li{font-size:40px}
+li::before{content:"";display:block;width:48px;height:4px;margin:0 auto 16px;background:${farbe}}
+.cta{font-family:"Mr Dafoe",cursive;font-size:96px;color:${farbe};margin:0;padding:0 16px}
+.fuss{display:flex;justify-content:center;gap:24px}
 </style></head><body><main class="karte">
 ${logoHtml(ursprung)}
 ${inhalt(s)}
-<p class="fuss"><span>Book of Terpz</span><span>${index + 1} / ${k.slides.length}</span></p>
+<p class="fuss"><span>Book of Terpz</span><span aria-hidden="true">·</span><span>${index + 1} / ${k.slides.length}</span></p>
 </main></body></html>`;
 }
