@@ -8,6 +8,7 @@ import { VorschlagFormular } from "@/components/umfrage/VorschlagFormular";
 import { phasenLabel } from "@/components/umfrage/phasen";
 import { stimmZustand } from "@/components/umfrage/stimmzustand";
 import { rundenZeitraum } from "@/components/umfrage/zeitraum";
+import { bluetenHref } from "@/lib/alte-adressen";
 import { cn } from "@/lib/cn";
 import { formatiereDatum } from "@/lib/format";
 import { ladeStrainAuswahl } from "@/lib/query/strains";
@@ -46,7 +47,7 @@ function RundenZeile({ runde, w, sprache }: { runde: UmfrageUebersicht; w: Woert
             {runde.gewinner.map((gewinner, index) => (
               <span key={gewinner.slug}>
                 {index > 0 ? ", " : null}
-                <Link prefetch={false} href={`/blueten/${gewinner.slug}`} className={textLinkKlassen()}>
+                <Link prefetch={false} href={bluetenHref(gewinner.slug, gewinner.kultivarSlug)} className={textLinkKlassen()}>
                   {gewinner.handelsname}
                 </Link>
               </span>
@@ -148,7 +149,7 @@ async function UmfragenInhalt({ w, sprache }: { w: Woerterbuch; sprache: Sprache
                 <li key={vorschlag.id} className="flex flex-col gap-2 py-6">
                   <div className="flex flex-wrap items-baseline justify-between gap-4 max-md:justify-center">
                     <Link prefetch={false}
-                      href={`/blueten/${vorschlag.slug}`}
+                      href={bluetenHref(vorschlag.slug, vorschlag.kultivarSlug)}
                       className={namenLinkKlassen("min-w-0 font-buch text-h2 font-medium wrap-break-word")}
                     >
                       {vorschlag.handelsname}

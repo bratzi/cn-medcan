@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { namenLinkKlassen } from "@/components/ui";
+import { bluetenHref } from "@/lib/alte-adressen";
 import { formatiereZahl } from "@/lib/format";
 import type { Sprache } from "@/lib/i18n/sprache-kern";
 import { t } from "@/lib/i18n/text";
@@ -31,7 +32,7 @@ export function CommunityVergleich({ daten, texte, sprache }: Props) {
               <li key={a.slug} className="flex flex-wrap items-baseline justify-between gap-x-4 border-t border-border pt-2">
                 <Link
                   prefetch={false}
-                  href={`/blueten/${a.slug}`}
+                  href={bluetenHref(a.slug, a.kultivarSlug)}
                   className={namenLinkKlassen("inline-flex min-h-11 items-center font-buch text-body wrap-break-word")}
                 >
                   {a.handelsname}

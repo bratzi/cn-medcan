@@ -14,6 +14,7 @@ import { BudpicBeitragenImBrowser } from "@/components/produkt/BudpicBeitragenIm
 import { BudpicDiashow, type DiashowBild } from "@/components/produkt/BudpicDiashow";
 import { budpicMeldungen } from "@/lib/budpic-anzeige";
 import { musterBildId } from "@/lib/budpics";
+import { bluetenHref } from "@/lib/alte-adressen";
 import { blueteBild } from "@/lib/medien";
 import type { StrainListenEintrag } from "@/lib/query/strains";
 
@@ -37,6 +38,7 @@ type Props = {
 export function ProduktCard({ strain, w, sprache, className, budpics = [], zugang = "gast", weitereVertreiber = 0 }: Props) {
   // Apotheken und Preise seit 2026-09-25 nur in Aussicht (Nutzer): keine Badges, kein Preis.
   // Ohne echtes Bild ein Musterbild: das gesetzte, sonst eines je Sorte stabil ueber den Slug (T9).
+  const href = bluetenHref(strain.slug, strain.kultivarSlug);
   const bild = blueteBild(strain.herstellerBildPfad) ?? musterBildId(strain.slug);
 
   return (
@@ -53,7 +55,7 @@ export function ProduktCard({ strain, w, sprache, className, budpics = [], zugan
         <figure title={w.budpic.muster} className="relative flex h-56 items-center justify-center overflow-hidden px-8 pt-8 pb-6">
           {/* Bild führt auch zur Sorte (Nutzer 2026-09-26); für Tastatur und Screenreader
               reicht der Link am Namen, daher hier ohne Tabstopp. */}
-          <Link prefetch={false} href={`/blueten/${strain.slug}`} tabIndex={-1} aria-hidden="true" className="flex h-full w-full items-center justify-center">
+          <Link prefetch={false} href={href} tabIndex={-1} aria-hidden="true" className="flex h-full w-full items-center justify-center">
             <Bild
               id={bild}
               dekorativ
@@ -70,7 +72,7 @@ export function ProduktCard({ strain, w, sprache, className, budpics = [], zugan
             <h3 className="text-h3 text-text">
               <Link
                 prefetch={false}
-                href={`/blueten/${strain.slug}`}
+                href={href}
                 className="hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring"
               >
                 {strain.handelsname}
@@ -116,6 +118,7 @@ export function ProduktCard({ strain, w, sprache, className, budpics = [], zugan
           <BudpicBeitragenImBrowser
             strainId={strain.id}
             slug={strain.slug}
+            kultivarSlug={strain.kultivarSlug}
             sprache={sprache}
             texte={w.budpic}
             meldungen={budpicMeldungen(w)}
@@ -126,6 +129,7 @@ export function ProduktCard({ strain, w, sprache, className, budpics = [], zugan
             zugang={zugang}
             strainId={strain.id}
             slug={strain.slug}
+            kultivarSlug={strain.kultivarSlug}
             sprache={sprache}
             texte={w.budpic}
             meldungen={budpicMeldungen(w)}

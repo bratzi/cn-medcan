@@ -20,7 +20,7 @@ export async function ladeStimmen(mitgliedId: string): Promise<StimmZeile[]> {
         select: {
           istGewinner: true,
           ergebnisReviewId: true,
-          strain: { select: { slug: true, handelsname: true, herstellerBildPfad: true } },
+          strain: { select: { slug: true, handelsname: true, herstellerBildPfad: true, kultivar: { select: { slug: true } } } },
         },
       },
     },
@@ -32,6 +32,7 @@ export async function ladeStimmen(mitgliedId: string): Promise<StimmZeile[]> {
     phase: istUmfragePhase(z.umfrage.phase) ? z.umfrage.phase : "BEENDET",
     abgegebenAm: z.abgegebenAm,
     slug: z.option.strain.slug,
+    kultivarSlug: z.option.strain.kultivar?.slug ?? null,
     handelsname: z.option.strain.handelsname,
     bildPfad: z.option.strain.herstellerBildPfad,
     istGewinner: z.option.istGewinner,

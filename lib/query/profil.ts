@@ -180,6 +180,7 @@ export async function ladeAuswertungsZeilen(mitgliedId: string): Promise<Registe
   }
   return zeilen.map((z) => ({
     slug: z.strain.slug,
+    kultivarSlug: z.kultivar?.slug ?? null,
     handelsname: z.strain.handelsname,
     erstelltAm: z.erstelltAm,
     gesamtnote: z.gesamtnote,

@@ -16,6 +16,7 @@ import {
   TableRow,
 } from "@/components/ui";
 import type { SelectOption } from "@/components/ui";
+import { bluetenHref } from "@/lib/alte-adressen";
 import { formatiereDatum } from "@/lib/format";
 import type { UmfrageAnsicht } from "@/lib/query/umfragen";
 import type { UmfragePhase } from "@/db/enums";
@@ -109,7 +110,7 @@ export function RundeSteuerung({ umfrage, strains }: Props) {
                   <TableRow key={option.id}>
                     <TableCell>
                       <Link prefetch={false}
-                        href={`/blueten/${option.slug}`}
+                        href={bluetenHref(option.slug, option.kultivarSlug)}
                         className="font-medium text-text underline underline-offset-2"
                         title={option.handelsname}
                       >

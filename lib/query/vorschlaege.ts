@@ -24,7 +24,7 @@ export async function blueteVorhanden(slug: string, handelsname: string) {
   const prisma = await getPrisma();
   return prisma.strain.findFirst({
     where: { OR: [{ slug }, { handelsname }] },
-    select: { id: true, slug: true, handelsname: true, aktiv: true },
+    select: { id: true, slug: true, handelsname: true, aktiv: true, kultivar: { select: { slug: true } } },
   });
 }
 

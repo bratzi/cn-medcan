@@ -1,10 +1,13 @@
 import Link from "next/link";
 
 import { Badge, namenLinkKlassen } from "@/components/ui";
+import { bluetenHref } from "@/lib/alte-adressen";
 import { cn } from "@/lib/cn";
 
 export type EmpfehlungsEintrag = {
   slug: string;
+  /** Sorten-Slug fuer den direkten Link (bluetenHref); fehlt er, fuehrt der Link ueber die Produktadresse. */
+  kultivarSlug?: string | null;
   handelsname: string;
   begruendung: string;
   /** Badge neben dem Namen, z. B. „noch nicht bestätigt“ (Spec Profil 5.2). */
@@ -32,7 +35,7 @@ export function EmpfehlungsListe({
         <li key={e.slug} className="flex flex-col gap-2 border-t border-border pt-4">
           <span className="flex flex-wrap items-center gap-x-4 gap-y-2">
             <Link prefetch={false}
-              href={`/blueten/${e.slug}`}
+              href={bluetenHref(e.slug, e.kultivarSlug)}
               className={namenLinkKlassen("inline-flex min-h-11 items-center font-buch text-h3 wrap-break-word")}
             >
               {e.handelsname}

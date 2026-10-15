@@ -151,7 +151,7 @@ export const FREMDE_NOTEN_SQL = `
 export function auswertungen(zeilen: readonly AuswertungsZeile[]): Auswertungen {
   const mitNote = zeilen.map((z) => ({ z, note: noteOderErsatz(z) }));
   const sortiert = [...mitNote].sort((a, b) => b.note - a.note || b.z.erstelltAm.getTime() - a.z.erstelltAm.getTime());
-  const kurz = ({ z, note }: { z: AuswertungsZeile; note: number }): BewertungsKurz => ({ slug: z.slug, handelsname: z.handelsname, note });
+  const kurz = ({ z, note }: { z: AuswertungsZeile; note: number }): BewertungsKurz => ({ slug: z.slug, ...(z.kultivarSlug ? { kultivarSlug: z.kultivarSlug } : {}), handelsname: z.handelsname, note });
   const top = sortiert.slice(0, 3).map(kurz);
   const flop = sortiert.slice(3).slice(-3).reverse().map(kurz);
 
@@ -168,7 +168,7 @@ export function auswertungen(zeilen: readonly AuswertungsZeile[]): Auswertungen 
   const abweichungen = [...vergleiche]
     .sort((a, b) => Math.abs(b.eigene - b.community) - Math.abs(a.eigene - a.community))
     .slice(0, 3)
-    .map((v) => ({ slug: v.z.slug, handelsname: v.z.handelsname, eigene: v.eigene, community: eine(v.community) }));
+    .map((v) => ({ slug: v.z.slug, ...(v.z.kultivarSlug ? { kultivarSlug: v.z.kultivarSlug } : {}), handelsname: v.z.handelsname, eigene: v.eigene, community: eine(v.community) }));
 
   let schnitte: Schnitte | null = null;
   if (zeilen.length > 0) {

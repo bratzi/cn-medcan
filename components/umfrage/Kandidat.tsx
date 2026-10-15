@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui";
 import { namenLinkKlassen } from "@/components/ui/textlink";
 import { EigeneStimme } from "@/components/umfrage/StimmzettelImBrowser";
 import type { UmfrageOptionAnsicht } from "@/lib/query/umfragen";
+import { bluetenHref } from "@/lib/alte-adressen";
 import { formatiereZahl } from "@/lib/format";
 import type { Sprache } from "@/lib/i18n/sprache-kern";
 import type { Woerterbuch } from "@/lib/i18n/typen";
@@ -75,7 +76,7 @@ export function Kandidat({ option, gesamt, gewaehlt, zeigeStimmen, texte, sprach
             </span>
           </BeiEigenerStimme>
           <Link prefetch={false}
-            href={`/blueten/${option.slug}`}
+            href={bluetenHref(option.slug, option.kultivarSlug)}
             className={namenLinkKlassen("min-w-0 font-buch text-h3 font-medium wrap-break-word")}
             title={option.handelsname}
           >

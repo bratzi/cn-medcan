@@ -3,6 +3,7 @@ import { getPrisma } from "@/lib/prisma";
 
 export type GespeicherteEmpfehlung = {
   slug: string;
+  kultivarSlug: string | null;
   handelsname: string;
   bezugHandelsname: string;
   bezugSlug: string;
@@ -31,12 +32,13 @@ export async function ladeEmpfehlungen(mitgliedId: string): Promise<Gespeicherte
     select: {
       gemeinsam: true,
       bestaetigt: true,
-      strain: { select: { slug: true, handelsname: true } },
+      strain: { select: { slug: true, handelsname: true, kultivar: { select: { slug: true } } } },
       bezug: { select: { slug: true, handelsname: true } },
     },
   });
   return zeilen.map((z) => ({
     slug: z.strain.slug,
+    kultivarSlug: z.strain.kultivar?.slug ?? null,
     handelsname: z.strain.handelsname,
     bezugHandelsname: z.bezug.handelsname,
     bezugSlug: z.bezug.slug,

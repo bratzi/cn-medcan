@@ -388,6 +388,7 @@ async function SorteInhalt({ slug, suche, w, sprache }: { slug: string; suche: S
         budpic={{
           strainId: strain.id,
           slug: strain.slug,
+          kultivarSlug: sorte.kultivar.slug,
           bilder: alsDiashow(budpics, w, sprache),
           zugang: !mitglied ? "gast" : mitglied.freigegeben ? "freigegeben" : "mitglied",
         }}

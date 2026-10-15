@@ -4,7 +4,7 @@ import { getPrisma } from "@/lib/prisma";
 import { ladeAutorZahlen } from "@/lib/query/autoren";
 import { alsReviewEintrag, BEWERTUNG_SELECT, type KennwerteZeile, type ReviewEintrag } from "@/lib/query/strains";
 import { istKultivarTyp, type KultivarTyp } from "@/db/enums";
-import { sortenWeiterleitung } from "@/lib/alte-adressen";
+import { abgeloesteSorteWeiterleitung, sortenWeiterleitung } from "@/lib/alte-adressen";
 
 export type WareProdukt = {
   id: string;
@@ -174,6 +174,8 @@ export async function ladeSortenBewertungen(kultivarId: string, vertreiberId: st
 export async function produktZuSorte(pfad: string, suche = ""): Promise<string | null> {
   const treffer = /^\/blueten\/([^/]+)$/.exec(pfad);
   if (!treffer) return null;
+  const abgeloest = abgeloesteSorteWeiterleitung(pfad, suche);
+  if (abgeloest) return abgeloest;
   const prisma = await getPrisma();
   const s = await prisma.strain.findUnique({ where: { slug: decodeURIComponent(treffer[1]) }, select: { kultivar: { select: { slug: true } } } });
   const kultivarSlug = s?.kultivar?.slug ?? null;

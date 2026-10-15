@@ -19,7 +19,7 @@ async function eigeneZahlen(autorId: string) {
     prisma.review.findFirst({
       where: wo,
       orderBy: [{ erstelltAm: "desc" }, { id: "asc" }],
-      select: { gesamtnote: true, erstelltAm: true, strain: { select: { slug: true, handelsname: true, kultivar: { select: { name: true } }, vertreiber: { select: { name: true } } } } },
+      select: { gesamtnote: true, erstelltAm: true, strain: { select: { slug: true, handelsname: true, kultivar: { select: { name: true, slug: true } }, vertreiber: { select: { name: true } } } } },
     }),
   ]);
   return {
@@ -28,6 +28,7 @@ async function eigeneZahlen(autorId: string) {
     zuletzt: zuletzt
       ? {
           slug: zuletzt.strain.slug,
+          kultivarSlug: zuletzt.strain.kultivar?.slug ?? null,
           handelsname: zuletzt.strain.handelsname,
           bluete: zuletzt.strain.kultivar?.name ?? zuletzt.strain.handelsname,
           vertreiber: zuletzt.strain.vertreiber?.name ?? null,

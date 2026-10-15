@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ErgebnisFormular } from "@/components/admin/ErgebnisFormular";
 import { Badge, Card, CardBody, CardHeader } from "@/components/ui";
 import type { SelectOption } from "@/components/ui";
+import { bluetenHref } from "@/lib/alte-adressen";
 import { formatiereDatum } from "@/lib/format";
 import type { BeendeteRunde } from "@/lib/query/umfragen";
 
@@ -70,7 +71,7 @@ export function ErgebnisListe({ runden, reviewsJeStrain }: Props) {
                     >
                       <div className="flex flex-wrap items-center gap-2">
                         <Link prefetch={false}
-                          href={`/blueten/${platz.slug}`}
+                          href={bluetenHref(platz.slug, platz.kultivarSlug)}
                           className="text-body font-medium text-text underline underline-offset-2"
                           title={platz.handelsname}
                         >

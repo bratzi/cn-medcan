@@ -162,6 +162,7 @@ export async function ReiheAehnliches({ id }: { id: string }) {
           className="w-full"
           eintraege={empfehlungen.map((e) => ({
             slug: e.slug,
+            kultivarSlug: e.kultivarSlug,
             handelsname: e.handelsname,
             begruendung: begruendungText(e, w, sprache),
             marke: e.bestaetigt ? undefined : texte.nichtBestaetigt,

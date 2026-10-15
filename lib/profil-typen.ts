@@ -19,6 +19,8 @@ export type ProfilWerte = {
 /** Eine eigene Bewertung, wie die Auswertungen sie brauchen (Spec Profil 4.5). */
 export type AuswertungsZeile = {
   slug: string;
+  /** Sorten-Slug fuer den direkten Link (bluetenHref). */
+  kultivarSlug?: string | null;
   handelsname: string;
   erstelltAm: Date;
   gesamtnote: number | null;
@@ -45,14 +47,14 @@ export type RegisterZeile = AuswertungsZeile & {
   eigenesBild: { id: string; breite: number; hoehe: number; offen: boolean } | null;
 };
 
-export type BewertungsKurz = { slug: string; handelsname: string; note: number };
+export type BewertungsKurz = { slug: string; kultivarSlug?: string | null; handelsname: string; note: number };
 
 export type CommunityVergleich = {
   /** Mittel (eigene − Community), auf 0,1 gerundet; null unter 2 vergleichbaren Bewertungen. */
   differenz: number | null;
   vergleichbar: number;
   /** Höchstens 3, größte |Differenz| zuerst. */
-  abweichungen: { slug: string; handelsname: string; eigene: number; community: number }[];
+  abweichungen: { slug: string; kultivarSlug?: string | null; handelsname: string; eigene: number; community: number }[];
 };
 
 export type Schnitte = {

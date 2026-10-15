@@ -99,7 +99,7 @@ test("Freigabe aus zwei Tabs: doppelte Terpen-Zeilen werfen nicht", () => {
 });
 
 test("Inaktive Blueten: kein Link ins Leere, Freigabe schaltet sie wieder an", () => {
-  assert.match(lies("lib/query/vorschlaege.ts"), /select: \{ id: true, slug: true, handelsname: true, aktiv: true \}/);
+  assert.match(lies("lib/query/vorschlaege.ts"), /select: \{ id: true, slug: true, handelsname: true, aktiv: true[ ,}]/);
   assert.match(lies("app/[lang]/vorschlagen/aktionen.ts"), /if \(vorhanden\?\.aktiv\)/);
   assert.match(lies("app/[lang]/admin/vorschlag-aktionen.ts"), /data: \{ aktiv: true \}/);
 });

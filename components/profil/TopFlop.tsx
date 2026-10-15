@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { namenLinkKlassen } from "@/components/ui";
+import { bluetenHref } from "@/lib/alte-adressen";
 import { formatiereZahl } from "@/lib/format";
 import type { Sprache } from "@/lib/i18n/sprache-kern";
 import { t } from "@/lib/i18n/text";
@@ -17,7 +18,7 @@ export function TopFlop({ top, flop, texte, sprache }: Props) {
         <li key={e.slug} className="flex items-baseline justify-between gap-4 border-t border-border pt-2">
           <Link
             prefetch={false}
-            href={`/blueten/${e.slug}`}
+            href={bluetenHref(e.slug, e.kultivarSlug)}
             className={namenLinkKlassen("inline-flex min-h-11 items-center font-buch text-body wrap-break-word")}
           >
             {e.handelsname}

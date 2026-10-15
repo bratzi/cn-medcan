@@ -27,13 +27,13 @@ export type KapitelDaten = {
   /** Verlauf des Netzes, älteste zuerst; nur im eigenen Kapitel, sonst leer (Nutzer 2026-10-09). */
   verlauf: VerlaufSchritt[];
   /** `bluete` und `vertreiber` fehlen in älteren gemerkten Antworten; dann gilt der Handelsname. */
-  zuletzt: { slug: string; handelsname: string; bluete?: string; vertreiber?: string | null; gesamtnote: number | null; datum: string } | null;
+  zuletzt: { slug: string; kultivarSlug?: string | null; handelsname: string; bluete?: string; vertreiber?: string | null; gesamtnote: number | null; datum: string } | null;
 };
 
 export type KapitelEingabe = Omit<KapitelDaten, "zuletzt" | "verlauf" | "seit"> & {
   verlauf?: VerlaufSchritt[];
   seit?: Date | null;
-  zuletzt: { slug: string; handelsname: string; bluete?: string | null; vertreiber?: string | null; gesamtnote: number | null; erstelltAm: Date } | null;
+  zuletzt: { slug: string; kultivarSlug?: string | null; handelsname: string; bluete?: string | null; vertreiber?: string | null; gesamtnote: number | null; erstelltAm: Date } | null;
 };
 
 export function kapitelAus(e: KapitelEingabe): KapitelDaten {
@@ -53,6 +53,7 @@ export function kapitelAus(e: KapitelEingabe): KapitelDaten {
         ? null
         : {
             slug: e.zuletzt.slug,
+            ...(e.zuletzt.kultivarSlug ? { kultivarSlug: e.zuletzt.kultivarSlug } : {}),
             handelsname: e.zuletzt.handelsname,
             bluete: e.zuletzt.bluete || e.zuletzt.handelsname,
             vertreiber: e.zuletzt.vertreiber ?? null,

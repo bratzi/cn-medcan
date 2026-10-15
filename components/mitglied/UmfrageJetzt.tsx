@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { buttonKlassen, textLinkKlassen } from "@/components/ui";
+import { bluetenHref } from "@/lib/alte-adressen";
 import { formatiereDatum } from "@/lib/format";
 import type { Sprache } from "@/lib/i18n/sprache-kern";
 import { t } from "@/lib/i18n/text";
@@ -51,7 +52,7 @@ export function UmfrageJetzt({ umfrage, eigeneOptionId, freigegeben, texte, phas
       </div>
       {umfrage.phase === "ABSTIMMUNG" && wahl ? (
         <div className="flex flex-wrap items-baseline gap-x-4 gap-y-2">
-          <Link prefetch={false} href={`/blueten/${wahl.slug}`} className={`${textLinkKlassen()} font-buch text-h3 wrap-break-word`}>
+          <Link prefetch={false} href={bluetenHref(wahl.slug, wahl.kultivarSlug)} className={`${textLinkKlassen()} font-buch text-h3 wrap-break-word`}>
             {wahl.handelsname}
           </Link>
           <span className="font-hand text-vermerk text-logo">{texte.deineWahl}</span>

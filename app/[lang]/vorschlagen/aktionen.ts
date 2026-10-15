@@ -16,7 +16,7 @@ export type VorschlagErgebnis =
   | {
       ok: false;
       fehler: string;
-      vorhanden?: { slug: string; handelsname: string };
+      vorhanden?: { slug: string; kultivarSlug: string | null; handelsname: string };
       /** Eigener offener oder entschiedener Vorschlag mit demselben Schluessel: Link auf Mein Profil. */
       schonVorgeschlagen?: true;
     };
@@ -47,7 +47,7 @@ export async function blueteVorschlagen(formData: FormData): Promise<VorschlagEr
     return {
       ok: false,
       fehler: wb.meldung["vorschlag.schonImKatalog"],
-      vorhanden: { slug: vorhanden.slug, handelsname: vorhanden.handelsname },
+      vorhanden: { slug: vorhanden.slug, kultivarSlug: vorhanden.kultivar?.slug ?? null, handelsname: vorhanden.handelsname },
     };
   }
 

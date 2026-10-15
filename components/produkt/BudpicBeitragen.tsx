@@ -5,6 +5,7 @@ import Link from "next/link";
 
 import { budpicHochladen } from "@/app/[lang]/blueten/[slug]/budpic-aktionen";
 import { Button, einzelLinkKlassen, useHydriert } from "@/components/ui";
+import { bluetenHref } from "@/lib/alte-adressen";
 import { BUDPIC_MAX_BYTES, BUDPIC_MAX_DATEIEN, BUDPIC_MAX_KANTE } from "@/lib/budpics";
 import { bildVerkleinernFrei } from "@/lib/bild-verkleinern";
 import type { Sprache } from "@/lib/i18n/sprache-kern";
@@ -17,6 +18,8 @@ type Props = {
   zugang: BudpicZugang;
   strainId: string;
   slug: string;
+  /** Sorten-Slug zum Produkt, damit der Anmelde-Ruecksprung ohne 308 ankommt. */
+  kultivarSlug?: string | null;
   sprache: Sprache;
   texte: Woerterbuch["budpic"];
   /** Nur die Meldungen dieses Ablaufs (budpicMeldungen), nicht das ganze Woerterbuch (Nutzlast je Karte). */
@@ -37,7 +40,7 @@ export type BudpicBeitragenProps = Props;
  * verkleinert und einzeln gesendet; der Knopf wird in jedem Fall wieder
  * frei (try/finally), auch nach einem geworfenen Serverfehler.
  */
-export function BudpicBeitragen({ zugang, strainId, slug, sprache, texte, meldungen, kompakt = false }: Props) {
+export function BudpicBeitragen({ zugang, strainId, slug, kultivarSlug, sprache, texte, meldungen, kompakt = false }: Props) {
   const hydriert = useHydriert();
   const eingabe = useRef<HTMLInputElement>(null);
   const [laeuft, setLaeuft] = useState<{ nr: number; gesamt: number } | null>(null);
@@ -46,7 +49,7 @@ export function BudpicBeitragen({ zugang, strainId, slug, sprache, texte, meldun
 
   if (zugang === "gast") {
     return (
-      <Link prefetch={false} href={`/anmelden?weiter=${encodeURIComponent(`/blueten/${slug}`)}`} className={einzelLinkKlassen()}>
+      <Link prefetch={false} href={`/anmelden?weiter=${encodeURIComponent(bluetenHref(slug, kultivarSlug))}`} className={einzelLinkKlassen()}>
         {texte.anmelden}
       </Link>
     );

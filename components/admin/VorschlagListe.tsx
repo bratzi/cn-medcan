@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import { VorschlagUebernehmen } from "@/components/admin/VorschlagUebernehmen";
 import { Avatar, Badge, Card, CardBody, CardHeader } from "@/components/ui";
+import { bluetenHref } from "@/lib/alte-adressen";
 import { formatiereDatum } from "@/lib/format";
 import type { VorschlagAnsicht } from "@/lib/query/umfragen";
 import type { UmfragePhase } from "@/db/enums";
@@ -56,7 +57,7 @@ export function VorschlagListe({ vorschlaege, phase }: Props) {
                   <div className="flex flex-wrap items-start justify-between gap-4">
                     <div>
                       <Link prefetch={false}
-                        href={`/blueten/${vorschlag.slug}`}
+                        href={bluetenHref(vorschlag.slug, vorschlag.kultivarSlug)}
                         className="text-body font-medium text-text underline underline-offset-2"
                         title={vorschlag.handelsname}
                       >

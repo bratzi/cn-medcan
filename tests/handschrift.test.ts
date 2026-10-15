@@ -85,6 +85,7 @@ function option(teil: Partial<UmfrageOptionAnsicht> = {}): UmfrageOptionAnsicht 
     strainId: "s1",
     handelsname: "Nebelharz 22 (fiktiv)",
     slug: "nebelharz-22",
+    kultivarSlug: null,
     reihenfolge: 1,
     herkunft: "COMMUNITY",
     istGewinner: false,

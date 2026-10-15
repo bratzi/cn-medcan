@@ -29,6 +29,7 @@ import {
   TableRow,
 } from "@/components/ui";
 import type { SelectOption } from "@/components/ui";
+import { bluetenHref } from "@/lib/alte-adressen";
 import { formatiereDatum } from "@/lib/format";
 import { offeneBewertungen, reviewAuswahlFuerStrains } from "@/lib/query/reviews";
 import { notizKuerzen } from "@/lib/admin-eingabe";
@@ -488,7 +489,7 @@ async function BudpicListe({ status }: { status: "OFFEN" | "FREIGEGEBEN" }) {
               {eintraege.map((b) => (
                 <li key={b.id} className="flex flex-col gap-2">
                   <p className="text-body text-text">
-                    <Link prefetch={false} href={`/blueten/${b.strainSlug}`} className="font-medium underline underline-offset-4">
+                    <Link prefetch={false} href={bluetenHref(b.strainSlug, b.kultivarSlug)} className="font-medium underline underline-offset-4">
                       {b.handelsname}
                     </Link>
                   </p>

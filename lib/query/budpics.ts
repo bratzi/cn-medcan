@@ -33,7 +33,7 @@ export async function ladeFreieBudpics(strainIds: readonly string[]): Promise<Ma
   return ergebnis;
 }
 
-export type OffenesBudpic = { id: string; strainSlug: string; handelsname: string; nutzer: string; erstelltAm: Date; breite: number; hoehe: number; ausBewertung: boolean };
+export type OffenesBudpic = { id: string; strainSlug: string; kultivarSlug: string | null; handelsname: string; nutzer: string; erstelltAm: Date; breite: number; hoehe: number; ausBewertung: boolean };
 
 /**
  * Budpics eines Status fuer /admin; ohne `daten`. Offene aelteste zuerst
@@ -50,7 +50,7 @@ export async function ladeBudpicsNachStatus(status: "OFFEN" | "FREIGEGEBEN"): Pr
         breite: true,
         hoehe: true,
         reviewId: true,
-        strain: { select: { slug: true, handelsname: true } },
+        strain: { select: { slug: true, handelsname: true, kultivar: { select: { slug: true } } } },
         mitglied: { select: { anzeigename: true } },
       },
       orderBy: { erstelltAm: status === "OFFEN" ? "asc" : "desc" },
@@ -63,6 +63,7 @@ export async function ladeBudpicsNachStatus(status: "OFFEN" | "FREIGEGEBEN"): Pr
     eintraege: zeilen.map((z) => ({
       id: z.id,
       strainSlug: z.strain.slug,
+      kultivarSlug: z.strain.kultivar?.slug ?? null,
       handelsname: z.strain.handelsname,
       nutzer: z.mitglied.anzeigename,
       erstelltAm: z.erstelltAm,

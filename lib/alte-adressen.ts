@@ -50,5 +50,28 @@ export function sortenWeiterleitung(
   const kultivarSlug = kultivarSlugVon(produktSlug);
   if (!kultivarSlug || kultivarSlug === produktSlug) return null;
   const rest = suche.startsWith("?") ? suche.slice(1) : suche;
-  return `/blueten/${kultivarSlug}?ware=${encodeURIComponent(produktSlug)}${rest ? `&${rest}` : ""}`;
+  return `${bluetenHref(produktSlug, kultivarSlug)}${rest ? `&${rest}` : ""}`;
+}
+
+/**
+ * Direkter Link auf eine Bluete ohne 308-Umweg: mit Sorten-Slug die
+ * Sortenseite mit ?ware=<produkt-slug>, sonst die Produktadresse.
+ */
+export function bluetenHref(produktSlug: string, kultivarSlug: string | null | undefined): string {
+  if (!kultivarSlug || kultivarSlug === produktSlug) return `/blueten/${produktSlug}`;
+  return `/blueten/${kultivarSlug}?ware=${encodeURIComponent(produktSlug)}`;
+}
+
+/** Zusammengelegte Sorten-Dubletten: alter Sorten-Slug -> behaltener (Migration 0025). */
+export const ABGELOESTE_SORTEN: Readonly<Record<string, string>> = {
+  "8-ball-kush-2": "8-ball-kush",
+};
+
+/** Ziel fuer /blueten/<abgeloester-sorten-slug>, Query bleibt; sonst null. */
+export function abgeloesteSorteWeiterleitung(pfad: string, suche: string): string | null {
+  const treffer = /^\/blueten\/([^/]+)$/.exec(pfad);
+  if (!treffer) return null;
+  const alt = decodeURIComponent(treffer[1]);
+  const ziel = Object.hasOwn(ABGELOESTE_SORTEN, alt) ? ABGELOESTE_SORTEN[alt] : null;
+  return ziel ? `/blueten/${ziel}${suche}` : null;
 }

@@ -9,6 +9,7 @@ import { Button, Field, Input, Meldung, Select, textLinkKlassen } from "@/compon
 import { useHydriert } from "@/components/ui/useHydriert";
 import type { SelectOption } from "@/components/ui";
 import { KULTIVAR_TYPEN } from "@/db/enums";
+import { bluetenHref } from "@/lib/alte-adressen";
 import { BUDPIC_MAX_BYTES, BUDPIC_MAX_KANTE } from "@/lib/budpics";
 import { bildVerkleinernFrei } from "@/lib/bild-verkleinern";
 import { MAX_VORSCHLAG_NOTIZ, MAX_VORSCHLAG_TERPENE } from "@/lib/vorschlag-eingabe";
@@ -210,7 +211,7 @@ export function BlueteVorschlagFormular({ terpene, nameVorbelegt, kultivarId, ku
           {antwort.vorhanden ? (
             <>
               {" "}
-              <Link prefetch={false} href={`/blueten/${antwort.vorhanden.slug}`} className={textLinkKlassen()}>
+              <Link prefetch={false} href={bluetenHref(antwort.vorhanden.slug, antwort.vorhanden.kultivarSlug)} className={textLinkKlassen()}>
                 {t(texte.zuBluete, { name: antwort.vorhanden.handelsname })}
               </Link>
             </>

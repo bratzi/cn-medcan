@@ -39,7 +39,7 @@ const umfrage = (phase: UmfrageAnsicht["phase"]): UmfrageAnsicht => ({
   endetAm: null,
   communityPlaetze: 2,
   optionen: [
-    { id: "o1", strainId: "s1", handelsname: "Sorte Eins", slug: "sorte-eins", reihenfolge: 1, herkunft: "COMMUNITY", istGewinner: false, stimmen: 3, ergebnisReviewId: null },
+    { id: "o1", strainId: "s1", handelsname: "Sorte Eins", slug: "sorte-eins", kultivarSlug: null, reihenfolge: 1, herkunft: "COMMUNITY", istGewinner: false, stimmen: 3, ergebnisReviewId: null },
   ],
   stimmenGesamt: 3,
 });

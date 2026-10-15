@@ -25,6 +25,8 @@ export type UmfrageOptionAnsicht = {
   strainId: string;
   handelsname: string;
   slug: string;
+  /** Sorten-Slug fuer den direkten Link (bluetenHref). */
+  kultivarSlug: string | null;
   reihenfolge: number;
   herkunft: OptionHerkunft;
   istGewinner: boolean;
@@ -97,7 +99,7 @@ export async function umfrageLaden(umfrageId: string): Promise<UmfrageAnsicht | 
             herkunft: true,
             istGewinner: true,
             ergebnisReviewId: true,
-            strain: { select: { handelsname: true, slug: true } },
+            strain: { select: { handelsname: true, slug: true, kultivar: { select: { slug: true } } } },
           },
           orderBy: { reihenfolge: "asc" },
           take: MAX_OPTIONEN,
@@ -125,6 +127,7 @@ export async function umfrageLaden(umfrageId: string): Promise<UmfrageAnsicht | 
       strainId: o.strainId,
       handelsname: o.strain.handelsname,
       slug: o.strain.slug,
+      kultivarSlug: o.strain.kultivar?.slug ?? null,
       reihenfolge: o.reihenfolge,
       herkunft,
       istGewinner: o.istGewinner,
@@ -170,6 +173,8 @@ export type VorschlagAnsicht = {
   strainId: string;
   handelsname: string;
   slug: string;
+  /** Sorten-Slug fuer den direkten Link (bluetenHref). */
+  kultivarSlug: string | null;
   begruendung: string | null;
   uebernommen: boolean;
   vonAnzeigename: string;
@@ -189,7 +194,7 @@ export async function vorschlaegeLaden(umfrageId: string): Promise<VorschlagAnsi
       begruendung: true,
       uebernommen: true,
       erstelltAm: true,
-      strain: { select: { handelsname: true, slug: true } },
+      strain: { select: { handelsname: true, slug: true, kultivar: { select: { slug: true } } } },
       mitglied: { select: { anzeigename: true, avatar: { select: { id: true } } } },
     },
     // Offene Vorschlaege zuerst - das ist die Arbeit, die ansteht.
@@ -202,6 +207,7 @@ export async function vorschlaegeLaden(umfrageId: string): Promise<VorschlagAnsi
     strainId: v.strainId,
     handelsname: v.strain.handelsname,
     slug: v.strain.slug,
+    kultivarSlug: v.strain.kultivar?.slug ?? null,
     begruendung: v.begruendung,
     uebernommen: v.uebernommen,
     vonAnzeigename: v.mitglied.anzeigename,
@@ -225,7 +231,7 @@ export type UmfrageUebersicht = {
   endetAm: Date | null;
   istAktiv: boolean;
   /** Nur die markierten Gewinner - der Rest interessiert in der Liste nicht. */
-  gewinner: { handelsname: string; slug: string }[];
+  gewinner: { handelsname: string; slug: string; kultivarSlug: string | null }[];
 };
 
 /**
@@ -248,7 +254,7 @@ export async function umfragenUebersicht(limit = MAX_UMFRAGEN): Promise<UmfrageU
       aktiv: true,
       optionen: {
         where: { istGewinner: true },
-        select: { strain: { select: { handelsname: true, slug: true } } },
+        select: { strain: { select: { handelsname: true, slug: true, kultivar: { select: { slug: true } } } } },
         orderBy: { reihenfolge: "asc" },
         take: MAX_OPTIONEN,
       },
@@ -265,6 +271,7 @@ export async function umfragenUebersicht(limit = MAX_UMFRAGEN): Promise<UmfrageU
     gewinner: u.optionen.map((o) => ({
       handelsname: o.strain.handelsname,
       slug: o.strain.slug,
+      kultivarSlug: o.strain.kultivar?.slug ?? null,
     })),
   }));
 }
@@ -304,6 +311,8 @@ export type ErgebnisPlatz = {
   strainId: string;
   handelsname: string;
   slug: string;
+  /** Sorten-Slug fuer den direkten Link (bluetenHref). */
+  kultivarSlug: string | null;
   herkunft: OptionHerkunft;
   ergebnisReviewId: string | null;
 };
@@ -345,7 +354,7 @@ export async function beendeteRundenMitGewinnern(
           strainId: true,
           herkunft: true,
           ergebnisReviewId: true,
-          strain: { select: { handelsname: true, slug: true } },
+          strain: { select: { handelsname: true, slug: true, kultivar: { select: { slug: true } } } },
         },
         orderBy: { reihenfolge: "asc" },
         take: MAX_OPTIONEN,
@@ -362,6 +371,7 @@ export async function beendeteRundenMitGewinnern(
       strainId: o.strainId,
       handelsname: o.strain.handelsname,
       slug: o.strain.slug,
+      kultivarSlug: o.strain.kultivar?.slug ?? null,
       // Wie in `umfrageLaden`: ein unbekannter Wert gilt als COMMUNITY.
       herkunft: istOptionHerkunft(o.herkunft) ? o.herkunft : "COMMUNITY",
       ergebnisReviewId: o.ergebnisReviewId,

@@ -18,6 +18,8 @@ export type StimmZeile = {
   phase: UmfragePhase;
   abgegebenAm: Date;
   slug: string;
+  /** Sorten-Slug fuer den direkten Link (bluetenHref). */
+  kultivarSlug?: string | null;
   handelsname: string;
   bildPfad: string | null;
   istGewinner: boolean;

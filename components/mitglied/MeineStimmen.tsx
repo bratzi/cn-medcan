@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Bild } from "@/components/medien/Bild";
 import { eintragHref } from "@/components/review/eintrag";
 import { Badge, textLinkKlassen } from "@/components/ui";
+import { bluetenHref } from "@/lib/alte-adressen";
 import { ersatzBildId } from "@/lib/bewertungsbilder";
 import { formatiereDatum } from "@/lib/format";
 import type { Sprache } from "@/lib/i18n/sprache-kern";
@@ -42,7 +43,7 @@ export function MeineStimmen({ stimmen, texte, sprache }: { stimmen: readonly St
             </div>
             <div className="flex flex-col gap-2">
               <Badge variante={VARIANTE[ausgang]}>{texte.ausgang[ausgang]}</Badge>
-              <Link prefetch={false} href={`/blueten/${s.slug}`} className={`${textLinkKlassen()} font-buch text-body wrap-break-word`}>
+              <Link prefetch={false} href={bluetenHref(s.slug, s.kultivarSlug)} className={`${textLinkKlassen()} font-buch text-body wrap-break-word`}>
                 {s.handelsname}
               </Link>
               <p className="text-small text-text-muted wrap-break-word">{s.rundentitel}</p>

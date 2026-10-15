@@ -113,6 +113,8 @@ export type StrainListenEintrag = {
   slug: string;
   handelsname: string;
   kultivarName: string | null;
+  /** Sorten-Slug fuer den direkten Link (bluetenHref). */
+  kultivarSlug: string | null;
   kultivarTyp: KultivarTyp;
   darreichungsform: Darreichungsform;
   genetik: string | null;
@@ -464,6 +466,7 @@ const listenSelect = (fachkreis: boolean) =>
     kultivarId: true,
     vertreiberId: true,
     vertreiber: { select: { name: true } },
+    kultivar: { select: { slug: true } },
     terpene: {
       where: { rang: { lte: 3 } },
       orderBy: { rang: "asc" },
@@ -503,6 +506,7 @@ type ListenZeile = {
   kultivarId: string | null;
   vertreiberId: string | null;
   vertreiber: { name: string } | null;
+  kultivar: { slug: string | null } | null;
   terpene: {
     rang: number;
     konzentrationProzent: number | null;
@@ -549,6 +553,7 @@ function zuListenEintrag(zeile: ListenZeile): StrainListenEintrag {
     slug: zeile.slug,
     handelsname: zeile.handelsname,
     kultivarName: zeile.kultivarName,
+    kultivarSlug: zeile.kultivar?.slug ?? null,
     kultivarTyp: alsKultivarTyp(zeile.kultivarTyp),
     darreichungsform: alsDarreichungsform(zeile.darreichungsform),
     genetik: zeile.genetik,

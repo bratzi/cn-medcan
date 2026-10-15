@@ -49,6 +49,7 @@ export async function GET() {
       kapitel,
       empfehlungen: liste.map((e) => ({
         slug: e.slug,
+        kultivarSlug: e.kultivarSlug,
         handelsname: e.handelsname,
         begruendung: begruendungText(e, w, sprache),
         // Aufgefüllte Sorten sichtbar markieren wie im Profil (Spec Profil 2.4).

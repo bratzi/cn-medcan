@@ -33,7 +33,7 @@ export type TitelblattProps = {
   /** Referenzbild (Medien-Id) oder null; ein Symbolbild, nicht die echte Sorte. */
   bild?: string | null;
   /** Budpics der Community (T9): Diashow statt Musterbild, dazu "Bild beitragen". */
-  budpic?: { strainId: string; slug: string; bilder: readonly DiashowBild[]; zugang: BudpicZugang };
+  budpic?: { strainId: string; slug: string; kultivarSlug?: string | null; bilder: readonly DiashowBild[]; zugang: BudpicZugang };
   w: Woerterbuch;
   sprache: Sprache;
 };
@@ -100,6 +100,7 @@ function BudpicBeitragenLeiste({ props }: { props: TitelblattProps }) {
       zugang={props.budpic.zugang}
       strainId={props.budpic.strainId}
       slug={props.budpic.slug}
+      kultivarSlug={props.budpic.kultivarSlug}
       sprache={props.sprache}
       texte={props.w.budpic}
       meldungen={budpicMeldungen(props.w)}

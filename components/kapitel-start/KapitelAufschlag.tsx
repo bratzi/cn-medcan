@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ProfilNetz } from "@/components/profil/ProfilNetz";
 import { BlattAnzeige } from "@/components/review/BlattAnzeige";
 import { Avatar, Badge, buttonKlassen, namenLinkKlassen } from "@/components/ui";
+import { bluetenHref } from "@/lib/alte-adressen";
 import { profilNetzTexte, type ProfilNetzTexte } from "@/lib/aroma-netz-texte";
 import { bluetenZeile } from "@/lib/bluete-zeile";
 import { formatiereDatum, formatiereZahl } from "@/lib/format";
@@ -151,7 +152,7 @@ export function KapitelAufschlag({
           <div className="flex min-w-0 flex-col items-center gap-2">
             <p className="text-small text-text-muted">{texte.zuletzt}</p>
             <p className="font-buch text-h3 wrap-break-word">
-              <Link prefetch={false} href={`/blueten/${daten.zuletzt.slug}`} className={namenLinkKlassen()}>
+              <Link prefetch={false} href={bluetenHref(daten.zuletzt.slug, daten.zuletzt.kultivarSlug)} className={namenLinkKlassen()}>
                 {daten.zuletzt.handelsname}
               </Link>
             </p>
