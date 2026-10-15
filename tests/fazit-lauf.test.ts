@@ -56,7 +56,7 @@ test("Mobile Leiste: aria-expanded/aria-controls aufs Fazit und die Kurzwerte sa
   assert.match(leiste, /min-\[118rem\]:hidden/);
   assert.match(leiste, new RegExp(de.aroma.erkundung.deinFazit));
   assert.match(leiste, /Pkt\./);
-  assert.match(leiste, /Prozentpunkte (über|unter) dem Community-Fazit|gleich dem Community-Fazit/);
+  assert.match(leiste, /Prozentpunkte (über|unter) dem Community-Score|gleich dem Community-Score/);
 });
 
 test("Ohne eigene Werte zeigt die Leiste den Community-Wert, ohne Delta", () => {
