@@ -20,7 +20,7 @@ import type { BeschaffenheitsKey } from "@/lib/query/bewertung";
 import type { GeschmacksKategorie } from "@/db/enums";
 
 export type BewertungErgebnis =
-  | { ok: true; sofortSichtbar: boolean; slug: string; netz: { vorher: Geschmack | null; nachher: Geschmack; geformt: boolean } | null }
+  | { ok: true; sofortSichtbar: boolean; slug: string; strainId: string; netz: { vorher: Geschmack | null; nachher: Geschmack; geformt: boolean } | null }
   | { ok: false; fehler: string };
 
 /**
@@ -163,5 +163,5 @@ export async function bewertungSpeichern(formData: FormData): Promise<BewertungE
   revalidiereSprachen("/reviews", "layout");
   revalidiereSprachen("/admin");
   revalidiereSprachen("/profil");
-  return { ok: true, sofortSichtbar: istBetreiber, slug: kultivar.slug ?? produktSlug ?? "", netz };
+  return { ok: true, sofortSichtbar: istBetreiber, slug: kultivar.slug ?? produktSlug ?? "", strainId: ziel.strainId, netz };
 }

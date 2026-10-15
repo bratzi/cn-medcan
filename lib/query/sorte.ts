@@ -1,5 +1,8 @@
+import { cache } from "react";
+
 import { getPrisma } from "@/lib/prisma";
-import type { KennwerteZeile } from "@/lib/query/strains";
+import { ladeAutorZahlen } from "@/lib/query/autoren";
+import { alsReviewEintrag, BEWERTUNG_SELECT, type KennwerteZeile, type ReviewEintrag } from "@/lib/query/strains";
 import { istKultivarTyp, type KultivarTyp } from "@/db/enums";
 import { sortenWeiterleitung } from "@/lib/alte-adressen";
 
@@ -54,6 +57,24 @@ export function gruppiereWaren(
   return [...jeVertreiber.values()].sort((a, b) => b.anzahl - a.anzahl || a.vertreiberName.localeCompare(b.vertreiberName, "de"));
 }
 
+/**
+ * Die angezeigte Ware (Spec Sorte im Fokus, 3): `?ware=<produkt-slug>` vor `?vertreiber=<id>`,
+ * sonst die meistbewertete. Unbekannte Werte fallen still auf die meistbewertete zurück.
+ */
+export function waehleAktiveWare(
+  waren: readonly WareKarte[],
+  wahl: { ware?: string; vertreiber?: string },
+): { ware: WareKarte; produkt: WareProdukt } | null {
+  if (wahl.ware) {
+    for (const ware of waren) {
+      const produkt = ware.produkte.find((p) => p.slug === wahl.ware);
+      if (produkt) return { ware, produkt };
+    }
+  }
+  const ware = (wahl.vertreiber ? waren.find((w) => w.vertreiberId === wahl.vertreiber) : undefined) ?? waren[0];
+  return ware && ware.produkte[0] ? { ware, produkt: ware.produkte[0] } : null;
+}
+
 function spanneAus(produkte: readonly WareProdukt[]): SorteDetail["spanne"] {
   if (produkte.length === 0) return { thcMin: null, thcMax: null, cbdMin: null, cbdMax: null };
   return {
@@ -69,7 +90,7 @@ function spanneAus(produkte: readonly WareProdukt[]): SorteDetail["spanne"] {
  * Kennwerten und Note je Vertreiber. Gruppiert wird im Code (höchstens 30 Produkte).
  * `fachkreis` bleibt in der Signatur für spätere Bestandsdaten; Sortendaten sind öffentlich.
  */
-export async function ladeSorte(slug: string, fachkreis: boolean): Promise<SorteDetail | null> {
+export const ladeSorte = cache(async function ladeSorte(slug: string, fachkreis: boolean): Promise<SorteDetail | null> {
   void fachkreis;
   const prisma = await getPrisma();
   const k = await prisma.kultivar.findUnique({
@@ -130,6 +151,22 @@ export async function ladeSorte(slug: string, fachkreis: boolean): Promise<Sorte
     kennwerte: k.kennwerte && k.kennwerte.anzahl > 0 ? k.kennwerte : null,
     waren,
   };
+});
+
+/**
+ * Bewertungen der Sorte für das Buch: freigegeben, Betreiber zuerst, höchstens 20; mit
+ * `vertreiberId` nur die über diesen Vertreiber (Ware-Leiste), sonst alle Vertreiber.
+ */
+export async function ladeSortenBewertungen(kultivarId: string, vertreiberId: string | null): Promise<ReviewEintrag[]> {
+  const prisma = await getPrisma();
+  const zeilen = await prisma.review.findMany({
+    where: { kultivarId, freigegeben: true, ...(vertreiberId ? { vertreiberId } : {}) },
+    orderBy: [{ istRedaktionell: "desc" }, { erstelltAm: "desc" }],
+    take: 20,
+    select: BEWERTUNG_SELECT,
+  });
+  const autorZahlen = await ladeAutorZahlen(zeilen.flatMap((z) => (z.autorId ? [z.autorId] : [])));
+  return zeilen.map((z) => alsReviewEintrag(z, autorZahlen));
 }
 
 /**

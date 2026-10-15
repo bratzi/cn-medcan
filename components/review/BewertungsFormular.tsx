@@ -10,6 +10,7 @@ import type { AromaSerie } from "@/components/review/AromaKarte";
 import type { BeschaffenheitsWerte } from "@/components/review/BeschaffenheitsLeiste";
 import type { Gesamteindruck } from "@/components/review/GesamteindruckLeiste";
 import { BewertungsBilder } from "@/components/review/BewertungsBilder";
+import { WareWahlFeld } from "@/components/sorte/WareWahlFeld";
 import { MiniNetz } from "@/components/review/MiniNetz";
 import { NoteUndErkundung } from "@/components/review/NoteUndErkundung";
 import { Button, Field, Input, Meldung } from "@/components/ui";
@@ -22,12 +23,17 @@ import type { AromaTexte, Woerterbuch } from "@/lib/i18n/typen";
 import { t } from "@/lib/i18n/text";
 import type { LiveNetzBasis } from "@/lib/live-netz";
 import type { Geschmack } from "@/lib/profil-typen";
+import type { WareKarte } from "@/lib/query/sorte";
 
 type Props = {
+  /** Produkt der angezeigten Ware; Rückfall für die Bilder, falls der Server keins nennt. */
   strainId: string;
-  /** Sorte und Vertreiber des Produkts (Spec 2026-10-15); fehlt eines, lehnt der Server mit Meldung ab. */
+  /** Sorte der Seite (Spec 2026-10-15); fehlt sie, lehnt der Server mit Meldung ab. */
   kultivarId: string | null;
-  vertreiberId: string | null;
+  /** Waren der Sorte für Vertreiber und Stärke (WareWahlFeld). */
+  waren: readonly WareKarte[];
+  vorgewaehlt: { vertreiberId: string | null; strainId: string | null };
+  wareTexte: Woerterbuch["bluete"]["vertreiber"];
   handelsname: string;
   /** Sortenkopf samt Angaben zur Blüte über der Karte, als Server-Teil hereingereicht. */
   bild?: React.ReactNode;
@@ -74,7 +80,9 @@ type Props = {
 export function BewertungsFormular({
   strainId,
   kultivarId,
-  vertreiberId,
+  waren,
+  vorgewaehlt,
+  wareTexte,
   handelsname,
   bild,
   terpene,
@@ -131,7 +139,8 @@ export function BewertungsFormular({
     let bildFehler: string[] = [];
     let bilderGesendet = 0;
     if (mitBildern) {
-      const lauf = await bilderSenden(vorgemerkt, strainId, bewertungsbildHochladen, {
+      // Die Bilder gehören zur gespeicherten Bewertung; ihr Produkt nennt der Server (Stärke kann offen sein).
+      const lauf = await bilderSenden(vorgemerkt, ergebnis.strainId || strainId, bewertungsbildHochladen, {
         fortschritt: (nr, gesamt) => setBildLauf({ nr, gesamt }),
         fehlgeschlagen: bildMeldungen["budpic.fehlgeschlagen"],
         dateiFehler: texte.bildFehler,
@@ -154,9 +163,16 @@ export function BewertungsFormular({
 
   return (
     <form onSubmit={absenden} className="flex flex-col gap-16 md:gap-24">
-      <input type="hidden" name="strainId" value={strainId} />
       <input type="hidden" name="kultivarId" value={kultivarId ?? ""} />
-      <input type="hidden" name="vertreiberId" value={vertreiberId ?? ""} />
+      {/* Erst die Ware zuordnen, dann bewerten (Spec Sorte im Fokus, 2): Vertreiber Pflicht, Stärke freiwillig. */}
+      <WareWahlFeld
+        key={`ware-${stand}-${vorgewaehlt.vertreiberId ?? ""}`}
+        waren={waren}
+        vorgewaehlt={vorgewaehlt}
+        texte={wareTexte}
+        sprache={aromaTexte.sprache}
+        kultivarId={kultivarId ?? undefined}
+      />
 
       {/* Gleiche Reihenfolge wie die Startseite (Nutzer 2026-10-06): Sortenkopf, Gesamtnote, Overall,
           Terpz. Die Note hält der gemeinsame Baustein selbst und reicht sie ans eigene Sortenfazit

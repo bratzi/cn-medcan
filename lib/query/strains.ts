@@ -1292,16 +1292,19 @@ export async function ladeAromaVorzeige(): Promise<AromaVorzeige | null> {
 }
 
 /**
- * Die eigene Bewertung eines Mitglieds zu einer Sorte, auch solange sie noch
- * nicht freigegeben ist (Vorbelegung der Maske, Bewertung v2 T4). Je Mitglied
- * und Sorte gibt es höchstens eine (Unique-Index autorId × strainId), also
- * ein Zugriff über den Index, nicht aus der öffentlichen Liste.
+ * Die eigene Bewertung eines Mitglieds zu einer Sorte bei einem Vertreiber, auch solange sie noch
+ * nicht freigegeben ist (Vorbelegung der Maske). Seit Spec 2026-10-15 gilt eine Bewertung je Sorte
+ * und Vertreiber; aus der Zeit „eine je Produkt“ kann es mehrere geben, dann die kleinste id wie
+ * beim Speichern (waehleZielBewertung).
  */
-export async function ladeEigeneBewertung(autorId: string, strainId: string): Promise<GespeicherteBewertung | null> {
+export async function ladeEigeneBewertung(autorId: string, kultivarId: string, vertreiberId: string): Promise<GespeicherteBewertung | null> {
   const prisma = await getPrisma();
-  const zeile = await prisma.review.findUnique({
-    where: { autorId_strainId: { autorId, strainId } },
+  const zeile = await prisma.review.findFirst({
+    where: { autorId, kultivarId, vertreiberId },
+    orderBy: { id: "asc" },
     select: {
+      strainId: true,
+      wareGenau: true,
       aussehen: true,
       geruch: true,
       geschmack: true,

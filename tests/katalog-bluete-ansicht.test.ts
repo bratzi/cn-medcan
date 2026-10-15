@@ -17,10 +17,10 @@ const kultivar = {
 };
 
 test("AnsichtUmschalter: zwei Links, aktuelle Ansicht mit aria-current, Wechsel auf Seite 1 mit übrigen Filtern", () => {
-  const filter = parseStrainFilter({ typ: "INDICA", seite: "3" });
+  const filter = parseStrainFilter({ typ: "INDICA", seite: "3", ansicht: "ware" });
   const html = renderToStaticMarkup(createElement(AnsichtUmschalter, { filter, texte: de.katalog.ansicht }));
   assert.match(html, /aria-current="page"[^>]*>Handelsnamen/);
-  assert.match(html, /href="\/blueten\?typ=INDICA&amp;ansicht=bluete"/);
+  assert.match(html, /href="\/blueten\?typ=INDICA"/);
   assert.doesNotMatch(html, /seite=3/);
 });
 
@@ -37,6 +37,9 @@ test("KultivarKarte: Name, Typ, Spanne, fünf Vertreiber plus Rest, Overall, Lin
   assert.match(html, new RegExp(`href="/blueten\\?typ=INDICA&amp;kultivar=${ID}"`));
   assert.match(html, /7 Handelsnamen ansehen/);
   assert.match(html, /wrap-break-word/);
+  assert.doesNotMatch(html, /href="\/blueten\/[^"?]/);
+  const mitSlug = renderToStaticMarkup(createElement(KultivarKarte, { kultivar: { ...kultivar, slug: "black-cherry-punch" }, filter, w: de, sprache: "de" }));
+  assert.match(mitSlug, /href="\/blueten\/black-cherry-punch"[^>]*>Black Cherry Punch/);
 });
 
 test("KultivarKarte: ohne Bewertung kein Overall, ohne Vertreiber der Ersatztext", () => {
@@ -51,7 +54,7 @@ test("AktiveFilter: Chip Blüte mit Namen, unbekannte Id als unbekannt, Entferne
   const filter = parseStrainFilter({ kultivar: ID, ansicht: "bluete" });
   const mit = renderToStaticMarkup(createElement(AktiveFilter, { filter, kultivarName: "Black Cherry Punch", w: de, sprache: "de" }));
   assert.match(mit, /Blüte: Black Cherry Punch/);
-  assert.match(mit, /href="\/blueten\?ansicht=bluete"/);
+  assert.match(mit, /href="\/blueten\??"/);
   const ohne = renderToStaticMarkup(createElement(AktiveFilter, { filter, kultivarName: null, w: de, sprache: "de" }));
   assert.match(ohne, /Blüte: unbekannt/);
 });
@@ -87,7 +90,7 @@ test("KultivarKarte: ohne Vertreiber keine Zählzeile „bei 0“", () => {
 
 test("Katalogseite: Zurücksetzen im Leerzustand behält die Blüten-Ansicht", () => {
   const seite = readFileSync("app/[lang]/blueten/page.tsx", "utf8");
-  assert.match(seite, /bluetenAnsicht \? "\/blueten\?ansicht=bluete" : "\/blueten"/);
+  assert.match(seite, /bluetenAnsicht \? "\/blueten" : "\/blueten\?ansicht=ware"/);
 });
 
 test("Trefferzeile der Handelsnamen-Ansicht zählt Handelsnamen", () => {
