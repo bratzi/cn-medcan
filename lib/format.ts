@@ -224,6 +224,13 @@ export function formatiereZahl(wert: number, stellen = 1, sprache: Sprache = "de
   return formatter(formate(sprache), stellen).format(wert);
 }
 
+/** Zwei Zahlen als Spanne; `gleich`, wenn sie gerundet gleich aussehen („25 bis 25“ wird dann ein Wert). */
+export function formatiereZahlSpanne(min: number, max: number, stellen = 1, sprache: Sprache = "de") {
+  const von = formatiereZahl(min, stellen, sprache);
+  const bis = formatiereZahl(max, stellen, sprache);
+  return { von, bis, gleich: von === bis };
+}
+
 /** Wert mit hoechstens einer Nachkommastelle, z. B. Reglerwerte `4` oder `3,5`. */
 export function formatiereWert(wert: number, sprache: Sprache = "de"): string {
   return formate(sprache).kurz.format(wert);

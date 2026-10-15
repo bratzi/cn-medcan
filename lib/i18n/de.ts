@@ -397,6 +397,7 @@ export const de = {
       overall: "Overall {note} von 5",
       bewertungen: { one: "{anzahl} Bewertung", other: "{anzahl} Bewertungen" },
       thc: "{von} bis {bis} % THC",
+      thcEinzeln: "{wert} % THC",
     },
     karte: {
       symbolbild: "Symbolbild",

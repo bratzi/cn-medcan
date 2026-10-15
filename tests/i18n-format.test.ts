@@ -8,6 +8,7 @@ import {
   formatiereProzent,
   formatiereProzentSpanne,
   formatiereRelativ,
+  formatiereZahlSpanne,
 } from "@/lib/format";
 
 const JETZT = Date.UTC(2026, 8, 27, 12);
@@ -50,4 +51,10 @@ test("formatiereWert: hoechstens eine Stelle", async () => {
   assert.equal(formatiereWert(4), "4");
   assert.equal(formatiereWert(3.54), "3,5");
   assert.equal(formatiereWert(3.54, "en"), "3.5");
+});
+
+test("Zahlenspanne: gerundet gleiche Enden sind ein Wert", () => {
+  assert.equal(formatiereZahlSpanne(24.6, 25.4, 0).gleich, true);
+  assert.equal(formatiereZahlSpanne(25, 25, 0).von, "25");
+  assert.equal(formatiereZahlSpanne(22, 28, 0).gleich, false);
 });

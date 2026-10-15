@@ -3,7 +3,7 @@ import Link from "next/link";
 import { BlattAnzeige } from "@/components/review/BlattAnzeige";
 import { Badge, Card, CardBody } from "@/components/ui";
 import { einzelLinkKlassen } from "@/components/ui/textlink";
-import { formatiereZahl } from "@/lib/format";
+import { formatiereZahl, formatiereZahlSpanne } from "@/lib/format";
 import type { Sprache } from "@/lib/i18n/sprache-kern";
 import { mehrzahl, t } from "@/lib/i18n/text";
 import type { Woerterbuch } from "@/lib/i18n/typen";
@@ -29,7 +29,10 @@ export function KultivarKarte({ kultivar, filter, w, sprache }: Props) {
         </div>
         {kultivar.thcMin !== null && kultivar.thcMax !== null ? (
           <p className="numeric text-small text-text">
-            {t(texte.thc, { von: formatiereZahl(kultivar.thcMin, 0, sprache), bis: formatiereZahl(kultivar.thcMax, 0, sprache) })}
+            {(() => {
+              const s = formatiereZahlSpanne(kultivar.thcMin, kultivar.thcMax, 0, sprache);
+              return s.gleich ? t(texte.thcEinzeln, { wert: s.von }) : t(texte.thc, { von: s.von, bis: s.bis });
+            })()}
           </p>
         ) : null}
         <div className="flex flex-col gap-2">
