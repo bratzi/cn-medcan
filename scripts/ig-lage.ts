@@ -6,18 +6,18 @@
  */
 import { istThemenMarke, markenAus, publoraPosts, tagBelegt } from "./ig-gemeinsam";
 
-type Post = { status?: string; createdAt?: string; scheduledTime?: string; mediaUrls?: unknown };
+type Post = { postGroupId?: string; status?: string; createdAt?: string; scheduledTime?: string; mediaUrls?: unknown };
 
 async function main() {
   const posts = (await publoraPosts()) as Post[];
   const zeilen = posts
-    .map((p) => ({ status: p.status ?? "?", erstellt: p.createdAt ?? "", marke: [...markenAus([p])][0] ?? "" }))
+    .map((p) => ({ id: p.postGroupId ?? "", status: p.status ?? "?", erstellt: p.createdAt ?? "", marke: [...markenAus([p])][0] ?? "" }))
     .sort((a, b) => b.erstellt.localeCompare(a.erstellt));
   const themen = zeilen.filter((z) => istThemenMarke(z.marke));
   console.log(
     JSON.stringify(
       {
-        offeneThemenEntwuerfe: themen.filter((z) => z.status === "draft").map((z) => z.marke),
+        offeneThemenEntwuerfe: themen.filter((z) => z.status === "draft").map((z) => `${z.marke} (id ${z.id})`),
         veroeffentlichteThemen: themen.filter((z) => z.status === "published").map((z) => z.marke),
         heuteBelegt: tagBelegt(posts),
         geplant: posts

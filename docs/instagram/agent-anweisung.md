@@ -42,7 +42,11 @@ Der Wochentag (UTC) bestimmt, was du tust:
 2. **Bremse:** Ist `heuteBelegt` wahr (heute schon ein Post eingeplant oder erschienen, siehe auch `geplant`), legst du
    nichts an. Ebenso, wenn 3 oder mehr offene Themen-Entwürfe (`bot-k-` und `bot-thema-`) liegen. Weiter mit
    Schritt 5.
-3. **Thema wählen** aus der Themenliste der Säule im Redaktionsplan:
+3. **Fertigen Entwurf zuerst:** Liegt in `offeneThemenEntwuerfe` ein Karussell der heutigen Säule (Marke
+   `bot-k-<saeule>-…`), legst du keinen neuen an, sondern planst diesen ein:
+   `npx --yes tsx scripts/ig-planen.ts <id> <heute>T17:00:00Z`, dann Schritt 5. (Publora Free plant nur wenige Tage im
+   Voraus; fertige Pins warten deshalb als Entwurf auf ihren Tag.) Sonst **Thema wählen** aus der Themenliste der Säule
+   im Redaktionsplan:
    - Nicht nehmen, was schon als Marke `bot-k-<saeule>-<schluessel>` vorkommt (offen oder veröffentlicht).
    - Im Plan der Reihe nach vorgehen. Von der Reihenfolge nur abweichen, wenn der Betreiber ähnliche Themen schon
      veröffentlicht hat (`veroeffentlichteThemen`).
