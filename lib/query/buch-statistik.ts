@@ -1,3 +1,4 @@
+import { bewertungHref } from "@/lib/alte-adressen";
 import { getPrisma } from "@/lib/prisma";
 import { MIN_BEWERTUNGEN, ordneNoten, STATISTIK_MAX, type BuchStatistik, type StatistikEintrag } from "@/lib/buch-statistik";
 
@@ -65,12 +66,12 @@ export async function ladeBuchStatistik(): Promise<BuchStatistik> {
         })
       : [],
     kultivarIds.length
-      ? prisma.kultivar.findMany({ where: { id: { in: kultivarIds } }, select: { id: true, name: true }, take: 90 })
+      ? prisma.kultivar.findMany({ where: { id: { in: kultivarIds } }, select: { id: true, name: true, slug: true }, take: 90 })
       : [],
     bewertungIds.length
       ? prisma.review.findMany({
           where: { id: { in: bewertungIds }, freigegeben: true },
-          select: { id: true, strain: { select: { slug: true, handelsname: true } } },
+          select: { id: true, vertreiberId: true, kultivar: { select: { slug: true } }, strain: { select: { slug: true, handelsname: true } } },
           take: 90,
         })
       : [],
@@ -80,10 +81,11 @@ export async function ladeBuchStatistik(): Promise<BuchStatistik> {
   for (const s of strains) if (s.kultivarId && !slugJeKultivar.has(s.kultivarId)) slugJeKultivar.set(s.kultivarId, s.slug);
   const name = new Map(kultivare.map((k) => [k.id, k.name]));
   for (const [id, n] of namenKennwerte) if (!name.has(id)) name.set(id, n);
-  const review = new Map(reviews.map((r) => [r.id, r.strain]));
+  const sortenSlug = new Map(kultivare.map((k) => [k.id, k.slug]));
+  const review = new Map(reviews.map((r) => [r.id, r]));
 
   const blute = (id: string, wert: number): StatistikEintrag | null => {
-    const slug = slugJeKultivar.get(id);
+    const slug = sortenSlug.get(id) ?? slugJeKultivar.get(id);
     const titel = name.get(id);
     return slug && titel ? { titel, href: `/blueten/${slug}`, wert } : null;
   };
@@ -92,8 +94,10 @@ export async function ladeBuchStatistik(): Promise<BuchStatistik> {
   const bewertung = (zeilen: { zielId: string }[], wert: (index: number) => number) =>
     zeilen
       .flatMap((z, i) => {
-        const s = review.get(z.zielId);
-        return s ? [{ titel: s.handelsname, href: `/blueten/${s.slug}#bewertung-${z.zielId}`, wert: wert(i) }] : [];
+        const r = review.get(z.zielId);
+        return r
+          ? [{ titel: r.strain.handelsname, href: bewertungHref({ strainSlug: r.strain.slug, kultivarSlug: r.kultivar?.slug, vertreiberId: r.vertreiberId }, z.zielId), wert: wert(i) }]
+          : [];
       })
       .slice(0, STATISTIK_MAX);
 

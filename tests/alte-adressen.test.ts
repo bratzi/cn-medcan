@@ -6,7 +6,7 @@ import { join } from "node:path";
 import { getPathMatch } from "next/dist/shared/lib/router/utils/path-match";
 import { prepareDestination } from "next/dist/shared/lib/router/utils/prepare-destination";
 
-import { ALTE_KATALOG_WEITERLEITUNGEN, bewertenWeiterleitung } from "@/lib/alte-adressen";
+import { ALTE_KATALOG_WEITERLEITUNGEN, bewertenWeiterleitung, bewertungHref } from "@/lib/alte-adressen";
 
 /** Spielt die Redirect-Regeln so durch, wie Next sie auswertet. */
 function weiterleiten(pfad: string, query: Record<string, string> = {}) {
@@ -70,4 +70,13 @@ test("Ziel existiert als Route, die alte Route ist weg, next.config nutzt die Re
   assert.ok(existsSync(join(wurzel, "app/[lang]/blueten/[slug]/aktionen.ts")));
   const config = readFileSync(join(wurzel, "next.config.ts"), "utf8");
   assert.match(config, /redirects\(\)\s*\{\s*return \[\.\.\.ALTE_KATALOG_WEITERLEITUNGEN, \.\.\.ALTE_KONTO_WEITERLEITUNGEN\]/);
+});
+
+test("bewertungHref: Sortenseite mit Vertreiber, sonst Produktadresse", () => {
+  assert.equal(
+    bewertungHref({ strainSlug: "420-evolution-mac", kultivarSlug: "mac-1", vertreiberId: "v 1" }, "r1"),
+    "/blueten/mac-1?vertreiber=v%201#bewertung-r1",
+  );
+  assert.equal(bewertungHref({ strainSlug: "p", kultivarSlug: "mac-1", vertreiberId: null }, "r1"), "/blueten/mac-1#bewertung-r1");
+  assert.equal(bewertungHref({ strainSlug: "p", kultivarSlug: null, vertreiberId: "v" }, "r1"), "/blueten/p#bewertung-r1");
 });

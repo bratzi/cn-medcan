@@ -1,5 +1,6 @@
 "use server";
 
+import { bewertungHref } from "@/lib/alte-adressen";
 import { revalidiereSprachen } from "@/lib/i18n/revalidiere";
 
 import { benachrichtigen, nachrichtenFuer, textKommentar, textKommentarGemeldet } from "@/lib/benachrichtigung";
@@ -76,7 +77,9 @@ export async function schreibeKommentar(
     zielOeffentlich = review.freigegeben;
     inhaberId = review.autorId ?? "";
     kultivarId = review.strain?.kultivarId ?? null;
-    link = review.strain?.slug ? `/blueten/${review.strain.slug}#bewertung-${zielId}` : null;
+    link = review.strain?.slug
+      ? bewertungHref({ strainSlug: review.strain.slug, kultivarSlug: review.kultivar?.slug, vertreiberId: review.vertreiberId }, zielId)
+      : null;
   } else {
     const m = await prisma.mitglied.findUnique({ where: { id: zielId }, select: { id: true, profilOeffentlich: true, freigegeben: true } });
     if (!m) return { ok: false, fehler: "weg" };

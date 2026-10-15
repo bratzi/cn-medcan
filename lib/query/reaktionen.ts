@@ -1,6 +1,7 @@
 import "server-only";
 
 import type { ZielArt } from "@/db/enums";
+import { bewertungHref } from "@/lib/alte-adressen";
 import { D1_HAEPPCHEN, inHaeppchen } from "@/lib/haeppchen";
 import { getPrisma } from "@/lib/prisma";
 import { aktuellesMitglied } from "@/lib/session";
@@ -92,7 +93,7 @@ export async function ladeReaktionsZahlen(mitgliedId: string): Promise<{ folgend
 }
 
 export type Gemocht = {
-  bewertungen: { id: string; slug: string; handelsname: string }[];
+  bewertungen: { id: string; href: string; handelsname: string }[];
   bluete: { id: string; name: string; slug: string | null }[];
   mitglieder: { id: string; name: string; kurzId: string }[];
 };
@@ -112,10 +113,10 @@ export async function ladeGemocht(mitgliedId: string): Promise<Gemocht> {
   const ids = (art: ZielArt) => likes.filter((l) => l.zielArt === art).map((l) => l.zielId);
   const [bewertungen, kultivare, mitglieder] = await Promise.all([
     ids("BEWERTUNG").length
-      ? prisma.review.findMany({ where: { id: { in: ids("BEWERTUNG") }, freigegeben: true, strain: { aktiv: true } }, select: { id: true, strain: { select: { slug: true, handelsname: true } } } })
+      ? prisma.review.findMany({ where: { id: { in: ids("BEWERTUNG") }, freigegeben: true, strain: { aktiv: true } }, select: { id: true, vertreiberId: true, kultivar: { select: { slug: true } }, strain: { select: { slug: true, handelsname: true } } } })
       : [],
     ids("BLUETE").length
-      ? prisma.kultivar.findMany({ where: { id: { in: ids("BLUETE") } }, select: { id: true, name: true, strains: { where: { aktiv: true }, take: 1, select: { slug: true } } } })
+      ? prisma.kultivar.findMany({ where: { id: { in: ids("BLUETE") } }, select: { id: true, name: true, slug: true, strains: { where: { aktiv: true }, take: 1, select: { slug: true } } } })
       : [],
     ids("MITGLIED").length
       ? prisma.mitglied.findMany({ where: { id: { in: ids("MITGLIED") }, profilOeffentlich: true, freigegeben: true }, select: { id: true, anzeigename: true, kurzId: true } })
@@ -126,8 +127,12 @@ export async function ladeGemocht(mitgliedId: string): Promise<Gemocht> {
     return [...zeilen].sort((a, b) => (rang.get(a.id) ?? 0) - (rang.get(b.id) ?? 0));
   };
   return {
-    bewertungen: nachLike("BEWERTUNG", bewertungen).map((r) => ({ id: r.id, slug: r.strain.slug, handelsname: r.strain.handelsname })),
-    bluete: nachLike("BLUETE", kultivare).map((k) => ({ id: k.id, name: k.name, slug: k.strains[0]?.slug ?? null })),
+    bewertungen: nachLike("BEWERTUNG", bewertungen).map((r) => ({
+      id: r.id,
+      href: bewertungHref({ strainSlug: r.strain.slug, kultivarSlug: r.kultivar?.slug, vertreiberId: r.vertreiberId }, r.id),
+      handelsname: r.strain.handelsname,
+    })),
+    bluete: nachLike("BLUETE", kultivare).map((k) => ({ id: k.id, name: k.name, slug: k.slug ?? k.strains[0]?.slug ?? null })),
     mitglieder: nachLike("MITGLIED", mitglieder).flatMap((m) => (m.kurzId ? [{ id: m.id, name: m.anzeigename, kurzId: m.kurzId }] : [])),
   };
 }

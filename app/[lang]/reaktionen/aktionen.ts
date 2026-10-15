@@ -1,6 +1,7 @@
 "use server";
 
 import type { ZielArt } from "@/db/enums";
+import { bewertungHref } from "@/lib/alte-adressen";
 import { textFolgt, textLike } from "@/lib/benachrichtigung";
 import { likeErlaubt } from "@/lib/like-regeln";
 import { getPrisma } from "@/lib/prisma";
@@ -28,13 +29,13 @@ export async function schalteLike(art: ZielArt, zielId: string): Promise<LikeErg
   const prisma = await getPrisma();
   let zielAutorId: string | null = null;
   let oeffentlich = false;
-  let strainSlug: string | null = null;
+  let bewertungLink: string | null = null;
   if (art === "BEWERTUNG") {
-    const r = await prisma.review.findUnique({ where: { id: zielId }, select: { autorId: true, freigegeben: true, strain: { select: { slug: true } } } });
+    const r = await prisma.review.findUnique({ where: { id: zielId }, select: { autorId: true, freigegeben: true, vertreiberId: true, kultivar: { select: { slug: true } }, strain: { select: { slug: true } } } });
     if (r) {
       zielAutorId = r.autorId;
       oeffentlich = r.freigegeben;
-      strainSlug = r.strain.slug;
+      bewertungLink = bewertungHref({ strainSlug: r.strain.slug, kultivarSlug: r.kultivar?.slug, vertreiberId: r.vertreiberId }, zielId);
     }
   } else if (art === "BLUETE") {
     oeffentlich = (await prisma.kultivar.findUnique({ where: { id: zielId }, select: { id: true } })) !== null;
@@ -79,9 +80,7 @@ export async function schalteLike(art: ZielArt, zielId: string): Promise<LikeErg
       ? ich.profilOeffentlich && ich.kurzId
         ? `/profil/${ich.kurzId}`
         : null
-      : strainSlug
-        ? `/blueten/${strainSlug}#bewertung-${zielId}`
-        : null;
+      : bewertungLink;
     const nachrichtArt = folgt ? "FOLGT" : "LIKE";
     // Tagesgrenze in UTC (Workers laufen in UTC).
     const heute = new Date();

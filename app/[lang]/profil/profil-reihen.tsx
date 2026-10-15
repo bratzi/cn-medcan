@@ -220,7 +220,7 @@ export async function ReiheGemocht({ id }: { id: string }) {
         {
           titel: texte.bewertungen,
           leer: texte.leerBewertungen,
-          zeilen: gemocht.bewertungen.map((b) => ({ key: b.id, text: b.handelsname, href: `/blueten/${b.slug}#bewertung-${b.id}` })),
+          zeilen: gemocht.bewertungen.map((b) => ({ key: b.id, text: b.handelsname, href: b.href })),
         },
         {
           titel: texte.bluete,

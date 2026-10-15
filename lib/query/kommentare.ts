@@ -39,7 +39,7 @@ export const KOMMENTAR_SELECT = {
 export const KOMMENTAR_KOPF = { autorId: true, zielArt: true, zielId: true, status: true } as const;
 
 /** Was beim Schreiben von einer Bewertung gebraucht wird. */
-export const REVIEW_ZIEL = { freigegeben: true, autorId: true, strain: { select: { kultivarId: true, slug: true } } } as const;
+export const REVIEW_ZIEL = { freigegeben: true, autorId: true, vertreiberId: true, kultivar: { select: { slug: true } }, strain: { select: { kultivarId: true, slug: true } } } as const;
 
 export function zuAnsicht(z: KommentarZeile, darf: boolean): KommentarAnsicht {
   return {

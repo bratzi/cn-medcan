@@ -10,6 +10,7 @@ import { ProfilSichtbarkeit } from "@/components/mitglied/ProfilSichtbarkeit";
 import { UmfrageJetzt } from "@/components/mitglied/UmfrageJetzt";
 import { Badge, buttonKlassen, textLinkKlassen } from "@/components/ui";
 import type { VorschlagStatus } from "@/db/enums";
+import { bluetenHref } from "@/lib/alte-adressen";
 import { benachrichtigungSatz } from "@/lib/benachrichtigung";
 import { formatiereDatum } from "@/lib/format";
 import { t } from "@/lib/i18n/text";
@@ -63,7 +64,7 @@ export async function ReiheMitbestimmen({ id, freigegeben }: { id: string; freig
               <li key={v.id} className="flex flex-col gap-2">
                 <span className="flex flex-wrap items-center gap-2">
                   {v.strainSlug ? (
-                    <Link prefetch={false} href={`/blueten/${v.strainSlug}`} className={`${textLinkKlassen()} wrap-break-word`}>
+                    <Link prefetch={false} href={bluetenHref(v.strainSlug, v.kultivarSlug)} className={`${textLinkKlassen()} wrap-break-word`}>
                       {v.handelsname}
                     </Link>
                   ) : (

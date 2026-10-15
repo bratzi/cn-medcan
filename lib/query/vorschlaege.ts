@@ -74,6 +74,8 @@ export type EigenerVorschlag = {
   status: VorschlagStatus;
   begruendung: string | null;
   strainSlug: string | null;
+  /** Sorten-Slug fuer den direkten Link (bluetenHref). */
+  kultivarSlug: string | null;
   erstelltAm: Date;
 };
 
@@ -90,7 +92,7 @@ export async function eigeneVorschlaege(mitgliedId: string): Promise<EigenerVors
       status: true,
       begruendung: true,
       erstelltAm: true,
-      strain: { select: { slug: true } },
+      strain: { select: { slug: true, kultivar: { select: { slug: true } } } },
     },
   });
   return zeilen.map((z) => ({
@@ -99,6 +101,7 @@ export async function eigeneVorschlaege(mitgliedId: string): Promise<EigenerVors
     status: istVorschlagStatus(z.status) ? z.status : "OFFEN",
     begruendung: z.begruendung,
     strainSlug: z.strain?.slug ?? null,
+    kultivarSlug: z.strain?.kultivar?.slug ?? null,
     erstelltAm: z.erstelltAm,
   }));
 }

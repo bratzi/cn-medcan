@@ -62,6 +62,19 @@ export function bluetenHref(produktSlug: string, kultivarSlug: string | null | u
   return `/blueten/${kultivarSlug}?ware=${encodeURIComponent(produktSlug)}`;
 }
 
+/**
+ * Direkter Link auf eine Bewertung ohne 308-Umweg: mit Sorten-Slug die Sortenseite,
+ * auf den Vertreiber gefiltert, sonst die Produktadresse.
+ */
+export function bewertungHref(
+  ziel: { strainSlug: string; kultivarSlug: string | null | undefined; vertreiberId: string | null | undefined },
+  id: string,
+): string {
+  if (!ziel.kultivarSlug) return `/blueten/${ziel.strainSlug}#bewertung-${id}`;
+  const frage = ziel.vertreiberId ? `?vertreiber=${encodeURIComponent(ziel.vertreiberId)}` : "";
+  return `/blueten/${ziel.kultivarSlug}${frage}#bewertung-${id}`;
+}
+
 /** Zusammengelegte Sorten-Dubletten: alter Sorten-Slug -> behaltener (Migration 0025). */
 export const ABGELOESTE_SORTEN: Readonly<Record<string, string>> = {
   "8-ball-kush-2": "8-ball-kush",
