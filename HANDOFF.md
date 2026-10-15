@@ -67,10 +67,9 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 - Pinnwand öffentliches Profil hell/dunkel, `/ig` Optik, Explorer hell/dunkel und Knopfgröße 44 px bei 390 px.
 - ✅ Session 65: Produktlinks gehen per `bluetenHref` direkt auf die Sortenseite (`260cd34`), `8-ball-kush-2`
   leitet 308 auf `8-ball-kush` (`ABGELOESTE_SORTEN`). Live geprüft: Umleitung, Startseiten-Links mit `?ware=`,
-  Abstimmung letzte Sektion, kein Querscroll; Optik der kleineren Abstimmung nicht per Screenshot angesehen. Abstimmung kompakt ans Seitenende (`2aff16d`). Noch mit 308:
-  „Ähnlich im Aroma“ (`AEHNLICH_SQL`, Cache `sorten_aehnlich`), `eintragHref` in MeineStimmen, Fallback in
-  BewertungsRegister, ig-feed-Fallback (Session 66 erledigt: Apotheken, konto-/profil-reihen,
-  buch-statistik, Benachrichtigungen per `bewertungHref`). Kein Link setzt `#kommentare-<id>`. Explorer zeigt bei wenig Daten < 12 Sorten. Rangliste
+  Abstimmung letzte Sektion, kein Querscroll; Optik der kleineren Abstimmung nicht per Screenshot angesehen. Abstimmung kompakt ans Seitenende (`2aff16d`). Keine 308-Links mehr bekannt (Session 66: Apotheken, konto-/profil-reihen, buch-statistik,
+  Benachrichtigungen per `bewertungHref`, MeineStimmen, „Ähnlich im Aroma“ mit `kultivarSlug`; alte
+  `sorten_aehnlich`-Zeilen erneuern sich binnen einer Woche). Kein Link setzt `#kommentare-<id>`. Explorer zeigt bei wenig Daten < 12 Sorten. Rangliste
   sortiert nach Note (vorbestehend, nur für Mitglieder hinter Gate; HWG-Frage beim Nutzer klären).
 
 ### ⇢ SESSION 63 (2026-10-15): Instagram als Produktmarke, selbständiges Posten (`2ac1a4f..b15c6ff`)

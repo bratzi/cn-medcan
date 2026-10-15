@@ -258,11 +258,13 @@ test("empfehlungenErsetzen: zweimal speichern ersetzt die Liste atomar, höchste
 test("ähnlich im Aroma (SQL): Kosinus über Rang, ohne sich selbst, nur aktive, ab Mindestähnlichkeit", () => {
   const db = new Database(":memory:");
   db.exec(`
-    CREATE TABLE strains (id TEXT PRIMARY KEY, slug TEXT, handelsname TEXT, aktiv INTEGER);
+    CREATE TABLE strains (id TEXT PRIMARY KEY, slug TEXT, handelsname TEXT, aktiv INTEGER, kultivar_id TEXT);
+    CREATE TABLE kultivare (id TEXT PRIMARY KEY, slug TEXT);
+    INSERT INTO kultivare VALUES ('kb','sorte-b');
     CREATE TABLE terpene (id TEXT PRIMARY KEY, name TEXT);
     CREATE TABLE strain_terpene (strain_id TEXT, terpen_id TEXT, rang INTEGER);
     INSERT INTO terpene VALUES ('m','Myrcen'),('l','Limonen'),('c','beta-Caryophyllen'),('h','Humulen');
-    INSERT INTO strains VALUES ('a','a','A',1),('b','b','B',1),('c','c','C',1),('d','d','D',0),('e','e','E',1);
+    INSERT INTO strains VALUES ('a','a','A',1,NULL),('b','b','B',1,'kb'),('c','c','C',1,NULL),('d','d','D',0,NULL),('e','e','E',1,NULL);
     INSERT INTO strain_terpene VALUES
       ('a','l',1),('a','m',2),
       ('b','l',1),('b','m',2),('b','c',3),
@@ -270,9 +272,10 @@ test("ähnlich im Aroma (SQL): Kosinus über Rang, ohne sich selbst, nur aktive,
       ('d','l',1),('d','m',2),
       ('e','h',1);
   `);
-  const zeilen = db.prepare(AEHNLICH_SQL).all("a", "a") as { slug: string; gemeinsam: string }[];
+  const zeilen = db.prepare(AEHNLICH_SQL).all("a", "a") as { slug: string; kultivarSlug: string | null; gemeinsam: string }[];
   // C teilt nur Myrcen auf hinterem Rang: Kosinus unter der Mindestähnlichkeit.
   assert.deepEqual(zeilen.map((z) => z.slug), ["b"]);
+  assert.equal(zeilen[0].kultivarSlug, "sorte-b");
   assert.deepEqual(zeilen[0].gemeinsam.split("|").sort(), ["Limonen", "Myrcen"]);
 });
 

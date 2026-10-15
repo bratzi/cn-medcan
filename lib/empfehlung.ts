@@ -500,9 +500,10 @@ export const AEHNLICH_SQL = `
                   * (SELECT SUM(1.0 / (c.rang * c.rang)) FROM strain_terpene c WHERE c.strain_id = tr.sid)) AS kos2
       FROM treffer tr
     )
-    SELECT s.slug AS slug, s.handelsname AS handelsname, bw.gemeinsam AS gemeinsam
+    SELECT s.slug AS slug, k.slug AS kultivarSlug, s.handelsname AS handelsname, bw.gemeinsam AS gemeinsam
     FROM bewertet bw
     JOIN strains s ON s.id = bw.sid AND s.aktiv = 1
+    LEFT JOIN kultivare k ON k.id = s.kultivar_id
     WHERE bw.kos2 >= ${AEHNLICH_MIN_KOSINUS * AEHNLICH_MIN_KOSINUS}
     ORDER BY bw.kos2 DESC, s.handelsname
     LIMIT 6`;

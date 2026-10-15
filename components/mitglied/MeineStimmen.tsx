@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 import { Bild } from "@/components/medien/Bild";
-import { eintragHref } from "@/components/review/eintrag";
+import { eintragAnker } from "@/components/review/eintrag";
 import { Badge, textLinkKlassen } from "@/components/ui";
 import { bluetenHref } from "@/lib/alte-adressen";
 import { ersatzBildId } from "@/lib/bewertungsbilder";
@@ -49,7 +49,7 @@ export function MeineStimmen({ stimmen, texte, sprache }: { stimmen: readonly St
               <p className="text-small text-text-muted wrap-break-word">{s.rundentitel}</p>
               <p className="text-caption text-text-muted numeric">{t(texte.gestimmtAm, { datum: formatiereDatum(s.abgegebenAm, sprache) })}</p>
               {ausgang === "gewonnen" && s.ergebnisReviewId ? (
-                <Link prefetch={false} href={eintragHref(s.slug, s.ergebnisReviewId)} className={textLinkKlassen()}>
+                <Link prefetch={false} href={`${bluetenHref(s.slug, s.kultivarSlug)}#${eintragAnker(s.ergebnisReviewId)}`} className={textLinkKlassen()}>
                   {texte.zurBewertung}
                 </Link>
               ) : null}

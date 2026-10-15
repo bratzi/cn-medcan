@@ -47,7 +47,8 @@ export async function ladeEmpfehlungen(mitgliedId: string): Promise<Gespeicherte
   }));
 }
 
-export type AehnlicheSorte = { slug: string; handelsname: string; gemeinsam: string[] };
+/** kultivarSlug fehlt in Cache-Zeilen von vor Session 66; sie erneuern sich nach einer Woche. */
+export type AehnlicheSorte = { slug: string; kultivarSlug?: string | null; handelsname: string; gemeinsam: string[] };
 
 function aehnlicheAus(roh: string): AehnlicheSorte[] {
   try {
@@ -73,13 +74,14 @@ export async function aehnlichImAroma(strainId: string): Promise<AehnlicheSorte[
   const jetzt = Date.now();
   if (gespeichert && !aehnlichVeraltet(gespeichert.berechnetAm.getTime(), jetzt)) return aehnlicheAus(gespeichert.liste);
 
-  const zeilen = await prisma.$queryRawUnsafe<{ slug: string; handelsname: string; gemeinsam: string | null }[]>(
+  const zeilen = await prisma.$queryRawUnsafe<{ slug: string; kultivarSlug: string | null; handelsname: string; gemeinsam: string | null }[]>(
     AEHNLICH_SQL,
     strainId,
     strainId,
   );
   const liste: AehnlicheSorte[] = zeilen.map((z) => ({
     slug: z.slug,
+    kultivarSlug: z.kultivarSlug,
     handelsname: z.handelsname,
     gemeinsam: (z.gemeinsam ?? "").split("|").filter(Boolean),
   }));

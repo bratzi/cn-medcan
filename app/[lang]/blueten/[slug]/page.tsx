@@ -581,6 +581,7 @@ async function SorteInhalt({ slug, suche, w, sprache }: { slug: string; suche: S
             className="mt-8"
             eintraege={aehnliche.map((a) => ({
               slug: a.slug,
+              kultivarSlug: a.kultivarSlug,
               handelsname: a.handelsname,
               // Gemeinsame Terpene in der Rangfolge dieser Sorte, höchstens drei.
               begruendung: t(w.empfehlung.gemeinsam, {
