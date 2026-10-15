@@ -56,6 +56,8 @@ model Unternehmen {
   vertrieben  Strain[] @relation("Vertreiber")
 
   vertreiberKennwerte VertreiberKennwerte?
+  reviews             Review[]                      @relation("ReviewVertreiber")
+  kultivarKennwerte   KultivarVertreiberKennwerte[]
 
   erstelltAm DateTime @default(now()) @map("erstellt_am")
 
@@ -245,6 +247,13 @@ model Review {
   chargeId String? @map("charge_id")
   charge   Charge? @relation(fields: [chargeId], references: [id], onDelete: SetNull)
 
+  kultivarId   String?      @map("kultivar_id")
+  kultivar     Kultivar?    @relation(fields: [kultivarId], references: [id], onDelete: SetNull)
+  vertreiberId String?      @map("vertreiber_id")
+  vertreiber   Unternehmen? @relation("ReviewVertreiber", fields: [vertreiberId], references: [id], onDelete: SetNull)
+  /// 1 = Produkt (Stärke) bekannt; 0 = nur Vertreiber gewählt, strainId ist dann Platzhalter (Spec 2026-10-15).
+  wareGenau    Boolean      @default(true) @map("ware_genau")
+
   /// Autor der Bewertung.
   ///
   /// Bewusst optional: die fiktiven Bewertungen aus dem Seed haben kein
@@ -309,6 +318,7 @@ model Review {
   @@index([chargeId])
   @@index([autorId])
   @@unique([autorId, strainId])
+  @@index([autorId, kultivarId, vertreiberId])
   @@index([istRedaktionell, erstelltAm])
   @@map("reviews")
 }
@@ -788,11 +798,14 @@ model SortenAehnlich {
 model Kultivar {
   id         String   @id @default(uuid())
   name       String   @unique
+  slug       String?  @unique
   erstelltAm DateTime @default(now()) @map("erstellt_am")
 
-  strains     Strain[]
-  vorschlaege SortenVorschlag[]
-  kennwerte   KultivarKennwerte?
+  strains             Strain[]
+  vorschlaege         SortenVorschlag[]
+  kennwerte           KultivarKennwerte?
+  reviews             Review[]
+  vertreiberKennwerte KultivarVertreiberKennwerte[]
 
   @@map("kultivare")
 }
@@ -809,6 +822,20 @@ model KultivarKennwerte {
   aktualisiertAm   DateTime @updatedAt @map("aktualisiert_am")
 
   @@map("kultivar_kennwerte")
+}
+
+/// Note je Sorte und Vertreiber, beim Speichern fortgeschrieben (Spec 2026-10-15).
+model KultivarVertreiberKennwerte {
+  kultivarId       String      @map("kultivar_id")
+  vertreiberId     String      @map("vertreiber_id")
+  kultivar         Kultivar    @relation(fields: [kultivarId], references: [id], onDelete: Cascade)
+  vertreiber       Unternehmen @relation(fields: [vertreiberId], references: [id], onDelete: Cascade)
+  anzahl           Int
+  gesamtnoteMittel Float?      @map("gesamtnote_mittel")
+  aktualisiertAm   DateTime    @updatedAt @map("aktualisiert_am")
+
+  @@id([kultivarId, vertreiberId])
+  @@map("kultivar_vertreiber_kennwerte")
 }
 
 /// Chargenqualität je Vertreiber über alle seine Handelsnamen; beim Speichern fortgeschrieben.
