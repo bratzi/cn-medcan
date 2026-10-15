@@ -96,22 +96,30 @@ async function publora<T>(pfad: string, body?: unknown): Promise<T> {
   return daten;
 }
 
-/** Entwurf ohne Termin mit einem Bild; dateiname ist zugleich die Marke. */
-export async function entwurf(caption: string, png: string, dateiname: string): Promise<string> {
+type Medium = { pfad: string; name: string; typ: "image/png" | "video/mp4" };
+
+/** Entwurf ohne Termin mit einem oder mehreren Medien (Karussell, Reel); Dateinamen tragen die Marke. */
+export async function entwurfMedien(caption: string, medien: Medium[]): Promise<string> {
   const plattform = pflicht(umgebung(), "INSTAGRAM_PLATFORM_ID");
   const { postGroupId } = await publora<{ postGroupId: string }>("create-post", { content: caption, platforms: [plattform] });
-  const { uploadUrl, mediaId } = await publora<{ uploadUrl: string; mediaId: string }>("get-upload-url", {
-    fileName: dateiname,
-    contentType: "image/png",
-    type: "image",
-    postGroupId,
-  });
-  const hoch = await fetch(uploadUrl, { method: "PUT", headers: { "Content-Type": "image/png" }, body: readFileSync(png) });
-  if (!hoch.ok) throw new Error(`Bild-Upload: ${hoch.status}`);
-  // Ohne diesen Schritt bleibt das Bild in Publora auf „uploading“ (Live 2026-10-14).
-  const { mediaFile } = await publora<{ mediaFile?: { status?: string } }>(`complete-media/${mediaId}`, {});
-  if (mediaFile?.status !== "ready") throw new Error(`Bild nicht bereit: ${mediaFile?.status ?? "unbekannt"} (Entwurf ${postGroupId})`);
+  for (const m of medien) {
+    const { uploadUrl, mediaId } = await publora<{ uploadUrl: string; mediaId: string }>("get-upload-url", {
+      fileName: m.name,
+      contentType: m.typ,
+      type: m.typ === "video/mp4" ? "video" : "image",
+      postGroupId,
+    });
+    const hoch = await fetch(uploadUrl, { method: "PUT", headers: { "Content-Type": m.typ }, body: readFileSync(m.pfad) });
+    if (!hoch.ok) throw new Error(`Upload ${m.name}: ${hoch.status}`);
+    // Ohne diesen Schritt bleibt das Medium in Publora auf „uploading“ (Live 2026-10-14).
+    const { mediaFile } = await publora<{ mediaFile?: { status?: string } }>(`complete-media/${mediaId}`, {});
+    if (mediaFile?.status !== "ready") throw new Error(`${m.name} nicht bereit: ${mediaFile?.status ?? "unbekannt"} (Entwurf ${postGroupId})`);
+  }
   return postGroupId;
+}
+
+export async function entwurf(caption: string, png: string, dateiname: string): Promise<string> {
+  return entwurfMedien(caption, [{ pfad: png, name: dateiname, typ: "image/png" }]);
 }
 
 /** Alle Posts aus list-posts, Seite für Seite (Publora liefert 20 je Seite). */
@@ -140,8 +148,8 @@ export function markenAus(posts: unknown[]): Set<string> {
     const urls = (post as { mediaUrls?: unknown } | null)?.mediaUrls;
     if (!Array.isArray(urls)) continue;
     for (const url of urls) {
-      const name = typeof url === "string" ? /\/\d+-([^/]+)\.png$/i.exec(url)?.[1] : undefined;
-      if (name) marken.add(name);
+      const name = typeof url === "string" ? /\/\d+-([^/]+)\.(png|mp4)$/i.exec(url)?.[1] : undefined;
+      if (name) marken.add(name.startsWith("bot-k-") ? name.replace(/-\d+$/, "") : name);
     }
   }
   return marken;

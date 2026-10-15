@@ -34,3 +34,12 @@ test("Themen-Marken: Themenkarte und Karussell zählen, Bewertungen nicht", () =
   assert.equal(istThemenMarke("bot-k-wissen-myrcen"), true);
   assert.equal(istThemenMarke("f7932866-c769"), false);
 });
+
+test("markenAus: Karussell-Slides ergeben eine Marke, Videos zählen mit", () => {
+  const posts = [
+    { mediaUrls: ["https://c.dev/images/171-bot-k-wissen-terpene-1.png", "https://c.dev/images/171-bot-k-wissen-terpene-2.png"] },
+    { mediaUrls: ["https://c.dev/videos/172-bot-reel-schema.mp4"] },
+    { mediaUrls: ["https://c.dev/images/173-abc123.png"] },
+  ];
+  assert.deepEqual([...markenAus(posts)].sort(), ["abc123", "bot-k-wissen-terpene", "bot-reel-schema"]);
+});
