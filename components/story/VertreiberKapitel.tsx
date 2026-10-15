@@ -2,24 +2,24 @@ import { unstable_rethrow } from "next/navigation";
 import { Suspense } from "react";
 
 import { Schlagwort } from "@/components/story/Schlagwort";
+import { SortenExplorer } from "@/components/story/SortenExplorer";
 import { SKELETT_FLAECHE, SkelettAnsage } from "@/components/story/Skelette";
-import { VertreiberBeispielKarte } from "@/components/story/VertreiberBeispielKarte";
 import { holeSprache, holeWoerterbuch } from "@/lib/i18n";
-import { ladeVertreiberBeispiel, type VertreiberBeispiel } from "@/lib/query/vertreiber-beispiel";
+import { ladeSortenExplorer, type ExplorerSorte } from "@/lib/query/sorten-explorer";
 
-/** Lädt das Beispiel; leer und Fehler zeigen nur Kopf und Absatz (Spec Abschnitt 1). */
-async function Beispiel() {
+/** Lädt die Sorten statisch mit der Startseite; leer und Fehler zeigen nur Kopf und Absatz (Spec 2026-10-15 Abschnitt 4). */
+async function Explorer() {
   const [w, sprache] = await Promise.all([holeWoerterbuch(), holeSprache()]);
-  let beispiel: VertreiberBeispiel | null;
+  let sorten: ExplorerSorte[];
   try {
-    beispiel = await ladeVertreiberBeispiel();
+    sorten = await ladeSortenExplorer();
   } catch (fehler) {
     unstable_rethrow(fehler);
-    console.error("ladeVertreiberBeispiel fehlgeschlagen", fehler);
+    console.error("ladeSortenExplorer fehlgeschlagen", fehler);
     return null;
   }
-  if (!beispiel) return null;
-  return <VertreiberBeispielKarte beispiel={beispiel} texte={w.start.vertreiber} sprache={sprache} />;
+  if (sorten.length === 0) return null;
+  return <SortenExplorer sorten={sorten} texte={w.start.vertreiber} typen={w.label.kultivarTyp} sprache={sprache} />;
 }
 
 /** Nach TransparentMachen: wofür die Beschaffenheit zählt (Spec 2026-10-13 Vertreiber sichtbar). */
@@ -48,7 +48,7 @@ export async function VertreiberKapitel() {
             </div>
           }
         >
-          <Beispiel />
+          <Explorer />
         </Suspense>
       </div>
     </section>
