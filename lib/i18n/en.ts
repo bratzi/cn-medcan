@@ -390,7 +390,7 @@ export const en: Woerterbuch = {
     karte: {
       symbolbild: "Illustrative image",
       vertreiberUnbekannt: "Distributor unknown",
-      weitereVertreiber: { one: "also from {anzahl} other distributor", other: "also from {anzahl} other distributors" },
+      weitereVertreiber: { one: "also from one other distributor", other: "also from {anzahl} other distributors" },
       keinTerpenprofil: "No terpene profile on record.",
       dominant: "dominant",
     },
