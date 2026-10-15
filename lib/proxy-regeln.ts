@@ -10,8 +10,9 @@ import type { Sprache } from "@/lib/i18n/sprache-kern";
  * Ohne Passwort erreichbar: die Login-Seite samt Route, Impressum und
  * Datenschutz (§ 5 DDG, Art. 13 DSGVO) und der Sprachwechsel, der auch auf
  * diesen Seiten funktionieren muss.
+ * /ig: Landingpage aus der Instagram-Bio, muss ohne Passwort erreichbar sein (Spec 2026-10-15).
  */
-const OHNE_GATE = ["/zugang", "/impressum", "/datenschutz", "/api/zugang", "/api/sprache"] as const;
+const OHNE_GATE = ["/zugang", "/impressum", "/datenschutz", "/api/zugang", "/api/sprache", "/ig"] as const;
 
 export function istOhneGate(pfad: string): boolean {
   return OHNE_GATE.some((frei) => pfad === frei || pfad.startsWith(`${frei}/`));

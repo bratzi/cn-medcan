@@ -27,6 +27,15 @@ test("Alles andere liegt hinter dem Passwort, auch API, interne Pfade und Scanne
   for (const pfad of geschuetzt) assert.equal(istOhneGate(pfad), false, pfad);
 });
 
+test("Landingpage /ig aus der Instagram-Bio: ohne Passwort, Nachbarn bleiben gesperrt", () => {
+  assert.equal(istOhneGate("/ig"), true);
+  // /de/ig gibt es nur intern nach dem Rewrite; der Proxy prüft den sichtbaren Pfad.
+  assert.equal(istOhneGate(ohneSprachPraefix("/de/ig")), true);
+  for (const pfad of ["/ig-irgendwas", "/ig-feed", "/igel", "/reviews", "/api/ig-feed"]) {
+    assert.equal(istOhneGate(pfad), false, pfad);
+  }
+});
+
 test("API-Pfade: nur /api und darunter", () => {
   assert.equal(istApiPfad("/api"), true);
   assert.equal(istApiPfad("/api/startseite"), true);
