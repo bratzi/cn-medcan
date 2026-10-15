@@ -3,7 +3,7 @@
 > Übergabemedium zwischen Sessions. Wird nach jedem Arbeitsblock aktualisiert und committet.
 > Wer hier weiterarbeitet, liest diese Datei zuerst und braucht den Chatverlauf nicht.
 
-**Letzte Aktualisierung:** 2026-10-15 (Session 62)
+**Letzte Aktualisierung:** 2026-10-16 (Session 66)
 **Repo:** https://github.com/bratzi/cn-medcan (public)
 **Branch:** `main` (Makeover „Grünes Buch“ Teilprojekt 1 ist seit 2026-09-24 auf `main`)
 
@@ -27,6 +27,28 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 ---
 
 ## ⇢ Hier geht es weiter
+
+### ⇢ SESSION 66 (2026-10-16): Links, Score, Budpics, Explorer-Bild, IG neu eingetaktet
+
+**ALS ERSTES**
+1. Admin-Dashboard (Nutzerwunsch, noch nicht begonnen): Admin direkt im Profil erreichbar machen, Admin-Menü
+   ausbauen und übersichtlich wie ein professionelles Dashboard, Publora-Feed mit Kalender (wann welcher Post) und
+   Benachrichtigungen. Mit Brainstorming und Design-Skills starten.
+2. Instagram-Profil von Hand ändern: Link entfernen, Bio-Zeile 3 „Vorabzugang und Testnutzer: schreib uns per DM.“
+   (docs/instagram/profil.md). Manifest (veröffentlicht) zeigt noch „Link in Bio“.
+3. Am 16.10 nach 17:00 UTC prüfen, ob „So bewerten wir“ (neu, Publora `6ad162ad58d8b1502d3ddf4d`) erschien.
+
+**Erledigt**
+- Links: keine 308-Umwege mehr (Apotheken, Profil, Statistik, Benachrichtigungen per `bewertungHref`, MeineStimmen,
+  „Ähnlich im Aroma“ mit `kultivarSlug`).
+- Fazit heißt Score: Community-Score, Terpz-Score (Betreiber), Vertreiber/Chargen-Score.
+- Katalog-Blüten-Ansicht zeigt wieder Budpics/Musterbild (`ladeFreieBudpicsJeKultivar`), Diashow `einpassen`.
+- Startseite: Sorten-Explorer zeigt die Blüte links unter dem Text, Auftritt 600 ms (`.sorten-bild-rein`).
+- IG: Slides/Reel-Szenen brauchen `grafik` (Blätter oder Icons, `lib/ig-grafik.tsx`); „Link in Bio“ ersetzt durch
+  `IG_CTA` „Vorabzugang per DM“; Nutzer bewerten, Chargen nicht im Fokus. Publora neu: So bewerten wir 16.10 17:00
+  (geplant), Reel so-bewerten-wir 21.10 17:00 + Story, Entwürfe mach-mit, terpz-loverz (neu, Testnutzer-Aufruf),
+  Reel aroma-karte + Story (Entwurf, ab ~21.10 für 28.10 planen).
+- Nicht live geprüft: Katalog-Bilder, Explorer-Animation, Score-Texte.
 
 ### ⇢ SESSION 64 (2026-10-15): Sorte im Fokus live, 1102-Fix, Story-Mitposten, Publora-MCP (`aef5009..HEAD`)
 

@@ -23,7 +23,7 @@ export function igCaption(r: IgReview): string {
   ].filter(Boolean);
   const tags = [...GRUND_TAGS, ...r.aromen.slice(0, 2).map((a) => `#${a.toLowerCase()}`)];
   const titel = r.vertreiber ? `${r.bluete} von ${r.vertreiber}` : r.bluete;
-  const absaetze = [fakten.join(" "), zitat ? `„${zitat}“` : "", "Ganze Bewertung: Link in Bio", tags.join(" ")];
+  const absaetze = [fakten.join(" "), zitat ? `„${zitat}“` : "", `Vorabzugang zum Portal: schreib uns per DM`, tags.join(" ")];
   return `${titel}\n${absaetze.filter(Boolean).join("\n\n")}`;
 }
 
@@ -43,6 +43,8 @@ export function igCaptionPruefen(caption: string): string[] {
   const tags = caption.match(HASHTAG) ?? [];
   if (tags.length < 3 || tags.length > 5) fehler.push(`Hashtags: ${tags.length} statt 3 bis 5`);
   if (caption.length > 2200) fehler.push("länger als 2200 Zeichen");
+  // Es gibt keinen Link in der Bio (Nutzer 2026-10-16): Vorabzugang per DM.
+  if (/link in (der )?bio/i.test(ohneTags)) fehler.push("„Link in Bio“: es gibt keinen Link, Vorabzugang per DM");
   // Handwerk (docs/instagram/handwerk.md, aus den ig-*-Skills): Hook vor dem „mehr“-Falz, keine Köder, wenig Striche.
   const hook = caption.split("\n")[0] ?? "";
   if (hook.length > 125) fehler.push(`Hook (erste Zeile) ${hook.length} statt höchstens 125 Zeichen`);

@@ -6,10 +6,10 @@ const r: IgReel = {
   saeule: "transparenz",
   schluessel: "so-bewerten-wir",
   szenen: [
-    { kicker: "So bewerten wir", titel: "Fünf Noten", sekunden: 4 },
-    { titel: "Aussehen & Geruch", text: "Jede Charge gleich geprüft.", sekunden: 5 },
-    { titel: "An der Charge", sekunden: 5 },
-    { titel: "Link in Bio", sekunden: 4 },
+    { kicker: "So bewerten wir", titel: "Fünf Noten", blaetter: 4, sekunden: 4 },
+    { titel: "Aussehen & Geruch", text: "Jede Sorte gleich geprüft.", icons: ["aussehen", "geruch"], sekunden: 5 },
+    { titel: "Geschmack", icons: ["geschmack"], sekunden: 5 },
+    { titel: "Vorabzugang per DM", icons: ["community"], sekunden: 4 },
   ],
 };
 
@@ -31,4 +31,11 @@ test("schluessel geprüft", () => {
 test("höchstens fünf Icons je Szene", () => {
   const icons = ["a", "b", "c", "d", "e", "f"];
   assert.ok(reelPruefen({ ...r, szenen: [{ ...r.szenen[0], icons }, ...r.szenen.slice(1)] }).some((f) => f.includes("Icons")));
+});
+
+test("jede Szene braucht Icons oder Blätter, kein Link in der Bio", () => {
+  const ohne = { ...r, szenen: [{ titel: "Leer", sekunden: 4 }, ...r.szenen.slice(1)] };
+  assert.ok(reelPruefen(ohne).some((f) => f.includes("Icons oder Blätter")));
+  const bio = { ...r, szenen: [{ ...r.szenen[0], titel: "Link in Bio" }, ...r.szenen.slice(1)] };
+  assert.ok(reelPruefen(bio).some((f) => f.includes("Link in der Bio")));
 });

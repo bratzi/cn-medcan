@@ -6,29 +6,34 @@
       {
         "typ": "cover",
         "kicker": "Mach mit",
-        "titel": "Sorten gemeinsam nach vorn bringen"
+        "titel": "Sorten gemeinsam nach vorn bringen",
+        "grafik": { "art": "icons", "namen": ["community"] }
       },
       {
         "typ": "inhalt",
         "titel": "Events statt Pflicht",
-        "text": "Ab und zu laden wir zu Events ein. Wer mag, macht mit. Wer nicht, liest einfach weiter."
+        "text": "Ab und zu laden wir zu Events ein. Wer mag, macht mit. Wer nicht, liest einfach weiter.",
+        "grafik": { "art": "icons", "namen": ["abstimmen"] }
       },
       {
         "typ": "inhalt",
         "titel": "Vorschlagen und pushen",
-        "text": "Mitglieder schlagen Sorten vor und bringen gemeinsam die nach vorn, die sie spannend finden."
+        "text": "Mitglieder schlagen Sorten vor und bringen gemeinsam die nach vorn, die sie spannend finden.",
+        "grafik": { "art": "icons", "namen": ["blatt", "community"] }
       },
       {
         "typ": "inhalt",
         "titel": "Zusammen bewerten",
-        "text": "Am Ende bewerten wir gemeinsam. So entsteht mehr Wissen über eine Sorte, als einer allein sammelt."
+        "text": "Am Ende bewerten alle mit, nach demselben Schema. So wissen wir mehr über eine Blüte als einer allein.",
+        "grafik": { "art": "icons", "namen": ["aussehen", "geruch", "geschmack", "konsistenz"] }
       },
       {
         "typ": "cta",
         "titel": "Werde Mitglied",
-        "text": "Freiwillig mitmachen, Sorten pushen, gemeinsam mehr wissen."
+        "text": "Freiwillig mitmachen, Sorten pushen, gemeinsam mehr wissen.",
+        "grafik": { "art": "icons", "namen": ["buch"] }
       }
     ]
   },
-  "caption": "Eine Sorte gemeinsam nach vorn bringen? Bei unseren Events geht das, ganz freiwillig.\n\nMitglieder schlagen Sorten vor, pushen ihre Favoriten und bewerten am Ende zusammen. Wer nur mitlesen will, liest einfach mit.\n\nLink in Bio\n\n#bookofterpz #community #sortenbewertung #medizinalcannabis"
+  "caption": "Eine Sorte gemeinsam nach vorn bringen? Bei unseren Events geht das, ganz freiwillig.\n\nMitglieder schlagen Sorten vor, pushen ihre Favoriten und bewerten am Ende zusammen. Wer nur mitlesen will, liest einfach mit.\n\nLust auf Vorabzugang? Schreib uns per DM.\n\n#bookofterpz #community #sortenbewertung #medizinalcannabis"
 }

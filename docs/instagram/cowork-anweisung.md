@@ -41,7 +41,7 @@ veröffentlichst nie selbst. Jeder Post bleibt ein **Entwurf in Publora**, bis d
 ## Caption-Regeln
 
 - Deutsch, zwei bis vier Sätze. Erzähle von Aroma, Aussehen, Charge und Note, gern im Ton der Notiz.
-- Danach eine Zeile „Ganze Bewertung: Link in Bio“.
+- Danach eine Zeile „Vorabzugang zum Portal: schreib uns per DM“.
 - Fünf bis zehn Hashtags, zum Beispiel `#bookofterpz #medizinalcannabis #terpene #sortenbewertung` plus Aromen.
 - **Verboten (Heilmittelwerbegesetz):** jede Aussage zur Wirkung, Linderung, Krankheiten oder Beschwerden,
   Dosierung, Wörter wie „hilft“, „gegen“, „bei Schmerzen“, „bei Schlafproblemen“, „beruhigt“, „entspannt“,

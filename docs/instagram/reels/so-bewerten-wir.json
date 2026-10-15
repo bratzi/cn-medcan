@@ -3,33 +3,10 @@
   "schluessel": "so-bewerten-wir",
   "farbe": "#3fbf94",
   "szenen": [
-    {
-      "kicker": "So bewerten wir",
-      "titel": "Fünf Noten statt Sternchen",
-      "sekunden": 4
-    },
-    {
-      "kicker": "Aussehen & Geruch",
-      "titel": "Was du siehst und riechst",
-      "text": "Jede Sorte nach demselben Schema.",
-      "sekunden": 5
-    },
-    {
-      "kicker": "Geschmack",
-      "titel": "Ehrlich notiert",
-      "text": "Eine Person, ein festes Schema.",
-      "sekunden": 5
-    },
-    {
-      "kicker": "Gesamtnote",
-      "titel": "In Blättern von 1 bis 5",
-      "text": "Alle Noten stehen offen da.",
-      "sekunden": 5
-    },
-    {
-      "kicker": "Mitmachen",
-      "titel": "Das Schema im Portal",
-      "sekunden": 4
-    }
+    { "kicker": "So bewerten wir", "titel": "Was heißt 4 von 5 Blättern?", "blaetter": 4, "sekunden": 4 },
+    { "kicker": "Aussehen & Geruch", "titel": "Was du siehst und riechst", "text": "Jedes Mitglied bewertet nach demselben Schema.", "icons": ["aussehen", "geruch"], "sekunden": 5 },
+    { "kicker": "Geschmack & Konsistenz", "titel": "Was du schmeckst und fühlst", "text": "Vier Merkmale, für jede Sorte gleich.", "icons": ["geschmack", "konsistenz"], "sekunden": 5 },
+    { "kicker": "Gesamtnote", "titel": "1 bis 5 Blätter", "text": "Je mehr Blätter, desto besser gefällt uns die Blüte.", "blaetter": 5, "sekunden": 5 },
+    { "kicker": "Mitmachen", "titel": "Bewerte selbst mit", "icons": ["community"], "sekunden": 4 }
   ]
 }

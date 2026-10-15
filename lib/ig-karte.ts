@@ -15,6 +15,12 @@ const ZITAT_MAX = 140;
  * Rausch, Konsum oder Beschwerden klingt, nimmt das Zitat ganz heraus (Live-Probe 2026-10-14: „ballert“)
  * und sperrt Captions des Themen-Agenten (`igCaptionPruefen`).
  */
+/**
+ * Abschluss aller IG-Medien (Nutzer 2026-10-16): es gibt keinen Link in der Bio; Interessenten
+ * schreiben per DM und bekommen Vorabzugang.
+ */
+export const IG_CTA = "Vorabzugang per DM";
+
 export const IG_SPERRE =
   /ballert|knallt|bal+ern|\bhigh\b|stoned|breit\b|wirk|rausch|rauch|kiff|dröhn|entspann|beruhig|schlaf|schmerz|angst|\bdaily\b|dosis|dosier|\bthc\b|\bcbd\b|hilft|lindert|gegen\s+(stress|schmerz|angst|übelkeit)|stimmungs|euphor|therap|heil/i;
 
@@ -72,6 +78,6 @@ blockquote{margin:0;padding:32px 0 0;border-top:4px solid #3fbf94;max-width:800p
 </style></head><body><main class="karte">
 ${logoHtml(ursprung)}
 <h1>${maske(r.bluete)}</h1>${zeilen}
-<p class="fuss">Bewertung im Book of Terpz · Link in Bio</p>
+<p class="fuss">Bewertung im Book of Terpz · ${IG_CTA}</p>
 </main></body></html>`;
 }

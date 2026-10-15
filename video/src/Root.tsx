@@ -15,7 +15,7 @@ const beispiel: ErklaerReelProps = {
   szenen: [
     { kicker: "So bewerten wir", titel: "Fünf Noten", sekunden: 4 },
     { titel: "Alle Noten offen", text: "Jede Sorte gleich geprüft.", sekunden: 5 },
-    { titel: "Link in Bio", sekunden: 4 },
+    { titel: "Vorabzugang per DM", sekunden: 4 },
   ],
 };
 

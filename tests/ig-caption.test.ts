@@ -12,7 +12,7 @@ test("Caption enthält Kerndaten, Link-Hinweis und Hashtags aus den Aromen", () 
   assert.ok(c.includes("Zitrus, Süß"));
   assert.ok(c.includes("Charge C1"));
   assert.ok(c.includes("„Zitrus vorne“"));
-  assert.ok(c.includes("Ganze Bewertung: Link in Bio"));
+  assert.ok(c.includes("Vorabzugang zum Portal: schreib uns per DM"));
   assert.ok(c.includes("#bookofterpz") && c.includes("#zitrus") && c.includes("#suess"));
 });
 
@@ -28,7 +28,7 @@ test("Notiz mit Wirkversprechen erscheint nicht", () => {
 });
 
 test("Caption-Prüfung: gültig ergibt leere Liste", () => {
-  const c = "Limonen riecht nach frischer Zitronenschale.\n\nWelches Terpen kommt als Nächstes? Link in Bio\n\n#bookofterpz #terpene #limonen";
+  const c = "Limonen riecht nach frischer Zitronenschale.\n\nWelches Terpen kommt als Nächstes?\n\n#bookofterpz #terpene #limonen";
   assert.deepEqual(igCaptionPruefen(c), []);
 });
 
@@ -46,7 +46,7 @@ test("Bewertungs-Caption hat höchstens 5 Hashtags", () => {
 });
 
 test("Handwerk: Hook in der ersten Zeile höchstens 125 Zeichen", () => {
-  const f = igCaptionPruefen(`${"Duft ".repeat(30)}\n\nLink in Bio\n\n#a #b #c`);
+  const f = igCaptionPruefen(`${"Duft ".repeat(30)}\n\nSchreib uns per DM\n\n#a #b #c`);
   assert.ok(f.some((x) => x.includes("125")));
 });
 

@@ -191,6 +191,11 @@ export function GeschmackIcon({ geschmack, className }: { geschmack: GeschmacksK
   return <Rahmen className={className}>{GESCHMACK[geschmack]}</Rahmen>;
 }
 
+/** Kennt die Zeichnung diesen Terpen-Namen? (IG-Slides wählen nur bekannte Icons.) */
+export function hatTerpenIcon(name: string): boolean {
+  return name.trim().toLowerCase() in TERPEN;
+}
+
 export function TerpenIcon({ name, className }: { name: string; className?: string }) {
   return <Rahmen className={className}>{TERPEN[name.trim().toLowerCase()] ?? RING}</Rahmen>;
 }

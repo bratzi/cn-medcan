@@ -1,4 +1,4 @@
-import { KARTEN_STIL, logoHtml, maske } from "@/lib/ig-karte";
+import { IG_CTA, KARTEN_STIL, logoHtml, maske } from "@/lib/ig-karte";
 
 /** Themen-Post für Instagram (Spec 2026-10-14 Themen-Agent): gleicher Stil wie die Bewertungskarte. */
 export type IgThema = {
@@ -29,6 +29,6 @@ li::before{content:"";display:block;width:48px;height:4px;margin:0 auto 12px;bac
 </style></head><body><main class="karte">
 ${logoHtml(ursprung)}
 <p class="kicker">${maske(t.kicker)}</p><h1>${maske(t.titel)}</h1><p class="text">${maske(t.text)}</p>${punkte}
-<p class="fuss">Book of Terpz · Link in Bio</p>
+<p class="fuss">Book of Terpz · ${IG_CTA}</p>
 </main></body></html>`;
 }

@@ -30,7 +30,7 @@ Vorkommen in Pflanzen ist Allgemeinwissen der Aromachemie und frei von Wirkaussa
 
 ## Features der Website (`art: "feature"`)
 
-Fakten aus dem Code und `docs/brand/gruenes-buch.md`. Pfad nennen, damit Leser es finden („Link in Bio“).
+Fakten aus dem Code und `docs/brand/gruenes-buch.md`. Pfad nennen, damit Leser es finden (Vorabzugang per DM).
 
 | schluessel | Feature | Kern |
 |---|---|---|

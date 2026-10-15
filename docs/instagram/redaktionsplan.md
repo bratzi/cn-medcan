@@ -28,14 +28,14 @@ Die ausführlichen Regeln (Hook, Humanizer, Hashtags nach Größe, Checkliste) s
 2. **Slide 2:** die wichtigste Aussage. Wer nur zwei Slides sieht, hat das Entscheidende (Serial Position: Anfang
    bleibt haften).
 3. **Inhaltsslides:** je ein Gedanke, Titel höchstens 60 Zeichen, Text höchstens 220, höchstens 4 Punkte à 60.
-4. **CTA zuletzt:** genau eine Handlung, etwa „Mitglied werden“. Der CTA-Text selbst enthält kein „Link in Bio“, das steht fest auf der Slide (karussellPruefen lehnt es ab). Der letzte Eindruck bleibt (Peak-End).
+4. **CTA zuletzt:** genau eine Handlung, etwa „Mitglied werden“. „Vorabzugang per DM“ steht fest auf der Slide; es gibt keinen Link in der Bio. Der letzte Eindruck bleibt (Peak-End).
    Keine zweite Bitte daneben.
 
 ## Caption-Regeln
 
 - Erste Zeile ist der Hook, unter 125 Zeichen, damit sie vor „mehr“ sichtbar ist.
 - 2 bis 4 kurze Absätze, je 1 bis 2 Sätze, Leerzeile dazwischen. Deutsch, du-Form, ruhig und sachkundig.
-- Schluss mit einer Frage an die Community oder „Link in Bio“.
+- Schluss mit einer Frage an die Community oder „Vorabzugang per DM“.
 - 3 bis 5 Hashtags: `#bookofterpz #medizinalcannabis #terpene` plus 0 bis 2 thematische.
 - Kein KI-Ton: keine Gedankenstriche als Stilmittel, höchstens 1 Emoji, keine Floskeln („Tauche ein“, „Entdecke die Welt“).
 

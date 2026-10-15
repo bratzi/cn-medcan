@@ -6,39 +6,41 @@
       {
         "typ": "cover",
         "kicker": "So bewerten wir",
-        "titel": "Was hinter einer Note im Buch steckt"
+        "titel": "Was hinter 4 von 5 Blättern steckt",
+        "grafik": { "art": "blaetter", "note": 4 }
       },
       {
         "typ": "inhalt",
-        "titel": "Vier Merkmale, dann die Gesamtnote",
-        "punkte": [
-          "Aussehen",
-          "Geruch",
-          "Geschmack",
-          "Konsistenz"
-        ]
+        "titel": "Ihr bewertet vier Merkmale",
+        "punkte": ["Aussehen", "Geruch", "Geschmack", "Konsistenz"],
+        "grafik": { "art": "icons", "namen": ["aussehen", "geruch", "geschmack", "konsistenz"] }
       },
       {
         "typ": "inhalt",
-        "titel": "Blätter statt Sterne",
-        "text": "Die Gesamtnote vergibt das Buch in Blättern von 1 bis 5. Ein Blatt mehr heißt: die Charge überzeugt uns mehr."
+        "titel": "Dann die Gesamtnote in Blättern",
+        "text": "Jedes Mitglied gibt 1 bis 5 Blätter. Je mehr Blätter, desto besser gefällt uns die Blüte.",
+        "grafik": { "art": "blaetter", "note": 5 }
       },
       {
         "typ": "inhalt",
         "titel": "Aroma auf einen Blick",
-        "text": "Die Aroma-Karte zeigt, welche Richtungen hervortreten, von Zitrus bis Diesel."
+        "text": "Die Aroma-Karte zeigt, welche Richtungen hervortreten.",
+        "punkte": ["Zitrus", "Süß", "Kräutrig", "Erdig", "Diesel"],
+        "grafik": { "art": "icons", "namen": ["ZITRUS", "SUESS", "KRAEUTRIG", "ERDIG", "DIESEL"] }
       },
       {
         "typ": "inhalt",
         "titel": "Restfeuchte im Blick",
-        "text": "Ist eine Charge zu trocken (unter 8 %), steht ein Hinweis dabei: Blüten zerfallen dann leichter, Terpene verfliegen."
+        "text": "Ist eine Blüte zu trocken (unter 8 %), steht ein Hinweis dabei: sie zerfällt leichter, Terpene verfliegen.",
+        "grafik": { "art": "icons", "namen": ["restfeuchte"] }
       },
       {
         "typ": "cta",
         "titel": "Zum Nachschlagen speichern",
-        "text": "Aussehen, Geruch, Geschmack, Konsistenz, Gesamtnote in Blättern. Für jede Sorte gleich."
+        "text": "Aussehen, Geruch, Geschmack, Konsistenz, dann die Blätter. Für jede Sorte gleich.",
+        "grafik": { "art": "icons", "namen": ["aussehen", "geruch", "geschmack", "konsistenz", "blatt"] }
       }
     ]
   },
-  "caption": "Was bedeutet eigentlich 4 von 5 Blättern? Das ganze Schema auf sechs Slides.\n\nAussehen, Geruch, Geschmack und Konsistenz, dann die Gesamtnote in Blättern. Für jede Sorte dasselbe Schema, damit Bewertungen vergleichbar bleiben.\n\nWelche der fünf Noten schaust du dir zuerst an?\n\n#bookofterpz #aromaprofil #sortenbewertung #terpene"
+  "caption": "Was bedeutet eigentlich 4 von 5 Blättern? Das ganze Schema auf sechs Slides.\n\nMitglieder bewerten Aussehen, Geruch, Geschmack und Konsistenz, dann geben sie 1 bis 5 Blätter. Je mehr Blätter, desto besser gefällt uns die Blüte. Für jede Sorte dasselbe Schema, damit Bewertungen vergleichbar bleiben.\n\nWelches Merkmal schaust du dir zuerst an?\n\n#bookofterpz #aromaprofil #sortenbewertung #terpene"
 }

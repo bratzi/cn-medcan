@@ -10,14 +10,14 @@ Stand 2026-10-15. Der Betreiber setzt Profil, Bio und Highlights in der Instagra
 | Profilbild | Signet „gB“ (`scripts/marke/signet.ts`) |
 | Name | Book of Terpz Sortenbewertung (29 Zeichen, Suchwort im durchsuchten NAME-Feld) |
 | Kategorie | Website (keine Gesundheits-Kategorie) |
-| Link | `https://cn-medcan.w-helwich.workers.dev/ig` |
+| Link | keiner (Nutzer 2026-10-16): Vorabzugang nur per DM |
 
 Bio (drei Zeilen, 138 Zeichen, Limit 150; Nutzen, Thema, Beleg nach ig-profile-optimizer):
 
 ```
 Unabhängige Sortenbewertung: 5 Noten, ein Schema.
 Bei Events bringen wir Sorten gemeinsam nach vorn.
-Mitglied werden: Link unten.
+Vorabzugang und Testnutzer: schreib uns per DM.
 ```
 
 ## Highlights

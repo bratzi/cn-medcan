@@ -6,9 +6,9 @@ const k: IgKarussell = {
   saeule: "wissen",
   schluessel: "terpene-lesen",
   slides: [
-    { typ: "cover", kicker: "Wissen", titel: "Terpene & <Aroma>" },
-    { typ: "inhalt", titel: "Was sind Terpene?", text: "Duftstoffe der Pflanze.", punkte: ["Zitrus", "Kiefer"] },
-    { typ: "cta", titel: "Mehr im Buch", text: "Alle Bewertungen zum Blättern." },
+    { typ: "cover", kicker: "Wissen", titel: "Terpene & <Aroma>", grafik: { art: "icons", namen: ["myrcen"] } },
+    { typ: "inhalt", titel: "Was sind Terpene?", text: "Duftstoffe der Pflanze.", punkte: ["Zitrus", "Kiefer"], grafik: { art: "icons", namen: ["ZITRUS", "KRAEUTRIG"] } },
+    { typ: "cta", titel: "Mehr im Buch", text: "Alle Bewertungen zum Blättern.", grafik: { art: "blaetter", note: 4 } },
   ],
 };
 
@@ -45,14 +45,14 @@ test("Slide-HTML maskiert, zeigt Seitenzahl und Säulenfarbe", () => {
   assert.ok(h.includes(SAEULEN_FARBE.wissen));
   assert.ok(h.includes("width:1080px") && h.includes("height:1350px"));
   const mitte = igSlideHtml(k, 1, "https://x.dev");
-  assert.ok(mitte.includes("<li>Zitrus</li>") && mitte.includes("2 / 3"));
+  assert.ok(mitte.includes("<figcaption>Zitrus</figcaption>") && mitte.includes("2 / 3"));
   assert.ok(!mitte.includes("undefined"));
 });
 
-test("karussellPruefen: CTA-Text darf Link in Bio nicht wiederholen", () => {
+test("karussellPruefen: kein Link in der Bio", () => {
   const slides = [...k.slides.slice(0, -1), { typ: "cta" as const, titel: "Mehr im Buch", text: "Alle Noten. LINK IN BIO." }];
   const fehler = karussellPruefen({ ...k, slides });
-  assert.ok(fehler.some((f) => f.includes("steht schon fest auf der CTA")), fehler.join("; "));
+  assert.ok(fehler.some((f) => f.includes("keinen Link in der Bio")), fehler.join("; "));
 });
 
 test("Marke", () => {
@@ -64,4 +64,14 @@ test("Handwerk: Kicker höchstens 30 Zeichen, höchstens ein Gedankenstrich je S
   assert.ok(karussellPruefen(langerKicker).some((f) => f.includes("Kicker")));
   const striche = { ...k, slides: [k.slides[0], { typ: "inhalt" as const, titel: "Kiefer – Zitrus – Erde" }, ...k.slides.slice(2)] };
   assert.ok(karussellPruefen(striche).some((f) => f.includes("Gedankenstrich")));
+});
+
+test("Grafik: Pflicht je Slide, nur bekannte Icons, Blätter 0 bis 5", () => {
+  const ohne = { ...k, slides: [k.slides[0], { typ: "inhalt" as const, titel: "Ohne Bild" }, k.slides[2]] };
+  assert.ok(karussellPruefen(ohne).some((f) => f.includes("Grafik fehlt")));
+  const fremd = { ...k, slides: [k.slides[0], { typ: "inhalt" as const, titel: "X", grafik: { art: "icons" as const, namen: ["einhorn"] } }, k.slides[2]] };
+  assert.ok(karussellPruefen(fremd).some((f) => f.includes("Icon unbekannt")));
+  const zuviel = { ...k, slides: [k.slides[0], { typ: "inhalt" as const, titel: "X", grafik: { art: "blaetter" as const, note: 6 } }, k.slides[2]] };
+  assert.ok(karussellPruefen(zuviel).some((f) => f.includes("Blätter")));
+  assert.match(igSlideHtml(k, 2, "https://x"), /Vorabzugang per DM/);
 });

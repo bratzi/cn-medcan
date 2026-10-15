@@ -14,7 +14,7 @@ import {
 import { AromaIcon } from "./AromaIcon";
 
 /** Spiegelt IgReel aus lib/ig-reel.ts; das Paket bleibt bewusst ohne Import aus dem Hauptprojekt. */
-export type ErklaerSzene = { kicker?: string; titel: string; text?: string; icons?: string[]; sekunden: number };
+export type ErklaerSzene = { kicker?: string; titel: string; text?: string; icons?: string[]; blaetter?: number; sekunden: number };
 export type ErklaerReelProps = {
   saeule: string;
   schluessel: string;
@@ -30,6 +30,35 @@ const VIOLETT = "#b48cf0";
 const TEXT = "#e9efec";
 const LEISE = "#93a39b";
 const AUSBLENDEN = 12;
+
+/** Blattzeichnung wie components/review/BlattAnzeige.tsx (Kopie, das Paket importiert nichts aus dem Hauptprojekt). */
+const BLATT_LINKS =
+  "M12 17Q10.4 9.5 12 2ZM12 17Q9.9 10.5 5.2 5.6Q7.3 12.1 12 17ZM12 17Q7.87 13.26 2.5 11.8Q6.63 15.54 12 17ZM12 17Q9.6 18.84 6.6 19.2Q9 17.36 12 17Z";
+const BLATT_RECHTS =
+  "M12 17Q13.6 9.5 12 2ZM12 17Q14.1 10.5 18.8 5.6Q16.7 12.1 12 17ZM12 17Q16.13 13.26 21.5 11.8Q17.37 15.54 12 17ZM12 17Q14.4 18.84 17.4 19.2Q15 17.36 12 17Z";
+const BLATT_KONTUR = BLATT_LINKS + BLATT_RECHTS;
+
+/** Fünf Blätter; jedes springt nacheinander auf (4 Frames Versatz), gefüllte füllen sich danach. */
+function Blaetter({ note, farbe }: { note: number; farbe: string }) {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  return (
+    <div style={{ display: "flex", justifyContent: "center", gap: 24, marginBottom: 56 }}>
+      {[1, 2, 3, 4, 5].map((b, i) => {
+        const auf = spring({ fps, frame: frame - 4 - i * 4, config: { damping: 14, stiffness: 160 } });
+        const fuellen = spring({ fps, frame: frame - 18 - i * 4, config: { damping: 200 } });
+        return (
+          <svg key={b} viewBox="0 0 24 24" width={160} height={160} style={{ transform: `scale(${0.6 + 0.4 * auf})`, opacity: auf }}>
+            <path d={BLATT_LINKS} fill={farbe} opacity={note >= b - 0.5 ? fuellen : 0} />
+            <path d={BLATT_RECHTS} fill={farbe} opacity={note >= b ? fuellen : 0} />
+            <path d={BLATT_KONTUR} fill="none" stroke={farbe} strokeWidth={0.75} strokeLinejoin="round" />
+            <path d="M12 17v4.5" stroke={farbe} strokeWidth={0.75} strokeLinecap="round" />
+          </svg>
+        );
+      })}
+    </div>
+  );
+}
 
 /** Zwei maskierte Ebenen wie logoHtml in lib/ig-karte.ts. */
 function Logo() {
@@ -58,6 +87,7 @@ function Szene({ szene, farbe }: { szene: ErklaerSzene; farbe: string }) {
   return (
     <AbsoluteFill style={{ justifyContent: "center", alignItems: "center", textAlign: "center", padding: "0 96px", opacity: aus }}>
       <div style={{ opacity: ein, transform: `translateY(${(1 - ein) * 48}px)` }}>
+        {szene.blaetter !== undefined ? <Blaetter note={szene.blaetter} farbe={farbe} /> : null}
         {szene.icons?.length ? (
           <div style={{ display: "flex", justifyContent: "center", gap: 48, marginBottom: 48 }}>
             {szene.icons.map((n) => (
@@ -145,7 +175,7 @@ export function ErklaerReel({ szenen, farbe }: ErklaerReelProps) {
           textAlign: "center",
         }}
       >
-        Book of Terpz · <span style={{ fontFamily: dafoe, fontSize: 64, color: farbe, letterSpacing: 0 }}>Link in Bio</span>
+        Book of Terpz · <span style={{ fontFamily: dafoe, fontSize: 64, color: farbe, letterSpacing: 0 }}>Vorabzugang per DM</span>
       </p>
     </AbsoluteFill>
   );

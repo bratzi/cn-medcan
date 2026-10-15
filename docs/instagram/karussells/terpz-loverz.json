@@ -1,0 +1,39 @@
+{
+  "karussell": {
+    "saeule": "portal",
+    "schluessel": "terpz-loverz",
+    "slides": [
+      {
+        "typ": "cover",
+        "kicker": "Terpz Loverz gesucht",
+        "titel": "Gestalte die Community-Plattform mit",
+        "grafik": { "art": "icons", "namen": ["community"] }
+      },
+      {
+        "typ": "inhalt",
+        "titel": "Wir hauen in die Tasten",
+        "text": "Wir bauen eine Plattform, auf der Mitglieder Blüten nach einem festen Schema bewerten und vergleichen.",
+        "grafik": { "art": "icons", "namen": ["buch"] }
+      },
+      {
+        "typ": "inhalt",
+        "titel": "Was du mitgestaltest",
+        "punkte": ["Bewerten", "Aroma-Karte", "Community"],
+        "grafik": { "art": "icons", "namen": ["blatt", "aromakarte", "community"] }
+      },
+      {
+        "typ": "inhalt",
+        "titel": "Testnutzer, sobald es skaliert",
+        "text": "Läuft das System stabil, holen wir engagierte Testnutzer an Bord. Wer früh dabei ist, prägt, wie es wird.",
+        "grafik": { "art": "icons", "namen": ["abstimmen"] }
+      },
+      {
+        "typ": "cta",
+        "titel": "Bock, das Projekt mitzugestalten?",
+        "text": "Erzähl uns, welche Blüten du liebst und was dir fehlt.",
+        "grafik": { "art": "icons", "namen": ["community", "blatt"] }
+      }
+    ]
+  },
+  "caption": "Terpz Loverz gesucht: Wir bauen eine Community-Plattform für Blütenbewertungen und suchen Leute, die mitgestalten.\n\nGerade hauen wir in die Tasten. Sobald das System stabil skaliert, holen wir engagierte Testnutzer an Bord. Wer früh dabei ist, prägt Bewertungen, Aroma-Karte und Community mit.\n\nLust auf Vorabzugang? Schreib uns per DM.\n\n#bookofterpz #community #terpene #terpenprofil"
+}
