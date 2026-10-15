@@ -1,6 +1,6 @@
 /**
  * Karussell als Publora-Entwurf (Spec 2026-10-15 Produktmarke).
- *   npx tsx scripts/ig-karussell.ts /tmp/karussell.json [--probe]
+ *   npx tsx scripts/ig-karussell.ts /tmp/karussell.json [--probe] [--planen=<ISO|jetzt>]
  * JSON: { "karussell": IgKarussell, "caption": "…" }. Prüft Slides und Caption, fotografiert jede Slide
  * und legt einen Entwurf mit allen Bildern an. Bildnamen bot-k-<saeule>-<schluessel>-<n>.png = Marke.
  */
@@ -10,7 +10,7 @@ import { pathToFileURL } from "node:url";
 
 import { igCaptionPruefen } from "../lib/ig-caption";
 import { igSlideHtml, karussellMarke, karussellPruefen, type IgKarussell } from "../lib/ig-karussell";
-import { entwurfMedien, htmlOffline, markenAus, publoraPosts, screenshot, umgebung } from "./ig-gemeinsam";
+import { entwurfMedien, planen, planZeit, htmlOffline, markenAus, publoraPosts, screenshot, umgebung } from "./ig-gemeinsam";
 
 async function main() {
   const [datei, ...rest] = process.argv.slice(2);
@@ -22,6 +22,9 @@ async function main() {
   const marke = karussellMarke(karussell);
   const ursprung = new URL(umgebung().IG_FEED_URL ?? "https://cn-medcan.w-helwich.workers.dev").origin;
   const probe = rest.includes("--probe");
+  // Zeit vorab prüfen, damit kein Entwurf ohne gültigen Termin entsteht.
+  const planArg = rest.find((a) => a.startsWith("--planen="))?.slice(9);
+  const zeit = planArg ? planZeit(planArg) : undefined;
   if (!probe && markenAus(await publoraPosts()).has(marke)) throw new Error(`Karussell schon vorhanden: ${marke}`);
   const ordner = resolve("tmp/ig");
   mkdirSync(ordner, { recursive: true });
@@ -46,6 +49,10 @@ async function main() {
   }
   const gruppe = await entwurfMedien(caption, medien);
   console.log(`Entwurf angelegt: ${karussell.slides[0].titel} (${medien.length} Slides, Publora ${gruppe})`);
+  if (zeit) {
+    await planen(gruppe, zeit);
+    console.log(`Eingeplant um ${zeit}`);
+  }
 }
 
 main().catch((f: unknown) => {

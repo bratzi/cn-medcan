@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { browserPfad, cssMitDaten, entwurfMedien, feedSchluessel, istThemenMarke, linkDurchStil, markenAus, planZeit, pngOk, schriftUrls } from "../scripts/ig-gemeinsam";
+import { browserPfad, cssMitDaten, entwurfMedien, feedSchluessel, istThemenMarke, linkDurchStil, markenAus, planZeit, pngOk, schriftUrls, tagBelegt } from "../scripts/ig-gemeinsam";
 
 test("Schlüssel aus IG_FEED_KEY oder IG_FEED_URL", () => {
   assert.equal(feedSchluessel({ IG_FEED_KEY: "a" }), "a");
@@ -104,4 +104,12 @@ test("planZeit: jetzt = +3 Minuten, Vergangenes und Unsinn abgelehnt", () => {
   assert.equal(planZeit("2026-10-16T16:00:00Z", t0), "2026-10-16T16:00:00.000Z");
   assert.throws(() => planZeit("2026-10-15T12:01:00Z", t0), /Zukunft/);
   assert.throws(() => planZeit("morgen", t0), /gültige/);
+});
+
+test("tagBelegt: geplanter oder veröffentlichter Post am selben UTC-Tag belegt den Tag", () => {
+  const jetzt = new Date("2026-10-16T16:05:00Z");
+  assert.equal(tagBelegt([{ status: "scheduled", scheduledTime: "2026-10-16T17:00:00Z" }], jetzt), true);
+  assert.equal(tagBelegt([{ status: "published", scheduledTime: "2026-10-16T09:00:00Z" }], jetzt), true);
+  assert.equal(tagBelegt([{ status: "draft", scheduledTime: "2026-10-16T17:00:00Z" }], jetzt), false);
+  assert.equal(tagBelegt([{ status: "scheduled", scheduledTime: "2026-10-17T17:00:00Z" }], jetzt), false);
 });

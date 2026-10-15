@@ -7,7 +7,7 @@ import { basename } from "node:path";
 
 import { igCaptionPruefen } from "../lib/ig-caption";
 import { reelPruefen, type IgReel } from "../lib/ig-reel";
-import { entwurfMedien, markenAus, publoraPosts } from "./ig-gemeinsam";
+import { entwurfMedien, markenAus, planen, planZeit, publoraPosts } from "./ig-gemeinsam";
 
 async function main() {
   const [mp4, captionDatei] = process.argv.slice(2);
@@ -23,8 +23,14 @@ async function main() {
   const fehler = igCaptionPruefen(caption);
   if (fehler.length) throw new Error(`Caption abgelehnt: ${fehler.join("; ")}`);
   if (markenAus(await publoraPosts()).has(name.replace(/\.mp4$/, ""))) throw new Error(`Reel schon vorhanden: ${name}`);
+  const planArg = process.argv.find((a) => a.startsWith("--planen="))?.slice(9);
+  const zeit = planArg ? planZeit(planArg) : undefined;
   const gruppe = await entwurfMedien(caption, [{ pfad: mp4, name, typ: "video/mp4" }]);
   console.log(`Reel-Entwurf angelegt (Publora ${gruppe})`);
+  if (zeit) {
+    await planen(gruppe, zeit);
+    console.log(`Eingeplant um ${zeit}`);
+  }
 }
 
 main().catch((f: unknown) => {

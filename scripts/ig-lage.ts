@@ -4,9 +4,9 @@
  * zuletzt vorkamen. Ändert nichts.
  *   npx tsx scripts/ig-lage.ts
  */
-import { istThemenMarke, markenAus, publoraPosts } from "./ig-gemeinsam";
+import { istThemenMarke, markenAus, publoraPosts, tagBelegt } from "./ig-gemeinsam";
 
-type Post = { status?: string; createdAt?: string; mediaUrls?: unknown };
+type Post = { status?: string; createdAt?: string; scheduledTime?: string; mediaUrls?: unknown };
 
 async function main() {
   const posts = (await publoraPosts()) as Post[];
@@ -19,6 +19,10 @@ async function main() {
       {
         offeneThemenEntwuerfe: themen.filter((z) => z.status === "draft").map((z) => z.marke),
         veroeffentlichteThemen: themen.filter((z) => z.status === "published").map((z) => z.marke),
+        heuteBelegt: tagBelegt(posts),
+        geplant: posts
+          .filter((p) => p.status === "scheduled")
+          .map((p) => `${[...markenAus([p])][0] ?? "?"} um ${p.scheduledTime}`),
         letzteMarken: zeilen.slice(0, 20).map((z) => `${z.marke} (${z.status})`),
       },
       null,

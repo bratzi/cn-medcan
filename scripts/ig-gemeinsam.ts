@@ -277,6 +277,12 @@ export function planZeit(angabe: string, jetzt: Date = new Date()): string {
   return zeit.toISOString();
 }
 
+/** Ist heute (UTC) schon ein Post eingeplant oder erschienen? Dann legt die Routine keinen weiteren an. */
+export function tagBelegt(posts: { status?: string; scheduledTime?: string }[], jetzt: Date = new Date()): boolean {
+  const tag = jetzt.toISOString().slice(0, 10);
+  return posts.some((p) => (p.status === "scheduled" || p.status === "published") && p.scheduledTime?.slice(0, 10) === tag);
+}
+
 /** Entwurf zur Veröffentlichung einplanen (Publora: update-post mit status „scheduled“). */
 export async function planen(postGroupId: string, zeitpunkt: string): Promise<void> {
   await publora(`update-post/${postGroupId}`, { status: "scheduled", scheduledTime: zeitpunkt }, "PUT");
