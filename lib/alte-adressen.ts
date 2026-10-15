@@ -32,3 +32,23 @@ export function bewertenWeiterleitung(pfad: string, suche: string): string | nul
   if (!treffer) return null;
   return `/blueten/${treffer[1]}${suche}#bewerten`;
 }
+
+/**
+ * Ziel fuer eine alte Produktadresse /blueten/<produkt-slug> (Spec Sorte im
+ * Fokus, 2): die Sortenseite mit ?ware=<produkt-slug>, vorhandene Query
+ * dahinter. null, wenn der Pfad keine Bluetenseite ist, der Slug kein Produkt
+ * kennt oder schon der Sorten-Slug ist (keine Schleife).
+ */
+export function sortenWeiterleitung(
+  pfad: string,
+  suche: string,
+  kultivarSlugVon: (produktSlug: string) => string | null,
+): string | null {
+  const treffer = /^\/blueten\/([^/]+)$/.exec(pfad);
+  if (!treffer) return null;
+  const produktSlug = treffer[1];
+  const kultivarSlug = kultivarSlugVon(produktSlug);
+  if (!kultivarSlug || kultivarSlug === produktSlug) return null;
+  const rest = suche.startsWith("?") ? suche.slice(1) : suche;
+  return `/blueten/${kultivarSlug}?ware=${encodeURIComponent(produktSlug)}${rest ? `&${rest}` : ""}`;
+}
