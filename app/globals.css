@@ -650,6 +650,46 @@
   }
 }
 
+/* Sorten-Explorer (Spec 2026-10-15 Abschnitt 4): Balken stehen ohne Bewegung sofort auf ihrem Anteil. */
+.explorer-balken {
+  transform: scaleX(var(--anteil, 0));
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  /* Zustand: beim Sortenwechsel kommen die Waren gestaffelt herein, 200 ms ease-out. */
+  :root:not([data-sparmodus]) .explorer-karte {
+    transition:
+      opacity 200ms var(--ease-out),
+      transform 200ms var(--ease-out);
+    transition-delay: calc(var(--i, 0) * 40ms);
+    @starting-style {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+  }
+
+  /* Erzählung: der Balken wächst auf seinen Anteil der Sortenskala. */
+  :root:not([data-sparmodus]) .explorer-balken {
+    animation: explorer-balken 350ms var(--ease-out) calc(80ms + var(--i, 0) * 40ms) backwards;
+  }
+
+  /* Rückmeldung beim Drücken, nur Zeigegeräte mit Hover. */
+  @media (hover: hover) and (pointer: fine) {
+    :root:not([data-sparmodus]) .explorer-druck {
+      transition-property: color, background-color, border-color, transform;
+    }
+    :root:not([data-sparmodus]) .explorer-druck:active {
+      transform: scale(0.98);
+    }
+  }
+}
+
+@keyframes explorer-balken {
+  from {
+    transform: scaleX(0);
+  }
+}
+
 @keyframes netz-erscheinen {
   from {
     opacity: 0;
