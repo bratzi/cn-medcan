@@ -7,7 +7,7 @@ import { basename } from "node:path";
 
 import { igCaptionPruefen } from "../lib/ig-caption";
 import { reelPruefen, type IgReel } from "../lib/ig-reel";
-import { entwurfMedien, markenAus, planen, planZeit, publoraPosts } from "./ig-gemeinsam";
+import { entwurfMedien, markenAus, planenMitStory, planZeit, publoraPosts, storyEntwurf } from "./ig-gemeinsam";
 
 async function main() {
   const [mp4, captionDatei] = process.argv.slice(2);
@@ -27,9 +27,11 @@ async function main() {
   const zeit = planArg ? planZeit(planArg) : undefined;
   const gruppe = await entwurfMedien(caption, [{ pfad: mp4, name, typ: "video/mp4" }]);
   console.log(`Reel-Entwurf angelegt (Publora ${gruppe})`);
+  const story = await storyEntwurf(name.replace(/\.mp4$/, ""), mp4);
+  console.log(`Story-Entwurf angelegt (Publora ${story})`);
   if (zeit) {
-    await planen(gruppe, zeit);
-    console.log(`Eingeplant um ${zeit}`);
+    await planenMitStory(gruppe, zeit);
+    console.log(`Eingeplant um ${zeit}, Story eine Minute später`);
   }
 }
 

@@ -225,9 +225,14 @@ async function publora<T>(pfad: string, body?: unknown, methode?: "PUT" | "DELET
 type Medium = { pfad: string; name: string; typ: "image/png" | "video/mp4" };
 
 /** Entwurf ohne Termin mit einem oder mehreren Medien (Karussell, Reel); Dateinamen tragen die Marke. */
-export async function entwurfMedien(caption: string, medien: Medium[]): Promise<string> {
+export async function entwurfMedien(caption: string, medien: Medium[], alsStory = false): Promise<string> {
   const plattform = pflicht(umgebung(), "INSTAGRAM_PLATFORM_ID");
-  const { postGroupId } = await publora<{ postGroupId: string }>("create-post", { content: caption, platforms: [plattform] });
+  const { postGroupId } = await publora<{ postGroupId: string }>("create-post", {
+    content: caption,
+    platforms: [plattform],
+    // Publora kennt Storys nur als Video mit videoType STORIES (docs.publora.com/platforms/instagram).
+    ...(alsStory ? { platformSettings: { instagram: { videoType: "STORIES" } } } : {}),
+  });
   try {
     for (const m of medien) {
       const { uploadUrl, mediaId } = await publora<{ uploadUrl: string; mediaId: string }>("get-upload-url", {
@@ -313,4 +318,57 @@ export function markenAus(posts: unknown[]): Set<string> {
     }
   }
   return marken;
+}
+
+/**
+ * Story zu jedem Feed-Post (Betreiber 2026-10-15). Instagrams „Auch in Story teilen“ gibt es in der API nicht; deshalb
+ * entsteht neben jedem Reel oder Karussell ein eigener Story-Entwurf mit der Marke bot-story-…, den planenMitStory
+ * zusammen mit dem Feed-Post einplant.
+ */
+export function storyMarke(feedMarke: string): string {
+  if (!feedMarke.startsWith("bot-")) throw new Error(`keine Feed-Marke: ${feedMarke}`);
+  return `bot-story-${feedMarke.slice(4)}`;
+}
+
+type PostZeile = { postGroupId?: string; status?: string; mediaUrls?: unknown };
+
+/** postGroupId des offenen Story-Entwurfs zum Feed-Post, sonst null. */
+export function storyFuer(posts: readonly PostZeile[], feedGruppe: string): string | null {
+  const feed = posts.find((p) => p.postGroupId === feedGruppe);
+  const marke = feed ? [...markenAus([feed])][0] : undefined;
+  if (!marke || marke.startsWith("bot-story-")) return null;
+  const ziel = storyMarke(marke);
+  const story = posts.find((p) => p.status === "draft" && markenAus([p]).has(ziel));
+  return story?.postGroupId ?? null;
+}
+
+/** ffmpeg-Argumente: Bild mittig auf dunklem 1080×1920-Grund, 6 s stumm, H.264 (Story aus einem Karussell-Cover). */
+export function storyVideoArgumente(bild: string, ziel: string): string[] {
+  return [
+    "-y", "-loop", "1", "-i", bild, "-t", "6", "-r", "30",
+    "-vf", "scale=1080:-2,pad=1080:1920:(ow-iw)/2:(oh-ih)/2:color=0x0d1210,format=yuv420p",
+    "-c:v", "libx264", "-pix_fmt", "yuv420p", "-movflags", "+faststart", ziel,
+  ];
+}
+
+const FFMPEG = resolve("video/node_modules/@remotion/compositor-win32-x64-msvc/ffmpeg.exe");
+
+/** Story-Entwurf aus einem Reel (dasselbe MP4) oder einem Karussell-Cover (PNG → MP4). */
+export async function storyEntwurf(feedMarke: string, quelle: string): Promise<string> {
+  const name = `${storyMarke(feedMarke)}.mp4`;
+  let mp4 = quelle;
+  if (quelle.endsWith(".png")) {
+    mp4 = join(resolve("tmp/ig"), name);
+    mkdirSync(resolve("tmp/ig"), { recursive: true });
+    execFileSync(existsSync(FFMPEG) ? FFMPEG : "ffmpeg", storyVideoArgumente(quelle, mp4), { stdio: "ignore" });
+  }
+  return entwurfMedien("Neu im Feed: Book of Terpz", [{ pfad: mp4, name, typ: "video/mp4" }], true);
+}
+
+/** Feed-Post einplanen und, falls vorhanden, seine Story eine Minute später. */
+export async function planenMitStory(feedGruppe: string, zeitpunkt: string): Promise<string | null> {
+  await planen(feedGruppe, zeitpunkt);
+  const story = storyFuer((await publoraPosts()) as PostZeile[], feedGruppe);
+  if (story) await planen(story, new Date(new Date(zeitpunkt).getTime() + 60_000).toISOString());
+  return story;
 }
