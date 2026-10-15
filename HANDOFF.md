@@ -28,6 +28,35 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 
 ## ⇢ Hier geht es weiter
 
+### ⇢ SESSION 63 (2026-10-15): Instagram als Produktmarke, selbständiges Posten (`2ac1a4f..b15c6ff`)
+
+**ALS ERSTES: diese Fragen in EINER AskUserQuestion stellen**
+1. Startseite: Die Abstimmung steht dort noch prominent (`components/story/Abstimmung`). Nutzer will Events „nicht zu
+   sehr im Fokus“: Abschnitt verkleinern/nach hinten schieben oder so lassen?
+2. Publora-MCP einrichten (Regel: nutzen, wenn Mehrwert, z. B. Statistiken/Post-Status)? Braucht `claude mcp add` mit
+   dem Publora-Schlüssel.
+3. Faktenblatt für Wissens-Themen ohne Repo-Beleg (terpene-erklaert, trichome-aussehen, lagerung) anlegen? Die Routine
+   überspringt sie sonst.
+4. Erstes Wochen-Reel „portal“ für Mi 28.10. jetzt bauen (Remotion lokal)?
+5. Offene Punkte aus Session 62 (unten) noch aktuell?
+
+**Stand**
+- Spec `docs/superpowers/specs/2026-10-15-instagram-produktmarke-design.md`, Plan `docs/superpowers/plans/2026-10-15-instagram-produktmarke.md`.
+- **Inhaltliche Korrektur (Nutzer):** Bewertungen hängen NICHT an einer Charge (optional). Abstimmungen = freiwillige
+  Events, Sorten gemeinsam pushen, nicht im Fokus. Website `/ig`, alle IG-Texte, Grünes Buch, Schema-Kommentare bereinigt.
+- **Regeln:** `docs/instagram/handwerk.md` (aus den 9 ig-Plugin-Skills, Pflicht vor jedem Post), Layout zentriert,
+  `karussellPruefen`/`igCaptionPruefen` prüfen Hook ≤125, Floskeln, Striche, Kicker ≤30, CTA ohne „Link in Bio“.
+- **Werkzeuge:** `scripts/ig-karussell.ts [--probe] [--planen=ISO|jetzt]`, `scripts/ig-reel.ts <mp4> <txt> [--planen=]`,
+  `scripts/ig-planen.ts <id> <ISO|jetzt>`, `scripts/ig-lage.ts` (heuteBelegt, geplant, offene Entwürfe mit id),
+  `scripts/ig-highlights.ts`; Reels in `video/` (Remotion 4.0.535, eigenes Paket, nicht im Worker). Schriften
+  eingecheckt unter `scripts/ig-schriften/`.
+- **Veröffentlichen freigegeben:** Probepost Manifest erschien 2026-10-15. Plan: Fr 16.10 So bewerten wir (geplant),
+  Mo 19.10 Wissen (Routine), Mi 21.10 Reel (geplant), Fr 23.10 Mach mit (Entwurf `6ad0e7fa…`, Routine plant ihn ein;
+  Publora Free: „Schedule horizon reached“ bei >~7 Tagen).
+- **Routine** `trig_01AhFzavSK5zreuGEASsz5Ws` postet jetzt selbst um 17:00 UTC, 1 Post/Tag, Prompt aktualisiert.
+- `/ig` live 200 ohne Passwort; Optik ungeprüft (Browser-Erweiterung war nicht verbunden).
+- 1145 Tests grün, tsc sauber.
+
 ### ⇢ SESSION 62 (2026-10-15): Live-Prüfung Teil 1, zwei Fixes (`66631c2`)
 
 Live geprüft (Browser 1): `/reviews` lädt (Adressen ohne `/de`-Präfix!), Herz bei fremder Bewertung setzt sich und
