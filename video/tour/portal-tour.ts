@@ -57,17 +57,25 @@ async function main() {
 
   mkdirSync("out/raw", { recursive: true });
   const browser = await chromium.launch();
+  // Exakt 9:16, damit zuschnitt.ts ohne Beschnitt auf 1080 × 1920 skaliert.
+  const basis = { viewport: { width: 432, height: 768 }, deviceScaleFactor: 2.5, colorScheme: "dark" as const, locale: "de-DE" };
+
+  // Erst ohne Aufnahme durchs Gate, Sitzung merken; das Passwortfeld erscheint so nie im Video.
+  const vorab = await browser.newContext(basis);
+  const login = await vorab.newPage();
+  await login.goto(BASIS + pfad, { waitUntil: "networkidle" });
+  await gate(login, pw);
+  const sitzung = await vorab.storageState();
+  await vorab.close();
+
   const context = await browser.newContext({
-    viewport: { width: 430, height: 932 },
-    deviceScaleFactor: 2.5,
-    colorScheme: "dark",
-    locale: "de-DE",
+    ...basis,
+    storageState: sitzung,
     // Playwright nimmt in CSS-Pixeln auf; eine größere size skaliert nicht, sondern füllt grau auf.
-    recordVideo: { dir: "out/raw", size: { width: 430, height: 932 } },
+    recordVideo: { dir: "out/raw", size: basis.viewport },
   });
   const page = await context.newPage();
   await page.goto(BASIS + pfad, { waitUntil: "networkidle" });
-  await gate(page, pw);
   await warte(1000);
   await scrollen(page);
   for (const sel of KLICKS[pfad] ?? []) {
