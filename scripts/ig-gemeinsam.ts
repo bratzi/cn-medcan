@@ -8,6 +8,7 @@ import { createHash } from "node:crypto";
 import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, renameSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
+import { pathToFileURL } from "node:url";
 
 type Env = Record<string, string | undefined>;
 
@@ -342,11 +343,19 @@ export function storyFuer(posts: readonly PostZeile[], feedGruppe: string): stri
   return story?.postGroupId ?? null;
 }
 
-/** ffmpeg-Argumente: Bild mittig auf dunklem 1080×1920-Grund, 6 s stumm, H.264 (Story aus einem Karussell-Cover). */
+/** Hochformat-Seite: Karussell-Cover mittig auf dunklem 1080×1920-Grund. */
+export function storyHtml(bildUrl: string): string {
+  return `<!doctype html><html><body style="margin:0;width:1080px;height:1920px;background:#0d1210;display:flex;align-items:center;justify-content:center"><img src="${bildUrl}" style="width:1080px;display:block"></body></html>`;
+}
+
+/**
+ * ffmpeg-Argumente: fertiges 1080×1920-Bild als 6 s stummes H.264-Video. Das ffmpeg aus Remotion kennt kein
+ * pad/overlay, darum entsteht der Hochformat-Grund vorher per Screenshot (storyHtml).
+ */
 export function storyVideoArgumente(bild: string, ziel: string): string[] {
   return [
     "-y", "-loop", "1", "-i", bild, "-t", "6", "-r", "30",
-    "-vf", "scale=1080:-2,pad=1080:1920:(ow-iw)/2:(oh-ih)/2:color=0x0d1210,format=yuv420p",
+    "-vf", "scale=1080:1920,format=yuv420p",
     "-c:v", "libx264", "-pix_fmt", "yuv420p", "-movflags", "+faststart", ziel,
   ];
 }
@@ -360,7 +369,11 @@ export async function storyEntwurf(feedMarke: string, quelle: string): Promise<s
   if (quelle.endsWith(".png")) {
     mp4 = join(resolve("tmp/ig"), name);
     mkdirSync(resolve("tmp/ig"), { recursive: true });
-    execFileSync(existsSync(FFMPEG) ? FFMPEG : "ffmpeg", storyVideoArgumente(quelle, mp4), { stdio: "ignore" });
+    const html = join(resolve("tmp/ig"), `${storyMarke(feedMarke)}.html`);
+    const hoch = html.replace(/\.html$/, ".png");
+    writeFileSync(html, storyHtml(pathToFileURL(resolve(quelle)).href));
+    screenshot(pathToFileURL(html).href, hoch, "1080,1920");
+    execFileSync(existsSync(FFMPEG) ? FFMPEG : "ffmpeg", storyVideoArgumente(hoch, mp4), { stdio: "ignore" });
   }
   return entwurfMedien("Neu im Feed: Book of Terpz", [{ pfad: mp4, name, typ: "video/mp4" }], true);
 }
@@ -369,6 +382,13 @@ export async function storyEntwurf(feedMarke: string, quelle: string): Promise<s
 export async function planenMitStory(feedGruppe: string, zeitpunkt: string): Promise<string | null> {
   await planen(feedGruppe, zeitpunkt);
   const story = storyFuer((await publoraPosts()) as PostZeile[], feedGruppe);
-  if (story) await planen(story, new Date(new Date(zeitpunkt).getTime() + 60_000).toISOString());
+  if (!story) return null;
+  try {
+    await planen(story, new Date(new Date(zeitpunkt).getTime() + 60_000).toISOString());
+  } catch (f) {
+    // Publora Free begrenzt geplante Posts; der Feed-Post steht schon, die Story bleibt Entwurf.
+    console.error(`Story ${story} nicht geplant: ${f instanceof Error ? f.message : f}`);
+    return null;
+  }
   return story;
 }

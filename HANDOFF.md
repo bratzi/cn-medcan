@@ -39,10 +39,12 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
    `6ad1249610a1cbf1ad927978`, Story `6ad1249f10a1cbf1ad927a17`. **Offen:** ab ~21.10 per
    `scripts/ig-planen.ts 6ad1249610a1cbf1ad927978 2026-10-28T17:00:00Z` planen. Publora-MCP ist verbunden
    (`claude mcp list`), Werkzeuge erscheinen aber erst in neuer Session.
-3. Story-Mitposten erstmals live beobachten: erster Lauf von ig-karussell/ig-reel mit Story; prüfen, ob Publora den
-   Story-Entwurf mit `platformSettings.instagram.videoType = "STORIES"` annimmt und als Story postet.
-4. Cloud-Routine `trig_01AhFzavSK5zreuGEASsz5Ws`: Prompt sagt noch nichts von Storys; die Skripte machen es jetzt
-   automatisch (ig-karussell legt Story an, ig-planen plant sie mit). Prüfen, ob die Routine `ig-planen.ts` nutzt.
+3. Story-Mitposten (Session 65): Bug behoben, Remotions ffmpeg hat kein `pad`-Filter, Story aus Karussell-PNG
+   scheiterte immer. Jetzt Hochformat per Edge-Screenshot (`storyHtml`), ffmpeg nur Kodierung. Story zu
+   „So bewerten wir“ geplant 16.10 17:01 UTC: **am 16.10 abends prüfen, ob sie als Story erschien.** Story zum Reel
+   so-bewerten-wir (21.10) blieb Entwurf: Publora Free „403 Scheduled post limit reached“ (3 geplante). Story-Planung
+   scheitert jetzt nicht mehr den ganzen Lauf. **Nutzer fragen:** Storys verbrauchen das Kontingent (15/Monat) doppelt.
+4. ✅ Routine nutzt `ig-planen.ts` und `ig-karussell.ts --planen`, beide planen die Story mit.
 
 **Erledigt und live**
 - Plan `docs/superpowers/plans/2026-10-15-sorte-im-fokus.md` komplett (Subagent-driven, alle Tasks reviewt):

@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { storyFuer, storyMarke, storyVideoArgumente } from "../scripts/ig-gemeinsam";
+import { storyFuer, storyHtml, storyMarke, storyVideoArgumente } from "../scripts/ig-gemeinsam";
 
 test("storyMarke: Feed-Marke wird zu bot-story-…", () => {
   assert.equal(storyMarke("bot-reel-aroma-karte"), "bot-story-reel-aroma-karte");
@@ -24,6 +24,13 @@ test("storyVideoArgumente: Bild mittig auf 1080×1920, 6 s, H.264", () => {
   const a = storyVideoArgumente("in.png", "out.mp4");
   assert.ok(a.includes("in.png") && a.at(-1) === "out.mp4");
   assert.ok(a.join(" ").includes("1080:1920"));
+  // Remotions ffmpeg hat kein pad-Filter.
+  assert.ok(!a.join(" ").includes("pad="));
   assert.ok(a.includes("libx264") && a.includes("yuv420p"));
   assert.equal(a[a.indexOf("-t") + 1], "6");
+});
+
+test("storyHtml: Bild auf 1080×1920 dunklem Grund", () => {
+  const h = storyHtml("file:///x.png");
+  assert.ok(h.includes("1920px") && h.includes("file:///x.png") && h.includes("#0d1210"));
 });
