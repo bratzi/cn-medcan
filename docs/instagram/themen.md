@@ -67,7 +67,7 @@ Allgemeinwissen der Botanik und Aromachemie, nur Duft, Aussehen, Chemie und Lage
 - Bei Cannabis entstehen sie vor allem in den Drüsenhaaren (Trichome) der Blüte.
 - Man riecht sie, weil sie schon bei Raumtemperatur verdunsten; deshalb verändert sich der Duft mit der Zeit.
 - Ein Duftprofil entsteht aus vielen Terpenen zugleich; das Etikett nennt meist nur die mengenmäßig größten.
-- Auf Botanical Terpz zeigen wir je Blüte die Terpene laut Datenblatt und die zehn Aromarichtungen (`lib/terpen-aromen.ts`).
+- Im Book of Terpz zeigen wir je Blüte die Terpene laut Datenblatt und die zehn Aromarichtungen (`lib/terpen-aromen.ts`).
 
 ### trichome-aussehen
 - Trichome sind feine Drüsenhaare auf Blüte und Blattspitzen; mit bloßem Auge wirken sie wie Raureif oder Zucker.
