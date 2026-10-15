@@ -1358,6 +1358,8 @@ export const de = {
     "umfrage.gesetzt": "Dieser Platz ist gesetzt und steht nicht zur Abstimmung.",
     "umfrage.schonAbgestimmt": "Du hast in dieser Runde bereits abgestimmt.",
     "bewertung.sorteFehlt": "Die Sorte fehlt.",
+    "bewertung.vertreiberFehlt": "Wähle den Vertreiber deiner Ware.",
+    "bewertung.wareFremd": "Diese Ware gehört nicht zu dieser Sorte.",
     "bewertung.chargeZeichen": "Die Chargennummer enthält unerlaubte Zeichen.",
     "bewertung.note": "{label}: bitte eine Note von 1 bis 5 wählen.",
     "bewertung.feuchte": "Restfeuchte bitte als Prozent zwischen 0 und 30 angeben.",

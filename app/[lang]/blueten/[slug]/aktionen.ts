@@ -4,6 +4,7 @@ import { revalidiereSprachen } from "@/lib/i18n/revalidiere";
 
 import { bewertungPruefen } from "@/lib/bewertung-eingabe";
 import { kennwerteFortschreiben } from "@/lib/kennwerte";
+import { waehleWare } from "@/lib/ware-wahl";
 import { ladeProfil, profilFortschreiben } from "@/lib/query/profil";
 import { netzGeformt, noteOderErsatz } from "@/lib/profil";
 import type { Geschmack } from "@/lib/profil-typen";
@@ -60,12 +61,6 @@ export async function bewertungSpeichern(formData: FormData): Promise<BewertungE
   const istBetreiber = mitglied.rolle === "ADMIN";
 
   const prisma = await getPrisma();
-  const strain = await prisma.strain.findUnique({
-    where: { id: String(formData.get("strainId") ?? "") },
-    select: { id: true, slug: true, aktiv: true },
-  });
-  if (!strain || !strain.aktiv) return { ok: false, fehler: text(w, sprache, { schluessel: "bewertung.sorteWeg" }) };
-
   // Alle bekannten Terpene: auch solche, die der Hersteller nicht angibt, die man aber schmeckt.
   const bekannte = await prisma.terpen.findMany({ select: { name: true } });
   const geprueft = bewertungPruefen(
@@ -74,14 +69,22 @@ export async function bewertungSpeichern(formData: FormData): Promise<BewertungE
   );
   if (!geprueft.ok) return { ok: false, fehler: text(w, sprache, geprueft.fehler) };
   const e = geprueft.wert;
+  const kultivar = await prisma.kultivar.findUnique({
+    where: { id: e.kultivarId },
+    select: { id: true, slug: true, strains: { select: { id: true, slug: true, vertreiberId: true, handelsname: true, aktiv: true } } },
+  });
+  if (!kultivar) return { ok: false, fehler: text(w, sprache, { schluessel: "bewertung.sorteWeg" }) };
+  const ware = waehleWare(kultivar.strains, e.vertreiberId, e.strainId);
+  if (!ware.ok) return { ok: false, fehler: text(w, sprache, { schluessel: "bewertung.wareFremd" }) };
+  const produktSlug = kultivar.strains.find((s) => s.id === ware.strainId)?.slug ?? null;
   if (e.instagramReelUrl && !istBetreiber) return { ok: false, fehler: text(w, sprache, { schluessel: "bewertung.reelNurBetreiber" }) };
 
   // Charge: vorhandene nehmen, sonst anlegen. Ohne Nummer bleibt die Bewertung ohne Charge.
   let chargeId: string | null = null;
   if (e.chargenNr) {
     const charge = await prisma.charge.upsert({
-      where: { strainId_chargenNr: { strainId: strain.id, chargenNr: e.chargenNr } },
-      create: { strainId: strain.id, chargenNr: e.chargenNr },
+      where: { strainId_chargenNr: { strainId: ware.strainId, chargenNr: e.chargenNr } },
+      create: { strainId: ware.strainId, chargenNr: e.chargenNr },
       update: {},
       select: { id: true },
     });
@@ -105,12 +108,17 @@ export async function bewertungSpeichern(formData: FormData): Promise<BewertungE
   // Mini-Netz (Spec Profil 2.12): der echte Stand vor dem Speichern, auch wenn eine
   // ältere Bewertung bearbeitet wird. Ohne Stand wächst das Netz aus der Mitte.
   const vorher = await ladeProfil(mitglied.mitgliedId).catch(() => null);
-  await prisma.review.upsert({
-    where: { autorId_strainId: { autorId: mitglied.mitgliedId, strainId: strain.id } },
-    create: { strainId: strain.id, autorId: mitglied.mitgliedId, ...daten },
-    update: daten,
+  // Eine Bewertung je Mitglied, Sorte und Vertreiber (Spec 2026-10-15); ältere je Produkt werden mitgefunden.
+  // Der Platzhalter gehört immer zum gewählten Vertreiber: eine Kollision mit @@unique([autorId, strainId])
+  // träfe also dieselbe Sorte samt Vertreiber, die findFirst schon findet.
+  const bestehend = await prisma.review.findFirst({
+    where: { autorId: mitglied.mitgliedId, kultivarId: kultivar.id, vertreiberId: e.vertreiberId },
+    select: { id: true },
   });
-  await kennwerteFortschreiben(strain.id);
+  const zuordnungDaten = { strainId: ware.strainId, kultivarId: kultivar.id, vertreiberId: e.vertreiberId, wareGenau: ware.wareGenau };
+  if (bestehend) await prisma.review.update({ where: { id: bestehend.id }, data: { ...daten, ...zuordnungDaten } });
+  else await prisma.review.create({ data: { autorId: mitglied.mitgliedId, ...daten, ...zuordnungDaten } });
+  await kennwerteFortschreiben(ware.strainId);
   // Empfehlungen und Profil (T11, Spec Profil 4.4) hier vorberechnen, nie je Seitenaufruf.
   // Ein Fehler darin soll die gespeicherte Bewertung nicht als gescheitert melden.
   let netz: { vorher: Geschmack | null; nachher: Geschmack; geformt: boolean } | null = null;
@@ -129,10 +137,12 @@ export async function bewertungSpeichern(formData: FormData): Promise<BewertungE
     console.error("profilFortschreiben/ladeProfil (Mini-Netz) fehlgeschlagen", fehler);
   }
 
-  revalidiereSprachen(`/blueten/${strain.slug}`);
+  // Bis die Sortenseite auf den Kultivar-Slug umzieht (Task 4), lebt die Seite noch unter dem Produkt-Slug.
+  if (kultivar.slug) revalidiereSprachen(`/blueten/${kultivar.slug}`);
+  if (produktSlug) revalidiereSprachen(`/blueten/${produktSlug}`);
   revalidiereSprachen("/");
   revalidiereSprachen("/reviews", "layout");
   revalidiereSprachen("/admin");
   revalidiereSprachen("/profil");
-  return { ok: true, sofortSichtbar: istBetreiber, slug: strain.slug, netz };
+  return { ok: true, sofortSichtbar: istBetreiber, slug: kultivar.slug ?? produktSlug ?? "", netz };
 }

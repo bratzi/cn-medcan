@@ -56,7 +56,7 @@ export async function kennwerteFortschreiben(strainId: string): Promise<void> {
   if (!strain) return;
   const [eigene, imKultivar, beimVertreiber] = await Promise.all([
     prisma.review.findMany({ where: { strainId, freigegeben: true }, select: ZEILE }),
-    strain.kultivarId ? prisma.review.findMany({ where: { freigegeben: true, strain: { kultivarId: strain.kultivarId } }, select: AROMA_ZEILE }) : Promise.resolve([]),
+    strain.kultivarId ? prisma.review.findMany({ where: { freigegeben: true, kultivarId: strain.kultivarId }, select: AROMA_ZEILE }) : Promise.resolve([]),
     strain.vertreiberId ? prisma.review.findMany({ where: { freigegeben: true, strain: { vertreiberId: strain.vertreiberId } }, select: CHARGEN_ZEILE }) : Promise.resolve([]),
   ]);
 
@@ -75,6 +75,19 @@ export async function kennwerteFortschreiben(strainId: string): Promise<void> {
       where: { kultivarId: strain.kultivarId },
       create: { kultivarId: strain.kultivarId, ...kultivarDaten },
       update: kultivarDaten,
+    });
+  }
+  if (strain.kultivarId && strain.vertreiberId) {
+    const paar = await prisma.review.findMany({
+      where: { freigegeben: true, kultivarId: strain.kultivarId, vertreiberId: strain.vertreiberId },
+      select: { gesamtnote: true },
+    });
+    const noten = paar.map((r) => r.gesamtnote).filter((n): n is number => n !== null);
+    const daten = { anzahl: paar.length, gesamtnoteMittel: noten.length ? Math.round((noten.reduce((s, n) => s + n, 0) / noten.length) * 10) / 10 : null };
+    await prisma.kultivarVertreiberKennwerte.upsert({
+      where: { kultivarId_vertreiberId: { kultivarId: strain.kultivarId, vertreiberId: strain.vertreiberId } },
+      create: { kultivarId: strain.kultivarId, vertreiberId: strain.vertreiberId, ...daten },
+      update: daten,
     });
   }
   if (strain.vertreiberId) {

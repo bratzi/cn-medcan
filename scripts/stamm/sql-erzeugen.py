@@ -117,8 +117,11 @@ def main():
         vid = iid or hid
         hid = hid if iid and hid and iid != hid else None
         kname = (p.get("kultivarName") or "").strip() or name
+        # Slug wie lib/kultivar-slug.ts; ist die Basis belegt, haengt SQL einen Zufallszusatz an (Spec 2026-10-15).
+        ks = q(slug(kname))
         kultivare.append(
-            f"INSERT OR IGNORE INTO kultivare (id, name) VALUES (lower(hex(randomblob(16))), {q(kname)});"
+            f"INSERT OR IGNORE INTO kultivare (id, name, slug) VALUES (lower(hex(randomblob(16))), {q(kname)},"
+            f" CASE WHEN EXISTS (SELECT 1 FROM kultivare WHERE slug = {ks}) THEN {ks} || '-' || lower(hex(randomblob(3))) ELSE {ks} END);"
         )
         such = " ".join(x for x in (name, p.get("kultivarName"), p.get("genetik")) if x).lower()
         zeilen.append(

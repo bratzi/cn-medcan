@@ -1345,6 +1345,8 @@ export const en: Woerterbuch = {
     "umfrage.gesetzt": "This place is fixed and not up for vote.",
     "umfrage.schonAbgestimmt": "You have already voted in this round.",
     "bewertung.sorteFehlt": "The strain is missing.",
+    "bewertung.vertreiberFehlt": "Pick the distributor of your batch.",
+    "bewertung.wareFremd": "This product does not belong to this strain.",
     "bewertung.chargeZeichen": "The batch number contains characters that are not allowed.",
     "bewertung.note": "{label}: please choose a score from 1 to 5.",
     "bewertung.feuchte": "Please enter residual moisture as a percentage between 0 and 30.",

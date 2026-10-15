@@ -6,6 +6,8 @@ import { bewertungPruefen } from "@/lib/bewertung-eingabe";
 function formular(werte: Record<string, string>) {
   const basis: Record<string, string> = {
     strainId: "s1",
+    kultivarId: "k1",
+    vertreiberId: "v1",
     "note-aussehen": "4",
     "note-geruch": "5",
     "note-geschmack": "4",
@@ -49,7 +51,8 @@ test("jede Ablehnung nennt einen Meldungsschluessel, den das Woerterbuch kennt",
   const { de } = await import("@/lib/i18n/de");
   const { en } = await import("@/lib/i18n/en");
   const faelle = [
-    formular({ strainId: "" }),
+    formular({ kultivarId: "" }),
+    formular({ vertreiberId: "" }),
     formular({ chargenNr: "<b>" }),
     formular({ "note-wirkung": "" }),
     formular({ feuchtigkeit: "45" }),
@@ -71,6 +74,8 @@ test("jede Ablehnung nennt einen Meldungsschluessel, den das Woerterbuch kennt",
 test("Terpene werden als an oder aus angenommen; alte Stufen gelten als an (Nutzer 2026-10-03)", () => {
   const felder = new Map<string, unknown>([
     ["strainId", "s1"],
+    ["kultivarId", "k1"],
+    ["vertreiberId", "v1"],
     ["note-aussehen", "4"],
     ["note-geruch", "4"],
     ["note-geschmack", "4"],
@@ -84,4 +89,14 @@ test("Terpene werden als an oder aus angenommen; alte Stufen gelten als an (Nutz
   assert.equal(ergebnis.ok, true);
   if (!ergebnis.ok) return;
   assert.deepEqual(ergebnis.wert.terpenIntensitaet, { Myrcen: 1, Limonen: 0, Humulen: 1 });
+});
+
+test("Sorte und Vertreiber sind Pflicht, Produkt optional", () => {
+  assert.deepEqual(bewertungPruefen(formular({ vertreiberId: "" }), []), { ok: false, fehler: { schluessel: "bewertung.vertreiberFehlt" } });
+  assert.deepEqual(bewertungPruefen(formular({ kultivarId: "" }), []), { ok: false, fehler: { schluessel: "bewertung.sorteFehlt" } });
+  const e = bewertungPruefen(formular({ strainId: "" }), []);
+  assert.ok(e.ok);
+  assert.equal(e.wert.strainId, null);
+  assert.equal(e.wert.kultivarId, "k1");
+  assert.equal(e.wert.vertreiberId, "v1");
 });

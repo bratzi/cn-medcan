@@ -25,6 +25,9 @@ import type { Geschmack } from "@/lib/profil-typen";
 
 type Props = {
   strainId: string;
+  /** Sorte und Vertreiber des Produkts (Spec 2026-10-15); fehlt eines, lehnt der Server mit Meldung ab. */
+  kultivarId: string | null;
+  vertreiberId: string | null;
   handelsname: string;
   /** Sortenkopf samt Angaben zur Blüte über der Karte, als Server-Teil hereingereicht. */
   bild?: React.ReactNode;
@@ -70,6 +73,8 @@ type Props = {
  */
 export function BewertungsFormular({
   strainId,
+  kultivarId,
+  vertreiberId,
   handelsname,
   bild,
   terpene,
@@ -150,6 +155,8 @@ export function BewertungsFormular({
   return (
     <form onSubmit={absenden} className="flex flex-col gap-16 md:gap-24">
       <input type="hidden" name="strainId" value={strainId} />
+      <input type="hidden" name="kultivarId" value={kultivarId ?? ""} />
+      <input type="hidden" name="vertreiberId" value={vertreiberId ?? ""} />
 
       {/* Gleiche Reihenfolge wie die Startseite (Nutzer 2026-10-06): Sortenkopf, Gesamtnote, Overall,
           Terpz. Die Note hält der gemeinsame Baustein selbst und reicht sie ans eigene Sortenfazit

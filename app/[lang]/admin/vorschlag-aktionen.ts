@@ -7,7 +7,8 @@ import { istEindeutigkeitsfehler } from "@/lib/prisma-fehler";
 import { benachrichtigen, nachrichtenFuer, vorlageAbgelehnt, vorlageFreigegeben, type Nachricht } from "@/lib/benachrichtigung";
 import { inHaeppchen } from "@/lib/haeppchen";
 import { blueteVorhanden, terpenNamen } from "@/lib/query/vorschlaege";
-import { strainIdAusSlug, unternehmensIdAusSchluessel, unternehmensSchluessel } from "@/lib/stamm-id";
+import { freierKultivarSlug } from "@/lib/kultivar-slug";
+import { slugAusName, strainIdAusSlug, unternehmensIdAusSchluessel, unternehmensSchluessel } from "@/lib/stamm-id";
 import {
   blueteFreigabePruefen,
   freigabeKonflikt,
@@ -84,7 +85,11 @@ async function kultivarSichern(name: string): Promise<string> {
   const vorhanden = await prisma.kultivar.findFirst({ where: { name: sauber }, select: { id: true } });
   if (vorhanden) return vorhanden.id;
   try {
-    return (await prisma.kultivar.create({ data: { name: sauber }, select: { id: true } })).id;
+    // Slug für die Sortenseite (Spec 2026-10-15): eindeutig, Kollision bekommt einen Zähler.
+    const basis = slugAusName(sauber);
+    const belegt = await prisma.kultivar.findMany({ where: { slug: { startsWith: basis } }, select: { slug: true } });
+    const slug = freierKultivarSlug(sauber, belegt.flatMap((k) => (k.slug ? [k.slug] : [])));
+    return (await prisma.kultivar.create({ data: { name: sauber, slug }, select: { id: true } })).id;
   } catch (fehler) {
     // Zweiter Tab war schneller: der Name ist unique, also den vorhandenen nehmen.
     if (!istEindeutigkeitsfehler(fehler)) throw fehler;

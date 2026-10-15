@@ -450,6 +450,8 @@ async function ProduktInhalt({ slug, w, sprache }: { slug: string; w: Woerterbuc
             <div className="mt-8">
               <BewertungsFormular
                 strainId={strain.id}
+                kultivarId={strain.kultivar?.id ?? null}
+                vertreiberId={strain.vertreiberId}
                 handelsname={strain.handelsname}
                 terpene={strain.terpene}
                 chargen={strain.chargen.map((charge) => charge.chargenNr)}

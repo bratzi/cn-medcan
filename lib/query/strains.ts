@@ -315,6 +315,8 @@ export type StrainDetail = {
   kultivar: { id: string; name: string } | null;
   /** Wer den Handelsnamen in Deutschland vertreibt; an ihm hängt die Chargenqualität. */
   vertreiber: UnternehmenEintrag | null;
+  /** Id des Vertreibers, für die Bewertung (Spec 2026-10-15). */
+  vertreiberId: string | null;
   /** Der Anbauer (Hersteller), meist unbekannt. */
   hersteller: UnternehmenEintrag | null;
   /** Vollstaendiges Terpenprofil, alle Raenge. */
@@ -651,6 +653,7 @@ export async function ladeStrainDetail(
       aktualisiertAm: true,
       hersteller: { select: { name: true, land: true, website: true } },
       kultivar: { select: { id: true, name: true, kennwerte: KENNWERTE_SELECT } },
+      vertreiberId: true,
       vertreiber: {
         select: {
           name: true,
@@ -754,6 +757,7 @@ export async function ladeStrainDetail(
     verschreibungspflichtig: zeile.verschreibungspflichtig,
     bfarmGelistet: zeile.bfarmGelistet,
     kultivar: zeile.kultivar ? { id: zeile.kultivar.id, name: zeile.kultivar.name } : null,
+    vertreiberId: zeile.vertreiberId,
     vertreiber: zeile.vertreiber
       ? { name: zeile.vertreiber.name, land: zeile.vertreiber.land, website: zeile.vertreiber.website }
       : null,

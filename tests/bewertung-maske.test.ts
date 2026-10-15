@@ -71,6 +71,8 @@ function felder(html: string): Map<string, string> {
 test("Maske: die gespeicherte Bewertung kommt unverändert wieder beim Server an (upsert überschreibt sie)", () => {
   const formular = felder(maske());
   formular.set("strainId", "sorte-1");
+  formular.set("kultivarId", "kultivar-1");
+  formular.set("vertreiberId", "vertreiber-1");
   const geprueft = bewertungPruefen(formular, ["Myrcen", "Limonen"]);
   assert.ok(geprueft.ok, JSON.stringify(geprueft));
   assert.deepEqual(geprueft.wert.noten, VORBELEGUNG.noten);

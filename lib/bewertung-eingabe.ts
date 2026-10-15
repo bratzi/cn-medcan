@@ -17,7 +17,10 @@ import {
 export const MAX_NOTIZ = 1500;
 
 export type BewertungEingabe = {
-  strainId: string;
+  kultivarId: string;
+  vertreiberId: string;
+  /** Gewählte Stärke; null heißt: Platzhalter-Produkt des Vertreibers (lib/ware-wahl.ts). */
+  strainId: string | null;
   chargenNr: string | null;
   /** 0,5-5 in halben Schritten, optional (Bewertung v2). */
   gesamtnote: number | null;
@@ -55,14 +58,17 @@ const intensitaet = z.coerce.number().int().min(0).max(5).transform((wert) => (w
 const REEL = /^https:\/\/(www\.)?instagram\.com\/(reel|p)\/[A-Za-z0-9_-]+\/?(\?.*)?$/;
 
 /**
- * Liest ein Formular. Erwartete Felder: strainId, chargenNr, note-<achse>
+ * Liest ein Formular. Erwartete Felder: kultivarId, vertreiberId, strainId (optional), chargenNr, note-<achse>
  * (1-5 in Zehntelschritten), feuchtigkeit (Prozent, optional), geschmack-<achse> (0-5 in
  * halben Schritten), terpen-<Name> (0 oder 1, 0 = nicht geschmeckt, nur fuer uebergebene Terpene),
  * notiz, instagramReelUrl.
  */
 export function bewertungPruefen(formular: Lesbar, terpenNamen: readonly string[]): Pruefung {
-  const strainId = text(formular.get("strainId"));
-  if (!strainId) return { ok: false, fehler: { schluessel: "bewertung.sorteFehlt" } };
+  const kultivarId = text(formular.get("kultivarId"));
+  if (!kultivarId) return { ok: false, fehler: { schluessel: "bewertung.sorteFehlt" } };
+  const vertreiberId = text(formular.get("vertreiberId"));
+  if (!vertreiberId) return { ok: false, fehler: { schluessel: "bewertung.vertreiberFehlt" } };
+  const strainId = text(formular.get("strainId")) || null;
 
   const chargenNr = text(formular.get("chargenNr")) || null;
   if (chargenNr && !/^[A-Za-z0-9./ -]{1,40}$/.test(chargenNr)) {
@@ -125,6 +131,6 @@ export function bewertungPruefen(formular: Lesbar, terpenNamen: readonly string[
 
   return {
     ok: true,
-    wert: { strainId, chargenNr, gesamtnote, noten, feuchtigkeitProzent, geschmacksMatrix, terpenIntensitaet, beschaffenheit, notiz, instagramReelUrl },
+    wert: { kultivarId, vertreiberId, strainId, chargenNr, gesamtnote, noten, feuchtigkeitProzent, geschmacksMatrix, terpenIntensitaet, beschaffenheit, notiz, instagramReelUrl },
   };
 }

@@ -13,3 +13,12 @@ export function kultivarSlugs(kultivare: readonly { id: string; name: string }[]
   }
   return ergebnis;
 }
+
+/** Slug für einen neu angelegten Kultivar: Basis aus dem Namen, bei Kollision `-2`, `-3` … wie `kultivarSlugs`. */
+export function freierKultivarSlug(name: string, vorhandene: Iterable<string>): string {
+  const vergeben = new Set(vorhandene);
+  const basis = slugAusName(name);
+  let slug = basis;
+  for (let n = 2; vergeben.has(slug); n++) slug = `${basis}-${n}`;
+  return slug;
+}
