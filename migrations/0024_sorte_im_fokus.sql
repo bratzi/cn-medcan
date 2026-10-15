@@ -1,5 +1,6 @@
 -- 0024_sorte_im_fokus (Spec 2026-10-15). Per wrangler d1 execute --file.
--- Die ALTER TABLE-Zeilen laufen nur einmal; die Datenschritte darunter sind wiederholbar.
+-- ALTER TABLE und CREATE-Teil laufen genau einmal (SQLite kennt kein ADD COLUMN IF NOT EXISTS).
+-- Die Datenschritte darunter sind per WHERE-Wächter gegen ein erneutes Einspielen geschützt.
 ALTER TABLE kultivare ADD COLUMN slug TEXT;
 CREATE UNIQUE INDEX IF NOT EXISTS kultivare_slug_key ON kultivare(slug);
 ALTER TABLE reviews ADD COLUMN kultivar_id TEXT REFERENCES kultivare(id) ON DELETE SET NULL;
@@ -8,7 +9,8 @@ ALTER TABLE reviews ADD COLUMN ware_genau INTEGER NOT NULL DEFAULT 1;
 CREATE INDEX IF NOT EXISTS reviews_autor_kultivar_vertreiber_idx ON reviews(autor_id, kultivar_id, vertreiber_id);
 UPDATE reviews SET
   kultivar_id = (SELECT kultivar_id FROM strains WHERE strains.id = reviews.strain_id),
-  vertreiber_id = (SELECT vertreiber_id FROM strains WHERE strains.id = reviews.strain_id);
+  vertreiber_id = (SELECT vertreiber_id FROM strains WHERE strains.id = reviews.strain_id)
+WHERE kultivar_id IS NULL AND vertreiber_id IS NULL;
 CREATE TABLE IF NOT EXISTS kultivar_vertreiber_kennwerte (
   kultivar_id TEXT NOT NULL REFERENCES kultivare(id) ON DELETE CASCADE,
   vertreiber_id TEXT NOT NULL REFERENCES unternehmen(id) ON DELETE CASCADE,
@@ -17,7 +19,7 @@ CREATE TABLE IF NOT EXISTS kultivar_vertreiber_kennwerte (
   aktualisiert_am DATETIME NOT NULL,
   PRIMARY KEY (kultivar_id, vertreiber_id)
 );
--- Slugs (erzeugt von scripts/kultivar-slugs.ts)
+-- BEGIN Slugs (erzeugt von scripts/kultivar-slugs.ts)
 UPDATE kultivare SET slug = 'cherry-cookies' WHERE id = '0003fa8f49e6ba4175f18bef157daf4a' AND slug IS NULL;
 UPDATE kultivare SET slug = 'pav-s1' WHERE id = '00546592b6699aeab2c605d0106dd719' AND slug IS NULL;
 UPDATE kultivare SET slug = 'cannabistada-14-1' WHERE id = '00ff91c13f87ba355618a7ac4e851fe2' AND slug IS NULL;
@@ -445,3 +447,4 @@ UPDATE kultivare SET slug = 'grape-gasoline' WHERE id = 'fdcdf07fdedcc1412d88599
 UPDATE kultivare SET slug = 'cannatonic' WHERE id = 'fe8f124db420e8eac92ccfcc7a9dba21' AND slug IS NULL;
 UPDATE kultivare SET slug = 'gmo-breath' WHERE id = 'ff5f1c9a8d1fdaefd3650d07deb3b2a3' AND slug IS NULL;
 UPDATE kultivare SET slug = 'og-kush' WHERE id = 'ff6453c6d470647603337aead49bd6c4' AND slug IS NULL;
+-- END Slugs
