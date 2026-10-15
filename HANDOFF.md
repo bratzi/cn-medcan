@@ -28,6 +28,17 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 
 ## ⇢ Hier geht es weiter
 
+### ⇢ SESSION 64 (2026-10-15): Sorte im Fokus (Spec freigegeben), Publora-MCP, Faktenblatt
+- **Beim Sessionstart selbst prüfen:** Publora-MCP (`claude mcp add publora -s local`, Schlüssel aus `.env`) per `/mcp`
+  bzw. Werkzeugliste verbunden? Konten abrufen als Probe.
+- Spec `docs/superpowers/specs/2026-10-15-sorte-im-fokus-design.md` vom Nutzer freigegeben; Plan folgt.
+- Faktenblatt Wissen (terpene-erklaert, trichome-aussehen, lagerung) in `docs/instagram/themen.md`.
+- Startseiten-Abstimmung bleibt wie sie ist (Nutzer). Reel „portal“ für Mi 28.10. bauen (Nutzer will Remotion).
+- Live geprüft: Autorkasten bricht sauber um, gesetztes Herz zeigt 1 (Fix `66631c2` ok). Test-Like bei
+  `bewertung-c7a31726…` per JS-Klick nicht entfernt (blieb gesetzt); danach `/reviews` Error 1102 (CPU). Offen:
+  per Koordinaten-Klick entfernen, Pinnwand hell/dunkel, `/ig` Optik. Kleinkram aus älteren Sessions: Nutzer sagt ja,
+  als eigener Strang in den Plan.
+
 ### ⇢ SESSION 63 (2026-10-15): Instagram als Produktmarke, selbständiges Posten (`2ac1a4f..b15c6ff`)
 
 **ALS ERSTES: diese Fragen in EINER AskUserQuestion stellen**
