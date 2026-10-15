@@ -4,7 +4,8 @@ import { revalidiereSprachen } from "@/lib/i18n/revalidiere";
 
 import { bewertungPruefen } from "@/lib/bewertung-eingabe";
 import { kennwerteFortschreiben } from "@/lib/kennwerte";
-import { waehleWare } from "@/lib/ware-wahl";
+import { istEindeutigkeitsfehler } from "@/lib/prisma-fehler";
+import { waehleWare, waehleZielBewertung } from "@/lib/ware-wahl";
 import { ladeProfil, profilFortschreiben } from "@/lib/query/profil";
 import { netzGeformt, noteOderErsatz } from "@/lib/profil";
 import type { Geschmack } from "@/lib/profil-typen";
@@ -76,15 +77,27 @@ export async function bewertungSpeichern(formData: FormData): Promise<BewertungE
   if (!kultivar) return { ok: false, fehler: text(w, sprache, { schluessel: "bewertung.sorteWeg" }) };
   const ware = waehleWare(kultivar.strains, e.vertreiberId, e.strainId);
   if (!ware.ok) return { ok: false, fehler: text(w, sprache, { schluessel: "bewertung.wareFremd" }) };
-  const produktSlug = kultivar.strains.find((s) => s.id === ware.strainId)?.slug ?? null;
   if (e.instagramReelUrl && !istBetreiber) return { ok: false, fehler: text(w, sprache, { schluessel: "bewertung.reelNurBetreiber" }) };
+
+  // Eine Bewertung je Mitglied, Sorte und Vertreiber (Spec 2026-10-15). Aus der Zeit "eine je Produkt" kann
+  // ein Mitglied mehrere beim selben Vertreiber haben; welche überschrieben wird, entscheidet waehleZielBewertung.
+  const kandidaten = await prisma.review.findMany({
+    where: {
+      autorId: mitglied.mitgliedId,
+      OR: [{ kultivarId: kultivar.id, vertreiberId: e.vertreiberId }, { strainId: ware.strainId }],
+    },
+    select: { id: true, strainId: true, wareGenau: true },
+  });
+  const produkteBeimVertreiber = kultivar.strains.filter((s) => s.vertreiberId === e.vertreiberId && s.aktiv).map((s) => s.id);
+  const ziel = waehleZielBewertung(kandidaten, ware, e.strainId !== null, produkteBeimVertreiber);
+  const produktSlug = kultivar.strains.find((s) => s.id === ziel.strainId)?.slug ?? null;
 
   // Charge: vorhandene nehmen, sonst anlegen. Ohne Nummer bleibt die Bewertung ohne Charge.
   let chargeId: string | null = null;
   if (e.chargenNr) {
     const charge = await prisma.charge.upsert({
-      where: { strainId_chargenNr: { strainId: ware.strainId, chargenNr: e.chargenNr } },
-      create: { strainId: ware.strainId, chargenNr: e.chargenNr },
+      where: { strainId_chargenNr: { strainId: ziel.strainId, chargenNr: e.chargenNr } },
+      create: { strainId: ziel.strainId, chargenNr: e.chargenNr },
       update: {},
       select: { id: true },
     });
@@ -108,17 +121,23 @@ export async function bewertungSpeichern(formData: FormData): Promise<BewertungE
   // Mini-Netz (Spec Profil 2.12): der echte Stand vor dem Speichern, auch wenn eine
   // ältere Bewertung bearbeitet wird. Ohne Stand wächst das Netz aus der Mitte.
   const vorher = await ladeProfil(mitglied.mitgliedId).catch(() => null);
-  // Eine Bewertung je Mitglied, Sorte und Vertreiber (Spec 2026-10-15); ältere je Produkt werden mitgefunden.
-  // Der Platzhalter gehört immer zum gewählten Vertreiber: eine Kollision mit @@unique([autorId, strainId])
-  // träfe also dieselbe Sorte samt Vertreiber, die findFirst schon findet.
-  const bestehend = await prisma.review.findFirst({
-    where: { autorId: mitglied.mitgliedId, kultivarId: kultivar.id, vertreiberId: e.vertreiberId },
-    select: { id: true },
-  });
-  const zuordnungDaten = { strainId: ware.strainId, kultivarId: kultivar.id, vertreiberId: e.vertreiberId, wareGenau: ware.wareGenau };
-  if (bestehend) await prisma.review.update({ where: { id: bestehend.id }, data: { ...daten, ...zuordnungDaten } });
-  else await prisma.review.create({ data: { autorId: mitglied.mitgliedId, ...daten, ...zuordnungDaten } });
-  await kennwerteFortschreiben(ware.strainId);
+  const zuordnungDaten = { strainId: ziel.strainId, kultivarId: kultivar.id, vertreiberId: e.vertreiberId, wareGenau: ziel.wareGenau };
+  let alteStrainId = ziel.alteStrainId;
+  try {
+    if (ziel.zielId) await prisma.review.update({ where: { id: ziel.zielId }, data: { ...daten, ...zuordnungDaten } });
+    else await prisma.review.create({ data: { autorId: mitglied.mitgliedId, ...daten, ...zuordnungDaten } });
+  } catch (fehler) {
+    // Paralleles Speichern hat dazwischen eine Bewertung auf genau diesem Produkt angelegt: die nehmen.
+    if (!istEindeutigkeitsfehler(fehler)) throw fehler;
+    await prisma.review.update({
+      where: { autorId_strainId: { autorId: mitglied.mitgliedId, strainId: ziel.strainId } },
+      data: { ...daten, ...zuordnungDaten },
+    });
+    alteStrainId = ziel.strainId;
+  }
+  await kennwerteFortschreiben(ziel.strainId);
+  // Zieht die Bewertung auf ein anderes Produkt um, stimmen die Kennwerte des alten sonst nicht mehr.
+  if (alteStrainId && alteStrainId !== ziel.strainId) await kennwerteFortschreiben(alteStrainId);
   // Empfehlungen und Profil (T11, Spec Profil 4.4) hier vorberechnen, nie je Seitenaufruf.
   // Ein Fehler darin soll die gespeicherte Bewertung nicht als gescheitert melden.
   let netz: { vorher: Geschmack | null; nachher: Geschmack; geformt: boolean } | null = null;

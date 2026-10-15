@@ -84,19 +84,24 @@ async function kultivarSichern(name: string): Promise<string> {
   const sauber = name.trim();
   const vorhanden = await prisma.kultivar.findFirst({ where: { name: sauber }, select: { id: true } });
   if (vorhanden) return vorhanden.id;
-  try {
-    // Slug für die Sortenseite (Spec 2026-10-15): eindeutig, Kollision bekommt einen Zähler.
-    const basis = slugAusName(sauber);
+  // Slug für die Sortenseite (Spec 2026-10-15): eindeutig, Kollision bekommt einen Zähler.
+  const basis = slugAusName(sauber);
+  let letzter: unknown;
+  for (let versuch = 0; versuch < 3; versuch++) {
     const belegt = await prisma.kultivar.findMany({ where: { slug: { startsWith: basis } }, select: { slug: true } });
     const slug = freierKultivarSlug(sauber, belegt.flatMap((k) => (k.slug ? [k.slug] : [])));
-    return (await prisma.kultivar.create({ data: { name: sauber, slug }, select: { id: true } })).id;
-  } catch (fehler) {
-    // Zweiter Tab war schneller: der Name ist unique, also den vorhandenen nehmen.
-    if (!istEindeutigkeitsfehler(fehler)) throw fehler;
-    const dazwischen = await prisma.kultivar.findFirst({ where: { name: sauber }, select: { id: true } });
-    if (!dazwischen) throw fehler;
-    return dazwischen.id;
+    try {
+      return (await prisma.kultivar.create({ data: { name: sauber, slug }, select: { id: true } })).id;
+    } catch (fehler) {
+      if (!istEindeutigkeitsfehler(fehler)) throw fehler;
+      // Zweiter Tab war schneller: gleicher Name, also den vorhandenen nehmen. Sonst war nur der
+      // Slug vergeben (anderer Name, gleiche Basis): mit dem nächsten freien Slug erneut versuchen.
+      const dazwischen = await prisma.kultivar.findFirst({ where: { name: sauber }, select: { id: true } });
+      if (dazwischen) return dazwischen.id;
+      letzter = fehler;
+    }
   }
+  throw letzter;
 }
 
 /**
