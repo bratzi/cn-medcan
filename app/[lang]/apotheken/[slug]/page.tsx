@@ -27,6 +27,7 @@ import {
 import { holeSprache, holeWoerterbuch, type Sprache, type Woerterbuch } from "@/lib/i18n";
 import { t } from "@/lib/i18n/text";
 import { istFachkreis } from "@/lib/query/fachkreis";
+import { bluetenHref } from "@/lib/alte-adressen";
 import { ladeApothekeDetail, type ApothekeDetail } from "@/lib/query/strains";
 
 /**
@@ -216,7 +217,7 @@ function Sortiment({
             <TableRow key={zeile.id}>
               <TableCell>
                 <Link prefetch={false}
-                  href={`/blueten/${zeile.strain.slug}`}
+                  href={bluetenHref(zeile.strain.slug, zeile.strain.kultivarSlug)}
                   title={zeile.strain.handelsname}
                   className="rounded-sm text-accent underline underline-offset-2 transition-opacity duration-150 ease-standard hover:opacity-70 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring"
                 >

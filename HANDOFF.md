@@ -69,7 +69,7 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
   leitet 308 auf `8-ball-kush` (`ABGELOESTE_SORTEN`). Live geprüft: Umleitung, Startseiten-Links mit `?ware=`,
   Abstimmung letzte Sektion, kein Querscroll; Optik der kleineren Abstimmung nicht per Screenshot angesehen. Abstimmung kompakt ans Seitenende (`2aff16d`). Noch mit 308:
   „Ähnlich im Aroma“ (`AEHNLICH_SQL`, Cache `sorten_aehnlich`), `eintragHref` in MeineStimmen, Fallback in
-  BewertungsRegister, konto-reihen, profil-reihen (gemocht), apotheken/[slug], ig-feed-Fallback, buch-statistik,
+  BewertungsRegister, konto-reihen, profil-reihen (gemocht), ig-feed-Fallback, buch-statistik,
   Benachrichtigungen. Kein Link setzt `#kommentare-<id>`. Explorer zeigt bei wenig Daten < 12 Sorten. Rangliste
   sortiert nach Note (vorbestehend, nur für Mitglieder hinter Gate; HWG-Frage beim Nutzer klären).
 

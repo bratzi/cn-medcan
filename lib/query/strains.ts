@@ -1084,6 +1084,8 @@ export type ApothekeDetail = {
     standAm: Date;
     strain: {
       slug: string;
+      /** Sorten-Slug fuer den direkten Link (bluetenHref). */
+      kultivarSlug: string | null;
       handelsname: string;
       kultivarTyp: KultivarTyp;
       darreichungsform: Darreichungsform;
@@ -1135,6 +1137,7 @@ export async function ladeApothekeDetail(
               darreichungsform: true,
               thcMinProzent: true,
               thcMaxProzent: true,
+              kultivar: { select: { slug: true } },
             },
           },
         },
@@ -1168,6 +1171,7 @@ export async function ladeApothekeDetail(
       standAm: bestand.standAm,
       strain: {
         slug: bestand.strain.slug,
+        kultivarSlug: bestand.strain.kultivar?.slug ?? null,
         handelsname: bestand.strain.handelsname,
         kultivarTyp: alsKultivarTyp(bestand.strain.kultivarTyp),
         darreichungsform: alsDarreichungsform(bestand.strain.darreichungsform),
