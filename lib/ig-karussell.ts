@@ -22,6 +22,7 @@ export type IgSlide =
 export type IgKarussell = { saeule: IgSaeule; schluessel: string; slides: IgSlide[] };
 
 const TITEL_MAX = 60;
+const KICKER_MAX = 30;
 const TEXT_MAX = 220;
 const PUNKT_MAX = 60;
 
@@ -46,6 +47,9 @@ export function karussellPruefen(k: IgKarussell): string[] {
       fehler.push(`Slide ${i + 1}: höchstens 4 Punkte zu je ${PUNKT_MAX}`);
     if (s.typ === "cta" && /link in bio/i.test(s.text ?? "")) fehler.push(`Slide ${i + 1}: „Link in Bio“ steht schon fest auf der CTA`);
     const alles = texte(s).join(" ");
+    // Handwerk (docs/instagram/handwerk.md): kurzer Kicker, ein Strich pro Slide liest sich nicht generiert.
+    if (s.typ === "cover" && s.kicker.length > KICKER_MAX) fehler.push(`Slide ${i + 1}: Kicker länger als ${KICKER_MAX}`);
+    if ((alles.match(/\s[–—]\s|—/g) ?? []).length > 1) fehler.push(`Slide ${i + 1}: mehr als ein Gedankenstrich`);
     const sperre = IG_SPERRE.exec(alles);
     if (hwgTreffer(alles)) fehler.push(`Slide ${i + 1}: HWG-Filter schlägt an`);
     if (sperre) fehler.push(`Slide ${i + 1}: Sperrwort ${sperre[0]}`);

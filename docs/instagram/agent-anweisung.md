@@ -44,6 +44,9 @@ Der Wochentag (UTC) bestimmt, was du tust:
    - Eigene Idee erlaubt, wenn alle Fakten im Repo belegt sind. Dann einen neuen, sprechenden `schluessel` wählen
      (a-z, 0-9, Bindestrich).
 4. **Karussell und Caption schreiben und anlegen:**
+   - **Zuerst `docs/instagram/handwerk.md` lesen** und den Entwurf gegen dessen Checkliste prüfen (Cover mit
+     Versprechen und offener Schleife, Stärkstes auf Slide 2–3, letzte Slide Zusammenfassung plus eine Bitte, Hook in der
+     ersten Caption-Zeile, genau eine Bitte, Humanizer-Durchgang, Hashtags nach Größe und anders als beim letzten Post).
    - Aufbau nach „Dramaturgie“ im Redaktionsplan: 5 bis 7 Slides, Cover mit Frage oder Behauptung (höchstens 6 Wörter),
      wichtigste Aussage auf Slide 2, ein Gedanke je Slide, ein CTA zuletzt mit genau einer Handlung.
    - Grenzen: 3 bis 10 Slides, erste `cover`, letzte `cta`. `titel` höchstens 60 Zeichen, `text` höchstens 220,

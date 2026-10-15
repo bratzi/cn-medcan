@@ -29,6 +29,10 @@ export function igCaption(r: IgReview): string {
 
 const HASHTAG = /#[\p{L}\p{N}_]+/gu;
 
+/** Engagement-Köder (Instagram stuft sie herab) und typische KI-Floskeln, die Leser als generiert erkennen. */
+const FLOSKELN =
+  /doppel-?\s?tipp|double tap|markier\w*\s+\d|tagge?\s+\d|kommentier\w*\s+(mit\s+)?[„"]?ja\b|was (denkt|meint|sagt) ihr\??|was denkst du\?|das ergebnis\?|spoiler:|plot twist|lass(t)? uns (eintauchen|darüber reden)|game-?changer|next level|ehrlich gesagt|real talk|in der heutigen (schnelllebigen )?zeit|tauchen wir ein/i;
+
 /** Prüft eine Caption des Themen-Agenten vor dem Entwurf; leere Liste = in Ordnung. */
 export function igCaptionPruefen(caption: string): string[] {
   const fehler: string[] = [];
@@ -39,5 +43,12 @@ export function igCaptionPruefen(caption: string): string[] {
   const tags = caption.match(HASHTAG) ?? [];
   if (tags.length < 3 || tags.length > 5) fehler.push(`Hashtags: ${tags.length} statt 3 bis 5`);
   if (caption.length > 2200) fehler.push("länger als 2200 Zeichen");
+  // Handwerk (docs/instagram/handwerk.md, aus den ig-*-Skills): Hook vor dem „mehr“-Falz, keine Köder, wenig Striche.
+  const hook = caption.split("\n")[0] ?? "";
+  if (hook.length > 125) fehler.push(`Hook (erste Zeile) ${hook.length} statt höchstens 125 Zeichen`);
+  const floskel = FLOSKELN.exec(ohneTags);
+  if (floskel) fehler.push(`Floskel oder Köder: ${floskel[0]}`);
+  const striche = (ohneTags.match(/\s[–—]\s|—/g) ?? []).length;
+  if (striche > 2) fehler.push(`${striche} Gedankenstriche statt höchstens 2`);
   return fehler;
 }

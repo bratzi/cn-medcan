@@ -44,3 +44,19 @@ test("Caption-Prüfung: Wirkung, auch gebeugt, und Hashtag-Zahl", () => {
 test("Bewertungs-Caption hat höchstens 5 Hashtags", () => {
   assert.ok((igCaption(r).match(/#/g) ?? []).length <= 5);
 });
+
+test("Handwerk: Hook in der ersten Zeile höchstens 125 Zeichen", () => {
+  const f = igCaptionPruefen(`${"Duft ".repeat(30)}\n\nLink in Bio\n\n#a #b #c`);
+  assert.ok(f.some((x) => x.includes("125")));
+});
+
+test("Handwerk: Köder und KI-Floskeln werden abgelehnt", () => {
+  for (const s of ["Doppeltipp, wenn du zustimmst!", "Markiere 3 Freunde.", "Was denkt ihr?", "Das Ergebnis? Ein Blatt mehr.", "Ein echter Gamechanger."]) {
+    assert.ok(igCaptionPruefen(`Kiefer und Zitrus.\n\n${s}\n\n#a #b #c`).some((x) => x.includes("Floskel")), s);
+  }
+});
+
+test("Handwerk: höchstens zwei Gedankenstriche", () => {
+  const f = igCaptionPruefen("Kiefer – Zitrus – Erde – Holz.\n\n#a #b #c");
+  assert.ok(f.some((x) => x.includes("Gedankenstrich")));
+});

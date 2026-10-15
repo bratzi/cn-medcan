@@ -3,13 +3,37 @@
     "saeule": "transparenz",
     "schluessel": "manifest",
     "slides": [
-      { "typ": "cover", "kicker": "Unser Versprechen", "titel": "Ehrlich. An der Charge." },
-      { "typ": "inhalt", "titel": "Eine Person bewertet, nach festem Schema", "text": "Jede Sorte bekommt dieselben Noten: Aussehen, Geruch, Geschmack, Konsistenz und eine Gesamtnote in Blättern von 1 bis 5." },
-      { "typ": "inhalt", "titel": "Jede Bewertung hängt an einer Charge", "text": "Chargen derselben Sorte unterscheiden sich. Darum steht bei jeder Bewertung, welche Charge gemeint ist." },
-      { "typ": "inhalt", "titel": "Aroma statt Hype", "text": "Es geht um Duft, Geschmack, Aussehen und die Qualität der Charge, nicht um Zahlen auf dem Etikett." },
-      { "typ": "inhalt", "titel": "Die Community wählt mit", "text": "Verifizierte Mitglieder stimmen ab, welche Sorte als Nächstes bewertet wird. Das Ergebnis gilt." },
-      { "typ": "cta", "titel": "Schau ins Buch", "text": "Alle Bewertungen zum Blättern." }
+      {
+        "typ": "cover",
+        "kicker": "Unser Versprechen",
+        "titel": "4 Regeln, an die wir uns halten"
+      },
+      {
+        "typ": "inhalt",
+        "titel": "Eine Person bewertet, nach festem Schema",
+        "text": "Jede Sorte bekommt dieselben Noten: Aussehen, Geruch, Geschmack, Konsistenz und eine Gesamtnote in Blättern von 1 bis 5."
+      },
+      {
+        "typ": "inhalt",
+        "titel": "Jede Bewertung hängt an einer Charge",
+        "text": "Chargen derselben Sorte unterscheiden sich. Darum steht bei jeder Bewertung, welche Charge gemeint ist."
+      },
+      {
+        "typ": "inhalt",
+        "titel": "Aroma statt Hype",
+        "text": "Es geht um Duft, Geschmack, Aussehen und die Qualität der Charge, nicht um Zahlen auf dem Etikett."
+      },
+      {
+        "typ": "inhalt",
+        "titel": "Die Community wählt mit",
+        "text": "Verifizierte Mitglieder stimmen ab, welche Sorte als Nächstes bewertet wird. Das Ergebnis gilt."
+      },
+      {
+        "typ": "cta",
+        "titel": "Speichern und nachprüfen",
+        "text": "Eine Person, ein Schema, jede Bewertung an ihrer Charge. Die Community wählt mit."
+      }
     ]
   },
-  "caption": "Wofür steht Book of Terpz? Für Bewertungen, die man nachprüfen kann.\n\nEine Person bewertet jede Sorte nach demselben Schema, immer an einer konkreten Charge. Die Community wählt, was als Nächstes dran ist.\n\nWas wünschst du dir von einer unabhängigen Bewertung? Link in Bio\n\n#bookofterpz #medizinalcannabis #terpene"
+  "caption": "4 Regeln, damit du jede Bewertung im Book of Terpz nachprüfen kannst.\n\nEine Person bewertet jede Sorte nach demselben Schema, immer an einer konkreten Charge. Was als Nächstes dran ist, wählen die Mitglieder.\n\nSpeicher dir das für die nächste Bewertung, die du liest.\n\n#bookofterpz #sortenbewertung #chargenbewertung #medizinalcannabis"
 }

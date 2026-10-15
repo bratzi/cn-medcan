@@ -58,3 +58,10 @@ test("karussellPruefen: CTA-Text darf Link in Bio nicht wiederholen", () => {
 test("Marke", () => {
   assert.equal(karussellMarke(k), "bot-k-wissen-terpene-lesen");
 });
+
+test("Handwerk: Kicker höchstens 30 Zeichen, höchstens ein Gedankenstrich je Slide", () => {
+  const langerKicker = { ...k, slides: [{ typ: "cover" as const, kicker: "x".repeat(31), titel: "T" }, ...k.slides.slice(1)] };
+  assert.ok(karussellPruefen(langerKicker).some((f) => f.includes("Kicker")));
+  const striche = { ...k, slides: [k.slides[0], { typ: "inhalt" as const, titel: "Kiefer – Zitrus – Erde" }, ...k.slides.slice(2)] };
+  assert.ok(karussellPruefen(striche).some((f) => f.includes("Gedankenstrich")));
+});

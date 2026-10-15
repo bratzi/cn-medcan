@@ -3,13 +3,42 @@
     "saeule": "transparenz",
     "schluessel": "so-bewerten-wir",
     "slides": [
-      { "typ": "cover", "kicker": "So bewerten wir", "titel": "Fünf Noten, ein Schema" },
-      { "typ": "inhalt", "titel": "Vier Merkmale, dann die Gesamtnote", "punkte": ["Aussehen", "Geruch", "Geschmack", "Konsistenz"] },
-      { "typ": "inhalt", "titel": "Blätter statt Sterne", "text": "Die Gesamtnote vergibt das Buch in Blättern von 1 bis 5. Ein Blatt mehr heißt: die Charge überzeugt uns mehr." },
-      { "typ": "inhalt", "titel": "Bewertet wird die Charge", "text": "Nicht die Sorte im Allgemeinen, sondern genau die Charge, die auf dem Tisch lag. Eine andere Charge kann anders ausfallen." },
-      { "typ": "inhalt", "titel": "Restfeuchte im Blick", "text": "Ist eine Charge zu trocken (unter 8 %), steht ein Hinweis dabei: Blüten zerfallen dann leichter, Terpene verfliegen." },
-      { "typ": "cta", "titel": "Sieh dir ein Beispiel an", "text": "Im Buch steht jede Bewertung mit allen Noten." }
+      {
+        "typ": "cover",
+        "kicker": "So bewerten wir",
+        "titel": "Was hinter einer Note im Buch steckt"
+      },
+      {
+        "typ": "inhalt",
+        "titel": "Vier Merkmale, dann die Gesamtnote",
+        "punkte": [
+          "Aussehen",
+          "Geruch",
+          "Geschmack",
+          "Konsistenz"
+        ]
+      },
+      {
+        "typ": "inhalt",
+        "titel": "Blätter statt Sterne",
+        "text": "Die Gesamtnote vergibt das Buch in Blättern von 1 bis 5. Ein Blatt mehr heißt: die Charge überzeugt uns mehr."
+      },
+      {
+        "typ": "inhalt",
+        "titel": "Bewertet wird die Charge",
+        "text": "Nicht die Sorte im Allgemeinen, sondern genau die Charge, die auf dem Tisch lag. Eine andere Charge kann anders ausfallen."
+      },
+      {
+        "typ": "inhalt",
+        "titel": "Restfeuchte im Blick",
+        "text": "Ist eine Charge zu trocken (unter 8 %), steht ein Hinweis dabei: Blüten zerfallen dann leichter, Terpene verfliegen."
+      },
+      {
+        "typ": "cta",
+        "titel": "Zum Nachschlagen speichern",
+        "text": "Aussehen, Geruch, Geschmack, Konsistenz, Gesamtnote in Blättern. Immer an der Charge."
+      }
     ]
   },
-  "caption": "Fünf Noten, Blätter statt Sterne: So bewerten wir jede Charge.\n\nAussehen, Geruch, Geschmack, Konsistenz und Gesamtnote. Immer dasselbe Schema, damit Bewertungen vergleichbar bleiben.\n\nWelche Note ist dir beim Vergleichen am wichtigsten? Link in Bio\n\n#bookofterpz #medizinalcannabis #terpene #bewertung"
+  "caption": "Was bedeutet eigentlich 4 von 5 Blättern? Das ganze Schema auf sechs Slides.\n\nAussehen, Geruch, Geschmack und Konsistenz, dann die Gesamtnote in Blättern. Immer an der Charge, damit Bewertungen vergleichbar bleiben.\n\nWelche der fünf Noten schaust du dir zuerst an?\n\n#bookofterpz #aromaprofil #sortenbewertung #terpene"
 }

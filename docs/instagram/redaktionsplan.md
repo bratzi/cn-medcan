@@ -19,6 +19,8 @@ legt sie nie an. Stories pflegt der Betreiber manuell in der App.
 
 ## Dramaturgie eines Karussells
 
+Die ausführlichen Regeln (Hook, Humanizer, Hashtags nach Größe, Checkliste) stehen in `handwerk.md`; sie gelten vorrangig.
+
 3 bis 10 Slides, im Regelfall 5 bis 7: Cover, 2 bis 5 Inhaltsslides, CTA.
 
 1. **Cover (Hook):** eine Frage oder eine Behauptung, höchstens 6 Wörter. Der Kicker darüber ist kurz und handschriftlich
