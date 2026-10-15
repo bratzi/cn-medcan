@@ -28,16 +28,46 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 
 ## ⇢ Hier geht es weiter
 
-### ⇢ SESSION 64 (2026-10-15): Sorte im Fokus (Spec freigegeben), Publora-MCP, Faktenblatt
-- **Beim Sessionstart selbst prüfen:** Publora-MCP (`claude mcp add publora -s local`, Schlüssel aus `.env`) per `/mcp`
-  bzw. Werkzeugliste verbunden? Konten abrufen als Probe.
-- Spec `docs/superpowers/specs/2026-10-15-sorte-im-fokus-design.md` vom Nutzer freigegeben; Plan folgt.
-- Faktenblatt Wissen (terpene-erklaert, trichome-aussehen, lagerung) in `docs/instagram/themen.md`.
-- Startseiten-Abstimmung bleibt wie sie ist (Nutzer). Reel „portal“ für Mi 28.10. bauen (Nutzer will Remotion).
-- Live geprüft: Autorkasten bricht sauber um, gesetztes Herz zeigt 1 (Fix `66631c2` ok). Test-Like bei
-  `bewertung-c7a31726…` per JS-Klick nicht entfernt (blieb gesetzt); danach `/reviews` Error 1102 (CPU). Offen:
-  per Koordinaten-Klick entfernen, Pinnwand hell/dunkel, `/ig` Optik. Kleinkram aus älteren Sessions: Nutzer sagt ja,
-  als eigener Strang in den Plan.
+### ⇢ SESSION 64 (2026-10-15): Sorte im Fokus live, 1102-Fix, Story-Mitposten, Publora-MCP (`aef5009..HEAD`)
+
+**ALS ERSTES**
+1. Publora-MCP prüfen (eingerichtet per `claude mcp add publora -s local`, Schlüssel aus `.env`): Werkzeuge da?
+   Probe: Konten abrufen. Fehlt er, `/mcp` ansehen.
+2. **Reel „aroma-karte“ neu bauen** (Nutzer-Feedback, Memory `ig-zielgruppe-kenner`): Terpen-Icons des Portals
+   (`components/review/AromaIcon.tsx`, `TerpenBand`) ins Reel, und Fakten für Kenner statt Grundlagen (z. B.
+   Ester/Thiole beim „Diesel“, Terpen in unerwarteten Pflanzen, Myrcen in Hopfen). Dateien:
+   `docs/instagram/reels/aroma-karte.{json,txt}`, `video/src/ErklaerReel.tsx` (Icons als Szenen-Feld ergänzen).
+   Danach alten Publora-Entwurf `6ad1210710a1cbf1ad924e56` löschen (`loeschen()` in scripts/ig-gemeinsam.ts), neu
+   per `scripts/ig-reel.ts` anlegen (legt jetzt auch den Story-Entwurf an), für Mi 28.10 17:00 UTC planen, sobald
+   im Publora-Horizont (~7 Tage, also ab ~21.10).
+3. Story-Mitposten erstmals live beobachten: erster Lauf von ig-karussell/ig-reel mit Story; prüfen, ob Publora den
+   Story-Entwurf mit `platformSettings.instagram.videoType = "STORIES"` annimmt und als Story postet.
+4. Cloud-Routine `trig_01AhFzavSK5zreuGEASsz5Ws`: Prompt sagt noch nichts von Storys; die Skripte machen es jetzt
+   automatisch (ig-karussell legt Story an, ig-planen plant sie mit). Prüfen, ob die Routine `ig-planen.ts` nutzt.
+
+**Erledigt und live**
+- Plan `docs/superpowers/plans/2026-10-15-sorte-im-fokus.md` komplett (Subagent-driven, alle Tasks reviewt):
+  Bewertung = Sorte + Vertreiber (Stärke optional, `ware_genau`), `/blueten/<kultivar-slug>` ist Sortenseite mit
+  Ware-Leiste, alte Produktadressen leiten 308 auf `?ware=` (live geprüft: `/blueten/420-evolution-22-1-ca-mac` →
+  `/blueten/mac-1?ware=…`), Sorten-Explorer auf der Startseite (live: 12 Sorten, kein Querscroll), Bewertungen zeigen
+  Sortenname + „über Vertreiber“, Ranglisten je Sorte, Katalog je Sorte. Kleinkram: HWG-Stämme, „einem weiteren“,
+  „25 %“ statt „25 bis 25 %“, `#kommentare-<id>` öffnet Bereich, 8-Ball-Dublette zusammengelegt.
+- Remote-D1: 0024 (Slugs, review.kultivar_id/vertreiber_id/ware_genau, kultivar_vertreiber_kennwerte), 0025
+  (8 Ball Kush) eingespielt; Backfill nach Deploy wiederholt; `scripts/kennwerte-neu.ts` gelaufen (13 Paare).
+- 1102: Band auf `/reviews` 8 statt 24 Einträge (`aef5009`). Telemetrie: Kaltstart nach jedem Deploy kostet
+  250–1500 ms CPU auf vielen Routen; Startseite hatte danach noch 2× exceededCpu. **Offen:** Kaltstart/Bundle und
+  Startseiten-Render untersuchen; weniger Deploys (keine Doku-only-Pushes einzeln).
+- Faktenblatt Wissen in `docs/instagram/themen.md`. Story-Mitposten in `scripts/ig-gemeinsam.ts`
+  (`storyEntwurf`, `planenMitStory`), Test `tests/ig-story.test.ts`.
+- Live geprüft Session 62: Autorkasten bricht sauber um, gesetztes Herz zeigt 1.
+
+**Offen (nicht dringend)**
+- Test-Like bei `bewertung-c7a31726…` (TerpzTester#1) per Koordinaten-Klick entfernen (JS-Klick wirkte nicht).
+- Pinnwand öffentliches Profil hell/dunkel, `/ig` Optik, Explorer hell/dunkel und Knopfgröße 44 px bei 390 px.
+- Aus dem Gesamtreview: Produktlinks (ProduktCard, EmpfehlungsListe, KapitelAufschlag, TopFlop, Umfragen, Admin)
+  noch auf Produkt-Slug → je ein 308-Sprung; auf Sorten-Slug umstellen. Kein Link setzt `#kommentare-<id>`.
+  `8-ball-kush-2` ohne Umleitung. Explorer zeigt bei wenig Daten < 12 Sorten. Rangliste sortiert weiter nach Note
+  (vorbestehend, nur für Mitglieder hinter Gate; HWG-Frage beim Nutzer klären).
 
 ### ⇢ SESSION 63 (2026-10-15): Instagram als Produktmarke, selbständiges Posten (`2ac1a4f..b15c6ff`)
 
