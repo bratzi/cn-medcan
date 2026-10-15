@@ -15,8 +15,8 @@ Stand 2026-10-15. Der Betreiber setzt Profil, Bio und Highlights in der Instagra
 Bio (drei Zeilen, 138 Zeichen, Limit 150; Nutzen, Thema, Beleg nach ig-profile-optimizer):
 
 ```
-Unabhängige Sortenbewertung: 5 Noten, jede an ihrer Charge.
-Die Community wählt, was wir als Nächstes testen.
+Unabhängige Sortenbewertung: 5 Noten, ein Schema.
+Bei Events bringen wir Sorten gemeinsam nach vorn.
 Mitglied werden: Link unten.
 ```
 
@@ -27,10 +27,10 @@ Kreis in der Mitte, die Farbe folgt der Säule.
 
 | Highlight | Säule | Story-Ideen |
 |---|---|---|
-| Was ist das | Transparenz (Blattgrün) | Das Buch in einem Satz; Eine Person bewertet, die Community wählt; Screenshot der Startseite; Warum jede Bewertung an einer Charge hängt |
+| Was ist das | Transparenz (Blattgrün) | Das Buch in einem Satz; Eine Person bewertet, die Community macht bei Events mit; Screenshot der Startseite; Aroma statt Hype |
 | So bewerten wir | Transparenz (Blattgrün) | Die Noten: Aussehen, Geruch, Geschmack, Konsistenz; Gesamtnote in Blättern von 1 bis 5; Beispielkarte einer Bewertung; Chargen derselben Sorte unterscheiden sich |
-| Abstimmen | Mitbestimmen | So stimmst du ab (Screenshot Umfrage); Wer abstimmen darf: verifizierte Mitglieder; Aktuelle Umfrage mit Link; Ergebnis der letzten Runde |
-| FAQ | Portal | Wie werde ich Mitglied; Wo finde ich eine Sorte; Wie lese ich eine Bewertung; Was heißt Charge |
+| Mitmachen | Mitbestimmen | Was ein Event ist; Sorten vorschlagen und pushen; Aktuelles Event mit Link; Was beim letzten Event herauskam |
+| FAQ | Portal | Wie werde ich Mitglied; Wo finde ich eine Sorte; Wie lese ich eine Bewertung; Muss ich bei Events mitmachen? |
 
 Hochladen: Profil, Neu, Story-Highlight, Stories wählen, Name eintragen, „Cover bearbeiten“, Bild aus der Galerie.
 
@@ -40,7 +40,7 @@ Angepinnt werden drei Karussells, von links nach rechts:
 
 1. Manifest (`docs/instagram/karussells/manifest.json`)
 2. So bewerten wir (`so-bewerten-wir.json`)
-3. Stimm mit ab (`stimm-mit-ab.json`)
+3. Mach mit (`mach-mit.json`)
 
 Entwurf anlegen: `npx tsx scripts/ig-karussell.ts docs/instagram/karussells/<name>.json`. Veröffentlichen und
 anpinnen macht der Betreiber in der App, in umgekehrter Reihenfolge (Stimm mit ab zuerst), damit das Manifest

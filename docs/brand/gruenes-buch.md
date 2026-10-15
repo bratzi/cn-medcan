@@ -31,7 +31,7 @@ wird. Daher kommen die Farbe der Handschrift und der eine WebGL-Effekt (Abschnit
   Verlauf Grün–Violett, feine Kopierstift-Kontur, Glanz; dahinter die vier driftenden Umrisse
   (`.marke-kontur-N`). Steht im Kopf aller Seiten. Diese Nutzerentscheidung geht dem Verbot von
   Verläufen unten vor (gilt für Wortmarke im Auftakt und Logo).
-- **Unterzeile** „Charge für Charge“ in Geist 500, `text-caption`, Versalien per CSS, Laufweite 0,3 em,
+- **Unterzeile** „Terpen für Terpen“ in Geist 500, `text-caption`, Versalien per CSS, Laufweite 0,3 em,
   in `text`. Gespeichert in natürlicher Schreibung. Schwung über Ordnung.
 - **Signet** „gB“ in Inspiration, `violett-500` auf `neutral-100`, quadratisch, aus den Glyphen der Schrift
   (`scripts/marke/signet.ts`): Favicon, App-Icon, Instagram-Profilbild.
@@ -233,5 +233,5 @@ dank, 420, Heilung, heilt, wirkt gegen.
 | Motiv | freigestelltes Blatt in Farbe auf dem Papier | Joint vor dunklem Grund, Foto negativ per `invert` |
 | Wirkung | Wirkung nur im vollständigen Eintrag | große Wirkungsnote auf der Startseite |
 | Zahlen | echte Zähler oder die Leitsätze | „Über 10.000 zufriedene Nutzer“ |
-| Trenner | „Book of Terpz. Charge für Charge.“ | „Book of Terpz — Charge für Charge“ |
+| Trenner | „Book of Terpz. Terpen für Terpen.“ | „Book of Terpz — Terpen für Terpen“ |
 | Formen | eckige Karte, Pillen-Button | abgerundete Karte, eckiger Button |

@@ -15,6 +15,10 @@ Karussell.
 
 ## Nie erfinden
 
+**Veraltet, nie mehr behaupten (Betreiber 2026-10-15):** Eine Bewertung hängt *nicht* an einer Charge; die Charge ist
+eine freiwillige Angabe. Abstimmungen und Runden sind **freiwillige Events**, bei denen die Community Sorten gemeinsam
+voranbringt und zusammen bewertet. Sie stehen nie im Mittelpunkt eines Posts über das Portal.
+
 Keine Zahl, kein Datum, kein Ergebnis, das nicht im Repo belegt ist (`docs/instagram/themen.md`,
 `docs/brand/gruenes-buch.md`, Code). Fehlt ein konkretes Detail, Satz weglassen, nicht schmücken. Eine erfundene Zahl ist
 eine Richtigstellung; eine fehlende nur ein schwächerer Post.
@@ -63,7 +67,7 @@ stehen lassen. Immer streichen:
 3 bis 5, nach Größe gemischt: 2–3 Nische (unter 50k Beiträge), 1–2 mittel, höchstens 1 breit. Immer passend zum
 Inhalt, am Ende der Caption. **Pro Thema wechseln**, nicht denselben Block auf jeden Post.
 Bausteine: Marke `#bookofterpz` (immer), mittel `#medizinalcannabis` `#terpene`, Nische nach Thema (`#terpenprofil`,
-`#aromaprofil`, `#sortenbewertung`, `#chargenbewertung`, Terpenname wie `#limonen`). Keine Wirk-, Patienten- oder
+`#aromaprofil`, `#sortenbewertung`, `#community`, Terpenname wie `#limonen`). Keine Wirk-, Patienten- oder
 Krankheits-Tags.
 
 ## Reel (Hook in den ersten 1–3 Sekunden)
@@ -89,7 +93,7 @@ Nie denselben Text zweimal posten.
 2. Cover verspricht etwas und öffnet eine Schleife; Stärkstes auf Slide 2–3.
 3. Letzte Slide: Zusammenfassung plus eine Bitte.
 4. Hook in der ersten Caption-Zeile, höchstens 125 Zeichen; genau eine Bitte in der Caption.
-5. Keine erfundenen Fakten; HWG-frei (Duft, Geschmack, Aussehen, Charge, Portal, nie Wirkung).
+5. Keine erfundenen Fakten; HWG-frei (Duft, Geschmack, Aussehen, Noten, Portal, nie Wirkung).
 6. Humanizer-Durchgang: Brücken, Stakkato, Dreier, Modewörter, Striche.
 7. 3–5 Hashtags nach Größe, anders als beim letzten Post.
 8. `--probe` rendern und die Slides ansehen: lesbar in 2 Sekunden, nichts abgeschnitten.

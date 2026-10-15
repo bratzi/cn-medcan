@@ -1,0 +1,34 @@
+{
+  "karussell": {
+    "saeule": "mitbestimmen",
+    "schluessel": "mach-mit",
+    "slides": [
+      {
+        "typ": "cover",
+        "kicker": "Mach mit",
+        "titel": "Sorten gemeinsam nach vorn bringen"
+      },
+      {
+        "typ": "inhalt",
+        "titel": "Events statt Pflicht",
+        "text": "Ab und zu laden wir zu Events ein. Wer mag, macht mit. Wer nicht, liest einfach weiter."
+      },
+      {
+        "typ": "inhalt",
+        "titel": "Vorschlagen und pushen",
+        "text": "Mitglieder schlagen Sorten vor und bringen gemeinsam die nach vorn, die sie spannend finden."
+      },
+      {
+        "typ": "inhalt",
+        "titel": "Zusammen bewerten",
+        "text": "Am Ende bewerten wir gemeinsam. So entsteht mehr Wissen über eine Sorte, als einer allein sammelt."
+      },
+      {
+        "typ": "cta",
+        "titel": "Werde Mitglied",
+        "text": "Freiwillig mitmachen, Sorten pushen, gemeinsam mehr wissen."
+      }
+    ]
+  },
+  "caption": "Eine Sorte gemeinsam nach vorn bringen? Bei unseren Events geht das, ganz freiwillig.\n\nMitglieder schlagen Sorten vor, pushen ihre Favoriten und bewerten am Ende zusammen. Wer nur mitlesen will, liest einfach mit.\n\nLink in Bio\n\n#bookofterpz #community #sortenbewertung #medizinalcannabis"
+}

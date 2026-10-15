@@ -14,7 +14,7 @@ const beispiel: ErklaerReelProps = {
   farbe: "#3fbf94",
   szenen: [
     { kicker: "So bewerten wir", titel: "Fünf Noten", sekunden: 4 },
-    { titel: "An der Charge", text: "Jede Charge gleich geprüft.", sekunden: 5 },
+    { titel: "Alle Noten offen", text: "Jede Sorte gleich geprüft.", sekunden: 5 },
     { titel: "Link in Bio", sekunden: 4 },
   ],
 };

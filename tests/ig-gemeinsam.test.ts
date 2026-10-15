@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { browserPfad, cssMitDaten, entwurfMedien, feedSchluessel, istThemenMarke, linkDurchStil, markenAus, pngOk, schriftUrls } from "../scripts/ig-gemeinsam";
+import { browserPfad, cssMitDaten, entwurfMedien, feedSchluessel, istThemenMarke, linkDurchStil, markenAus, planZeit, pngOk, schriftUrls } from "../scripts/ig-gemeinsam";
 
 test("Schlüssel aus IG_FEED_KEY oder IG_FEED_URL", () => {
   assert.equal(feedSchluessel({ IG_FEED_KEY: "a" }), "a");
@@ -96,4 +96,12 @@ test("pngOk: gültig, abgeschnitten, falsche Größe", () => {
   assert.equal(pngOk(png(1080, 1350, false), 1080, 1350), false);
   assert.equal(pngOk(png(1080, 1300), 1080, 1350), false);
   assert.equal(pngOk(Buffer.from("kein png"), 1, 1), false);
+});
+
+test("planZeit: jetzt = +3 Minuten, Vergangenes und Unsinn abgelehnt", () => {
+  const t0 = new Date("2026-10-15T12:00:00.000Z");
+  assert.equal(planZeit("jetzt", t0), "2026-10-15T12:03:00.000Z");
+  assert.equal(planZeit("2026-10-16T16:00:00Z", t0), "2026-10-16T16:00:00.000Z");
+  assert.throws(() => planZeit("2026-10-15T12:01:00Z", t0), /Zukunft/);
+  assert.throws(() => planZeit("morgen", t0), /gültige/);
 });

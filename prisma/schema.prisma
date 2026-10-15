@@ -214,8 +214,8 @@ model PharmacyStock {
   @@map("pharmacy_stock")
 }
 
-/// Charge / Batch. Bewertungen haengen an der Charge, nicht nur am Produkt -
-/// zwei Chargen desselben Handelsnamens koennen deutlich abweichen.
+/// Charge / Batch. Eine optionale Angabe zur Bewertung (Nutzer 2026-10-15): man kann sie nennen, muss aber nicht -
+/// Bewertungen gelten der Sorte, nicht einer bestimmten Charge.
 model Charge {
   id            String    @id @default(uuid())
   strainId      String    @map("strain_id")
@@ -237,7 +237,7 @@ model Charge {
 //  Community
 // ---------------------------------------------------------------------------
 
-/// Bewertung nach festem Schema, gebunden an eine konkrete Charge.
+/// Bewertung nach festem Schema; die Charge ist optional.
 model Review {
   id       String  @id @default(uuid())
   strainId String  @map("strain_id")

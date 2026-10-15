@@ -36,9 +36,8 @@ Fakten aus dem Code und `docs/brand/gruenes-buch.md`. Pfad nennen, damit Leser e
 |---|---|---|
 | bewertungsschema | Bewertungsschema | Jede Sorte nach demselben Schema: Aussehen, Geruch, Geschmack, Konsistenz, Gesamtnote in Blättern (1–5). Wirkung wird auf Instagram nie gezeigt. |
 | aroma-karte | Aroma-Karte | Zeigt, welche Terpene zu welchen Aromen führen: zehn Aromarichtungen von Zitrus bis Diesel. |
-| chargen | Chargenbezug | Jede Bewertung hängt an einer konkreten Charge, weil sich Chargen derselben Sorte unterscheiden. |
-| restfeuchte | Restfeuchte | Hinweis bei zu trockener Charge (unter 8 %): Blüten zerfallen leichter, Terpene verfliegen. |
-| abstimmung | Abstimmung | Verifizierte Mitglieder wählen, welche Sorte als Nächstes bewertet wird. Seite `/umfragen`. |
+| restfeuchte | Restfeuchte | Hinweis bei zu trockenen Blüten (unter 8 %): Blüten zerfallen leichter, Terpene verfliegen. |
+| events | Events | Freiwillige Events: Mitglieder schlagen Sorten vor, pushen sie gemeinsam und bewerten zusammen. Seite `/umfragen`. |
 | kommentare-likes | Kommentare und Likes | Bewertungen kommentieren und liken, Blüten merken, Profilen folgen. |
 | zahlen-aus-dem-buch | Zahlen aus dem Buch | Statistik auf `/reviews`: meistbewertet, am besten bewertet, meistkommentiert. |
 | buch | Das Buch | Bewertungen zum Blättern wie in einem Notizbuch, mit handschriftlicher Notiz. |
@@ -47,10 +46,9 @@ Fakten aus dem Code und `docs/brand/gruenes-buch.md`. Pfad nennen, damit Leser e
 
 | schluessel | Thema | Kern |
 |---|---|---|
-| ehrlich-und-chargengenau | Ehrliche Bewertungen | Eine Person bewertet nach festem Schema, gebunden an die Charge. |
-| community-waehlt | Die Community wählt | Mitglieder bestimmen per Abstimmung die nächste Bewertung. Das Ergebnis ist verbindlich. |
-| nur-verifiziert | Nur verifizierte Mitglieder | Abstimmen dürfen nur verifizierte Mitglieder, damit Ergebnisse nicht gekauft oder gefälscht werden. |
-| aroma-statt-hype | Aroma statt Hype | Es geht um Duft, Geschmack, Aussehen und Qualität der Charge, nicht um THC-Zahlen. |
+| ehrlich-nach-schema | Ehrliche Bewertungen | Eine Person bewertet nach festem Schema, alle Noten offen. |
+| gemeinsam-nach-vorn | Gemeinsam nach vorn | Bei freiwilligen Events bringt die Community Sorten gemeinsam voran und bewertet zusammen. |
+| aroma-statt-hype | Aroma statt Hype | Es geht um Duft, Geschmack, Aussehen und Qualität, nicht um THC-Zahlen. |
 
 ## Schema (`art: "schema"`)
 

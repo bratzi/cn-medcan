@@ -13,18 +13,19 @@ Präsenz rein als Marke, keine Person, kein Gesicht.
 Medizinalcannabis ist verschreibungspflichtig, §10 HWG verbietet Publikumswerbung dafür. Beworben wird ausschließlich
 das Portal (Transparenz, Community, Wissen über Sensorik). Verboten in Bild und Text: Sortenname als Kaufanreiz, Wirkung,
 Beschwerden, Dosierung, Preis, Apotheke, Aufforderung zu Konsum oder Bezug. Jeder Text läuft durch den bestehenden
-HWG-Filter (`lib/ig-karte.ts`), jeder Post wird vom Betreiber freigegeben. Nichts wird automatisch veröffentlicht.
+HWG-Filter (`lib/ig-karte.ts`), jeder Post durchläuft die Checkliste in `docs/instagram/handwerk.md`. Nachtrag 2026-10-15: Der Betreiber hat Claude
+beauftragt, Posts selbständig zu planen und zu veröffentlichen (`scripts/ig-planen.ts`); erster Post als Probe.
 
 ## Positionierung
 
-„Unabhängige Sortenbewertung für Medizinalcannabis – ehrlich, an der Charge, und die Community wählt, was als Nächstes
-getestet wird.“
+„Unabhängige Sortenbewertung für Medizinalcannabis – ehrlich, nach festem Schema, mit einer Community, die Sorten
+gemeinsam voranbringt.“
 
 ## Säulen
 
-1. **Transparenz**: festes Schema (fünf Noten, Restfeuchte, acht Aroma-Achsen), Bewertung an einer konkreten Charge.
-2. **Mitbestimmen**: Umfragen, nur verifizierte Mitglieder stimmen ab, gesetzte und gewählte Plätze offen gekennzeichnet.
-3. **Wissen**: Terpene, Aussehen, Trichome, Lagerung, Chargenetikett lesen. Nur Sensorik und Qualität.
+1. **Transparenz**: festes Schema (fünf Noten, Restfeuchte, acht Aroma-Achsen), alle Noten offen. (Nachtrag 2026-10-15: Bewertungen hängen nicht an einer Charge; die Charge ist optional.)
+2. **Mitmachen** (Schlüssel `mitbestimmen`): freiwillige Events, bei denen die Community Sorten gemeinsam vorschlägt, pusht und zusammen bewertet. Nie Hauptfokus (Nachtrag 2026-10-15).
+3. **Wissen**: Terpene, Aussehen, Trichome, Lagerung, Aromarichtungen. Nur Sensorik und Qualität.
 4. **Portal zeigen**: Features als Produkt-Demo (Filter, Geschmacksmatrix, Vergleich, Mitglied werden).
 
 ## Rhythmus
@@ -50,8 +51,8 @@ automatische Bewertungs-Entwurf in der Routine wird abgeschaltet. Stories pflegt
 ## Profil
 
 - Bio mit Nutzenversprechen in einem Satz, Link auf die Landingpage `/ig`.
-- Story-Highlights: Was ist das, So bewerten wir, Abstimmen, FAQ.
-- Drei gepinnte Posts: Manifest, „So bewerten wir“, „Stimm mit ab“.
+- Story-Highlights: Was ist das, So bewerten wir, Mitmachen, FAQ.
+- Drei gepinnte Posts: Manifest, „So bewerten wir“, „Mach mit“.
 
 ## Technik
 
@@ -62,7 +63,7 @@ automatische Bewertungs-Entwurf in der Routine wird abgeschaltet. Stories pflegt
    entfernt, Bremse bleibt (höchstens 3 offene Entwürfe).
 4. **Reel**: Skript nimmt per Playwright eine Portal-Tour auf (Remotion für animierte Erklärungen), schneidet auf
    15 bis 30 s, legt sie als Video-Entwurf in Publora ab. Läuft lokal, nur kostenlose Werkzeuge.
-5. **Landingpage `/ig`**: kurze Seite im Portal, drei Einstiege (So bewerten wir, Abstimmen, Mitglied werden).
+5. **Landingpage `/ig`**: kurze Seite im Portal, drei Einstiege (So bewerten wir, Mitmachen, Mitglied werden).
 6. **Profiltexte**: Bio, Highlight-Cover, drei Pin-Posts als Entwürfe.
 
 ## Erfolg nach acht Wochen

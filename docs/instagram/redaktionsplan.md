@@ -63,7 +63,7 @@ Mindestens acht Wochen, in dieser Reihenfolge, wenn nichts dagegen spricht.
 | 3 | myrcen | Myrcen im Porträt: erdig, fruchtig, kräutrig; Hopfen, Mango, Thymian |
 | 4 | restfeuchte | Restfeuchte: warum zu trockene Blüten leichter zerfallen und Terpene verfliegen |
 | 5 | limonen | Limonen im Porträt: Zitrus; Zitrusschalen, Wacholder, Pfefferminze |
-| 6 | chargenetikett | Das Chargenetikett lesen: was draufsteht und warum die Charge zählt |
+| 6 | aromarichtungen | Zehn Aromarichtungen von Zitrus bis Diesel |
 | 7 | trichome-aussehen | Trichome und Aussehen: was man an der Blüte sehen kann |
 | 8 | lagerung | Lagerung: warum Licht, Luft und Trockenheit den Duft verändern |
 | 9 | beta-caryophyllen | Beta-Caryophyllen: würzig, holzig; Schwarzer Pfeffer, Nelke, Zimt |
@@ -78,7 +78,7 @@ ester-thiole).
 |---|---|
 | fuenf-noten | Die fünf Noten: was hinter Aussehen, Geruch, Geschmack, Konsistenz und Gesamtnote steckt |
 | blaetter-statt-sterne | Blätter statt Sterne: die Gesamtnote von 1 bis 5 |
-| warum-charge | Warum Charge: dieselbe Sorte, andere Charge, andere Bewertung |
+| alle-noten-offen | Alle Noten offen: warum du mehr siehst als einen Endwert |
 | wer-bewertet | Wer bewertet: eine Person, festes Schema, offen gezeigt |
 | aroma-statt-hype | Aroma statt Hype: Duft, Geschmack, Aussehen statt Zahlen auf dem Etikett |
 
@@ -88,12 +88,12 @@ Schon als Pin-Posts angelegt: `manifest`, `so-bewerten-wir` (Dateien in `docs/in
 
 | schluessel | Thema |
 |---|---|
-| so-laeuft-eine-runde | So läuft eine Runde: Auswahl, Abstimmung, Ergebnis |
-| gesetzt-oder-gewaehlt | Gesetzte und gewählte Plätze, offen gekennzeichnet |
-| nur-verifiziert | Warum nur verifizierte Mitglieder abstimmen |
-| mitglied-werden | Mitglied werden: so kommst du in die Abstimmung |
+| was-ist-ein-event | Was ein Event ist: freiwillig, gemeinsam, eine Sorte nach vorn |
+| sorten-pushen | Sorten vorschlagen und gemeinsam pushen |
+| zusammen-bewerten | Zusammen bewerten: mehr Wissen als einer allein |
+| mitglied-werden | Mitglied werden: mitlesen, mitbewerten, bei Events mitmachen |
 
-Schon als Pin-Post angelegt: `stimm-mit-ab`.
+Schon als Pin-Post angelegt: `mach-mit`. Events sind freiwillig und nie Hauptthema der Woche; die Säule läuft höchstens jeden zweiten Freitag.
 
 ### Portal (Mi, Säule `portal`, Reel; als Karussell nur auf Wunsch)
 
@@ -102,7 +102,7 @@ Schon als Pin-Post angelegt: `stimm-mit-ab`.
 | aroma-karte | Aroma-Karte: welche Terpene zu welchen Aromen führen |
 | das-buch | Das Buch: Bewertungen zum Blättern mit handschriftlicher Notiz |
 | zahlen-aus-dem-buch | Zahlen aus dem Buch: meistbewertet, am besten bewertet, meistkommentiert (`/reviews`) |
-| vergleich | Vergleich: Chargen und Bewertungen nebeneinander |
+| vergleich | Vergleich: Sorten und Bewertungen nebeneinander |
 
 ## Reihenfolge der Fr-Posts
 

@@ -14,7 +14,7 @@ import { htmlOffline, screenshot, umgebung } from "./ig-gemeinsam";
 const COVER: Array<{ datei: string; titel: string; saeule: IgSaeule }> = [
   { datei: "was-ist-das", titel: "Was ist das", saeule: "transparenz" },
   { datei: "so-bewerten-wir", titel: "So bewerten wir", saeule: "transparenz" },
-  { datei: "abstimmen", titel: "Abstimmen", saeule: "mitbestimmen" },
+  { datei: "mitmachen", titel: "Mitmachen", saeule: "mitbestimmen" },
   { datei: "faq", titel: "FAQ", saeule: "portal" },
 ];
 

@@ -210,10 +210,10 @@ export function screenshot(url: string, ziel: string, groesse = "1080,1350"): vo
   }
 }
 
-async function publora<T>(pfad: string, body?: unknown): Promise<T> {
+async function publora<T>(pfad: string, body?: unknown, methode?: "PUT" | "DELETE"): Promise<T> {
   const schluessel = pflicht(umgebung(), "PUBLORA_API_KEY");
   const antwort = await fetch(`${PUBLORA}/${pfad}`, {
-    method: body === undefined ? "GET" : "POST",
+    method: methode ?? (body === undefined ? "GET" : "POST"),
     headers: { "Content-Type": "application/json", "x-publora-key": schluessel },
     body: body === undefined ? undefined : JSON.stringify(body),
   });
@@ -263,6 +263,28 @@ export async function publoraPosts(): Promise<unknown[]> {
     if (!pagination?.hasNextPage) break;
   }
   return alle;
+}
+
+/**
+ * Planzeit für Publora: „jetzt“ heißt in drei Minuten (Publora braucht Vorlauf), sonst ein ISO-Zeitpunkt, der mindestens
+ * zwei Minuten in der Zukunft liegt. Ungültiges oder Vergangenes ist ein Fehler, damit nie versehentlich sofort gepostet wird.
+ */
+export function planZeit(angabe: string, jetzt: Date = new Date()): string {
+  if (angabe === "jetzt") return new Date(jetzt.getTime() + 3 * 60_000).toISOString();
+  const zeit = new Date(angabe);
+  if (Number.isNaN(zeit.getTime())) throw new Error(`keine gültige Zeit: ${angabe}`);
+  if (zeit.getTime() < jetzt.getTime() + 2 * 60_000) throw new Error(`Zeit liegt nicht mindestens 2 Minuten in der Zukunft: ${angabe}`);
+  return zeit.toISOString();
+}
+
+/** Entwurf zur Veröffentlichung einplanen (Publora: update-post mit status „scheduled“). */
+export async function planen(postGroupId: string, zeitpunkt: string): Promise<void> {
+  await publora(`update-post/${postGroupId}`, { status: "scheduled", scheduledTime: zeitpunkt }, "PUT");
+}
+
+/** Entwurf samt Medien löschen. */
+export async function loeschen(postGroupId: string): Promise<void> {
+  await publora(`delete-post/${postGroupId}`, undefined, "DELETE");
 }
 
 /** Themen-Posts des Agenten: alte Themenkarten (`bot-thema-`) und Karussells (`bot-k-`). */
