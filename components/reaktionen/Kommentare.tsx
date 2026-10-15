@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useRef, useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 
 import { ladeKommentareSeite, loescheKommentar, meldeKommentar } from "@/app/[lang]/reaktionen/kommentar-aktionen";
 import { KommentarFeld } from "@/components/reaktionen/KommentarFeld";
@@ -63,6 +63,22 @@ export function Kommentare({
   const [differenz, setDifferenz] = useState(0);
   const [laedt, starteLaden] = useTransition();
   const laeuftSchon = useRef(false);
+  const detailsRef = useRef<HTMLDetailsElement>(null);
+  const anker = `kommentare-${zielId}`;
+
+  // Ein Link auf `#kommentare-<id>` (auch von derselben Seite aus) klappt den Bereich auf und scrollt dorthin.
+  useEffect(() => {
+    const oeffneBeiHash = () => {
+      if (window.location.hash !== `#${anker}`) return;
+      const d = detailsRef.current;
+      if (!d) return;
+      d.open = true;
+      d.scrollIntoView({ block: "start" });
+    };
+    oeffneBeiHash();
+    window.addEventListener("hashchange", oeffneBeiHash);
+    return () => window.removeEventListener("hashchange", oeffneBeiHash);
+  }, [anker]);
 
   const gesamt = Math.max(0, anzahl + differenz);
 
@@ -94,7 +110,9 @@ export function Kommentare({
 
   return (
     <details
-      className="group flex flex-col gap-4"
+      ref={detailsRef}
+      id={anker}
+      className="group flex flex-col gap-4 scroll-mt-24"
       open={offen || undefined}
       onToggle={(e) => {
         if (e.currentTarget.open && !geladen && !laedt) lade();
