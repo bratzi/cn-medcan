@@ -402,7 +402,7 @@ export const de = {
     karte: {
       symbolbild: "Symbolbild",
       vertreiberUnbekannt: "Vertreiber unbekannt",
-      weitereVertreiber: { one: "auch bei {anzahl} weiteren Vertreiber", other: "auch bei {anzahl} weiteren Vertreibern" },
+      weitereVertreiber: { one: "auch bei einem weiteren Vertreiber", other: "auch bei {anzahl} weiteren Vertreibern" },
       keinTerpenprofil: "Kein Terpenprofil hinterlegt.",
       dominant: "dominant",
     },
