@@ -14,6 +14,7 @@ const ID = "ed9c2468f2c9b661441986de9d72f496";
 const kultivar = {
   id: ID, name: "Black Cherry Punch", typ: "INDICA" as const, thcMin: 20, thcMax: 30,
   vertreiber: ["Alpha", "Beta", "Gamma", "Delta", "Epsilon", "Zeta", "Eta"], handelsnamen: 7, overall: 3.8, bewertungen: 4,
+  bildSlug: null, herstellerBildPfad: null,
 };
 
 test("AnsichtUmschalter: zwei Links, aktuelle Ansicht mit aria-current, Wechsel auf Seite 1 mit übrigen Filtern", () => {

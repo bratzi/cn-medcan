@@ -25,6 +25,8 @@ type Props = {
   rahmen?: string;
   /** Klassen des äußeren figure; Standard "flex w-full flex-col gap-2". Im Buch füllt es die Höhe. */
   className?: string;
+  /** Ganzes Bild im Rahmen (object-contain) statt randlos beschnitten; für Katalogkarten. */
+  einpassen?: boolean;
 };
 
 /** Wert einer Media Query; auf dem Server false. */
@@ -62,7 +64,7 @@ function useTabVerborgen(): boolean {
  * Nur im Browser noetig, weil Zeitgeber und Zustand: das Muster ohne echtes
  * Bild ist dagegen ein statisches Bild (BudpicSchau) und laedt diese Datei nicht.
  */
-export function BudpicDiashow({ bilder, name, texte, rahmen = "aspect-square w-full", className = "flex w-full flex-col gap-2" }: Props) {
+export function BudpicDiashow({ bilder, name, texte, rahmen = "aspect-square w-full", className = "flex w-full flex-col gap-2", einpassen = false }: Props) {
   const anzahl = bilder.length;
   const [aktuell, setAktuell] = useState(0);
   const [angehalten, setAngehalten] = useState(false);
@@ -122,7 +124,7 @@ export function BudpicDiashow({ bilder, name, texte, rahmen = "aspect-square w-f
               hoehe={bild.hoehe}
               alt={t(texte.alt, { name })}
               lazy={i !== nr}
-              className="size-full object-cover"
+              className={cn("size-full", einpassen ? "object-contain" : "object-cover")}
             />
           </div>
           );

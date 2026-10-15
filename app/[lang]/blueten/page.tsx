@@ -6,7 +6,7 @@ import { AktiveFilter } from "@/components/produkt/AktiveFilter";
 import { AnsichtUmschalter } from "@/components/produkt/AnsichtUmschalter";
 import { FilterLeiste } from "@/components/produkt/FilterLeiste";
 import { alsDiashow } from "@/lib/budpic-anzeige";
-import { budpicZugang, ladeFreieBudpics } from "@/lib/query/budpics";
+import { budpicZugang, ladeFreieBudpics, ladeFreieBudpicsJeKultivar } from "@/lib/query/budpics";
 import { KultivarKarte } from "@/components/produkt/KultivarKarte";
 import { ProduktCard } from "@/components/produkt/ProduktCard";
 import { EmptyState, Spinner, buttonKlassen, textLinkKlassen } from "@/components/ui";
@@ -85,8 +85,9 @@ async function Ergebnisbereich({ filter, w, sprache }: { filter: StrainFilter; w
   const eintraege = liste?.eintraege ?? [];
   // Budpics (T9): eine Abfrage fuer alle Karten der Seite, danach je Sorte gezeigt.
   // Mit Filter kultivar sind alle Treffer dieselbe Blüte: dann kein Hinweis auf weitere Vertreiber.
-  const [budpics, jeKultivar] = await Promise.all([
+  const [budpics, budpicsJeKultivar, jeKultivar] = await Promise.all([
     ladeFreieBudpics(eintraege.map((e) => e.id)),
+    ladeFreieBudpicsJeKultivar(kultivare?.eintraege.map((k) => k.id) ?? []),
     filter.kultivar
       ? Promise.resolve(new Map<string, Set<string>>())
       : ladeVertreiberJeKultivar(eintraege.flatMap((e) => (e.kultivarId ? [e.kultivarId] : []))),
@@ -156,7 +157,13 @@ async function Ergebnisbereich({ filter, w, sprache }: { filter: StrainFilter; w
             {kultivare
               ? kultivare.eintraege.map((k) => (
                   <li key={k.id} className="flex">
-                    <KultivarKarte kultivar={k} filter={filter} w={w} sprache={sprache} />
+                    <KultivarKarte
+                      kultivar={k}
+                      filter={filter}
+                      w={w}
+                      sprache={sprache}
+                      budpics={alsDiashow(budpicsJeKultivar.get(k.id) ?? [], w, sprache)}
+                    />
                   </li>
                 ))
               : eintraege.map((strain) => (

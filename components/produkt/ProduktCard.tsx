@@ -47,7 +47,7 @@ export function ProduktCard({ strain, w, sprache, className, budpics = [], zugan
         // Echte Bilder der Community (T9): Diashow statt Musterbild. Bewusst ausserhalb des
         // Links, weil sie eigene Knoepfe hat; der Link am Namen fuehrt zur Sorte.
         <div className="px-8 pt-8 pb-2">
-          <BudpicDiashow bilder={budpics} name={strain.handelsname} texte={w.budpic} rahmen="h-56 w-full" />
+          <BudpicDiashow bilder={budpics} name={strain.handelsname} texte={w.budpic} rahmen="h-56 w-full" einpassen />
         </div>
       ) : bild ? (
         // Referenzbild (Nutzer 2026-09-25): nicht die echte Sorte, deshalb als Symbolbild gekennzeichnet.

@@ -33,6 +33,33 @@ export async function ladeFreieBudpics(strainIds: readonly string[]): Promise<Ma
   return ergebnis;
 }
 
+/**
+ * Freigegebene Budpics je Blüte (Kultivar) für die Blüten-Ansicht des Katalogs:
+ * dieselben Bilder wie auf den Karten der Handelsnamen, gesammelt über alle
+ * Handelsnamen der Blüte. Ein `in` mit höchstens einer Katalogseite Ids.
+ */
+export async function ladeFreieBudpicsJeKultivar(kultivarIds: readonly string[]): Promise<Map<string, BudpicAnzeige[]>> {
+  const ergebnis = new Map<string, BudpicAnzeige[]>();
+  if (kultivarIds.length === 0) return ergebnis;
+  const prisma = await getPrisma();
+  const zeilen = await prisma.budpic.findMany({
+    where: { status: "FREIGEGEBEN", strain: { kultivarId: { in: [...kultivarIds] } } },
+    select: { id: true, erstelltAm: true, breite: true, hoehe: true, strain: { select: { kultivarId: true } }, mitglied: { select: { anzeigename: true } } },
+    orderBy: { erstelltAm: "desc" },
+    take: MAX_ZEILEN,
+  });
+  for (const z of zeilen) {
+    const kultivarId = z.strain.kultivarId;
+    if (!kultivarId) continue;
+    const liste = ergebnis.get(kultivarId) ?? [];
+    if (liste.length < BUDPIC_MAX_ANZEIGE) {
+      liste.push({ id: z.id, nutzer: z.mitglied.anzeigename, erstelltAm: z.erstelltAm, breite: z.breite, hoehe: z.hoehe });
+      ergebnis.set(kultivarId, liste);
+    }
+  }
+  return ergebnis;
+}
+
 export type OffenesBudpic = { id: string; strainSlug: string; kultivarSlug: string | null; handelsname: string; nutzer: string; erstelltAm: Date; breite: number; hoehe: number; ausBewertung: boolean };
 
 /**

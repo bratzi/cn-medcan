@@ -42,7 +42,7 @@ export type KultivarZeile = {
   name: string;
   slug?: string | null;
   kennwerte: { gesamtnoteMittel: number | null; anzahl: number } | null;
-  strains: { kultivarTyp: string; thcMinProzent: number; thcMaxProzent: number; vertreiber: { name: string } | null }[];
+  strains: { slug?: string; herstellerBildPfad?: string | null; kultivarTyp: string; thcMinProzent: number; thcMaxProzent: number; vertreiber: { name: string } | null }[];
 };
 
 export type KultivarListenEintrag = {
@@ -58,6 +58,9 @@ export type KultivarListenEintrag = {
   handelsnamen: number;
   overall: number | null;
   bewertungen: number;
+  /** Musterbild wie auf der Karte des ersten Handelsnamens, solange kein Budpic da ist. */
+  bildSlug: string | null;
+  herstellerBildPfad: string | null;
 };
 
 export type KultivarListe = { eintraege: KultivarListenEintrag[]; gesamt: number; seite: number; seitenAnzahl: number };
@@ -82,6 +85,8 @@ export function verdichteKultivar(zeile: KultivarZeile): KultivarListenEintrag {
     handelsnamen: zeile.strains.length,
     overall: zeile.kennwerte?.anzahl ? zeile.kennwerte.gesamtnoteMittel : null,
     bewertungen: zeile.kennwerte?.anzahl ?? 0,
+    bildSlug: zeile.strains[0]?.slug ?? null,
+    herstellerBildPfad: zeile.strains.find((s) => s.herstellerBildPfad)?.herstellerBildPfad ?? null,
   };
 }
 
@@ -104,7 +109,8 @@ export async function ladeKultivarListe(filter: StrainFilter, fachkreis: boolean
         kennwerte: { select: { gesamtnoteMittel: true, anzahl: true } },
         strains: {
           where: strainWhere,
-          select: { kultivarTyp: true, thcMinProzent: true, thcMaxProzent: true, vertreiber: { select: { name: true } } },
+          select: { slug: true, herstellerBildPfad: true, kultivarTyp: true, thcMinProzent: true, thcMaxProzent: true, vertreiber: { select: { name: true } } },
+          orderBy: { slug: "asc" },
           take: 50,
         },
       },
