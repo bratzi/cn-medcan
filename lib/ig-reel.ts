@@ -3,7 +3,7 @@ import { IG_SPERRE } from "@/lib/ig-karte";
 import { SAEULEN_FARBE, type IgSaeule } from "@/lib/ig-karussell";
 
 /** Wochen-Reel (Spec 2026-10-15 Produktmarke): Daten und Prüfung; gerendert wird in video/ mit Remotion. */
-export type IgReelSzene = { kicker?: string; titel: string; text?: string; sekunden: number };
+export type IgReelSzene = { kicker?: string; titel: string; text?: string; icons?: string[]; sekunden: number };
 export type IgReel = { saeule: IgSaeule; schluessel: string; szenen: IgReelSzene[] };
 
 export function reelPruefen(r: IgReel): string[] {
@@ -15,6 +15,7 @@ export function reelPruefen(r: IgReel): string[] {
   if (dauer < 15 || dauer > 30) fehler.push(`Dauer: ${dauer} s statt 15 bis 30`);
   r.szenen.forEach((z, i) => {
     if (z.sekunden < 2 || z.sekunden > 6) fehler.push(`Szene ${i + 1}: 2 bis 6 Sekunden`);
+    if ((z.icons ?? []).length > 5) fehler.push(`Szene ${i + 1}: höchstens 5 Icons`);
     if (z.titel.length > 40 || (z.text ?? "").length > 120) fehler.push(`Szene ${i + 1}: zu lang`);
     const alles = [z.kicker, z.titel, z.text].filter(Boolean).join(" ");
     if (hwgTreffer(alles) || IG_SPERRE.test(alles)) fehler.push(`Szene ${i + 1}: HWG/Sperrwort`);

@@ -27,3 +27,8 @@ test("Sperrwort in Szene lehnt ab", () => {
 test("schluessel geprüft", () => {
   assert.ok(reelPruefen({ ...r, schluessel: "Ä x" }).some((f) => f.includes("schluessel")));
 });
+
+test("höchstens fünf Icons je Szene", () => {
+  const icons = ["a", "b", "c", "d", "e", "f"];
+  assert.ok(reelPruefen({ ...r, szenen: [{ ...r.szenen[0], icons }, ...r.szenen.slice(1)] }).some((f) => f.includes("Icons")));
+});

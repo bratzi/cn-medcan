@@ -33,13 +33,12 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 **ALS ERSTES**
 1. Publora-MCP prüfen (eingerichtet per `claude mcp add publora -s local`, Schlüssel aus `.env`): Werkzeuge da?
    Probe: Konten abrufen. Fehlt er, `/mcp` ansehen.
-2. **Reel „aroma-karte“ neu bauen** (Nutzer-Feedback, Memory `ig-zielgruppe-kenner`): Terpen-Icons des Portals
-   (`components/review/AromaIcon.tsx`, `TerpenBand`) ins Reel, und Fakten für Kenner statt Grundlagen (z. B.
-   Ester/Thiole beim „Diesel“, Terpen in unerwarteten Pflanzen, Myrcen in Hopfen). Dateien:
-   `docs/instagram/reels/aroma-karte.{json,txt}`, `video/src/ErklaerReel.tsx` (Icons als Szenen-Feld ergänzen).
-   Danach alten Publora-Entwurf `6ad1210710a1cbf1ad924e56` löschen (`loeschen()` in scripts/ig-gemeinsam.ts), neu
-   per `scripts/ig-reel.ts` anlegen (legt jetzt auch den Story-Entwurf an), für Mi 28.10 17:00 UTC planen, sobald
-   im Publora-Horizont (~7 Tage, also ab ~21.10).
+2. ✅ Reel „aroma-karte“ neu gebaut (Session 65): Szenen-Feld `icons` (Terpen- oder Geschmacksname, max. 5,
+   Pfade kopiert nach `video/src/AromaIcon.tsx`), Kenner-Fakten (Diesel = Prenylthiol wie Lichtgeschmack im Bier,
+   Myrcen im Hopfenöl, Humulen nach Humulus benannt, Limonen in der Schale). Neue Entwürfe: Reel
+   `6ad1249610a1cbf1ad927978`, Story `6ad1249f10a1cbf1ad927a17`. **Offen:** ab ~21.10 per
+   `scripts/ig-planen.ts 6ad1249610a1cbf1ad927978 2026-10-28T17:00:00Z` planen. Publora-MCP ist verbunden
+   (`claude mcp list`), Werkzeuge erscheinen aber erst in neuer Session.
 3. Story-Mitposten erstmals live beobachten: erster Lauf von ig-karussell/ig-reel mit Story; prüfen, ob Publora den
    Story-Entwurf mit `platformSettings.instagram.videoType = "STORIES"` annimmt und als Story postet.
 4. Cloud-Routine `trig_01AhFzavSK5zreuGEASsz5Ws`: Prompt sagt noch nichts von Storys; die Skripte machen es jetzt

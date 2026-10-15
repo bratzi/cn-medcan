@@ -3,11 +3,11 @@
   "schluessel": "aroma-karte",
   "farbe": "#c98a3e",
   "szenen": [
-    { "kicker": "Aroma-Karte", "titel": "Woher kommt der Zitrusduft?", "sekunden": 4 },
-    { "kicker": "Terpene", "titel": "Duftstoffe der Pflanze", "text": "Jede Blüte trägt viele davon zugleich.", "sekunden": 5 },
-    { "kicker": "Limonen", "titel": "Zum größten Teil Zitrus", "text": "Dazu fruchtig und süß.", "sekunden": 4 },
-    { "kicker": "Myrcen", "titel": "Erdig, fruchtig, kräutrig", "text": "Wie Hopfen, Mango, Thymian.", "sekunden": 4 },
-    { "kicker": "Zehn Richtungen", "titel": "Von Zitrus bis Diesel", "text": "Die Karte zeigt, welches Terpen wohin führt.", "sekunden": 5 },
-    { "kicker": "Im Portal", "titel": "Die Aroma-Karte jeder Bewertung", "sekunden": 4 }
+    { "kicker": "Aroma-Karte", "titel": "Diesel ist kein Terpen", "icons": ["thiole"], "sekunden": 4 },
+    { "kicker": "Thiole", "titel": "Schwefel macht den Diesel", "text": "Prenylthiol in Spuren. Derselbe Stoff steckt in Bier, das zu lange im Licht stand.", "icons": ["thiole"], "sekunden": 6 },
+    { "kicker": "Myrcen", "titel": "Hopfen hat oft mehr davon", "text": "Im Hopfenöl stellt Myrcen nicht selten die Hälfte.", "icons": ["myrcen", "humulen"], "sekunden": 5 },
+    { "kicker": "Humulen", "titel": "Benannt nach dem Hopfen", "text": "Humulus lupulus gab ihm den Namen.", "icons": ["humulen"], "sekunden": 4 },
+    { "kicker": "Limonen", "titel": "Sitzt in der Schale", "text": "Nicht im Saft. Darum duftet geriebene Zeste so stark.", "icons": ["limonen"], "sekunden": 4 },
+    { "kicker": "Im Portal", "titel": "Aroma-Karte zu jeder Bewertung", "icons": ["zitrus", "erdig", "holzig", "diesel"], "sekunden": 5 }
   ]
 }

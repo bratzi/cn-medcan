@@ -11,8 +11,10 @@ import {
   useVideoConfig,
 } from "remotion";
 
+import { AromaIcon } from "./AromaIcon";
+
 /** Spiegelt IgReel aus lib/ig-reel.ts; das Paket bleibt bewusst ohne Import aus dem Hauptprojekt. */
-export type ErklaerSzene = { kicker?: string; titel: string; text?: string; sekunden: number };
+export type ErklaerSzene = { kicker?: string; titel: string; text?: string; icons?: string[]; sekunden: number };
 export type ErklaerReelProps = {
   saeule: string;
   schluessel: string;
@@ -56,6 +58,13 @@ function Szene({ szene, farbe }: { szene: ErklaerSzene; farbe: string }) {
   return (
     <AbsoluteFill style={{ justifyContent: "center", alignItems: "center", textAlign: "center", padding: "0 96px", opacity: aus }}>
       <div style={{ opacity: ein, transform: `translateY(${(1 - ein) * 48}px)` }}>
+        {szene.icons?.length ? (
+          <div style={{ display: "flex", justifyContent: "center", gap: 48, marginBottom: 48 }}>
+            {szene.icons.map((n) => (
+              <AromaIcon key={n} name={n} farbe={farbe} groesse={szene.icons!.length > 2 ? 120 : 176} />
+            ))}
+          </div>
+        ) : null}
         {szene.kicker ? (
           <p style={{ margin: "0 0 32px", fontSize: 44, letterSpacing: "0.08em", textTransform: "uppercase", color: farbe }}>
             {szene.kicker}
