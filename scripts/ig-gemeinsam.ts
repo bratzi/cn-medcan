@@ -125,9 +125,14 @@ export async function publoraPosts(): Promise<unknown[]> {
   return alle;
 }
 
+/** Themen-Posts des Agenten: alte Themenkarten (`bot-thema-`) und Karussells (`bot-k-`). */
+export function istThemenMarke(marke: string): boolean {
+  return marke.startsWith("bot-thema-") || marke.startsWith("bot-k-");
+}
+
 /**
  * Marken aller Posts aus den mediaUrls: Publora speichert …/images/<Zeitstempel>-<Dateiname>.png, die Marke
- * ist der Dateiname ohne Zeitstempel und Endung (Bewertungs-Id oder bot-thema-…).
+ * ist der Dateiname ohne Zeitstempel und Endung (Bewertungs-Id, bot-thema-… oder bot-k-…).
  */
 export function markenAus(posts: unknown[]): Set<string> {
   const marken = new Set<string>();

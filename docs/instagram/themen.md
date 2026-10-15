@@ -1,7 +1,9 @@
-# Themenpool für den Instagram-Agenten
+# Faktenquelle für den Instagram-Agenten
 
-Startliste für Themen-Posts. Der Agent wählt daraus und darf eigene Ideen ergänzen, solange die Fakten aus diesem
-Repo stammen. Jeder Eintrag hat einen `schluessel` (wird Teil der Bildmarke `bot-thema-<art>-<schluessel>.png`).
+**Dient nur noch als Faktenquelle.** Welches Thema wann drankommt, steht im Redaktionsplan nach Säulen und Wochentag:
+`docs/instagram/redaktionsplan.md`. Hier stehen die belegten Fakten zu Terpenen, Features und Schema. Der Agent
+darf eigene Ideen ergänzen, solange die Fakten aus diesem Repo stammen. Die `schluessel` der Tabellen stammen aus der
+alten Themenkarte (Marke `bot-thema-<art>-<schluessel>`); neue Karussells heißen `bot-k-<saeule>-<schluessel>`.
 
 **HWG gilt für jeden Eintrag:** nur Duft, Geschmack, Aussehen, Vorkommen in Pflanzen, Chemie, Funktionen der Website.
 Nie Wirkung, Linderung, Krankheit, Dosierung, Stimmung, Schlaf, Entspannung, Konsum.

@@ -4,7 +4,7 @@
  * zuletzt vorkamen. Ändert nichts.
  *   npx tsx scripts/ig-lage.ts
  */
-import { markenAus, publoraPosts } from "./ig-gemeinsam";
+import { istThemenMarke, markenAus, publoraPosts } from "./ig-gemeinsam";
 
 type Post = { status?: string; createdAt?: string; mediaUrls?: unknown };
 
@@ -13,7 +13,7 @@ async function main() {
   const zeilen = posts
     .map((p) => ({ status: p.status ?? "?", erstellt: p.createdAt ?? "", marke: [...markenAus([p])][0] ?? "" }))
     .sort((a, b) => b.erstellt.localeCompare(a.erstellt));
-  const themen = zeilen.filter((z) => z.marke.startsWith("bot-thema-"));
+  const themen = zeilen.filter((z) => istThemenMarke(z.marke));
   console.log(
     JSON.stringify(
       {

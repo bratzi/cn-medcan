@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { browserPfad, feedSchluessel, markenAus } from "../scripts/ig-gemeinsam";
+import { browserPfad, feedSchluessel, istThemenMarke, markenAus } from "../scripts/ig-gemeinsam";
 
 test("Schlüssel aus IG_FEED_KEY oder IG_FEED_URL", () => {
   assert.equal(feedSchluessel({ IG_FEED_KEY: "a" }), "a");
@@ -28,4 +28,9 @@ test("Marken aus mediaUrls, robust ohne Feld", () => {
     null,
   ]);
   assert.deepEqual([...m].sort(), ["bot-thema-terpen-limonen", "f7932866-c769"]);
+});
+test("Themen-Marken: Themenkarte und Karussell zählen, Bewertungen nicht", () => {
+  assert.equal(istThemenMarke("bot-thema-terpen-limonen"), true);
+  assert.equal(istThemenMarke("bot-k-wissen-myrcen"), true);
+  assert.equal(istThemenMarke("f7932866-c769"), false);
 });
