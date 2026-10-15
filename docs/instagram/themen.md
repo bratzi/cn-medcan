@@ -57,3 +57,28 @@ Fakten aus dem Code und `docs/brand/gruenes-buch.md`. Pfad nennen, damit Leser e
 | fuenf-noten | Fünf Noten | Was hinter Aussehen, Geruch, Geschmack, Konsistenz und Gesamtnote steckt. |
 | blaetter-statt-sterne | Blätter statt Sterne | Die Gesamtnote in Blättern von 1 bis 5 und wie sie entsteht. |
 | aroma-richtungen | Zehn Aromarichtungen | Zitrus, fruchtig, süß, blumig, kräutrig, minzig, holzig, würzig, erdig, Diesel. |
+
+## Wissen: Faktenblatt (Säule `wissen`, Nutzer-Freigabe 2026-10-15)
+
+Allgemeinwissen der Botanik und Aromachemie, nur Duft, Aussehen, Chemie und Lagerung. Keine Wirkung, keine Dosierung.
+
+### terpene-erklaert
+- Terpene sind flüchtige Duftstoffe, die viele Pflanzen bilden, nicht nur Cannabis (Zitrusschale, Kiefer, Lavendel, Hopfen).
+- Bei Cannabis entstehen sie vor allem in den Drüsenhaaren (Trichome) der Blüte.
+- Man riecht sie, weil sie schon bei Raumtemperatur verdunsten; deshalb verändert sich der Duft mit der Zeit.
+- Ein Duftprofil entsteht aus vielen Terpenen zugleich; das Etikett nennt meist nur die mengenmäßig größten.
+- Auf Botanical Terpz zeigen wir je Blüte die Terpene laut Datenblatt und die zehn Aromarichtungen (`lib/terpen-aromen.ts`).
+
+### trichome-aussehen
+- Trichome sind feine Drüsenhaare auf Blüte und Blattspitzen; mit bloßem Auge wirken sie wie Raureif oder Zucker.
+- Unter der Lupe sieht man Stiel und Köpfchen; im Köpfchen sitzen Harz und Terpene.
+- Die Farbe der Köpfchen reicht von klar über milchig bis bernsteinfarben.
+- Abgebrochene oder plattgedrückte Trichome sieht man als matte, verschmierte Stellen; das spricht für grobe Behandlung.
+- „Aussehen“ ist eine unserer fünf Noten: Trichombesatz, Form, Farbe und Verarbeitung der Blüte (Schema in `docs/instagram/themen.md`, Abschnitt Schema).
+
+### lagerung
+- Licht (UV), Wärme und Luftsauerstoff bauen Terpene ab, der Duft wird flacher.
+- Zu trockene Blüten zerbröseln, Trichome brechen ab; zu feuchte riskieren Schimmel.
+- Unser Schema: Restfeuchte unter 8 % gilt als zu trocken, über 13 % als zu feucht (Feld in der Bewertung).
+- Gut ist: dunkel, kühl (nicht im Kühlschrank wegen Kondenswasser), luftdicht, im Originalbehälter oder Glas.
+- Häufiges Öffnen lässt Duft entweichen; Feuchtigkeitsbeutel halten die Restfeuchte stabil.
