@@ -55,8 +55,8 @@ Der Wochentag (UTC) bestimmt, was du tust:
 5. **Bericht** per Push-Nachricht, auf Deutsch, höchstens 5 Zeilen: angelegtes Karussell mit Säule und Titel, am
    Mittwoch die Erinnerung ans Reel mit Thema, übersprungen und warum (etwa Bremse), Fehler.
 
-Beispiel für `/tmp/karussell.json` (nur das Format: Texte immer selbst neu schreiben, nie aus diesem Beispiel kopieren;
-das Thema ist schon als Pin-Post angelegt):
+Beispiel für `/tmp/karussell.json` (nur das Format: Texte immer selbst neu schreiben, nie aus diesem Beispiel kopieren).
+CTA-Text ohne „Link in Bio“, das steht fest auf der Slide (karussellPruefen lehnt es ab):
 
 ```json
 {
@@ -67,7 +67,7 @@ das Thema ist schon als Pin-Post angelegt):
       { "typ": "cover", "kicker": "Kurzer Kicker", "titel": "Hook in sechs Wörtern" },
       { "typ": "inhalt", "titel": "Wichtigste Aussage zuerst", "text": "Ein bis zwei Sätze, höchstens 220 Zeichen." },
       { "typ": "inhalt", "titel": "Ein Gedanke je Slide", "punkte": ["Kurze Zeile eins", "Kurze Zeile zwei"] },
-      { "typ": "cta", "titel": "Eine Handlung", "text": "Ein Satz mit genau einer Bitte. Link in Bio." }
+      { "typ": "cta", "titel": "Eine Handlung", "text": "Ein Satz mit genau einer Bitte." }
     ]
   },
   "caption": "Hook-Frage unter 125 Zeichen?\n\nZwei kurze Sätze zum Thema.\n\nFrage an die Community? Link in Bio\n\n#bookofterpz #medizinalcannabis #terpene"

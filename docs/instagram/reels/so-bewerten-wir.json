@@ -5,7 +5,7 @@
   "szenen": [
     { "kicker": "So bewerten wir", "titel": "Fünf Noten statt Sternchen", "sekunden": 4 },
     { "kicker": "Aussehen & Geruch", "titel": "Was du siehst und riechst", "text": "Jede Charge nach demselben Schema.", "sekunden": 5 },
-    { "kicker": "Geschmack", "titel": "Ehrlich notiert", "text": "Von Mitgliedern, nicht von Herstellern.", "sekunden": 5 },
+    { "kicker": "Geschmack", "titel": "Ehrlich notiert", "text": "Eine Person, ein festes Schema.", "sekunden": 5 },
     { "kicker": "An der Charge", "titel": "Jede Bewertung hängt an ihrer Charge", "sekunden": 5 },
     { "kicker": "Mitmachen", "titel": "Das Schema im Portal", "sekunden": 4 }
   ]

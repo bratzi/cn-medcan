@@ -87,16 +87,56 @@ export function linkDurchStil(html: string, css: string): string {
   return html.replace(FONT_LINK, () => `<style>${css}</style>`);
 }
 
+/** Eingecheckte Schriften (SIL OFL, siehe LIZENZ.md): kein Google zur Laufzeit in der Cloud. */
+const SCHRIFTEN_ORDNER = "scripts/ig-schriften";
+
+/** Dateiname des Stylesheets (ohne Endung) zu einem Google-Fonts-Link. */
+export function schriftHash(link: string): string {
+  return createHash("sha1").update(link).digest("hex").slice(0, 16);
+}
+
 /**
- * Macht eine Seite netzfrei: Das Stylesheet und die Schriftdateien werden einmal geholt und unter
- * tmp/ig/fonts zwischengespeichert, danach steckt alles als Data-URL im HTML. So hängt der Screenshot
- * (--virtual-time-budget) nicht mehr an Google Fonts (ETIMEDOUT-Fälle 2026-10-15).
+ * Lokales Stylesheet (url(./datei.woff2)) mit Data-URLs füllen. `lese` liefert die Datei oder undefined;
+ * fehlt eine, gibt es null (dann greift der Netz-Weg).
+ */
+export function cssLokal(css: string, lese: (name: string) => Buffer | undefined): string | null {
+  let fehlt = false;
+  const ergebnis = css.replace(/url\(\.\/([^)]+)\)/g, (alt, name: string) => {
+    const daten = lese(name);
+    if (!daten) {
+      fehlt = true;
+      return alt;
+    }
+    return `url(data:font/woff2;base64,${daten.toString("base64")})`;
+  });
+  return fehlt ? null : ergebnis;
+}
+
+/** Ersetzt den Google-Link durch die eingecheckten Schriften, ohne Netz; null, wenn eine Datei fehlt. */
+export function htmlMitLokalenSchriften(html: string, ordner = resolve(SCHRIFTEN_ORDNER)): string | null {
+  const link = FONT_LINK.exec(html)?.[1];
+  if (!link) return html;
+  const cssDatei = join(ordner, `${schriftHash(link)}.css`);
+  if (!existsSync(cssDatei)) return null;
+  const css = cssLokal(readFileSync(cssDatei, "utf8"), (name) => {
+    const pfad = join(ordner, name);
+    return existsSync(pfad) ? readFileSync(pfad) : undefined;
+  });
+  return css === null ? null : linkDurchStil(html, css);
+}
+
+/**
+ * Macht eine Seite netzfrei: Zuerst die eingecheckten Schriften (scripts/ig-schriften). Fehlt eine, werden
+ * Stylesheet und Schriftdateien einmal geholt und unter tmp/ig/fonts zwischengespeichert, danach steckt alles
+ * als Data-URL im HTML. So hängt der Screenshot (--virtual-time-budget) nicht an Google Fonts (ETIMEDOUT 2026-10-15).
  */
 export async function htmlOffline(html: string): Promise<string> {
   const link = FONT_LINK.exec(html)?.[1];
   if (!link) return html;
+  const lokal = htmlMitLokalenSchriften(html);
+  if (lokal !== null) return lokal;
   const ordner = resolve("tmp/ig/fonts");
-  const cache = join(ordner, `${createHash("sha1").update(link).digest("hex").slice(0, 16)}.css`);
+  const cache = join(ordner, `${schriftHash(link)}.css`);
   if (!existsSync(cache)) {
     const holen = async (url: string, optionen: RequestInit = {}) => {
       const antwort = await fetch(url, { ...optionen, signal: AbortSignal.timeout(15_000) });
@@ -121,6 +161,12 @@ export function pngOk(datei: Buffer, breite: number, hoehe: number): boolean {
   if (datei.length < 33 || !datei.subarray(0, 8).equals(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]))) return false;
   if (!datei.subarray(-12).includes("IEND")) return false;
   return datei.readUInt32BE(16) === breite && datei.readUInt32BE(20) === hoehe;
+}
+
+/** Breite × Höhe aus dem PNG-Kopf (IHDR), z. B. „1080×1300“; null ohne gültigen Kopf. */
+export function pngMasse(datei: Buffer): string | null {
+  if (datei.length < 24 || !datei.subarray(0, 8).equals(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]))) return null;
+  return `${datei.readUInt32BE(16)}×${datei.readUInt32BE(20)}`;
 }
 
 /** Screenshot (Standard 1080 × 1350); url darf http(s) oder file:// sein. */
@@ -158,7 +204,10 @@ export function screenshot(url: string, ziel: string, groesse = "1080,1350"): vo
       // Aufräumen darf ein gelungenes Bild nicht kippen (EBUSY unter Windows).
     }
   }
-  if (!bildOk()) throw new Error(`Screenshot unvollständig oder falsche Größe (${groesse}): ${ziel}`);
+  if (!bildOk()) {
+    const ist = existsSync(ziel) ? (pngMasse(readFileSync(ziel)) ?? "kein gültiges PNG") : "keine Datei";
+    throw new Error(`Screenshot unvollständig oder falsche Größe (erwartet ${breite}×${hoehe}, ist ${ist}): ${ziel}`);
+  }
 }
 
 async function publora<T>(pfad: string, body?: unknown): Promise<T> {

@@ -26,7 +26,7 @@ legt sie nie an. Stories pflegt der Betreiber manuell in der App.
 2. **Slide 2:** die wichtigste Aussage. Wer nur zwei Slides sieht, hat das Entscheidende (Serial Position: Anfang
    bleibt haften).
 3. **Inhaltsslides:** je ein Gedanke, Titel höchstens 60 Zeichen, Text höchstens 220, höchstens 4 Punkte à 60.
-4. **CTA zuletzt:** genau eine Handlung, etwa „Link in Bio“ oder „Mitglied werden“. Der letzte Eindruck bleibt (Peak-End).
+4. **CTA zuletzt:** genau eine Handlung, etwa „Mitglied werden“. Der CTA-Text selbst enthält kein „Link in Bio“, das steht fest auf der Slide (karussellPruefen lehnt es ab). Der letzte Eindruck bleibt (Peak-End).
    Keine zweite Bitte daneben.
 
 ## Caption-Regeln

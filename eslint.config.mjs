@@ -22,6 +22,8 @@ const eslintConfig = defineConfig([
     // Sie werden nie gebaut und folgen nicht unseren Regeln.
     ".agents/**",
     ".claude/**",
+    // Eigenes Remotion-Projekt mit eigenen Regeln.
+    "video/**",
   ]),
 ]);
 
