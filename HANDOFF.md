@@ -43,7 +43,7 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
    scheiterte immer. Jetzt Hochformat per Edge-Screenshot (`storyHtml`), ffmpeg nur Kodierung. Story zu
    „So bewerten wir“ geplant 16.10 17:01 UTC: **am 16.10 abends prüfen, ob sie als Story erschien.** Story zum Reel
    so-bewerten-wir (21.10) blieb Entwurf: Publora Free „403 Scheduled post limit reached“ (3 geplante). Story-Planung
-   scheitert jetzt nicht mehr den ganzen Lauf. **Nutzer fragen:** Storys verbrauchen das Kontingent (15/Monat) doppelt.
+   scheitert jetzt nicht mehr den ganzen Lauf. **Entschieden (Nutzer):** Storys nur zu Reels, `ig-karussell.ts` legt keine mehr an (Kontingent 15/Monat).
 4. ✅ Routine nutzt `ig-planen.ts` und `ig-karussell.ts --planen`, beide planen die Story mit.
 
 **Erledigt und live**

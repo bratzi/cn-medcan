@@ -10,7 +10,7 @@ import { pathToFileURL } from "node:url";
 
 import { igCaptionPruefen } from "../lib/ig-caption";
 import { igSlideHtml, karussellMarke, karussellPruefen, type IgKarussell } from "../lib/ig-karussell";
-import { entwurfMedien, planenMitStory, planZeit, htmlOffline, markenAus, publoraPosts, screenshot, storyEntwurf, umgebung } from "./ig-gemeinsam";
+import { entwurfMedien, planen, planZeit, htmlOffline, markenAus, publoraPosts, screenshot, umgebung } from "./ig-gemeinsam";
 
 async function main() {
   const [datei, ...rest] = process.argv.slice(2);
@@ -49,11 +49,10 @@ async function main() {
   }
   const gruppe = await entwurfMedien(caption, medien);
   console.log(`Entwurf angelegt: ${karussell.slides[0].titel} (${medien.length} Slides, Publora ${gruppe})`);
-  const story = await storyEntwurf(marke, medien[0].pfad);
-  console.log(`Story-Entwurf angelegt (Publora ${story})`);
+  // Storys nur zu Reels (Nutzer 2026-10-15): jede Story zählt bei Publora Free als eigener Post.
   if (zeit) {
-    await planenMitStory(gruppe, zeit);
-    console.log(`Eingeplant um ${zeit}, Story eine Minute später`);
+    await planen(gruppe, zeit);
+    console.log(`Eingeplant um ${zeit}`);
   }
 }
 
