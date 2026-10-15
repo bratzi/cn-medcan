@@ -66,7 +66,8 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 - Test-Like bei `bewertung-c7a31726…` (TerpzTester#1) per Koordinaten-Klick entfernen (JS-Klick wirkte nicht).
 - Pinnwand öffentliches Profil hell/dunkel, `/ig` Optik, Explorer hell/dunkel und Knopfgröße 44 px bei 390 px.
 - ✅ Session 65: Produktlinks gehen per `bluetenHref` direkt auf die Sortenseite (`260cd34`), `8-ball-kush-2`
-  leitet 308 auf `8-ball-kush` (`ABGELOESTE_SORTEN`). Abstimmung kompakt ans Seitenende (`2aff16d`). Noch mit 308:
+  leitet 308 auf `8-ball-kush` (`ABGELOESTE_SORTEN`). Live geprüft: Umleitung, Startseiten-Links mit `?ware=`,
+  Abstimmung letzte Sektion, kein Querscroll; Optik der kleineren Abstimmung nicht per Screenshot angesehen. Abstimmung kompakt ans Seitenende (`2aff16d`). Noch mit 308:
   „Ähnlich im Aroma“ (`AEHNLICH_SQL`, Cache `sorten_aehnlich`), `eintragHref` in MeineStimmen, Fallback in
   BewertungsRegister, konto-reihen, profil-reihen (gemocht), apotheken/[slug], ig-feed-Fallback, buch-statistik,
   Benachrichtigungen. Kein Link setzt `#kommentare-<id>`. Explorer zeigt bei wenig Daten < 12 Sorten. Rangliste
