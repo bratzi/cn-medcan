@@ -77,9 +77,10 @@ def main():
             rid = str(uuid.uuid5(NS, f"r:{sid}:{j}"))
             notiz = "Fiktive Beispielbewertung: " + zufall.choice(NOTIZEN)
             zeilen.append(
-                "INSERT INTO reviews (id, strain_id, ist_redaktionell, aussehen, geruch, geschmack, wirkung, konsistenz,"
+                "INSERT INTO reviews (id, strain_id, kultivar_id, vertreiber_id, ware_genau, ist_redaktionell, aussehen, geruch, geschmack, wirkung, konsistenz,"
                 " feuchtigkeit_prozent, geschmacks_matrix, terpen_intensitaet, notiz, freigegeben, erstellt_am, aktualisiert_am)"
-                f" VALUES ({q(rid)}, {q(sid)}, {redaktionell}, {', '.join(map(str, noten))},"
+                f" VALUES ({q(rid)}, {q(sid)}, (SELECT kultivar_id FROM strains WHERE id = {q(sid)}),"
+                f" (SELECT vertreiber_id FROM strains WHERE id = {q(sid)}), 1, {redaktionell}, {', '.join(map(str, noten))},"
                 f" {round(zufall.uniform(8.5, 12.5), 1)}, {q(json.dumps(matrix))}, {q(json.dumps(intens, ensure_ascii=False))},"
                 f" {q(notiz)}, 1, datetime('now', '-{i * 3 + j} days'), CURRENT_TIMESTAMP)"
                 " ON CONFLICT(id) DO UPDATE SET geschmacks_matrix=excluded.geschmacks_matrix,"

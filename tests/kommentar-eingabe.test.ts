@@ -4,11 +4,11 @@ import { hwgTreffer } from "@/lib/hwg-filter";
 import { kommentarPruefen, meldegrundPruefen, MAX_KOMMENTAR } from "@/lib/kommentar-eingabe";
 
 test("Filter fängt Wirkversprechen, auch groß und mit Umlauten", () => {
-  for (const s of ["Hilft bei Migräne", "HILFT BEI Übelkeit", "heilt alles", "gut gegen Schmerzen", "my go-to for anxiety", "cures insomnia", "nimm das bei Depression", "hilft bei Migräne", "half gegen Schmerzen", "Linderung pur", "wirkt lindernd", "depressive Phasen"]) assert.ok(hwgTreffer(s), s);
+  for (const s of ["Hilft bei Migräne", "HILFT BEI Übelkeit", "heilt alles", "gut gegen Schmerzen", "my go-to for anxiety", "cures insomnia", "nimm das bei Depression", "hilft bei Migräne", "half gegen Schmerzen", "Linderung pur", "wirkt lindernd", "depressive Phasen", "Schmerzlinderung"]) assert.ok(hwgTreffer(s), s);
 });
 
 test("Filter lässt Aroma und Teilwörter in Ruhe", () => {
-  for (const s of ["sehr hilfreich beschrieben", "riecht nach Zitrus, Diesel im Abgang", "Schmerzensgeld ist kein Thema", "Therapiehund? nein, Katze", "Duft nach Linde und Honig", "kein Hilfsmittel, nur Genuss"]) assert.equal(hwgTreffer(s), null, s);
+  for (const s of ["sehr hilfreich beschrieben", "riecht nach Zitrus, Diesel im Abgang", "Schmerzensgeld ist kein Thema", "Therapiehund? nein, Katze", "Duft nach Linde und Honig", "kein Hilfsmittel, nur Genuss", "Zylinder aus Glas"]) assert.equal(hwgTreffer(s), null, s);
 });
 
 test("Kommentar: getrimmt, 1 bis 1000 Zeichen, HWG", () => {

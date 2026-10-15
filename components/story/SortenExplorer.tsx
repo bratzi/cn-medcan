@@ -165,10 +165,10 @@ export function SortenExplorer({ sorten, texte, typen, sprache }: Props) {
           </p>
           {/* Von Restorff und Peak-End: eine gefüllte Aktion, sie lädt zur eigenen Bewertung ein. */}
           <div className="flex flex-wrap items-center gap-x-8 gap-y-4">
-            <Link prefetch={false} href={`/blueten/${sorte.slug}?vertreiber=${ware.vertreiberId}#bewerten`} className={buttonKlassen("primary", "md")}>
+            <Link prefetch={false} href={`/blueten/${sorte.slug}?vertreiber=${encodeURIComponent(ware.vertreiberId)}#bewerten`} className={buttonKlassen("primary", "md")}>
               {texte.wareBewerten}
             </Link>
-            <Link prefetch={false} href={`/blueten/${sorte.slug}?vertreiber=${ware.vertreiberId}`} className={einzelLinkKlassen("text-body")}>
+            <Link prefetch={false} href={`/blueten/${sorte.slug}?vertreiber=${encodeURIComponent(ware.vertreiberId)}`} className={einzelLinkKlassen("text-body")}>
               {texte.zurSorte}
             </Link>
           </div>
