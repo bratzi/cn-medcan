@@ -50,8 +50,9 @@ export default function StartPage() {
         <GemeinsamLernen />
         <NeuesterEintrag />
         <Empfehlungen />
-        <Abstimmung />
         <Katalog />
+        {/* Abstimmungen sind freiwillige Events, nicht im Fokus (Nutzer 2026-10-15): ans Ende, kompakt. */}
+        <Abstimmung />
         <StoryBuehne />
       </div>
     </StartSitzung>

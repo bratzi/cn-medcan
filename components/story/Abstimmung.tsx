@@ -36,7 +36,8 @@ async function Stimmzettel() {
 }
 
 /**
- * Sektion 6 (Spec TP3 8.6): der Stimmzettel im Buch, "Wähl mit." von Hand.
+ * Der Stimmzettel im Buch, "Wähl mit." von Hand. Seit 2026-10-15 (Nutzer) kompakt am Seitenende,
+ * weil Abstimmungen freiwillige Events sind und nicht im Fokus stehen.
  * Ziel des Buttons "Wähl mit".
  */
 export async function Abstimmung() {
@@ -48,14 +49,14 @@ export async function Abstimmung() {
       aria-labelledby="abstimmung-titel"
       data-story="abstimmung"
       data-story-vorhang=""
-      className="relative isolate overflow-x-clip px-4 pt-32 pb-24 sm:px-8 sm:pt-48 sm:pb-32"
+      className="relative isolate overflow-x-clip px-4 py-16 sm:px-8 sm:py-24"
     >
-      <div className="mx-auto grid w-full max-w-360 grid-cols-1 gap-12 lg:grid-cols-[2fr_3fr] lg:items-start">
+      <div className="mx-auto grid w-full max-w-240 grid-cols-1 gap-8 lg:grid-cols-[2fr_3fr] lg:items-start">
         <div className="flex flex-col items-start gap-6 max-lg:items-center max-lg:text-center">
-          <h2 id="abstimmung-titel" className="font-buch text-kapitel text-text text-balance">
+          <h2 id="abstimmung-titel" className="font-buch text-h1 text-text text-balance">
             {texte.titel}
           </h2>
-          <p data-story="waehl-mit" className="farbverlauf font-hand text-notiz">
+          <p data-story="waehl-mit" className="farbverlauf font-hand text-vermerk">
             {texte.waehlMit}
           </p>
           <p className="max-w-[48ch] text-body text-text-muted text-pretty">
