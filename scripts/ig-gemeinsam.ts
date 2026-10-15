@@ -4,7 +4,10 @@
  * /opt/pw-browsers). Nur Node-Bordmittel, keine Pakete.
  */
 import { execFileSync } from "node:child_process";
-import { existsSync, readdirSync, readFileSync } from "node:fs";
+import { createHash } from "node:crypto";
+import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join, resolve } from "node:path";
 
 type Env = Record<string, string | undefined>;
 
@@ -63,24 +66,80 @@ export function browserPfad(
   throw new Error("kein Browser gefunden (IG_BROWSER setzen)");
 }
 
-/** Screenshot 1080 × 1350; url darf http(s) oder file:// sein. */
-export function screenshot(url: string, ziel: string): void {
+const FONT_LINK = /<link rel="stylesheet" href="(https:\/\/fonts\.googleapis\.com\/[^"]+)">/;
+const FONT_UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0 Safari/537.36";
+
+/** Alle Schrift-URLs eines Google-Fonts-Stylesheets, ohne Dubletten. */
+export function schriftUrls(css: string): string[] {
+  return [...new Set([...css.matchAll(/url\((https:\/\/[^)]+)\)/g)].map((t) => t[1]))];
+}
+
+/** Ersetzt jede Schrift-URL durch eine Data-URL (Base64 je URL aus `daten`). */
+export function cssMitDaten(css: string, daten: Map<string, string>): string {
+  return css.replace(/url\((https:\/\/[^)]+)\)/g, (alt, url: string) => {
+    const b64 = daten.get(url);
+    return b64 ? `url(data:font/woff2;base64,${b64})` : alt;
+  });
+}
+
+/** Setzt den Google-Fonts-Link der Seite durch ein Inline-Stylesheet; ohne Link bleibt das HTML gleich. */
+export function linkDurchStil(html: string, css: string): string {
+  return html.replace(FONT_LINK, () => `<style>${css}</style>`);
+}
+
+/**
+ * Macht eine Seite netzfrei: Das Stylesheet und die Schriftdateien werden einmal geholt und unter
+ * tmp/ig/fonts zwischengespeichert, danach steckt alles als Data-URL im HTML. So hängt der Screenshot
+ * (--virtual-time-budget) nicht mehr an Google Fonts (ETIMEDOUT-Fälle 2026-10-15).
+ */
+export async function htmlOffline(html: string): Promise<string> {
+  const link = FONT_LINK.exec(html)?.[1];
+  if (!link) return html;
+  const ordner = resolve("tmp/ig/fonts");
+  const cache = join(ordner, `${createHash("sha1").update(link).digest("hex").slice(0, 16)}.css`);
+  if (!existsSync(cache)) {
+    const css = await (await fetch(link, { headers: { "User-Agent": FONT_UA } })).text();
+    const daten = new Map<string, string>();
+    for (const url of schriftUrls(css)) {
+      const antwort = await fetch(url);
+      if (!antwort.ok) throw new Error(`Schrift ${url}: ${antwort.status}`);
+      daten.set(url, Buffer.from(await antwort.arrayBuffer()).toString("base64"));
+    }
+    mkdirSync(ordner, { recursive: true });
+    writeFileSync(cache, cssMitDaten(css, daten));
+  }
+  return linkDurchStil(html, readFileSync(cache, "utf8"));
+}
+
+/** Screenshot (Standard 1080 × 1350); url darf http(s) oder file:// sein. */
+export function screenshot(url: string, ziel: string, groesse = "1080,1350"): void {
   const linux = process.platform !== "win32";
-  execFileSync(
-    browserPfad(process.platform),
-    [
-      "--headless",
-      "--disable-gpu",
-      ...(linux ? ["--no-sandbox"] : []),
-      "--hide-scrollbars",
-      "--force-device-scale-factor=1",
-      "--window-size=1080,1350",
-      "--virtual-time-budget=8000",
-      `--screenshot=${ziel}`,
-      url,
-    ],
-    { stdio: "ignore", timeout: 60_000 },
-  );
+  // Frisches Profil je Lauf: ein offener Browser oder ein altes Profil lässt den Start hängen.
+  const profil = mkdtempSync(join(tmpdir(), "ig-browser-"));
+  rmSync(ziel, { force: true });
+  try {
+    execFileSync(
+      browserPfad(process.platform),
+      [
+        "--headless",
+        "--disable-gpu",
+        ...(linux ? ["--no-sandbox"] : []),
+        `--user-data-dir=${profil}`,
+        "--hide-scrollbars",
+        "--force-device-scale-factor=1",
+        `--window-size=${groesse}`,
+        "--virtual-time-budget=8000",
+        `--screenshot=${ziel}`,
+        url,
+      ],
+      { stdio: "ignore", timeout: 30_000 },
+    );
+  } catch (f) {
+    // Edge speichert das Bild manchmal und hängt dann beim Beenden: ein vorhandenes Bild gilt.
+    if (!existsSync(ziel) || statSync(ziel).size === 0) throw f;
+  } finally {
+    rmSync(profil, { recursive: true, force: true });
+  }
   if (!existsSync(ziel)) throw new Error(`Screenshot fehlt: ${ziel}`);
 }
 

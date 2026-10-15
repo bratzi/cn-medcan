@@ -11,7 +11,7 @@ import { pathToFileURL } from "node:url";
 
 import { igCaptionPruefen } from "../lib/ig-caption";
 import { igThemenKarteHtml, type IgThema } from "../lib/ig-themen-karte";
-import { entwurf, markenAus, publoraPosts, screenshot, umgebung } from "./ig-gemeinsam";
+import { entwurf, htmlOffline, markenAus, publoraPosts, screenshot, umgebung } from "./ig-gemeinsam";
 
 const ARTEN = new Set(["terpen", "feature", "mission", "schema"]);
 
@@ -37,7 +37,7 @@ async function main() {
       h.replaceAll(`${ursprung}/marke/${name}`, `data:image/webp;base64,${readFileSync(resolve("public/marke", name)).toString("base64")}`),
     igThemenKarteHtml(thema, ursprung),
   );
-  writeFileSync(html, eingebettet);
+  writeFileSync(html, await htmlOffline(eingebettet));
   screenshot(pathToFileURL(html).href, png);
   if (rest.includes("--probe")) {
     console.log(`Probe: ${png}`);

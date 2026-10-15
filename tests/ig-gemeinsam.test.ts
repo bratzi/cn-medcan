@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { browserPfad, entwurfMedien, feedSchluessel, istThemenMarke, markenAus } from "../scripts/ig-gemeinsam";
+import { browserPfad, cssMitDaten, entwurfMedien, feedSchluessel, istThemenMarke, linkDurchStil, markenAus, schriftUrls } from "../scripts/ig-gemeinsam";
 
 test("Schlüssel aus IG_FEED_KEY oder IG_FEED_URL", () => {
   assert.equal(feedSchluessel({ IG_FEED_KEY: "a" }), "a");
@@ -63,4 +63,23 @@ test("markenAus: Karussell-Slides ergeben eine Marke, Videos zählen mit", () =>
     { mediaUrls: ["https://c.dev/images/173-abc123.png"] },
   ];
   assert.deepEqual([...markenAus(posts)].sort(), ["abc123", "bot-k-wissen-terpene", "bot-reel-schema"]);
+});
+
+test("Schriften offline: URLs finden, als Data-URL einsetzen, Link durch Stil ersetzen", () => {
+  const css =
+    "@font-face{src:url(https://fonts.gstatic.com/a.woff2) format('woff2')}@font-face{src:url(https://fonts.gstatic.com/a.woff2)}@font-face{src:url(https://fonts.gstatic.com/b.woff2)}";
+  assert.deepEqual(schriftUrls(css), ["https://fonts.gstatic.com/a.woff2", "https://fonts.gstatic.com/b.woff2"]);
+  const aus = cssMitDaten(
+    css,
+    new Map([
+      ["https://fonts.gstatic.com/a.woff2", "QQ"],
+      ["https://fonts.gstatic.com/b.woff2", "RR"],
+    ]),
+  );
+  assert.ok(aus.includes("url(data:font/woff2;base64,QQ)") && aus.includes("url(data:font/woff2;base64,RR)"));
+  assert.ok(!aus.includes("gstatic"));
+  const html = '<head><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Mr+Dafoe&display=block"><title>x</title></head>';
+  const neu = linkDurchStil(html, "a{b:c}");
+  assert.ok(neu.includes("<style>a{b:c}</style>") && !neu.includes("googleapis"));
+  assert.equal(linkDurchStil("<p>ohne</p>", "a{}"), "<p>ohne</p>");
 });
