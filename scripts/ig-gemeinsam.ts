@@ -5,7 +5,7 @@
  */
 import { execFileSync } from "node:child_process";
 import { createHash } from "node:crypto";
-import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, renameSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 
@@ -98,17 +98,29 @@ export async function htmlOffline(html: string): Promise<string> {
   const ordner = resolve("tmp/ig/fonts");
   const cache = join(ordner, `${createHash("sha1").update(link).digest("hex").slice(0, 16)}.css`);
   if (!existsSync(cache)) {
-    const css = await (await fetch(link, { headers: { "User-Agent": FONT_UA } })).text();
-    const daten = new Map<string, string>();
-    for (const url of schriftUrls(css)) {
-      const antwort = await fetch(url);
+    const holen = async (url: string, optionen: RequestInit = {}) => {
+      const antwort = await fetch(url, { ...optionen, signal: AbortSignal.timeout(15_000) });
       if (!antwort.ok) throw new Error(`Schrift ${url}: ${antwort.status}`);
-      daten.set(url, Buffer.from(await antwort.arrayBuffer()).toString("base64"));
-    }
+      return antwort;
+    };
+    const css = await (await holen(link, { headers: { "User-Agent": FONT_UA } })).text();
+    const urls = schriftUrls(css);
+    if (!urls.length) throw new Error(`Google Fonts lieferte keine Schriftdateien: ${link}`);
+    const daten = new Map<string, string>();
+    for (const url of urls) daten.set(url, Buffer.from(await (await holen(url)).arrayBuffer()).toString("base64"));
     mkdirSync(ordner, { recursive: true });
-    writeFileSync(cache, cssMitDaten(css, daten));
+    const temp = `${cache}.${process.pid}.tmp`;
+    writeFileSync(temp, cssMitDaten(css, daten));
+    renameSync(temp, cache);
   }
   return linkDurchStil(html, readFileSync(cache, "utf8"));
+}
+
+/** Gültiges PNG in genau dieser Größe: Signatur, IHDR-Maße, IEND am Ende (kein abgeschnittenes Bild). */
+export function pngOk(datei: Buffer, breite: number, hoehe: number): boolean {
+  if (datei.length < 33 || !datei.subarray(0, 8).equals(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]))) return false;
+  if (!datei.subarray(-12).includes("IEND")) return false;
+  return datei.readUInt32BE(16) === breite && datei.readUInt32BE(20) === hoehe;
 }
 
 /** Screenshot (Standard 1080 × 1350); url darf http(s) oder file:// sein. */
@@ -117,6 +129,8 @@ export function screenshot(url: string, ziel: string, groesse = "1080,1350"): vo
   // Frisches Profil je Lauf: ein offener Browser oder ein altes Profil lässt den Start hängen.
   const profil = mkdtempSync(join(tmpdir(), "ig-browser-"));
   rmSync(ziel, { force: true });
+  const [breite, hoehe] = groesse.split(",").map(Number);
+  const bildOk = () => existsSync(ziel) && pngOk(readFileSync(ziel), breite, hoehe);
   try {
     execFileSync(
       browserPfad(process.platform),
@@ -135,12 +149,16 @@ export function screenshot(url: string, ziel: string, groesse = "1080,1350"): vo
       { stdio: "ignore", timeout: 30_000 },
     );
   } catch (f) {
-    // Edge speichert das Bild manchmal und hängt dann beim Beenden: ein vorhandenes Bild gilt.
-    if (!existsSync(ziel) || statSync(ziel).size === 0) throw f;
+    // Edge speichert das Bild manchmal und hängt dann beim Beenden: ein vollständiges Bild gilt.
+    if (!bildOk()) throw f;
   } finally {
-    rmSync(profil, { recursive: true, force: true });
+    try {
+      rmSync(profil, { recursive: true, force: true, maxRetries: 3 });
+    } catch {
+      // Aufräumen darf ein gelungenes Bild nicht kippen (EBUSY unter Windows).
+    }
   }
-  if (!existsSync(ziel)) throw new Error(`Screenshot fehlt: ${ziel}`);
+  if (!bildOk()) throw new Error(`Screenshot unvollständig oder falsche Größe (${groesse}): ${ziel}`);
 }
 
 async function publora<T>(pfad: string, body?: unknown): Promise<T> {

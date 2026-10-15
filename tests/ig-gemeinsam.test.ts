@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { browserPfad, cssMitDaten, entwurfMedien, feedSchluessel, istThemenMarke, linkDurchStil, markenAus, schriftUrls } from "../scripts/ig-gemeinsam";
+import { browserPfad, cssMitDaten, entwurfMedien, feedSchluessel, istThemenMarke, linkDurchStil, markenAus, pngOk, schriftUrls } from "../scripts/ig-gemeinsam";
 
 test("Schlüssel aus IG_FEED_KEY oder IG_FEED_URL", () => {
   assert.equal(feedSchluessel({ IG_FEED_KEY: "a" }), "a");
@@ -82,4 +82,18 @@ test("Schriften offline: URLs finden, als Data-URL einsetzen, Link durch Stil er
   const neu = linkDurchStil(html, "a{b:c}");
   assert.ok(neu.includes("<style>a{b:c}</style>") && !neu.includes("googleapis"));
   assert.equal(linkDurchStil("<p>ohne</p>", "a{}"), "<p>ohne</p>");
+});
+
+test("pngOk: gültig, abgeschnitten, falsche Größe", () => {
+  const png = (b: number, h: number, ende = true) => {
+    const kopf = Buffer.alloc(33);
+    Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]).copy(kopf);
+    kopf.writeUInt32BE(b, 16);
+    kopf.writeUInt32BE(h, 20);
+    return ende ? Buffer.concat([kopf, Buffer.from([0, 0, 0, 0, 0x49, 0x45, 0x4e, 0x44, 0xae, 0x42, 0x60, 0x82])]) : kopf;
+  };
+  assert.equal(pngOk(png(1080, 1350), 1080, 1350), true);
+  assert.equal(pngOk(png(1080, 1350, false), 1080, 1350), false);
+  assert.equal(pngOk(png(1080, 1300), 1080, 1350), false);
+  assert.equal(pngOk(Buffer.from("kein png"), 1, 1), false);
 });
