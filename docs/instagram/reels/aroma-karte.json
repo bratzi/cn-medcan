@@ -1,0 +1,13 @@
+{
+  "saeule": "portal",
+  "schluessel": "aroma-karte",
+  "farbe": "#c98a3e",
+  "szenen": [
+    { "kicker": "Aroma-Karte", "titel": "Woher kommt der Zitrusduft?", "sekunden": 4 },
+    { "kicker": "Terpene", "titel": "Duftstoffe der Pflanze", "text": "Jede Blüte trägt viele davon zugleich.", "sekunden": 5 },
+    { "kicker": "Limonen", "titel": "Zum größten Teil Zitrus", "text": "Dazu fruchtig und süß.", "sekunden": 4 },
+    { "kicker": "Myrcen", "titel": "Erdig, fruchtig, kräutrig", "text": "Wie Hopfen, Mango, Thymian.", "sekunden": 4 },
+    { "kicker": "Zehn Richtungen", "titel": "Von Zitrus bis Diesel", "text": "Die Karte zeigt, welches Terpen wohin führt.", "sekunden": 5 },
+    { "kicker": "Im Portal", "titel": "Die Aroma-Karte jeder Bewertung", "sekunden": 4 }
+  ]
+}
