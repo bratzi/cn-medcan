@@ -13,7 +13,7 @@ import { BuchReiter, ReiterLeiste, type BuchReiterEintrag } from "@/components/r
 import { NotenLeiste } from "@/components/review/NotenLeiste";
 import { LikeKnopf } from "@/components/reaktionen/LikeKnopf";
 import { NurAufgeschlagen } from "@/components/review/NurAufgeschlagen";
-import { eintragAnker, eintragHref, type EintragDaten } from "@/components/review/eintrag";
+import { eintragAnker, eintragHref, sortenEintragHref, type EintragDaten } from "@/components/review/eintrag";
 import { ablauf } from "@/components/review/eintritt";
 import { FALZ_LINKS, FALZ_RECHTS } from "@/components/review/falz";
 import { Avatar, Badge, namenLinkKlassen } from "@/components/ui";
@@ -23,6 +23,7 @@ import { profilHref } from "@/lib/kurz-id";
 import type { Sprache } from "@/lib/i18n/sprache-kern";
 import { t } from "@/lib/i18n/text";
 import { aromaTexte, type Woerterbuch } from "@/lib/i18n/typen";
+import { wareZeile } from "@/lib/ware-zeile";
 import type { KatalogTerpen } from "@/lib/query/strains";
 
 /**
@@ -71,6 +72,12 @@ export function BuchDoppelseite({ eintrag, ueberschrift: Ueberschrift, w, sprach
   const verlinkt = Boolean(eintrag.autorName && eintrag.autorProfil);
   // Kein Ersatz aus der Umgebung: nur eine gültige eigene URL ergibt ein Reel.
   const reel = baueEmbedUrl(eintrag.instagramReelUrl) ? eintrag.instagramReelUrl : null;
+
+  // Titel ist die Sorte, darunter „über <Vertreiber>“ (Spec Sorte im Fokus 2); Altdaten ohne Kultivar zeigen das Produkt.
+  const sortenHref = eintrag.sorte ? sortenEintragHref(eintrag.sorte, eintrag.id) : eintragHref(eintrag.slug, eintrag.id);
+  const sortenZeile = eintrag.sorte
+    ? wareZeile({ vertreiberName: eintrag.sorte.vertreiberName, wareGenau: eintrag.sorte.wareGenau, handelsname: eintrag.handelsname }, { ueber: w.buch.ueber })
+    : "";
 
   const bildfeld = <BuchBildfeld eintrag={eintrag} name={name} w={w} sprache={sprache} />;
   // Ohne eigenes Bild steht ein Ersatzbild, das unter lg entfällt (Nutzer 2026-10-06).
@@ -142,11 +149,13 @@ export function BuchDoppelseite({ eintrag, ueberschrift: Ueberschrift, w, sprach
         {sorte ? (
           <div className="flex flex-col gap-1">
             <p className="font-buch text-h3 text-text">
-              <Link prefetch={false} href={eintragHref(eintrag.slug, eintrag.id)} className={namenLinkKlassen()}>
-                {eintrag.handelsname}
+              <Link prefetch={false} href={sortenHref} className={namenLinkKlassen()}>
+                {eintrag.sorte?.name ?? eintrag.handelsname}
               </Link>
             </p>
-            {eintrag.bluete !== undefined ? (
+            {eintrag.sorte ? (
+              sortenZeile ? <p className="text-small text-text-muted">{sortenZeile}</p> : null
+            ) : eintrag.bluete !== undefined ? (
               <p className="text-small text-text-muted">
                 {bluetenZeile(w.start.bluetenZeile, w.bluete.vertreiber.unbekannt, eintrag)}
               </p>
@@ -200,7 +209,7 @@ export function BuchDoppelseite({ eintrag, ueberschrift: Ueberschrift, w, sprach
           {sorte && eintrag.kommentare !== undefined ? (
             <Link
               prefetch={false}
-              href={`/blueten/${eintrag.slug}#bewertung-${eintrag.id}`}
+              href={`/blueten/${eintrag.sorte?.slug ?? eintrag.slug}${eintrag.sorte?.vertreiberId ? `?vertreiber=${encodeURIComponent(eintrag.sorte.vertreiberId)}` : ""}#bewertung-${eintrag.id}`}
               className={namenLinkKlassen("inline-flex min-h-11 items-center whitespace-nowrap text-small")}
             >
               {w.reaktionen.kommentare.titel} (<span className="numeric">{eintrag.kommentare}</span>)

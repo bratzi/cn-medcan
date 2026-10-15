@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { begrenzeSeite, KARTEN_JE_SEITE, ordne, parameter, seiteVon, type SortenZeile } from "@/lib/rangliste";
+import { fasseJeKultivar, begrenzeSeite, KARTEN_JE_SEITE, ordne, parameter, seiteVon, type SortenZeile } from "@/lib/rangliste";
 
 const z = (id: string, noten: number[], extra: Partial<SortenZeile> = {}): SortenZeile => ({
   strainId: id,
@@ -75,4 +75,24 @@ test("begrenzeSeite: Seite jenseits der letzten wird die letzte, nie unter 1", (
   assert.equal(begrenzeSeite(viele, 2), 2);
   assert.equal(begrenzeSeite(viele, 0), 1);
   assert.equal(begrenzeSeite([], 5), 1);
+});
+
+test("fasseJeKultivar: zwei Produkte derselben Sorte ergeben einen Eintrag mit gemeinsamer Bayes-Wertung", () => {
+  const zeilen = [
+    z("p1", [4, 4], { kultivarId: "k1", betreiber: 4, betreiberAm: "2026-01-01T00:00:00.000Z", zuletzt: "2026-02-01T00:00:00.000Z" }),
+    z("p2", [5, 5, 5], { kultivarId: "k1", betreiber: 5, betreiberAm: "2026-03-01T00:00:00.000Z", zuletzt: "2026-01-01T00:00:00.000Z" }),
+    z("p3", [3], { kultivarId: "k2" }),
+    z("p4", [2], { kultivarId: null }),
+  ];
+  const fest = fasseJeKultivar(zeilen);
+  assert.equal(fest.length, 3);
+  const k1 = fest.find((x) => x.kultivarId === "k1")!;
+  assert.equal(k1.anzahl, 5);
+  assert.equal(k1.summe, 23);
+  assert.equal(k1.strainId, "p2");
+  assert.equal(k1.betreiber, 5);
+  assert.equal(k1.zuletzt, "2026-02-01T00:00:00.000Z");
+  const p = ordne(fest, "hoechste");
+  assert.equal(p.length, 3);
+  assert.equal(p[0].strainId, "p2");
 });

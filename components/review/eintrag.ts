@@ -18,6 +18,8 @@ export type EintragDaten = {
   /** undefined = kein Produktbezug (Blütenseite, keine Chargenzeile); null = Vertreiber unbekannt. */
   vertreiber?: string | null;
   slug: string;
+  /** Sorte und Ware der Bewertung: Titel ist der Sortenname, Link die Sortenseite (Spec Sorte im Fokus 2). */
+  sorte?: ReviewEintrag["sorte"];
   aussehen: number;
   geruch: number;
   geschmack: number;
@@ -65,6 +67,12 @@ export function eintragHref(slug: string, id: string): string {
   return `/blueten/${slug}#${eintragAnker(id)}`;
 }
 
+/** Sprungziel auf der Sortenseite, auf den Vertreiber der Bewertung gefiltert, wenn er bekannt ist. */
+export function sortenEintragHref(sorte: { slug: string; vertreiberId: string | null }, id: string): string {
+  const frage = sorte.vertreiberId ? `?vertreiber=${encodeURIComponent(sorte.vertreiberId)}` : "";
+  return `/blueten/${sorte.slug}${frage}#${eintragAnker(id)}`;
+}
+
 /**
  * Eine Bewertung der Produktseite als Eintrag: Name und Slug kommen vom
  * Produkt, die Matrix aus der JSON-Spalte wird geprueft (kaputt = neutral).
@@ -82,6 +90,7 @@ export function alsEintrag(
     // Bewusst ohne `?? null`, anders als `bluete`: undefined heißt kein Produktbezug (Blütenseite, keine Chargenzeile), null Vertreiber unbekannt.
     vertreiber: produkt.vertreiber,
     slug: produkt.slug,
+    sorte: review.sorte ?? null,
     aussehen: review.aussehen,
     geruch: review.geruch,
     geschmack: review.geschmack,

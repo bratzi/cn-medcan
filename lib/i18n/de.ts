@@ -518,6 +518,7 @@ export const de = {
     community: "Community",
     ohneName: "Mitglied",
     betreiberName: "Book of Terpz",
+    ueber: "über {vertreiber}",
     median: { one: "Median aus einer Bewertung:", other: "Median aller {anzahl} Bewertungen:" },
     reiter: "Werte dieser Bewertung",
     reiterKarte: "Terpenbewertung",

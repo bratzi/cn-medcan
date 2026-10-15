@@ -16,6 +16,10 @@ export type SortenZeile = {
   communityAnzahl: number;
   communitySumme: number;
   zuletzt: string;
+  /** Sorte (Kultivar) des Produkts; Zeilen mit gleicher Sorte zählt `fasseJeKultivar` zusammen. */
+  kultivarId?: string | null;
+  /** Zeitpunkt der Betreiber-Note, damit beim Zusammenfassen die neueste gilt. */
+  betreiberAm?: string | null;
 };
 export type Platz = SortenZeile & { rang: number; schnitt: number; gewichtet: number; abstand: number | null };
 
@@ -23,6 +27,37 @@ export function parameter(nach: string | null, seite: string | null): { nach: Ra
   const n = (RANGLISTEN as readonly string[]).includes(nach ?? "") ? (nach as Rangliste) : "hoechste";
   const s = seite && /^\d+$/.test(seite) && Number(seite) >= 1 ? Number(seite) : 1;
   return { nach: n, seite: s };
+}
+
+/**
+ * Fasst Zeilen je Produkt zu einer Zeile je Sorte zusammen (Spec Sorte im Fokus 3): Anzahl und Summen
+ * addieren sich, die Betreiber-Note ist die neueste. `strainId` bleibt die des zahlenstärksten Produkts,
+ * damit die Karte ein Bild findet; Zeilen ohne Sorte bleiben einzeln.
+ */
+export function fasseJeKultivar(zeilen: readonly SortenZeile[]): SortenZeile[] {
+  const gruppen = new Map<string, SortenZeile[]>();
+  for (const z of zeilen) {
+    const schluessel = z.kultivarId ? `k:${z.kultivarId}` : `s:${z.strainId}`;
+    gruppen.set(schluessel, [...(gruppen.get(schluessel) ?? []), z]);
+  }
+  return [...gruppen.values()].map((g) => {
+    if (g.length === 1) return g[0];
+    const haupt = [...g].sort((a, b) => b.anzahl - a.anzahl || a.strainId.localeCompare(b.strainId))[0];
+    const betreiber = g
+      .filter((z) => z.betreiber !== null)
+      .sort((a, b) => (b.betreiberAm ?? "").localeCompare(a.betreiberAm ?? "") || a.strainId.localeCompare(b.strainId))[0];
+    return {
+      strainId: haupt.strainId,
+      kultivarId: haupt.kultivarId,
+      anzahl: g.reduce((a, z) => a + z.anzahl, 0),
+      summe: g.reduce((a, z) => a + z.summe, 0),
+      betreiber: betreiber?.betreiber ?? null,
+      betreiberAm: betreiber?.betreiberAm ?? null,
+      communityAnzahl: g.reduce((a, z) => a + z.communityAnzahl, 0),
+      communitySumme: g.reduce((a, z) => a + z.communitySumme, 0),
+      zuletzt: g.reduce((a, z) => (z.zuletzt > a ? z.zuletzt : a), ""),
+    };
+  });
 }
 
 export function ordne(zeilen: readonly SortenZeile[], nach: Rangliste): Platz[] {

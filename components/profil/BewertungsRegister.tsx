@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { Bild, BudpicBild } from "@/components/medien/Bild";
+import { sortenEintragHref } from "@/components/review/eintrag";
 import { textLinkKlassen } from "@/components/ui";
 import { SORTIERUNGEN, type registerAnsicht, type Sortierung } from "@/lib/bewertungs-register";
 import { cn } from "@/lib/cn";
@@ -8,6 +9,7 @@ import { formatiereDatum, formatiereZahl } from "@/lib/format";
 import type { Sprache } from "@/lib/i18n/sprache-kern";
 import { t } from "@/lib/i18n/text";
 import type { Woerterbuch } from "@/lib/i18n/typen";
+import { wareZeile } from "@/lib/ware-zeile";
 
 type Props = {
   ansicht: ReturnType<typeof registerAnsicht>;
@@ -15,6 +17,8 @@ type Props = {
   alle: boolean;
   texte: Woerterbuch["profil"];
   sprache: Sprache;
+  /** Vorlage „über {vertreiber}“ für die Unterzeile unter dem Sortennamen; fehlt = keine Zeile. */
+  ueber?: string;
 };
 
 const ziel = (sortierung: Sortierung, alle: boolean) => {
@@ -38,7 +42,7 @@ export function abstandText(abstand: number, sprache: Sprache): string {
  * oder das der Sorte, die Note groß, darunter Community und Abstand.
  * Sortiert wird über Links, ohne JavaScript. Ab 1080 px fünf je Reihe.
  */
-export function BewertungsRegister({ ansicht, sortierung, alle, texte, sprache }: Props) {
+export function BewertungsRegister({ ansicht, sortierung, alle, texte, sprache, ueber }: Props) {
   if (ansicht.gesamt === 0) return <p className="max-w-[68ch] text-body text-text-muted">{texte.registerLeer}</p>;
   return (
     <div className="flex flex-col gap-8">
@@ -83,9 +87,12 @@ export function BewertungsRegister({ ansicht, sortierung, alle, texte, sprache }
               )}
             </div>
             <div className="flex flex-col gap-2">
-              <Link prefetch={false} href={`/blueten/${e.slug}`} className={cn(textLinkKlassen(), "font-buch text-body wrap-break-word")}>
+              <Link prefetch={false} href={e.eintrag ? sortenEintragHref({ slug: e.slug, vertreiberId: e.eintrag.vertreiberId }, e.eintrag.id) : `/blueten/${e.slug}`} className={cn(textLinkKlassen(), "font-buch text-body wrap-break-word")}>
                 {e.handelsname}
               </Link>
+              {ueber && e.ware && wareZeile(e.ware, { ueber }) ? (
+                <p className="text-small text-text-muted wrap-break-word">{wareZeile(e.ware, { ueber })}</p>
+              ) : null}
               <p className="flex items-baseline gap-2">
                 <span className="sr-only">{t(texte.registerNote, { note: formatiereZahl(e.note, 1, sprache) })}</span>
                 <span aria-hidden="true" className="numeric text-h2 text-text">
