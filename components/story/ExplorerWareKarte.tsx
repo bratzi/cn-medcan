@@ -45,6 +45,8 @@ type Props = {
   skala: number;
   gewaehlt: boolean;
   imVergleich: boolean;
+  /** Erst ab zwei Vertreibern gibt es etwas zu vergleichen. */
+  vergleichbar: boolean;
   texte: Texte;
   sprache: Sprache;
   onWaehlen: () => void;
@@ -52,7 +54,7 @@ type Props = {
 };
 
 /** Eine Ware im Regal des Sorten-Explorers (Spec 2026-10-15 Abschnitt 4). */
-export function ExplorerWareKarte({ ware, index, skala, gewaehlt, imVergleich, texte, sprache, onWaehlen, onVergleichen }: Props) {
+export function ExplorerWareKarte({ ware, index, skala, gewaehlt, imVergleich, vergleichbar, texte, sprache, onWaehlen, onVergleichen }: Props) {
   return (
     <li className="explorer-karte flex flex-col gap-2" style={{ "--i": index } as CSSProperties}>
       <button
@@ -75,15 +77,17 @@ export function ExplorerWareKarte({ ware, index, skala, gewaehlt, imVergleich, t
           <BlattAnzeige note={ware.note} text={t(texte.overall, { note: formatiereZahl(ware.note, 1, sprache) })} />
         ) : null}
       </button>
-      <button
-        type="button"
-        aria-pressed={imVergleich}
-        onClick={onVergleichen}
-        className={buttonKlassen(imVergleich ? "secondary" : "ghost", "sm", "self-start aria-pressed:border-accent")}
-      >
-        {texte.vergleichen}
-        <span className="sr-only"> {ware.vertreiberName}</span>
-      </button>
+      {vergleichbar ? (
+        <button
+          type="button"
+          aria-pressed={imVergleich}
+          onClick={onVergleichen}
+          className={buttonKlassen(imVergleich ? "secondary" : "ghost", "sm", "self-start aria-pressed:border-accent")}
+        >
+          {texte.vergleichen}
+          <span className="sr-only"> {ware.vertreiberName}</span>
+        </button>
+      ) : null}
     </li>
   );
 }
