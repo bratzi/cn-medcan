@@ -35,8 +35,7 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 - `wip/ig-jury-entwuerfe` gemergt: Jury-Posts nur als Publora-Entwurf, Skript druckt „Collaborator von Hand hinzufügen“.
 - `wip/jury-profil-bilder` gemergt: Jury lädt Bilder am eigenen Entwurf im Profil (BildVerwaltung, Recht per `bildRecht`),
   Favourites zeigen Jury-Bewertungen (Blüten mit Beitrag, Abstimmungsgewinner). tsc grün, 1244 Tests grün.
-- Offen: „Jury bewertet wie normale Nutzer (Freigabe nicht mehr an ADMIN)“ unklar umgesetzt: Jury-Reviews brauchen
-  weiter Admin-Freigabe wie alle Nutzer, `istRedaktionell` = Jury laut Spec. Nutzer fragen, ob das so gemeint ist.
+- Entschieden (Nutzer): Jury-Reviews brauchen weiter Admin-Freigabe wie alle Nutzer, so bleibt es.
 - Nicht live gesehen: Profil-Bildupload, /jury/favourites mit Bewertungsliste.
 
 ### ⇢ SESSION 67 (2026-10-16): Terpz-Jury live, Suche, Blütenkarte, Wording
