@@ -5,13 +5,16 @@ import { benachrichtigen, nachrichtenFuer } from "@/lib/benachrichtigung";
 import { bildPruefen } from "@/lib/bild-pruefen";
 import { revalidiereSprachen } from "@/lib/i18n/revalidiere";
 import { beitragPruefen, JURY_BILD_MAX_BYTES, JURY_BILD_MAX_KANTE, JURY_BILDER_MAX, juryslug, juryslugBasis } from "@/lib/jury";
+import { bildRecht } from "@/lib/jury-rechte";
 import { getPrisma } from "@/lib/prisma";
-import { adminErforderlich } from "@/lib/session";
+import { adminErforderlich, mitgliedErforderlich } from "@/lib/session";
 
 export type Ergebnis = { ok: true } | { ok: false; fehler: string };
 
 // Admin-Seite ohne i18n: Meldungen fest deutsch, wie in den übrigen Admin-Aktionen.
 const UNBEKANNT = "Diesen Beitrag gibt es nicht.";
+const KEIN_RECHT = "Dazu fehlt dir die Berechtigung.";
+const BILD_WEG = "Das Bild gibt es nicht mehr.";
 const IG_URL = /^https:\/\/www\.instagram\.com\/(p|reel)\/[A-Za-z0-9_-]+\/?$/;
 
 /** Nach jeder Änderung: Admin, Jury-Seiten, Startseite und die Blütenseite der verknüpften Sorte. */
@@ -116,45 +119,78 @@ export async function beitragZurueckziehen(fd: FormData): Promise<Ergebnis> {
   return { ok: true };
 }
 
+/**
+ * Bilder hochladen, löschen, ordnen: der Betreiber jederzeit, ein Jury-Mitglied nur am eigenen Entwurf (Profil,
+ * Spec 2026-10-16). Das Recht kommt aus der Sitzung (bildRecht), nie aus dem Formular.
+ */
 export async function juryBildHochladen(fd: FormData): Promise<Ergebnis> {
-  await adminErforderlich();
+  let m;
+  try {
+    m = await mitgliedErforderlich();
+  } catch {
+    return { ok: false, fehler: KEIN_RECHT };
+  }
   const beitragId = String(fd.get("beitragId") ?? "");
   const datei = fd.get("bild");
   if (!(datei instanceof File) || datei.size === 0) return { ok: false, fehler: "Es wurde kein Bild gesendet." };
   if (datei.size > JURY_BILD_MAX_BYTES) return { ok: false, fehler: `Das Bild ist größer als ${JURY_BILD_MAX_BYTES / 1024} KB.` };
+  const prisma = await getPrisma();
+  const [b, anzahl] = await Promise.all([
+    prisma.juryBeitrag.findUnique({ where: { id: beitragId }, select: { autorId: true, status: true } }),
+    prisma.juryBild.count({ where: { beitragId } }),
+  ]);
+  if (!b) return { ok: false, fehler: UNBEKANNT };
+  const recht = bildRecht(b, m, anzahl);
+  if (recht === "recht") return { ok: false, fehler: KEIN_RECHT };
+  if (recht === "voll") return { ok: false, fehler: `Mehr als ${JURY_BILDER_MAX} Bilder sind nicht möglich.` };
   const bytes = new Uint8Array(await datei.arrayBuffer());
   const g = bildPruefen(bytes, { maxBytes: JURY_BILD_MAX_BYTES, maxBreite: JURY_BILD_MAX_KANTE, maxHoehe: JURY_BILD_MAX_KANTE });
   if (!g.ok) return { ok: false, fehler: "Das ist kein gültiges Bild (JPEG, PNG oder WebP, Kante höchstens 1600 Pixel)." };
-  const prisma = await getPrisma();
-  if (!(await prisma.juryBeitrag.findUnique({ where: { id: beitragId }, select: { id: true } }))) return { ok: false, fehler: UNBEKANNT };
-  const anzahl = await prisma.juryBild.count({ where: { beitragId } });
-  if (anzahl >= JURY_BILDER_MAX) return { ok: false, fehler: `Mehr als ${JURY_BILDER_MAX} Bilder sind nicht möglich.` };
   await prisma.juryBild.create({
     data: { beitragId, position: anzahl, daten: bytes, breite: g.breite, hoehe: g.hoehe, symbolbild: fd.get("symbolbild") === "1", alt: String(fd.get("alt") ?? "").slice(0, 200) },
   });
-  await neuLaden(beitragId);
+  await bildNeuLaden(beitragId);
   return { ok: true };
 }
 
-export async function juryBildLoeschen(fd: FormData): Promise<Ergebnis> {
-  await adminErforderlich();
-  const id = String(fd.get("id") ?? "");
+/** Bild samt Beitrag laden und das Recht prüfen; liefert die Beitrags-Id oder eine Fehlermeldung. */
+async function bildZugriff(id: string): Promise<{ beitragId: string } | { ok: false; fehler: string }> {
+  let m;
+  try {
+    m = await mitgliedErforderlich();
+  } catch {
+    return { ok: false, fehler: KEIN_RECHT };
+  }
   const prisma = await getPrisma();
-  const bild = await prisma.juryBild.findUnique({ where: { id }, select: { beitragId: true } });
-  if (!bild) return { ok: false, fehler: "Das Bild gibt es nicht mehr." };
+  const bild = await prisma.juryBild.findUnique({ where: { id }, select: { beitragId: true, beitrag: { select: { autorId: true, status: true } } } });
+  if (!bild) return { ok: false, fehler: BILD_WEG };
+  if (bildRecht(bild.beitrag, m) !== "ok") return { ok: false, fehler: KEIN_RECHT };
+  return { beitragId: bild.beitragId };
+}
+
+/** Wie neuLaden, dazu das Profil: dort bearbeitet die Jury ihre Entwurfsbilder. */
+async function bildNeuLaden(beitragId: string) {
+  await neuLaden(beitragId);
+  revalidiereSprachen("/profil");
+}
+
+export async function juryBildLoeschen(fd: FormData): Promise<Ergebnis> {
+  const id = String(fd.get("id") ?? "");
+  const bild = await bildZugriff(id);
+  if (!("beitragId" in bild)) return bild;
+  const prisma = await getPrisma();
   await prisma.juryBild.delete({ where: { id } });
-  await neuLaden(bild.beitragId);
+  await bildNeuLaden(bild.beitragId);
   return { ok: true };
 }
 
 /** position ±1: tauscht mit dem Nachbarn in der Reihenfolge. */
 export async function juryBildVerschieben(fd: FormData): Promise<Ergebnis> {
-  await adminErforderlich();
   const id = String(fd.get("id") ?? "");
   const richtung = Number(fd.get("richtung") ?? 0) < 0 ? -1 : 1;
+  const bild = await bildZugriff(id);
+  if (!("beitragId" in bild)) return bild;
   const prisma = await getPrisma();
-  const bild = await prisma.juryBild.findUnique({ where: { id }, select: { beitragId: true } });
-  if (!bild) return { ok: false, fehler: "Das Bild gibt es nicht mehr." };
   const alle = await prisma.juryBild.findMany({
     where: { beitragId: bild.beitragId },
     orderBy: [{ position: "asc" }, { id: "asc" }],
@@ -168,18 +204,17 @@ export async function juryBildVerschieben(fd: FormData): Promise<Ergebnis> {
   const reihenfolge = alle.map((x) => x.id);
   [reihenfolge[i], reihenfolge[j]] = [reihenfolge[j], reihenfolge[i]];
   await prisma.$transaction(reihenfolge.map((bildId, position) => prisma.juryBild.update({ where: { id: bildId }, data: { position } })));
-  await neuLaden(bild.beitragId);
+  await bildNeuLaden(bild.beitragId);
   return { ok: true };
 }
 
 export async function juryBildSymbol(fd: FormData): Promise<Ergebnis> {
-  await adminErforderlich();
   const id = String(fd.get("id") ?? "");
+  const bild = await bildZugriff(id);
+  if (!("beitragId" in bild)) return bild;
   const prisma = await getPrisma();
-  const bild = await prisma.juryBild.findUnique({ where: { id }, select: { beitragId: true } });
-  if (!bild) return { ok: false, fehler: "Das Bild gibt es nicht mehr." };
   await prisma.juryBild.update({ where: { id }, data: { symbolbild: fd.get("symbolbild") === "1" } });
-  await neuLaden(bild.beitragId);
+  await bildNeuLaden(bild.beitragId);
   return { ok: true };
 }
 

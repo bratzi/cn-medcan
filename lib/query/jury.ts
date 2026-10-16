@@ -1,7 +1,7 @@
 import "server-only";
 
 import type { Prisma } from "@/lib/generated/prisma/client";
-import { sichtbar } from "@/lib/jury";
+import { favouritenSortenIds, sichtbar } from "@/lib/jury";
 import { getPrisma } from "@/lib/prisma";
 
 export type JuryBildMeta = { id: string; breite: number; hoehe: number; symbolbild: boolean; alt: string };
@@ -169,15 +169,70 @@ export async function ladeJuryAusgabe(slug: string): Promise<{
   return { titel: a.titel, einleitung: a.einleitung, erscheintAm: a.erscheintAm, beitraege: a.beitraege.map(zuKarte) };
 }
 
-export async function ladeJuryFavourites(): Promise<JuryKarte[]> {
+/** Jury-Bewertung in den Favourites: ohne Note und ohne Bilder, verlinkt auf die Blüte. */
+export type JuryFavBewertung = {
+  id: string;
+  sorte: string;
+  kultivarSlug: string | null;
+  autor: { name: string; kurzId: string | null };
+  erstelltAm: Date;
+};
+
+/**
+ * Favourites der Jury (Spec 2026-10-16, Nutzer 2026-10-16): Beiträge mit verknüpfter Bewertung aus
+ * veröffentlichten Ausgaben und dazu die sichtbaren Bewertungen von Jury-Mitgliedern zu Blüten, die einen
+ * sichtbaren Jury-Beitrag haben oder eine beendete Community-Abstimmung gewonnen haben. Beides neueste zuerst,
+ * nie nach Note (HWG).
+ */
+export async function ladeJuryFavourites(): Promise<{ karten: JuryKarte[]; bewertungen: JuryFavBewertung[] }> {
   const prisma = await getPrisma();
-  const zeilen = await prisma.juryBeitrag.findMany({
-    where: { status: "VEROEFFENTLICHT", reviewId: { not: null }, ausgabe: { status: "VEROEFFENTLICHT" } },
-    orderBy: { veroeffentlichtAm: "desc" },
-    take: 60,
-    select: KARTE_SELECT,
-  });
-  return zeilen.map(zuKarte);
+  const [zeilen, beitragSorten, gewinner] = await Promise.all([
+    prisma.juryBeitrag.findMany({
+      where: { status: "VEROEFFENTLICHT", reviewId: { not: null }, ausgabe: { status: "VEROEFFENTLICHT" } },
+      orderBy: { veroeffentlichtAm: "desc" },
+      take: 60,
+      select: KARTE_SELECT,
+    }),
+    prisma.juryBeitrag.findMany({
+      where: { ...OEFFENTLICH, reviewId: { not: null } },
+      orderBy: { veroeffentlichtAm: "desc" },
+      take: 50,
+      select: { review: { select: { strainId: true } } },
+    }),
+    prisma.umfrageOption.findMany({
+      where: { istGewinner: true, umfrage: { phase: "BEENDET" } },
+      orderBy: { erstelltAm: "desc" },
+      take: 50,
+      select: { strainId: true },
+    }),
+  ]);
+  const sorten = favouritenSortenIds(
+    beitragSorten.map((z) => z.review?.strainId ?? null),
+    gewinner.map((g) => g.strainId),
+  );
+  const reviews = sorten.length
+    ? await prisma.review.findMany({
+        where: { strainId: { in: sorten }, freigegeben: true, autor: { jury: true } },
+        orderBy: { erstelltAm: "desc" },
+        take: 50,
+        select: {
+          id: true, erstelltAm: true,
+          strain: { select: { handelsname: true } },
+          kultivar: { select: { name: true, slug: true } },
+          autor: { select: { anzeigename: true, kurzId: true, profilOeffentlich: true } },
+        },
+      })
+    : [];
+  return {
+    karten: zeilen.map(zuKarte),
+    bewertungen: reviews.map((r) => ({
+      id: r.id,
+      sorte: r.kultivar?.name ?? r.strain.handelsname,
+      kultivarSlug: r.kultivar?.slug ?? null,
+      autor: { name: r.autor?.anzeigename ?? "", kurzId: r.autor?.profilOeffentlich ? r.autor.kurzId : null },
+      erstelltAm: r.erstelltAm,
+    })),
+  };
 }
 
 export async function ladeJuryTeam(): Promise<

@@ -20,8 +20,8 @@ test("darfVerknuepfen: nur eigene, freigegebene Bewertung", () => {
 
 test("Upload lehnt über JURY_BILDER_MAX ab, bevor er schreibt", () => {
   const q = readFileSync("app/[lang]/admin/jury/aktionen.ts", "utf8");
-  assert.ok(q.indexOf("anzahl >= JURY_BILDER_MAX") < q.indexOf("juryBild.create"));
-  assert.match(q, /export async function juryBildHochladen[\s\S]*?await adminErforderlich\(\)/);
+  assert.ok(q.indexOf("bildRecht(b, m, anzahl)") < q.indexOf("juryBild.create"));
+  assert.match(q, /export async function juryBildHochladen[\s\S]*?await mitgliedErforderlich\(\)/);
 });
 
 test("darfEinreichen: nur aus ENTWURF, auch für Admins", () => {

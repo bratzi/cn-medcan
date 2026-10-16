@@ -49,3 +49,19 @@ export function juryslug(titel: string, vorhanden: (s: string) => boolean): stri
 export function sichtbar(b: { status: string; ausgabe: { status: string } | null }): boolean {
   return b.status === "VEROEFFENTLICHT" && (!b.ausgabe || b.ausgabe.status === "VEROEFFENTLICHT");
 }
+
+/** Höchstzahl der Sorten-Ids je `in`-Abfrage der Favourites. */
+export const FAVOURITEN_SORTEN_MAX = 50;
+
+/**
+ * Sorten für die Jury-Bewertungen der Favourites: zuerst die aus sichtbaren Jury-Beiträgen, dann die Gewinner
+ * beendeter Abstimmungen; ohne Doppel, höchstens FAVOURITEN_SORTEN_MAX.
+ */
+export function favouritenSortenIds(beitragSorten: readonly (string | null)[], umfrageSorten: readonly string[]): string[] {
+  const ids = new Set<string>();
+  for (const id of [...beitragSorten, ...umfrageSorten]) {
+    if (ids.size >= FAVOURITEN_SORTEN_MAX) break;
+    if (id) ids.add(id);
+  }
+  return [...ids];
+}

@@ -49,7 +49,7 @@ test("Editor: frisch gespeichert zeigt die Meldung gleich beim Aufbau", () => {
 
 test("Liste: nach dem Einreichen steht die Bestätigung da", async () => {
   const { EigeneBeitraege } = await import("@/components/jury/EigeneBeitraege");
-  const props = { beitraege: [], bewertungen: [], offen: null, texte: de.profil.jury };
+  const props = { beitraege: [], bewertungen: [], offen: null, texte: de.profil.jury, bildTexte: de.admin.jury };
   const mit = rendere(createElement(AppRouterContext.Provider, { value: {} as never }, createElement(EigeneBeitraege, { ...props, eingereicht: true })));
   assert.match(mit, /Eingereicht\. Wir melden uns/);
   const ohne = rendere(createElement(AppRouterContext.Provider, { value: {} as never }, createElement(EigeneBeitraege, props)));

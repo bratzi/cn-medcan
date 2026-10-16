@@ -11,7 +11,9 @@ export async function eigeneJuryBeitraege(mitgliedId: string) {
     where: { autorId: mitgliedId },
     orderBy: { geaendertAm: "desc" },
     take: MAX_EIGENE,
-    select: { id: true, slug: true, titel: true, anriss: true, text: true, status: true, notiz: true, reviewId: true },
+    select: { id: true, slug: true, titel: true, anriss: true, text: true, status: true, notiz: true, reviewId: true,
+      bilder: { orderBy: [{ position: "asc" }, { id: "asc" }], select: { id: true, breite: true, hoehe: true, symbolbild: true, alt: true } },
+    },
   });
 }
 

@@ -24,6 +24,7 @@ export async function ReiheJury({ id, offen, frischGespeichert, eingereicht }: {
           frischGespeichert={frischGespeichert}
           eingereicht={eingereicht}
           texte={texte}
+          bildTexte={w.admin.jury}
         />
       )}
     </Feld>
