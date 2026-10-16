@@ -27,6 +27,7 @@ export const ladeJuryBewertung = cache(async (reviewId: string): Promise<Eintrag
           herstellerBildPfad: true,
           terpene: {
             orderBy: { rang: "asc" },
+            take: 50,
             select: { rang: true, konzentrationProzent: true, terpen: { select: { name: true, geschmack: true } } },
           },
         },

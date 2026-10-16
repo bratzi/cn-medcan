@@ -204,6 +204,7 @@ export async function ladeJuryBeitraegeZuBewertungen(reviewIds: readonly string[
   const zeilen = await prisma.juryBeitrag.findMany({
     where: { reviewId: { in: [...reviewIds].slice(0, 50) }, ...OEFFENTLICH },
     orderBy: { veroeffentlichtAm: "desc" },
+    take: 50,
     select: { reviewId: true, slug: true },
   });
   const karte = new Map<string, string>();

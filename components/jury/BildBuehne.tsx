@@ -82,6 +82,23 @@ export function BildBuehne({
       </div>
       {aktuelles.symbolbild ? <p className="text-small text-text-muted">{b.symbolbildHinweis}</p> : null}
       {anzahl > 1 ? (
+        <div className="flex flex-wrap items-center gap-2">
+          <button
+            type="button"
+            aria-label={b.zurueck}
+            onClick={() => gehe(aktiv - 1)}
+            className="inline-flex size-12 items-center justify-center border border-border-strong bg-surface-raised text-body text-text transition-colors duration-fast ease-standard hover:border-text"
+          >
+            <span aria-hidden="true">←</span>
+          </button>
+          <button
+            type="button"
+            aria-label={b.weiter}
+            onClick={() => gehe(aktiv + 1)}
+            className="inline-flex size-12 items-center justify-center border border-border-strong bg-surface-raised text-body text-text transition-colors duration-fast ease-standard hover:border-text"
+          >
+            <span aria-hidden="true">→</span>
+          </button>
         <ul className="flex flex-wrap gap-2">
           {bilder.map((bild, index) => (
             <li key={bild.id}>
@@ -100,6 +117,7 @@ export function BildBuehne({
             </li>
           ))}
         </ul>
+        </div>
       ) : null}
     </div>
   );

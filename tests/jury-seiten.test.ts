@@ -28,6 +28,8 @@ test("BildBuehne: Daumenleiste nur bei mehreren Bildern, Rahmen ohne Bild", () =
   const bild = (id: string) => ({ id, breite: 800, hoehe: 1200, symbolbild: false, alt: "" });
   const mehrere = renderToStaticMarkup(createElement(BildBuehne, { bilder: [bild("a"), bild("b")], name: "Gelato", texte: de.jury }));
   assert.match(mehrere, /Bild 2 zeigen/);
+  assert.match(mehrere, /aria-label="Vorheriges Bild"/);
+  assert.match(mehrere, /aria-label="Nächstes Bild"/);
   const eins = renderToStaticMarkup(createElement(BildBuehne, { bilder: [bild("a")], name: "Gelato", texte: de.jury }));
   assert.doesNotMatch(eins, /Bild 1 zeigen/);
   const keins = renderToStaticMarkup(createElement(BildBuehne, { bilder: [], name: "Gelato", texte: de.jury }));
