@@ -34,7 +34,9 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
   00:00 UTC aus. Hauptverbraucher: EXISTS auf strains nahm Index `aktiv` (bis 286k Lesezeilen je Explorer-/Suchabfrage).
 - Fix f07bde7: Migration 0027 (Indizes kultivar_id+aktiv, vertreiber_id+aktiv), remote eingespielt.
 - **Offen:** nach 00:00 UTC /blueten live prüfen; dann `wrangler d1 insights cn-medcan-db --sort-by reads` ansehen.
-- Admin-Dashboard und Infobox-Frage: Nutzer hat noch nicht geantwortet, erneut fragen.
+- Infobox geklärt: gemeint war die Tafel im Register „Terpene und ihre …“ (RegisterAuswahl). Jetzt in `WeicheHoehe`
+  gehüllt. **Live prüfen:** Terpen↔Geschmack umschalten, Höhe gleitet; Glas-Schatten nicht abgeschnitten (overflow-hidden).
+- Admin-Dashboard: Nutzer hat noch nicht geantwortet, erneut fragen.
 
 ### ⇢ SESSION 70 (2026-10-16): Startseiten-Typografie live
 
