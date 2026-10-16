@@ -11,6 +11,11 @@ import { JURY_BILD_MAX_BYTES, JURY_BILD_MAX_KANTE, JURY_BILDER_MAX } from "@/lib
 import { t } from "@/lib/i18n/text";
 import type { Woerterbuch } from "@/lib/i18n/typen";
 
+/** Löschen ist unwiderruflich: abgesetzt von den Knöpfen zum Ordnen, Gefahrenfarbe, eigene Klassen (cn mischt nicht). */
+const LOESCH_KNOPF =
+  "inline-flex h-9 items-center justify-center rounded-full border border-danger bg-surface-raised px-4 text-small font-medium text-danger " +
+  "transition-colors duration-fast ease-standard hover:bg-surface-sunken disabled:pointer-events-none disabled:opacity-50 pointer-coarse:h-11";
+
 export type AdminBild = { id: string; breite: number; hoehe: number; symbolbild: boolean; alt: string };
 
 type Props = { beitragId: string; bilder: readonly AdminBild[]; texte: Woerterbuch["admin"]["jury"] };
@@ -26,6 +31,8 @@ export function BildVerwaltung({ beitragId, bilder, texte }: Props) {
   const [alt, setAlt] = useState("");
   const [symbol, setSymbol] = useState(false);
   const [bereitet, setBereitet] = useState(false);
+  /** Id des Bildes, dessen Löschen gerade bestätigt werden soll (zweistufig: Löschen ist unwiderruflich). */
+  const [loeschFrage, setLoeschFrage] = useState<string | null>(null);
   const frei = JURY_BILDER_MAX - bilder.length;
 
   function los(lauf: (fd: FormData) => Promise<AktionsErgebnis>, id: string, extra?: Record<string, string>) {
@@ -123,16 +130,38 @@ export function BildVerwaltung({ beitragId, bilder, texte }: Props) {
                   >
                     {texte.symbolbildBadge}
                   </Button>
-                  <Button
-                    type="button"
-                    groesse="sm"
-                    variante="ghost"
-                    aria-label={t(texte.loeschen, { nr })}
-                    disabled={!aktion.bereit}
-                    onClick={() => los(juryBildLoeschen, b.id)}
-                  >
-                    ×
-                  </Button>
+                </div>
+                <div className="mt-2 flex flex-wrap items-center gap-2 border-t border-border pt-2">
+                  {loeschFrage === b.id ? (
+                    <>
+                      <span className="text-small font-medium text-danger">{texte.loeschenFrage}</span>
+                      <button
+                        type="button"
+                        aria-label={t(texte.loeschenEndgueltig, { nr })}
+                        className={LOESCH_KNOPF}
+                        disabled={!aktion.bereit}
+                        onClick={() => {
+                          setLoeschFrage(null);
+                          los(juryBildLoeschen, b.id);
+                        }}
+                      >
+                        {t(texte.loeschenEndgueltig, { nr })}
+                      </button>
+                      <Button type="button" groesse="sm" variante="ghost" onClick={() => setLoeschFrage(null)}>
+                        {texte.abbrechen}
+                      </Button>
+                    </>
+                  ) : (
+                    <button
+                      type="button"
+                      aria-label={t(texte.loeschen, { nr })}
+                      className={LOESCH_KNOPF}
+                      disabled={!aktion.bereit}
+                      onClick={() => setLoeschFrage(b.id)}
+                    >
+                      <span aria-hidden="true">×</span>
+                    </button>
+                  )}
                 </div>
               </li>
             );

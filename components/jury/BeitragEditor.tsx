@@ -28,6 +28,8 @@ type Props = {
   beitrag: EditorBeitrag | null;
   bewertungen: readonly { id: string; label: string }[];
   texte: Woerterbuch["profil"]["jury"];
+  /** Der Beitrag wurde eben zum ersten Mal gespeichert (?gespeichert=1): die Meldung überlebt den Neuaufbau. */
+  frischGespeichert?: boolean;
 };
 
 type Antwort = { art: "fehler" | "erfolg"; text: string } | null;
@@ -45,7 +47,7 @@ type Reiter = (typeof REITER)[number];
  * Einreichen speichert zuerst und gibt dann zur Prüfung frei. Geprüft wird auf dem Server
  * (lib/jury.ts), maxLength und Zähler sind Bedienkomfort.
  */
-export function BeitragEditor({ beitrag, bewertungen, texte }: Props) {
+export function BeitragEditor({ beitrag, bewertungen, texte, frischGespeichert = false }: Props) {
   const router = useRouter();
   const hydriert = useHydriert();
   const basis = useId();
@@ -56,7 +58,7 @@ export function BeitragEditor({ beitrag, bewertungen, texte }: Props) {
   const [text, setText] = useState(beitrag?.text ?? "");
   const [reiter, setReiter] = useState<Reiter>("schreiben");
   const [laeuft, setLaeuft] = useState(false);
-  const [antwort, setAntwort] = useState<Antwort>(null);
+  const [antwort, setAntwort] = useState<Antwort>(frischGespeichert ? { art: "erfolg", text: texte.gespeichert } : null);
 
   const bloecke = juryTextBloecke(text);
   const zaehler = (anzahl: number, max: number) => t(texte.zaehler, { anzahl, max });
@@ -74,7 +76,8 @@ export function BeitragEditor({ beitrag, bewertungen, texte }: Props) {
     const neueId = ergebnis.id ?? id;
     if (neueId && neueId !== id) {
       setId(neueId);
-      router.replace(`/profil?jury=${neueId}`, { scroll: false });
+      // Die Seite baut den Editor mit der neuen Id neu auf; das Kennzeichen rettet die Meldung dorthin.
+      router.replace(`/profil?jury=${neueId}&gespeichert=1`, { scroll: false });
     }
     router.refresh();
     return neueId ?? null;

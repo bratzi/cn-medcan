@@ -39,3 +39,10 @@ test("Jury-Texte: de und en gleich aufgebaut, ohne Gedankenstrich", () => {
   assert.deepEqual(Object.keys(en.profil.jury).sort(), Object.keys(de.profil.jury).sort());
   assert.doesNotMatch(JSON.stringify([de.profil.jury, en.profil.jury]), /[–—]/);
 });
+
+test("Editor: frisch gespeichert zeigt die Meldung gleich beim Aufbau", () => {
+  const beitrag = { id: "b1", slug: "x", titel: "T", anriss: "", text: "Text", reviewId: null, notiz: null };
+  const html = zeige({ beitrag, bewertungen: [], texte: de.profil.jury, frischGespeichert: true });
+  assert.match(html, /Entwurf gespeichert\./);
+  assert.doesNotMatch(zeige({ beitrag, bewertungen: [], texte: de.profil.jury }), /Entwurf gespeichert\./);
+});

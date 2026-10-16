@@ -45,3 +45,9 @@ test("Admin-Texte: de und en gleich aufgebaut, ohne Gedankenstrich", () => {
   assert.deepEqual(Object.keys(en.admin.jury).sort(), Object.keys(de.admin.jury).sort());
   assert.doesNotMatch(JSON.stringify(de.admin.jury), /[–—]/);
 });
+
+test("BildVerwaltung: Löschen fragt erst nach (keine Frage im Ausgangszustand)", () => {
+  const html = zeige(createElement(BildVerwaltung, { beitragId: "x", bilder: [bild(0)], texte: de.admin.jury }));
+  assert.doesNotMatch(html, new RegExp(de.admin.jury.loeschenFrage.replace("?", "\?")));
+  assert.match(html, /aria-label="Bild 1 löschen"/);
+});

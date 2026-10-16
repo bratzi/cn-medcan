@@ -13,6 +13,8 @@ type Props = {
   bewertungen: readonly { id: string; label: string }[];
   /** `neu`, eine Beitrags-Id oder null (nur die Liste). Kommt aus ?jury= in /profil. */
   offen: string | null;
+  /** ?gespeichert=1: der Editor zeigt „Entwurf gespeichert“ gleich beim Aufbau. */
+  frischGespeichert?: boolean;
   texte: Woerterbuch["profil"]["jury"];
 };
 
@@ -24,7 +26,7 @@ const VARIANTE: Record<string, BadgeVariante> = {
 };
 
 /** Liste der eigenen Beiträge; ein Entwurf (oder „neu“) öffnet den Editor darunter. */
-export function EigeneBeitraege({ beitraege, bewertungen, offen, texte }: Props) {
+export function EigeneBeitraege({ beitraege, bewertungen, offen, texte, frischGespeichert = false }: Props) {
   const bearbeitet = offen && offen !== "neu" ? beitraege.find((b) => b.id === offen && b.status === "ENTWURF") : undefined;
   const zeigeEditor = offen === "neu" || !!bearbeitet;
   return (
@@ -32,7 +34,7 @@ export function EigeneBeitraege({ beitraege, bewertungen, offen, texte }: Props)
       <p className="max-w-[68ch] text-body text-text-muted text-pretty">{texte.satz}</p>
       {zeigeEditor ? (
         // key: beim Wechsel des Beitrags beginnt der Editor mit dessen Werten.
-        <BeitragEditor key={bearbeitet?.id ?? "neu"} beitrag={bearbeitet ?? null} bewertungen={bewertungen} texte={texte} />
+        <BeitragEditor key={bearbeitet?.id ?? "neu"} beitrag={bearbeitet ?? null} bewertungen={bewertungen} texte={texte} frischGespeichert={frischGespeichert} />
       ) : (
         <div>
           <Link prefetch={false} scroll={false} href="/profil?jury=neu" className={buttonKlassen("primary")}>
