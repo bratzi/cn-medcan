@@ -386,6 +386,9 @@ export const en: Woerterbuch = {
       bewertungen: { one: "{anzahl} rating", other: "{anzahl} ratings" },
       thc: "{von} to {bis} % THC",
       thcEinzeln: "{wert} % THC",
+      cbd: "{von} to {bis} % CBD",
+      cbdEinzeln: "{wert} % CBD",
+      terpene: "Dominant terpenes",
       keineBewertung: "Not reviewed yet",
     },
     karte: {

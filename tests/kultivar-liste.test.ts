@@ -50,6 +50,23 @@ test("verdichteKultivar: ohne Kennwerte kein Overall, ohne Handelsnamen keine Sp
   assert.equal(e.typ, "HYBRID");
 });
 
+test("verdichteKultivar: CBD-Spanne und Top-3-Terpene nach Rangpunkten", () => {
+  const terp = (name: string, rang: number) => ({ rang, terpen: { name, geschmack: "ERDIG" } });
+  const e = verdichteKultivar(
+    zeile({
+      strains: [
+        { kultivarTyp: "INDICA", thcMinProzent: 20, thcMaxProzent: 22, cbdMinProzent: 0.1, cbdMaxProzent: 0.5, vertreiber: null, terpene: [terp("Myrcen", 1), terp("Limonen", 2), terp("Pinen", 3)] },
+        { kultivarTyp: "INDICA", thcMinProzent: 20, thcMaxProzent: 22, cbdMinProzent: 0, cbdMaxProzent: 1, vertreiber: null, terpene: [terp("Limonen", 1), terp("Caryophyllen", 2), terp("Myrcen", 3)] },
+      ],
+    }),
+  );
+  assert.equal(e.cbdMin, 0);
+  assert.equal(e.cbdMax, 1);
+  assert.deepEqual(e.terpene.map((t) => t.name), ["Limonen", "Myrcen", "Caryophyllen"]);
+  assert.equal(e.terpene[0].rang, 1);
+  assert.equal(verdichteKultivar(zeile({})).cbdMin, null);
+});
+
 test("kultivar-liste.ts: groupBy statt Schleife, jede findMany mit take, Blätterung wie die Liste", () => {
   const q = readFileSync("lib/query/kultivar-liste.ts", "utf8");
   assert.match(q, /groupBy\(\{\s*by: \["kultivarId", "vertreiberId"\]/);

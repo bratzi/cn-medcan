@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Bild } from "@/components/medien/Bild";
 import { BudpicDiashow, type DiashowBild } from "@/components/produkt/BudpicDiashow";
 import { BlattAnzeige } from "@/components/review/BlattAnzeige";
+import { TerpenChips } from "@/components/produkt/TerpenChips";
 import { Badge } from "@/components/ui";
 import { einzelLinkKlassen } from "@/components/ui/textlink";
 import { musterBildId } from "@/lib/budpics";
@@ -48,6 +49,13 @@ export function KultivarKarte({ kultivar, filter, w, sprache, budpics = [] }: Pr
       ? (() => {
           const s = formatiereZahlSpanne(kultivar.thcMin, kultivar.thcMax, 0, sprache);
           return s.gleich ? t(texte.thcEinzeln, { wert: s.von }) : t(texte.thc, { von: s.von, bis: s.bis });
+        })()
+      : null;
+  const cbd =
+    kultivar.cbdMin !== null && kultivar.cbdMax !== null
+      ? (() => {
+          const s = formatiereZahlSpanne(kultivar.cbdMin, kultivar.cbdMax, 1, sprache);
+          return s.gleich ? t(texte.cbdEinzeln, { wert: s.von }) : t(texte.cbd, { von: s.von, bis: s.bis });
         })()
       : null;
 
@@ -97,7 +105,15 @@ export function KultivarKarte({ kultivar, filter, w, sprache, budpics = [] }: Pr
         <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
           <Badge variante="neutral">{w.label.kultivarTyp[kultivar.typ]}</Badge>
           {thc ? <span className="numeric text-small text-text">{thc}</span> : null}
+          {cbd ? <span className="numeric text-small text-text-muted">{cbd}</span> : null}
         </div>
+
+        {kultivar.terpene.length > 0 ? (
+          <div className="flex flex-col gap-2">
+            <p className="sr-only">{texte.terpene}</p>
+            <TerpenChips terpene={kultivar.terpene} w={w} sprache={sprache} />
+          </div>
+        ) : null}
 
         {sichtbar.length > 0 ? (
           <ul className="flex flex-wrap gap-x-2 gap-y-2 text-small text-text">

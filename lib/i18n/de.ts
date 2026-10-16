@@ -398,6 +398,9 @@ export const de = {
       bewertungen: { one: "{anzahl} Bewertung", other: "{anzahl} Bewertungen" },
       thc: "{von} bis {bis} % THC",
       thcEinzeln: "{wert} % THC",
+      cbd: "{von} bis {bis} % CBD",
+      cbdEinzeln: "{wert} % CBD",
+      terpene: "Dominante Terpene",
       keineBewertung: "Noch nicht bewertet",
     },
     karte: {

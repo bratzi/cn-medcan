@@ -12,7 +12,8 @@ import { parseStrainFilter } from "@/lib/query/filter";
 
 const ID = "ed9c2468f2c9b661441986de9d72f496";
 const kultivar = {
-  id: ID, name: "Black Cherry Punch", typ: "INDICA" as const, thcMin: 20, thcMax: 30,
+  id: ID, name: "Black Cherry Punch", typ: "INDICA" as const, thcMin: 20, thcMax: 30, cbdMin: 0.5, cbdMax: 1,
+  terpene: [{ name: "Myrcen", geschmack: null, rang: 1 }, { name: "Limonen", geschmack: null, rang: 2 }],
   vertreiber: ["Alpha", "Beta", "Gamma", "Delta", "Epsilon", "Zeta", "Eta"], handelsnamen: 7, overall: 3.8, bewertungen: 4,
   bildSlug: null, herstellerBildPfad: null,
 };
@@ -31,6 +32,9 @@ test("KultivarKarte: Name, Typ, Spanne, fünf Vertreiber plus Rest, Overall, Lin
   assert.match(html, /Black Cherry Punch/);
   assert.match(html, /Indica/i);
   assert.match(html, /20 bis 30 % THC/);
+  assert.match(html, /0,5 bis 1,0 % CBD/);
+  assert.match(html, /Myrcen/);
+  assert.match(html, /Limonen/);
   assert.match(html, /Epsilon/);
   assert.doesNotMatch(html, /Zeta/);
   assert.match(html, /\+2/);
