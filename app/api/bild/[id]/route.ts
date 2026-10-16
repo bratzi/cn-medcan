@@ -32,6 +32,11 @@ async function bildLaden(id: string): Promise<{ bytes: Uint8Array; typ: string; 
   if (avatar) return { bytes: avatar.bild, typ: "image/webp", cache: CACHE_JAHR };
   const budpic = await prisma.budpic.findFirst({ where: { id, status: "FREIGEGEBEN" }, select: { daten: true } });
   if (budpic) return { bytes: budpic.daten, typ: "image/webp", cache: CACHE_STUNDE };
+  const jury = await prisma.juryBild.findFirst({
+    where: { id, beitrag: { status: "VEROEFFENTLICHT", OR: [{ ausgabeId: null }, { ausgabe: { status: "VEROEFFENTLICHT" } }] } },
+    select: { daten: true },
+  });
+  if (jury) return { bytes: jury.daten, typ: "image/webp", cache: CACHE_STUNDE };
   return null;
 }
 

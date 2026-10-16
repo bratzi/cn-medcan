@@ -1,0 +1,188 @@
+import "server-only";
+
+import type { Prisma } from "@/lib/generated/prisma/client";
+import { sichtbar } from "@/lib/jury";
+import { getPrisma } from "@/lib/prisma";
+
+export type JuryBildMeta = { id: string; breite: number; hoehe: number; symbolbild: boolean; alt: string };
+
+export type JuryKarte = {
+  slug: string;
+  titel: string;
+  anriss: string;
+  autor: { name: string; kurzId: string | null };
+  veroeffentlichtAm: Date;
+  titelbild: JuryBildMeta | null;
+  sorte: { name: string; slug: string | null } | null;
+};
+
+export type JuryBeitragVoll = JuryKarte & {
+  text: string;
+  bilder: JuryBildMeta[];
+  igUrl: string | null;
+  ausgabe: { slug: string; titel: string } | null;
+  review: {
+    id: string;
+    strainSlug: string;
+    kultivarSlug: string | null;
+    vertreiberId: string | null;
+    vertreiberName: string | null;
+    gesamtnote: number | null;
+  } | null;
+};
+
+const BILD_META = { id: true, position: true, breite: true, hoehe: true, symbolbild: true, alt: true } as const;
+const KARTE_SELECT = {
+  slug: true, titel: true, anriss: true, veroeffentlichtAm: true,
+  autor: { select: { anzeigename: true, kurzId: true, profilOeffentlich: true } },
+  bilder: { select: BILD_META, orderBy: { position: "asc" }, take: 5 },
+  review: { select: { kultivar: { select: { name: true, slug: true } } } },
+} as const;
+/** Öffentlich: Beitrag veröffentlicht, Ausgabe fehlt oder ist veröffentlicht (gleich `sichtbar`). */
+const OEFFENTLICH: Prisma.JuryBeitragWhereInput = {
+  status: "VEROEFFENTLICHT",
+  OR: [{ ausgabeId: null }, { ausgabe: { status: "VEROEFFENTLICHT" } }],
+};
+
+const SEITE = 12;
+
+export type KartenZeile = {
+  slug: string; titel: string; anriss: string; veroeffentlichtAm: Date | null;
+  autor: { anzeigename: string; kurzId: string | null; profilOeffentlich: boolean };
+  bilder: (JuryBildMeta & { position: number })[];
+  review: { kultivar: { name: string; slug: string | null } | null } | null;
+};
+
+function bildMeta(b: JuryBildMeta): JuryBildMeta {
+  return { id: b.id, breite: b.breite, hoehe: b.hoehe, symbolbild: b.symbolbild, alt: b.alt };
+}
+
+export function zuKarte(z: KartenZeile): JuryKarte {
+  const erstes = [...z.bilder].sort((a, b) => a.position - b.position)[0];
+  return {
+    slug: z.slug, titel: z.titel, anriss: z.anriss, veroeffentlichtAm: z.veroeffentlichtAm ?? new Date(0),
+    autor: { name: z.autor.anzeigename, kurzId: z.autor.profilOeffentlich ? z.autor.kurzId : null },
+    titelbild: erstes ? bildMeta(erstes) : null,
+    sorte: z.review?.kultivar ? { name: z.review.kultivar.name, slug: z.review.kultivar.slug } : null,
+  };
+}
+
+export async function ladeJuryStart(seite: number): Promise<{
+  aufmacher: { slug: string; titel: string; einleitung: string; erscheintAm: Date | null; beitraege: JuryKarte[] } | null;
+  beitraege: JuryKarte[];
+  seitenAnzahl: number;
+}> {
+  const prisma = await getPrisma();
+  const s = Number.isInteger(seite) && seite > 0 ? seite : 1;
+  const [ausgabe, zeilen, anzahl] = await Promise.all([
+    prisma.juryAusgabe.findFirst({
+      where: { status: "VEROEFFENTLICHT" },
+      orderBy: { erscheintAm: "desc" },
+      take: 1,
+      select: {
+        slug: true, titel: true, einleitung: true, erscheintAm: true,
+        beitraege: { where: OEFFENTLICH, orderBy: { position: "asc" }, take: 30, select: KARTE_SELECT },
+      },
+    }),
+    prisma.juryBeitrag.findMany({
+      where: OEFFENTLICH,
+      orderBy: { veroeffentlichtAm: "desc" },
+      skip: (s - 1) * SEITE,
+      take: SEITE,
+      select: KARTE_SELECT,
+    }),
+    prisma.juryBeitrag.count({ where: OEFFENTLICH }),
+  ]);
+  return {
+    aufmacher: ausgabe
+      ? {
+          slug: ausgabe.slug, titel: ausgabe.titel, einleitung: ausgabe.einleitung,
+          erscheintAm: ausgabe.erscheintAm, beitraege: ausgabe.beitraege.map(zuKarte),
+        }
+      : null,
+    beitraege: zeilen.map(zuKarte),
+    seitenAnzahl: Math.max(1, Math.ceil(anzahl / SEITE)),
+  };
+}
+
+export async function ladeJuryBeitrag(slug: string): Promise<JuryBeitragVoll | null> {
+  const prisma = await getPrisma();
+  const z = await prisma.juryBeitrag.findUnique({
+    where: { slug },
+    select: {
+      ...KARTE_SELECT,
+      text: true, igUrl: true, status: true,
+      bilder: { select: BILD_META, orderBy: { position: "asc" }, take: 5 },
+      ausgabe: { select: { slug: true, titel: true, status: true } },
+      review: {
+        select: {
+          id: true, vertreiberId: true, gesamtnote: true,
+          vertreiber: { select: { name: true } },
+          kultivar: { select: { name: true, slug: true } },
+          strain: { select: { slug: true } },
+        },
+      },
+    },
+  });
+  if (!z || !sichtbar(z)) return null;
+  return {
+    ...zuKarte(z),
+    text: z.text,
+    bilder: z.bilder.map(bildMeta),
+    igUrl: z.igUrl,
+    ausgabe: z.ausgabe ? { slug: z.ausgabe.slug, titel: z.ausgabe.titel } : null,
+    review: z.review
+      ? {
+          id: z.review.id,
+          strainSlug: z.review.strain.slug,
+          kultivarSlug: z.review.kultivar?.slug ?? null,
+          vertreiberId: z.review.vertreiberId,
+          vertreiberName: z.review.vertreiber?.name ?? null,
+          gesamtnote: z.review.gesamtnote,
+        }
+      : null,
+  };
+}
+
+export async function ladeJuryAusgabe(slug: string): Promise<{
+  titel: string; einleitung: string; erscheintAm: Date | null; beitraege: JuryKarte[];
+} | null> {
+  const prisma = await getPrisma();
+  const a = await prisma.juryAusgabe.findFirst({
+    where: { slug, status: "VEROEFFENTLICHT" },
+    select: {
+      titel: true, einleitung: true, erscheintAm: true,
+      beitraege: { where: OEFFENTLICH, orderBy: { position: "asc" }, take: 60, select: KARTE_SELECT },
+    },
+  });
+  if (!a) return null;
+  return { titel: a.titel, einleitung: a.einleitung, erscheintAm: a.erscheintAm, beitraege: a.beitraege.map(zuKarte) };
+}
+
+export async function ladeJuryFavourites(): Promise<JuryKarte[]> {
+  const prisma = await getPrisma();
+  const zeilen = await prisma.juryBeitrag.findMany({
+    where: { status: "VEROEFFENTLICHT", reviewId: { not: null }, ausgabe: { status: "VEROEFFENTLICHT" } },
+    orderBy: { veroeffentlichtAm: "desc" },
+    take: 60,
+    select: KARTE_SELECT,
+  });
+  return zeilen.map(zuKarte);
+}
+
+export async function ladeJuryTeam(): Promise<
+  { id: string; name: string; kurzId: string | null; instagram: string | null; beitraege: number }[]
+> {
+  const prisma = await getPrisma();
+  const m = await prisma.mitglied.findMany({
+    where: { jury: true, profilOeffentlich: true, freigegeben: true },
+    take: 50,
+    select: {
+      id: true, anzeigename: true, kurzId: true, instagramHandle: true,
+      _count: { select: { juryBeitraege: { where: OEFFENTLICH } } },
+    },
+  });
+  return m.map((x) => ({
+    id: x.id, name: x.anzeigename, kurzId: x.kurzId, instagram: x.instagramHandle, beitraege: x._count.juryBeitraege,
+  }));
+}
