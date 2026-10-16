@@ -3,7 +3,7 @@
 > Übergabemedium zwischen Sessions. Wird nach jedem Arbeitsblock aktualisiert und committet.
 > Wer hier weiterarbeitet, liest diese Datei zuerst und braucht den Chatverlauf nicht.
 
-**Letzte Aktualisierung:** 2026-10-16 (Session 66)
+**Letzte Aktualisierung:** 2026-10-16 (Session 67)
 **Repo:** https://github.com/bratzi/cn-medcan (public)
 **Branch:** `main` (Makeover „Grünes Buch“ Teilprojekt 1 ist seit 2026-09-24 auf `main`)
 
@@ -27,6 +27,31 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 ---
 
 ## ⇢ Hier geht es weiter
+
+### ⇢ SESSION 67 (2026-10-16): Terpz-Jury live, Suche, Blütenkarte, Wording
+
+**ALS ERSTES: diese Fragen in EINER AskUserQuestion stellen**
+1. Kapiteltitel im Explorer: „Gleiche Blüte, andere Variante“ (jetzt live) oder „Gleiche Blüte, anderer Vertreiber“?
+2. Nutzer hat kaum Usage: WIP-Branches in kleinen Schritten fertig machen und jeweils sofort live pushen (Nutzerwunsch)? Reihenfolge: zuerst `wip/ig-jury-entwuerfe` (klein), dann `wip/jury-profil-bilder`?
+
+**Offen, als WIP gesichert (nicht auf main, ungeprüft)**
+1. `wip/ig-jury-entwuerfe` (7a6914d): Nutzer will KEINE Auto-Collab-Posts und keine Meta-App/Token („zu großer Overhead“).
+   `scripts/ig-jury.ts` soll nur Karussell rendern, Publora-ENTWURF anlegen, Status ENTWURF melden und je Autor
+   „Collaborator von Hand hinzufügen: @handle“ ausgeben; Caption behält „Von @handle“; Graph-Weg und `--planen` raus,
+   `--probe` bleibt; agent-anweisung.md anpassen. Stand: halb umgebaut (lib/ig-graph.ts gelöscht). tsc/Test prüfen, fertig, push.
+2. `wip/jury-profil-bilder` (Worktree `.claude/worktrees/agent-a96c9ffed0763517b`): Nutzerentscheidung: Jury bewertet
+   wie normale Nutzer (Freigabe nicht mehr an ADMIN, Abzeichen „Jury“ bleibt); Jury's Favourites zeigt zusätzlich
+   Jury-Bewertungen zu Blüten mit Jury-Beitrag und aus abgeschlossenen Community-Abstimmungen (nach Datum, take);
+   Jury-Mitglieder laden Bilder (≤5, 1600 px, 300 KB) und Langtext selbst im Profil hoch, nur eigener Entwurf,
+   `/api/bild/offen` auch für Autor; Admin gibt frei. Stand: Agent brach bei „i18n und Seite“ ab. Prüfen, fertig, review, push.
+
+**Erledigt und live (main 7cfc77e)**
+- Jury-Plan Task 1–9 (Migration 0026 remote), Final-Review-Fixes 941258c. Live gesehen: /jury, Navigation „JURY“.
+- Explorer-Suche + Startseiten-Suche mit Umfang der Blütensuche; Wording ohne „Ware“/„Stärke“.
+- Blütenkarte (KultivarKarte): Buchseite, Name groß (text-sorte), Typ-Kicker, Lesebändchen, CBD/Terpene. Live gesehen.
+- Nicht live gesehen: Startseiten-Suche, Jury-Editor im Profil, /admin/jury, hell/390 px.
+- Ledger/Reviews: `.superpowers/sdd/2026-10-16-terpz-jury/` (lokal, gitignored).
+
 
 ### ⇢ SESSION 66 (2026-10-16): Links, Score, Budpics, Explorer-Bild, IG neu eingetaktet
 
