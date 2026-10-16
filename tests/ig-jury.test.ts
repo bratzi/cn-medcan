@@ -1,7 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { IG_PROFIL_ADRESSE, igMeldungPruefen, igUeberschreibbar, juryKarussell, juryZitat } from "@/lib/ig-jury";
-import { graphKarussellSchritte } from "@/lib/ig-graph";
+import { collabHinweis, IG_PROFIL_ADRESSE, igMeldungPruefen, igUeberschreibbar, juryKarussell, juryZitat } from "@/lib/ig-jury";
 import { karussellPruefen } from "@/lib/ig-karussell";
 import { igCaptionPruefen } from "@/lib/ig-caption";
 
@@ -15,17 +14,10 @@ test("juryKarussell besteht alle Prüfungen und nennt den Autor", () => {
   assert.ok(karussell.slides.some((s) => s.grafik?.art === "blaetter"));
 });
 
-test("Graph: Kinder-Container, Karussell mit collaborators, Veröffentlichen", () => {
-  const s = graphKarussellSchritte(["https://x/1.png", "https://x/2.png"], "Text", ["wal.terpz"]);
-  assert.equal(s.filter((x) => x.parameter.is_carousel_item === "true").length, 2);
-  const karussell = s.find((x) => x.parameter.media_type === "CAROUSEL")!;
-  assert.equal(karussell.parameter.collaborators, JSON.stringify(["wal.terpz"]));
-  assert.equal(s.at(-1)!.pfad, "media_publish");
-});
-
-test("Graph: höchstens drei Collaborators", () => {
-  const s = graphKarussellSchritte(["https://x/1.png"], "T", ["a", "b", "c", "d"]);
-  assert.equal(s.find((x) => x.parameter.media_type === "CAROUSEL")!.parameter.collaborators, JSON.stringify(["a", "b", "c"]));
+test("Collab-Hinweis: Handle bereinigt, sonst kein Handle hinterlegt", () => {
+  assert.equal(collabHinweis({ name: "Wal", instagram: "@wal.terpz" }), "Collaborator von Hand hinzufügen: @wal.terpz");
+  assert.equal(collabHinweis({ name: "Wal", instagram: null }), "Wal: kein Handle hinterlegt");
+  assert.equal(collabHinweis({ name: "Wal", instagram: "kein handle!" }), "Wal: kein Handle hinterlegt");
 });
 
 test("ohne Bewertung und Handle: Buch-Icon statt Blätter, keine Aroma-Slide, keine Von-Zeile", () => {
