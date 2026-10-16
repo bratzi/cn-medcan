@@ -1,7 +1,7 @@
 import { getPrisma } from "@/lib/prisma";
 import { TREFFER_PRO_SEITE, type StrainFilter } from "@/lib/query/filter";
 import { baueWhere, type StrainListenEintrag } from "@/lib/query/strains";
-import { istKultivarTyp, type KultivarTyp } from "@/db/enums";
+import { istGeschmacksKategorie, istKultivarTyp, type GeschmacksKategorie, type KultivarTyp } from "@/db/enums";
 
 /**
  * Je Kultivar die Ids seiner Vertreiber mit aktivem Handelsnamen (ohne unbekannte).
@@ -42,7 +42,9 @@ export type KultivarZeile = {
   name: string;
   slug?: string | null;
   kennwerte: { gesamtnoteMittel: number | null; anzahl: number } | null;
-  strains: { slug?: string; herstellerBildPfad?: string | null; kultivarTyp: string; thcMinProzent: number; thcMaxProzent: number; vertreiber: { name: string } | null }[];
+  strains: { slug?: string; herstellerBildPfad?: string | null; kultivarTyp: string; thcMinProzent: number; thcMaxProzent: number; cbdMinProzent?: number; cbdMaxProzent?: number;
+    terpene?: { rang: number; terpen: { name: string; geschmack: string } }[];
+    vertreiber: { name: string } | null }[];
 };
 
 export type KultivarListenEintrag = {
@@ -53,6 +55,10 @@ export type KultivarListenEintrag = {
   typ: KultivarTyp;
   thcMin: number | null;
   thcMax: number | null;
+  cbdMin: number | null;
+  cbdMax: number | null;
+  /** Häufigste dominante Terpene über alle Handelsnamen, höchstens drei; Rang 1 ist das stärkste. */
+  terpene: { name: string; geschmack: GeschmacksKategorie | null; rang: number }[];
   /** Vertreibernamen, eindeutig, alphabetisch; unbekannte fehlen. */
   vertreiber: string[];
   handelsnamen: number;
@@ -65,6 +71,20 @@ export type KultivarListenEintrag = {
 
 export type KultivarListe = { eintraege: KultivarListenEintrag[]; gesamt: number; seite: number; seitenAnzahl: number };
 
+/** Top drei Terpene einer Blüte: Punkte 4 minus Rang je Handelsname, Gleichstand alphabetisch. */
+function topTerpene(strains: KultivarZeile["strains"]): KultivarListenEintrag["terpene"] {
+  const punkte = new Map<string, { punkte: number; geschmack: string }>();
+  for (const s of strains)
+    for (const t of s.terpene ?? []) {
+      const alt = punkte.get(t.terpen.name);
+      punkte.set(t.terpen.name, { punkte: (alt?.punkte ?? 0) + 4 - t.rang, geschmack: t.terpen.geschmack });
+    }
+  return [...punkte]
+    .sort((a, b) => b[1].punkte - a[1].punkte || a[0].localeCompare(b[0]))
+    .slice(0, 3)
+    .map(([name, p], i) => ({ name, geschmack: istGeschmacksKategorie(p.geschmack) ? p.geschmack : null, rang: i + 1 }));
+}
+
 /** Typ-Mehrheit (Gleichstand: alphabetisch), THC-Spanne und Vertreiber einer Kultivarzeile. */
 export function verdichteKultivar(zeile: KultivarZeile): KultivarListenEintrag {
   const typen = new Map<string, number>();
@@ -74,6 +94,7 @@ export function verdichteKultivar(zeile: KultivarZeile): KultivarListenEintrag {
   const vertreiber = [...new Set(zeile.strains.flatMap((s) => (s.vertreiber ? [s.vertreiber.name] : [])))].sort((a, b) =>
     a.localeCompare(b, "de"),
   );
+  const cbd = zeile.strains.filter((s) => s.cbdMinProzent !== undefined && s.cbdMaxProzent !== undefined);
   return {
     id: zeile.id,
     name: zeile.name,
@@ -81,6 +102,9 @@ export function verdichteKultivar(zeile: KultivarZeile): KultivarListenEintrag {
     typ,
     thcMin: zeile.strains.length > 0 ? Math.min(...zeile.strains.map((s) => s.thcMinProzent)) : null,
     thcMax: zeile.strains.length > 0 ? Math.max(...zeile.strains.map((s) => s.thcMaxProzent)) : null,
+    cbdMin: cbd.length > 0 ? Math.min(...cbd.map((s) => s.cbdMinProzent ?? 0)) : null,
+    cbdMax: cbd.length > 0 ? Math.max(...cbd.map((s) => s.cbdMaxProzent ?? 0)) : null,
+    terpene: topTerpene(zeile.strains),
     vertreiber,
     handelsnamen: zeile.strains.length,
     overall: zeile.kennwerte?.anzahl ? zeile.kennwerte.gesamtnoteMittel : null,
@@ -109,7 +133,14 @@ export async function ladeKultivarListe(filter: StrainFilter, fachkreis: boolean
         kennwerte: { select: { gesamtnoteMittel: true, anzahl: true } },
         strains: {
           where: strainWhere,
-          select: { slug: true, herstellerBildPfad: true, kultivarTyp: true, thcMinProzent: true, thcMaxProzent: true, vertreiber: { select: { name: true } } },
+          select: { slug: true, herstellerBildPfad: true, kultivarTyp: true, thcMinProzent: true,
+            thcMaxProzent: true,
+            cbdMinProzent: true,
+            cbdMaxProzent: true,
+            vertreiber: { select: { name: true } },
+            // Ohne Bilder; je Handelsname nur die drei dominanten Terpene.
+            terpene: { where: { rang: { lte: 3 } }, orderBy: { rang: "asc" }, take: 3, select: { rang: true, terpen: { select: { name: true, geschmack: true } } } },
+          },
           orderBy: { slug: "asc" },
           take: 50,
         },

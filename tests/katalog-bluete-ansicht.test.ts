@@ -12,7 +12,8 @@ import { parseStrainFilter } from "@/lib/query/filter";
 
 const ID = "ed9c2468f2c9b661441986de9d72f496";
 const kultivar = {
-  id: ID, name: "Black Cherry Punch", typ: "INDICA" as const, thcMin: 20, thcMax: 30,
+  id: ID, name: "Black Cherry Punch", typ: "INDICA" as const, thcMin: 20, thcMax: 30, cbdMin: 0.5, cbdMax: 1,
+  terpene: [{ name: "Myrcen", geschmack: null, rang: 1 }, { name: "Limonen", geschmack: null, rang: 2 }],
   vertreiber: ["Alpha", "Beta", "Gamma", "Delta", "Epsilon", "Zeta", "Eta"], handelsnamen: 7, overall: 3.8, bewertungen: 4,
   bildSlug: null, herstellerBildPfad: null,
 };
@@ -31,6 +32,9 @@ test("KultivarKarte: Name, Typ, Spanne, fünf Vertreiber plus Rest, Overall, Lin
   assert.match(html, /Black Cherry Punch/);
   assert.match(html, /Indica/i);
   assert.match(html, /20 bis 30 % THC/);
+  assert.match(html, /0,5 bis 1,0 % CBD/);
+  assert.match(html, /Myrcen/);
+  assert.match(html, /Limonen/);
   assert.match(html, /Epsilon/);
   assert.doesNotMatch(html, /Zeta/);
   assert.match(html, /\+2/);
@@ -80,6 +84,13 @@ test("FilterLeiste: Sortierwahl nicht in der Blüten-Ansicht, Zurücksetzen beh�
   const q = readFileSync("components/produkt/FilterLeiste.tsx", "utf8");
   assert.match(q, /filter\.ansicht === "bluete" \? null :/);
   assert.match(q, /ansicht: filter\.ansicht/);
+});
+
+test("KultivarKarte: CBD-Zeile fehlt bei 0 oder ohne Werte", () => {
+  for (const k of [{ ...kultivar, cbdMin: 0, cbdMax: 0 }, { ...kultivar, cbdMin: null, cbdMax: null }]) {
+    const html = renderToStaticMarkup(createElement(KultivarKarte, { kultivar: k, filter: parseStrainFilter({}), w: de, sprache: "de" }));
+    assert.doesNotMatch(html, /CBD/);
+  }
 });
 
 test("KultivarKarte: ohne Vertreiber keine Zählzeile „bei 0“", () => {
