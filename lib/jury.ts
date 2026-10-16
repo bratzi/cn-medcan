@@ -22,16 +22,26 @@ export function beitragPruefen(e: BeitragEingabe): string[] {
   return f;
 }
 
-export function juryslug(titel: string, vorhanden: (s: string) => boolean): string {
-  const basis =
+/** Feste Pfade unter /jury: ein Beitrags-Slug darf ihnen nicht gleichen. */
+const RESERVIERT: ReadonlySet<string> = new Set(["team", "favourites", "seite", "ausgabe"]);
+
+/** Slug ohne Kollisionsprüfung; auch das Präfix für die Suche nach belegten Slugs. */
+export function juryslugBasis(titel: string): string {
+  return (
     titel
       .toLowerCase()
       .replace(/ä/g, "ae").replace(/ö/g, "oe").replace(/ü/g, "ue").replace(/ß/g, "ss")
       .replace(/[^a-z0-9]+/g, "-")
       .replace(/^-+|-+$/g, "")
-      .slice(0, 60) || "beitrag";
-  if (!vorhanden(basis)) return basis;
-  for (let n = 2; ; n++) if (!vorhanden(`${basis}-${n}`)) return `${basis}-${n}`;
+      .slice(0, 60) || "beitrag"
+  );
+}
+
+export function juryslug(titel: string, vorhanden: (s: string) => boolean): string {
+  const basis = juryslugBasis(titel);
+  const belegt = (s: string) => RESERVIERT.has(s) || vorhanden(s);
+  if (!belegt(basis)) return basis;
+  for (let n = 2; ; n++) if (!belegt(`${basis}-${n}`)) return `${basis}-${n}`;
 }
 
 /** Öffentlich nur, wenn der Beitrag und seine Ausgabe (falls vorhanden) veröffentlicht sind. */

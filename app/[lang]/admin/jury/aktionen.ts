@@ -4,7 +4,7 @@ import { istIgStatus } from "@/db/enums";
 import { benachrichtigen, nachrichtenFuer } from "@/lib/benachrichtigung";
 import { bildPruefen } from "@/lib/bild-pruefen";
 import { revalidiereSprachen } from "@/lib/i18n/revalidiere";
-import { beitragPruefen, JURY_BILD_MAX_BYTES, JURY_BILD_MAX_KANTE, JURY_BILDER_MAX, juryslug } from "@/lib/jury";
+import { beitragPruefen, JURY_BILD_MAX_BYTES, JURY_BILD_MAX_KANTE, JURY_BILDER_MAX, juryslug, juryslugBasis } from "@/lib/jury";
 import { getPrisma } from "@/lib/prisma";
 import { adminErforderlich } from "@/lib/session";
 
@@ -208,7 +208,7 @@ export async function ausgabeSpeichern(fd: FormData): Promise<Ergebnis> {
     return { ok: true };
   }
   const belegt = new Set(
-    (await prisma.juryAusgabe.findMany({ where: { slug: { startsWith: juryslug(titel, () => false) } }, select: { slug: true }, take: 50 })).map((x) => x.slug),
+    (await prisma.juryAusgabe.findMany({ where: { slug: { startsWith: juryslugBasis(titel) } }, select: { slug: true }, take: 50 })).map((x) => x.slug),
   );
   const slug = juryslug(titel, (s) => belegt.has(s));
   await prisma.juryAusgabe.create({ data: { slug, titel, einleitung, erscheintAm } });

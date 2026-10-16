@@ -5,7 +5,7 @@ import { holeWoerterbuchAusAnfrage } from "@/lib/i18n/anfrage";
 import { revalidiereSprachen } from "@/lib/i18n/revalidiere";
 import { meldungText } from "@/lib/i18n/text";
 import type { MeldungSchluessel } from "@/lib/i18n/typen";
-import { beitragPruefen, juryslug } from "@/lib/jury";
+import { beitragPruefen, juryslug, juryslugBasis } from "@/lib/jury";
 import { darfBearbeiten, darfVerknuepfen } from "@/lib/jury-rechte";
 import { getPrisma } from "@/lib/prisma";
 import { juryErforderlich } from "@/lib/session";
@@ -51,7 +51,7 @@ export async function beitragSpeichern(fd: FormData): Promise<Ergebnis> {
     return { ok: true, slug: b.slug, id };
   }
   const belegt = new Set(
-    (await prisma.juryBeitrag.findMany({ where: { slug: { startsWith: juryslug(e.titel, () => false) } }, select: { slug: true }, take: 50 })).map((x) => x.slug),
+    (await prisma.juryBeitrag.findMany({ where: { slug: { startsWith: juryslugBasis(e.titel) } }, select: { slug: true }, take: 50 })).map((x) => x.slug),
   );
   const slug = juryslug(e.titel, (s) => belegt.has(s));
   const neu = await prisma.juryBeitrag.create({ select: { id: true }, data: { slug, titel: e.titel.trim(), anriss: e.anriss.trim(), text: e.text, reviewId: e.reviewId, autorId: m.mitgliedId } });
