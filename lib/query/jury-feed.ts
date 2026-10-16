@@ -1,7 +1,7 @@
 import "server-only";
 
 import type { GeschmacksKategorie } from "@/db/enums";
-import { juryZitat, type JuryFeedBeitrag } from "@/lib/ig-jury";
+import { IG_GESCHUETZT, igUeberschreibbar, juryZitat, type JuryFeedBeitrag } from "@/lib/ig-jury";
 import { liebsteAromen } from "@/lib/profil-ansicht";
 import { getPrisma } from "@/lib/prisma";
 import { GESCHMACKS_ACHSEN, parseGeschmacksMatrix } from "@/lib/query/bewertung";
@@ -43,12 +43,17 @@ export async function juryFeed(ursprung: string): Promise<JuryFeedBeitrag[]> {
   }));
 }
 
-/** Setzt Status und Adresse nach der Veröffentlichung; false, wenn der Beitrag nicht veröffentlicht vorliegt. */
-export async function juryIgSetzen(slug: string, igStatus: string, igUrl: string | null): Promise<boolean> {
+/**
+ * Setzt Status und Adresse; ein bereits auf Instagram veröffentlichter Beitrag wird nie überschrieben.
+ * "geschuetzt" = war schon veröffentlicht (nichts geändert), "fehlt" = kein veröffentlichter Beitrag.
+ */
+export async function juryIgSetzen(slug: string, igStatus: string, igUrl: string | null): Promise<"ok" | "geschuetzt" | "fehlt"> {
   const prisma = await getPrisma();
   const r = await prisma.juryBeitrag.updateMany({
-    where: { slug, status: "VEROEFFENTLICHT" },
+    where: { slug, status: "VEROEFFENTLICHT", igStatus: { not: IG_GESCHUETZT } },
     data: { igStatus, igUrl },
   });
-  return r.count > 0;
+  if (r.count > 0) return "ok";
+  const da = await prisma.juryBeitrag.findFirst({ where: { slug, status: "VEROEFFENTLICHT" }, select: { igStatus: true } });
+  return da && !igUeberschreibbar(da.igStatus) ? "geschuetzt" : "fehlt";
 }

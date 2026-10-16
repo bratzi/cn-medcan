@@ -13,7 +13,7 @@ import { pathToFileURL } from "node:url";
 
 import { igCaptionPruefen } from "../lib/ig-caption";
 import { graphKarussellSchritte } from "../lib/ig-graph";
-import { juryKarussell, type IgMeldung, type JuryFeedBeitrag } from "../lib/ig-jury";
+import { IG_PROFIL_ADRESSE, igMeldungPruefen, juryKarussell, type IgMeldung, type JuryFeedBeitrag } from "../lib/ig-jury";
 import { igSlideHtml, karussellMarke, karussellPruefen } from "../lib/ig-karussell";
 import { entwurfMedien, feedSchluessel, htmlOffline, markenAus, planen, planZeit, publoraPosts, screenshot, tagBelegt, umgebung } from "./ig-gemeinsam";
 
@@ -60,6 +60,7 @@ async function main() {
   const planArg = rest.find((a) => a.startsWith("--planen="))?.slice(9);
   const direkt = rest.includes("--veroeffentlichen") && Boolean(env.IG_GRAPH_TOKEN && env.IG_BUSINESS_ID);
 
+  let live = false;
   try {
     const feed = await fetch(`${ursprung}/api/jury-feed?key=${encodeURIComponent(schluessel)}`, { signal: AbortSignal.timeout(20_000) });
     if (!feed.ok) throw new Error(`Feed: ${feed.status}`);
@@ -116,9 +117,17 @@ async function main() {
         const id = `${env.IG_BUSINESS_ID}/${schritt.pfad}`;
         if (schritt.pfad === "media_publish") {
           const { id: medienId } = await graph<{ id: string }>(id, { creation_id: behaelter }, token);
-          const { permalink } = await graph<{ permalink: string }>(medienId, { fields: "permalink" }, token, "GET");
+          // Ab hier steht der Post auf Instagram: nie mehr FEHLER melden, sonst bleibt er im Feed und wird doppelt gepostet.
+          live = true;
+          let permalink: string = IG_PROFIL_ADRESSE;
+          try {
+            const p = (await graph<{ permalink?: string }>(medienId, { fields: "permalink" }, token, "GET")).permalink;
+            if (p && igMeldungPruefen({ slug, igStatus: "VEROEFFENTLICHT", igUrl: p }).length === 0) permalink = p;
+          } catch {
+            // Fallback: Profiladresse; der Beitrag gilt trotzdem als veröffentlicht.
+          }
+          console.log(`Veröffentlicht: ${permalink} (Medien-Id ${medienId})`);
           await meldeStatus(ursprung, schluessel, { slug, igStatus: "VEROEFFENTLICHT", igUrl: permalink });
-          console.log(`Veröffentlicht: ${permalink}`);
         } else if (schritt.parameter.media_type === "CAROUSEL") {
           behaelter = (await graph<{ id: string }>(id, { ...schritt.parameter, children: kinder.join(",") }, token)).id;
         } else {
@@ -137,12 +146,14 @@ async function main() {
         console.log("Heute ist schon ein Post eingeplant oder erschienen: Entwurf bleibt liegen.");
       } else {
         await planen(gruppe, zeit);
+        live = true; // eingeplant: ein späterer Fehler darf den Beitrag nicht erneut in den Feed schicken
         status = "GEPLANT";
         console.log(`Eingeplant um ${zeit}`);
       }
     }
     await meldeStatus(ursprung, schluessel, { slug, igStatus: status });
   } catch (f) {
+    if (live) throw new Error(`${f instanceof Error ? f.message : String(f)} (Post ist raus, Status ${slug} von Hand nachtragen, kein FEHLER gemeldet)`);
     try {
       await meldeStatus(ursprung, schluessel, { slug, igStatus: "FEHLER" });
     } catch {

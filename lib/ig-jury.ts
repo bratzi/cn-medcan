@@ -74,7 +74,16 @@ export function juryKarussell(b: JuryFeedBeitrag): { karussell: IgKarussell; cap
   return { karussell: { saeule: "portal", schluessel: `jury-${b.slug}`.slice(0, 40).replace(/-+$/, ""), slides }, caption };
 }
 
-export const IG_MELDUNG_STATUS = ["ENTWURF", "GEPLANT", "VEROEFFENTLICHT", "FEHLER"] as const;
+/** Ein veröffentlichter Beitrag bleibt veröffentlicht: kein späterer Fehler darf ihn zurück in den Feed schicken. */
+export const IG_GESCHUETZT = "VEROEFFENTLICHT";
+export function igUeberschreibbar(alt: string): boolean {
+  return alt !== IG_GESCHUETZT;
+}
+
+/** Adresse, falls Instagram den Permalink nicht liefert: das Profil, damit der Status trotzdem stimmt. */
+export const IG_PROFIL_ADRESSE = "https://www.instagram.com/bookofterpz/";
+
+export const IG_MELDUNG_STATUS =["ENTWURF", "GEPLANT", "VEROEFFENTLICHT", "FEHLER"] as const;
 export type IgMeldung = { slug: string; igStatus: (typeof IG_MELDUNG_STATUS)[number]; igUrl?: string | null };
 
 const IG_ADRESSE = /^https:\/\/(www\.)?instagram\.com\/[A-Za-z0-9._\-/?=&%]+$/;

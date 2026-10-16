@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { igMeldungPruefen, juryKarussell, juryZitat } from "@/lib/ig-jury";
+import { IG_PROFIL_ADRESSE, igMeldungPruefen, igUeberschreibbar, juryKarussell, juryZitat } from "@/lib/ig-jury";
 import { graphKarussellSchritte } from "@/lib/ig-graph";
 import { karussellPruefen } from "@/lib/ig-karussell";
 import { igCaptionPruefen } from "@/lib/ig-caption";
@@ -69,4 +69,13 @@ test("Meldung: Status und Adresse werden geprüft", () => {
   assert.ok(igMeldungPruefen({ slug: "a", igStatus: "KEIN" }).length > 0);
   assert.ok(igMeldungPruefen({ slug: "", igStatus: "FEHLER" }).length > 0);
   assert.ok(igMeldungPruefen("x").length > 0);
+});
+
+test("veröffentlicht bleibt geschützt, alles andere ist überschreibbar" , () => {
+  assert.equal(igUeberschreibbar("VEROEFFENTLICHT"), false);
+  for (const s of ["KEIN", "FEHLER", "ENTWURF", "GEPLANT"]) assert.equal(igUeberschreibbar(s), true);
+});
+
+test("Fallback-Adresse nach Veröffentlichung besteht die Meldungsprüfung", () => {
+  assert.deepEqual(igMeldungPruefen({ slug: "a", igStatus: "VEROEFFENTLICHT", igUrl: IG_PROFIL_ADRESSE }), []);
 });

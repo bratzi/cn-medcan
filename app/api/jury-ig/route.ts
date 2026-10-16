@@ -11,6 +11,7 @@ export async function POST(anfrage: Request) {
   const fehler = igMeldungPruefen(body);
   if (fehler.length) return NextResponse.json({ fehler }, { status: 400 });
   const m = body as IgMeldung;
-  const ok = await juryIgSetzen(m.slug, m.igStatus, m.igStatus === "VEROEFFENTLICHT" ? (m.igUrl ?? null) : null);
-  return ok ? NextResponse.json({ ok: true }) : NextResponse.json({ fehler: "Beitrag nicht gefunden" }, { status: 404 });
+  const r = await juryIgSetzen(m.slug, m.igStatus, m.igStatus === "VEROEFFENTLICHT" ? (m.igUrl ?? null) : null);
+  if (r === "fehlt") return NextResponse.json({ fehler: "Beitrag nicht gefunden" }, { status: 404 });
+  return NextResponse.json({ ok: true, unveraendert: r === "geschuetzt" });
 }
