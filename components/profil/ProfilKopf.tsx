@@ -23,6 +23,8 @@ type Props = {
   sprache: Sprache;
   /** Öffentliches Profil: der Folgen-Knopf (Client-Insel) neben Rolle und Datum. */
   folgen?: ReactNode;
+  /** Abzeichen „Terpz-Jury“ (Text); nur bei Jury-Mitgliedern gesetzt. */
+  jury?: string;
 };
 
 const MONAT = {
@@ -36,7 +38,7 @@ const MONAT = {
  * je vier (Bewertungen | Mitbestimmung, getrennt durch eine Linie), rechts die Aktionen. Klebt ab
  * 1080 px unter dem Seitenkopf; von 1080 bis 1279 px stehen die Zahlen in einer zweiten Reihe.
  */
-export function ProfilKopf({ name, avatarId, rolle, seit, gruppen, aromen, aktionen, texte, sprache, folgen }: Props) {
+export function ProfilKopf({ name, avatarId, rolle, seit, gruppen, aromen, aktionen, texte, sprache, folgen, jury }: Props) {
   const datum = seit ? MONAT[sprache].format(seit) : null;
   const sichtbar = gruppen.filter((g) => g.notizen.length > 0);
   return (
@@ -48,6 +50,7 @@ export function ProfilKopf({ name, avatarId, rolle, seit, gruppen, aromen, aktio
             <h1 className="font-buch text-h2 font-normal text-text text-balance wrap-break-word">{name}</h1>
             <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
               {rolle ? <Badge variante={rolle === "betreiber" ? "accent" : "neutral"}>{texte[rolle]}</Badge> : null}
+              {jury ? <Badge variante="accent">{jury}</Badge> : null}
               {datum ? <span className="text-small text-text-muted">{t(texte.dabeiSeit, { datum })}</span> : null}
               {folgen}
             </div>

@@ -22,6 +22,7 @@ import { Aufklaerung } from "@/components/review/Aufklaerung";
 import { AromaErkundung } from "@/components/review/AromaErkundung";
 import { BewertungsFormular } from "@/components/review/BewertungsFormular";
 import { BewertungsBuch } from "@/components/review/BewertungsBuch";
+import { ladeJuryBeitraegeZuBewertungen } from "@/lib/query/jury";
 import { BlattAnzeige } from "@/components/review/BlattAnzeige";
 import { WareLeiste } from "@/components/sorte/WareLeiste";
 import { erkundungsDaten } from "@/components/review/erkundung-daten";
@@ -253,7 +254,7 @@ async function SorteInhalt({ slug, suche, w, sprache }: { slug: string; suche: S
   ]);
   if (!strain) notFound();
   // „Ähnlich im Aroma“ (T11) rechnet D1, nicht der Worker; ohne Terpene entfällt es.
-  const [aehnliche, reviewZaehler] = await Promise.all([
+  const [aehnliche, reviewZaehler, juryBeitraege] = await Promise.all([
     strain.terpene.length > 0
       ? aehnlichImAroma(strain.id).catch((fehler: unknown) => {
           unstable_rethrow(fehler);
@@ -263,6 +264,12 @@ async function SorteInhalt({ slug, suche, w, sprache }: { slug: string; suche: S
       : Promise.resolve([]),
     // Ein Aufruf für alle Herzen im Bewertungsbuch (Zähler, kein COUNT über Likes).
     reaktionenFuer("BEWERTUNG", reviews.map((r) => r.id)),
+    // Nur Jury-Bewertungen können einen Beitrag haben; ein Fehler lässt nur den Link weg.
+    ladeJuryBeitraegeZuBewertungen(reviews.filter((r) => r.istRedaktionell).map((r) => r.id)).catch((fehler: unknown) => {
+      unstable_rethrow(fehler);
+      console.error("ladeJuryBeitraegeZuBewertungen fehlgeschlagen", fehler);
+      return new Map<string, string>();
+    }),
   ]);
   const { likes: reviewLikes, kommentare: reviewKommentare } = teileZaehler(reviewZaehler);
   const blueteLikes = blueteLikeZahlen.get(sorte.kultivar.id) ?? 0;
@@ -475,7 +482,7 @@ async function SorteInhalt({ slug, suche, w, sprache }: { slug: string; suche: S
             </Link>
           </nav>
         ) : null}
-        <BewertungsBuch reviews={reviews} kennwerte={sorte.kennwerte} produkt={produkt} w={w} sprache={sprache} katalog={katalog} likes={reviewLikes} kommentare={reviewKommentare} />
+        <BewertungsBuch reviews={reviews} kennwerte={sorte.kennwerte} produkt={produkt} w={w} sprache={sprache} katalog={katalog} likes={reviewLikes} kommentare={reviewKommentare} juryBeitraege={juryBeitraege} />
       </div>
 
       {/* Bewerten an der Stelle der Erkundung (Masterplan Bewertung v2, T4; /bewerten entfällt):

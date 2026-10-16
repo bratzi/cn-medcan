@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { EigeneLikes } from "@/components/reaktionen/EigeneLikes";
@@ -8,7 +9,10 @@ import { Feld } from "@/components/kapitel/Feld";
 import { OeffentlicheBewertungen } from "@/components/profil/OeffentlicheBewertungen";
 import { ProfilNetz } from "@/components/profil/ProfilNetz";
 import { ProfilKopf } from "@/components/profil/ProfilKopf";
+import { namenLinkKlassen } from "@/components/ui";
+import { formatiereDatum } from "@/lib/format";
 import { holeSprache, holeWoerterbuch } from "@/lib/i18n";
+import { ladeJuryProfil } from "@/lib/query/jury";
 import { mehrzahl, t } from "@/lib/i18n/text";
 import { istKurzId } from "@/lib/kurz-id";
 import { liebsteAromen } from "@/lib/profil-ansicht";
@@ -50,6 +54,10 @@ export default async function OeffentlichesProfilPage({ params }: Params) {
   const folgende = zaehler?.likes ?? 0;
   const pinnwandZahl = zaehler?.kommentare ?? 0;
   // Die Seite ist ohnehin dynamisch: die erste Seite Kommentare steht gleich da. Ein Fehler lässt sie auf Abruf laden.
+  const juryProfil = await ladeJuryProfil(profil.id).catch((fehler: unknown) => {
+    console.error("ladeJuryProfil fehlgeschlagen", fehler);
+    return { jury: false, beitraege: [] };
+  });
   const pinnwand = await ladeKommentare("PROFIL", profil.id).catch((fehler: unknown) => {
     console.error("ladeKommentare fehlgeschlagen", fehler);
     return undefined;
@@ -71,6 +79,7 @@ export default async function OeffentlichesProfilPage({ params }: Params) {
         aromen={werte ? liebsteAromen(werte.geschmack).map((a) => w.label.geschmack[a]) : []}
         aktionen={[]}
         folgen={<LikeKnopf art="MITGLIED" zielId={profil.id} anzahl={folgende} text={w.reaktionen.knopf} />}
+        jury={juryProfil.jury ? texte.juryAbzeichen : undefined}
         texte={s}
         sprache={sprache}
       />
@@ -90,6 +99,20 @@ export default async function OeffentlichesProfilPage({ params }: Params) {
             )}
           </div>
         </Feld>
+        {juryProfil.jury && juryProfil.beitraege.length > 0 ? (
+          <Feld id="jury" rahmen="karte" groesse="klein" titel={texte.juryTitel} className={SPALTEN[12]}>
+            <ul className="flex flex-col gap-2">
+              {juryProfil.beitraege.map((b) => (
+                <li key={b.slug} className="flex flex-wrap items-baseline gap-x-4">
+                  <Link prefetch={false} href={`/jury/${b.slug}`} className={namenLinkKlassen("inline-flex min-h-11 items-center text-body wrap-break-word")}>
+                    {b.titel}
+                  </Link>
+                  <span className="numeric text-small text-text-muted">{formatiereDatum(b.veroeffentlichtAm, sprache)}</span>
+                </li>
+              ))}
+            </ul>
+          </Feld>
+        ) : null}
         <Feld id="bewertungen" rahmen="karte" groesse="klein" titel={texte.bewertungenTitel} className={SPALTEN[12]}>
           <OeffentlicheBewertungen
             bewertungen={profil.bewertungen}

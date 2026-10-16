@@ -29,6 +29,7 @@ export function BewertungsBuch({
   katalog,
   likes,
   kommentare,
+  juryBeitraege,
 }: {
   reviews: readonly ReviewEintrag[];
   kennwerte: Pick<KennwerteZeile, "gesamtnoteMedian" | "anzahl"> | null;
@@ -40,6 +41,8 @@ export function BewertungsBuch({
   likes?: ReadonlyMap<string, number>;
   /** Kommentare je Bewertungs-Id aus demselben Zähler; fehlt = keine Kommentare unter der Bewertung. */
   kommentare?: ReadonlyMap<string, number>;
+  /** Sichtbarer Jury-Beitrag je Bewertungs-Id (Slug); fehlt = kein Link „Jury-Beitrag lesen“. */
+  juryBeitraege?: ReadonlyMap<string, string>;
 }) {
   const { community } = teileBewertungen(reviews);
   const median = kennwerte?.gesamtnoteMedian ?? null;
@@ -84,7 +87,7 @@ export function BewertungsBuch({
             anker: eintragAnker(review.id),
             inhalt: (
               <div className="flex flex-col gap-4">
-                <BuchDoppelseite eintrag={alsEintrag(review, produkt, likes?.get(review.id), kommentare?.get(review.id))} ueberschrift="h3" w={w} sprache={sprache} katalog={katalog} />
+                <BuchDoppelseite eintrag={{ ...alsEintrag(review, produkt, likes?.get(review.id), kommentare?.get(review.id)), juryBeitrag: juryBeitraege?.get(review.id) ?? null }} ueberschrift="h3" w={w} sprache={sprache} katalog={katalog} />
                 {/* Die Liste lädt erst beim Aufklappen: die Seite bleibt statisch und macht keine Abfrage je Bewertung. */}
                 {kommentare ? (
                   <div className="px-2 sm:px-4">

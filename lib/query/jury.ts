@@ -196,3 +196,48 @@ export async function ladeJuryTeam(): Promise<
     id: x.id, name: x.anzeigename, kurzId: x.kurzId, instagram: x.instagramHandle, avatarId: x.avatar?.id ?? null, beitraege: x._count.juryBeitraege,
   }));
 }
+
+/** Sichtbare Jury-Beiträge zu Bewertungen: Bewertungs-Id zu Beitrags-Slug (Sortenseite, „Jury-Beitrag lesen“). */
+export async function ladeJuryBeitraegeZuBewertungen(reviewIds: readonly string[]): Promise<Map<string, string>> {
+  if (reviewIds.length === 0) return new Map();
+  const prisma = await getPrisma();
+  const zeilen = await prisma.juryBeitrag.findMany({
+    where: { reviewId: { in: [...reviewIds].slice(0, 50) }, ...OEFFENTLICH },
+    orderBy: { veroeffentlichtAm: "desc" },
+    select: { reviewId: true, slug: true },
+  });
+  const karte = new Map<string, string>();
+  for (const z of zeilen) if (z.reviewId && !karte.has(z.reviewId)) karte.set(z.reviewId, z.slug);
+  return karte;
+}
+
+/** Jury-Flag und die neuesten sichtbaren Beiträge (höchstens 6) eines Mitglieds, für sein öffentliches Profil. */
+export async function ladeJuryProfil(
+  mitgliedId: string,
+): Promise<{ jury: boolean; beitraege: { slug: string; titel: string; veroeffentlichtAm: Date | null }[] }> {
+  const prisma = await getPrisma();
+  const m = await prisma.mitglied.findUnique({
+    where: { id: mitgliedId },
+    select: {
+      jury: true,
+      juryBeitraege: {
+        where: OEFFENTLICH,
+        orderBy: { veroeffentlichtAm: "desc" },
+        take: 6,
+        select: { slug: true, titel: true, veroeffentlichtAm: true },
+      },
+    },
+  });
+  return m?.jury ? { jury: true, beitraege: m.juryBeitraege } : { jury: false, beitraege: [] };
+}
+
+/** Der neueste sichtbare Beitrag für die Startseite; null, solange es keinen gibt. */
+export async function ladeNeuestenJuryBeitrag(): Promise<JuryKarte | null> {
+  const prisma = await getPrisma();
+  const z = await prisma.juryBeitrag.findFirst({
+    where: OEFFENTLICH,
+    orderBy: { veroeffentlichtAm: "desc" },
+    select: KARTE_SELECT,
+  });
+  return z ? zuKarte(z) : null;
+}
