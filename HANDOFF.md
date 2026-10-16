@@ -30,7 +30,20 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 
 ### ⇢ SESSION 66 (2026-10-16): Links, Score, Budpics, Explorer-Bild, IG neu eingetaktet
 
-**ALS ERSTES**
+**ALS ERSTES: diese Fragen in EINER AskUserQuestion stellen**
+1. Jury-Plan `docs/superpowers/plans/2026-10-16-terpz-jury.md` (Spec `docs/superpowers/specs/2026-10-16-terpz-jury-design.md`,
+   vom Nutzer freigegeben): Plan ok? Ausführung Subagent-driven (empfohlen: 10 Tasks, 4 parallele Stränge mit
+   Worktrees, Schnittstellen zwischen Tasks) oder Native?
+2. Explorer-Suche (bounded, Entwurf im Chat, Ja steht aus): Suche über alle Sorten per `/api/sorten-suche?q=`
+   (ab 2 Zeichen, 250 ms, max 12, Cache 1 h, Sortierung Menge/Name), Suchfeld neu (Lupe, Löschen-Knopf, 48 px,
+   rund, Fokusring, Ladehinweis, Leerzustand). Bauen?
+3. Wording (Nutzer 2026-10-16, gemerkt): nie „Ware“ (Blüte/Strain), nie „Stärke“ (Variante). Bestehende Texte in
+   `lib/i18n/de.ts`/`en.ts` umbenennen (Explorer „Gleiche Blüte, andere Ware“, `waren`, `staerken`, Ware-Leiste,
+   „Diese Ware bewerten“, Katalog). Jetzt mit der Explorer-Suche zusammen? Startseite mitziehen.
+4. Admin-Dashboard mit Publora-Kalender: Daten live aus der Publora-API (Secret im Worker) oder täglich per Routine
+   nach D1 (empfohlen)?
+
+**Danach / weiter offen**
 1. Admin-Dashboard (Nutzerwunsch, noch nicht begonnen): Admin direkt im Profil erreichbar machen, Admin-Menü
    ausbauen und übersichtlich wie ein professionelles Dashboard, Publora-Feed mit Kalender (wann welcher Post) und
    Benachrichtigungen. Mit Brainstorming und Design-Skills starten.
