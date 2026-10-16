@@ -10,7 +10,7 @@ import { darfBearbeiten, darfVerknuepfen } from "@/lib/jury-rechte";
 import { getPrisma } from "@/lib/prisma";
 import { juryErforderlich } from "@/lib/session";
 
-export type Ergebnis = { ok: true; slug?: string } | { ok: false; fehler: string };
+export type Ergebnis = { ok: true; slug?: string; id?: string } | { ok: false; fehler: string };
 
 async function fehlerText(schluessel: MeldungSchluessel): Promise<Ergebnis> {
   const w = await holeWoerterbuchAusAnfrage();
@@ -48,15 +48,15 @@ export async function beitragSpeichern(fd: FormData): Promise<Ergebnis> {
     if (!b || !darfBearbeiten(b, m)) return fehlerText("jury.keineBerechtigung");
     await prisma.juryBeitrag.update({ where: { id }, data: { titel: e.titel.trim(), anriss: e.anriss.trim(), text: e.text, reviewId: e.reviewId } });
     revalidiereSprachen("/profil");
-    return { ok: true, slug: b.slug };
+    return { ok: true, slug: b.slug, id };
   }
   const belegt = new Set(
     (await prisma.juryBeitrag.findMany({ where: { slug: { startsWith: juryslug(e.titel, () => false) } }, select: { slug: true }, take: 50 })).map((x) => x.slug),
   );
   const slug = juryslug(e.titel, (s) => belegt.has(s));
-  await prisma.juryBeitrag.create({ data: { slug, titel: e.titel.trim(), anriss: e.anriss.trim(), text: e.text, reviewId: e.reviewId, autorId: m.mitgliedId } });
+  const neu = await prisma.juryBeitrag.create({ select: { id: true }, data: { slug, titel: e.titel.trim(), anriss: e.anriss.trim(), text: e.text, reviewId: e.reviewId, autorId: m.mitgliedId } });
   revalidiereSprachen("/profil");
-  return { ok: true, slug };
+  return { ok: true, slug, id: neu.id };
 }
 
 /** Entwurf einreichen; Admins bekommen eine Benachrichtigung. */

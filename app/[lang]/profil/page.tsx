@@ -17,6 +17,7 @@ import { profilNotizen } from "@/lib/profil-dashboard";
 import { kopfNotizen } from "@/lib/profil-kopf";
 import { aktuellesMitglied } from "@/lib/session";
 
+import { ReiheJury } from "./jury-reihe";
 import {
   ReiheEinstellungen,
   ReiheMitbestimmen,
@@ -131,6 +132,11 @@ export default async function ProfilPage({
           </Suspense>
         ) : (
           <>
+            {mitglied.jury ? (
+              <Suspense fallback={skelett}>
+                <ReiheJury id={id} offen={typeof parameter.jury === "string" ? parameter.jury : null} />
+              </Suspense>
+            ) : null}
             <Suspense
               fallback={
                 <FeldSkelett
