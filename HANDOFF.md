@@ -3,7 +3,7 @@
 > Übergabemedium zwischen Sessions. Wird nach jedem Arbeitsblock aktualisiert und committet.
 > Wer hier weiterarbeitet, liest diese Datei zuerst und braucht den Chatverlauf nicht.
 
-**Letzte Aktualisierung:** 2026-10-16 (Session 68)
+**Letzte Aktualisierung:** 2026-10-16 (Session 69)
 **Repo:** https://github.com/bratzi/cn-medcan (public)
 **Branch:** `main` (Makeover „Grünes Buch“ Teilprojekt 1 ist seit 2026-09-24 auf `main`)
 
@@ -27,6 +27,28 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 ---
 
 ## ⇢ Hier geht es weiter
+
+### ⇢ SESSION 69 (2026-10-16): Admin-Dashboard geplant, Startseiten-Typografie offen
+
+**ALS ERSTES: diese Fragen in EINER AskUserQuestion stellen**
+1. Plan `docs/superpowers/plans/2026-10-16-admin-dashboard.md` (Spec `docs/superpowers/specs/2026-10-16-admin-dashboard-design.md`,
+   vom Nutzer freigegeben): Plan ok? Ausführung Subagent-driven (empfohlen: 3 parallele Stränge A=T1→T6, B=T2→T3, C=T4,
+   danach T5, T7 durch Controller) oder Native?
+2. „Dein Kapitel“: Wort „Kapitel“ auf dieselbe Größe wie „Geschmäcker“ (UEBERLAUF_GRAD, ~16rem max) setzen? So verstanden.
+
+**Nutzeraufträge, noch nicht begonnen (bounded, direkt umsetzen nach Frage 2)**
+1. Startseite Typografie: die umrandete Hintergrundschrift (4 driftende Konturen `marke-kontur-1..4`, rosa) weg, die grüne
+   Vordergrundschrift bleibt. Betrifft `components/story/UeberlaufWort.tsx` (Terpenprofil., Geschmäcker., prüfen wir nach.)
+   und `Buzz` in `components/story/TransparentMachen.tsx` (Overall, Terpz, Qualität). „Linien hinten raus“ bei
+   „prüfen wir nach“ = dieselben Konturen. AromaErkundung.tsx:544 hat auch Konturen (nicht genannt, mit Nutzer klären oder
+   gleich mitziehen). Danach CSS `marke-kontur*` in globals.css prüfen, ob noch genutzt (Hero, Community-Fazit).
+2. „Dein Kapitel“ (`components/story/DeinKapitel.tsx:35`, `em.hand-betont`): „Kapitel“ so groß wie „Geschmäcker“.
+3. Sektion „Terpene und ihre Geschmäcker“ (AromaSektion/AromaErkundung): Infobox springt beim Größenwechsel ruckartig.
+   Höhenänderung weich animieren (Ease, z. B. `interpolate-size: allow-keywords` + `transition: height` oder
+   ResizeObserver mit gemessener Höhe; `prefers-reduced-motion` beachten). Skills: animate, emil-design-eng.
+4. Live prüfen (hell/dunkel, 390 px), Startseite mitziehen.
+
+**Erledigt diese Session**: siehe Session 68 (WIP-Branches live, Kapiteltitel), Spec + Plan Admin-Dashboard committet.
 
 ### ⇢ SESSION 68 (2026-10-16): WIP-Branches fertig und live
 
