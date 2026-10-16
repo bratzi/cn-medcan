@@ -2,6 +2,7 @@ import { istKultivarTyp, type KultivarTyp } from "@/db/enums";
 import { musterBildId } from "@/lib/budpics";
 import { bildQuelle, blueteBild, medium } from "@/lib/medien";
 import { getPrisma } from "@/lib/prisma";
+import { SUCHE_MAX } from "@/lib/sorten-suche";
 
 /** Eine Ware: dieselbe Sorte bei einem Vertreiber (Spec 2026-10-15 Abschnitt 4). */
 export type ExplorerWare = {
@@ -23,6 +24,7 @@ export type ExplorerSorte = { slug: string; name: string; typ: KultivarTyp; anza
 const SORTEN_MAX = 12;
 const WAREN_MAX = 8;
 const KANDIDATEN_MAX = 60;
+const SUCHE_KANDIDATEN_MAX = 36;
 
 const nachMengeDannName = (a: { anzahl: number; name: string }, b: { anzahl: number; name: string }) =>
   b.anzahl - a.anzahl || a.name.localeCompare(b.name, "de");
@@ -39,6 +41,11 @@ export function waehleExplorerSorten(kandidaten: readonly ExplorerSorte[]): Expl
         .sort((a, b) => nachMengeDannName({ anzahl: a.anzahl, name: a.vertreiberName }, { anzahl: b.anzahl, name: b.vertreiberName }))
         .slice(0, WAREN_MAX),
     }));
+}
+
+/** Suchtreffer wie der Explorer selbst: Menge, dann Name, nie die Note (HWG); höchstens zwölf. */
+export function waehleSuchTreffer(kandidaten: readonly ExplorerSorte[]): ExplorerSorte[] {
+  return waehleExplorerSorten(kandidaten).slice(0, SUCHE_MAX);
 }
 
 export type ExplorerZeile = {
@@ -88,31 +95,33 @@ export function verdichteExplorerSorte(zeile: ExplorerZeile): ExplorerSorte | nu
   return { slug: zeile.slug, name: zeile.name, typ, anzahl: zeile.kennwerte?.anzahl ?? 0, waren: [...waren.values()] };
 }
 
+const SORTE_SELECT = {
+  id: true,
+  slug: true,
+  name: true,
+  kennwerte: { select: { anzahl: true } },
+  vertreiberKennwerte: { select: { vertreiberId: true, anzahl: true, gesamtnoteMittel: true } },
+  strains: {
+    where: { aktiv: true, vertreiberId: { not: null } },
+    select: {
+      slug: true,
+      herstellerBildPfad: true,
+      kultivarTyp: true,
+      thcMinProzent: true,
+      thcMaxProzent: true,
+      cbdMinProzent: true,
+      cbdMaxProzent: true,
+      vertreiber: { select: { id: true, name: true } },
+    },
+  },
+} as const;
+
 /** Eine Abfrage, statisch mit der Startseite (ISR); kein Aggregieren pro Request. */
 export async function ladeSortenExplorer(): Promise<ExplorerSorte[]> {
   const prisma = await getPrisma();
   const zeilen = await prisma.kultivar.findMany({
     where: { slug: { not: null }, strains: { some: { aktiv: true, vertreiberId: { not: null } } } },
-    select: {
-      id: true,
-      slug: true,
-      name: true,
-      kennwerte: { select: { anzahl: true } },
-      vertreiberKennwerte: { select: { vertreiberId: true, anzahl: true, gesamtnoteMittel: true } },
-      strains: {
-        where: { aktiv: true, vertreiberId: { not: null } },
-        select: {
-          slug: true,
-          herstellerBildPfad: true,
-          kultivarTyp: true,
-          thcMinProzent: true,
-          thcMaxProzent: true,
-          cbdMinProzent: true,
-          cbdMaxProzent: true,
-          vertreiber: { select: { id: true, name: true } },
-        },
-      },
-    },
+    select: SORTE_SELECT,
     orderBy: [{ kennwerte: { anzahl: "desc" } }, { name: "asc" }],
     take: KANDIDATEN_MAX,
   });
@@ -138,4 +147,23 @@ export function explorerBild(
   if (!id) return null;
   const m = medium(id);
   return { ...bildQuelle(id), breite: m.breite, hoehe: m.hoehe, symbol: true };
+}
+
+/**
+ * Sortensuche des Explorers (`/api/sorten-suche`): Name enthält den Text (SQLite-LIKE, ASCII ohne
+ * Beachtung der Schreibung), nach Menge dann Name. Eine Abfrage mit `take`; Bild nur als Symbolbild,
+ * damit die Antwort ohne zweite Abfrage auskommt und eine Stunde lang gecacht werden darf.
+ */
+export async function ladeSortenSuche(text: string): Promise<ExplorerSorte[]> {
+  const prisma = await getPrisma();
+  const zeilen = await prisma.kultivar.findMany({
+    where: { slug: { not: null }, name: { contains: text }, strains: { some: { aktiv: true, vertreiberId: { not: null } } } },
+    select: SORTE_SELECT,
+    orderBy: [{ kennwerte: { anzahl: "desc" } }, { name: "asc" }],
+    take: SUCHE_KANDIDATEN_MAX,
+  });
+  return waehleSuchTreffer(zeilen.flatMap((z) => verdichteExplorerSorte(z) ?? [])).map((s) => ({
+    ...s,
+    bild: explorerBild(undefined, zeilen.find((z) => z.slug === s.slug)?.strains ?? []),
+  }));
 }

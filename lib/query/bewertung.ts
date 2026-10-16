@@ -289,7 +289,7 @@ export const BESCHAFFENHEIT_ACHSEN = [
   { key: "budDichte", label: "Bud-Dichte", links: "weich", rechts: "fest", hinweis: "Wie fest die Blüte ist: weich und luftig oder dicht und hart.", sweetSpot: true },
   { key: "terpenDichte", label: "Terpendichte", links: "wenig", rechts: "viel", hinweis: "Wie dicht das Aroma sitzt: kaum Duft oder satt beim Öffnen.", sweetSpot: true },
   { key: "trichomFarbe", label: "Trichomfarbe", links: "klar", rechts: "bernstein", hinweis: "Reife der Trichome: klar, milchig, bernstein.", sweetSpot: true },
-  { key: "frische", label: "Frische", links: "abgestanden", rechts: "frisch", hinweis: "Wie frisch die Ware wirkt: alt und heuig oder frisch verpackt.", sweetSpot: false },
+  { key: "frische", label: "Frische", links: "abgestanden", rechts: "frisch", hinweis: "Wie frisch die Blüte wirkt: alt und heuig oder frisch verpackt.", sweetSpot: false },
 ] as const;
 
 export type BeschaffenheitsKey = (typeof BESCHAFFENHEIT_ACHSEN)[number]["key"];
