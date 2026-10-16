@@ -32,7 +32,7 @@ type Props = {
 };
 
 /**
- * Sorten-Explorer im Kapitel „Gleiche Blüte, andere Variante“ (Spec 2026-10-15 Abschnitt 4).
+ * Sorten-Explorer im Kapitel „Gleiche Blüte, anderer Vertreiber“ (Spec 2026-10-15 Abschnitt 4).
  * Daten kommen statisch mit der Startseite; die Reihenfolge stammt aus waehleExplorerSorten
  * (Menge, dann Name), nie aus der Note (HWG). Ohne JavaScript steht die erste Sorte vollständig.
  */

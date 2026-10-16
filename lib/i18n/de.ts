@@ -874,8 +874,8 @@ export const de = {
     },
     vertreiber: {
       vor: "Gleiche Blüte,",
-      betont: "andere",
-      nach: "Variante.",
+      betont: "anderer",
+      nach: "Vertreiber.",
       schlagwort: "wer liefert",
       absatz:
         "Overall und Terpene beschreiben die Blüte, egal woher sie kommt. Qualität, Restfeuchte und Frische hängen am Vertreiber: wie er lagert und wie frisch seine Charge ist. Darum bewerten wir beides getrennt.",

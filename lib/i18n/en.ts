@@ -862,7 +862,7 @@ export const en: Woerterbuch = {
     vertreiber: {
       vor: "Same flower,",
       betont: "different",
-      nach: "variant.",
+      nach: "distributor.",
       schlagwort: "who supplies",
       absatz:
         "Overall and terpenes describe the flower, wherever it comes from. Quality, moisture and freshness depend on the distributor: how they store it and how fresh their batch is. That is why we rate both separately.",
