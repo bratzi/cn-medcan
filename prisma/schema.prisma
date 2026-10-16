@@ -148,6 +148,8 @@ model Strain {
   @@index([suchtext])
   @@index([kultivarId])
   @@index([vertreiberId])
+  @@index([kultivarId, aktiv], map: "strains_kultivar_id_aktiv_idx")
+  @@index([vertreiberId, aktiv], map: "strains_vertreiber_id_aktiv_idx")
   @@map("strains")
 }
 
