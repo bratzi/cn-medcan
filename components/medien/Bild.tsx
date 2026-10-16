@@ -92,6 +92,40 @@ export function BudpicBild({
 }
 
 /**
+ * Bild eines Jury-Beitrags (Spec Terpz-Jury): kommt wie ein Budpic von
+ * /api/bild/<id> mit den echten Massen, damit nichts springt. `prioritaet`
+ * für das erste sichtbare Bild einer Seite (LCP), sonst lazy.
+ */
+export function JuryBild({
+  id,
+  breite,
+  hoehe,
+  alt,
+  prioritaet = false,
+  className,
+}: {
+  id: string;
+  breite: number;
+  hoehe: number;
+  alt: string;
+  prioritaet?: boolean;
+  className?: string;
+}) {
+  return (
+    <img
+      src={`/api/bild/${id}`}
+      width={breite}
+      height={hoehe}
+      alt={alt}
+      loading={prioritaet ? "eager" : "lazy"}
+      fetchPriority={prioritaet ? "high" : undefined}
+      decoding="async"
+      className={className}
+    />
+  );
+}
+
+/**
  * Bild einer Sorte mit fertiger Quelle (Sorten-Explorer, Startseite): Budpic aus
  * /api/bild oder Pipeline-Foto, auf dem Server aufgelöst, damit der Client
  * lib/medien nicht laden muss. Immer ganz im Rahmen (object-contain).
