@@ -86,6 +86,13 @@ test("FilterLeiste: Sortierwahl nicht in der Blüten-Ansicht, Zurücksetzen beh�
   assert.match(q, /ansicht: filter\.ansicht/);
 });
 
+test("KultivarKarte: CBD-Zeile fehlt bei 0 oder ohne Werte", () => {
+  for (const k of [{ ...kultivar, cbdMin: 0, cbdMax: 0 }, { ...kultivar, cbdMin: null, cbdMax: null }]) {
+    const html = renderToStaticMarkup(createElement(KultivarKarte, { kultivar: k, filter: parseStrainFilter({}), w: de, sprache: "de" }));
+    assert.doesNotMatch(html, /CBD/);
+  }
+});
+
 test("KultivarKarte: ohne Vertreiber keine Zählzeile „bei 0“", () => {
   const html = renderToStaticMarkup(
     createElement(KultivarKarte, { kultivar: { ...kultivar, vertreiber: [] }, filter: parseStrainFilter({}), w: de, sprache: "de" }),

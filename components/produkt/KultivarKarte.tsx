@@ -52,7 +52,7 @@ export function KultivarKarte({ kultivar, filter, w, sprache, budpics = [] }: Pr
         })()
       : null;
   const cbd =
-    kultivar.cbdMin !== null && kultivar.cbdMax !== null
+    kultivar.cbdMin !== null && kultivar.cbdMax !== null && kultivar.cbdMax > 0
       ? (() => {
           const s = formatiereZahlSpanne(kultivar.cbdMin, kultivar.cbdMax, 1, sprache);
           return s.gleich ? t(texte.cbdEinzeln, { wert: s.von }) : t(texte.cbd, { von: s.von, bis: s.bis });
