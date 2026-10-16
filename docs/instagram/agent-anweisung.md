@@ -21,6 +21,29 @@ Plan und Themen: `docs/instagram/redaktionsplan.md`. Fakten: `docs/instagram/the
 - Chromium für Screenshots findet das Skript selbst unter `/opt/pw-browsers`.
 - Schlägt ein Befehl wegen Netz oder Publora fehl: nicht wiederholen, im Bericht melden, Lauf beenden.
 
+## Terpz-Jury zuerst (täglich)
+
+Vor jedem Themen-Karussell prüfst du, ob die Terpz-Jury etwas Neues hat. Die Jury steht vor dem Redaktionsplan.
+
+1. Offene Beiträge holen: `GET $IG_FEED_URL` mit dem Pfad `/api/jury-feed` (gleicher Ursprung und gleicher `key` wie der
+   Feed; Antwort `beitraege`, älteste zuerst). Jeder Eintrag ist ein veröffentlichter Beitrag, der noch nicht auf Instagram
+   steht (`igStatus` KEIN oder FEHLER).
+2. **Höchstens ein Post pro Tag** (gleiche Bremse wie oben: `heuteBelegt` aus `scripts/ig-lage.ts`). Ist der Tag belegt,
+   bleibt der Beitrag im Feed liegen und kommt am nächsten freien Tag dran.
+3. Gibt es einen offenen Beitrag und ist der Tag frei: erst probieren, dann planen. Das Skript prüft Slides und Caption
+   selbst, holt die Fotos des Beitrags (sie stehen vor den Text-Slides) und meldet den Status an `/api/jury-ig` zurück.
+   - `npx --yes tsx scripts/ig-jury.ts <slug> --probe`, jede PNG unter `tmp/ig/` ansehen (lesbar, zentriert, nichts
+     abgeschnitten; handwerk.md Checkliste 8).
+   - `npx --yes tsx scripts/ig-jury.ts <slug> --planen=<heute>T17:00:00Z`: legt den Publora-Entwurf an und plant ihn nur
+     ein, wenn der Tag noch frei ist. Status `GEPLANT` bzw. `ENTWURF` geht ans Portal, bei einem Fehler `FEHLER`
+     (Abbruch, keine Wiederholung; der Beitrag erscheint beim nächsten Lauf erneut im Feed).
+   - Die Autorin oder der Autor steht mit `@handle` in der Caption („Von @handle“). Ein echtes Instagram-Collab setzt nur der
+     Weg über die Graph-API (`--veroeffentlichen` mit `IG_GRAPH_TOKEN`, `IG_BUSINESS_ID`, `IG_MEDIEN_BASIS_URL`); den
+     startest du nur, wenn der Betreiber diese Variablen für die Routine gesetzt hat.
+4. Wurde ein Jury-Post angelegt, ist der Themen-Teil dieses Laufs übersprungen (ein Post pro Tag). Im Bericht nennen:
+   Beitragstitel, Status.
+5. Nie Beiträge ändern oder den Feed verändern: Der Schlüssel erlaubt nur Lesen und die Statusmeldung des Skripts.
+
 ## Bewertungs-Posts
 
 Bewertungs-Posts legst du **nicht** mehr an. Sie entstehen nur noch auf ausdrücklichen Wunsch des Betreibers, lokal per
