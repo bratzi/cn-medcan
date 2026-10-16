@@ -398,6 +398,7 @@ export const de = {
       bewertungen: { one: "{anzahl} Bewertung", other: "{anzahl} Bewertungen" },
       thc: "{von} bis {bis} % THC",
       thcEinzeln: "{wert} % THC",
+      keineBewertung: "Noch nicht bewertet",
     },
     karte: {
       symbolbild: "Symbolbild",

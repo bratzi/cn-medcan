@@ -3,7 +3,7 @@ import Link from "next/link";
 import { Bild } from "@/components/medien/Bild";
 import { BudpicDiashow, type DiashowBild } from "@/components/produkt/BudpicDiashow";
 import { BlattAnzeige } from "@/components/review/BlattAnzeige";
-import { Badge, Card, CardBody } from "@/components/ui";
+import { Badge } from "@/components/ui";
 import { einzelLinkKlassen } from "@/components/ui/textlink";
 import { musterBildId } from "@/lib/budpics";
 import { formatiereZahl, formatiereZahlSpanne } from "@/lib/format";
@@ -25,82 +25,116 @@ type Props = {
   budpics?: readonly DiashowBild[];
 };
 
+/** Bildfläche: in jeder Karte gleich hoch, damit das Raster ruhig steht, auch ohne Bild. */
+const BILDFLAECHE = "aspect-4/3 w-full";
+
 /**
- * Karte je Blüte (Spec 2.3). Bild wie auf der Handelsnamen-Karte: Budpics der Blüte, sonst das
- * Musterbild des ersten Handelsnamens, immer ganz im festen Rahmen. Der Name führt auf die Sortenseite.
+ * Karte je Blüte (Spec 2.3). Reihenfolge nach Wichtigkeit: Bild, Name, Vertreiber-Zahl, Typ und
+ * THC-Spanne, Vertreiber, Bewertungsstand und der Weg zu den Handelsnamen im Fuß.
+ * Die ganze Karte ist ein Ziel: der Name trägt den Link (Sortenseite, sonst die Handelsnamen der
+ * Blüte) und spannt ihn per `after:` über die Fläche. Diashow-Knöpfe und der Fuß-Link liegen
+ * darüber (`relative z-10`), damit sie eigene Ziele bleiben.
+ * Bewegung nur Farbe (Rahmen, Name); globale Regel schaltet sie bei reduzierter Bewegung ab.
  */
 export function KultivarKarte({ kultivar, filter, w, sprache, budpics = [] }: Props) {
   const texte = w.katalog.kultivar;
   const sichtbar = kultivar.vertreiber.slice(0, VERTREIBER_MAX);
   const rest = kultivar.vertreiber.length - sichtbar.length;
-  const ziel = serialisiereFilter({ ...filter, kultivar: kultivar.id, ansicht: "ware", seite: 1 }).toString();
+  const ziel = `/blueten?${serialisiereFilter({ ...filter, kultivar: kultivar.id, ansicht: "ware", seite: 1 }).toString()}`;
+  const hauptziel = kultivar.slug ? `/blueten/${kultivar.slug}` : ziel;
   const bild = blueteBild(kultivar.herstellerBildPfad) ?? (kultivar.bildSlug ? musterBildId(kultivar.bildSlug) : null);
+  const thc =
+    kultivar.thcMin !== null && kultivar.thcMax !== null
+      ? (() => {
+          const s = formatiereZahlSpanne(kultivar.thcMin, kultivar.thcMax, 0, sprache);
+          return s.gleich ? t(texte.thcEinzeln, { wert: s.von }) : t(texte.thc, { von: s.von, bis: s.bis });
+        })()
+      : null;
+
   return (
-    <Card className="flex w-full flex-col">
+    <article className="group relative flex w-full flex-col rounded-lg border border-border bg-surface transition-colors duration-fast ease-standard focus-within:border-border-strong hover:border-border-strong">
       {budpics.length > 0 ? (
-        <div className="px-8 pt-8 pb-2">
-          <BudpicDiashow bilder={budpics} name={kultivar.name} texte={w.budpic} rahmen="h-56 w-full" einpassen />
+        <div className="relative z-10 p-4">
+          <BudpicDiashow bilder={budpics} name={kultivar.name} texte={w.budpic} rahmen={BILDFLAECHE} einpassen />
         </div>
-      ) : bild ? (
-        // Referenzbild, als Symbolbild gekennzeichnet; feste Höhe, das Bild passt sich ein.
-        <figure title={w.budpic.muster} className="relative flex h-56 items-center justify-center overflow-hidden px-8 pt-8 pb-6">
-          <Bild
-            id={bild}
-            dekorativ
-            sizes="(min-width: 1280px) 22vw, (min-width: 640px) 45vw, 90vw"
-            className="h-full! min-h-0 w-full object-contain"
-          />
-          <figcaption className="absolute right-4 bottom-2 text-caption text-text-muted">{w.katalog.karte.symbolbild}</figcaption>
-        </figure>
-      ) : null}
-      <CardBody className="flex flex-1 flex-col gap-4">
-        <h3 className="font-buch text-h3 text-text wrap-break-word">
-          {kultivar.slug ? (
-            <Link prefetch={false} href={`/blueten/${kultivar.slug}`} className={einzelLinkKlassen()}>
+      ) : (
+        <div className="p-4">
+          {bild ? (
+            // Referenzbild, als Symbolbild gekennzeichnet; ganz im Rahmen, nie beschnitten.
+            <figure title={w.budpic.muster} className="flex flex-col gap-2">
+              <div className={`flex items-center justify-center overflow-hidden bg-surface-sunken p-4 ${BILDFLAECHE}`}>
+                <Bild
+                  id={bild}
+                  dekorativ
+                  sizes="(min-width: 1280px) 22vw, (min-width: 640px) 45vw, 90vw"
+                  className="h-full! min-h-0 w-full object-contain"
+                />
+              </div>
+              <figcaption className="text-caption text-text-muted">{w.katalog.karte.symbolbild}</figcaption>
+            </figure>
+          ) : (
+            <div aria-hidden="true" className={`bg-surface-sunken ${BILDFLAECHE}`} />
+          )}
+        </div>
+      )}
+
+      <div className="flex flex-1 flex-col gap-4 px-4 pb-4">
+        <div className="flex flex-col gap-2">
+          <h3 className="font-buch text-h3 text-balance text-text wrap-break-word">
+            <Link
+              prefetch={false}
+              href={hauptziel}
+              className="rounded-sm transition-colors duration-fast ease-standard group-hover:text-accent after:absolute after:inset-0 after:content-['']"
+            >
               {kultivar.name}
             </Link>
-          ) : (
-            kultivar.name
-          )}
-        </h3>
-        <div className="flex flex-wrap gap-2">
-          <Badge variante="neutral">{w.label.kultivarTyp[kultivar.typ]}</Badge>
-        </div>
-        {kultivar.thcMin !== null && kultivar.thcMax !== null ? (
-          <p className="numeric text-small text-text">
-            {(() => {
-              const s = formatiereZahlSpanne(kultivar.thcMin, kultivar.thcMax, 0, sprache);
-              return s.gleich ? t(texte.thcEinzeln, { wert: s.von }) : t(texte.thc, { von: s.von, bis: s.bis });
-            })()}
-          </p>
-        ) : null}
-        <div className="flex flex-col gap-2">
+          </h3>
           {sichtbar.length > 0 ? (
-            <>
-              <p className="text-small text-text-muted">{mehrzahl(sprache, texte.vertreiber, kultivar.vertreiber.length)}</p>
-              <ul className="flex flex-wrap gap-x-4 gap-y-2 text-small text-text">
-                {sichtbar.map((name) => (
-                  <li key={name} className="wrap-break-word">{name}</li>
-                ))}
-                {rest > 0 ? <li className="text-text-muted">{t(texte.mehrVertreiber, { anzahl: rest })}</li> : null}
-              </ul>
-            </>
+            <p className="text-small text-text-muted">{mehrzahl(sprache, texte.vertreiber, kultivar.vertreiber.length)}</p>
+          ) : null}
+        </div>
+
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+          <Badge variante="neutral">{w.label.kultivarTyp[kultivar.typ]}</Badge>
+          {thc ? <span className="numeric text-small text-text">{thc}</span> : null}
+        </div>
+
+        {sichtbar.length > 0 ? (
+          <ul className="flex flex-wrap gap-x-2 gap-y-2 text-small text-text">
+            {sichtbar.map((name, i) => (
+              <li key={name} className="wrap-break-word">
+                {name}
+                {i < sichtbar.length - 1 || rest > 0 ? <span aria-hidden="true" className="text-text-muted">,</span> : null}
+              </li>
+            ))}
+            {rest > 0 ? <li className="numeric text-text-muted">{t(texte.mehrVertreiber, { anzahl: rest })}</li> : null}
+          </ul>
+        ) : (
+          <p className="text-small text-text-muted">{texte.vertreiberUnbekannt}</p>
+        )}
+
+        <div className="mt-auto flex flex-col gap-4 border-t border-border pt-4">
+          {kultivar.overall !== null ? (
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+              <BlattAnzeige note={kultivar.overall} text={t(texte.overall, { note: formatiereZahl(kultivar.overall, 1, sprache) })} />
+              <span className="numeric text-small text-text-muted">{mehrzahl(sprache, texte.bewertungen, kultivar.bewertungen)}</span>
+            </div>
           ) : (
-            <p className="text-small text-text-muted">{texte.vertreiberUnbekannt}</p>
+            <p className="text-small text-text-muted">{texte.keineBewertung}</p>
+          )}
+          {kultivar.slug ? (
+            <p className="relative z-10">
+              <Link prefetch={false} href={ziel} className={einzelLinkKlassen()}>
+                {mehrzahl(sprache, texte.handelsnamen, kultivar.handelsnamen)}
+              </Link>
+            </p>
+          ) : (
+            <p className="text-small text-accent" aria-hidden="true">
+              {mehrzahl(sprache, texte.handelsnamen, kultivar.handelsnamen)}
+            </p>
           )}
         </div>
-        {kultivar.overall !== null ? (
-          <div className="flex flex-col gap-2">
-            <BlattAnzeige note={kultivar.overall} text={t(texte.overall, { note: formatiereZahl(kultivar.overall, 1, sprache) })} />
-            <span className="text-small text-text-muted numeric">{mehrzahl(sprache, texte.bewertungen, kultivar.bewertungen)}</span>
-          </div>
-        ) : null}
-        <p className="mt-auto">
-          <Link prefetch={false} href={`/blueten?${ziel}`} className={einzelLinkKlassen()}>
-            {mehrzahl(sprache, texte.handelsnamen, kultivar.handelsnamen)}
-          </Link>
-        </p>
-      </CardBody>
-    </Card>
+      </div>
+    </article>
   );
 }
