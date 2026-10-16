@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { darfBearbeiten, darfVerknuepfen } from "@/lib/jury-rechte";
+import { darfBearbeiten, darfEinreichen, darfVerknuepfen } from "@/lib/jury-rechte";
 
 const autor = { mitgliedId: "a", jury: true, rolle: "MITGLIED" };
 test("darfBearbeiten", () => {
@@ -22,4 +22,35 @@ test("Upload lehnt über JURY_BILDER_MAX ab, bevor er schreibt", () => {
   const q = readFileSync("app/[lang]/admin/jury/aktionen.ts", "utf8");
   assert.ok(q.indexOf("anzahl >= JURY_BILDER_MAX") < q.indexOf("juryBild.create"));
   assert.match(q, /export async function juryBildHochladen[\s\S]*?await adminErforderlich\(\)/);
+});
+
+test("darfEinreichen: nur aus ENTWURF, auch für Admins", () => {
+  const admin = { mitgliedId: "x", jury: false, rolle: "ADMIN" };
+  assert.equal(darfEinreichen({ autorId: "a", status: "ENTWURF" }, autor), true);
+  assert.equal(darfEinreichen({ autorId: "a", status: "VEROEFFENTLICHT" }, autor), false);
+  assert.equal(darfEinreichen({ autorId: "b", status: "VEROEFFENTLICHT" }, admin), false);
+  assert.equal(darfEinreichen({ autorId: "b", status: "EINGEREICHT" }, admin), false);
+  assert.equal(darfEinreichen({ autorId: "b", status: "ENTWURF" }, autor), false);
+});
+
+test("beitragEinreichen prüft über darfEinreichen", () => {
+  const q = readFileSync("app/[lang]/jury/aktionen.ts", "utf8");
+  assert.match(q, /export async function beitragEinreichen[\s\S]*?darfEinreichen\(b, m\)/);
+});
+
+test("Admin-Aktionen revalidieren auch die Folgeseiten des Magazins", () => {
+  const q = readFileSync("app/[lang]/admin/jury/aktionen.ts", "utf8");
+  assert.equal(q.match(/revalidiereSprachen\("\/jury\/seite\/\[nummer\]", "page"\)/g)?.length, 2);
+});
+
+test("ladeJuryTeam sortiert nach Anzeigename", () => {
+  const q = readFileSync("lib/query/jury.ts", "utf8");
+  assert.match(q, /export async function ladeJuryTeam[\s\S]*?orderBy: \{ anzeigename: "asc" \}/);
+});
+
+test("ig-jury: Graph-Weg prüft den Tag, Probe meldet nichts", () => {
+  const q = readFileSync("scripts/ig-jury.ts", "utf8");
+  const direkt = q.indexOf("if (direkt) {");
+  assert.ok(q.indexOf("tagBelegt(", direkt) > direkt && q.indexOf("tagBelegt(", direkt) < q.indexOf("graphKarussellSchritte(urls"));
+  assert.match(q, /if \(!probe\) \{\s*try \{\s*await meldeStatus\(ursprung, schluessel, \{ slug, igStatus: "FEHLER" \}\)/);
 });

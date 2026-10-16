@@ -25,6 +25,7 @@ async function neuLaden(beitragId: string, ausgabeSlugZusatz?: string | null) {
   revalidiereSprachen("/jury");
   revalidiereSprachen("/jury/favourites");
   revalidiereSprachen("/jury/team");
+  revalidiereSprachen("/jury/seite/[nummer]", "page");
   revalidiereSprachen("/");
   if (b) revalidiereSprachen(`/jury/${b.slug}`);
   const ausgabeSlug = b?.ausgabe?.slug ?? ausgabeSlugZusatz;
@@ -185,6 +186,7 @@ export async function juryBildSymbol(fd: FormData): Promise<Ergebnis> {
 function ausgabeNeuLaden(slug: string) {
   revalidiereSprachen("/admin/jury");
   revalidiereSprachen("/jury");
+  revalidiereSprachen("/jury/seite/[nummer]", "page");
   revalidiereSprachen(`/jury/ausgabe/${slug}`);
   revalidiereSprachen("/");
 }

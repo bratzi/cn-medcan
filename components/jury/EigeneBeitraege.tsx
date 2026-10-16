@@ -15,6 +15,8 @@ type Props = {
   offen: string | null;
   /** ?gespeichert=1: der Editor zeigt „Entwurf gespeichert“ gleich beim Aufbau. */
   frischGespeichert?: boolean;
+  /** ?eingereicht=1: Bestätigung nach dem Einreichen, der Editor ist dann schon zu. */
+  eingereicht?: boolean;
   texte: Woerterbuch["profil"]["jury"];
 };
 
@@ -26,12 +28,17 @@ const VARIANTE: Record<string, BadgeVariante> = {
 };
 
 /** Liste der eigenen Beiträge; ein Entwurf (oder „neu“) öffnet den Editor darunter. */
-export function EigeneBeitraege({ beitraege, bewertungen, offen, texte, frischGespeichert = false }: Props) {
+export function EigeneBeitraege({ beitraege, bewertungen, offen, texte, frischGespeichert = false, eingereicht = false }: Props) {
   const bearbeitet = offen && offen !== "neu" ? beitraege.find((b) => b.id === offen && b.status === "ENTWURF") : undefined;
   const zeigeEditor = offen === "neu" || !!bearbeitet;
   return (
     <div className="flex flex-col gap-6">
       <p className="max-w-[68ch] text-body text-text-muted text-pretty">{texte.satz}</p>
+      {eingereicht ? (
+        <p role="status" className="max-w-[68ch] text-body text-success text-pretty">
+          {texte.eingereicht}
+        </p>
+      ) : null}
       {zeigeEditor ? (
         // key: beim Wechsel des Beitrags beginnt der Editor mit dessen Werten.
         <BeitragEditor key={bearbeitet?.id ?? "neu"} beitrag={bearbeitet ?? null} bewertungen={bewertungen} texte={texte} frischGespeichert={frischGespeichert} />

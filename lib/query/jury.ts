@@ -186,6 +186,7 @@ export async function ladeJuryTeam(): Promise<
   const prisma = await getPrisma();
   const m = await prisma.mitglied.findMany({
     where: { jury: true, profilOeffentlich: true, freigegeben: true },
+    orderBy: { anzeigename: "asc" },
     take: 50,
     select: {
       id: true, anzeigename: true, kurzId: true, instagramHandle: true, avatar: { select: { id: true } },

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useId, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 
 import { beitragEinreichen, beitragSpeichern } from "@/app/[lang]/jury/aktionen";
 import { TextBloecke } from "@/components/jury/TextBloecke";
@@ -60,6 +60,12 @@ export function BeitragEditor({ beitrag, bewertungen, texte, frischGespeichert =
   const [laeuft, setLaeuft] = useState(false);
   const [antwort, setAntwort] = useState<Antwort>(frischGespeichert ? { art: "erfolg", text: texte.gespeichert } : null);
 
+  // Die Meldung steht im Zustand; das Kennzeichen hat seinen Dienst getan und verschwindet aus der Adresse.
+  useEffect(() => {
+    if (frischGespeichert && id) router.replace(`/profil?jury=${id}`, { scroll: false });
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- nur einmal beim Aufbau
+  }, []);
+
   const bloecke = juryTextBloecke(text);
   const zaehler = (anzahl: number, max: number) => t(texte.zaehler, { anzahl, max });
 
@@ -100,7 +106,7 @@ export function BeitragEditor({ beitrag, bewertungen, texte, frischGespeichert =
         setAntwort({ art: "fehler", text: ergebnis.fehler });
         return;
       }
-      router.replace("/profil", { scroll: false });
+      router.replace("/profil?eingereicht=1", { scroll: false });
       router.refresh();
     } catch {
       setAntwort({ art: "fehler", text: texte.fehlerAllgemein });

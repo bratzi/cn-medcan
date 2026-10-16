@@ -134,7 +134,7 @@ export default async function ProfilPage({
           <>
             {mitglied.jury ? (
               <Suspense fallback={skelett}>
-                <ReiheJury id={id} offen={typeof parameter.jury === "string" ? parameter.jury : null} frischGespeichert={parameter.gespeichert === "1"} />
+                <ReiheJury id={id} offen={typeof parameter.jury === "string" ? parameter.jury : null} frischGespeichert={parameter.gespeichert === "1"} eingereicht={parameter.eingereicht === "1"} />
               </Suspense>
             ) : null}
             <Suspense

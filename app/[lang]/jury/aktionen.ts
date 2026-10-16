@@ -6,7 +6,7 @@ import { revalidiereSprachen } from "@/lib/i18n/revalidiere";
 import { meldungText } from "@/lib/i18n/text";
 import type { MeldungSchluessel } from "@/lib/i18n/typen";
 import { beitragPruefen, juryslug, juryslugBasis } from "@/lib/jury";
-import { darfBearbeiten, darfVerknuepfen } from "@/lib/jury-rechte";
+import { darfBearbeiten, darfEinreichen, darfVerknuepfen } from "@/lib/jury-rechte";
 import { getPrisma } from "@/lib/prisma";
 import { juryErforderlich } from "@/lib/session";
 
@@ -70,7 +70,7 @@ export async function beitragEinreichen(fd: FormData): Promise<Ergebnis> {
   const prisma = await getPrisma();
   const id = String(fd.get("id") ?? "");
   const b = await prisma.juryBeitrag.findUnique({ where: { id }, select: { autorId: true, status: true, titel: true } });
-  if (!b || !darfBearbeiten(b, m)) return fehlerText("jury.keineBerechtigung");
+  if (!b || !darfEinreichen(b, m)) return fehlerText("jury.keineBerechtigung");
   await prisma.juryBeitrag.update({ where: { id }, data: { status: "EINGEREICHT" } });
   const admins = await prisma.mitglied.findMany({ where: { rolle: "ADMIN" }, select: { id: true }, take: 50 });
   // Art "KOMMENTAR" ohne Parameter zeigt den gespeicherten Satz; neue Arten braeuchten eine Trigger-Migration.

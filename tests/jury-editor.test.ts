@@ -46,3 +46,12 @@ test("Editor: frisch gespeichert zeigt die Meldung gleich beim Aufbau", () => {
   assert.match(html, /Entwurf gespeichert\./);
   assert.doesNotMatch(zeige({ beitrag, bewertungen: [], texte: de.profil.jury }), /Entwurf gespeichert\./);
 });
+
+test("Liste: nach dem Einreichen steht die Bestätigung da", async () => {
+  const { EigeneBeitraege } = await import("@/components/jury/EigeneBeitraege");
+  const props = { beitraege: [], bewertungen: [], offen: null, texte: de.profil.jury };
+  const mit = rendere(createElement(AppRouterContext.Provider, { value: {} as never }, createElement(EigeneBeitraege, { ...props, eingereicht: true })));
+  assert.match(mit, /Eingereicht\. Wir melden uns/);
+  const ohne = rendere(createElement(AppRouterContext.Provider, { value: {} as never }, createElement(EigeneBeitraege, props)));
+  assert.doesNotMatch(ohne, /Eingereicht\. Wir melden uns/);
+});

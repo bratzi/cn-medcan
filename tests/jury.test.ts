@@ -37,3 +37,10 @@ test("juryslugBasis: Präfix für die Suche nach belegten Slugs", () => {
   assert.equal(juryslugBasis("Team"), "team");
   assert.equal(juryslugBasis("Süße Grüße!"), "suesse-gruesse");
 });
+
+test("juryslugBasis: nach dem Kürzen endet der Slug nie auf einem Strich", () => {
+  const titel = `${"a".repeat(59)} b`;
+  const slug = juryslugBasis(titel);
+  assert.equal(slug, "a".repeat(59));
+  assert.doesNotMatch(juryslugBasis("x".repeat(59) + "!!! y"), /-$/);
+});

@@ -6,7 +6,7 @@ import { juryBeitraegeLaden, juryBewertungenLaden, textLaden } from "./laden";
 import { SPALTEN } from "./spalten";
 
 /** Bereich „Jury“ im Profil (Spec 2026-10-16), nur für Mitglieder mit Jury-Flag; `offen` kommt aus ?jury=. */
-export async function ReiheJury({ id, offen, frischGespeichert }: { id: string; offen: string | null; frischGespeichert: boolean }) {
+export async function ReiheJury({ id, offen, frischGespeichert, eingereicht }: { id: string; offen: string | null; frischGespeichert: boolean; eingereicht: boolean }) {
   const [{ w }, beitraege, bewertungen] = await Promise.all([textLaden(), juryBeitraegeLaden(id), juryBewertungenLaden(id)]);
   const texte = w.profil.jury;
   return (
@@ -22,6 +22,7 @@ export async function ReiheJury({ id, offen, frischGespeichert }: { id: string; 
           }))}
           offen={offen}
           frischGespeichert={frischGespeichert}
+          eingereicht={eingereicht}
           texte={texte}
         />
       )}

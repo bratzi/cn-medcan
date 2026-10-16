@@ -110,6 +110,10 @@ async function main() {
       if (!basis) throw new Error("IG_MEDIEN_BASIS_URL fehlt: Instagram braucht öffentliche Bild-Adressen");
       const urls = medien.map((m) => `${basis}/${m.name}`);
       for (const u of urls) if (!(await fetch(u, { method: "HEAD" })).ok) throw new Error(`Bild nicht erreichbar: ${u}`);
+      if (tagBelegt((await publoraPosts()) as { status?: string; scheduledTime?: string }[])) {
+        console.log("Heute ist schon ein Post eingeplant oder erschienen: nichts veröffentlicht.");
+        return;
+      }
       const handle = beitrag.autor.instagram?.replace(/^@+/, "");
       const kinder: string[] = [];
       let behaelter = "";
@@ -154,10 +158,13 @@ async function main() {
     await meldeStatus(ursprung, schluessel, { slug, igStatus: status });
   } catch (f) {
     if (live) throw new Error(`${f instanceof Error ? f.message : String(f)} (Post ist raus, Status ${slug} von Hand nachtragen, kein FEHLER gemeldet)`);
-    try {
-      await meldeStatus(ursprung, schluessel, { slug, igStatus: "FEHLER" });
-    } catch {
-      // Die Ursprungsmeldung zählt; ein zweiter Fehler überdeckt sie nicht.
+    // Die Probe schreibt nichts, auch keinen Fehlerstatus ans Portal.
+    if (!probe) {
+      try {
+        await meldeStatus(ursprung, schluessel, { slug, igStatus: "FEHLER" });
+      } catch {
+        // Die Ursprungsmeldung zählt; ein zweiter Fehler überdeckt sie nicht.
+      }
     }
     throw f;
   }
