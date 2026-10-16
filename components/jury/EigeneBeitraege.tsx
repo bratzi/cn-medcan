@@ -1,12 +1,13 @@
 import Link from "next/link";
 
+import { BildVerwaltung, type AdminBild } from "@/components/admin/jury/BildVerwaltung";
 import { BeitragEditor, type EditorBeitrag } from "@/components/jury/BeitragEditor";
 import { Badge, buttonKlassen, textLinkKlassen } from "@/components/ui";
 import type { BadgeVariante } from "@/components/ui";
 import { t } from "@/lib/i18n/text";
 import type { Woerterbuch } from "@/lib/i18n/typen";
 
-type Zeile = EditorBeitrag & { status: string };
+type Zeile = EditorBeitrag & { status: string; bilder: readonly AdminBild[] };
 
 type Props = {
   beitraege: readonly Zeile[];
@@ -18,6 +19,8 @@ type Props = {
   /** ?eingereicht=1: Bestätigung nach dem Einreichen, der Editor ist dann schon zu. */
   eingereicht?: boolean;
   texte: Woerterbuch["profil"]["jury"];
+  /** Texte der Bildverwaltung (dieselbe wie im Admin; das Recht prüft der Server über bildRecht). */
+  bildTexte: Woerterbuch["admin"]["jury"];
 };
 
 const VARIANTE: Record<string, BadgeVariante> = {
@@ -28,7 +31,7 @@ const VARIANTE: Record<string, BadgeVariante> = {
 };
 
 /** Liste der eigenen Beiträge; ein Entwurf (oder „neu“) öffnet den Editor darunter. */
-export function EigeneBeitraege({ beitraege, bewertungen, offen, texte, frischGespeichert = false, eingereicht = false }: Props) {
+export function EigeneBeitraege({ beitraege, bewertungen, offen, texte, bildTexte, frischGespeichert = false, eingereicht = false }: Props) {
   const bearbeitet = offen && offen !== "neu" ? beitraege.find((b) => b.id === offen && b.status === "ENTWURF") : undefined;
   const zeigeEditor = offen === "neu" || !!bearbeitet;
   return (
@@ -41,7 +44,14 @@ export function EigeneBeitraege({ beitraege, bewertungen, offen, texte, frischGe
       ) : null}
       {zeigeEditor ? (
         // key: beim Wechsel des Beitrags beginnt der Editor mit dessen Werten.
-        <BeitragEditor key={bearbeitet?.id ?? "neu"} beitrag={bearbeitet ?? null} bewertungen={bewertungen} texte={texte} frischGespeichert={frischGespeichert} />
+        <>
+          <BeitragEditor key={bearbeitet?.id ?? "neu"} beitrag={bearbeitet ?? null} bewertungen={bewertungen} texte={texte} frischGespeichert={frischGespeichert} />
+          {bearbeitet ? (
+            <BildVerwaltung beitragId={bearbeitet.id} bilder={bearbeitet.bilder} texte={bildTexte} />
+          ) : (
+            <p className="max-w-[68ch] text-small text-text-muted text-pretty">{texte.bilderErstSpeichern}</p>
+          )}
+        </>
       ) : (
         <div>
           <Link prefetch={false} scroll={false} href="/profil?jury=neu" className={buttonKlassen("primary")}>

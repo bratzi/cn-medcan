@@ -23,7 +23,7 @@ type Props = { beitragId: string; bilder: readonly AdminBild[]; texte: Woerterbu
 /**
  * Bilder eines Jury-Beitrags: Reihenfolge, Symbolbild, Löschen und Upload (Spec 2026-10-16). Der Browser
  * verkleinert, der Server prüft jede Datei erneut (juryBildHochladen). Vorschau über /api/bild/offen/<id>,
- * die nur der Betreiber sieht.
+ * die Betreiber und Autor sehen. Auch im Profil am eigenen Entwurf.
  */
 export function BildVerwaltung({ beitragId, bilder, texte }: Props) {
   const aktion = useAktion();
