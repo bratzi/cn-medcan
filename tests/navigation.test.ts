@@ -7,8 +7,8 @@ import { HAUPTNAVIGATION, PROFIL_LINK, istAktiv } from "@/lib/navigation";
 import { de } from "@/lib/i18n/de";
 import { en } from "@/lib/i18n/en";
 
-test("Kern zuerst: Bewertungen, Abstimmung, Blüten; Profil als ein Knopf (Nutzer 2026-10-13)", () => {
-  assert.deepEqual(HAUPTNAVIGATION.map((eintrag) => eintrag.href), ["/reviews", "/umfragen", "/blueten"]);
+test("Kern zuerst: Bewertungen, Abstimmung, Jury, Blüten; Profil als ein Knopf (Nutzer 2026-10-13)", () => {
+  assert.deepEqual(HAUPTNAVIGATION.map((eintrag) => eintrag.href), ["/reviews", "/umfragen", "/jury", "/blueten"]);
   assert.deepEqual(PROFIL_LINK, { href: "/profil", schluessel: "profil" });
   assert.equal(de.kopf.navigation.profil, "Mein Profil");
   assert.equal(en.kopf.navigation.profil, "My profile");

@@ -18,6 +18,8 @@ export type JuryKarte = {
 
 export type JuryBeitragVoll = JuryKarte & {
   text: string;
+  autorAvatarId: string | null;
+  autorInstagram: string | null;
   bilder: JuryBildMeta[];
   igUrl: string | null;
   ausgabe: { slug: string; titel: string } | null;
@@ -111,6 +113,12 @@ export async function ladeJuryBeitrag(slug: string): Promise<JuryBeitragVoll | n
     where: { slug },
     select: {
       ...KARTE_SELECT,
+      autor: {
+        select: {
+          anzeigename: true, kurzId: true, profilOeffentlich: true, instagramHandle: true,
+          avatar: { select: { id: true } },
+        },
+      },
       text: true, igUrl: true, status: true,
       bilder: { select: BILD_META, orderBy: { position: "asc" }, take: 5 },
       ausgabe: { select: { slug: true, titel: true, status: true } },
@@ -128,6 +136,8 @@ export async function ladeJuryBeitrag(slug: string): Promise<JuryBeitragVoll | n
   return {
     ...zuKarte(z),
     text: z.text,
+    autorAvatarId: z.autor.profilOeffentlich ? (z.autor.avatar?.id ?? null) : null,
+    autorInstagram: z.autor.instagramHandle,
     bilder: z.bilder.map(bildMeta),
     igUrl: z.igUrl,
     ausgabe: z.ausgabe ? { slug: z.ausgabe.slug, titel: z.ausgabe.titel } : null,
@@ -171,18 +181,18 @@ export async function ladeJuryFavourites(): Promise<JuryKarte[]> {
 }
 
 export async function ladeJuryTeam(): Promise<
-  { id: string; name: string; kurzId: string | null; instagram: string | null; beitraege: number }[]
+  { id: string; name: string; kurzId: string | null; instagram: string | null; avatarId: string | null; beitraege: number }[]
 > {
   const prisma = await getPrisma();
   const m = await prisma.mitglied.findMany({
     where: { jury: true, profilOeffentlich: true, freigegeben: true },
     take: 50,
     select: {
-      id: true, anzeigename: true, kurzId: true, instagramHandle: true,
+      id: true, anzeigename: true, kurzId: true, instagramHandle: true, avatar: { select: { id: true } },
       _count: { select: { juryBeitraege: { where: OEFFENTLICH } } },
     },
   });
   return m.map((x) => ({
-    id: x.id, name: x.anzeigename, kurzId: x.kurzId, instagram: x.instagramHandle, beitraege: x._count.juryBeitraege,
+    id: x.id, name: x.anzeigename, kurzId: x.kurzId, instagram: x.instagramHandle, avatarId: x.avatar?.id ?? null, beitraege: x._count.juryBeitraege,
   }));
 }

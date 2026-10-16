@@ -6,6 +6,7 @@
 export const HAUPTNAVIGATION = [
   { href: "/reviews", schluessel: "bewertungen" },
   { href: "/umfragen", schluessel: "abstimmung" },
+  { href: "/jury", schluessel: "jury" },
   { href: "/blueten", schluessel: "blueten" },
   // Apotheken seit 2026-09-25 nur in Aussicht (Nutzer), deshalb nicht in der Navigation.
 ] as const;

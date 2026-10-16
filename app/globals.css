@@ -2528,3 +2528,21 @@ button.netz-marke:active .netz-marke-kreis {
     opacity: 1;
   }
 }
+
+/* Terpz-Jury: Bildwechsel der Bühne. Alle Bilder liegen übereinander; das gewählte blendet mit
+   Deckkraft und Maßstab ein (300 ms), das verlassene aus. Wechselnde Bilder retargeten mitten
+   in der Bewegung (Transition, kein Keyframe). Ohne Freigabe und im Sparmodus tauscht es sofort. */
+@media (prefers-reduced-motion: no-preference) {
+  :root:not([data-sparmodus]) .jury-buehne-bild {
+    transition:
+      opacity 300ms var(--ease-auftritt),
+      transform 300ms var(--ease-auftritt),
+      visibility 0s linear 300ms;
+  }
+  :root:not([data-sparmodus]) .jury-buehne-bild[data-aktiv="false"] {
+    transform: scale(0.97);
+  }
+  :root:not([data-sparmodus]) .jury-buehne-bild[data-aktiv="true"] {
+    transition-delay: 0s;
+  }
+}
