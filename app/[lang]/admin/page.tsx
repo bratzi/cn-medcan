@@ -31,6 +31,9 @@ import {
 import type { SelectOption } from "@/components/ui";
 import { bluetenHref } from "@/lib/alte-adressen";
 import { formatiereDatum } from "@/lib/format";
+import { de } from "@/lib/i18n/de";
+import { mehrzahl } from "@/lib/i18n/text";
+import { zaehleEingereichteJuryBeitraege } from "@/lib/query/jury-admin";
 import { offeneBewertungen, reviewAuswahlFuerStrains } from "@/lib/query/reviews";
 import { notizKuerzen } from "@/lib/admin-eingabe";
 import { ladeBudpicsNachStatus } from "@/lib/query/budpics";
@@ -453,6 +456,29 @@ async function VorschlaegeKarte() {
   );
 }
 
+/** Jury (Spec 2026-10-16): nur die Zahl eingereichter Beiträge, geprüft wird auf /admin/jury. Eine Zählabfrage. */
+async function JuryKarte() {
+  const offen = await zaehleEingereichteJuryBeitraege();
+  const texte = de.admin.jury;
+  return (
+    <section aria-labelledby="jury-karte-titel">
+      <Card>
+        <CardHeader>
+          <h2 id="jury-karte-titel" className="text-h3 text-text">
+            {texte.kachelTitel}
+          </h2>
+        </CardHeader>
+        <CardBody className="flex flex-wrap items-center justify-between gap-4">
+          <p className="text-body text-text">{offen > 0 ? mehrzahl("de", texte.kachelEingereicht, offen) : texte.leerEingereicht}</p>
+          <Link prefetch={false} href="/admin/jury" className={buttonKlassen(offen > 0 ? "primary" : "secondary")}>
+            {texte.zurJury}
+          </Link>
+        </CardBody>
+      </Card>
+    </section>
+  );
+}
+
 /**
  * Budpics (T9): Bilder von Mitgliedern. Offene erscheinen erst nach der
  * Freigabe oeffentlich; freigegebene lassen sich hier wieder ablehnen oder
@@ -546,6 +572,10 @@ export default async function AdminPage() {
 
         <Suspense fallback={<Spinner text="Vorschläge werden gezählt" />}>
           <VorschlaegeKarte />
+        </Suspense>
+
+        <Suspense fallback={<Spinner text="Jury-Beiträge werden gezählt" />}>
+          <JuryKarte />
         </Suspense>
 
         <section aria-labelledby="kennwerte-titel">

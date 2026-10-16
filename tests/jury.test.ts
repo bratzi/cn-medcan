@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { beitragPruefen, juryslug, sichtbar, TITEL_MAX } from "@/lib/jury";
+import { beitragPruefen, juryslug, juryslugBasis, sichtbar, TITEL_MAX } from "@/lib/jury";
 
 const gut = { titel: "Gelato im Glas", anriss: "Süß und cremig.", text: "Riecht nach Beeren.", reviewId: null };
 
@@ -22,4 +22,18 @@ test("sichtbar: Beitrag und Ausgabe müssen veröffentlicht sein", () => {
   assert.equal(sichtbar({ status: "VEROEFFENTLICHT", ausgabe: null }), true);
   assert.equal(sichtbar({ status: "VEROEFFENTLICHT", ausgabe: { status: "ENTWURF" } }), false);
   assert.equal(sichtbar({ status: "EINGEREICHT", ausgabe: null }), false);
+});
+
+test("juryslug: feste Pfade unter /jury sind reserviert", () => {
+  for (const wort of ["team", "favourites", "seite", "ausgabe"]) {
+    assert.equal(juryslug(wort, () => false), `${wort}-2`);
+    assert.equal(juryslug(wort.toUpperCase(), () => false), `${wort}-2`);
+  }
+  assert.equal(juryslug("Team", (s) => s === "team-2"), "team-3");
+  assert.equal(juryslug("Teamgeist", () => false), "teamgeist");
+});
+
+test("juryslugBasis: Präfix für die Suche nach belegten Slugs", () => {
+  assert.equal(juryslugBasis("Team"), "team");
+  assert.equal(juryslugBasis("Süße Grüße!"), "suesse-gruesse");
 });

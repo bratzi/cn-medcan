@@ -6,6 +6,7 @@ import { benachrichtigungenLaden } from "@/lib/query/benachrichtigungen";
 import { ladeStimmen, stimmZahlen } from "@/lib/query/konto";
 import { aktuellesProfil, ladeAuswertungsZeilen } from "@/lib/query/profil";
 import { aktiveUmfrage } from "@/lib/query/umfragen";
+import { eigeneFreigegebeneBewertungen, eigeneJuryBeitraege } from "@/lib/query/jury-eigene";
 import { ladeGemocht, ladeReaktionsZahlen } from "@/lib/query/reaktionen";
 import { eigeneVorschlaege } from "@/lib/query/vorschlaege";
 
@@ -45,3 +46,9 @@ export const umfrageLaden = cache(() => aktiveUmfrage().catch(oderNull<Ergebnis<
 /** Folgende und erhaltene Likes für den Profilkopf: Summe der Zähler (aggregate), je Aufruf einmal. */
 export const reaktionsZahlenLaden = cache((id: string) => ladeReaktionsZahlen(id).catch(oderNull<Ergebnis<typeof ladeReaktionsZahlen>>("ladeReaktionsZahlen")));
 export const gemochtLaden = cache((id: string) => ladeGemocht(id).catch(oderNull<Ergebnis<typeof ladeGemocht>>("ladeGemocht")));
+
+/** Nur für Jury-Mitglieder aufgerufen (page.tsx prüft das Flag vorher). */
+export const juryBeitraegeLaden = cache((id: string) => eigeneJuryBeitraege(id).catch(oderNull<Ergebnis<typeof eigeneJuryBeitraege>>("eigeneJuryBeitraege")));
+export const juryBewertungenLaden = cache((id: string) =>
+  eigeneFreigegebeneBewertungen(id).catch(oderNull<Ergebnis<typeof eigeneFreigegebeneBewertungen>>("eigeneFreigegebeneBewertungen")),
+);
