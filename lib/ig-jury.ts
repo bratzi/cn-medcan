@@ -3,8 +3,8 @@ import { juryTextBloecke } from "@/lib/jury-text";
 import { GESCHMACKS_ACHSEN } from "@/lib/query/bewertung";
 
 /**
- * Terpz-Jury auf Instagram (Spec 2026-10-16, Task 9): aus einem veröffentlichten Beitrag ein Karussell mit
- * Collab-Hinweis auf die Autorin oder den Autor. Rein, ohne Netz; Handwerk nach docs/instagram/handwerk.md.
+ * Terpz-Jury auf Instagram (Spec 2026-10-16, Task 9): aus einem veröffentlichten Beitrag ein Karussell-Entwurf; die
+ * Autorin oder der Autor steht mit @handle in der Caption, das Collab setzt der Betreiber von Hand. Rein, ohne Netz; Handwerk nach docs/instagram/handwerk.md.
  */
 export type JuryFeedBeitrag = {
   slug: string;
@@ -40,6 +40,12 @@ export function juryZitat(text: string): string {
 function handleSauber(h: string | null): string | null {
   const t = (h ?? "").trim().replace(/^@+/, "");
   return /^[A-Za-z0-9._]{1,30}$/.test(t) ? t : null;
+}
+
+/** Hinweis für den Betreiber: wen er in Publora oder auf Instagram von Hand als Collaborator hinzufügt. */
+export function collabHinweis(autor: { name: string; instagram: string | null }): string {
+  const handle = handleSauber(autor.instagram);
+  return handle ? `Collaborator von Hand hinzufügen: @${handle}` : `${autor.name}: kein Handle hinterlegt`;
 }
 
 export function juryKarussell(b: JuryFeedBeitrag): { karussell: IgKarussell; caption: string } {
