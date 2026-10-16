@@ -8,7 +8,7 @@ const MUSTER = [
   "heilt", "heilen", "heilung", "hilft bei", "hilft gegen", "gegen schmerzen", "gegen schlafstoerung",
   "schmerzen", "schmerz", "therapie", "depression", "depressionen", "angst", "angststoerung", "schlafstoerung",
   "schlafstoerungen", "migraene", "uebelkeit", "krebs", "epilepsie", "adhs", "ptbs", "entzuendung",
-  "half bei", "half gegen", "helfen bei", "helfen gegen", "helfe bei", "helfe gegen",
+  "einschlafen", "half bei", "half gegen", "helfen bei", "helfen gegen", "helfe bei", "helfe gegen",
   "cures", "cure", "heals", "helps with", "for pain", "pain", "anxiety", "insomnia", "depression", "nausea", "cancer", "therapy",
 ];
 
