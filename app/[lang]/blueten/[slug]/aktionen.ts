@@ -108,7 +108,7 @@ export async function bewertungSpeichern(formData: FormData): Promise<BewertungE
   const daten = {
     gesamtnote: e.gesamtnote,
     chargeId,
-    istRedaktionell: istBetreiber,
+    istRedaktionell: mitglied.jury,
     freigegeben: istBetreiber,
     ...e.noten,
     feuchtigkeitProzent: e.feuchtigkeitProzent,

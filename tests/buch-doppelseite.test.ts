@@ -64,7 +64,7 @@ test("Rahmen: eindeutige Id, Überschrift mit Namen, beide Hälften, die Höhe w
 test("Links: Avatar, Name, Marke, Text und Kolophon in dieser Reihenfolge, ohne Noten und Karte", () => {
   const { links } = seiten(zeige());
   assert.ok(
-    aufsteigend(stellen(links, ['class="inline-flex shrink-0 select-none', ">Waldi<", ">Betreiber<", "Sehr dichte Blüten.", ">Datum<", ">Charge<", ">Bewertungen insgesamt<"])),
+    aufsteigend(stellen(links, ['class="inline-flex shrink-0 select-none', ">Waldi<", ">Jury<", "Sehr dichte Blüten.", ">Datum<", ">Charge<", ">Bewertungen insgesamt<"])),
     "Reihenfolge links",
   );
   assert.doesNotMatch(links, /Aussehen|viewBox="0 0 24 24"|data-eintritt="einlage"/);
@@ -90,9 +90,9 @@ test("Vermerk von Hand über dem Text: meine notiz beim Betreiber, von euch bei 
   assert.match(community, />Community</);
   const betreiber = seiten(zeige()).links;
   assert.match(betreiber, /<p data-eintritt="schreiben" style="--i:1" class="font-hand text-vermerk text-logo[^"]*">meine notiz<\/p>/);
-  assert.match(betreiber, />Betreiber</);
+  assert.match(betreiber, />Jury</);
   // Der Vermerk steht über dem Text, nach dem Exlibris.
-  assert.ok(betreiber.indexOf("meine notiz") > betreiber.indexOf(">Betreiber<"));
+  assert.ok(betreiber.indexOf("meine notiz") > betreiber.indexOf(">Jury<"));
 });
 
 test("Stimme der Person: kursives Zitat mit grüner Linie, ohne Text kein Vermerk (Nutzer 2026-10-09)", () => {

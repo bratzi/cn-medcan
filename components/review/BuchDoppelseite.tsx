@@ -196,10 +196,15 @@ export function BuchDoppelseite({ eintrag, ueberschrift: Ueberschrift, w, sprach
                 <span title={name}>{name}</span>
               )}
             </Ueberschrift>
-            <p>
+            <p className="flex flex-wrap items-center gap-x-4 gap-y-1">
               <Badge variante={eintrag.istBetreiber ? "accent" : "neutral"} zeichen={false}>
                 {eintrag.istBetreiber ? w.buch.betreiber : w.buch.community}
               </Badge>
+              {eintrag.juryBeitrag ? (
+                <Link prefetch={false} href={`/jury/${eintrag.juryBeitrag}`} className={namenLinkKlassen("inline-flex min-h-11 items-center text-small")}>
+                  {w.buch.juryBeitrag}
+                </Link>
+              ) : null}
             </p>
           </div>
           {eintrag.likes !== undefined ? (

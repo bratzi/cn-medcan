@@ -24,7 +24,9 @@ export function istOhneGate(pfad: string): boolean {
  * Gilt nur für genau /api/ig-feed und /api/ig-karte/<id>, nie für Seiten oder andere Routen.
  */
 export function igFeedSchluessel(pfad: string, suche: string): string | null {
-  if (pfad !== "/api/ig-feed" && !/^\/api\/ig-karte\/[^/]+$/.test(pfad)) return null;
+  // Terpz-Jury (Task 9): Feed, Statusmeldung und die Jury-Fotos, die das Skript herunterlädt.
+  const frei = pfad === "/api/ig-feed" || pfad === "/api/jury-feed" || pfad === "/api/jury-ig" || /^\/api\/(ig-karte|bild)\/[^/]+$/.test(pfad);
+  if (!frei || pfad === "/api/bild/offen") return null;
   return new URLSearchParams(suche).get("key") || null;
 }
 

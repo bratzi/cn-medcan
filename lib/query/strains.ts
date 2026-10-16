@@ -1,3 +1,4 @@
+import { suchtextBedingung } from "@/lib/sorten-suche";
 import { cache } from "react";
 import type { Prisma } from "@/lib/generated/prisma/client";
 import {
@@ -378,7 +379,7 @@ export function baueWhere(
     // der kleingeschriebenen Spalte `suchtext` (Handelsname, Kultivarname
     // und Genetik zusammengefasst, beim Schreiben gefuellt) mit ebenfalls
     // kleingeschriebener Eingabe. Ein OR ueber drei Spalten entfaellt damit.
-    bedingungen.suchtext = { contains: filter.q.toLowerCase() };
+    Object.assign(bedingungen, suchtextBedingung(filter.q));
   }
 
   if (filter.typ.length > 0) bedingungen.kultivarTyp = { in: filter.typ };

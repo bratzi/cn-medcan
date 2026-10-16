@@ -156,6 +156,7 @@ export function SortenExplorer({ sorten, texte, typen, sprache, kopf }: Props) {
             index={index}
             skala={skala}
             gewaehlt={w.vertreiberId === ware?.vertreiberId}
+            vergleichbar={sorte.waren.length >= 2}
             imVergleich={vergleich.some((v) => v.vertreiberId === w.vertreiberId)}
             texte={texte}
             sprache={sprache}

@@ -54,6 +54,8 @@ export type EintragDaten = {
   bilder?: ReviewBild[];
   /** Likes laut Zähler (Strang A); fehlt = kein Herz an dieser Stelle. */
   likes?: number;
+  /** Slug des sichtbaren Jury-Beitrags zu dieser Bewertung (Sortenseite); fehlt = kein Link. */
+  juryBeitrag?: string | null;
   /** Kommentare laut Zähler (Strang B); fehlt = kein Kommentar-Link an dieser Stelle. */
   kommentare?: number;
 };
