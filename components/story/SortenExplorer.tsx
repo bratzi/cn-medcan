@@ -1,18 +1,19 @@
 "use client";
 
 import Link from "next/link";
-import { useId, useReducer, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
+import { useReducer, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
 
 import { SortenBild } from "@/components/medien/Bild";
 
 import { ExplorerWareKarte } from "@/components/story/ExplorerWareKarte";
+import { SortenSuche } from "@/components/story/SortenSuche";
 import { differenz, explorerStart, explorerZustand, filtereSorten } from "@/components/story/explorer-zustand";
 import { buttonKlassen } from "@/components/ui/Button";
-import { INPUT_KLASSEN } from "@/components/ui/Input";
 import { einzelLinkKlassen } from "@/components/ui/textlink";
 import { cn } from "@/lib/cn";
 import type { KultivarTyp } from "@/db/enums";
 import { formatiereZahl } from "@/lib/format";
+import { normalisiereSuche } from "@/lib/sorten-suche";
 import type { Sprache } from "@/lib/i18n/sprache-kern";
 import { mehrzahl, t } from "@/lib/i18n/text";
 import type { Woerterbuch } from "@/lib/i18n/typen";
@@ -31,7 +32,7 @@ type Props = {
 };
 
 /**
- * Sorten-Explorer im Kapitel „Gleiche Blüte, andere Ware“ (Spec 2026-10-15 Abschnitt 4).
+ * Sorten-Explorer im Kapitel „Gleiche Blüte, andere Variante“ (Spec 2026-10-15 Abschnitt 4).
  * Daten kommen statisch mit der Startseite; die Reihenfolge stammt aus waehleExplorerSorten
  * (Menge, dann Name), nie aus der Note (HWG). Ohne JavaScript steht die erste Sorte vollständig.
  */
@@ -41,10 +42,13 @@ export function SortenExplorer({ sorten, texte, typen, sprache, kopf }: Props) {
   // Die eben verlassene Sorte bleibt kurz stehen und geht ab, während die neue auftritt.
   const [vorher, setVorher] = useState<ExplorerSorte | null>(null);
   const chips = useRef<Map<string, HTMLButtonElement>>(new Map());
-  const suchId = useId();
+  // Treffer der Suche, die nicht zu den zwölf Start-Sorten gehören, kommen als weitere Pille dazu.
+  const [gesucht, setGesucht] = useState<ExplorerSorte[]>([]);
 
-  const sichtbar = filtereSorten(sorten, zustand.suche);
-  const sorte = sorten.find((s) => s.slug === zustand.sorte) ?? sorten[0];
+  const alle = gesucht.length > 0 ? [...sorten, ...gesucht.filter((g) => !sorten.some((s) => s.slug === g.slug))] : sorten;
+  const sucheAktiv = normalisiereSuche(zustand.suche) !== null;
+  const sichtbar = filtereSorten(alle, zustand.suche);
+  const sorte = alle.find((s) => s.slug === zustand.sorte) ?? sorten[0];
   if (!sorte) return null;
   const ware = sorte.waren.find((w) => w.vertreiberId === zustand.ware) ?? sorte.waren[0];
   const skala = Math.max(...sorte.waren.map((w) => w.thc[1]));
@@ -60,6 +64,12 @@ export function SortenExplorer({ sorten, texte, typen, sprache, kopf }: Props) {
     setVorher(sorte?.bild ? sorte : null);
     senden({ typ: "sorte", slug: neu.slug, ersteWare: neu.waren[0]?.vertreiberId ?? null });
     setMeldung(t(texte.sorteGewechselt, { name: neu.name, waren: mehrzahl(sprache, texte.waren, neu.waren.length) }));
+  }
+
+  function waehleTreffer(neu: ExplorerSorte) {
+    setGesucht((vorherige) => (vorherige.some((g) => g.slug === neu.slug) ? vorherige : [...vorherige, neu]));
+    senden({ typ: "suche", text: "" });
+    waehleSorte(neu);
   }
 
   function tasten(e: KeyboardEvent<HTMLDivElement>) {
@@ -99,18 +109,9 @@ export function SortenExplorer({ sorten, texte, typen, sprache, kopf }: Props) {
       </div>
     <div className="flex min-w-0 flex-col gap-8">
       <div className="flex flex-col gap-4">
-        <label htmlFor={suchId} className="text-small text-text-muted">
-          {texte.suchen}
-        </label>
-        <input
-          id={suchId}
-          type="search"
-          autoComplete="off"
-          value={zustand.suche}
-          onChange={(e) => senden({ typ: "suche", text: e.target.value })}
-          className={cn(INPUT_KLASSEN, "max-w-96 rounded-full")}
-        />
+        <SortenSuche text={zustand.suche} onText={(text) => senden({ typ: "suche", text })} onWaehlen={waehleTreffer} texte={texte} sprache={sprache} />
         {/* Hick: höchstens zwölf Sorten; die Suche grenzt weiter ein. */}
+        {sucheAktiv ? null : (
         <div role="radiogroup" aria-label={texte.sortenWahl} onKeyDown={tasten} className="flex flex-wrap gap-2">
           {sichtbar.map((s) => {
             const aktiv = s.slug === sorte.slug;
@@ -136,7 +137,8 @@ export function SortenExplorer({ sorten, texte, typen, sprache, kopf }: Props) {
             );
           })}
         </div>
-        {sichtbar.length === 0 ? <p className="text-small text-text-muted">{t(texte.keineTreffer, { suche: zustand.suche.trim() })}</p> : null}
+        )}
+        {!sucheAktiv && sichtbar.length === 0 ? <p className="text-small text-text-muted">{t(texte.keineTreffer, { suche: zustand.suche.trim() })}</p> : null}
       </div>
 
       <div className="flex flex-col gap-2 border-t border-border-strong pt-8">
