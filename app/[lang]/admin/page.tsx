@@ -272,6 +272,7 @@ async function MitgliederBereich({ eigeneMitgliedId }: { eigeneMitgliedId: strin
         freigegeben: true,
         freigegebenAm: true,
         rolle: true,
+        jury: true,
         erstelltAm: true,
         avatar: { select: { id: true } },
         user: { select: { email: true } },
@@ -398,6 +399,7 @@ async function MitgliederBereich({ eigeneMitgliedId }: { eigeneMitgliedId: strin
                             anzeigename={satz.anzeigename}
                             freigegeben={satz.freigegeben}
                             rolle={rolle}
+                            jury={satz.jury}
                             istSelbst={istSelbst}
                           />
                         </TableCell>

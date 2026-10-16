@@ -184,3 +184,14 @@ export async function kennwerteNeuRechnen(
     if (weiter === null || fehler) revalidiereSprachen("/", "layout");
   }
 }
+
+export async function juryUmschalten(formData: FormData): Promise<AdminErgebnis> {
+  await adminErforderlich();
+  const id = String(formData.get("mitgliedId") ?? "");
+  const an = formData.get("jury") === "1";
+  const prisma = await getPrisma();
+  await prisma.mitglied.update({ where: { id }, data: { jury: an } });
+  revalidiereSprachen("/admin");
+  revalidiereSprachen("/jury/team");
+  return { ok: true };
+}

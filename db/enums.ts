@@ -122,6 +122,17 @@ export const VORSCHLAG_STATUS = ["OFFEN", "FREIGEGEBEN", "ABGELEHNT"] as const;
 export type VorschlagStatus = (typeof VORSCHLAG_STATUS)[number];
 export const istVorschlagStatus = istWert(VORSCHLAG_STATUS);
 
+/** Jury-Beitraege und Ausgaben (Spec 2026-10-16). */
+export const JURY_STATUS = ["ENTWURF", "EINGEREICHT", "VEROEFFENTLICHT", "ZURUECKGEZOGEN"] as const;
+export type JuryStatus = (typeof JURY_STATUS)[number];
+export const AUSGABE_STATUS = ["ENTWURF", "VEROEFFENTLICHT"] as const;
+export type AusgabeStatus = (typeof AUSGABE_STATUS)[number];
+export const IG_STATUS = ["KEIN", "ENTWURF", "GEPLANT", "VEROEFFENTLICHT", "FEHLER"] as const;
+export type IgStatus = (typeof IG_STATUS)[number];
+export const istJuryStatus = istWert(JURY_STATUS);
+export const istAusgabeStatus = istWert(AUSGABE_STATUS);
+export const istIgStatus = istWert(IG_STATUS);
+
 /** Arten von Benachrichtigungen im Mitgliederbereich. Erweiterbar (Umfragen, Mail). */
 export const BENACHRICHTIGUNG_ARTEN = ["VORSCHLAG_FREIGEGEBEN", "VORSCHLAG_ABGELEHNT", "LIKE", "FOLGT", "KOMMENTAR", "KOMMENTAR_GEMELDET"] as const;
 export type BenachrichtigungArt = (typeof BENACHRICHTIGUNG_ARTEN)[number];

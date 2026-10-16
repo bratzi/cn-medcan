@@ -315,6 +315,8 @@ model Review {
   bilder Budpic[]
 
   @@index([strainId, freigegeben])
+  juryBeitraege JuryBeitrag[]
+
   @@index([chargeId])
   @@index([autorId])
   @@unique([autorId, strainId])
@@ -446,6 +448,9 @@ model Mitglied {
   /// Preis-Sichtbarkeit nach §10 HWG ohne Schemaaenderung nachziehbar ist.
   rolle String @default("MITGLIED")
 
+  /// Jury-Mitglied (Spec 2026-10-16), unabhaengig von der Rolle.
+  jury Boolean @default(false)
+
   /// Öffentliches Profil unter /profil/<kurzId> (Spec Profil 9). Opt-in, Vorgabe aus.
   profilOeffentlich Boolean @default(false) @map("profil_oeffentlich")
   /// 8 Zeichen, beim ersten Einschalten vergeben, bleibt beim Ausschalten.
@@ -456,6 +461,7 @@ model Mitglied {
   vorschlaege UmfrageVorschlag[]
   stimmen     Stimme[]
   reviews     Review[]
+  juryBeitraege JuryBeitrag[]
 
   sortenVorschlaege  SortenVorschlag[]
   benachrichtigungen Benachrichtigung[]
@@ -912,4 +918,57 @@ model Zaehler {
 
   @@id([zielArt, zielId])
   @@map("zaehler")
+}
+
+model JuryAusgabe {
+  id          String        @id @default(uuid())
+  slug        String        @unique
+  titel       String
+  einleitung  String        @default("")
+  erscheintAm DateTime?     @map("erscheint_am")
+  status      String        @default("ENTWURF")
+  erstelltAm  DateTime      @default(now()) @map("erstellt_am")
+  beitraege   JuryBeitrag[]
+  @@map("jury_ausgaben")
+}
+
+model JuryBeitrag {
+  id                String       @id @default(uuid())
+  slug              String       @unique
+  titel             String
+  anriss            String       @default("")
+  text              String       @default("")
+  autorId           String       @map("autor_id")
+  autor             Mitglied     @relation(fields: [autorId], references: [id], onDelete: Cascade)
+  reviewId          String?      @map("review_id")
+  review            Review?      @relation(fields: [reviewId], references: [id], onDelete: SetNull)
+  ausgabeId         String?      @map("ausgabe_id")
+  ausgabe           JuryAusgabe? @relation(fields: [ausgabeId], references: [id], onDelete: SetNull)
+  position          Int          @default(0)
+  status            String       @default("ENTWURF")
+  notiz             String?
+  igUrl             String?      @map("ig_url")
+  igStatus          String       @default("KEIN") @map("ig_status")
+  veroeffentlichtAm DateTime?    @map("veroeffentlicht_am")
+  erstelltAm        DateTime     @default(now()) @map("erstellt_am")
+  geaendertAm       DateTime     @default(now()) @updatedAt @map("geaendert_am")
+  bilder            JuryBild[]
+  @@index([status, veroeffentlichtAm])
+  @@index([autorId, status])
+  @@index([ausgabeId, position])
+  @@map("jury_beitraege")
+}
+
+model JuryBild {
+  id         String      @id @default(uuid())
+  beitragId  String      @map("beitrag_id")
+  beitrag    JuryBeitrag @relation(fields: [beitragId], references: [id], onDelete: Cascade)
+  position   Int         @default(0)
+  daten      Bytes
+  breite     Int
+  hoehe      Int
+  symbolbild Boolean     @default(false)
+  alt        String      @default("")
+  @@index([beitragId, position])
+  @@map("jury_bilder")
 }

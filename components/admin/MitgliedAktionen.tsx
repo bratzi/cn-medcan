@@ -1,6 +1,6 @@
 "use client";
 
-import { freigabeSetzen, rolleSetzen } from "@/app/[lang]/admin/aktionen";
+import { freigabeSetzen, juryUmschalten, rolleSetzen } from "@/app/[lang]/admin/aktionen";
 import { useAktion } from "@/components/admin/useAktion";
 import { Button, Meldung, Select } from "@/components/ui";
 import { MITGLIED_ROLLEN, type MitgliedRolle } from "@/db/enums";
@@ -21,6 +21,8 @@ type Props = {
   anzeigename: string;
   freigegeben: boolean;
   rolle: MitgliedRolle;
+  /** Jury-Flag (Spec 2026-10-16). */
+  jury: boolean;
   /** Der eigene Satz des angemeldeten Betreibers - Aktionen darauf gesperrt. */
   istSelbst: boolean;
 };
@@ -40,6 +42,7 @@ export function MitgliedAktionen({
   anzeigename,
   freigegeben,
   rolle,
+  jury,
   istSelbst,
 }: Props) {
   const { bereit, fehler, ausfuehren } = useAktion();
@@ -57,6 +60,13 @@ export function MitgliedAktionen({
     daten.set("mitgliedId", mitgliedId);
     daten.set("rolle", wert);
     ausfuehren(() => rolleSetzen(daten));
+  }
+
+  function juryAendern() {
+    const daten = new FormData();
+    daten.set("mitgliedId", mitgliedId);
+    daten.set("jury", jury ? "0" : "1");
+    ausfuehren(() => juryUmschalten(daten));
   }
 
   return (
@@ -82,6 +92,11 @@ export function MitgliedAktionen({
           className="w-40"
           feldClassName="w-40"
         />
+
+        <Button variante="secondary" disabled={!bereit} onClick={juryAendern}>
+          {jury ? "Jury entfernen" : "Jury"}
+          <span className="sr-only"> — {anzeigename}</span>
+        </Button>
       </div>
 
       {fehler ? <Meldung art="fehler">{fehler}</Meldung> : null}

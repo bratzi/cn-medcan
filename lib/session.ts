@@ -31,6 +31,8 @@ export type AngemeldetesMitglied = {
   /// Manuell vom Betreiber freigegeben - erst damit besteht Stimmrecht.
   freigegeben: boolean;
   rolle: MitgliedRolle;
+  /// Jury-Mitglied (Spec 2026-10-16), unabhängig von der Rolle.
+  jury: boolean;
   /// Öffentliches Profil unter /profil/<kurzId> (Spec Profil 9). Opt-in, Vorgabe aus.
   profilOeffentlich: boolean;
   /// Kurz-Id des öffentlichen Profils, null bis zum ersten Einschalten. Bleibt beim Ausschalten.
@@ -86,6 +88,7 @@ export const aktuellesMitglied = cache(async (): Promise<AngemeldetesMitglied | 
     // die niedrigste Rolle zurueck statt ungeprueft Rechte zu tragen.
     rolle: istMitgliedRolle(satz.rolle) ? satz.rolle : "MITGLIED",
     // Beide kommen mit dem Satz (include liefert alle Skalare), keine weitere Abfrage.
+    jury: satz.jury,
     profilOeffentlich: satz.profilOeffentlich,
     kurzId: satz.kurzId,
     erstelltAm: satz.erstelltAm,
@@ -124,5 +127,12 @@ export async function freigabeErforderlich(): Promise<AngemeldetesMitglied> {
 export async function adminErforderlich(): Promise<AngemeldetesMitglied> {
   const mitglied = await mitgliedErforderlich();
   if (mitglied.rolle !== "ADMIN") throw new Error("Keine Berechtigung.");
+  return mitglied;
+}
+
+/** Jury-Mitglied (Spec 2026-10-16), unabhängig von der Rolle; wirft ohne Flag. */
+export async function juryErforderlich(): Promise<AngemeldetesMitglied> {
+  const mitglied = await mitgliedErforderlich();
+  if (!mitglied.jury) throw new Error("Keine Berechtigung.");
   return mitglied;
 }
