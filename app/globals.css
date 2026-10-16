@@ -124,6 +124,14 @@
   --text-vermerk--line-height: 1.2;
   --text-vermerk--font-weight: 400;
 
+  /* Sortenname auf der Rasterkarte unter /blueten (Nutzer 2026-10-16: der Name soll der
+     Blickfang der Karte sein). Newsreader 500 mit optischer Groesse, eng gesetzt; unter
+     40 px also nicht 200 (Regel 3). Nie Handschrift: Namen bleiben gedruckt. */
+  --text-sorte: clamp(1.625rem, 1.35rem + 0.9vw, 2rem);
+  --text-sorte--line-height: 1.08;
+  --text-sorte--font-weight: 500;
+  --text-sorte--letter-spacing: -0.018em;
+
   --tracking-gesperrt: 0.3em;
 
   /* ---- Grundfarben (Spec 4.1) - nie direkt in Komponenten -------------- */
@@ -196,6 +204,8 @@
   --shadow-sm: 0 1px 2px oklch(0.2 0.009 165 / 0.06);
   --shadow-md: 0 2px 8px oklch(0.2 0.009 165 / 0.1);
   --shadow-lg: 0 8px 24px oklch(0.2 0.009 165 / 0.14);
+  /* Gehobene Rasterkarte (Hover/Fokus): eine Buchseite, die sich vom Tisch hebt. */
+  --shadow-karte: 0 1px 2px oklch(0.2 0.009 165 / 0.06), 0 12px 28px -8px oklch(0.2 0.009 165 / 0.22);
 
   /* ---- Bewegung: Hover 180 bis 350 ms (Spec 4.6) ------------------------ */
   --ease-standard: cubic-bezier(0.2, 0, 0.2, 1);
@@ -244,6 +254,7 @@
     --shadow-sm: 0 1px 2px oklch(0 0 0 / 0.5);
     --shadow-md: 0 2px 8px oklch(0 0 0 / 0.55);
     --shadow-lg: 0 8px 24px oklch(0 0 0 / 0.6);
+    --shadow-karte: 0 1px 2px oklch(0 0 0 / 0.5), 0 12px 28px -8px oklch(0 0 0 / 0.7);
   }
 }
 
@@ -277,6 +288,7 @@
   --shadow-sm: 0 1px 2px oklch(0 0 0 / 0.5);
   --shadow-md: 0 2px 8px oklch(0 0 0 / 0.55);
   --shadow-lg: 0 8px 24px oklch(0 0 0 / 0.6);
+  --shadow-karte: 0 1px 2px oklch(0 0 0 / 0.5), 0 12px 28px -8px oklch(0 0 0 / 0.7);
 }
 
 /* ==========================================================================
@@ -2544,5 +2556,58 @@ button.netz-marke:active .netz-marke-kreis {
   }
   :root:not([data-sparmodus]) .jury-buehne-bild[data-aktiv="true"] {
     transition-delay: 0s;
+  }
+}
+
+/* ==========================================================================
+   Rasterkarte der Blüten (KultivarKarte, Nutzer 2026-10-16)
+   Eine Buchseite auf dem Tisch: Ebene mit feiner Kante, oben ein Lesebändchen
+   in accent. Beim Zeigen hebt sie sich: nur transform und opacity (die
+   Schattenebene blendet ein, das Bändchen wächst per scaleX). Hover nur mit
+   feinem Zeiger; Fokus von innen hebt immer. Reduzierte Bewegung: keine
+   Verschiebung, Schatten und Bändchen bleiben als statisches Signal.
+   ========================================================================== */
+.kultivar-karte {
+  transition: transform var(--duration-normal) var(--ease-auftritt);
+}
+.kultivar-karte::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  box-shadow: var(--shadow-karte);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--duration-normal) var(--ease-auftritt);
+}
+.kultivar-band {
+  transform: scaleX(0.18);
+  transform-origin: left center;
+  transition: transform var(--duration-slow) var(--ease-auftritt);
+}
+.kultivar-karte:focus-within {
+  transform: translateY(-4px);
+}
+.kultivar-karte:focus-within::before {
+  opacity: 1;
+}
+.kultivar-karte:focus-within .kultivar-band {
+  transform: scaleX(1);
+}
+@media (hover: hover) and (pointer: fine) {
+  .kultivar-karte:hover {
+    transform: translateY(-4px);
+  }
+  .kultivar-karte:hover::before {
+    opacity: 1;
+  }
+  .kultivar-karte:hover .kultivar-band {
+    transform: scaleX(1);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .kultivar-karte:hover,
+  .kultivar-karte:focus-within {
+    transform: none;
   }
 }
