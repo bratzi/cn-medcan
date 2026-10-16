@@ -12,7 +12,7 @@ export const ueberlaufPlatz: CSSProperties = {
 
 /**
  * Übergroßes Schlusswort einer Überschrift (Nutzer 2026-09-26) im Stil der
- * Hero-Wortmarke: Verlauf, vier driftende Konturen, ruhiger Puls. Kein
+ * Hero-Wortmarke: Verlauf und ruhiger Puls, ohne Konturen (Nutzer 2026-10-16). Kein
  * Absatz: ein Anker ohne Breite sitzt direkt hinter dem letzten Wort, von dort
  * setzt das Wort in derselben Zeile fort, leicht schräg nach rechts unten
  * versetzt, hinter dem Text und rechts aus dem Inhaltsbereich ragend. Die
@@ -32,11 +32,6 @@ export function UeberlaufWort({ wort, absatz = false }: { wort: string; absatz?:
         }
         style={{ fontSize: "var(--ueberlauf-grad)" }}
       >
-        {["marke-kontur-1", "marke-kontur-2", "marke-kontur-3", "marke-kontur-4"].map((klasse) => (
-          <span key={klasse} aria-hidden="true" className={`marke-kontur ${klasse} justify-start font-hand text-kulisse leading-[0.85]`} style={{ fontSize: "1em" }}>
-            <span>{wort}</span>
-          </span>
-        ))}
         {/* Glanz wie die Hero-Wortmarke (glanz-wort) im inneren Span, weil fazit-puls
             außen schon die Animation belegt. */}
         <span className="fazit-puls block font-hand text-kulisse leading-[0.85]" style={{ fontSize: "1em" }}>

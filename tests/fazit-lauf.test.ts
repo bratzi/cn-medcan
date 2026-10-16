@@ -68,7 +68,7 @@ test("Ohne eigene Werte zeigt die Leiste den Community-Wert, ohne Delta", () => 
 test("Handschrift-Zahl des Sortenfazits bleibt im Seitenrand ab 118rem bei 4rem (Fix I1)", () => {
   const html = erkundung(true);
   const zahlen = html.match(/class="[^"]*text-umschlag[^"]*"/g) ?? [];
-  assert.ok(zahlen.length >= 2);
+  assert.ok(zahlen.length >= 1);
   for (const klasse of zahlen) assert.match(klasse, /min-\[118rem\]:text-\[4rem\]/);
 });
 

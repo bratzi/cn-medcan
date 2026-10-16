@@ -3,6 +3,7 @@ import { unstable_rethrow } from "next/navigation";
 import { kapitelTexte } from "@/components/kapitel-start/KapitelAufschlag";
 import { KapitelImBrowser } from "@/components/kapitel-start/KapitelImBrowser";
 import { Schlagwort } from "@/components/story/Schlagwort";
+import { UEBERLAUF_GRAD } from "@/components/story/UeberlaufWort";
 import { holeSprache, holeWoerterbuch } from "@/lib/i18n";
 import type { KapitelDaten } from "@/lib/kapitel-start";
 import { ladeSchaufensterKapitel } from "@/lib/query/kapitel-start";
@@ -33,7 +34,8 @@ export async function DeinKapitel() {
       <Schlagwort satz={texte.schlagwort} ton="lila" />
       <div className="mx-auto flex w-full max-w-360 flex-col gap-12">
         <h2 id="kapitel-titel" className="font-buch text-kapitel text-text text-center text-balance">
-          {texte.vor} <em className="farbverlauf hand-betont">{texte.betont}</em>
+          {texte.vor} {/* „Kapitel“ so groß wie „Geschmäcker.“ (Nutzer 2026-10-16). */}
+          <em className="farbverlauf hand-betont" style={{ fontSize: UEBERLAUF_GRAD }}>{texte.betont}</em>
         </h2>
         <KapitelImBrowser schaufenster={daten} texte={kapitelTexteFuerInsel} sprache={sprache} />
       </div>

@@ -535,17 +535,9 @@ export function AromaErkundung({
               {sortenFazitWert !== null ? (
                 <div className="flex flex-col items-center gap-2">
                   <dt className="text-small uppercase tracking-wide text-text-muted">{texte.aroma.erkundung.communityFazit}</dt>
-                  {/* tabular-nums auf dem dd: gilt für die Zahl und ihre Konturen gleich,
-                      damit die Konturen deckungsgleich bleiben. */}
-                  <dd className="relative isolate flex justify-center tabular-nums">
-                    {/* Die Essenz der Seite (Nutzer 2026-09-25): dieselben driftenden Konturen
-                        wie die Wortmarke im Hero, dazu ein ruhiges Pulsieren. In der 18rem-Spalte ab xl fest
-                          4rem (T16-Fix I1): text-umschlag wüchse dort bis 16rem und bräche um. */}
-                    {["marke-kontur-1", "marke-kontur-2", "marke-kontur-3", "marke-kontur-4"].map((klasse) => (
-                      <span key={klasse} aria-hidden="true" className={`marke-kontur ${klasse} font-hand text-umschlag leading-none min-[118rem]:text-[4rem]`}>
-                        <span>{prozent(sortenFazitWert, texte.sprache)}</span>
-                      </span>
-                    ))}
+                  {/* Die Essenz der Seite: ruhiges Pulsieren, ohne Konturen (Nutzer 2026-10-16). In der
+                        18rem-Spalte ab xl fest 4rem (T16-Fix I1): text-umschlag wüchse dort bis 16rem. */}
+                  <dd className="flex justify-center tabular-nums">
                     <span className="fazit-puls farbverlauf font-hand text-umschlag leading-none min-[118rem]:text-[4rem]">
                       {prozent(sortenFazitWert, texte.sprache)}
                     </span>

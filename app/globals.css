@@ -364,7 +364,7 @@
      den Viewport, loops.ts startet es also nicht. */
   /* Sparmodus (T2): Endlosschleifen stehen, Einblendungen laufen zu Ende. */
   :root[data-sparmodus] :is(.glanz-wort, .auftakt-marke .marke-pinsel, .blob-morph, .blob-linie, .bild-zoom,
-      .bild-wechsel > *, .bild-schweben > *, .marke-kontur > span, .fazit-puls, .marke-puls, .glas-maske,
+      .bild-wechsel > *, .bild-schweben > *, .fazit-puls, .marke-puls, .glas-maske,
       .delta-puls, .bogen-fluss, .bogen-voll, .delta-funke) {
     animation-play-state: paused !important;
   }
@@ -1233,80 +1233,6 @@ html.joint-cursor :is(input:not([type="range"]):not([type="radio"]):not([type="c
   animation-play-state: paused;
 }
 
-/* Konturen hinter der Wortmarke im Auftakt (Auftakt.tsx): dieselbe Schrift,
-   nur als Umriss, in Grün- und Violetttönen, leicht versetzt. Günstig: kein 3D,
-   keine Form-Animation, nur transform auf je einer Ebene; der Zeiger verschiebt
-   die Ebene per `translate` (bewegung/punkte.ts). */
-.marke-kontur {
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  display: flex;
-  justify-content: center;
-  pointer-events: none;
-}
-
-/* Versatz und Strich hängen an der Schriftgröße (Nutzer 2026-10-08): in em allein
-   wächst der Versatz bei 174px Kulissenschrift auf fast 8px und die Kontur zerfällt
-   in versetzte Haarlinien. Deshalb wächst der Versatz nur bis zum Deckel mit (min(),
-   das ist der Wert bei rund 40px Schrift) und der Strich wächst leicht mit (max()).
-   So sitzt die Kontur bei 174px genauso eng wie bei 40px. */
-.marke-kontur > span {
-  --versatz-x: 0.02em;
-  --versatz-y: 0.015em;
-  color: transparent;
-  -webkit-text-fill-color: transparent;
-  -webkit-text-stroke: max(var(--strich, 1px), 0.012em) var(--kontur);
-  transform: translate(var(--versatz-x), var(--versatz-y));
-}
-
-.marke-kontur-1 > span {
-  --kontur: var(--color-kopierstift);
-  --strich: 1.5px;
-  --versatz-x: calc(-1 * min(0.025em, 1px));
-  --versatz-y: min(0.02em, 0.8px);
-  --drift: 9s;
-}
-
-.marke-kontur-2 > span {
-  --kontur: var(--color-accent);
-  --strich: 1px;
-  --versatz-x: min(0.03em, 1.2px);
-  --versatz-y: calc(-1 * min(0.018em, 0.72px));
-  --drift: 12s;
-}
-
-.marke-kontur-3 > span {
-  --kontur: color-mix(in oklab, var(--color-kopierstift) 55%, var(--color-surface));
-  --strich: 1px;
-  --versatz-x: min(0.045em, 1.8px);
-  --versatz-y: min(0.03em, 1.2px);
-  --drift: 15s;
-}
-
-.marke-kontur-4 > span {
-  --kontur: color-mix(in oklab, var(--color-accent) 55%, var(--color-surface));
-  --strich: 1px;
-  --versatz-x: calc(-1 * min(0.04em, 1.6px));
-  --versatz-y: calc(-1 * min(0.028em, 1.12px));
-  --drift: 11s;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  /* Schreibt sich mit der Wortmarke, dann ruhige Drift gegenläufig zum Versatz. */
-  .marke-kontur [data-marke-zeile] {
-    animation: schreiben 0.8s var(--ease-standard) 0.3s backwards;
-  }
-
-  .marke-kontur [data-marke-zeile] + [data-marke-zeile] {
-    animation-delay: 1s;
-  }
-
-  .marke-kontur > span {
-    animation: kontur-drift var(--drift, 10s) ease-in-out infinite alternate;
-  }
-}
-
 /* Community-Fazit (AromaErkundung) und Hero-Wortmarke (Auftakt): pulsieren ruhig, nur transform. */
 @media (prefers-reduced-motion: no-preference) {
   .fazit-puls {
@@ -1323,12 +1249,6 @@ html.joint-cursor :is(input:not([type="range"]):not([type="radio"]):not([type="c
 @keyframes fazit-puls {
   50% {
     transform: scale(1.05);
-  }
-}
-
-@keyframes kontur-drift {
-  to {
-    transform: translate(calc(var(--versatz-x) * -1), calc(var(--versatz-y) * -1));
   }
 }
 

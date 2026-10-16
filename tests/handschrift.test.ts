@@ -202,7 +202,7 @@ test("Fazit-Zahlen in Handschrift stehen tabellarisch", () => {
       texte: aromaTexte(de, "de"),
     }),
   );
-  assert.match(html, /<dd class="relative isolate flex justify-center tabular-nums">/);
+  assert.match(html, /<dd class="flex justify-center tabular-nums">/);
   assert.match(html, /fazit-puls farbverlauf font-hand text-umschlag/);
 });
 
