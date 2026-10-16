@@ -1,5 +1,6 @@
 import { getPrisma } from "@/lib/prisma";
 import { istBudpicId } from "@/lib/budpics";
+import { darfBildSehen } from "@/lib/jury-rechte";
 import { aktuellesMitglied } from "@/lib/session";
 
 /**
@@ -19,9 +20,9 @@ export async function GET(_anfrage: Request, ctx: { params: Promise<{ id: string
   const prisma = await getPrisma();
   const bild = await prisma.budpic.findUnique({ where: { id }, select: { daten: true, mitgliedId: true } });
   if (!bild) {
-    // Bilder eines Jury-Beitrags vor der Veröffentlichung: nur der Betreiber (Admin-Vorschau, Spec 2026-10-16).
-    const jury = mitglied.rolle === "ADMIN" ? await prisma.juryBild.findUnique({ where: { id }, select: { daten: true } }) : null;
-    if (!jury) return nichtDa();
+    // Bilder eines Jury-Beitrags vor der Veröffentlichung: Betreiber und Autor des Beitrags (Spec 2026-10-16).
+    const jury = await prisma.juryBild.findUnique({ where: { id }, select: { daten: true, beitrag: { select: { autorId: true } } } });
+    if (!jury || !darfBildSehen(jury.beitrag, mitglied)) return nichtDa();
     return new Response(jury.daten as BodyInit, {
       headers: { "Content-Type": "image/webp", "Cache-Control": "private, no-store", "X-Content-Type-Options": "nosniff" },
     });
