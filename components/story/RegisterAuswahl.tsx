@@ -1,17 +1,6 @@
 "use client";
 
-import {
-  Fragment,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-  useSyncExternalStore,
-  type CSSProperties,
-  type FocusEvent,
-  type PointerEvent,
-  type ReactNode,
-} from "react";
+import { Fragment, useEffect, useMemo, useRef, useState, useSyncExternalStore, type CSSProperties, type FocusEvent, type PointerEvent, type ReactNode } from "react";
 
 import { GeschmackIcon, TerpenIcon } from "@/components/review/AromaIcon";
 import { WeicheHoehe } from "@/components/ui/WeicheHoehe";
@@ -31,25 +20,13 @@ export type RegisterAnsicht = {
     sortenKurz: string;
     duft: string | null;
     vorkommen: string | null;
-    noten: readonly {
-      anker: string;
-      geschmack: GeschmacksKategorie;
-      label: string;
-      anteil: number;
-      haupt: boolean;
-    }[];
+    noten: readonly { anker: string; geschmack: GeschmacksKategorie; label: string; anteil: number; haupt: boolean }[];
   }[];
   noten: readonly {
     anker: string;
     geschmack: GeschmacksKategorie;
     label: string;
-    traeger: readonly {
-      anker: string;
-      name: string;
-      icon: string;
-      anteil: number;
-      sortenKurz: string;
-    }[];
+    traeger: readonly { anker: string; name: string; icon: string; anteil: number; sortenKurz: string }[];
     begleitstoffe: readonly { name: string; hinweis: string; satz: string }[];
   }[];
 };
@@ -67,12 +44,7 @@ export type RegisterTexte = {
   begleitstoffe: string;
 };
 
-type Linie = {
-  terpen: string;
-  note: string;
-  geschmack: GeschmacksKategorie;
-  pfad: string;
-};
+type Linie = { terpen: string; note: string; geschmack: GeschmacksKategorie; pfad: string };
 
 /** Linienfarbe wie in der Aroma-Karte; Verlaufsrichtungen nehmen ihre erste Farbe. */
 function linienFarbe(geschmack: GeschmacksKategorie): string {
@@ -101,29 +73,16 @@ const VERWEIS =
  * Darüber läuft derselbe Lichtfluss (globals.css .bogen-fluss) vom Terpen zum
  * Geschmack. Bei reduzierter Bewegung und im Sparmodus aus, der Balken steht.
  */
-function Balken({
-  anteil,
-  geschmack,
-}: {
-  anteil: number;
-  geschmack: GeschmacksKategorie;
-}) {
+function Balken({ anteil, geschmack }: { anteil: number; geschmack: GeschmacksKategorie }) {
   return (
     <span
       aria-hidden="true"
       data-register-balken=""
       data-geschmack={geschmack}
       className="relative block h-2 origin-left overflow-hidden rounded-full"
-      style={{
-        width: `${Math.round(Math.min(1, Math.max(0, anteil)) * 100)}%`,
-        background: farbFlaeche(geschmack),
-      }}
+      style={{ width: `${Math.round(Math.min(1, Math.max(0, anteil)) * 100)}%`, background: farbFlaeche(geschmack) }}
     >
-      <svg
-        viewBox="0 0 100 8"
-        preserveAspectRatio="none"
-        className="absolute inset-0 size-full"
-      >
+      <svg viewBox="0 0 100 8" preserveAspectRatio="none" className="absolute inset-0 size-full">
         <path
           d="M0 4H100"
           pathLength={100}
@@ -131,14 +90,7 @@ function Balken({
           stroke="var(--color-surface-raised)"
           strokeDasharray="16 184"
           className="bogen-fluss"
-          style={
-            {
-              strokeWidth: 8,
-              opacity: 0.6,
-              "--fluss-dauer": "2.4s",
-              "--fluss-strich": 16,
-            } as CSSProperties
-          }
+          style={{ strokeWidth: 8, opacity: 0.6, "--fluss-dauer": "2.4s", "--fluss-strich": 16 } as CSSProperties}
         />
       </svg>
     </span>
@@ -147,13 +99,7 @@ function Balken({
 
 /** Farbpunkt einer Geschmacksrichtung in der Pille (8 px), dieselbe Quelle wie die Karte. */
 function Farbpunkt({ geschmack }: { geschmack: GeschmacksKategorie }) {
-  return (
-    <span
-      aria-hidden="true"
-      className="block size-2 shrink-0 rounded-full"
-      style={{ background: farbFlaeche(geschmack) }}
-    />
-  );
+  return <span aria-hidden="true" className="block size-2 shrink-0 rounded-full" style={{ background: farbFlaeche(geschmack) }} />;
 }
 
 function Tafel({
@@ -186,20 +132,11 @@ function Tafel({
       <p data-register-zeile="" className="text-small text-text-muted">
         {art}
       </p>
-      <div
-        data-register-zeile=""
-        className="mt-2 flex items-center gap-4 sm:gap-6"
-      >
-        <span
-          data-register-icon=""
-          className="grid size-12 shrink-0 place-items-center text-text sm:size-16"
-        >
+      <div data-register-zeile="" className="mt-2 flex items-center gap-4 sm:gap-6">
+        <span data-register-icon="" className="grid size-12 shrink-0 place-items-center text-text sm:size-16">
           {icon}
         </span>
-        <h3
-          id={`${anker}-titel`}
-          className="min-w-0 font-buch text-kapitel text-text text-balance wrap-break-word hyphens-auto"
-        >
+        <h3 id={`${anker}-titel`} className="min-w-0 font-buch text-kapitel text-text text-balance wrap-break-word hyphens-auto">
           {titel}
         </h3>
       </div>
@@ -219,13 +156,7 @@ const abonnierenNichts = () => () => {};
 const imClient = () => true;
 const aufDemServer = () => false;
 
-function Eintrag({
-  begriff,
-  children,
-}: {
-  begriff: string;
-  children: ReactNode;
-}) {
+function Eintrag({ begriff, children }: { begriff: string; children: ReactNode }) {
   return (
     <div data-register-zeile="" className="grid gap-2">
       <dt className="text-small font-medium text-text-muted">{begriff}</dt>
@@ -248,33 +179,18 @@ function Eintrag({
  * Auswahl einer Pille heben die verbundenen Pillen der Gegenseite mit Ring
  * hervor und dimmen den Rest; Tippen wählt, erneutes Tippen löst.
  */
-export function RegisterAuswahl({
-  ansicht,
-  start,
-  texte,
-}: {
-  ansicht: RegisterAnsicht;
-  start: string;
-  texte: RegisterTexte;
-}) {
+export function RegisterAuswahl({ ansicht, start, texte }: { ansicht: RegisterAnsicht; start: string; texte: RegisterTexte }) {
   const [aktiv, setAktiv] = useState(start);
   // Erst nach dem Hydrieren alle Tafeln; Server und erster Client-Render zeigen nur die gewählte.
   // useSyncExternalStore statt setState im Effekt: der Server-Schnappschuss ist false, der Client true.
-  const montiert = useSyncExternalStore(
-    abonnierenNichts,
-    imClient,
-    aufDemServer,
-  );
+  const montiert = useSyncExternalStore(abonnierenNichts, imClient, aufDemServer);
   const zeige = (anker: string) => montiert || anker === aktiv;
   // Verbindung (T17): Maus-Hover und Tastaturfokus heben vorübergehend hervor; ohne beides gilt
   // die gewählte Pille, außer sie wurde durch erneutes Tippen gelöst.
   const [hervor, setHervor] = useState<string | null>(null);
   const [geloest, setGeloest] = useState(false);
   const fokusNach = useRef<string | null>(null);
-  const karte = useMemo(
-    () => verbindungsKarte(ansicht.terpene),
-    [ansicht.terpene],
-  );
+  const karte = useMemo(() => verbindungsKarte(ansicht.terpene), [ansicht.terpene]);
   const quelle = hervor ?? (geloest ? null : aktiv);
   const verbunden = new Set(quelle ? (karte[quelle] ?? []) : []);
   const flaeche = useRef<HTMLDivElement>(null);
@@ -289,9 +205,7 @@ export function RegisterAuswahl({
     const messen = () => {
       const basis = wurzel.getBoundingClientRect();
       const lage = new Map<string, DOMRect>();
-      for (const knopf of wurzel.querySelectorAll<HTMLElement>(
-        "[data-register-knopf]",
-      )) {
+      for (const knopf of wurzel.querySelectorAll<HTMLElement>("[data-register-knopf]")) {
         const anker = knopf.getAttribute("aria-controls");
         if (anker) lage.set(anker, knopf.getBoundingClientRect());
       }
@@ -302,14 +216,8 @@ export function RegisterAuswahl({
         for (const note of terpen.noten) {
           const unten = lage.get(note.anker);
           if (!unten) continue;
-          const von = {
-            x: oben.left + oben.width / 2 - basis.left,
-            y: oben.bottom - basis.top,
-          };
-          const nach = {
-            x: unten.left + unten.width / 2 - basis.left,
-            y: unten.top - basis.top,
-          };
+          const von = { x: oben.left + oben.width / 2 - basis.left, y: oben.bottom - basis.top };
+          const nach = { x: unten.left + unten.width / 2 - basis.left, y: unten.top - basis.top };
           const mitteY = (von.y + nach.y) / 2;
           neu.push({
             terpen: terpen.anker,
@@ -346,11 +254,7 @@ export function RegisterAuswahl({
       setAktiv(ziel);
       setGeloest(false);
       // Hash leeren, damit derselbe Eintrag im Band erneut hashchange auslöst.
-      window.history.replaceState(
-        null,
-        "",
-        window.location.pathname + window.location.search,
-      );
+      window.history.replaceState(null, "", window.location.pathname + window.location.search);
     };
     aufschlagen();
     window.addEventListener("hashchange", aufschlagen);
@@ -374,10 +278,7 @@ export function RegisterAuswahl({
     "data-verbindung": (karte[anker] ?? []).join(" "),
     "data-quelle": quelle === anker ? "" : undefined,
     "data-verbunden": verbunden.has(anker) ? "" : undefined,
-    "data-gedimmt":
-      quelle !== null && quelle !== anker && !verbunden.has(anker)
-        ? ""
-        : undefined,
+    "data-gedimmt": quelle !== null && quelle !== anker && !verbunden.has(anker) ? "" : undefined,
     onPointerEnter: (e: PointerEvent<HTMLButtonElement>) => {
       if (e.pointerType !== "touch") setHervor(anker);
     },
@@ -389,10 +290,7 @@ export function RegisterAuswahl({
   });
 
   return (
-    <div
-      ref={flaeche}
-      className="register-raster relative isolate mt-16 grid gap-12 md:gap-16"
-    >
+    <div ref={flaeche} className="register-raster relative isolate mt-16 grid gap-12 md:gap-16">
       {/* Linien vom Terpen hinunter zum Geschmack (Nutzer 2026-09-30): dieselben Bögen und derselbe
           Lichtfluss wie in der Aroma-Karte, in der Farbe der Geschmacksrichtung. Die Beschreibung in
           der Mitte liegt als Violett-Glas (.glas-tafel) darüber: die Linien scheinen weich durch. */}
@@ -442,15 +340,8 @@ export function RegisterAuswahl({
         </svg>
       ) : null}
 
-      <div
-        role="group"
-        aria-labelledby="register-terpene"
-        className="register-knoepfe grid gap-4"
-      >
-        <h3
-          id="register-terpene"
-          className="text-small font-medium text-text-muted"
-        >
+      <div role="group" aria-labelledby="register-terpene" className="register-knoepfe grid gap-4">
+        <h3 id="register-terpene" className="text-small font-medium text-text-muted">
           {texte.terpene}
         </h3>
         <ul className="flex flex-wrap justify-between gap-x-4 gap-y-2">
@@ -467,10 +358,7 @@ export function RegisterAuswahl({
               >
                 <TerpenIcon name={terpen.icon} className="size-8" />
                 <span className="text-small">{terpen.name}</span>
-                <span
-                  aria-hidden="true"
-                  className="numeric text-caption text-text-muted"
-                >
+                <span aria-hidden="true" className="numeric text-caption text-text-muted">
                   {terpen.sorten}
                 </span>
                 <span className="sr-only">, {terpen.sortenKurz}</span>
@@ -483,146 +371,88 @@ export function RegisterAuswahl({
       {/* Höhe wechselt weich mit der Tafel (Nutzer 2026-10-16: die Box sprang beim Umschalten). */}
       <WeicheHoehe className="register-tafeln mx-auto w-full max-w-3xl">
         <div className="grid content-start">
-          {ansicht.terpene
-            .filter((terpen) => zeige(terpen.anker))
-            .map((terpen) => (
-              <Tafel
-                key={terpen.anker}
-                anker={terpen.anker}
-                aktiv={aktiv === terpen.anker}
-                art={texte.terpen}
-                icon={<TerpenIcon name={terpen.icon} className="size-full" />}
-                titel={terpen.name}
-                unterzeile={terpen.sortenText}
-              >
-                {terpen.duft ? (
-                  <Eintrag begriff={texte.duft}>{terpen.duft}</Eintrag>
-                ) : null}
-                {terpen.vorkommen ? (
-                  <Eintrag begriff={texte.vorkommen}>
-                    {terpen.vorkommen}
-                  </Eintrag>
-                ) : null}
-                <Eintrag begriff={texte.noten}>
-                  <ul className="grid gap-2">
-                    {terpen.noten.map((note) => (
-                      <li
-                        key={note.anker}
-                        className="grid grid-cols-[minmax(0,10rem)_minmax(0,1fr)] items-center gap-4"
-                      >
-                        <button
-                          type="button"
-                          aria-controls={note.anker}
-                          onClick={() => waehle(note.anker, true)}
-                          className={`${VERWEIS} gap-2`}
-                        >
-                          <GeschmackIcon
-                            geschmack={note.geschmack}
-                            className="size-6"
-                          />
-                          {note.label}
-                        </button>
-                        <span className="flex items-center gap-4">
-                          <span className="block min-w-0 flex-1">
-                            <Balken
-                              anteil={note.anteil}
-                              geschmack={note.geschmack}
-                            />
-                          </span>
-                          {note.haupt ? (
-                            <span className="shrink-0 text-small text-text-muted">
-                              {texte.hauptnote}
-                            </span>
-                          ) : null}
+        {ansicht.terpene.filter((terpen) => zeige(terpen.anker)).map((terpen) => (
+          <Tafel
+            key={terpen.anker}
+            anker={terpen.anker}
+            aktiv={aktiv === terpen.anker}
+            art={texte.terpen}
+            icon={<TerpenIcon name={terpen.icon} className="size-full" />}
+            titel={terpen.name}
+            unterzeile={terpen.sortenText}
+          >
+            {terpen.duft ? <Eintrag begriff={texte.duft}>{terpen.duft}</Eintrag> : null}
+            {terpen.vorkommen ? <Eintrag begriff={texte.vorkommen}>{terpen.vorkommen}</Eintrag> : null}
+            <Eintrag begriff={texte.noten}>
+              <ul className="grid gap-2">
+                {terpen.noten.map((note) => (
+                  <li key={note.anker} className="grid grid-cols-[minmax(0,10rem)_minmax(0,1fr)] items-center gap-4">
+                    <button type="button" aria-controls={note.anker} onClick={() => waehle(note.anker, true)} className={`${VERWEIS} gap-2`}>
+                      <GeschmackIcon geschmack={note.geschmack} className="size-6" />
+                      {note.label}
+                    </button>
+                    <span className="flex items-center gap-4">
+                      <span className="block min-w-0 flex-1">
+                        <Balken anteil={note.anteil} geschmack={note.geschmack} />
+                      </span>
+                      {note.haupt ? <span className="shrink-0 text-small text-text-muted">{texte.hauptnote}</span> : null}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </Eintrag>
+          </Tafel>
+        ))}
+        {ansicht.noten.filter((note) => zeige(note.anker)).map((note) => (
+          <Tafel
+            key={note.anker}
+            anker={note.anker}
+            aktiv={aktiv === note.anker}
+            art={texte.geschmack}
+            icon={<GeschmackIcon geschmack={note.geschmack} className="size-full" />}
+            titel={note.label}
+          >
+            {note.traeger.length > 0 ? (
+              <Eintrag begriff={texte.traeger}>
+                <ul className="grid gap-2">
+                  {note.traeger.map((terpen) => (
+                    <li key={terpen.anker} className="grid grid-cols-[minmax(0,10rem)_minmax(0,1fr)] items-center gap-4">
+                      <button type="button" aria-controls={terpen.anker} onClick={() => waehle(terpen.anker, true)} className={`${VERWEIS} gap-2`}>
+                        <TerpenIcon name={terpen.icon} className="size-6" />
+                        {terpen.name}
+                      </button>
+                      <span className="flex items-center gap-4">
+                        <span className="block min-w-0 flex-1">
+                          <Balken anteil={terpen.anteil} geschmack={note.geschmack} />
                         </span>
-                      </li>
-                    ))}
-                  </ul>
-                </Eintrag>
-              </Tafel>
-            ))}
-          {ansicht.noten
-            .filter((note) => zeige(note.anker))
-            .map((note) => (
-              <Tafel
-                key={note.anker}
-                anker={note.anker}
-                aktiv={aktiv === note.anker}
-                art={texte.geschmack}
-                icon={
-                  <GeschmackIcon
-                    geschmack={note.geschmack}
-                    className="size-full"
-                  />
-                }
-                titel={note.label}
-              >
-                {note.traeger.length > 0 ? (
-                  <Eintrag begriff={texte.traeger}>
-                    <ul className="grid gap-2">
-                      {note.traeger.map((terpen) => (
-                        <li
-                          key={terpen.anker}
-                          className="grid grid-cols-[minmax(0,10rem)_minmax(0,1fr)] items-center gap-4"
-                        >
-                          <button
-                            type="button"
-                            aria-controls={terpen.anker}
-                            onClick={() => waehle(terpen.anker, true)}
-                            className={`${VERWEIS} gap-2`}
-                          >
-                            <TerpenIcon name={terpen.icon} className="size-6" />
-                            {terpen.name}
-                          </button>
-                          <span className="flex items-center gap-4">
-                            <span className="block min-w-0 flex-1">
-                              <Balken
-                                anteil={terpen.anteil}
-                                geschmack={note.geschmack}
-                              />
-                            </span>
-                            <span className="numeric shrink-0 text-small text-text-muted">
-                              {terpen.sortenKurz}
-                            </span>
-                          </span>
-                        </li>
-                      ))}
-                    </ul>
-                  </Eintrag>
-                ) : null}
-                {note.begleitstoffe.length > 0 ? (
-                  <Eintrag begriff={texte.begleitstoffe}>
-                    <ul className="grid gap-4">
-                      {note.begleitstoffe.map((stoff) => (
-                        <li key={stoff.name} className="grid gap-2">
-                          <span>
-                            <span className="font-medium">{stoff.name}</span>
-                            {stoff.hinweis ? (
-                              <span className="text-text-muted">
-                                , {stoff.hinweis}
-                              </span>
-                            ) : null}
-                          </span>
-                          {stoff.satz ? (
-                            <span className="text-small text-text-muted">
-                              {stoff.satz}
-                            </span>
-                          ) : null}
-                        </li>
-                      ))}
-                    </ul>
-                  </Eintrag>
-                ) : null}
-              </Tafel>
-            ))}
+                        <span className="numeric shrink-0 text-small text-text-muted">{terpen.sortenKurz}</span>
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </Eintrag>
+            ) : null}
+            {note.begleitstoffe.length > 0 ? (
+              <Eintrag begriff={texte.begleitstoffe}>
+                <ul className="grid gap-4">
+                  {note.begleitstoffe.map((stoff) => (
+                    <li key={stoff.name} className="grid gap-2">
+                      <span>
+                        <span className="font-medium">{stoff.name}</span>
+                        {stoff.hinweis ? <span className="text-text-muted">, {stoff.hinweis}</span> : null}
+                      </span>
+                      {stoff.satz ? <span className="text-small text-text-muted">{stoff.satz}</span> : null}
+                    </li>
+                  ))}
+                </ul>
+              </Eintrag>
+            ) : null}
+          </Tafel>
+        ))}
         </div>
       </WeicheHoehe>
 
-      <div
-        role="group"
-        aria-labelledby="register-geschmaecker"
-        className="register-knoepfe grid gap-4"
-      >
+      <div role="group" aria-labelledby="register-geschmaecker" className="register-knoepfe grid gap-4">
         <ul className="flex flex-wrap justify-between gap-x-4 gap-y-2">
           {ansicht.noten.map((note) => (
             <li key={note.anker}>
@@ -642,10 +472,7 @@ export function RegisterAuswahl({
             </li>
           ))}
         </ul>
-        <h3
-          id="register-geschmaecker"
-          className="text-small font-medium text-text-muted"
-        >
+        <h3 id="register-geschmaecker" className="text-small font-medium text-text-muted">
           {texte.geschmaecker}
         </h3>
       </div>
