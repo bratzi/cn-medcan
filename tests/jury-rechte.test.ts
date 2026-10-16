@@ -48,9 +48,9 @@ test("ladeJuryTeam sortiert nach Anzeigename", () => {
   assert.match(q, /export async function ladeJuryTeam[\s\S]*?orderBy: \{ anzeigename: "asc" \}/);
 });
 
-test("ig-jury: Graph-Weg prüft den Tag, Probe meldet nichts", () => {
+test("ig-jury: nur Entwurf ohne Graph-Weg, Probe meldet nichts", () => {
   const q = readFileSync("scripts/ig-jury.ts", "utf8");
-  const direkt = q.indexOf("if (direkt) {");
-  assert.ok(q.indexOf("tagBelegt(", direkt) > direkt && q.indexOf("tagBelegt(", direkt) < q.indexOf("graphKarussellSchritte(urls"));
+  assert.doesNotMatch(q, /ig-graph|--planen|--veroeffentlichen/);
+  assert.match(q, /igStatus: "ENTWURF"/);
   assert.match(q, /if \(!probe\) \{\s*try \{\s*await meldeStatus\(ursprung, schluessel, \{ slug, igStatus: "FEHLER" \}\)/);
 });
