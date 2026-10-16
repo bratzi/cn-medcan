@@ -4,7 +4,6 @@ import { Bild } from "@/components/medien/Bild";
 import { BudpicDiashow, type DiashowBild } from "@/components/produkt/BudpicDiashow";
 import { BlattAnzeige } from "@/components/review/BlattAnzeige";
 import { TerpenChips } from "@/components/produkt/TerpenChips";
-import { Badge } from "@/components/ui";
 import { einzelLinkKlassen } from "@/components/ui/textlink";
 import { musterBildId } from "@/lib/budpics";
 import { formatiereZahl, formatiereZahlSpanne } from "@/lib/format";
@@ -35,7 +34,8 @@ const BILDFLAECHE = "aspect-4/3 w-full";
  * Die ganze Karte ist ein Ziel: der Name trägt den Link (Sortenseite, sonst die Handelsnamen der
  * Blüte) und spannt ihn per `after:` über die Fläche. Diashow-Knöpfe und der Fuß-Link liegen
  * darüber (`relative z-10`), damit sie eigene Ziele bleiben.
- * Bewegung nur Farbe (Rahmen, Name); globale Regel schaltet sie bei reduzierter Bewegung ab.
+ * Gestalt: Buchseite mit Lesebändchen, Typ als Kicker, Name in `text-sorte` als Blickfang. Hebung
+ * beim Zeigen nur per transform/opacity (`.kultivar-karte` in globals.css), reduziert ohne Verschiebung.
  */
 export function KultivarKarte({ kultivar, filter, w, sprache, budpics = [] }: Props) {
   const texte = w.katalog.kultivar;
@@ -60,17 +60,21 @@ export function KultivarKarte({ kultivar, filter, w, sprache, budpics = [] }: Pr
       : null;
 
   return (
-    <article className="group relative flex w-full flex-col rounded-lg border border-border bg-surface transition-colors duration-fast ease-standard focus-within:border-border-strong hover:border-border-strong">
+    <article className="kultivar-karte group relative isolate flex h-full w-full flex-col border border-border bg-surface-raised shadow-sm transition-colors duration-fast ease-standard focus-within:border-border-strong hover:border-border-strong">
+      {/* Lesebändchen: die Akzentkante oben, wächst beim Zeigen über die ganze Breite. */}
+      <span aria-hidden="true" className="kultivar-band absolute inset-x-0 top-0 h-1 bg-accent" />
       {budpics.length > 0 ? (
-        <div className="relative z-10 p-4">
+        <div className="relative z-10 p-4 pt-6">
           <BudpicDiashow bilder={budpics} name={kultivar.name} texte={w.budpic} rahmen={BILDFLAECHE} einpassen />
         </div>
       ) : (
-        <div className="p-4">
+        <div className="p-4 pt-6">
           {bild ? (
             // Referenzbild, als Symbolbild gekennzeichnet; ganz im Rahmen, nie beschnitten.
             <figure title={w.budpic.muster} className="flex flex-col gap-2">
-              <div className={`flex items-center justify-center overflow-hidden bg-surface-sunken p-4 ${BILDFLAECHE}`}>
+              <div
+                className={`relative flex items-center justify-center overflow-hidden bg-surface-sunken p-4 ring-1 ring-border ring-inset ${BILDFLAECHE}`}
+              >
                 <Bild
                   id={bild}
                   dekorativ
@@ -81,18 +85,23 @@ export function KultivarKarte({ kultivar, filter, w, sprache, budpics = [] }: Pr
               <figcaption className="text-caption text-text-muted">{w.katalog.karte.symbolbild}</figcaption>
             </figure>
           ) : (
-            <div aria-hidden="true" className={`bg-surface-sunken ${BILDFLAECHE}`} />
+            <div aria-hidden="true" className={`bg-surface-sunken ring-1 ring-border ring-inset ${BILDFLAECHE}`} />
           )}
         </div>
       )}
 
       <div className="flex flex-1 flex-col gap-4 px-4 pb-4">
         <div className="flex flex-col gap-2">
-          <h3 className="font-buch text-h3 text-balance text-text wrap-break-word">
+          {/* Kicker: der Typ als kleine Versalzeile über dem Namen, mit kurzem Akzentstrich. */}
+          <p className="flex items-center gap-2 text-caption tracking-[0.16em] text-text-muted uppercase">
+            <span aria-hidden="true" className="h-px w-4 bg-accent" />
+            {w.label.kultivarTyp[kultivar.typ]}
+          </p>
+          <h3 className="font-buch text-sorte text-balance text-text hyphens-none wrap-break-word [font-optical-sizing:auto]">
             <Link
               prefetch={false}
               href={hauptziel}
-              className="rounded-sm transition-colors duration-fast ease-standard group-hover:text-accent after:absolute after:inset-0 after:content-['']"
+              className="transition-colors duration-fast ease-standard group-hover:text-accent after:absolute after:inset-0 after:content-['']"
             >
               {kultivar.name}
             </Link>
@@ -102,11 +111,12 @@ export function KultivarKarte({ kultivar, filter, w, sprache, budpics = [] }: Pr
           ) : null}
         </div>
 
-        <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
-          <Badge variante="neutral">{w.label.kultivarTyp[kultivar.typ]}</Badge>
-          {thc ? <span className="numeric text-small text-text">{thc}</span> : null}
-          {cbd ? <span className="numeric text-small text-text-muted">{cbd}</span> : null}
-        </div>
+        {thc || cbd ? (
+          <p className="numeric flex flex-wrap items-baseline gap-x-4 gap-y-1 border-y border-border py-2 text-small">
+            {thc ? <span className="text-text">{thc}</span> : null}
+            {cbd ? <span className="text-text-muted">{cbd}</span> : null}
+          </p>
+        ) : null}
 
         {kultivar.terpene.length > 0 ? (
           <div className="flex flex-col gap-2">
