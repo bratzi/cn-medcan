@@ -3,7 +3,7 @@
 > Übergabemedium zwischen Sessions. Wird nach jedem Arbeitsblock aktualisiert und committet.
 > Wer hier weiterarbeitet, liest diese Datei zuerst und braucht den Chatverlauf nicht.
 
-**Letzte Aktualisierung:** 2026-10-16 (Session 69)
+**Letzte Aktualisierung:** 2026-10-16 (Session 70)
 **Repo:** https://github.com/bratzi/cn-medcan (public)
 **Branch:** `main` (Makeover „Grünes Buch“ Teilprojekt 1 ist seit 2026-09-24 auf `main`)
 
@@ -27,6 +27,19 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 ---
 
 ## ⇢ Hier geht es weiter
+
+### ⇢ SESSION 70 (2026-10-16): Startseiten-Typografie live
+
+**ALS ERSTES: diese Fragen in EINER AskUserQuestion stellen**
+1. Admin-Dashboard-Plan `docs/superpowers/plans/2026-10-16-admin-dashboard.md`: jetzt ausführen (Subagent-driven,
+   3 Stränge A=T1→T6, B=T2→T3, C=T4, danach T5, T7) oder weiter zurückstellen? (Nutzer sagte in S70 „Später“.)
+2. Infobox-Ruckeln: umgesetzt als weiche Höhe der Fazit-Box (`components/ui/WeicheHoehe.tsx` in FazitLauf).
+   Die Info-Tafel unter der Aroma-Karte hat feste Höhe (h-56). War die richtige Box gemeint?
+
+**Erledigt (main 4a3da54 + Folgecommit)**
+- Rosa Konturen weg (UeberlaufWort, Buzz, Community-Fazit), CSS `marke-kontur*`/`kontur-drift` gelöscht. Live: 0 Konturen.
+- „Kapitel“ in UEBERLAUF_GRAD (live 256 px wie Geschmäcker), kleiner Abstand zu „Dein“.
+- Nicht live gesehen: 390 px (Fenster ließ sich nicht verkleinern), dunkel, weiche Fazit-Höhe.
 
 ### ⇢ SESSION 69 (2026-10-16): Admin-Dashboard geplant, Startseiten-Typografie offen
 

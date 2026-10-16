@@ -35,7 +35,7 @@ export async function DeinKapitel() {
       <div className="mx-auto flex w-full max-w-360 flex-col gap-12">
         <h2 id="kapitel-titel" className="font-buch text-kapitel text-text text-center text-balance">
           {texte.vor} {/* „Kapitel“ so groß wie „Geschmäcker.“ (Nutzer 2026-10-16). */}
-          <em className="farbverlauf hand-betont" style={{ fontSize: UEBERLAUF_GRAD }}>{texte.betont}</em>
+          <em className="farbverlauf hand-betont" style={{ fontSize: UEBERLAUF_GRAD, marginLeft: "0.08em" }}>{texte.betont}</em>
         </h2>
         <KapitelImBrowser schaufenster={daten} texte={kapitelTexteFuerInsel} sprache={sprache} />
       </div>
