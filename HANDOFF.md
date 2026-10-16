@@ -3,7 +3,7 @@
 > Übergabemedium zwischen Sessions. Wird nach jedem Arbeitsblock aktualisiert und committet.
 > Wer hier weiterarbeitet, liest diese Datei zuerst und braucht den Chatverlauf nicht.
 
-**Letzte Aktualisierung:** 2026-10-16 (Session 67)
+**Letzte Aktualisierung:** 2026-10-16 (Session 68)
 **Repo:** https://github.com/bratzi/cn-medcan (public)
 **Branch:** `main` (Makeover „Grünes Buch“ Teilprojekt 1 ist seit 2026-09-24 auf `main`)
 
@@ -27,6 +27,17 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 ---
 
 ## ⇢ Hier geht es weiter
+
+### ⇢ SESSION 68 (2026-10-16): WIP-Branches fertig und live
+
+**Erledigt (main c0143e4)**
+- Explorer-Kapitel heißt „Gleiche Blüte, anderer Vertreiber“ (Nutzerentscheidung).
+- `wip/ig-jury-entwuerfe` gemergt: Jury-Posts nur als Publora-Entwurf, Skript druckt „Collaborator von Hand hinzufügen“.
+- `wip/jury-profil-bilder` gemergt: Jury lädt Bilder am eigenen Entwurf im Profil (BildVerwaltung, Recht per `bildRecht`),
+  Favourites zeigen Jury-Bewertungen (Blüten mit Beitrag, Abstimmungsgewinner). tsc grün, 1244 Tests grün.
+- Offen: „Jury bewertet wie normale Nutzer (Freigabe nicht mehr an ADMIN)“ unklar umgesetzt: Jury-Reviews brauchen
+  weiter Admin-Freigabe wie alle Nutzer, `istRedaktionell` = Jury laut Spec. Nutzer fragen, ob das so gemeint ist.
+- Nicht live gesehen: Profil-Bildupload, /jury/favourites mit Bewertungsliste.
 
 ### ⇢ SESSION 67 (2026-10-16): Terpz-Jury live, Suche, Blütenkarte, Wording
 
