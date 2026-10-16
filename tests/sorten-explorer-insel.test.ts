@@ -57,6 +57,18 @@ const zeige = () =>
     createElement(SortenExplorer, { kopf: null, sorten, texte: de.start.vertreiber, typen: de.label.kultivarTyp, sprache: "de" }),
   );
 
+test("SortenExplorer: Sorte mit nur einem Vertreiber hat keinen Vergleich, aber den Link zur Sortenseite", () => {
+  const html = renderToStaticMarkup(
+    createElement(SortenExplorer, {
+      kopf: null, sorten: [{ slug: "solo", name: "Solo", typ: "SATIVA", anzahl: 0, waren: [ware("z")] }],
+      texte: de.start.vertreiber, typen: de.label.kultivarTyp, sprache: "de",
+    }),
+  );
+  assert.equal((html.match(/class="explorer-karte/g) ?? []).length, 1);
+  assert.ok(!html.includes(`${de.start.vertreiber.vergleichen}<`));
+  assert.match(html, /href="\/blueten\/solo\?vertreiber=z"/);
+});
+
 test("SortenExplorer: Server rendert die erste Sorte vollständig", () => {
   const html = zeige();
   assert.match(html, /role="radiogroup"/);

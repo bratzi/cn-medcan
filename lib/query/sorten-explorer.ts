@@ -2,7 +2,7 @@ import { istKultivarTyp, type KultivarTyp } from "@/db/enums";
 import { musterBildId } from "@/lib/budpics";
 import { bildQuelle, blueteBild, medium } from "@/lib/medien";
 import { getPrisma } from "@/lib/prisma";
-import { SUCHE_MAX } from "@/lib/sorten-suche";
+import { SUCHE_MAX, suchtextBedingung } from "@/lib/sorten-suche";
 
 /** Eine Ware: dieselbe Sorte bei einem Vertreiber (Spec 2026-10-15 Abschnitt 4). */
 export type ExplorerWare = {
@@ -24,15 +24,14 @@ export type ExplorerSorte = { slug: string; name: string; typ: KultivarTyp; anza
 const SORTEN_MAX = 12;
 const WAREN_MAX = 8;
 const KANDIDATEN_MAX = 60;
-const SUCHE_KANDIDATEN_MAX = 36;
 
 const nachMengeDannName = (a: { anzahl: number; name: string }, b: { anzahl: number; name: string }) =>
   b.anzahl - a.anzahl || a.name.localeCompare(b.name, "de");
 
 /** HWG: Auswahl und Reihenfolge nur nach Menge und Name, nie nach Note. */
-export function waehleExplorerSorten(kandidaten: readonly ExplorerSorte[]): ExplorerSorte[] {
+export function waehleExplorerSorten(kandidaten: readonly ExplorerSorte[], mindestWaren = 2): ExplorerSorte[] {
   return kandidaten
-    .filter((s) => s.waren.length >= 2)
+    .filter((s) => s.waren.length >= mindestWaren)
     .sort(nachMengeDannName)
     .slice(0, SORTEN_MAX)
     .map((s) => ({
@@ -43,9 +42,9 @@ export function waehleExplorerSorten(kandidaten: readonly ExplorerSorte[]): Expl
     }));
 }
 
-/** Suchtreffer wie der Explorer selbst: Menge, dann Name, nie die Note (HWG); höchstens zwölf. */
+/** Suchtreffer wie der Explorer selbst: Menge, dann Name, nie die Note (HWG); höchstens zwölf, auch mit nur einem Vertreiber. */
 export function waehleSuchTreffer(kandidaten: readonly ExplorerSorte[]): ExplorerSorte[] {
-  return waehleExplorerSorten(kandidaten).slice(0, SUCHE_MAX);
+  return waehleExplorerSorten(kandidaten, 1).slice(0, SUCHE_MAX);
 }
 
 export type ExplorerZeile = {
@@ -150,17 +149,18 @@ export function explorerBild(
 }
 
 /**
- * Sortensuche des Explorers (`/api/sorten-suche`): Name enthält den Text (SQLite-LIKE, ASCII ohne
- * Beachtung der Schreibung), nach Menge dann Name. Eine Abfrage mit `take`; Bild nur als Symbolbild,
- * damit die Antwort ohne zweite Abfrage auskommt und eine Stunde lang gecacht werden darf.
+ * Sortensuche des Explorers (`/api/sorten-suche`): dieselbe Suchbedingung wie die Blütenliste
+ * (`suchtextBedingung`: Handelsname, Kultivarname, Genetik, klein geschrieben) auf aktiven Handelsnamen,
+ * auch Sorten mit nur einem Vertreiber. Nach Menge dann Name; eine Abfrage mit `take`. Bild nur als
+ * Symbolbild, damit die Antwort ohne zweite Abfrage auskommt und eine Stunde gecacht werden darf.
  */
 export async function ladeSortenSuche(text: string): Promise<ExplorerSorte[]> {
   const prisma = await getPrisma();
   const zeilen = await prisma.kultivar.findMany({
-    where: { slug: { not: null }, name: { contains: text }, strains: { some: { aktiv: true, vertreiberId: { not: null } } } },
+    where: { slug: { not: null }, strains: { some: { aktiv: true, vertreiberId: { not: null }, ...suchtextBedingung(text) } } },
     select: SORTE_SELECT,
     orderBy: [{ kennwerte: { anzahl: "desc" } }, { name: "asc" }],
-    take: SUCHE_KANDIDATEN_MAX,
+    take: SUCHE_MAX,
   });
   return waehleSuchTreffer(zeilen.flatMap((z) => verdichteExplorerSorte(z) ?? [])).map((s) => ({
     ...s,
