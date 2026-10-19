@@ -11,7 +11,6 @@ test("Layout prüft Recht: Gast Redirect, Nicht-Admin notFound", () => {
 
 test("jede Unterseite existiert und prüft selbst (Layouts schützen keine parallelen Requests)", () => {
   for (const b of ADMIN_BEREICHE) {
-    if (b.id === "instagram") continue; // Task 5
     const pfad = `app/[lang]/admin/${b.id}/page.tsx`;
     assert.ok(existsSync(pfad), pfad);
     assert.match(readFileSync(pfad, "utf8"), /adminSeite\(|adminErforderlich\(/, pfad);
