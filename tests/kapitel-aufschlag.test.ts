@@ -85,12 +85,12 @@ test("Name bricht nicht mitten im Wort: Grad text-kapitel statt text-titel (live
   assert.doesNotMatch(name, /text-titel/);
 });
 
-test("Dein Kapitel steht direkt hinter Terpene und ihre Geschmäcker (Nutzer 2026-10-09: zu weit unten)", async () => {
+test("Dein Kapitel steht direkt hinter dem Terpen-Band, die Bewertung gleich danach (Nutzer 2026-10-20)", async () => {
   const { readFileSync } = await import("node:fs");
   const seite = readFileSync("app/[lang]/page.tsx", "utf8");
-  assert.match(seite, /<TerpenRegister \/>\s*(\{\/\*[^]*?\*\/\}\s*)?<DeinKapitel \/>/);
+  assert.match(seite, /<TerpenBand \/>\s*(\{\/\*[^]*?\*\/\}\s*)?<DeinKapitel \/>\s*<NeuesterEintrag \/>/);
   const start = readFileSync("components/story/bewegung/start.ts", "utf8");
-  assert.match(start, /register,\n\s*kapitel,/);
+  assert.match(start, /kapitel,\n\s*randnotizen,\n\s*transparent,\n\s*register,/);
 });
 
 test("Schaufenster für ein Mitglied ohne eigenes Kapitel: kein Konto anlegen (Minor Dein Kapitel)", () => {
