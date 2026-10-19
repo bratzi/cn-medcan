@@ -1,5 +1,6 @@
 import { suchtextBedingung } from "@/lib/sorten-suche";
 import { cache } from "react";
+import { unstable_cache } from "next/cache";
 import type { Prisma } from "@/lib/generated/prisma/client";
 import {
   istBestandStatus,
@@ -884,7 +885,25 @@ export async function ladeUnternehmenNamen(ids: readonly string[]): Promise<Map<
   return new Map(zeilen.map((z) => [z.id, z.name]));
 }
 
-export async function ladeFilterFacetten(
+/**
+ * Facetten fuer alle Besucher gleich (nur zwei Varianten: Fachkreis ja/nein),
+ * darum gecacht (KV-Incremental-Cache, Binding NEXT_INC_CACHE_KV). Spart je
+ * Aufruf von /blueten acht D1-Abfragen samt Prisma-Aufbereitung - CPU, die auf
+ * dem Free-Plan (10 ms je Anfrage) zu Error 1102 beitrug. Eine Stunde Alter ist
+ * fuer Zaehler in der Filterleiste unkritisch; hoechstens 48 KV-Schreibvorgaenge
+ * am Tag (Free: 1000).
+ */
+const facettenGecacht = unstable_cache(
+  (fachkreis: boolean) => berechneFilterFacetten(fachkreis),
+  ["filter-facetten-v1"],
+  { revalidate: 3600, tags: ["facetten"] }
+);
+
+export function ladeFilterFacetten(fachkreis: boolean): Promise<FilterFacetten> {
+  return facettenGecacht(fachkreis);
+}
+
+async function berechneFilterFacetten(
   fachkreis: boolean
 ): Promise<FilterFacetten> {
   const prisma = await getPrisma();
