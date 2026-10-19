@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { notFound, redirect } from "next/navigation";
 import { Suspense } from "react";
 
 import { AusgabenVerwaltung } from "@/components/admin/jury/AusgabenVerwaltung";
@@ -9,7 +8,7 @@ import { Spinner } from "@/components/ui";
 import { de } from "@/lib/i18n/de";
 import { t } from "@/lib/i18n/text";
 import { ladeJuryAusgaben, ladeJuryBeitraegeNachStatus } from "@/lib/query/jury-admin";
-import { aktuellesMitglied } from "@/lib/session";
+import { adminSeite } from "@/lib/session";
 
 export const metadata: Metadata = {
   title: "Jury verwalten",
@@ -78,15 +77,13 @@ async function Ausgaben() {
 }
 
 export default async function AdminJuryPage({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
-  const mitglied = await aktuellesMitglied();
-  if (!mitglied) redirect("/anmelden?weiter=%2Fadmin%2Fjury");
   // Wie /admin: wer kein Betreiber ist, erfährt nicht, dass es die Seite gibt.
-  if (mitglied.rolle !== "ADMIN") notFound();
+  await adminSeite("/admin/jury");
 
   const reiter = reiterAus((await searchParams).reiter);
 
   return (
-    <div className="mx-auto w-full max-w-320 px-4 py-16 sm:px-8">
+    <div>
       <h1 className="text-h1 text-text">{texte.titel}</h1>
       <p className="mt-2 max-w-[68ch] text-body text-text-muted">{texte.satz}</p>
 

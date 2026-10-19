@@ -78,7 +78,7 @@ test("Ablehnen leert den BLOB, Freigegebene lassen sich in /admin zurueckziehen 
   const ad = readFileSync("app/[lang]/admin/budpic-aktionen.ts", "utf8");
   assert.match(ad, /status: was, daten: new Uint8Array\(0\)/);
   assert.match(ad, /budpic\.delete/);
-  const seite = readFileSync("app/[lang]/admin/page.tsx", "utf8");
+  const seite = readFileSync("app/[lang]/admin/budpics/page.tsx", "utf8");
   assert.match(seite, /<BudpicListe status="FREIGEGEBEN"/);
   assert.match(readFileSync("components/admin/BudpicFreigabe.tsx", "utf8"), /budpicLoeschen/);
 });
