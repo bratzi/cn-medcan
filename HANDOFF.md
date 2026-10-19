@@ -33,7 +33,7 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 **ALS ERSTES:** Browser verbinden (war nicht verbunden) und live prüfen: `/admin` (Kacheln, Kalender, „überfällig“-Badge),
 `/admin/bewertungen`, `/admin/instagram`, Profil-Kopf-Knopf „Verwaltung“ mit Zahl; hell/dunkel, 390 px ohne Querscroll.
 Dazu offen aus S71: `/blueten` live ansehen, RegisterAuswahl-Höhe gleitet.
-**Frage an Nutzer (AskUserQuestion):** Routine „Publora-Spiegel täglich“ ab 26.10. auf `0 5 * * *` UTC umstellen, damit sie im
+**Erledigt 2026-10-20:** Routine „Publora-Spiegel täglich“ auf `0 5 * * *` UTC umgestellt (Nutzer ja), damit sie im
 Winter 06:00 Berlin bleibt?
 
 **Erledigt (main d768c40)**
