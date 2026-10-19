@@ -28,6 +28,18 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 
 ## ⇢ Hier geht es weiter
 
+### ⇢ SESSION 73 (2026-10-20): Strain-Wording, Startseite, Publora offen
+
+**ALS ERSTES (neue Sitzung):** Publora-MCP und Cloudflare-Observability-MCP sind lokal eingetragen (`claude mcp`), Werkzeuge erst nach Neustart.
+1. Publora (MCP oder Skripte, aus PowerShell rendern, Bash-Screenshot klemmt): alten Entwurf „Mach mit“ `6ad162df10a1cbf1ad948b43`
+   und unvollständigen `6ad69c0e72ec65f94121c624` löschen. Dann einplanen aus `tmp/ig/*.json` (lokal, geprüft):
+   mach-mit 2026-10-23T17:00Z, terpene-erklaert 2026-10-26T17:00Z, fuenf-noten 2026-10-30T17:00Z. Nutzer fragen, welche Entwürfe er verwarf.
+2. Fehler 1102: Ursache per Cloudflare Observability (CPU je Route) belegen; Teil-Fix b67da31 (Facetten /blueten 1 h gecacht).
+3. Live offen: /blueten, /admin-Seiten, Strain-Texte überall.
+**Netz:** keine parallelen Agents/Worktrees (Downloads legten WLAN lahm), Tests nur `npx tsx --test --test-concurrency=2`.
+**Erledigt:** Strain statt Sorte (e5b3a1c, Menü „Strains“ live), IG-Doku (772203b), Startseite live geprüft: Terpen-Band, Storytelling,
+Kapitel, Bewertung, Rest (83dc72f). Routine Publora-Spiegel `0 5 * * *`. Instagram-Profilname auf „Book of Terpz Strainbewertung“ (Nutzer, App).
+
 ### ⇢ SESSION 72 (2026-10-20): Admin-Dashboard live auf main
 
 **ALS ERSTES:** Browser verbinden (war nicht verbunden) und live prüfen: `/admin` (Kacheln, Kalender, „überfällig“-Badge),
