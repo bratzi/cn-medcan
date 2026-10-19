@@ -3,7 +3,7 @@
 > Übergabemedium zwischen Sessions. Wird nach jedem Arbeitsblock aktualisiert und committet.
 > Wer hier weiterarbeitet, liest diese Datei zuerst und braucht den Chatverlauf nicht.
 
-**Letzte Aktualisierung:** 2026-10-16 (Session 70)
+**Letzte Aktualisierung:** 2026-10-20 (Session 72)
 **Repo:** https://github.com/bratzi/cn-medcan (public)
 **Branch:** `main` (Makeover „Grünes Buch“ Teilprojekt 1 ist seit 2026-09-24 auf `main`)
 
@@ -27,6 +27,28 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 ---
 
 ## ⇢ Hier geht es weiter
+
+### ⇢ SESSION 72 (2026-10-20): Admin-Dashboard live auf main
+
+**ALS ERSTES:** Browser verbinden (war nicht verbunden) und live prüfen: `/admin` (Kacheln, Kalender, „überfällig“-Badge),
+`/admin/bewertungen`, `/admin/instagram`, Profil-Kopf-Knopf „Verwaltung“ mit Zahl; hell/dunkel, 390 px ohne Querscroll.
+Dazu offen aus S71: `/blueten` live ansehen, RegisterAuswahl-Höhe gleitet.
+
+**Erledigt (main d768c40)**
+- Plan `docs/superpowers/plans/2026-10-16-admin-dashboard.md` Task 1–6 subagent-driven, alle Reviews sauber, Schlussreview „merge ready“.
+- Migration heißt `0028_publora_post.sql` (0027 war vergeben), remote eingespielt, Tabellen `publora_post`, `sync_stand` da.
+- Sync-Route ersetzt per `DB.batch` (echt atomar), doppelte IDs = 400, Termine ISO-normalisiert.
+- Hängende Posts (scheduled, Termin vorbei) zeigen „überfällig“ und zählen im Instagram-Zähler.
+- Lokaler Sync lief: „Publora-Spiegel: 6 Posts“. IG-Agent-Anweisung startet jeden Lauf mit dem Sync.
+- Neue Cloud-Routine „Publora-Spiegel täglich“ `trig_018BYGUFrYjug5wTfibQcXnk`, cron `0 4 * * *` UTC (06:00 Berlin bis 25.10.,
+  danach 05:00 Berlin; ggf. auf `0 5` umstellen).
+
+**Zurückgestellte Kleinigkeiten (aus Reviews)**
+- Zähler zählt Überfällige 14 Tage, Kalender zeigt „vergangen“ nur 7 Tage (bewusst so entschieden).
+- AdminLeiste aktiver Reiter per `endsWith`; Unterseiten ohne h1; `de.admin.jury`-Kacheltexte ungenutzt.
+- Leere Sektion „Entwürfe ohne Termin (0)“; Zeitspalte `w-12` in PostKalender evtl. zu schmal.
+- Profil wartet vor Suspense auf Admin-Zähler; Testlücken (Instagram-Zählabfrage, Profil-Test nur Regex).
+- Worktrees unter `.claude/worktrees/agent-*` und Branch `feat/admin-dashboard` können weg.
 
 ### ⇢ SESSION 71 (2026-10-16): /blueten down, D1-Tageslimit
 
