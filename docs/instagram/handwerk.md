@@ -16,7 +16,7 @@ Karussell.
 ## Nie erfinden
 
 **Veraltet, nie mehr behaupten (Betreiber 2026-10-15):** Eine Bewertung hängt *nicht* an einer Charge; die Charge ist
-eine freiwillige Angabe. Abstimmungen und Runden sind **freiwillige Events**, bei denen die Community Sorten gemeinsam
+eine freiwillige Angabe. Abstimmungen und Runden sind **freiwillige Events**, bei denen die Community Strains gemeinsam
 voranbringt und zusammen bewertet. Sie stehen nie im Mittelpunkt eines Posts über das Portal.
 
 Keine Zahl, kein Datum, kein Ergebnis, das nicht im Repo belegt ist (`docs/instagram/themen.md`,
@@ -53,7 +53,7 @@ eine Idee pro Bild (critique-composition, critique-visual-hierarchy).
 ## Inhalt (Nutzer 2026-10-16)
 
 - **Nutzer bewerten**, nicht „das Buch“. Wer zuschaut, kann selbst mitbewerten.
-- **Blüte und Sorte im Fokus**, Chargen nie: „je mehr Blätter, desto besser gefällt uns die Blüte“.
+- **Blüte und Strain im Fokus**, Chargen nie: „je mehr Blätter, desto besser gefällt uns die Blüte“.
 - **Jede Slide zeigt, wovon sie spricht:** Feld `grafik` (`blaetter` mit Note, oder `icons` mit Merkmal-, Geschmacks-
   oder Terpennamen, siehe `lib/ig-grafik.tsx`); `karussellPruefen` lehnt Slides ohne Grafik ab. Gleich viele Punkte wie
   Icons ergeben beschriftete Icons.
@@ -78,7 +78,7 @@ stehen lassen. Immer streichen:
 3 bis 5, nach Größe gemischt: 2–3 Nische (unter 50k Beiträge), 1–2 mittel, höchstens 1 breit. Immer passend zum
 Inhalt, am Ende der Caption. **Pro Thema wechseln**, nicht denselben Block auf jeden Post.
 Bausteine: Marke `#bookofterpz` (immer), mittel `#medizinalcannabis` `#terpene`, Nische nach Thema (`#terpenprofil`,
-`#aromaprofil`, `#sortenbewertung`, `#community`, Terpenname wie `#limonen`). Keine Wirk-, Patienten- oder
+`#aromaprofil`, `#strainbewertung`, `#community`, Terpenname wie `#limonen`). Keine Wirk-, Patienten- oder
 Krankheits-Tags.
 
 ## Reel (Hook in den ersten 1–3 Sekunden)

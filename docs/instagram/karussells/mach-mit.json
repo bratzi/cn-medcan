@@ -3,37 +3,12 @@
     "saeule": "mitbestimmen",
     "schluessel": "mach-mit",
     "slides": [
-      {
-        "typ": "cover",
-        "kicker": "Mach mit",
-        "titel": "Sorten gemeinsam nach vorn bringen",
-        "grafik": { "art": "icons", "namen": ["community"] }
-      },
-      {
-        "typ": "inhalt",
-        "titel": "Events statt Pflicht",
-        "text": "Ab und zu laden wir zu Events ein. Wer mag, macht mit. Wer nicht, liest einfach weiter.",
-        "grafik": { "art": "icons", "namen": ["abstimmen"] }
-      },
-      {
-        "typ": "inhalt",
-        "titel": "Vorschlagen und pushen",
-        "text": "Mitglieder schlagen Sorten vor und bringen gemeinsam die nach vorn, die sie spannend finden.",
-        "grafik": { "art": "icons", "namen": ["blatt", "community"] }
-      },
-      {
-        "typ": "inhalt",
-        "titel": "Zusammen bewerten",
-        "text": "Am Ende bewerten alle mit, nach demselben Schema. So wissen wir mehr über eine Blüte als einer allein.",
-        "grafik": { "art": "icons", "namen": ["aussehen", "geruch", "geschmack", "konsistenz"] }
-      },
-      {
-        "typ": "cta",
-        "titel": "Werde Mitglied",
-        "text": "Freiwillig mitmachen, Sorten pushen, gemeinsam mehr wissen.",
-        "grafik": { "art": "icons", "namen": ["buch"] }
-      }
+      { "typ": "cover", "kicker": "Mach mit", "titel": "Welcher Strain kommt als Nächstes?", "grafik": { "art": "icons", "namen": ["community"] } },
+      { "typ": "inhalt", "titel": "Ihr schlagt Strains vor", "text": "Bei unseren Events nennen Mitglieder die Strains, die sie spannend finden. Mitmachen ist freiwillig.", "grafik": { "art": "icons", "namen": ["blatt", "community"] } },
+      { "typ": "inhalt", "titel": "Gemeinsam nach vorn", "text": "Alle stimmen ab und bringen ihre Favoriten nach vorn. Wer nur mitlesen will, liest einfach mit.", "grafik": { "art": "icons", "namen": ["abstimmen"] } },
+      { "typ": "inhalt", "titel": "Zusammen bewerten", "text": "Am Ende bewerten alle nach demselben Schema. So wissen wir über einen Strain mehr als eine Person allein.", "grafik": { "art": "icons", "namen": ["aussehen", "geruch", "geschmack", "konsistenz"] } },
+      { "typ": "cta", "titel": "Werde Mitglied", "text": "Strains vorschlagen, abstimmen, gemeinsam bewerten.", "grafik": { "art": "icons", "namen": ["buch"] } }
     ]
   },
-  "caption": "Eine Sorte gemeinsam nach vorn bringen? Bei unseren Events geht das, ganz freiwillig.\n\nMitglieder schlagen Sorten vor, pushen ihre Favoriten und bewerten am Ende zusammen. Wer nur mitlesen will, liest einfach mit.\n\nLust auf Vorabzugang? Schreib uns per DM.\n\n#bookofterpz #community #sortenbewertung #medizinalcannabis"
+  "caption": "Welchen Strain bewerten wir als Nächstes? Bei unseren Events entscheidet ihr mit.\n\nMitglieder schlagen Strains vor, stimmen ab und bewerten den Gewinner am Ende zusammen, alle nach demselben Schema.\n\nMitmachen ist freiwillig. Lust auf Vorabzugang? Schreib uns per DM.\n\n#bookofterpz #strainbewertung #community #medizinalcannabis"
 }

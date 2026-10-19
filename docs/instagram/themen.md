@@ -34,10 +34,10 @@ Fakten aus dem Code und `docs/brand/gruenes-buch.md`. Pfad nennen, damit Leser e
 
 | schluessel | Feature | Kern |
 |---|---|---|
-| bewertungsschema | Bewertungsschema | Jede Sorte nach demselben Schema: Aussehen, Geruch, Geschmack, Konsistenz, Gesamtnote in Blättern (1–5). Wirkung wird auf Instagram nie gezeigt. |
+| bewertungsschema | Bewertungsschema | Jeder Strain nach demselben Schema: Aussehen, Geruch, Geschmack, Konsistenz, Gesamtnote in Blättern (1–5). Wirkung wird auf Instagram nie gezeigt. |
 | aroma-karte | Aroma-Karte | Zeigt, welche Terpene zu welchen Aromen führen: zehn Aromarichtungen von Zitrus bis Diesel. |
 | restfeuchte | Restfeuchte | Hinweis bei zu trockenen Blüten (unter 8 %): Blüten zerfallen leichter, Terpene verfliegen. |
-| events | Events | Freiwillige Events: Mitglieder schlagen Sorten vor, pushen sie gemeinsam und bewerten zusammen. Seite `/umfragen`. |
+| events | Events | Freiwillige Events: Mitglieder schlagen Strains vor, pushen sie gemeinsam und bewerten zusammen. Seite `/umfragen`. |
 | kommentare-likes | Kommentare und Likes | Bewertungen kommentieren und liken, Blüten merken, Profilen folgen. |
 | zahlen-aus-dem-buch | Zahlen aus dem Buch | Statistik auf `/reviews`: meistbewertet, am besten bewertet, meistkommentiert. |
 | buch | Das Buch | Bewertungen zum Blättern wie in einem Notizbuch, mit handschriftlicher Notiz. |
@@ -47,7 +47,7 @@ Fakten aus dem Code und `docs/brand/gruenes-buch.md`. Pfad nennen, damit Leser e
 | schluessel | Thema | Kern |
 |---|---|---|
 | ehrlich-nach-schema | Ehrliche Bewertungen | Eine Person bewertet nach festem Schema, alle Noten offen. |
-| gemeinsam-nach-vorn | Gemeinsam nach vorn | Bei freiwilligen Events bringt die Community Sorten gemeinsam voran und bewertet zusammen. |
+| gemeinsam-nach-vorn | Gemeinsam nach vorn | Bei freiwilligen Events bringt die Community Strains gemeinsam voran und bewertet zusammen. |
 | aroma-statt-hype | Aroma statt Hype | Es geht um Duft, Geschmack, Aussehen und Qualität, nicht um THC-Zahlen. |
 
 ## Schema (`art: "schema"`)

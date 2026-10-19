@@ -42,7 +42,7 @@ Die ausführlichen Regeln (Hook, Humanizer, Hashtags nach Größe, Checkliste) s
 ## HWG-Block
 
 Medizinalcannabis ist verschreibungspflichtig, §10 HWG verbietet Publikumswerbung dafür. Beworben wird ausschließlich
-das Portal (Transparenz, Community, Wissen über Sensorik). Verboten in Bild und Text: Sortenname als Kaufanreiz, Wirkung,
+das Portal (Transparenz, Community, Wissen über Sensorik). Verboten in Bild und Text: Strainname als Kaufanreiz, Wirkung,
 Beschwerden, Dosierung, Preis, Apotheke, Aufforderung zu Konsum oder Bezug. Jeder Text läuft durch den bestehenden
 HWG-Filter (`lib/ig-karte.ts`), jeder Post wird vom Betreiber freigegeben. Nichts wird automatisch veröffentlicht.
 
@@ -88,8 +88,8 @@ Schon als Pin-Posts angelegt: `manifest`, `so-bewerten-wir` (Dateien in `docs/in
 
 | schluessel | Thema |
 |---|---|
-| was-ist-ein-event | Was ein Event ist: freiwillig, gemeinsam, eine Sorte nach vorn |
-| sorten-pushen | Sorten vorschlagen und gemeinsam pushen |
+| was-ist-ein-event | Was ein Event ist: freiwillig, gemeinsam, einen Strain nach vorn |
+| strains-pushen | Strains vorschlagen und gemeinsam pushen |
 | zusammen-bewerten | Zusammen bewerten: mehr Wissen als einer allein |
 | mitglied-werden | Mitglied werden: mitlesen, mitbewerten, bei Events mitmachen |
 
@@ -102,7 +102,7 @@ Schon als Pin-Post angelegt: `mach-mit`. Events sind freiwillig und nie Hauptthe
 | aroma-karte | Aroma-Karte: welche Terpene zu welchen Aromen führen |
 | das-buch | Das Buch: Bewertungen zum Blättern mit handschriftlicher Notiz |
 | zahlen-aus-dem-buch | Zahlen aus dem Buch: meistbewertet, am besten bewertet, meistkommentiert (`/reviews`) |
-| vergleich | Vergleich: Sorten und Bewertungen nebeneinander |
+| vergleich | Vergleich: Strains und Bewertungen nebeneinander |
 
 ## Reihenfolge der Fr-Posts
 
