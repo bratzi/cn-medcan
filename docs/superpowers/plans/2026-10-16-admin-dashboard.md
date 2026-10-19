@@ -41,7 +41,7 @@
 |---|---|
 | `lib/admin-aufgaben.ts` | Bereiche, Kachel-Sortierung, `sicherZaehlen` (rein) |
 | `lib/query/admin-uebersicht.ts` | `ladeAdminZaehler()` (Prisma-`count`s, `cache`) |
-| `migrations/0027_publora_post.sql`, `prisma/schema.prisma` | Tabellen `publora_post`, `sync_stand` |
+| `migrations/0028_publora_post.sql`, `prisma/schema.prisma` | Tabellen `publora_post`, `sync_stand` |
 | `lib/publora-sync.ts` | Publora-Rohzeilen formen, Body prüfen (rein) |
 | `app/api/publora-sync/route.ts` | Schlüssel prüfen, Tabelle ersetzen |
 | `scripts/publora-sync.ts` | Publora holen, an Route schicken |
@@ -189,7 +189,7 @@ export const ladeAdminZaehler = cache(async (): Promise<AdminZaehler> => {
 **Skills:** cloudflare-d1, prisma-cli, prisma-client-api, edge-stack-master, migration, test-driven-development
 
 **Files:**
-- Create: `migrations/0027_publora_post.sql`, `lib/publora-sync.ts`, `app/api/publora-sync/route.ts`, `scripts/publora-sync.ts`
+- Create: `migrations/0028_publora_post.sql`, `lib/publora-sync.ts`, `app/api/publora-sync/route.ts`, `scripts/publora-sync.ts`
 - Modify: `prisma/schema.prisma` (Ende), danach `npm run db:generate`
 - Test: `tests/publora-sync.test.ts`
 
@@ -203,10 +203,10 @@ export const ladeAdminZaehler = cache(async (): Promise<AdminZaehler> => {
   - `syncPruefen(body: unknown): string[]` (leer = ok)
   - `SYNC_MAX = 500`, `PUBLORA_STATUS = ["draft","scheduled","published","failed"]`
 
-- [ ] **Step 1: Migration** `migrations/0027_publora_post.sql`
+- [ ] **Step 1: Migration** `migrations/0028_publora_post.sql`
 
 ```sql
--- 0027_publora_post (Spec 2026-10-16 Admin-Dashboard). Per wrangler d1 execute --file, genau einmal.
+-- 0028_publora_post (Spec 2026-10-16 Admin-Dashboard). Per wrangler d1 execute --file, genau einmal.
 CREATE TABLE IF NOT EXISTS publora_post (
   id TEXT PRIMARY KEY NOT NULL,
   gruppe TEXT NOT NULL,
@@ -435,7 +435,7 @@ main().catch((f: unknown) => {
 Prüfe in `scripts/ig-jury.ts`, wie `ursprung` und `schluessel` aus `IG_FEED_URL` gebildet werden, und nimm denselben Weg (Exportnamen von `umgebung` exakt übernehmen).
 
 - [ ] **Step 8:** `npx tsc --noEmit -p .` → 0; `npm test` → alles grün.
-- [ ] **Step 9: Commit** `git add migrations/0027_publora_post.sql prisma/schema.prisma lib/generated lib/publora-sync.ts app/api/publora-sync scripts/publora-sync.ts tests/publora-sync.test.ts lib/proxy-regeln.ts && git commit -m "feat(admin): Publora-Spiegel in D1 per Sync-Route"`
+- [ ] **Step 9: Commit** `git add migrations/0028_publora_post.sql prisma/schema.prisma lib/generated lib/publora-sync.ts app/api/publora-sync scripts/publora-sync.ts tests/publora-sync.test.ts lib/proxy-regeln.ts && git commit -m "feat(admin): Publora-Spiegel in D1 per Sync-Route"`
 
 ---
 
@@ -550,7 +550,7 @@ import { kalenderBauen, type Kalender } from "@/lib/admin-kalender";
 import { getPrisma } from "@/lib/prisma";
 import type { PostArt } from "@/lib/publora-sync";
 
-/** Spiegel lesen; fehlt die Tabelle (vor Migration 0027), gilt der Kalender als veraltet. */
+/** Spiegel lesen; fehlt die Tabelle (vor Migration 0028), gilt der Kalender als veraltet. */
 export async function ladeKalender(): Promise<Kalender> {
   try {
     const prisma = await getPrisma();
@@ -974,7 +974,7 @@ Den Typ der `aktionen` in `ProfilKopf` prüfen (`art`-Werte); passt `"secondary"
 
 **Skills:** cloudflare-d1, wrangler, schedule, verification-before-completion
 
-- [ ] **Step 1:** Remote-Migration selbst einspielen (Memory-Regel): `npx wrangler d1 execute <DB-Name aus wrangler.jsonc> --remote --file migrations/0027_publora_post.sql`.
+- [ ] **Step 1:** Remote-Migration selbst einspielen (Memory-Regel): `npx wrangler d1 execute <DB-Name aus wrangler.jsonc> --remote --file migrations/0028_publora_post.sql`.
 - [ ] **Step 2:** `docs/instagram/agent-anweisung.md`: als ersten Schritt jedes Laufs `npx --yes tsx scripts/publora-sync.ts` (Fehler melden, Lauf fortsetzen). Commit.
 - [ ] **Step 3:** Neue Cloud-Routine per Skill `schedule`: täglich 06:00 Europe/Berlin, nur `npx --yes tsx scripts/publora-sync.ts`, gleiche Secrets wie die IG-Routine.
 - [ ] **Step 4:** Lokal einmal `npx tsx scripts/publora-sync.ts` gegen live (nach Deploy), Ausgabe „Publora-Spiegel: N Posts“.
