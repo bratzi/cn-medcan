@@ -25,10 +25,9 @@ test("Admin-Aktionen: jede beginnt mit adminErforderlich", () => {
 test("Vorschlaege stehen auf /admin/vorschlaege, /admin zaehlt nur", () => {
   const seite = lies("app/[lang]/admin/page.tsx");
   assert.doesNotMatch(seite, /<BlueteVorschlaege \/>/);
-  assert.match(seite, /href="\/admin\/vorschlaege"/);
-  assert.match(seite, /sortenVorschlag\.count\(/);
+  assert.match(lies("lib/admin-aufgaben.ts"), /href: "\/admin\/vorschlaege"/);
   const eigene = lies("app/[lang]/admin/vorschlaege/page.tsx");
   assert.match(eigene, /<BlueteVorschlaege \/>/);
-  assert.match(eigene, /notFound\(\)/);
+  assert.match(eigene, /adminSeite\("\/admin\/vorschlaege"\)/);
   assert.match(lies("app/[lang]/admin/vorschlag-aktionen.ts"), /revalidiereSprachen\("\/admin\/vorschlaege"\)/);
 });

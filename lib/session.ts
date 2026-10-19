@@ -2,6 +2,7 @@ import "server-only";
 
 import { cache } from "react";
 import { headers } from "next/headers";
+import { notFound, redirect } from "next/navigation";
 
 import { getAuth } from "@/lib/auth";
 import { getPrisma } from "@/lib/prisma";
@@ -127,6 +128,14 @@ export async function freigabeErforderlich(): Promise<AngemeldetesMitglied> {
 export async function adminErforderlich(): Promise<AngemeldetesMitglied> {
   const mitglied = await mitgliedErforderlich();
   if (mitglied.rolle !== "ADMIN") throw new Error("Keine Berechtigung.");
+  return mitglied;
+}
+
+/** Für Admin-Seiten: Gast zur Anmeldung, Nicht-Admin 404 (die Seite soll nicht verraten, dass es sie gibt). */
+export async function adminSeite(weiter = "/admin") {
+  const mitglied = await aktuellesMitglied();
+  if (!mitglied) redirect(`/anmelden?weiter=${encodeURIComponent(weiter)}`);
+  if (mitglied.rolle !== "ADMIN") notFound();
   return mitglied;
 }
 
