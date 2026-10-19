@@ -16,9 +16,10 @@ export const ladeAdminZaehler = cache(async (): Promise<AdminZaehler> => {
     sicherZaehlen(() => prisma.budpic.count({ where: { status: "OFFEN" } })),
     sicherZaehlen(() => prisma.sortenVorschlag.count({ where: { status: "OFFEN" } })),
     sicherZaehlen(() => prisma.juryBeitrag.count({ where: { status: "EINGEREICHT" } })),
-    // TODO(Merge Strang B): prisma.publoraPost existiert erst mit Task 2; dann auf
-    // prisma.publoraPost.count({ where: { status: "failed", geplantAm: { gte: <jetzt minus 14 Tage als ISO> } } }) umstellen.
-    sicherZaehlen(async () => 0),
+    // geplantAm ist ein ISO-Text, daher lexikografischer Vergleich.
+    sicherZaehlen(() =>
+      prisma.publoraPost.count({ where: { status: "failed", geplantAm: { gte: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString() } } }),
+    ),
   ]);
   return { bewertungen, mitglieder, gemeldet, budpics, vorschlaege, jury, instagram };
 });
