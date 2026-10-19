@@ -25,7 +25,7 @@ export function istOhneGate(pfad: string): boolean {
  */
 export function igFeedSchluessel(pfad: string, suche: string): string | null {
   // Terpz-Jury (Task 9): Feed, Statusmeldung und die Jury-Fotos, die das Skript herunterlädt.
-  const frei = pfad === "/api/ig-feed" || pfad === "/api/jury-feed" || pfad === "/api/jury-ig" || /^\/api\/(ig-karte|bild)\/[^/]+$/.test(pfad);
+  const frei = pfad === "/api/ig-feed" || pfad === "/api/jury-feed" || pfad === "/api/jury-ig" || pfad === "/api/publora-sync" || /^\/api\/(ig-karte|bild)\/[^/]+$/.test(pfad);
   if (!frei || pfad === "/api/bild/offen") return null;
   return new URLSearchParams(suche).get("key") || null;
 }

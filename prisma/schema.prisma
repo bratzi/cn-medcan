@@ -974,3 +974,25 @@ model JuryBild {
   @@index([beitragId, position])
   @@map("jury_bilder")
 }
+
+/// Spiegel der Publora-Posts für den Admin-Kalender (Spec 2026-10-16), ersetzt je Sync-Lauf.
+model PubloraPost {
+  id          String  @id
+  gruppe      String
+  plattform   String
+  art         String
+  status      String
+  geplantAm   String? @map("geplant_am")
+  titel       String  @default("")
+  abgerufenAm String  @map("abgerufen_am")
+
+  @@index([geplantAm], map: "publora_post_geplant")
+  @@map("publora_post")
+}
+
+model SyncStand {
+  schluessel String @id
+  stand      String
+
+  @@map("sync_stand")
+}
