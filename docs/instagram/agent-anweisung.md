@@ -21,6 +21,11 @@ Plan und Themen: `docs/instagram/redaktionsplan.md`. Fakten: `docs/instagram/the
 - Chromium für Screenshots findet das Skript selbst unter `/opt/pw-browsers`.
 - Schlägt ein Befehl wegen Netz oder Publora fehl: nicht wiederholen, im Bericht melden, Lauf beenden.
 
+## Publora-Spiegel (erster Schritt jedes Laufs)
+
+Starte jeden Lauf mit `npx --yes tsx scripts/publora-sync.ts`. Das füllt den Kalender im Admin-Dashboard. Schlägt der
+Befehl fehl, meldest du das im Bericht und setzt den Lauf trotzdem fort (Ausnahme zur Regel oben).
+
 ## Terpz-Jury zuerst (täglich)
 
 Vor jedem Themen-Karussell prüfst du, ob die Terpz-Jury etwas Neues hat. Die Jury steht vor dem Redaktionsplan.
