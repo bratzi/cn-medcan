@@ -86,6 +86,7 @@ test("IG-Karte: Schlüssel nur auf /api/ig-karte/<id>", () => {
 test("Jury-Instagram: Schlüssel auf Feed, Meldung und Bild", () => {
   assert.equal(igFeedSchluessel("/api/jury-feed", "?key=k"), "k");
   assert.equal(igFeedSchluessel("/api/jury-ig", "?key=k"), "k");
+  assert.equal(igFeedSchluessel("/api/publora-sync", "?key=k"), "k");
   assert.equal(igFeedSchluessel("/api/bild/abc-1", "?key=k"), "k");
   assert.equal(igFeedSchluessel("/api/jury-feed/x", "?key=k"), null);
   assert.equal(igFeedSchluessel("/api/bild/offen/abc", "?key=k"), null);
