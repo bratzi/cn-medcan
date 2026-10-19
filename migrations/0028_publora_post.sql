@@ -1,4 +1,4 @@
-﻿-- 0028_publora_post (Spec 2026-10-16 Admin-Dashboard). Per wrangler d1 execute --file, genau einmal.
+-- 0028_publora_post (Spec 2026-10-16 Admin-Dashboard). Per wrangler d1 execute --file, genau einmal.
 CREATE TABLE IF NOT EXISTS publora_post (
   id TEXT PRIMARY KEY NOT NULL,
   gruppe TEXT NOT NULL,

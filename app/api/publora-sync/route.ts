@@ -2,8 +2,8 @@ import { NextResponse } from "next/server";
 
 import { igSchluesselOk } from "@/lib/ig-schluessel";
 import { revalidiereSprachen } from "@/lib/i18n/revalidiere";
-import { syncPruefen, type PubloraZeile } from "@/lib/publora-sync";
-import { getPrisma } from "@/lib/prisma";
+import { syncAnweisungen, syncPruefen, type PubloraZeile } from "@/lib/publora-sync";
+import { getEnv } from "@/lib/cloudflare";
 
 /** Publora-Spiegel ersetzen (Spec 2026-10-16 Admin-Dashboard). Gleicher Schlüssel wie /api/jury-ig. */
 export async function POST(anfrage: Request) {
@@ -13,13 +13,9 @@ export async function POST(anfrage: Request) {
   if (fehler.length) return NextResponse.json({ fehler }, { status: 400 });
   const posts = (body as { posts: PubloraZeile[] }).posts;
   const jetzt = new Date().toISOString();
-  const prisma = await getPrisma();
-  // Ganz oder gar nicht: löschen, einfügen, Stand setzen in einer Transaktion.
-  await prisma.$transaction([
-    prisma.publoraPost.deleteMany({}),
-    ...posts.map((p) => prisma.publoraPost.create({ data: { ...p, abgerufenAm: jetzt } })),
-    prisma.syncStand.upsert({ where: { schluessel: "publora" }, create: { schluessel: "publora", stand: jetzt }, update: { stand: jetzt } }),
-  ]);
+  const { DB } = await getEnv();
+  // Ganz oder gar nicht: D1-Batch läuft als eine Transaktion (Prisma $transaction auf D1 nicht).
+  await DB.batch(syncAnweisungen(posts, jetzt).map((a) => DB.prepare(a.sql).bind(...a.params)));
   revalidiereSprachen("/admin");
   return NextResponse.json({ ok: true, zeilen: posts.length });
 }

@@ -8,6 +8,7 @@ import { feedSchluessel, publoraPosts, umgebung } from "./ig-gemeinsam";
 
 async function main() {
   const env = umgebung();
+  if (!env.IG_FEED_URL) throw new Error("IG_FEED_URL fehlt (Umgebung, .env oder .env.ig-feed)");
   const zeilen = publoraZeilen(await publoraPosts()).slice(0, SYNC_MAX);
   const ziel = new URL("/api/publora-sync", env.IG_FEED_URL);
   ziel.searchParams.set("key", feedSchluessel(env));

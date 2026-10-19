@@ -49,6 +49,7 @@ export function syncPruefen(body: unknown): string[] {
   if (!Array.isArray(posts)) return ["posts fehlt"];
   if (posts.length > SYNC_MAX) return [`höchstens ${SYNC_MAX} Zeilen`];
   const fehler: string[] = [];
+  const ids = new Set<string>();
   posts.forEach((roh, i) => {
     const z = roh as Partial<PubloraZeile> | null;
     if (!z || typeof z.id !== "string" || !z.id || typeof z.gruppe !== "string" || typeof z.plattform !== "string" || typeof z.titel !== "string") fehler.push(`${i}: Felder`);
@@ -56,5 +57,28 @@ export function syncPruefen(body: unknown): string[] {
     else if (!(PUBLORA_STATUS as readonly string[]).includes(z.status ?? "")) fehler.push(`${i}: status`);
     else if (z.geplantAm !== null && (typeof z.geplantAm !== "string" || Number.isNaN(Date.parse(z.geplantAm)))) fehler.push(`${i}: geplantAm`);
   });
+  posts.forEach((roh, i) => {
+    const id = (roh as { id?: unknown } | null)?.id;
+    if (typeof id !== "string" || !id) return;
+    if (ids.has(id)) fehler.push(`${i}: id doppelt`);
+    ids.add(id);
+  });
   return fehler;
+}
+
+export type SyncAnweisung = { sql: string; params: (string | null)[] };
+
+/** D1-Batch für den Spiegel: leeren, Zeilen einfügen, Stand setzen (Spaltennamen wie Migration 0028). Rein. */
+export function syncAnweisungen(posts: PubloraZeile[], jetzt: string): SyncAnweisung[] {
+  return [
+    { sql: "DELETE FROM publora_post", params: [] },
+    ...posts.map((p) => ({
+      sql: "INSERT INTO publora_post (id, gruppe, plattform, art, status, geplant_am, titel, abgerufen_am) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+      params: [p.id, p.gruppe, p.plattform, p.art, p.status, p.geplantAm, p.titel, jetzt],
+    })),
+    {
+      sql: "INSERT INTO sync_stand (schluessel, stand) VALUES (?, ?) ON CONFLICT(schluessel) DO UPDATE SET stand = excluded.stand",
+      params: ["publora", jetzt],
+    },
+  ];
 }
