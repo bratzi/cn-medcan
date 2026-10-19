@@ -30,7 +30,20 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 
 ### ⇢ SESSION 73 (2026-10-20): Strain-Wording, Startseite, Publora offen
 
-**ALS ERSTES (neue Sitzung):** Publora-MCP und Cloudflare-Observability-MCP sind lokal eingetragen (`claude mcp`), Werkzeuge erst nach Neustart.
+**ALS ERSTES: Entwurf Startseite + Strain of the Month freigeben lassen (AskUserQuestion), dann Spec
+`docs/superpowers/specs/2026-10-20-startseite-sotm-design.md` schreiben (Brainstorming, architektonisch).**
+Nutzer-Antworten: „Bewertung“ = Overall·Terpz·Qualität (aus TransparentMachen lösen); SOTM automatisch nach Kalender;
+SOTM bewerten alle Mitglieder + Betreiber. Entwurf (im Chat gezeigt, Ja steht aus):
+- Startseite: Auftakt, TerpenBand, Storytelling (Manifest-Text), Dein Kapitel, Bewertung (Overall/Terpz/Qualität als Schritte 1–3
+  mit Beispielblüte), NeuesterEintrag, Terpene und ihre Geschmäcker (Register+Aroma), Katalog+„Gleiche Blüte, anderer Vertreiber“
+  als EINE Sektion (eine Suche, Vertreiber-Leiste klappt unter gewähltem Strain auf), Wissen, Lernen, Empfehlungen, SOTM zuletzt.
+- SOTM: Monat N stimmt für N+1 ab (1.–14. Vorschläge, 15.–Monatsende Abstimmung), Abschluss 1. 00:00 UTC per Cloudflare Cron
+  Trigger (`0 0 1 * *`, `0 0 15 * *`, idempotent, Fallback beim ersten Aufruf), Phasen-Schalter entfällt; ein Gewinner
+  (communityPlaetze 1), Gleichstand: früherer Vorschlag; keine Stimmen: kein SOTM. Umfrage.monat (JJJJ-MM, unique), Migration 0029.
+  Sektion: aktueller SOTM groß (Bild, Monat, Zahl Mitgliederbewertungen + Schnitt, Betreiber-Review, „Jetzt bewerten“), darunter
+  Abstimmung für nächsten Monat, Countdown als Text. Name „Strain of the Month“, Kopfmenü „SOTM“, Route /sotm, /umfragen 301.
+  Zwei Pläne nacheinander (A Startseite, B SOTM), keine parallelen Agents.
+**MCPs:** alle im User-Scope (`claude mcp list`): publora ✓, cloudflare-observability braucht `/mcp` → Authenticate (Nutzer).
 1. Publora (MCP oder Skripte, aus PowerShell rendern, Bash-Screenshot klemmt): alten Entwurf „Mach mit“ `6ad162df10a1cbf1ad948b43`
    und unvollständigen `6ad69c0e72ec65f94121c624` löschen. Dann einplanen aus `tmp/ig/*.json` (lokal, geprüft):
    mach-mit 2026-10-23T17:00Z, terpene-erklaert 2026-10-26T17:00Z, fuenf-noten 2026-10-30T17:00Z. Nutzer fragen, welche Entwürfe er verwarf.
