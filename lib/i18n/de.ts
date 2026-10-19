@@ -1327,6 +1327,8 @@ export const de = {
       reiter: { uebersicht: "Übersicht", aromen: "Aromen", bewertungen: "Bewertungen", vertreiber: "Vertreiber" },
       bewerten: "Blüte bewerten",
       bearbeiten: "Profil bearbeiten",
+      verwaltung: "Verwaltung",
+      verwaltungOffen: "Verwaltung · {zahl} offen",
     },
     reiterProfil: "Profil",
     reiterKonto: "Konto",
