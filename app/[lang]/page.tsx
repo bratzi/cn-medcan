@@ -39,10 +39,10 @@ export default function StartPage() {
         <Auftakt />
         {/* Band der Terpene zwischen Hero und Story (Nutzer 2026-09-30). */}
         <TerpenBand />
-        {/* Nutzer 2026-10-20: erst das eigene Kapitel, dann die Bewertung im Fokus, danach der Rest in alter Reihenfolge. */}
+        {/* Nutzer 2026-10-20: Storytelling, dann das eigene Kapitel, dann die Bewertung im Fokus, danach der Rest. */}
+        <TransparentMachen />
         <DeinKapitel />
         <NeuesterEintrag />
-        <TransparentMachen />
         <VertreiberKapitel />
         {/* T12: Register der Terpene und Geschmäcker, vor der Aroma-Karte (Nutzer 2026-09-29). */}
         <TerpenRegister />

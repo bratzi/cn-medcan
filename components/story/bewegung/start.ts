@@ -23,9 +23,9 @@ import { type Choreografie, type Werkzeug } from "./typen";
 const SCROLL_CHOREOGRAFIEN: readonly Choreografie[] = [
   umschlagWirdSeite,
   auftaktFilm,
+  transparent,
   kapitel,
   randnotizen,
-  transparent,
   register,
   abstimmung,
   schluss,
