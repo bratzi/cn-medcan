@@ -1314,6 +1314,8 @@ export const en: Woerterbuch = {
       reiter: { uebersicht: "Overview", aromen: "Aromas", bewertungen: "Ratings", vertreiber: "Distributors" },
       bewerten: "Rate a flower",
       bearbeiten: "Edit profile",
+      verwaltung: "Admin",
+      verwaltungOffen: "Admin · {zahl} open",
     },
     reiterProfil: "Profile",
     reiterKonto: "Account",

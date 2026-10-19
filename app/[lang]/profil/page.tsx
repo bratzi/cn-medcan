@@ -6,15 +6,17 @@ import { Suspense } from "react";
 import type { Randnotiz } from "@/components/kapitel/Randnotizen";
 import { FeldSkelett } from "@/components/kapitel/FeldSkelett";
 import { ProfilKopf } from "@/components/profil/ProfilKopf";
+import { summeOffen } from "@/lib/admin-aufgaben";
 import { registerParameter } from "@/lib/bewertungs-register";
 import { holeWoerterbuch } from "@/lib/i18n";
-import { mehrzahl } from "@/lib/i18n/text";
+import { mehrzahl, t } from "@/lib/i18n/text";
 import type { Woerterbuch } from "@/lib/i18n/typen";
 import { kontoNotizen } from "@/lib/konto";
 import { leereProfilWerte } from "@/lib/profil";
 import { liebsteAromen } from "@/lib/profil-ansicht";
 import { profilNotizen } from "@/lib/profil-dashboard";
 import { kopfNotizen } from "@/lib/profil-kopf";
+import { ladeAdminZaehler } from "@/lib/query/admin-uebersicht";
 import { aktuellesMitglied } from "@/lib/session";
 
 import { ReiheJury } from "./jury-reihe";
@@ -72,6 +74,7 @@ export default async function ProfilPage({
   const bearbeiten = parameter.ansicht === "bearbeiten";
   const id = mitglied.mitgliedId;
   const s = w.profil.seite;
+  const offen = mitglied.rolle === "ADMIN" ? summeOffen(await ladeAdminZaehler()) : null;
   const kopf = {
     name: mitglied.anzeigename,
     avatarId: mitglied.avatarId,
@@ -80,7 +83,7 @@ export default async function ProfilPage({
         ? ("betreiber" as const)
         : ("mitglied" as const),
     seit: mitglied.erstelltAm,
-    aktionen: seitenAktionen(s),
+    aktionen: seitenAktionen(s, offen),
     texte: s,
     sprache,
   };
@@ -184,8 +187,13 @@ export default async function ProfilPage({
 }
 
 /** Der Weg im Profilkopf; auch im Suspense-Fallback bekannt. „Profil bearbeiten“ steht nur im Reiter. */
-function seitenAktionen(s: Woerterbuch["profil"]["seite"]) {
-  return [{ href: "/blueten", text: s.bewerten, art: "primary" }] as const;
+function seitenAktionen(s: Woerterbuch["profil"]["seite"], offen: number | null) {
+  const bewerten = { href: "/blueten", text: s.bewerten, art: "primary" } as const;
+  if (offen === null) return [bewerten] as const;
+  return [
+    bewerten,
+    { href: "/admin", text: offen > 0 ? t(s.verwaltungOffen, { zahl: String(offen) }) : s.verwaltung, art: "secondary" },
+  ] as const;
 }
 
 /** Zahlen und liebste Aromen; die Quellen teilen sich Kopf und Boxen über laden.ts. */
