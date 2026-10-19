@@ -26,7 +26,7 @@ const SCHRITTE: Partial<Record<UmfragePhase, Schritt>> = {
   VORSCHLAG: {
     ziel: "ABSTIMMUNG",
     knopf: "Abstimmung starten",
-    frage: "Abstimmung starten? Danach kann niemand mehr Sorten vorschlagen.",
+    frage: "Abstimmung starten? Danach kann niemand mehr Strains vorschlagen.",
     bestaetigen: "Ja, Abstimmung starten",
     hinweis: "Vorher alle Vorschläge übernehmen, die auf die Wahlliste sollen.",
   },

@@ -43,7 +43,7 @@ test("Abfrage: eine queryRaw mit drei Unterabfragen, keine Transaktion", () => {
 
 test("Einträge deutsch: Tausenderpunkt, Mehrzahl, feste Reihenfolge", () => {
   assert.deepEqual(auftaktEintraege({ sorten: 412, bewertungen: 37, stimmen: 1284 }, de.start.auftakt.zahlen, "de"), [
-    { schluessel: "sorten", zahl: 412, text: "412", wort: "Sorten im Katalog" },
+    { schluessel: "sorten", zahl: 412, text: "412", wort: "Strains im Katalog" },
     { schluessel: "bewertungen", zahl: 37, text: "37", wort: "Bewertungen im Buch" },
     { schluessel: "stimmen", zahl: 1284, text: "1.284", wort: "Stimmen abgegeben" },
   ]);
@@ -57,7 +57,7 @@ test("Einträge englisch: Tausenderkomma, Einzahl bei 1", () => {
 
 test("Einzahl deutsch bei 1", () => {
   const eintraege = auftaktEintraege({ sorten: 1, bewertungen: 1, stimmen: 1 }, de.start.auftakt.zahlen, "de");
-  assert.deepEqual(eintraege.map((e) => e.wort), ["Sorte im Katalog", "Bewertung im Buch", "Stimme abgegeben"]);
+  assert.deepEqual(eintraege.map((e) => e.wort), ["Strain im Katalog", "Bewertung im Buch", "Stimme abgegeben"]);
 });
 
 test("Komponente: Fehlerfang, Endwert im HTML, eigenes Zählermerkmal", () => {

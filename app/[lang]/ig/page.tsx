@@ -16,7 +16,7 @@ export const revalidate = 86400;
 export const metadata: Metadata = {
   title: "Book of Terpz auf Instagram",
   description:
-    "Unabhängige Sortenbewertung für Medizinalcannabis – ehrlich, nach festem Schema, mit einer Community, die Sorten gemeinsam voranbringt.",
+    "Unabhängige Strain-Bewertung für Medizinalcannabis – ehrlich, nach festem Schema, mit einer Community, die Strains gemeinsam voranbringt.",
   robots: { index: true, follow: true },
 };
 
@@ -34,13 +34,13 @@ const WEGE: Weg[] = [
   {
     href: "/reviews",
     titel: "So bewerten wir",
-    nutzen: "Fünf Noten, Restfeuchte und Aroma, für jede Sorte nach demselben Schema.",
+    nutzen: "Fünf Noten, Restfeuchte und Aroma, für jeden Strain nach demselben Schema.",
     kante: "border-l-logo",
   },
   {
     href: "/umfragen",
     titel: "Mitmachen",
-    nutzen: "Freiwillige Events: gemeinsam Sorten vorschlagen, nach vorn bringen und zusammen bewerten.",
+    nutzen: "Freiwillige Events: gemeinsam Strains vorschlagen, nach vorn bringen und zusammen bewerten.",
     kante: "border-l-violett-400",
   },
   {
@@ -63,7 +63,7 @@ export default function IgPage() {
           Unabhängige Sortenbewertung für Medizinalcannabis
         </h1>
         <p className="mt-4 text-body text-pretty text-text-muted">
-          Ehrlich, nach festem Schema, mit einer Community, die Sorten gemeinsam voranbringt.
+          Ehrlich, nach festem Schema, mit einer Community, die Strains gemeinsam voranbringt.
         </p>
       </header>
 

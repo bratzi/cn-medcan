@@ -100,7 +100,7 @@ export async function gesetztenPlatzVergeben(
   const umfrageId = String(formData.get("umfrageId") ?? "").trim();
   const strainId = String(formData.get("strainId") ?? "").trim();
   if (!umfrageId) return { ok: false, fehler: "Keine Umfrage angegeben." };
-  if (!strainId) return { ok: false, fehler: "Bitte eine Sorte auswählen." };
+  if (!strainId) return { ok: false, fehler: "Bitte einen Strain auswählen." };
 
   const prisma = await getPrisma();
   const umfrage = await prisma.umfrage.findUnique({
@@ -123,7 +123,7 @@ export async function gesetztenPlatzVergeben(
     });
   } catch (fehler) {
     if (istEindeutigkeitsfehler(fehler)) {
-      return { ok: false, fehler: "Diese Sorte steht in dieser Runde schon auf der Liste." };
+      return { ok: false, fehler: "Dieser Strain steht in dieser Runde schon auf der Liste." };
     }
     throw fehler;
   }
@@ -176,7 +176,7 @@ export async function vorschlagUebernehmen(
     });
   } catch (fehler) {
     if (istEindeutigkeitsfehler(fehler)) {
-      return { ok: false, fehler: "Diese Sorte steht in dieser Runde schon auf der Liste." };
+      return { ok: false, fehler: "Dieser Strain steht in dieser Runde schon auf der Liste." };
     }
     throw fehler;
   }
@@ -323,7 +323,7 @@ export async function ergebnisVerknuepfen(
   // Eine Bewertung einer anderen Sorte als Ergebnis dieses Platzes waere
   // schlicht falsch und faellt sonst niemandem auf.
   if (review.strainId !== option.strainId) {
-    return { ok: false, fehler: "Die Bewertung gehört zu einer anderen Sorte." };
+    return { ok: false, fehler: "Die Bewertung gehört zu einem anderen Strain." };
   }
 
   await prisma.umfrageOption.update({

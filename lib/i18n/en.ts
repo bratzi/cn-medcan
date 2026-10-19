@@ -21,7 +21,7 @@ export const en: Woerterbuch = {
       bewertungen: "Reviews",
       abstimmung: "Vote",
       jury: "Jury",
-      blueten: "Flowers",
+      blueten: "Strains",
       profil: "My profile",
     },
     ungelesen: {
@@ -313,8 +313,8 @@ export const en: Woerterbuch = {
     },
   },
   katalog: {
-    titel: "Flowers",
-    metaTitel: "Flowers — medical cannabis catalogue",
+    titel: "Strains",
+    metaTitel: "Strains — medical cannabis catalogue",
     metaBeschreibung:
       "Filter all listed medical cannabis flowers by cultivar type, dosage form, THC range, dominant flavour and pharmacy availability.",
     einleitung: "All flowers listed here are prescription-only and can only be obtained from a pharmacy with a doctor's prescription.",

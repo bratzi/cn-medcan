@@ -89,7 +89,7 @@ test("CommunityVergleich: milder, gleich und leer", () => {
     renderToStaticMarkup(createElement(CommunityVergleich, { daten: { differenz, vergleichbar: differenz === null ? 1 : 2, abweichungen: [] }, texte: de.profil, sprache: "de" }));
   assert.match(r(0.3), /0,3 milder/);
   assert.match(r(0), /wie die Community/);
-  assert.match(r(null), /Sobald zwei deiner Sorten/);
+  assert.match(r(null), /Sobald zwei deiner Strains/);
 });
 
 test("Schnitte: sechs Werte mit Beschriftung aus dem Schema, Wirkung privat dabei", () => {

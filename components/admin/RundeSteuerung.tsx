@@ -98,7 +98,7 @@ export function RundeSteuerung({ umfrage, strains }: Props) {
             <Table caption="Kandidaten dieser Runde" captionVersteckt>
               <TableHead>
                 <TableRow>
-                  <TableHeaderCell>Sorte</TableHeaderCell>
+                  <TableHeaderCell>Strain</TableHeaderCell>
                   <TableHeaderCell>Herkunft</TableHeaderCell>
                   {zeigeStimmen ? (
                     <TableHeaderCell numerisch>Stimmen</TableHeaderCell>

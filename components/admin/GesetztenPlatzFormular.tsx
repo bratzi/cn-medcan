@@ -38,7 +38,7 @@ export function GesetztenPlatzFormular({ umfrageId, strains }: Props) {
       <div className="flex flex-wrap items-end gap-4">
         <Select
           id="gesetzter-platz-strain"
-          label="Sorte als gesetzten Platz aufnehmen"
+          label="Strain als gesetzten Platz aufnehmen"
           name="strainId"
           required
           optionen={strains}
