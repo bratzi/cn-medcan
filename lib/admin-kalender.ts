@@ -12,7 +12,10 @@ export function berlinTag(iso: string): string {
   return BERLIN.format(new Date(iso));
 }
 
-const zeit = (p: PubloraZeile) => Date.parse(p.geplantAm ?? "");
+/** Geplant, Termin verstrichen, weder veröffentlicht noch fehlgeschlagen: hängt vermutlich. */
+export const ueberfaellig = (p: PubloraZeile, jetzt: Date = new Date()) => p.status === "scheduled" && !!p.geplantAm && Date.parse(p.geplantAm) < jetzt.getTime();
+
+const zeit =(p: PubloraZeile) => Date.parse(p.geplantAm ?? "");
 
 export function kalenderBauen(zeilen: PubloraZeile[], stand: string | null, jetzt: Date = new Date()): Kalender {
   const t = jetzt.getTime();
@@ -28,7 +31,7 @@ export function kalenderBauen(zeilen: PubloraZeile[], stand: string | null, jetz
   }
   const alleEntwuerfe = zeilen.filter((p) => p.status === "draft" && !p.geplantAm);
   const vergangen = zeilen
-    .filter((p) => (p.status === "published" || p.status === "failed") && p.geplantAm && zeit(p) < t && zeit(p) >= t - 7 * TAG)
+    .filter((p) => (p.status === "published" || p.status === "failed" || p.status === "scheduled") && p.geplantAm && zeit(p) < t && zeit(p) >= t - 7 * TAG)
     .sort((a, b) => zeit(b) - zeit(a) || a.id.localeCompare(b.id));
   const veraltet = !stand || Number.isNaN(Date.parse(stand)) || t - Date.parse(stand) > 2 * TAG;
   return { kommend, entwuerfe: alleEntwuerfe.slice(0, 10), entwuerfeGesamt: alleEntwuerfe.length, vergangen, veraltet, stand };

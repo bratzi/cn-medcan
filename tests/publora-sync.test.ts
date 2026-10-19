@@ -60,3 +60,8 @@ test("syncAnweisungen: leeren, einfügen, Stand setzen mit Spalten der Migration
   assert.match(a[2].sql, /ON CONFLICT\(schluessel\) DO UPDATE SET stand = excluded\.stand/);
   assert.deepEqual(a[2].params, ["publora", "2026-10-16T10:00:00.000Z"]);
 });
+test("syncAnweisungen: geplantAm wird auf volles ISO normalisiert", () => {
+  const z = { id: "1", gruppe: "g", plattform: "instagram", art: "reel" as const, status: "scheduled", geplantAm: "2026-10-20T17:00:00+02:00", titel: "t" };
+  const a = syncAnweisungen([z], "2026-10-16T10:00:00.000Z");
+  assert.equal(a[1].params[5], "2026-10-20T15:00:00.000Z");
+});

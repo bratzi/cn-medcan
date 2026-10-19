@@ -1,6 +1,6 @@
 import { Badge } from "@/components/ui";
 import type { BadgeVariante } from "@/components/ui";
-import type { Kalender } from "@/lib/admin-kalender";
+import { ueberfaellig, type Kalender } from "@/lib/admin-kalender";
 import type { PostArt, PubloraZeile } from "@/lib/publora-sync";
 
 const ART: Record<PostArt, string> = { karussell: "Karussell", reel: "Reel", story: "Story", bild: "Bild" };
@@ -23,6 +23,7 @@ function Zeile({ p }: { p: PubloraZeile }) {
       <span className="text-small text-text-muted">{ART[p.art]}</span>
       <span className="min-w-0 flex-1 text-body text-text wrap-break-word">{p.titel || "Ohne Titel"}</span>
       <Badge variante={variante}>{text}</Badge>
+      {ueberfaellig(p) ? <Badge variante="danger">überfällig</Badge> : null}
     </li>
   );
 }

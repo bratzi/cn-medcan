@@ -74,7 +74,8 @@ export function syncAnweisungen(posts: PubloraZeile[], jetzt: string): SyncAnwei
     { sql: "DELETE FROM publora_post", params: [] },
     ...posts.map((p) => ({
       sql: "INSERT INTO publora_post (id, gruppe, plattform, art, status, geplant_am, titel, abgerufen_am) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-      params: [p.id, p.gruppe, p.plattform, p.art, p.status, p.geplantAm, p.titel, jetzt],
+      // Volle ISO-Form, sonst bricht der lexikografische Vergleich in den Abfragen.
+      params: [p.id, p.gruppe, p.plattform, p.art, p.status, p.geplantAm ? new Date(p.geplantAm).toISOString() : null, p.titel, jetzt],
     })),
     {
       sql: "INSERT INTO sync_stand (schluessel, stand) VALUES (?, ?) ON CONFLICT(schluessel) DO UPDATE SET stand = excluded.stand",

@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { berlinTag, kalenderBauen } from "@/lib/admin-kalender";
+import { berlinTag, kalenderBauen, ueberfaellig } from "@/lib/admin-kalender";
 import type { PubloraZeile } from "@/lib/publora-sync";
 
 const JETZT = new Date("2026-10-16T10:00:00Z");
@@ -27,6 +27,20 @@ test("kommend 14 Tage nach Tag, Entwürfe max 10, vergangen 7 Tage veröffentlic
   assert.equal(k.entwuerfeGesamt, 12);
   assert.deepEqual(k.vergangen.map((p) => p.id), ["d", "f"]);
   assert.equal(k.veraltet, false);
+});
+
+test("überfällige scheduled-Posts erscheinen unter vergangen", () => {
+  const zeilen = [
+    z("h", "scheduled", "2026-10-15T17:00:00Z"), // überfällig
+    z("i", "scheduled", "2026-10-01T17:00:00Z"), // älter als 7 Tage
+    z("j", "scheduled", "2026-10-20T17:00:00Z"), // kommend
+  ];
+  const k = kalenderBauen(zeilen, "2026-10-16T04:00:00Z", JETZT);
+  assert.deepEqual(k.vergangen.map((p) => p.id), ["h"]);
+  assert.deepEqual(k.kommend.flatMap((t) => t.posts.map((p) => p.id)), ["j"]);
+  assert.equal(ueberfaellig(zeilen[0], JETZT), true);
+  assert.equal(ueberfaellig(zeilen[2], JETZT), false);
+  assert.equal(ueberfaellig(z("p", "published", "2026-10-15T17:00:00Z"), JETZT), false);
 });
 
 test("veraltet ohne Stand oder nach 48 h", () => {
