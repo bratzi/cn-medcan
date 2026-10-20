@@ -41,7 +41,7 @@ Die URL bleibt teilbar und der Zurück-Knopf funktioniert. Die Seite erzählt zu
   `Cache-Control: public, max-age=300, stale-while-revalidate=3600`. Höchstens 24 KV-Schreibvorgänge am Tag.
 - **Fachkreis:** dieselbe Route mit Cookie liefert die Variante mit Preisen, `Cache-Control: private, no-store`,
   serverseitig ebenfalls per `unstable_cache` (zweiter Schlüssel). Freigabe nur über `istFachkreis()` und
-  `bestandSichtbarkeit()`; der öffentliche Cache enthält nie Preise.
+  `bestandSichtbarkeit()`; der öffentliche Cache enthält nur Bestandszeilen mit `nur_fuer_fachkreise = 0`, also nie mehr als die Seite heute öffentlich zeigt.
 - **CPU-Grenze:** Der Neubau bei Cache-Fehlschlag muss unter 10 ms Worker-CPU bleiben. Deshalb baut D1 das JSON
   per `json_group_array`/`json_object` in einer oder zwei SQL-Abfragen (`$queryRaw`), der Worker reicht den
   Text nur durch. **Task 0 ist ein Spike, der das live misst**; scheitert er, fällt der Plan auf ein bei
