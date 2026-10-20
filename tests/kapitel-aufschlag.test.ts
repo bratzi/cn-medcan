@@ -88,7 +88,7 @@ test("Name bricht nicht mitten im Wort: Grad text-kapitel statt text-titel (live
 test("Dein Kapitel steht direkt hinter dem Storytelling, die Bewertung gleich danach (Nutzer 2026-10-20)", async () => {
   const { readFileSync } = await import("node:fs");
   const seite = readFileSync("app/[lang]/page.tsx", "utf8");
-  assert.match(seite, /<TerpenBand \/>\s*(\{\/\*[^]*?\*\/\}\s*)?<TransparentMachen \/>\s*<DeinKapitel \/>\s*<NeuesterEintrag \/>/);
+  assert.match(seite, /<TerpenBand \/>\s*(\{\/\*[^]*?\*\/\}\s*)?<TransparentMachen \/>\s*<DeinKapitel \/>\s*<BewertungSchritte \/>\s*<NeuesterEintrag \/>/);
   const start = readFileSync("components/story/bewegung/start.ts", "utf8");
   assert.match(start, /transparent,\n\s*kapitel,\n\s*randnotizen,\n\s*register,/);
 });

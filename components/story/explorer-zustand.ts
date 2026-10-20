@@ -11,7 +11,9 @@ export type ExplorerAktion =
   | { typ: "vergleichEnde" }
   | { typ: "suche"; text: string };
 
-export function explorerStart(sorten: readonly ExplorerSorte[]): ExplorerZustand {
+/** `offen = false`: keine Sorte gewählt, der Katalog steht (Spec 2026-10-20, Teil A). */
+export function explorerStart(sorten: readonly ExplorerSorte[], offen = true): ExplorerZustand {
+  if (!offen) return { sorte: "", ware: null, vergleich: [], suche: "" };
   const erste = sorten[0];
   return { sorte: erste?.slug ?? "", ware: erste?.waren[0]?.vertreiberId ?? null, vergleich: [], suche: "" };
 }

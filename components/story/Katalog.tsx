@@ -1,13 +1,15 @@
 import Link from "next/link";
-import { Suspense } from "react";
+import { Suspense, type ReactNode } from "react";
 
 import { alsDiashow } from "@/lib/budpic-anzeige";
 import { ladeFreieBudpics } from "@/lib/query/budpics";
 import { ProduktCard } from "@/components/produkt/ProduktCard";
 import { KatalogSkelett } from "@/components/story/Skelette";
+import { SortenExplorer } from "@/components/story/SortenExplorer";
 import { EmptyState, buttonKlassen } from "@/components/ui";
 import { leererFilter } from "@/lib/query/filter";
 import { ladeVertreiberJeKultivar, weitereVertreiber } from "@/lib/query/kultivar-liste";
+import { ladeSortenExplorer } from "@/lib/query/sorten-explorer";
 import { ladeStrainListe } from "@/lib/query/strains";
 import { sicher } from "@/lib/sicher";
 import { holeSprache, holeWoerterbuch, type Woerterbuch } from "@/lib/i18n";
@@ -85,6 +87,27 @@ async function Reihe() {
   );
 }
 
+/**
+ * Katalog und „Gleiche Blüte, anderer Vertreiber“ als eine Sektion (Spec 2026-10-20, Teil A):
+ * eine Suche; ohne gewählten Strain steht die Katalog-Reihe, nach der Wahl klappt die
+ * Vertreiber-Leiste auf. Ohne Explorer-Daten bleibt nur der Katalog.
+ */
+async function KatalogExplorer({ zu }: { zu: ReactNode }) {
+  const [w, sprache] = await Promise.all([holeWoerterbuch(), holeSprache()]);
+  const sorten = await sicher(() => ladeSortenExplorer(), [], "Katalog-Explorer");
+  if (sorten.length === 0) return <>{zu}</>;
+  const texte = w.start.vertreiber;
+  const kopf = (
+    <>
+      <h3 className="font-buch text-kapitel text-balance text-text max-md:text-center">
+        {texte.vor} <em className="farbverlauf hand-betont">{texte.betont}</em> {texte.nach}
+      </h3>
+      <p className="max-w-[56ch] text-body text-pretty text-text max-md:mx-auto max-md:text-center">{texte.absatz}</p>
+    </>
+  );
+  return <SortenExplorer sorten={sorten} texte={texte} typen={w.label.kultivarTyp} sprache={sprache} kopf={kopf} zu={zu} />;
+}
+
 /** Sektion 7 (Spec 5.1): ruhiges Buch nach der Abstimmung. */
 export async function Katalog() {
   const w = await holeWoerterbuch();
@@ -106,18 +129,23 @@ export async function Katalog() {
           </Link>
         </div>
 
-        <ul aria-label={texte.einstiege} className="flex flex-wrap gap-2 max-md:justify-center">
-          {EINSTIEGE.map((eintrag) => (
-            <li key={eintrag.href}>
-              <Link prefetch={false} href={eintrag.href} className={buttonKlassen("secondary", "sm")}>
-                {eintrag.text(w)}
-              </Link>
-            </li>
-          ))}
-        </ul>
-
         <Suspense fallback={<KatalogSkelett ansage={w.katalog.laedt} />}>
-          <Reihe />
+          <KatalogExplorer
+            zu={
+              <div className="flex flex-col gap-8">
+                <ul aria-label={texte.einstiege} className="flex flex-wrap gap-2 max-md:justify-center">
+                  {EINSTIEGE.map((eintrag) => (
+                    <li key={eintrag.href}>
+                      <Link prefetch={false} href={eintrag.href} className={buttonKlassen("secondary", "sm")}>
+                        {eintrag.text(w)}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+                <Reihe />
+              </div>
+            }
+          />
         </Suspense>
       </div>
     </section>

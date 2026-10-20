@@ -3,6 +3,7 @@ import { DeinKapitel } from "@/components/story/DeinKapitel";
 import { AromaSektion } from "@/components/story/AromaSektion";
 import { Empfehlungen } from "@/components/story/Empfehlungen";
 import { Auftakt } from "@/components/story/Auftakt";
+import { BewertungSchritte } from "@/components/story/BewertungSchritte";
 import { FeldbuchRaster } from "@/components/story/FeldbuchRaster";
 import { GemeinsamLernen } from "@/components/story/GemeinsamLernen";
 import { Katalog } from "@/components/story/Katalog";
@@ -12,7 +13,6 @@ import { StoryBuehne } from "@/components/story/StoryBuehne";
 import { TerpenBand } from "@/components/story/TerpenBand";
 import { TerpenRegister } from "@/components/story/TerpenRegister";
 import { TransparentMachen } from "@/components/story/TransparentMachen";
-import { VertreiberKapitel } from "@/components/story/VertreiberKapitel";
 import { WissenBuendeln } from "@/components/story/WissenBuendeln";
 
 /**
@@ -39,18 +39,18 @@ export default function StartPage() {
         <Auftakt />
         {/* Band der Terpene zwischen Hero und Story (Nutzer 2026-09-30). */}
         <TerpenBand />
-        {/* Nutzer 2026-10-20: Storytelling, dann das eigene Kapitel, dann die Bewertung im Fokus, danach der Rest. */}
+        {/* Reihenfolge nach Spec 2026-10-20 (Teil A): Storytelling, eigenes Kapitel, Bewertung im Fokus,
+            Terpene, ein Katalog mit Vertreiber-Leiste, dann Wissen, Lernen, Empfehlungen. */}
         <TransparentMachen />
         <DeinKapitel />
+        <BewertungSchritte />
         <NeuesterEintrag />
-        <VertreiberKapitel />
-        {/* T12: Register der Terpene und Geschmäcker, vor der Aroma-Karte (Nutzer 2026-09-29). */}
         <TerpenRegister />
         <AromaSektion />
+        <Katalog />
         <WissenBuendeln />
         <GemeinsamLernen />
         <Empfehlungen />
-        <Katalog />
         {/* Abstimmungen sind freiwillige Events, nicht im Fokus (Nutzer 2026-10-15): ans Ende, kompakt. */}
         <Abstimmung />
         <StoryBuehne />

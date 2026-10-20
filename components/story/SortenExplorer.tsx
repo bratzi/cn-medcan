@@ -29,6 +29,8 @@ type Props = {
   sprache: Sprache;
   /** Überschrift und Absatz der linken Spalte; das Bild der gewählten Sorte steht darunter. */
   kopf: ReactNode;
+  /** Steht, solange keine Sorte gewählt ist (Katalog-Reihe); mit `zu` startet der Explorer zugeklappt. */
+  zu?: ReactNode;
 };
 
 /**
@@ -36,8 +38,12 @@ type Props = {
  * Daten kommen statisch mit der Startseite; die Reihenfolge stammt aus waehleExplorerSorten
  * (Menge, dann Name), nie aus der Note (HWG). Ohne JavaScript steht die erste Sorte vollständig.
  */
-export function SortenExplorer({ sorten, texte, typen, sprache, kopf }: Props) {
-  const [zustand, senden] = useReducer((z: ReturnType<typeof explorerStart>, a: Parameters<typeof explorerZustand>[0]) => explorerZustand(a, z), sorten, explorerStart);
+export function SortenExplorer({ sorten, texte, typen, sprache, kopf, zu }: Props) {
+  const [zustand, senden] = useReducer(
+    (z: ReturnType<typeof explorerStart>, a: Parameters<typeof explorerZustand>[0]) => explorerZustand(a, z),
+    sorten,
+    (s) => explorerStart(s, zu === undefined),
+  );
   const [meldung, setMeldung] = useState("");
   // Die eben verlassene Sorte bleibt kurz stehen und geht ab, während die neue auftritt.
   const [vorher, setVorher] = useState<ExplorerSorte | null>(null);
@@ -48,20 +54,14 @@ export function SortenExplorer({ sorten, texte, typen, sprache, kopf }: Props) {
   const alle = gesucht.length > 0 ? [...sorten, ...gesucht.filter((g) => !sorten.some((s) => s.slug === g.slug))] : sorten;
   const sucheAktiv = normalisiereSuche(zustand.suche) !== null;
   const sichtbar = filtereSorten(alle, zustand.suche);
-  const sorte = alle.find((s) => s.slug === zustand.sorte) ?? sorten[0];
-  if (!sorte) return null;
-  const ware = sorte.waren.find((w) => w.vertreiberId === zustand.ware) ?? sorte.waren[0];
-  const skala = Math.max(...sorte.waren.map((w) => w.thc[1]));
+  const gewaehlt = alle.find((s) => s.slug === zustand.sorte) ?? (zu === undefined ? sorten[0] : undefined);
   // Roving tabindex: die gewählte Sorte, oder die erste sichtbare, wenn die Suche sie ausblendet.
-  const tabbar = sichtbar.some((s) => s.slug === sorte.slug) ? sorte.slug : sichtbar[0]?.slug;
-  const vergleich = zustand.vergleich
-    .map((id) => sorte.waren.find((w) => w.vertreiberId === id))
-    .filter((w): w is ExplorerWare => w !== undefined);
+  const tabbar = gewaehlt && sichtbar.some((s) => s.slug === gewaehlt.slug) ? gewaehlt.slug : sichtbar[0]?.slug;
   const zahl = (wert: number) => formatiereZahl(wert, 1, sprache);
 
   function waehleSorte(neu: ExplorerSorte) {
-    if (neu.slug === sorte?.slug) return;
-    setVorher(sorte?.bild ? sorte : null);
+    if (neu.slug === gewaehlt?.slug) return;
+    setVorher(gewaehlt?.bild ? gewaehlt : null);
     senden({ typ: "sorte", slug: neu.slug, ersteWare: neu.waren[0]?.vertreiberId ?? null });
     setMeldung(t(texte.sorteGewechselt, { name: neu.name, waren: mehrzahl(sprache, texte.waren, neu.waren.length) }));
   }
@@ -87,34 +87,14 @@ export function SortenExplorer({ sorten, texte, typen, sprache, kopf }: Props) {
     chips.current.get(neu.slug)?.focus();
   }
 
-  return (
-    <div className={KAPITEL_RASTER}>
-      <div className="flex flex-col gap-8">
-        {kopf}
-        {sorte.bild ? (
-          <div className="sorten-buehne relative h-72 w-full max-w-md max-md:mx-auto sm:h-96">
-            {vorher?.bild && vorher.slug !== sorte.slug ? (
-              <figure key={`raus-${vorher.slug}`} aria-hidden="true" className="sorten-bild-raus" onAnimationEnd={() => setVorher(null)}>
-                <SortenBild {...vorher.bild} alt="" />
-              </figure>
-            ) : null}
-            <figure key={sorte.slug} className="sorten-bild-rein relative">
-              <SortenBild {...sorte.bild} alt={sorte.bild.symbol ? "" : t(texte.bildAlt, { name: sorte.name })} />
-              {sorte.bild.symbol ? (
-                <figcaption className="absolute right-0 bottom-0 text-caption text-text-muted">{texte.symbolbild}</figcaption>
-              ) : null}
-            </figure>
-          </div>
-        ) : null}
-      </div>
-    <div className="flex min-w-0 flex-col gap-8">
+  const auswahl = (
       <div className="flex flex-col gap-4">
         <SortenSuche text={zustand.suche} onText={(text) => senden({ typ: "suche", text })} onWaehlen={waehleTreffer} texte={texte} sprache={sprache} />
         {/* Hick: höchstens zwölf Sorten; die Suche grenzt weiter ein. */}
         {sucheAktiv ? null : (
         <div role="radiogroup" aria-label={texte.sortenWahl} onKeyDown={tasten} className="flex flex-wrap gap-2">
           {sichtbar.map((s) => {
-            const aktiv = s.slug === sorte.slug;
+            const aktiv = s.slug === gewaehlt?.slug;
             return (
               <button
                 key={s.slug}
@@ -140,6 +120,58 @@ export function SortenExplorer({ sorten, texte, typen, sprache, kopf }: Props) {
         )}
         {!sucheAktiv && sichtbar.length === 0 ? <p className="text-small text-text-muted">{t(texte.keineTreffer, { suche: zustand.suche.trim() })}</p> : null}
       </div>
+  );
+  const meldungZeile = (
+    <p aria-live="polite" className="sr-only">
+      {meldung}
+    </p>
+  );
+
+  // Zugeklappt (Startseite, Spec 2026-10-20): Suche und Pillen, darunter der Katalog.
+  if (!gewaehlt) {
+    if (zu === undefined) return null;
+    return (
+      <div className="flex flex-col gap-8">
+        {auswahl}
+        {zu}
+        {meldungZeile}
+      </div>
+    );
+  }
+  const sorte = gewaehlt;
+  const ware = sorte.waren.find((w) => w.vertreiberId === zustand.ware) ?? sorte.waren[0];
+  const skala = Math.max(...sorte.waren.map((w) => w.thc[1]));
+  const vergleich = zustand.vergleich
+    .map((id) => sorte.waren.find((w) => w.vertreiberId === id))
+    .filter((w): w is ExplorerWare => w !== undefined);
+
+  return (
+    <div className={KAPITEL_RASTER}>
+      <div className="flex flex-col gap-8">
+        {kopf}
+        {sorte.bild ? (
+          <div className="sorten-buehne relative h-72 w-full max-w-md max-md:mx-auto sm:h-96">
+            {vorher?.bild && vorher.slug !== sorte.slug ? (
+              <figure key={`raus-${vorher.slug}`} aria-hidden="true" className="sorten-bild-raus" onAnimationEnd={() => setVorher(null)}>
+                <SortenBild {...vorher.bild} alt="" />
+              </figure>
+            ) : null}
+            <figure key={sorte.slug} className="sorten-bild-rein relative">
+              <SortenBild {...sorte.bild} alt={sorte.bild.symbol ? "" : t(texte.bildAlt, { name: sorte.name })} />
+              {sorte.bild.symbol ? (
+                <figcaption className="absolute right-0 bottom-0 text-caption text-text-muted">{texte.symbolbild}</figcaption>
+              ) : null}
+            </figure>
+          </div>
+        ) : null}
+      </div>
+    <div className="flex min-w-0 flex-col gap-8">
+      {auswahl}
+      {zu !== undefined ? (
+        <button type="button" onClick={() => senden({ typ: "sorte", slug: "", ersteWare: null })} className={buttonKlassen("ghost", "sm", "self-start")}>
+          {texte.zurueck}
+        </button>
+      ) : null}
 
       <div className="flex flex-col gap-2 border-t border-border-strong pt-8">
         <p className="font-buch text-display text-balance text-text wrap-break-word">{sorte.name}</p>
@@ -207,9 +239,7 @@ export function SortenExplorer({ sorten, texte, typen, sprache, kopf }: Props) {
         </div>
       ) : null}
 
-      <p aria-live="polite" className="sr-only">
-        {meldung}
-      </p>
+      {meldungZeile}
       <p className="text-small text-text-muted">{texte.hinweis}</p>
     </div>
     </div>

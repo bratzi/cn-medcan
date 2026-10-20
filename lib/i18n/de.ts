@@ -912,6 +912,7 @@ export const de = {
       sorteGewechselt: "{name}, {waren}.",
       bildAlt: "Blüte des Strains {name}",
       symbolbild: "Symbolbild",
+      zurueck: "Zurück zum Katalog",
       hinweis: "Erfahrungen der Mitglieder, keine Empfehlung.",
     },
     skelett: {
