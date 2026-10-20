@@ -1,6 +1,6 @@
 {
-  "stand": "2026-09-25",
-  "methode": "Eigene Recherche: Fakten je Produkt aus Herstellerseiten, Apotheken-Live-Bestand (Grünhorn), Sortenübersicht cannabis-aerzte.de (Stand 05/2024) und Züchter-/Sortenseiten für die Genetik; bei Abweichung gilt Apotheke vor Hersteller vor Referenz, alle Werte stehen unter abweichungen. Runde 2 (2026-09-25): gezielte Suche je Hersteller (Suchliste data/stamm/hersteller-leads.json) ueber Herstellerseiten, Fachpresse und oeffentliche Apotheken-Listings, hoechstens 40 Produkte je Website; THC/CBD teils aus dem Handelsnamen abgeleitet. Runde 3 (2026-09-29): Sortensammlung des Betreibers (1.json, 2026-09); neue Sorten angelegt, vorhandene nur in leeren Feldern ergänzt, Wirk- und Indikationsangaben nicht übernommen (HWG).",
+  "stand": "2026-10-20",
+  "methode": "Eigene Recherche: Fakten je Produkt aus Herstellerseiten, Apotheken-Live-Bestand (Grünhorn), Sortenübersicht cannabis-aerzte.de (Stand 05/2024) und Züchter-/Sortenseiten für die Genetik; bei Abweichung gilt Apotheke vor Hersteller vor Referenz, alle Werte stehen unter abweichungen. Runde 2 (2026-09-25): gezielte Suche je Hersteller (Suchliste data/stamm/hersteller-leads.json) ueber Herstellerseiten, Fachpresse und oeffentliche Apotheken-Listings, hoechstens 40 Produkte je Website; THC/CBD teils aus dem Handelsnamen abgeleitet. Runde 3 (2026-09-29): Sortensammlung des Betreibers (1.json, 2026-09); neue Sorten angelegt, vorhandene nur in leeren Feldern ergänzt, Wirk- und Indikationsangaben nicht übernommen (HWG). Runde 4 (2026-10-20): Terpenprofile nachgetragen aus oeffentlichen Quellen je Produkt (Falken-Apotheke Hannover Bluetenliste, demecan.de/produkte, Bedrocan-Terpenprofil-PDFs, Terpen-Analysegrafiken auf cansativa.de/peacenaturals, greenmedical.health-Produktseiten, allefarben-apotheke.de-Produktseiten, medicanova.de, myweed24.de); ein Terpen nur, wenn die Quelle es fuer genau dieses Produkt nennt, URL steht in quellen und je Terpen unter quelle. Eine Liste wird nur ersetzt, wenn die Quelle mehr Terpene nennt als der bisherige Eintrag. Reihenfolge wie in der Quelle bzw. nach Anteil, wo die Quelle Anteile oder Balken zeigt; Anteile (Prozent am Terpengehalt) nicht als Konzentration uebernommen. Schreibfehler der Quelle auf das gemeinte Terpen gelegt (z. B. Mycren, Limomen), Isomere auf den Stammnamen (Selina-3,7(11)-dien/gamma-Selinen auf Selinen, alpha-Phellandren auf Phellandren, Fenchylalkohol auf Fenchol, alpha-Caryophyllen auf Humulen); Stoffe ohne Woerterbucheintrag (z. B. Germacren, gamma-Elemen, Kampfer, Fenchon) weggelassen. Wirk- und Indikationsangaben nicht uebernommen (HWG).",
   "anzahl": 727,
   "produkte": [
     {
@@ -79,11 +79,36 @@
           "name": "Terpinolen",
           "rang": 1,
           "konzentrationProzent": null,
-          "quelle": "https://www.cannabis-aerzte.de/medizinische-cannabissorten/"
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "beta-Caryophyllen",
+          "rang": 2,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Limonen",
+          "rang": 3,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Myrcen",
+          "rang": 4,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Ocimen",
+          "rang": 5,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
         }
       ],
       "quellen": [
-        "https://www.cannabis-aerzte.de/medizinische-cannabissorten/"
+        "https://www.cannabis-aerzte.de/medizinische-cannabissorten/",
+        "https://falken-apotheke-hannover.de/blueten/"
       ]
     },
     {
@@ -189,7 +214,26 @@
       "cbdMaxProzent": 1,
       "bestrahlung": "UNBESTRAHLT",
       "anbauland": "Portugal",
-      "terpene": [],
+      "terpene": [
+        {
+          "name": "Limonen",
+          "rang": 1,
+          "konzentrationProzent": null,
+          "quelle": "https://greenmedical.health/de/cannabis/flower/a_kineo_craft_no_1_27_1-hash_burger"
+        },
+        {
+          "name": "Myrcen",
+          "rang": 2,
+          "konzentrationProzent": null,
+          "quelle": "https://greenmedical.health/de/cannabis/flower/a_kineo_craft_no_1_27_1-hash_burger"
+        },
+        {
+          "name": "beta-Caryophyllen",
+          "rang": 3,
+          "konzentrationProzent": null,
+          "quelle": "https://greenmedical.health/de/cannabis/flower/a_kineo_craft_no_1_27_1-hash_burger"
+        }
+      ],
       "aromen": [],
       "pzn": null,
       "quellen": [
@@ -212,7 +256,26 @@
       "cbdMaxProzent": 1,
       "bestrahlung": "UNBESTRAHLT",
       "anbauland": "Portugal",
-      "terpene": [],
+      "terpene": [
+        {
+          "name": "beta-Caryophyllen",
+          "rang": 1,
+          "konzentrationProzent": null,
+          "quelle": "https://www.greenmedical.health/de/cannabis/flower/a_kineo_craft_no_1_30_1-hash_burger"
+        },
+        {
+          "name": "Myrcen",
+          "rang": 2,
+          "konzentrationProzent": null,
+          "quelle": "https://www.greenmedical.health/de/cannabis/flower/a_kineo_craft_no_1_30_1-hash_burger"
+        },
+        {
+          "name": "Limonen",
+          "rang": 3,
+          "konzentrationProzent": null,
+          "quelle": "https://www.greenmedical.health/de/cannabis/flower/a_kineo_craft_no_1_30_1-hash_burger"
+        }
+      ],
       "aromen": [],
       "pzn": null,
       "quellen": [
@@ -235,11 +298,31 @@
       "cbdMaxProzent": 1,
       "bestrahlung": "UNBEKANNT",
       "anbauland": null,
-      "terpene": [],
+      "terpene": [
+        {
+          "name": "Caryophyllenoxid",
+          "rang": 1,
+          "konzentrationProzent": null,
+          "quelle": "https://greenmedical.health/de/cannabis/flower/a_kineo_junglezz_24_1-wedding_cake"
+        },
+        {
+          "name": "Myrcen",
+          "rang": 2,
+          "konzentrationProzent": null,
+          "quelle": "https://greenmedical.health/de/cannabis/flower/a_kineo_junglezz_24_1-wedding_cake"
+        },
+        {
+          "name": "Limonen",
+          "rang": 3,
+          "konzentrationProzent": null,
+          "quelle": "https://greenmedical.health/de/cannabis/flower/a_kineo_junglezz_24_1-wedding_cake"
+        }
+      ],
       "aromen": [],
       "pzn": null,
       "quellen": [
-        "https://greenmedical.health/de/cannabis/producer/kineo_medical"
+        "https://greenmedical.health/de/cannabis/producer/kineo_medical",
+        "https://greenmedical.health/de/cannabis/flower/a_kineo_junglezz_24_1-wedding_cake"
       ]
     },
     {
@@ -257,7 +340,26 @@
       "cbdMaxProzent": 1,
       "bestrahlung": "UNBESTRAHLT",
       "anbauland": "Portugal",
-      "terpene": [],
+      "terpene": [
+        {
+          "name": "Pinen",
+          "rang": 1,
+          "konzentrationProzent": null,
+          "quelle": "https://greenmedical.health/de/cannabis/flower/a_kineo_spirit_no_1_25_1-muel_fuel"
+        },
+        {
+          "name": "beta-Caryophyllen",
+          "rang": 2,
+          "konzentrationProzent": null,
+          "quelle": "https://greenmedical.health/de/cannabis/flower/a_kineo_spirit_no_1_25_1-muel_fuel"
+        },
+        {
+          "name": "Humulen",
+          "rang": 3,
+          "konzentrationProzent": null,
+          "quelle": "https://greenmedical.health/de/cannabis/flower/a_kineo_spirit_no_1_25_1-muel_fuel"
+        }
+      ],
       "aromen": [],
       "pzn": null,
       "quellen": [
@@ -280,7 +382,32 @@
       "cbdMaxProzent": 1,
       "bestrahlung": "UNBESTRAHLT",
       "anbauland": "Portugal",
-      "terpene": [],
+      "terpene": [
+        {
+          "name": "Myrcen",
+          "rang": 1,
+          "konzentrationProzent": null,
+          "quelle": "https://greenmedical.health/de/cannabis/flower/a_kineo_spirit_no_1_27_1-muel_fuel"
+        },
+        {
+          "name": "Humulen",
+          "rang": 2,
+          "konzentrationProzent": null,
+          "quelle": "https://greenmedical.health/de/cannabis/flower/a_kineo_spirit_no_1_27_1-muel_fuel"
+        },
+        {
+          "name": "Pinen",
+          "rang": 3,
+          "konzentrationProzent": null,
+          "quelle": "https://greenmedical.health/de/cannabis/flower/a_kineo_spirit_no_1_27_1-muel_fuel"
+        },
+        {
+          "name": "beta-Caryophyllen",
+          "rang": 4,
+          "konzentrationProzent": null,
+          "quelle": "https://greenmedical.health/de/cannabis/flower/a_kineo_spirit_no_1_27_1-muel_fuel"
+        }
+      ],
       "aromen": [],
       "pzn": null,
       "quellen": [
@@ -382,7 +509,38 @@
       "cbdMaxProzent": 1,
       "bestrahlung": "UNBEKANNT",
       "anbauland": "Kanada",
-      "terpene": [],
+      "terpene": [
+        {
+          "name": "Myrcen",
+          "rang": 1,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Ocimen",
+          "rang": 2,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Limonen",
+          "rang": 3,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "beta-Caryophyllen",
+          "rang": 4,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "alpha-Pinen",
+          "rang": 5,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        }
+      ],
       "aromen": [],
       "pzn": null,
       "quellen": [
@@ -404,7 +562,38 @@
       "cbdMaxProzent": 1,
       "bestrahlung": "GAMMA",
       "anbauland": "Kanada",
-      "terpene": [],
+      "terpene": [
+        {
+          "name": "Terpinolen",
+          "rang": 1,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Myrcen",
+          "rang": 2,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "beta-Caryophyllen",
+          "rang": 3,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Humulen",
+          "rang": 4,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Limonen",
+          "rang": 5,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        }
+      ],
       "aromen": [],
       "pzn": null,
       "quellen": [
@@ -426,7 +615,38 @@
       "cbdMaxProzent": 1,
       "bestrahlung": "UNBEKANNT",
       "anbauland": "Kanada",
-      "terpene": [],
+      "terpene": [
+        {
+          "name": "beta-Caryophyllen",
+          "rang": 1,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Myrcen",
+          "rang": 2,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "alpha-Pinen",
+          "rang": 3,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Ocimen",
+          "rang": 4,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Bisabolol",
+          "rang": 5,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        }
+      ],
       "aromen": [],
       "pzn": null,
       "quellen": [
@@ -448,7 +668,38 @@
       "cbdMaxProzent": 1,
       "bestrahlung": "GAMMA",
       "anbauland": "Kanada",
-      "terpene": [],
+      "terpene": [
+        {
+          "name": "Terpinolen",
+          "rang": 1,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Myrcen",
+          "rang": 2,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "beta-Caryophyllen",
+          "rang": 3,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Humulen",
+          "rang": 4,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Limonen",
+          "rang": 5,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        }
+      ],
       "aromen": [],
       "pzn": null,
       "quellen": [
@@ -533,28 +784,52 @@
       "anbauland": "Kanada",
       "terpene": [
         {
-          "name": "Terpinolen",
-          "konzentrationProzent": null
-        },
-        {
           "name": "Linalool",
-          "konzentrationProzent": null
+          "rang": 1,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
         },
         {
           "name": "Humulen",
-          "konzentrationProzent": null
-        },
-        {
-          "name": "Myrcen",
-          "konzentrationProzent": null
-        },
-        {
-          "name": "beta-Caryophyllen",
-          "konzentrationProzent": null
+          "rang": 2,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
         },
         {
           "name": "alpha-Pinen",
-          "konzentrationProzent": null
+          "rang": 3,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Terpinolen",
+          "rang": 4,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Terpineol",
+          "rang": 5,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Limonen",
+          "rang": 6,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "beta-Caryophyllen",
+          "rang": 7,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Myrcen",
+          "rang": 8,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
         }
       ],
       "aromen": [
@@ -585,12 +860,49 @@
           "name": "beta-Pinen",
           "rang": 1,
           "konzentrationProzent": null,
-          "quelle": "https://www.cannabis-aerzte.de/medizinische-cannabissorten/"
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Valencen",
+          "rang": 2,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Limonen",
+          "rang": 3,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Terpinolen",
+          "rang": 4,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Linalool",
+          "rang": 5,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "beta-Caryophyllen",
+          "rang": 6,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Myrcen",
+          "rang": 7,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
         }
       ],
       "quellen": [
         "https://www.cannabis-aerzte.de/medizinische-cannabissorten/",
-        "Sortensammlung des Betreibers (1.json, 2026-09)"
+        "Sortensammlung des Betreibers (1.json, 2026-09)",
+        "https://falken-apotheke-hannover.de/blueten/"
       ],
       "aromen": [
         "Kiefer",
@@ -613,12 +925,37 @@
           "name": "Myrcen",
           "rang": 1,
           "konzentrationProzent": null,
-          "quelle": "https://www.cannabis-aerzte.de/medizinische-cannabissorten/"
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "beta-Caryophyllen",
+          "rang": 2,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Limonen",
+          "rang": 3,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Bisabolol",
+          "rang": 4,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Humulen",
+          "rang": 5,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
         }
       ],
       "quellen": [
         "https://www.cannabis-aerzte.de/medizinische-cannabissorten/",
-        "Sortensammlung des Betreibers (1.json, 2026-09)"
+        "Sortensammlung des Betreibers (1.json, 2026-09)",
+        "https://falken-apotheke-hannover.de/blueten/"
       ],
       "aromen": [
         "Tropisch",
@@ -903,20 +1240,40 @@
       "anbauland": "Kanada",
       "terpene": [
         {
-          "name": "Limonen",
-          "konzentrationProzent": null
-        },
-        {
-          "name": "alpha-Pinen",
-          "konzentrationProzent": null
-        },
-        {
           "name": "Myrcen",
-          "konzentrationProzent": null
+          "rang": 1,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Limonen",
+          "rang": 2,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
         },
         {
           "name": "beta-Caryophyllen",
-          "konzentrationProzent": null
+          "rang": 3,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Linalool",
+          "rang": 4,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Nerolidol",
+          "rang": 5,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Bisabolol",
+          "rang": 6,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
         }
       ],
       "aromen": [
@@ -927,7 +1284,8 @@
       "pzn": null,
       "quellen": [
         "https://bavarian-cannabis.com/shop/aurora",
-        "Sortensammlung des Betreibers (1.json, 2026-09)"
+        "Sortensammlung des Betreibers (1.json, 2026-09)",
+        "https://falken-apotheke-hannover.de/blueten/"
       ]
     },
     {
@@ -947,24 +1305,40 @@
       "anbauland": "Dänemark",
       "terpene": [
         {
-          "name": "alpha-Pinen",
+          "name": "Terpinolen",
           "rang": 1,
-          "konzentrationProzent": null
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
         },
         {
           "name": "Myrcen",
           "rang": 2,
-          "konzentrationProzent": null
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "beta-Caryophyllen",
+          "rang": 3,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "alpha-Pinen",
+          "rang": 4,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Ocimen",
+          "rang": 5,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
         },
         {
           "name": "beta-Pinen",
-          "rang": 3,
-          "konzentrationProzent": null
-        },
-        {
-          "name": "Terpinolen",
-          "rang": 4,
-          "konzentrationProzent": null
+          "rang": 6,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
         }
       ],
       "aromen": [
@@ -973,7 +1347,8 @@
       ],
       "pzn": null,
       "quellen": [
-        "https://bavarian-cannabis.com/shop/aurora"
+        "https://bavarian-cannabis.com/shop/aurora",
+        "https://falken-apotheke-hannover.de/blueten/"
       ]
     },
     {
@@ -1458,7 +1833,26 @@
       "cbdMaxProzent": 1,
       "bestrahlung": "UNBEKANNT",
       "anbauland": "Portugal",
-      "terpene": [],
+      "terpene": [
+        {
+          "name": "Limonen",
+          "rang": 1,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "beta-Caryophyllen",
+          "rang": 2,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Myrcen",
+          "rang": 3,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        }
+      ],
       "aromen": [],
       "pzn": null,
       "quellen": [
@@ -1480,7 +1874,38 @@
       "cbdMaxProzent": 1,
       "bestrahlung": "UNBEKANNT",
       "anbauland": "Portugal",
-      "terpene": [],
+      "terpene": [
+        {
+          "name": "Limonen",
+          "rang": 1,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Myrcen",
+          "rang": 2,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "beta-Caryophyllen",
+          "rang": 3,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Linalool",
+          "rang": 4,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Pinen",
+          "rang": 5,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        }
+      ],
       "aromen": [],
       "pzn": null,
       "quellen": [
@@ -1502,7 +1927,38 @@
       "cbdMaxProzent": 1,
       "bestrahlung": "UNBEKANNT",
       "anbauland": "Portugal",
-      "terpene": [],
+      "terpene": [
+        {
+          "name": "Limonen",
+          "rang": 1,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Myrcen",
+          "rang": 2,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "beta-Caryophyllen",
+          "rang": 3,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Linalool",
+          "rang": 4,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Pinen",
+          "rang": 5,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        }
+      ],
       "aromen": [],
       "pzn": null,
       "quellen": [
@@ -1645,7 +2101,38 @@
       "cbdMaxProzent": 1,
       "bestrahlung": "GAMMA",
       "anbauland": "Kanada",
-      "terpene": [],
+      "terpene": [
+        {
+          "name": "Terpinolen",
+          "rang": 1,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "beta-Caryophyllen",
+          "rang": 2,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Myrcen",
+          "rang": 3,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Ocimen",
+          "rang": 4,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Humulen",
+          "rang": 5,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        }
+      ],
       "aromen": [],
       "pzn": null,
       "quellen": [
@@ -1667,7 +2154,38 @@
       "cbdMaxProzent": 1,
       "bestrahlung": "GAMMA",
       "anbauland": "Kanada",
-      "terpene": [],
+      "terpene": [
+        {
+          "name": "Terpinolen",
+          "rang": 1,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "beta-Caryophyllen",
+          "rang": 2,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Myrcen",
+          "rang": 3,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Ocimen",
+          "rang": 4,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Humulen",
+          "rang": 5,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        }
+      ],
       "aromen": [],
       "pzn": null,
       "quellen": [
@@ -1692,27 +2210,79 @@
           "name": "Myrcen",
           "rang": 1,
           "konzentrationProzent": null,
-          "quelle": "https://precisionmeds.co.uk/cannabis-flos",
-          "art": "kultivar-typisch"
+          "quelle": "https://bedrocan.com/wp-content/uploads/bedica-terpene-profile.pdf"
         },
         {
           "name": "alpha-Pinen",
           "rang": 2,
           "konzentrationProzent": null,
-          "quelle": "https://precisionmeds.co.uk/cannabis-flos",
-          "art": "kultivar-typisch"
+          "quelle": "https://bedrocan.com/wp-content/uploads/bedica-terpene-profile.pdf"
         },
         {
           "name": "Ocimen",
           "rang": 3,
           "konzentrationProzent": null,
-          "quelle": "https://precisionmeds.co.uk/cannabis-flos",
-          "art": "kultivar-typisch"
+          "quelle": "https://bedrocan.com/wp-content/uploads/bedica-terpene-profile.pdf"
+        },
+        {
+          "name": "beta-Caryophyllen",
+          "rang": 4,
+          "konzentrationProzent": null,
+          "quelle": "https://bedrocan.com/wp-content/uploads/bedica-terpene-profile.pdf"
+        },
+        {
+          "name": "beta-Pinen",
+          "rang": 5,
+          "konzentrationProzent": null,
+          "quelle": "https://bedrocan.com/wp-content/uploads/bedica-terpene-profile.pdf"
+        },
+        {
+          "name": "Bisabolol",
+          "rang": 6,
+          "konzentrationProzent": null,
+          "quelle": "https://bedrocan.com/wp-content/uploads/bedica-terpene-profile.pdf"
+        },
+        {
+          "name": "Linalool",
+          "rang": 7,
+          "konzentrationProzent": null,
+          "quelle": "https://bedrocan.com/wp-content/uploads/bedica-terpene-profile.pdf"
+        },
+        {
+          "name": "Selinen",
+          "rang": 8,
+          "konzentrationProzent": null,
+          "quelle": "https://bedrocan.com/wp-content/uploads/bedica-terpene-profile.pdf"
+        },
+        {
+          "name": "Humulen",
+          "rang": 9,
+          "konzentrationProzent": null,
+          "quelle": "https://bedrocan.com/wp-content/uploads/bedica-terpene-profile.pdf"
+        },
+        {
+          "name": "Guajol",
+          "rang": 10,
+          "konzentrationProzent": null,
+          "quelle": "https://bedrocan.com/wp-content/uploads/bedica-terpene-profile.pdf"
+        },
+        {
+          "name": "Terpineol",
+          "rang": 11,
+          "konzentrationProzent": null,
+          "quelle": "https://bedrocan.com/wp-content/uploads/bedica-terpene-profile.pdf"
+        },
+        {
+          "name": "Farnesen",
+          "rang": 12,
+          "konzentrationProzent": null,
+          "quelle": "https://bedrocan.com/wp-content/uploads/bedica-terpene-profile.pdf"
         }
       ],
       "quellen": [
         "https://bedrocan.com/cannabis-products/cannabis-flowers/",
-        "Sortensammlung des Betreibers (1.json, 2026-09)"
+        "Sortensammlung des Betreibers (1.json, 2026-09)",
+        "https://bedrocan.com/wp-content/uploads/bedica-terpene-profile.pdf"
       ],
       "aromen": [
         "Tropisch",
@@ -1738,27 +2308,73 @@
           "name": "Myrcen",
           "rang": 1,
           "konzentrationProzent": null,
-          "quelle": "https://precisionmeds.co.uk/cannabis-flos",
-          "art": "kultivar-typisch"
+          "quelle": "https://bedrocan.com/wp-content/uploads/bediol-terpene-profile.pdf"
         },
         {
           "name": "alpha-Pinen",
           "rang": 2,
           "konzentrationProzent": null,
-          "quelle": "https://precisionmeds.co.uk/cannabis-flos",
-          "art": "kultivar-typisch"
+          "quelle": "https://bedrocan.com/wp-content/uploads/bediol-terpene-profile.pdf"
         },
         {
           "name": "Terpinolen",
           "rang": 3,
           "konzentrationProzent": null,
-          "quelle": "https://precisionmeds.co.uk/cannabis-flos",
-          "art": "kultivar-typisch"
+          "quelle": "https://bedrocan.com/wp-content/uploads/bediol-terpene-profile.pdf"
+        },
+        {
+          "name": "beta-Caryophyllen",
+          "rang": 4,
+          "konzentrationProzent": null,
+          "quelle": "https://bedrocan.com/wp-content/uploads/bediol-terpene-profile.pdf"
+        },
+        {
+          "name": "Ocimen",
+          "rang": 5,
+          "konzentrationProzent": null,
+          "quelle": "https://bedrocan.com/wp-content/uploads/bediol-terpene-profile.pdf"
+        },
+        {
+          "name": "Terpineol",
+          "rang": 6,
+          "konzentrationProzent": null,
+          "quelle": "https://bedrocan.com/wp-content/uploads/bediol-terpene-profile.pdf"
+        },
+        {
+          "name": "beta-Pinen",
+          "rang": 7,
+          "konzentrationProzent": null,
+          "quelle": "https://bedrocan.com/wp-content/uploads/bediol-terpene-profile.pdf"
+        },
+        {
+          "name": "Limonen",
+          "rang": 8,
+          "konzentrationProzent": null,
+          "quelle": "https://bedrocan.com/wp-content/uploads/bediol-terpene-profile.pdf"
+        },
+        {
+          "name": "Humulen",
+          "rang": 9,
+          "konzentrationProzent": null,
+          "quelle": "https://bedrocan.com/wp-content/uploads/bediol-terpene-profile.pdf"
+        },
+        {
+          "name": "Farnesen",
+          "rang": 10,
+          "konzentrationProzent": null,
+          "quelle": "https://bedrocan.com/wp-content/uploads/bediol-terpene-profile.pdf"
+        },
+        {
+          "name": "Selinen",
+          "rang": 11,
+          "konzentrationProzent": null,
+          "quelle": "https://bedrocan.com/wp-content/uploads/bediol-terpene-profile.pdf"
         }
       ],
       "quellen": [
         "https://bedrocan.com/cannabis-products/cannabis-flowers/",
-        "Sortensammlung des Betreibers (1.json, 2026-09)"
+        "Sortensammlung des Betreibers (1.json, 2026-09)",
+        "https://bedrocan.com/wp-content/uploads/bediol-terpene-profile.pdf"
       ],
       "aromen": [
         "Tropisch",
@@ -1784,27 +2400,55 @@
           "name": "Myrcen",
           "rang": 1,
           "konzentrationProzent": null,
-          "quelle": "https://precisionmeds.co.uk/cannabis-flos",
-          "art": "kultivar-typisch"
+          "quelle": "https://bedrocan.com/wp-content/uploads/bedrobinol-terpene-profile.pdf"
         },
         {
           "name": "alpha-Pinen",
           "rang": 2,
           "konzentrationProzent": null,
-          "quelle": "https://precisionmeds.co.uk/cannabis-flos",
-          "art": "kultivar-typisch"
+          "quelle": "https://bedrocan.com/wp-content/uploads/bedrobinol-terpene-profile.pdf"
         },
         {
           "name": "beta-Caryophyllen",
           "rang": 3,
           "konzentrationProzent": null,
-          "quelle": "https://precisionmeds.co.uk/cannabis-flos",
-          "art": "kultivar-typisch"
+          "quelle": "https://bedrocan.com/wp-content/uploads/bedrobinol-terpene-profile.pdf"
+        },
+        {
+          "name": "beta-Pinen",
+          "rang": 4,
+          "konzentrationProzent": null,
+          "quelle": "https://bedrocan.com/wp-content/uploads/bedrobinol-terpene-profile.pdf"
+        },
+        {
+          "name": "Ocimen",
+          "rang": 5,
+          "konzentrationProzent": null,
+          "quelle": "https://bedrocan.com/wp-content/uploads/bedrobinol-terpene-profile.pdf"
+        },
+        {
+          "name": "Humulen",
+          "rang": 6,
+          "konzentrationProzent": null,
+          "quelle": "https://bedrocan.com/wp-content/uploads/bedrobinol-terpene-profile.pdf"
+        },
+        {
+          "name": "Selinen",
+          "rang": 7,
+          "konzentrationProzent": null,
+          "quelle": "https://bedrocan.com/wp-content/uploads/bedrobinol-terpene-profile.pdf"
+        },
+        {
+          "name": "Limonen",
+          "rang": 8,
+          "konzentrationProzent": null,
+          "quelle": "https://bedrocan.com/wp-content/uploads/bedrobinol-terpene-profile.pdf"
         }
       ],
       "quellen": [
         "https://bedrocan.com/cannabis-products/cannabis-flowers/",
-        "Sortensammlung des Betreibers (1.json, 2026-09)"
+        "Sortensammlung des Betreibers (1.json, 2026-09)",
+        "https://bedrocan.com/wp-content/uploads/bedrobinol-terpene-profile.pdf"
       ],
       "aromen": [
         "Kräuter",
@@ -1830,27 +2474,97 @@
           "name": "Myrcen",
           "rang": 1,
           "konzentrationProzent": null,
-          "quelle": "https://precisionmeds.co.uk/cannabis-flos",
-          "art": "kultivar-typisch"
+          "quelle": "https://bedrocan.com/wp-content/uploads/bedrocan-terpene-profile.pdf"
         },
         {
           "name": "Terpinolen",
           "rang": 2,
           "konzentrationProzent": null,
-          "quelle": "https://precisionmeds.co.uk/cannabis-flos",
-          "art": "kultivar-typisch"
+          "quelle": "https://bedrocan.com/wp-content/uploads/bedrocan-terpene-profile.pdf"
         },
         {
           "name": "Ocimen",
           "rang": 3,
           "konzentrationProzent": null,
-          "quelle": "https://precisionmeds.co.uk/cannabis-flos",
-          "art": "kultivar-typisch"
+          "quelle": "https://bedrocan.com/wp-content/uploads/bedrocan-terpene-profile.pdf"
+        },
+        {
+          "name": "beta-Pinen",
+          "rang": 4,
+          "konzentrationProzent": null,
+          "quelle": "https://bedrocan.com/wp-content/uploads/bedrocan-terpene-profile.pdf"
+        },
+        {
+          "name": "Limonen",
+          "rang": 5,
+          "konzentrationProzent": null,
+          "quelle": "https://bedrocan.com/wp-content/uploads/bedrocan-terpene-profile.pdf"
+        },
+        {
+          "name": "beta-Caryophyllen",
+          "rang": 6,
+          "konzentrationProzent": null,
+          "quelle": "https://bedrocan.com/wp-content/uploads/bedrocan-terpene-profile.pdf"
+        },
+        {
+          "name": "alpha-Pinen",
+          "rang": 7,
+          "konzentrationProzent": null,
+          "quelle": "https://bedrocan.com/wp-content/uploads/bedrocan-terpene-profile.pdf"
+        },
+        {
+          "name": "Borneol",
+          "rang": 8,
+          "konzentrationProzent": null,
+          "quelle": "https://bedrocan.com/wp-content/uploads/bedrocan-terpene-profile.pdf"
+        },
+        {
+          "name": "Humulen",
+          "rang": 9,
+          "konzentrationProzent": null,
+          "quelle": "https://bedrocan.com/wp-content/uploads/bedrocan-terpene-profile.pdf"
+        },
+        {
+          "name": "Selinen",
+          "rang": 10,
+          "konzentrationProzent": null,
+          "quelle": "https://bedrocan.com/wp-content/uploads/bedrocan-terpene-profile.pdf"
+        },
+        {
+          "name": "Phellandren",
+          "rang": 11,
+          "konzentrationProzent": null,
+          "quelle": "https://bedrocan.com/wp-content/uploads/bedrocan-terpene-profile.pdf"
+        },
+        {
+          "name": "delta-3-Caren",
+          "rang": 12,
+          "konzentrationProzent": null,
+          "quelle": "https://bedrocan.com/wp-content/uploads/bedrocan-terpene-profile.pdf"
+        },
+        {
+          "name": "Farnesen",
+          "rang": 13,
+          "konzentrationProzent": null,
+          "quelle": "https://bedrocan.com/wp-content/uploads/bedrocan-terpene-profile.pdf"
+        },
+        {
+          "name": "Linalool",
+          "rang": 14,
+          "konzentrationProzent": null,
+          "quelle": "https://bedrocan.com/wp-content/uploads/bedrocan-terpene-profile.pdf"
+        },
+        {
+          "name": "Fenchol",
+          "rang": 15,
+          "konzentrationProzent": null,
+          "quelle": "https://bedrocan.com/wp-content/uploads/bedrocan-terpene-profile.pdf"
         }
       ],
       "quellen": [
         "https://bedrocan.com/cannabis-products/cannabis-flowers/",
-        "Sortensammlung des Betreibers (1.json, 2026-09)"
+        "Sortensammlung des Betreibers (1.json, 2026-09)",
+        "https://bedrocan.com/wp-content/uploads/bedrocan-terpene-profile.pdf"
       ],
       "aromen": [
         "Blumen",
@@ -1933,27 +2647,73 @@
           "name": "Myrcen",
           "rang": 1,
           "konzentrationProzent": null,
-          "quelle": "https://precisionmeds.co.uk/cannabis-flos",
-          "art": "kultivar-typisch"
+          "quelle": "https://bedrocan.com/wp-content/uploads/bedrolite-terpene-profile.pdf"
         },
         {
           "name": "beta-Caryophyllen",
           "rang": 2,
           "konzentrationProzent": null,
-          "quelle": "https://precisionmeds.co.uk/cannabis-flos",
-          "art": "kultivar-typisch"
+          "quelle": "https://bedrocan.com/wp-content/uploads/bedrolite-terpene-profile.pdf"
+        },
+        {
+          "name": "alpha-Pinen",
+          "rang": 3,
+          "konzentrationProzent": null,
+          "quelle": "https://bedrocan.com/wp-content/uploads/bedrolite-terpene-profile.pdf"
+        },
+        {
+          "name": "beta-Pinen",
+          "rang": 4,
+          "konzentrationProzent": null,
+          "quelle": "https://bedrocan.com/wp-content/uploads/bedrolite-terpene-profile.pdf"
+        },
+        {
+          "name": "Terpinolen",
+          "rang": 5,
+          "konzentrationProzent": null,
+          "quelle": "https://bedrocan.com/wp-content/uploads/bedrolite-terpene-profile.pdf"
         },
         {
           "name": "Humulen",
-          "rang": 3,
+          "rang": 6,
           "konzentrationProzent": null,
-          "quelle": "https://precisionmeds.co.uk/cannabis-flos",
-          "art": "kultivar-typisch"
+          "quelle": "https://bedrocan.com/wp-content/uploads/bedrolite-terpene-profile.pdf"
+        },
+        {
+          "name": "Farnesen",
+          "rang": 7,
+          "konzentrationProzent": null,
+          "quelle": "https://bedrocan.com/wp-content/uploads/bedrolite-terpene-profile.pdf"
+        },
+        {
+          "name": "Limonen",
+          "rang": 8,
+          "konzentrationProzent": null,
+          "quelle": "https://bedrocan.com/wp-content/uploads/bedrolite-terpene-profile.pdf"
+        },
+        {
+          "name": "Ocimen",
+          "rang": 9,
+          "konzentrationProzent": null,
+          "quelle": "https://bedrocan.com/wp-content/uploads/bedrolite-terpene-profile.pdf"
+        },
+        {
+          "name": "Caryophyllenoxid",
+          "rang": 10,
+          "konzentrationProzent": null,
+          "quelle": "https://bedrocan.com/wp-content/uploads/bedrolite-terpene-profile.pdf"
+        },
+        {
+          "name": "Terpineol",
+          "rang": 11,
+          "konzentrationProzent": null,
+          "quelle": "https://bedrocan.com/wp-content/uploads/bedrolite-terpene-profile.pdf"
         }
       ],
       "quellen": [
         "https://bedrocan.com/cannabis-products/cannabis-flowers/",
-        "Sortensammlung des Betreibers (1.json, 2026-09)"
+        "Sortensammlung des Betreibers (1.json, 2026-09)",
+        "https://bedrocan.com/wp-content/uploads/bedrolite-terpene-profile.pdf"
       ],
       "aromen": [
         "Erdig",
@@ -2297,9 +3057,29 @@
       "bestrahlung": "UNBESTRAHLT",
       "darreichungsform": "BLUETE",
       "dominanz": "indica",
-      "terpene": [],
+      "terpene": [
+        {
+          "name": "beta-Caryophyllen",
+          "rang": 1,
+          "konzentrationProzent": null,
+          "quelle": "https://allefarben-apotheke.de/product/bud-jet-21-1-sus-sunset-sherbet/"
+        },
+        {
+          "name": "Humulen",
+          "rang": 2,
+          "konzentrationProzent": null,
+          "quelle": "https://allefarben-apotheke.de/product/bud-jet-21-1-sus-sunset-sherbet/"
+        },
+        {
+          "name": "Myrcen",
+          "rang": 3,
+          "konzentrationProzent": null,
+          "quelle": "https://allefarben-apotheke.de/product/bud-jet-21-1-sus-sunset-sherbet/"
+        }
+      ],
       "quellen": [
-        "https://gruenhorn.de/live-bestand"
+        "https://gruenhorn.de/live-bestand",
+        "https://allefarben-apotheke.de/product/bud-jet-21-1-sus-sunset-sherbet/"
       ]
     },
     {
@@ -2317,7 +3097,26 @@
       "cbdMaxProzent": 1,
       "bestrahlung": "UNBEKANNT",
       "anbauland": null,
-      "terpene": [],
+      "terpene": [
+        {
+          "name": "Limonen",
+          "rang": 1,
+          "konzentrationProzent": null,
+          "quelle": "https://medicanova.de/produkte/budza-wrz-white-runtz"
+        },
+        {
+          "name": "beta-Caryophyllen",
+          "rang": 2,
+          "konzentrationProzent": null,
+          "quelle": "https://medicanova.de/produkte/budza-wrz-white-runtz"
+        },
+        {
+          "name": "Linalool",
+          "rang": 3,
+          "konzentrationProzent": null,
+          "quelle": "https://medicanova.de/produkte/budza-wrz-white-runtz"
+        }
+      ],
       "aromen": [],
       "pzn": null,
       "quellen": [
@@ -2577,7 +3376,44 @@
       "cbdMaxProzent": 14,
       "bestrahlung": "UNBEKANNT",
       "anbauland": "Lesotho",
-      "terpene": [],
+      "terpene": [
+        {
+          "name": "Myrcen",
+          "rang": 1,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "alpha-Pinen",
+          "rang": 2,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "beta-Pinen",
+          "rang": 3,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "beta-Caryophyllen",
+          "rang": 4,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Limonen",
+          "rang": 5,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Humulen",
+          "rang": 6,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        }
+      ],
       "aromen": [],
       "pzn": null,
       "quellen": [
@@ -2877,9 +3713,29 @@
       "cbdMaxProzent": 1,
       "bestrahlung": "UNBEKANNT",
       "pzn": "19295340",
-      "terpene": [],
+      "terpene": [
+        {
+          "name": "Limonen",
+          "rang": 1,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "beta-Caryophyllen",
+          "rang": 2,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Myrcen",
+          "rang": 3,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        }
+      ],
       "quellen": [
-        "https://www.cannamedical.com/produkte/"
+        "https://www.cannamedical.com/produkte/",
+        "https://falken-apotheke-hannover.de/blueten/"
       ]
     },
     {
@@ -4013,8 +4869,22 @@
       "anbauland": "Kanada",
       "terpene": [
         {
+          "name": "Myrcen",
+          "rang": 1,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
           "name": "beta-Caryophyllen",
-          "konzentrationProzent": null
+          "rang": 2,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Limonen",
+          "rang": 3,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
         }
       ],
       "aromen": [
@@ -4025,7 +4895,8 @@
       "pzn": null,
       "quellen": [
         "https://sanvivo-cannabis-apotheke.de/manufacturers/spectrum-therapeutics",
-        "Sortensammlung des Betreibers (1.json, 2026-09)"
+        "Sortensammlung des Betreibers (1.json, 2026-09)",
+        "https://falken-apotheke-hannover.de/blueten/"
       ]
     },
     {
@@ -4035,9 +4906,29 @@
       "kultivarTyp": "INDICA",
       "darreichungsform": "BLUETE",
       "bestrahlung": "UNBEKANNT",
-      "terpene": [],
+      "terpene": [
+        {
+          "name": "Myrcen",
+          "rang": 1,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "beta-Caryophyllen",
+          "rang": 2,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Limonen",
+          "rang": 3,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        }
+      ],
       "quellen": [
-        "https://canopymedical.de/products.json"
+        "https://canopymedical.de/products.json",
+        "https://falken-apotheke-hannover.de/blueten/"
       ]
     },
     {
@@ -4060,9 +4951,29 @@
       "kultivarTyp": "INDICA",
       "darreichungsform": "BLUETE",
       "bestrahlung": "UNBEKANNT",
-      "terpene": [],
+      "terpene": [
+        {
+          "name": "Myrcen",
+          "rang": 1,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Pinen",
+          "rang": 2,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "beta-Caryophyllen",
+          "rang": 3,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        }
+      ],
       "quellen": [
-        "https://canopymedical.de/products.json"
+        "https://canopymedical.de/products.json",
+        "https://falken-apotheke-hannover.de/blueten/"
       ]
     },
     {
@@ -4084,9 +4995,29 @@
       "kultivarTyp": "INDICA",
       "darreichungsform": "BLUETE",
       "bestrahlung": "UNBEKANNT",
-      "terpene": [],
+      "terpene": [
+        {
+          "name": "Limonen",
+          "rang": 1,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "beta-Caryophyllen",
+          "rang": 2,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Myrcen",
+          "rang": 3,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        }
+      ],
       "quellen": [
-        "https://canopymedical.de/products.json"
+        "https://canopymedical.de/products.json",
+        "https://falken-apotheke-hannover.de/blueten/"
       ]
     },
     {
@@ -4116,11 +5047,37 @@
       "cbdMaxProzent": 1,
       "bestrahlung": "UNBEKANNT",
       "anbauland": null,
-      "terpene": [],
+      "terpene": [
+        {
+          "name": "Terpineol",
+          "rang": 1,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "beta-Caryophyllen",
+          "rang": 2,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Pinen",
+          "rang": 3,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Myrcen",
+          "rang": 4,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        }
+      ],
       "aromen": [],
       "pzn": null,
       "quellen": [
-        "https://sanvivo-cannabis-apotheke.de/manufacturers/spectrum-therapeutics"
+        "https://sanvivo-cannabis-apotheke.de/manufacturers/spectrum-therapeutics",
+        "https://falken-apotheke-hannover.de/blueten/"
       ]
     },
     {
@@ -4138,11 +5095,37 @@
       "cbdMaxProzent": 1,
       "bestrahlung": "UNBEKANNT",
       "anbauland": null,
-      "terpene": [],
+      "terpene": [
+        {
+          "name": "Terpineol",
+          "rang": 1,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "beta-Caryophyllen",
+          "rang": 2,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Pinen",
+          "rang": 3,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Myrcen",
+          "rang": 4,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        }
+      ],
       "aromen": [],
       "pzn": null,
       "quellen": [
-        "https://sanvivo-cannabis-apotheke.de/manufacturers/spectrum-therapeutics"
+        "https://sanvivo-cannabis-apotheke.de/manufacturers/spectrum-therapeutics",
+        "https://falken-apotheke-hannover.de/blueten/"
       ]
     },
     {
@@ -4188,7 +5171,20 @@
       "cbdMaxProzent": 1,
       "bestrahlung": "E_BEAM",
       "anbauland": "Dänemark",
-      "terpene": [],
+      "terpene": [
+        {
+          "name": "Myrcen",
+          "rang": 1,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "beta-Caryophyllen",
+          "rang": 2,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        }
+      ],
       "aromen": [],
       "pzn": null,
       "quellen": [
@@ -4348,12 +5344,25 @@
           "name": "Myrcen",
           "rang": 1,
           "konzentrationProzent": null,
-          "quelle": "https://www.cannabis-aerzte.de/medizinische-cannabissorten/"
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Limonen",
+          "rang": 2,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Farnesen",
+          "rang": 3,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
         }
       ],
       "quellen": [
         "https://www.cannabis-aerzte.de/medizinische-cannabissorten/",
-        "Sortensammlung des Betreibers (1.json, 2026-09)"
+        "Sortensammlung des Betreibers (1.json, 2026-09)",
+        "https://falken-apotheke-hannover.de/blueten/"
       ],
       "aromen": [
         "Käse",
@@ -4375,15 +5384,28 @@
       "dominanz": "indica",
       "terpene": [
         {
-          "name": "Terpinolen",
+          "name": "beta-Caryophyllen",
           "rang": 1,
           "konzentrationProzent": null,
-          "quelle": "https://www.cannabis-aerzte.de/medizinische-cannabissorten/"
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Limonen",
+          "rang": 2,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Nerolidol",
+          "rang": 3,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
         }
       ],
       "quellen": [
         "https://www.cannabis-aerzte.de/medizinische-cannabissorten/",
-        "Sortensammlung des Betreibers (1.json, 2026-09)"
+        "Sortensammlung des Betreibers (1.json, 2026-09)",
+        "https://falken-apotheke-hannover.de/blueten/"
       ],
       "aromen": [
         "Kaffee",
@@ -4406,12 +5428,25 @@
           "name": "beta-Caryophyllen",
           "rang": 1,
           "konzentrationProzent": null,
-          "quelle": "https://www.cannabis-aerzte.de/medizinische-cannabissorten/"
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Limonen",
+          "rang": 2,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Myrcen",
+          "rang": 3,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
         }
       ],
       "quellen": [
         "https://www.cannabis-aerzte.de/medizinische-cannabissorten/",
-        "Sortensammlung des Betreibers (1.json, 2026-09)"
+        "Sortensammlung des Betreibers (1.json, 2026-09)",
+        "https://falken-apotheke-hannover.de/blueten/"
       ],
       "aromen": [
         "Minze",
@@ -4551,6 +5586,18 @@
           "rang": 2,
           "konzentrationProzent": null,
           "quelle": "https://www.demecan.de/produkte"
+        },
+        {
+          "name": "Limonen",
+          "rang": 3,
+          "konzentrationProzent": null,
+          "quelle": "https://www.demecan.de/produkte"
+        },
+        {
+          "name": "Linalool",
+          "rang": 4,
+          "konzentrationProzent": null,
+          "quelle": "https://www.demecan.de/produkte"
         }
       ],
       "quellen": [
@@ -4584,6 +5631,18 @@
         {
           "name": "Limonen",
           "rang": 2,
+          "konzentrationProzent": null,
+          "quelle": "https://www.demecan.de/produkte"
+        },
+        {
+          "name": "Humulen",
+          "rang": 3,
+          "konzentrationProzent": null,
+          "quelle": "https://www.demecan.de/produkte"
+        },
+        {
+          "name": "Linalool",
+          "rang": 4,
           "konzentrationProzent": null,
           "quelle": "https://www.demecan.de/produkte"
         }
@@ -4620,6 +5679,18 @@
           "rang": 2,
           "konzentrationProzent": null,
           "quelle": "https://www.demecan.de/produkte"
+        },
+        {
+          "name": "Linalool",
+          "rang": 3,
+          "konzentrationProzent": null,
+          "quelle": "https://www.demecan.de/produkte"
+        },
+        {
+          "name": "alpha-Pinen",
+          "rang": 4,
+          "konzentrationProzent": null,
+          "quelle": "https://www.demecan.de/produkte"
         }
       ],
       "quellen": [
@@ -4644,6 +5715,18 @@
         {
           "name": "beta-Caryophyllen",
           "rang": 2,
+          "konzentrationProzent": null,
+          "quelle": "https://www.demecan.de/produkte"
+        },
+        {
+          "name": "Myrcen",
+          "rang": 3,
+          "konzentrationProzent": null,
+          "quelle": "https://www.demecan.de/produkte"
+        },
+        {
+          "name": "Linalool",
+          "rang": 4,
           "konzentrationProzent": null,
           "quelle": "https://www.demecan.de/produkte"
         }
@@ -4678,6 +5761,18 @@
         {
           "name": "Limonen",
           "rang": 2,
+          "konzentrationProzent": null,
+          "quelle": "https://www.demecan.de/produkte"
+        },
+        {
+          "name": "Humulen",
+          "rang": 3,
+          "konzentrationProzent": null,
+          "quelle": "https://www.demecan.de/produkte"
+        },
+        {
+          "name": "Pinen",
+          "rang": 4,
           "konzentrationProzent": null,
           "quelle": "https://www.demecan.de/produkte"
         }
@@ -4716,6 +5811,18 @@
         {
           "name": "beta-Caryophyllen",
           "rang": 2,
+          "konzentrationProzent": null,
+          "quelle": "https://www.demecan.de/produkte"
+        },
+        {
+          "name": "Myrcen",
+          "rang": 3,
+          "konzentrationProzent": null,
+          "quelle": "https://www.demecan.de/produkte"
+        },
+        {
+          "name": "Humulen",
+          "rang": 4,
           "konzentrationProzent": null,
           "quelle": "https://www.demecan.de/produkte"
         }
@@ -4804,6 +5911,18 @@
           "rang": 2,
           "konzentrationProzent": null,
           "quelle": "https://www.demecan.de/produkte"
+        },
+        {
+          "name": "Humulen",
+          "rang": 3,
+          "konzentrationProzent": null,
+          "quelle": "https://www.demecan.de/produkte"
+        },
+        {
+          "name": "Myrcen",
+          "rang": 4,
+          "konzentrationProzent": null,
+          "quelle": "https://www.demecan.de/produkte"
         }
       ],
       "quellen": [
@@ -4828,6 +5947,18 @@
         {
           "name": "Limonen",
           "rang": 2,
+          "konzentrationProzent": null,
+          "quelle": "https://www.demecan.de/produkte"
+        },
+        {
+          "name": "Nerolidol",
+          "rang": 3,
+          "konzentrationProzent": null,
+          "quelle": "https://www.demecan.de/produkte"
+        },
+        {
+          "name": "Linalool",
+          "rang": 4,
           "konzentrationProzent": null,
           "quelle": "https://www.demecan.de/produkte"
         }
@@ -4931,9 +6062,29 @@
       "kultivarTyp": "SATIVA",
       "bestrahlung": "UNBESTRAHLT",
       "darreichungsform": "BLUETE",
-      "terpene": [],
+      "terpene": [
+        {
+          "name": "Myrcen",
+          "rang": 1,
+          "konzentrationProzent": null,
+          "quelle": "https://allefarben-apotheke.de/product/daily-special-27-1-les-lemon-sorbet/"
+        },
+        {
+          "name": "Limonen",
+          "rang": 2,
+          "konzentrationProzent": null,
+          "quelle": "https://allefarben-apotheke.de/product/daily-special-27-1-les-lemon-sorbet/"
+        },
+        {
+          "name": "beta-Caryophyllen",
+          "rang": 3,
+          "konzentrationProzent": null,
+          "quelle": "https://allefarben-apotheke.de/product/daily-special-27-1-les-lemon-sorbet/"
+        }
+      ],
       "quellen": [
-        "https://gruenhorn.de/live-bestand"
+        "https://gruenhorn.de/live-bestand",
+        "https://allefarben-apotheke.de/product/daily-special-27-1-les-lemon-sorbet/"
       ]
     },
     {
@@ -5026,12 +6177,31 @@
           "name": "Limonen",
           "rang": 1,
           "konzentrationProzent": null,
-          "quelle": "https://www.cannabis-aerzte.de/medizinische-cannabissorten/"
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "beta-Caryophyllen",
+          "rang": 2,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Myrcen",
+          "rang": 3,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Pinen",
+          "rang": 4,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
         }
       ],
       "quellen": [
         "https://www.cannabis-aerzte.de/medizinische-cannabissorten/",
-        "Sortensammlung des Betreibers (1.json, 2026-09)"
+        "Sortensammlung des Betreibers (1.json, 2026-09)",
+        "https://falken-apotheke-hannover.de/blueten/"
       ],
       "aromen": [
         "Chemisch",
@@ -5053,15 +6223,34 @@
       "dominanz": "indica",
       "terpene": [
         {
-          "name": "Limonen",
+          "name": "beta-Caryophyllen",
           "rang": 1,
           "konzentrationProzent": null,
-          "quelle": "https://www.cannabis-aerzte.de/medizinische-cannabissorten/"
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Limonen",
+          "rang": 2,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Myrcen",
+          "rang": 3,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Humulen",
+          "rang": 4,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
         }
       ],
       "quellen": [
         "https://www.cannabis-aerzte.de/medizinische-cannabissorten/",
-        "Sortensammlung des Betreibers (1.json, 2026-09)"
+        "Sortensammlung des Betreibers (1.json, 2026-09)",
+        "https://falken-apotheke-hannover.de/blueten/"
       ],
       "aromen": [
         "Minze",
@@ -5408,11 +6597,61 @@
       "cbdMaxProzent": 1,
       "bestrahlung": "UNBEKANNT",
       "anbauland": null,
-      "terpene": [],
+      "terpene": [
+        {
+          "name": "Myrcen",
+          "rang": 1,
+          "konzentrationProzent": null,
+          "quelle": "https://allefarben-apotheke.de/product/growmotion-sbc24-super-buff-cherry/"
+        },
+        {
+          "name": "Limonen",
+          "rang": 2,
+          "konzentrationProzent": null,
+          "quelle": "https://allefarben-apotheke.de/product/growmotion-sbc24-super-buff-cherry/"
+        },
+        {
+          "name": "beta-Pinen",
+          "rang": 3,
+          "konzentrationProzent": null,
+          "quelle": "https://allefarben-apotheke.de/product/growmotion-sbc24-super-buff-cherry/"
+        },
+        {
+          "name": "beta-Caryophyllen",
+          "rang": 4,
+          "konzentrationProzent": null,
+          "quelle": "https://allefarben-apotheke.de/product/growmotion-sbc24-super-buff-cherry/"
+        },
+        {
+          "name": "Humulen",
+          "rang": 5,
+          "konzentrationProzent": null,
+          "quelle": "https://allefarben-apotheke.de/product/growmotion-sbc24-super-buff-cherry/"
+        },
+        {
+          "name": "Linalool",
+          "rang": 6,
+          "konzentrationProzent": null,
+          "quelle": "https://allefarben-apotheke.de/product/growmotion-sbc24-super-buff-cherry/"
+        },
+        {
+          "name": "Fenchol",
+          "rang": 7,
+          "konzentrationProzent": null,
+          "quelle": "https://allefarben-apotheke.de/product/growmotion-sbc24-super-buff-cherry/"
+        },
+        {
+          "name": "Bisabolol",
+          "rang": 8,
+          "konzentrationProzent": null,
+          "quelle": "https://allefarben-apotheke.de/product/growmotion-sbc24-super-buff-cherry/"
+        }
+      ],
       "aromen": [],
       "pzn": null,
       "quellen": [
-        "https://sanvivo-cannabis-apotheke.de/manufacturers/youcann-gmbh"
+        "https://sanvivo-cannabis-apotheke.de/manufacturers/youcann-gmbh",
+        "https://allefarben-apotheke.de/product/growmotion-sbc24-super-buff-cherry/"
       ]
     },
     {
@@ -5977,9 +7216,35 @@
       "bestrahlung": "UNBESTRAHLT",
       "darreichungsform": "BLUETE",
       "dominanz": "indica",
-      "terpene": [],
+      "terpene": [
+        {
+          "name": "Myrcen",
+          "rang": 1,
+          "konzentrationProzent": null,
+          "quelle": "https://allefarben-apotheke.de/product/luana-32-1-cm-cherry-mints/"
+        },
+        {
+          "name": "Limonen",
+          "rang": 2,
+          "konzentrationProzent": null,
+          "quelle": "https://allefarben-apotheke.de/product/luana-32-1-cm-cherry-mints/"
+        },
+        {
+          "name": "beta-Caryophyllen",
+          "rang": 3,
+          "konzentrationProzent": null,
+          "quelle": "https://allefarben-apotheke.de/product/luana-32-1-cm-cherry-mints/"
+        },
+        {
+          "name": "Humulen",
+          "rang": 4,
+          "konzentrationProzent": null,
+          "quelle": "https://allefarben-apotheke.de/product/luana-32-1-cm-cherry-mints/"
+        }
+      ],
       "quellen": [
-        "https://gruenhorn.de/live-bestand"
+        "https://gruenhorn.de/live-bestand",
+        "https://allefarben-apotheke.de/product/luana-32-1-cm-cherry-mints/"
       ]
     },
     {
@@ -6488,11 +7753,37 @@
       "cbdMaxProzent": 1,
       "bestrahlung": "UNBESTRAHLT",
       "anbauland": "Kanada",
-      "terpene": [],
+      "terpene": [
+        {
+          "name": "Myrcen",
+          "rang": 1,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Limonen",
+          "rang": 2,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "beta-Caryophyllen",
+          "rang": 3,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Humulen",
+          "rang": 4,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        }
+      ],
       "aromen": [],
       "pzn": null,
       "quellen": [
-        "https://www.cansativa.de/peacenaturals/en/"
+        "https://www.cansativa.de/peacenaturals/en/",
+        "https://falken-apotheke-hannover.de/blueten/"
       ]
     },
     {
@@ -6510,11 +7801,109 @@
       "cbdMaxProzent": 1,
       "bestrahlung": "UNBESTRAHLT",
       "anbauland": "Kanada",
-      "terpene": [],
+      "terpene": [
+        {
+          "name": "beta-Caryophyllen",
+          "rang": 1,
+          "konzentrationProzent": null,
+          "quelle": "https://www.cansativa.de/peacenaturals/wp-content/uploads/sites/5/2026/03/31-1-OK-Terpen-Analyse.png"
+        },
+        {
+          "name": "Farnesen",
+          "rang": 2,
+          "konzentrationProzent": null,
+          "quelle": "https://www.cansativa.de/peacenaturals/wp-content/uploads/sites/5/2026/03/31-1-OK-Terpen-Analyse.png"
+        },
+        {
+          "name": "Myrcen",
+          "rang": 3,
+          "konzentrationProzent": null,
+          "quelle": "https://www.cansativa.de/peacenaturals/wp-content/uploads/sites/5/2026/03/31-1-OK-Terpen-Analyse.png"
+        },
+        {
+          "name": "Humulen",
+          "rang": 4,
+          "konzentrationProzent": null,
+          "quelle": "https://www.cansativa.de/peacenaturals/wp-content/uploads/sites/5/2026/03/31-1-OK-Terpen-Analyse.png"
+        },
+        {
+          "name": "Limonen",
+          "rang": 5,
+          "konzentrationProzent": null,
+          "quelle": "https://www.cansativa.de/peacenaturals/wp-content/uploads/sites/5/2026/03/31-1-OK-Terpen-Analyse.png"
+        },
+        {
+          "name": "Linalool",
+          "rang": 6,
+          "konzentrationProzent": null,
+          "quelle": "https://www.cansativa.de/peacenaturals/wp-content/uploads/sites/5/2026/03/31-1-OK-Terpen-Analyse.png"
+        },
+        {
+          "name": "Bisabolol",
+          "rang": 7,
+          "konzentrationProzent": null,
+          "quelle": "https://www.cansativa.de/peacenaturals/wp-content/uploads/sites/5/2026/03/31-1-OK-Terpen-Analyse.png"
+        },
+        {
+          "name": "Nerolidol",
+          "rang": 8,
+          "konzentrationProzent": null,
+          "quelle": "https://www.cansativa.de/peacenaturals/wp-content/uploads/sites/5/2026/03/31-1-OK-Terpen-Analyse.png"
+        },
+        {
+          "name": "beta-Pinen",
+          "rang": 9,
+          "konzentrationProzent": null,
+          "quelle": "https://www.cansativa.de/peacenaturals/wp-content/uploads/sites/5/2026/03/31-1-OK-Terpen-Analyse.png"
+        },
+        {
+          "name": "Terpineol",
+          "rang": 10,
+          "konzentrationProzent": null,
+          "quelle": "https://www.cansativa.de/peacenaturals/wp-content/uploads/sites/5/2026/03/31-1-OK-Terpen-Analyse.png"
+        },
+        {
+          "name": "Fenchol",
+          "rang": 11,
+          "konzentrationProzent": null,
+          "quelle": "https://www.cansativa.de/peacenaturals/wp-content/uploads/sites/5/2026/03/31-1-OK-Terpen-Analyse.png"
+        },
+        {
+          "name": "alpha-Pinen",
+          "rang": 12,
+          "konzentrationProzent": null,
+          "quelle": "https://www.cansativa.de/peacenaturals/wp-content/uploads/sites/5/2026/03/31-1-OK-Terpen-Analyse.png"
+        },
+        {
+          "name": "Caryophyllenoxid",
+          "rang": 13,
+          "konzentrationProzent": null,
+          "quelle": "https://www.cansativa.de/peacenaturals/wp-content/uploads/sites/5/2026/03/31-1-OK-Terpen-Analyse.png"
+        },
+        {
+          "name": "Borneol",
+          "rang": 14,
+          "konzentrationProzent": null,
+          "quelle": "https://www.cansativa.de/peacenaturals/wp-content/uploads/sites/5/2026/03/31-1-OK-Terpen-Analyse.png"
+        },
+        {
+          "name": "Terpinolen",
+          "rang": 15,
+          "konzentrationProzent": null,
+          "quelle": "https://www.cansativa.de/peacenaturals/wp-content/uploads/sites/5/2026/03/31-1-OK-Terpen-Analyse.png"
+        },
+        {
+          "name": "Camphen",
+          "rang": 16,
+          "konzentrationProzent": null,
+          "quelle": "https://www.cansativa.de/peacenaturals/wp-content/uploads/sites/5/2026/03/31-1-OK-Terpen-Analyse.png"
+        }
+      ],
       "aromen": [],
       "pzn": null,
       "quellen": [
-        "https://www.cansativa.de/peacenaturals/en/"
+        "https://www.cansativa.de/peacenaturals/en/",
+        "https://www.cansativa.de/peacenaturals/wp-content/uploads/sites/5/2026/03/31-1-OK-Terpen-Analyse.png"
       ]
     },
     {
@@ -6532,11 +7921,31 @@
       "cbdMaxProzent": 1,
       "bestrahlung": "UNBESTRAHLT",
       "anbauland": "Kanada",
-      "terpene": [],
+      "terpene": [
+        {
+          "name": "Limonen",
+          "rang": 1,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Humulen",
+          "rang": 2,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "beta-Caryophyllen",
+          "rang": 3,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        }
+      ],
       "aromen": [],
       "pzn": null,
       "quellen": [
-        "https://www.medizinisches-cannabis-apotheke.de/p/peace-naturals-31-1-sc/"
+        "https://www.medizinisches-cannabis-apotheke.de/p/peace-naturals-31-1-sc/",
+        "https://falken-apotheke-hannover.de/blueten/"
       ]
     },
     {
@@ -6554,11 +7963,109 @@
       "cbdMaxProzent": 1,
       "bestrahlung": "UNBESTRAHLT",
       "anbauland": "Kanada",
-      "terpene": [],
+      "terpene": [
+        {
+          "name": "Limonen",
+          "rang": 1,
+          "konzentrationProzent": null,
+          "quelle": "https://www.cansativa.de/peacenaturals/wp-content/uploads/sites/5/2026/03/31-1-SL-Terpen-Analyse.png"
+        },
+        {
+          "name": "Myrcen",
+          "rang": 2,
+          "konzentrationProzent": null,
+          "quelle": "https://www.cansativa.de/peacenaturals/wp-content/uploads/sites/5/2026/03/31-1-SL-Terpen-Analyse.png"
+        },
+        {
+          "name": "beta-Caryophyllen",
+          "rang": 3,
+          "konzentrationProzent": null,
+          "quelle": "https://www.cansativa.de/peacenaturals/wp-content/uploads/sites/5/2026/03/31-1-SL-Terpen-Analyse.png"
+        },
+        {
+          "name": "Linalool",
+          "rang": 4,
+          "konzentrationProzent": null,
+          "quelle": "https://www.cansativa.de/peacenaturals/wp-content/uploads/sites/5/2026/03/31-1-SL-Terpen-Analyse.png"
+        },
+        {
+          "name": "Farnesen",
+          "rang": 5,
+          "konzentrationProzent": null,
+          "quelle": "https://www.cansativa.de/peacenaturals/wp-content/uploads/sites/5/2026/03/31-1-SL-Terpen-Analyse.png"
+        },
+        {
+          "name": "Humulen",
+          "rang": 6,
+          "konzentrationProzent": null,
+          "quelle": "https://www.cansativa.de/peacenaturals/wp-content/uploads/sites/5/2026/03/31-1-SL-Terpen-Analyse.png"
+        },
+        {
+          "name": "Terpineol",
+          "rang": 7,
+          "konzentrationProzent": null,
+          "quelle": "https://www.cansativa.de/peacenaturals/wp-content/uploads/sites/5/2026/03/31-1-SL-Terpen-Analyse.png"
+        },
+        {
+          "name": "beta-Pinen",
+          "rang": 8,
+          "konzentrationProzent": null,
+          "quelle": "https://www.cansativa.de/peacenaturals/wp-content/uploads/sites/5/2026/03/31-1-SL-Terpen-Analyse.png"
+        },
+        {
+          "name": "alpha-Pinen",
+          "rang": 9,
+          "konzentrationProzent": null,
+          "quelle": "https://www.cansativa.de/peacenaturals/wp-content/uploads/sites/5/2026/03/31-1-SL-Terpen-Analyse.png"
+        },
+        {
+          "name": "Fenchol",
+          "rang": 10,
+          "konzentrationProzent": null,
+          "quelle": "https://www.cansativa.de/peacenaturals/wp-content/uploads/sites/5/2026/03/31-1-SL-Terpen-Analyse.png"
+        },
+        {
+          "name": "Bisabolol",
+          "rang": 11,
+          "konzentrationProzent": null,
+          "quelle": "https://www.cansativa.de/peacenaturals/wp-content/uploads/sites/5/2026/03/31-1-SL-Terpen-Analyse.png"
+        },
+        {
+          "name": "Terpinolen",
+          "rang": 12,
+          "konzentrationProzent": null,
+          "quelle": "https://www.cansativa.de/peacenaturals/wp-content/uploads/sites/5/2026/03/31-1-SL-Terpen-Analyse.png"
+        },
+        {
+          "name": "Borneol",
+          "rang": 13,
+          "konzentrationProzent": null,
+          "quelle": "https://www.cansativa.de/peacenaturals/wp-content/uploads/sites/5/2026/03/31-1-SL-Terpen-Analyse.png"
+        },
+        {
+          "name": "Nerolidol",
+          "rang": 14,
+          "konzentrationProzent": null,
+          "quelle": "https://www.cansativa.de/peacenaturals/wp-content/uploads/sites/5/2026/03/31-1-SL-Terpen-Analyse.png"
+        },
+        {
+          "name": "Camphen",
+          "rang": 15,
+          "konzentrationProzent": null,
+          "quelle": "https://www.cansativa.de/peacenaturals/wp-content/uploads/sites/5/2026/03/31-1-SL-Terpen-Analyse.png"
+        },
+        {
+          "name": "Caryophyllenoxid",
+          "rang": 16,
+          "konzentrationProzent": null,
+          "quelle": "https://www.cansativa.de/peacenaturals/wp-content/uploads/sites/5/2026/03/31-1-SL-Terpen-Analyse.png"
+        }
+      ],
       "aromen": [],
       "pzn": null,
       "quellen": [
-        "https://www.cansativa.de/peacenaturals/en/"
+        "https://www.cansativa.de/peacenaturals/en/",
+        "https://www.cansativa.de/peacenaturals/wp-content/uploads/sites/5/2026/03/31-1-SL-Terpen-Analyse.png"
       ]
     },
     {
@@ -6576,12 +8083,111 @@
       "cbdMaxProzent": 1,
       "bestrahlung": "UNBESTRAHLT",
       "anbauland": "Kanada",
-      "terpene": [],
+      "terpene": [
+        {
+          "name": "Myrcen",
+          "rang": 1,
+          "konzentrationProzent": null,
+          "quelle": "https://www.cansativa.de/peacenaturals/wp-content/uploads/sites/5/2026/03/33-1-GC-Terpen-Analyse.png"
+        },
+        {
+          "name": "beta-Caryophyllen",
+          "rang": 2,
+          "konzentrationProzent": null,
+          "quelle": "https://www.cansativa.de/peacenaturals/wp-content/uploads/sites/5/2026/03/33-1-GC-Terpen-Analyse.png"
+        },
+        {
+          "name": "Limonen",
+          "rang": 3,
+          "konzentrationProzent": null,
+          "quelle": "https://www.cansativa.de/peacenaturals/wp-content/uploads/sites/5/2026/03/33-1-GC-Terpen-Analyse.png"
+        },
+        {
+          "name": "Farnesen",
+          "rang": 4,
+          "konzentrationProzent": null,
+          "quelle": "https://www.cansativa.de/peacenaturals/wp-content/uploads/sites/5/2026/03/33-1-GC-Terpen-Analyse.png"
+        },
+        {
+          "name": "Humulen",
+          "rang": 5,
+          "konzentrationProzent": null,
+          "quelle": "https://www.cansativa.de/peacenaturals/wp-content/uploads/sites/5/2026/03/33-1-GC-Terpen-Analyse.png"
+        },
+        {
+          "name": "Bisabolol",
+          "rang": 6,
+          "konzentrationProzent": null,
+          "quelle": "https://www.cansativa.de/peacenaturals/wp-content/uploads/sites/5/2026/03/33-1-GC-Terpen-Analyse.png"
+        },
+        {
+          "name": "beta-Pinen",
+          "rang": 7,
+          "konzentrationProzent": null,
+          "quelle": "https://www.cansativa.de/peacenaturals/wp-content/uploads/sites/5/2026/03/33-1-GC-Terpen-Analyse.png"
+        },
+        {
+          "name": "Terpineol",
+          "rang": 8,
+          "konzentrationProzent": null,
+          "quelle": "https://www.cansativa.de/peacenaturals/wp-content/uploads/sites/5/2026/03/33-1-GC-Terpen-Analyse.png"
+        },
+        {
+          "name": "Fenchol",
+          "rang": 9,
+          "konzentrationProzent": null,
+          "quelle": "https://www.cansativa.de/peacenaturals/wp-content/uploads/sites/5/2026/03/33-1-GC-Terpen-Analyse.png"
+        },
+        {
+          "name": "alpha-Pinen",
+          "rang": 10,
+          "konzentrationProzent": null,
+          "quelle": "https://www.cansativa.de/peacenaturals/wp-content/uploads/sites/5/2026/03/33-1-GC-Terpen-Analyse.png"
+        },
+        {
+          "name": "Linalool",
+          "rang": 11,
+          "konzentrationProzent": null,
+          "quelle": "https://www.cansativa.de/peacenaturals/wp-content/uploads/sites/5/2026/03/33-1-GC-Terpen-Analyse.png"
+        },
+        {
+          "name": "Nerolidol",
+          "rang": 12,
+          "konzentrationProzent": null,
+          "quelle": "https://www.cansativa.de/peacenaturals/wp-content/uploads/sites/5/2026/03/33-1-GC-Terpen-Analyse.png"
+        },
+        {
+          "name": "Terpinolen",
+          "rang": 13,
+          "konzentrationProzent": null,
+          "quelle": "https://www.cansativa.de/peacenaturals/wp-content/uploads/sites/5/2026/03/33-1-GC-Terpen-Analyse.png"
+        },
+        {
+          "name": "Camphen",
+          "rang": 14,
+          "konzentrationProzent": null,
+          "quelle": "https://www.cansativa.de/peacenaturals/wp-content/uploads/sites/5/2026/03/33-1-GC-Terpen-Analyse.png"
+        },
+        {
+          "name": "Borneol",
+          "rang": 15,
+          "konzentrationProzent": null,
+          "quelle": "https://www.cansativa.de/peacenaturals/wp-content/uploads/sites/5/2026/03/33-1-GC-Terpen-Analyse.png"
+        },
+        {
+          "name": "Caryophyllenoxid",
+          "rang": 16,
+          "konzentrationProzent": null,
+          "quelle": "https://www.cansativa.de/peacenaturals/wp-content/uploads/sites/5/2026/03/33-1-GC-Terpen-Analyse.png"
+        }
+      ],
       "aromen": [],
       "pzn": null,
       "quellen": [
         "https://www.cansativa.de/peacenaturals/en/",
-        "https://cannabis-apotheke.de/sorten/peace-naturals-33-1-gc-gmoc"
+        "https://cannabis-apotheke.de/sorten/peace-naturals-33-1-gc-gmoc",
+        "https://falken-apotheke-hannover.de/blueten/",
+        "https://www.cansativa.de/peacenaturals/wp-content/uploads/sites/5/2026/03/33-1-GC-Terpen-Analyse.png"
       ]
     },
     {
@@ -6599,11 +8205,31 @@
       "cbdMaxProzent": 1,
       "bestrahlung": "UNBESTRAHLT",
       "anbauland": "Kanada",
-      "terpene": [],
+      "terpene": [
+        {
+          "name": "Limonen",
+          "rang": 1,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Humulen",
+          "rang": 2,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "beta-Caryophyllen",
+          "rang": 3,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        }
+      ],
       "aromen": [],
       "pzn": null,
       "quellen": [
-        "https://www.medizinisches-cannabis-apotheke.de/p/peace-naturals-33-1-sc/"
+        "https://www.medizinisches-cannabis-apotheke.de/p/peace-naturals-33-1-sc/",
+        "https://falken-apotheke-hannover.de/blueten/"
       ]
     },
     {
@@ -6621,11 +8247,31 @@
       "cbdMaxProzent": 1,
       "bestrahlung": "UNBESTRAHLT",
       "anbauland": "Kanada",
-      "terpene": [],
+      "terpene": [
+        {
+          "name": "Myrcen",
+          "rang": 1,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Humulen",
+          "rang": 2,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Limonen",
+          "rang": 3,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        }
+      ],
       "aromen": [],
       "pzn": null,
       "quellen": [
-        "https://www.medizinisches-cannabis-apotheke.de/p/peace-naturals-33-1-sl/"
+        "https://www.medizinisches-cannabis-apotheke.de/p/peace-naturals-33-1-sl/",
+        "https://falken-apotheke-hannover.de/blueten/"
       ]
     },
     {
@@ -6643,11 +8289,109 @@
       "cbdMaxProzent": 1,
       "bestrahlung": "UNBESTRAHLT",
       "anbauland": "Kanada",
-      "terpene": [],
+      "terpene": [
+        {
+          "name": "Myrcen",
+          "rang": 1,
+          "konzentrationProzent": null,
+          "quelle": "https://www.cansativa.de/peacenaturals/wp-content/uploads/sites/5/2026/03/36-1-SC-Terpen-Analyse.png"
+        },
+        {
+          "name": "beta-Caryophyllen",
+          "rang": 2,
+          "konzentrationProzent": null,
+          "quelle": "https://www.cansativa.de/peacenaturals/wp-content/uploads/sites/5/2026/03/36-1-SC-Terpen-Analyse.png"
+        },
+        {
+          "name": "Limonen",
+          "rang": 3,
+          "konzentrationProzent": null,
+          "quelle": "https://www.cansativa.de/peacenaturals/wp-content/uploads/sites/5/2026/03/36-1-SC-Terpen-Analyse.png"
+        },
+        {
+          "name": "Farnesen",
+          "rang": 4,
+          "konzentrationProzent": null,
+          "quelle": "https://www.cansativa.de/peacenaturals/wp-content/uploads/sites/5/2026/03/36-1-SC-Terpen-Analyse.png"
+        },
+        {
+          "name": "Humulen",
+          "rang": 5,
+          "konzentrationProzent": null,
+          "quelle": "https://www.cansativa.de/peacenaturals/wp-content/uploads/sites/5/2026/03/36-1-SC-Terpen-Analyse.png"
+        },
+        {
+          "name": "Bisabolol",
+          "rang": 6,
+          "konzentrationProzent": null,
+          "quelle": "https://www.cansativa.de/peacenaturals/wp-content/uploads/sites/5/2026/03/36-1-SC-Terpen-Analyse.png"
+        },
+        {
+          "name": "Terpineol",
+          "rang": 7,
+          "konzentrationProzent": null,
+          "quelle": "https://www.cansativa.de/peacenaturals/wp-content/uploads/sites/5/2026/03/36-1-SC-Terpen-Analyse.png"
+        },
+        {
+          "name": "beta-Pinen",
+          "rang": 8,
+          "konzentrationProzent": null,
+          "quelle": "https://www.cansativa.de/peacenaturals/wp-content/uploads/sites/5/2026/03/36-1-SC-Terpen-Analyse.png"
+        },
+        {
+          "name": "Fenchol",
+          "rang": 9,
+          "konzentrationProzent": null,
+          "quelle": "https://www.cansativa.de/peacenaturals/wp-content/uploads/sites/5/2026/03/36-1-SC-Terpen-Analyse.png"
+        },
+        {
+          "name": "Linalool",
+          "rang": 10,
+          "konzentrationProzent": null,
+          "quelle": "https://www.cansativa.de/peacenaturals/wp-content/uploads/sites/5/2026/03/36-1-SC-Terpen-Analyse.png"
+        },
+        {
+          "name": "alpha-Pinen",
+          "rang": 11,
+          "konzentrationProzent": null,
+          "quelle": "https://www.cansativa.de/peacenaturals/wp-content/uploads/sites/5/2026/03/36-1-SC-Terpen-Analyse.png"
+        },
+        {
+          "name": "Nerolidol",
+          "rang": 12,
+          "konzentrationProzent": null,
+          "quelle": "https://www.cansativa.de/peacenaturals/wp-content/uploads/sites/5/2026/03/36-1-SC-Terpen-Analyse.png"
+        },
+        {
+          "name": "Caryophyllenoxid",
+          "rang": 13,
+          "konzentrationProzent": null,
+          "quelle": "https://www.cansativa.de/peacenaturals/wp-content/uploads/sites/5/2026/03/36-1-SC-Terpen-Analyse.png"
+        },
+        {
+          "name": "Camphen",
+          "rang": 14,
+          "konzentrationProzent": null,
+          "quelle": "https://www.cansativa.de/peacenaturals/wp-content/uploads/sites/5/2026/03/36-1-SC-Terpen-Analyse.png"
+        },
+        {
+          "name": "Borneol",
+          "rang": 15,
+          "konzentrationProzent": null,
+          "quelle": "https://www.cansativa.de/peacenaturals/wp-content/uploads/sites/5/2026/03/36-1-SC-Terpen-Analyse.png"
+        },
+        {
+          "name": "Terpinolen",
+          "rang": 16,
+          "konzentrationProzent": null,
+          "quelle": "https://www.cansativa.de/peacenaturals/wp-content/uploads/sites/5/2026/03/36-1-SC-Terpen-Analyse.png"
+        }
+      ],
       "aromen": [],
       "pzn": null,
       "quellen": [
-        "https://www.cansativa.de/peacenaturals/en/"
+        "https://www.cansativa.de/peacenaturals/en/",
+        "https://www.cansativa.de/peacenaturals/wp-content/uploads/sites/5/2026/03/36-1-SC-Terpen-Analyse.png"
       ]
     },
     {
@@ -6667,19 +8411,34 @@
       "anbauland": "Kanada",
       "terpene": [
         {
-          "name": "alpha-Pinen",
+          "name": "Myrcen",
           "rang": 1,
-          "konzentrationProzent": null
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
         },
         {
-          "name": "Myrcen",
+          "name": "alpha-Pinen",
           "rang": 2,
-          "konzentrationProzent": null
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "beta-Caryophyllen",
+          "rang": 3,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
         },
         {
           "name": "Limonen",
-          "rang": 3,
-          "konzentrationProzent": null
+          "rang": 4,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "beta-Pinen",
+          "rang": 5,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
         }
       ],
       "aromen": [
@@ -6688,7 +8447,8 @@
       ],
       "pzn": null,
       "quellen": [
-        "https://bavarian-cannabis.com/shop/aurora"
+        "https://bavarian-cannabis.com/shop/aurora",
+        "https://falken-apotheke-hannover.de/blueten/"
       ]
     },
     {
@@ -6756,19 +8516,40 @@
       "anbauland": "Kanada",
       "terpene": [
         {
-          "name": "Myrcen",
+          "name": "Terpinolen",
           "rang": 1,
-          "konzentrationProzent": null
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "beta-Caryophyllen",
+          "rang": 2,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Myrcen",
+          "rang": 3,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
         },
         {
           "name": "Limonen",
-          "rang": 2,
-          "konzentrationProzent": null
+          "rang": 4,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
         },
         {
-          "name": "Terpinolen",
-          "rang": 3,
-          "konzentrationProzent": null
+          "name": "Linalool",
+          "rang": 5,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Ocimen",
+          "rang": 6,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
         }
       ],
       "aromen": [
@@ -6778,7 +8559,8 @@
       ],
       "pzn": null,
       "quellen": [
-        "https://bavarian-cannabis.com/shop/aurora"
+        "https://bavarian-cannabis.com/shop/aurora",
+        "https://falken-apotheke-hannover.de/blueten/"
       ]
     },
     {
@@ -6789,9 +8571,47 @@
       "kultivarTyp": "SATIVA",
       "bestrahlung": "GAMMA",
       "darreichungsform": "BLUETE",
-      "terpene": [],
+      "terpene": [
+        {
+          "name": "Terpinolen",
+          "rang": 1,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "beta-Caryophyllen",
+          "rang": 2,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Myrcen",
+          "rang": 3,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Limonen",
+          "rang": 4,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Linalool",
+          "rang": 5,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Ocimen",
+          "rang": 6,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        }
+      ],
       "quellen": [
-        "https://gruenhorn.de/live-bestand"
+        "https://gruenhorn.de/live-bestand",
+        "https://falken-apotheke-hannover.de/blueten/"
       ]
     },
     {
@@ -6811,19 +8631,40 @@
       "anbauland": "Kanada",
       "terpene": [
         {
-          "name": "Humulen",
+          "name": "Myrcen",
           "rang": 1,
-          "konzentrationProzent": null
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
         },
         {
           "name": "Limonen",
           "rang": 2,
-          "konzentrationProzent": null
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
         },
         {
-          "name": "Myrcen",
+          "name": "beta-Caryophyllen",
           "rang": 3,
-          "konzentrationProzent": null
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Nerolidol",
+          "rang": 4,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Linalool",
+          "rang": 5,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Guajol",
+          "rang": 6,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
         }
       ],
       "aromen": [
@@ -6832,7 +8673,8 @@
       ],
       "pzn": null,
       "quellen": [
-        "https://bavarian-cannabis.com/shop/aurora"
+        "https://bavarian-cannabis.com/shop/aurora",
+        "https://falken-apotheke-hannover.de/blueten/"
       ]
     },
     {
@@ -6908,17 +8750,26 @@
         {
           "name": "Limonen",
           "rang": 1,
-          "konzentrationProzent": null
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
         },
         {
           "name": "beta-Caryophyllen",
           "rang": 2,
-          "konzentrationProzent": null
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
         },
         {
           "name": "Nerolidol",
           "rang": 3,
-          "konzentrationProzent": null
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Humulen",
+          "rang": 4,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
         }
       ],
       "aromen": [
@@ -6930,7 +8781,8 @@
       "pzn": null,
       "quellen": [
         "https://bavarian-cannabis.com/shop/aurora",
-        "https://jiroo.de/pedanios-27-1-und-pedanios-29-1-von-aurora/"
+        "https://jiroo.de/pedanios-27-1-und-pedanios-29-1-von-aurora/",
+        "https://falken-apotheke-hannover.de/blueten/"
       ]
     },
     {
@@ -6941,9 +8793,35 @@
       "kultivarTyp": "HYBRID",
       "bestrahlung": "GAMMA",
       "darreichungsform": "BLUETE",
-      "terpene": [],
+      "terpene": [
+        {
+          "name": "Limonen",
+          "rang": 1,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "beta-Caryophyllen",
+          "rang": 2,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Nerolidol",
+          "rang": 3,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Humulen",
+          "rang": 4,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        }
+      ],
       "quellen": [
-        "https://gruenhorn.de/live-bestand"
+        "https://gruenhorn.de/live-bestand",
+        "https://falken-apotheke-hannover.de/blueten/"
       ]
     },
     {
@@ -6965,17 +8843,26 @@
         {
           "name": "Limonen",
           "rang": 1,
-          "konzentrationProzent": null
-        },
-        {
-          "name": "beta-Caryophyllen",
-          "rang": 2,
-          "konzentrationProzent": null
+          "konzentrationProzent": null,
+          "quelle": "https://allefarben-apotheke.de/product/pedanios-29-1-srd-ca-sourdough/"
         },
         {
           "name": "Myrcen",
+          "rang": 2,
+          "konzentrationProzent": null,
+          "quelle": "https://allefarben-apotheke.de/product/pedanios-29-1-srd-ca-sourdough/"
+        },
+        {
+          "name": "beta-Caryophyllen",
           "rang": 3,
-          "konzentrationProzent": null
+          "konzentrationProzent": null,
+          "quelle": "https://allefarben-apotheke.de/product/pedanios-29-1-srd-ca-sourdough/"
+        },
+        {
+          "name": "Linalool",
+          "rang": 4,
+          "konzentrationProzent": null,
+          "quelle": "https://allefarben-apotheke.de/product/pedanios-29-1-srd-ca-sourdough/"
         }
       ],
       "aromen": [
@@ -6985,7 +8872,8 @@
       "pzn": null,
       "quellen": [
         "https://jiroo.de/pedanios-27-1-und-pedanios-29-1-von-aurora/",
-        "Sortensammlung des Betreibers (1.json, 2026-09)"
+        "Sortensammlung des Betreibers (1.json, 2026-09)",
+        "https://allefarben-apotheke.de/product/pedanios-29-1-srd-ca-sourdough/"
       ]
     },
     {
@@ -7007,17 +8895,32 @@
         {
           "name": "beta-Caryophyllen",
           "rang": 1,
-          "konzentrationProzent": null
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
         },
         {
           "name": "Limonen",
           "rang": 2,
-          "konzentrationProzent": null
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
         },
         {
-          "name": "Nerolidol",
+          "name": "Linalool",
           "rang": 3,
-          "konzentrationProzent": null
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Humulen",
+          "rang": 4,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Myrcen",
+          "rang": 5,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
         }
       ],
       "aromen": [
@@ -7026,7 +8929,8 @@
       ],
       "pzn": null,
       "quellen": [
-        "https://bavarian-cannabis.com/shop/aurora"
+        "https://bavarian-cannabis.com/shop/aurora",
+        "https://falken-apotheke-hannover.de/blueten/"
       ]
     },
     {
@@ -7037,9 +8941,41 @@
       "kultivarTyp": "INDICA",
       "bestrahlung": "GAMMA",
       "darreichungsform": "BLUETE",
-      "terpene": [],
+      "terpene": [
+        {
+          "name": "beta-Caryophyllen",
+          "rang": 1,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Limonen",
+          "rang": 2,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Linalool",
+          "rang": 3,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Humulen",
+          "rang": 4,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Myrcen",
+          "rang": 5,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        }
+      ],
       "quellen": [
-        "https://gruenhorn.de/live-bestand"
+        "https://gruenhorn.de/live-bestand",
+        "https://falken-apotheke-hannover.de/blueten/"
       ]
     },
     {
@@ -7059,19 +8995,34 @@
       "anbauland": "Kanada",
       "terpene": [
         {
-          "name": "beta-Caryophyllen",
-          "rang": 1,
-          "konzentrationProzent": null
-        },
-        {
           "name": "Limonen",
-          "rang": 2,
-          "konzentrationProzent": null
+          "rang": 1,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
         },
         {
-          "name": "Pinen",
+          "name": "beta-Caryophyllen",
+          "rang": 2,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Myrcen",
           "rang": 3,
-          "konzentrationProzent": null
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "beta-Pinen",
+          "rang": 4,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Humulen",
+          "rang": 5,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
         }
       ],
       "aromen": [
@@ -7080,7 +9031,8 @@
       ],
       "pzn": null,
       "quellen": [
-        "https://bavarian-cannabis.com/shop/aurora"
+        "https://bavarian-cannabis.com/shop/aurora",
+        "https://falken-apotheke-hannover.de/blueten/"
       ]
     },
     {
@@ -7093,20 +9045,33 @@
       "anbauland": "Deutschland",
       "terpene": [
         {
-          "name": "beta-Caryophyllen",
+          "name": "Limonen",
           "rang": 1,
           "konzentrationProzent": null,
-          "quelle": "https://www.demecan.de/produkte"
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
         },
         {
           "name": "Farnesen",
           "rang": 2,
           "konzentrationProzent": null,
-          "quelle": "https://www.demecan.de/produkte"
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "beta-Caryophyllen",
+          "rang": 3,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Myrcen",
+          "rang": 4,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
         }
       ],
       "quellen": [
-        "https://www.demecan.de/produkte"
+        "https://www.demecan.de/produkte",
+        "https://falken-apotheke-hannover.de/blueten/"
       ]
     },
     {
@@ -7136,6 +9101,18 @@
         {
           "name": "Farnesen",
           "rang": 2,
+          "konzentrationProzent": null,
+          "quelle": "https://www.demecan.de/produkte"
+        },
+        {
+          "name": "beta-Caryophyllen",
+          "rang": 3,
+          "konzentrationProzent": null,
+          "quelle": "https://www.demecan.de/produkte"
+        },
+        {
+          "name": "Myrcen",
+          "rang": 4,
           "konzentrationProzent": null,
           "quelle": "https://www.demecan.de/produkte"
         }
@@ -7370,17 +9347,44 @@
         {
           "name": "beta-Caryophyllen",
           "rang": 1,
-          "konzentrationProzent": null
-        },
-        {
-          "name": "Myrcen",
-          "rang": 2,
-          "konzentrationProzent": null
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
         },
         {
           "name": "Limonen",
+          "rang": 2,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Myrcen",
           "rang": 3,
-          "konzentrationProzent": null
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Linalool",
+          "rang": 4,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "beta-Pinen",
+          "rang": 5,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "alpha-Pinen",
+          "rang": 6,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Fenchol",
+          "rang": 7,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
         }
       ],
       "aromen": [
@@ -7390,7 +9394,8 @@
       ],
       "pzn": null,
       "quellen": [
-        "https://bavarian-cannabis.com/shop/aurora"
+        "https://bavarian-cannabis.com/shop/aurora",
+        "https://falken-apotheke-hannover.de/blueten/"
       ]
     },
     {
@@ -7402,9 +9407,29 @@
       "bestrahlung": "UNBESTRAHLT",
       "darreichungsform": "BLUETE",
       "dominanz": "indica",
-      "terpene": [],
+      "terpene": [
+        {
+          "name": "Limonen",
+          "rang": 1,
+          "konzentrationProzent": null,
+          "quelle": "https://allefarben-apotheke.de/product/san-raf-31-1-cfk-campfire-kush/"
+        },
+        {
+          "name": "beta-Caryophyllen",
+          "rang": 2,
+          "konzentrationProzent": null,
+          "quelle": "https://allefarben-apotheke.de/product/san-raf-31-1-cfk-campfire-kush/"
+        },
+        {
+          "name": "Myrcen",
+          "rang": 3,
+          "konzentrationProzent": null,
+          "quelle": "https://allefarben-apotheke.de/product/san-raf-31-1-cfk-campfire-kush/"
+        }
+      ],
       "quellen": [
-        "https://gruenhorn.de/live-bestand"
+        "https://gruenhorn.de/live-bestand",
+        "https://allefarben-apotheke.de/product/san-raf-31-1-cfk-campfire-kush/"
       ]
     },
     {
@@ -7444,11 +9469,43 @@
       "cbdMaxProzent": null,
       "bestrahlung": "UNBEKANNT",
       "anbauland": "Portugal",
-      "terpene": [],
+      "terpene": [
+        {
+          "name": "beta-Caryophyllen",
+          "rang": 1,
+          "konzentrationProzent": null,
+          "quelle": "https://greenmedical.health/de/cannabis/flower/sibanax_crescendo_22_1-crescendo_cookies"
+        },
+        {
+          "name": "Bisabolol",
+          "rang": 2,
+          "konzentrationProzent": null,
+          "quelle": "https://greenmedical.health/de/cannabis/flower/sibanax_crescendo_22_1-crescendo_cookies"
+        },
+        {
+          "name": "Myrcen",
+          "rang": 3,
+          "konzentrationProzent": null,
+          "quelle": "https://greenmedical.health/de/cannabis/flower/sibanax_crescendo_22_1-crescendo_cookies"
+        },
+        {
+          "name": "Nerolidol",
+          "rang": 4,
+          "konzentrationProzent": null,
+          "quelle": "https://greenmedical.health/de/cannabis/flower/sibanax_crescendo_22_1-crescendo_cookies"
+        },
+        {
+          "name": "Humulen",
+          "rang": 5,
+          "konzentrationProzent": null,
+          "quelle": "https://greenmedical.health/de/cannabis/flower/sibanax_crescendo_22_1-crescendo_cookies"
+        }
+      ],
       "aromen": [],
       "pzn": null,
       "quellen": [
-        "https://greenmedical.health/de/cannabis/producer/heyday"
+        "https://greenmedical.health/de/cannabis/producer/heyday",
+        "https://greenmedical.health/de/cannabis/flower/sibanax_crescendo_22_1-crescendo_cookies"
       ]
     },
     {
@@ -7466,11 +9523,37 @@
       "cbdMaxProzent": 1,
       "bestrahlung": "UNBEKANNT",
       "anbauland": "Portugal",
-      "terpene": [],
+      "terpene": [
+        {
+          "name": "beta-Caryophyllen",
+          "rang": 1,
+          "konzentrationProzent": null,
+          "quelle": "https://greenmedical.health/de/cannabis/flower/sibanax_gmo_zkittlez_26_1-gmo_zkittlez"
+        },
+        {
+          "name": "Limonen",
+          "rang": 2,
+          "konzentrationProzent": null,
+          "quelle": "https://greenmedical.health/de/cannabis/flower/sibanax_gmo_zkittlez_26_1-gmo_zkittlez"
+        },
+        {
+          "name": "Linalool",
+          "rang": 3,
+          "konzentrationProzent": null,
+          "quelle": "https://greenmedical.health/de/cannabis/flower/sibanax_gmo_zkittlez_26_1-gmo_zkittlez"
+        },
+        {
+          "name": "Ocimen",
+          "rang": 4,
+          "konzentrationProzent": null,
+          "quelle": "https://greenmedical.health/de/cannabis/flower/sibanax_gmo_zkittlez_26_1-gmo_zkittlez"
+        }
+      ],
       "aromen": [],
       "pzn": null,
       "quellen": [
-        "https://greenmedical.health/de/cannabis/producer/heyday"
+        "https://greenmedical.health/de/cannabis/producer/heyday",
+        "https://greenmedical.health/de/cannabis/flower/sibanax_gmo_zkittlez_26_1-gmo_zkittlez"
       ]
     },
     {
@@ -7488,11 +9571,43 @@
       "cbdMaxProzent": 1,
       "bestrahlung": "UNBEKANNT",
       "anbauland": "Portugal",
-      "terpene": [],
+      "terpene": [
+        {
+          "name": "beta-Caryophyllen",
+          "rang": 1,
+          "konzentrationProzent": null,
+          "quelle": "https://greenmedical.health/de/cannabis/flower/sibanax-hybrid-mcf-23-1-mac-fem-f9e3"
+        },
+        {
+          "name": "Myrcen",
+          "rang": 2,
+          "konzentrationProzent": null,
+          "quelle": "https://greenmedical.health/de/cannabis/flower/sibanax-hybrid-mcf-23-1-mac-fem-f9e3"
+        },
+        {
+          "name": "Pinen",
+          "rang": 3,
+          "konzentrationProzent": null,
+          "quelle": "https://greenmedical.health/de/cannabis/flower/sibanax-hybrid-mcf-23-1-mac-fem-f9e3"
+        },
+        {
+          "name": "Linalool",
+          "rang": 4,
+          "konzentrationProzent": null,
+          "quelle": "https://greenmedical.health/de/cannabis/flower/sibanax-hybrid-mcf-23-1-mac-fem-f9e3"
+        },
+        {
+          "name": "Limonen",
+          "rang": 5,
+          "konzentrationProzent": null,
+          "quelle": "https://greenmedical.health/de/cannabis/flower/sibanax-hybrid-mcf-23-1-mac-fem-f9e3"
+        }
+      ],
       "aromen": [],
       "pzn": null,
       "quellen": [
-        "https://greenmedical.health/de/cannabis/producer/heyday"
+        "https://greenmedical.health/de/cannabis/producer/heyday",
+        "https://greenmedical.health/de/cannabis/flower/sibanax-hybrid-mcf-23-1-mac-fem-f9e3"
       ]
     },
     {
@@ -7510,11 +9625,31 @@
       "cbdMaxProzent": 1,
       "bestrahlung": "UNBEKANNT",
       "anbauland": "Portugal",
-      "terpene": [],
+      "terpene": [
+        {
+          "name": "Terpinolen",
+          "rang": 1,
+          "konzentrationProzent": null,
+          "quelle": "https://greenmedical.health/de/cannabis/flower/sibanax_z_umami_26_1-gmo_zkittlez"
+        },
+        {
+          "name": "Ocimen",
+          "rang": 2,
+          "konzentrationProzent": null,
+          "quelle": "https://greenmedical.health/de/cannabis/flower/sibanax_z_umami_26_1-gmo_zkittlez"
+        },
+        {
+          "name": "Limonen",
+          "rang": 3,
+          "konzentrationProzent": null,
+          "quelle": "https://greenmedical.health/de/cannabis/flower/sibanax_z_umami_26_1-gmo_zkittlez"
+        }
+      ],
       "aromen": [],
       "pzn": null,
       "quellen": [
-        "https://greenmedical.health/de/cannabis/producer/heyday"
+        "https://greenmedical.health/de/cannabis/producer/heyday",
+        "https://greenmedical.health/de/cannabis/flower/sibanax_z_umami_26_1-gmo_zkittlez"
       ]
     },
     {
@@ -7532,11 +9667,31 @@
       "cbdMaxProzent": 1,
       "bestrahlung": "UNBEKANNT",
       "anbauland": "Portugal",
-      "terpene": [],
+      "terpene": [
+        {
+          "name": "Limonen",
+          "rang": 1,
+          "konzentrationProzent": null,
+          "quelle": "https://greenmedical.health/de/cannabis/flower/sibanax_z_umami_28_1-gmo_zkittlez"
+        },
+        {
+          "name": "Ocimen",
+          "rang": 2,
+          "konzentrationProzent": null,
+          "quelle": "https://greenmedical.health/de/cannabis/flower/sibanax_z_umami_28_1-gmo_zkittlez"
+        },
+        {
+          "name": "Terpinolen",
+          "rang": 3,
+          "konzentrationProzent": null,
+          "quelle": "https://greenmedical.health/de/cannabis/flower/sibanax_z_umami_28_1-gmo_zkittlez"
+        }
+      ],
       "aromen": [],
       "pzn": null,
       "quellen": [
-        "https://greenmedical.health/de/cannabis/producer/heyday"
+        "https://greenmedical.health/de/cannabis/producer/heyday",
+        "https://greenmedical.health/de/cannabis/flower/sibanax_z_umami_28_1-gmo_zkittlez"
       ]
     },
     {
@@ -7863,7 +10018,26 @@
       "cbdMaxProzent": 1,
       "bestrahlung": "UNBESTRAHLT",
       "anbauland": "Kanada",
-      "terpene": [],
+      "terpene": [
+        {
+          "name": "Limonen",
+          "rang": 1,
+          "konzentrationProzent": null,
+          "quelle": "https://myweed24.de/product/therismos-28-1-pkm/"
+        },
+        {
+          "name": "Linalool",
+          "rang": 2,
+          "konzentrationProzent": null,
+          "quelle": "https://myweed24.de/product/therismos-28-1-pkm/"
+        },
+        {
+          "name": "beta-Caryophyllen",
+          "rang": 3,
+          "konzentrationProzent": null,
+          "quelle": "https://myweed24.de/product/therismos-28-1-pkm/"
+        }
+      ],
       "aromen": [],
       "pzn": null,
       "quellen": [
@@ -7930,7 +10104,38 @@
       "cbdMaxProzent": 1,
       "bestrahlung": "UNBEKANNT",
       "anbauland": "Griechenland",
-      "terpene": [],
+      "terpene": [
+        {
+          "name": "Limonen",
+          "rang": 1,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "beta-Caryophyllen",
+          "rang": 2,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Humulen",
+          "rang": 3,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Linalool",
+          "rang": 4,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "beta-Pinen",
+          "rang": 5,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        }
+      ],
       "aromen": [],
       "pzn": null,
       "quellen": [
@@ -7952,7 +10157,38 @@
       "cbdMaxProzent": 12.6,
       "bestrahlung": "UNBEKANNT",
       "anbauland": "Griechenland",
-      "terpene": [],
+      "terpene": [
+        {
+          "name": "Myrcen",
+          "rang": 1,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Limonen",
+          "rang": 2,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Linalool",
+          "rang": 3,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "beta-Caryophyllen",
+          "rang": 4,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Guajol",
+          "rang": 5,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        }
+      ],
       "aromen": [],
       "pzn": null,
       "quellen": [
@@ -7967,11 +10203,55 @@
       "kultivarTyp": "HYBRID",
       "bestrahlung": "UNBESTRAHLT",
       "darreichungsform": "BLUETE",
-      "terpene": [],
+      "terpene": [
+        {
+          "name": "Limonen",
+          "rang": 1,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Linalool",
+          "rang": 2,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "beta-Caryophyllen",
+          "rang": 3,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Myrcen",
+          "rang": 4,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Humulen",
+          "rang": 5,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Guajol",
+          "rang": 6,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "beta-Pinen",
+          "rang": 7,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        }
+      ],
       "quellen": [
         "https://cannazen.de/dopiopharm-hersteller-blueten-sorten-liste/",
         "https://gruenhorn.de/live-bestand",
-        "https://www.gruenhorn.de/live-bestand/"
+        "https://www.gruenhorn.de/live-bestand/",
+        "https://falken-apotheke-hannover.de/blueten/"
       ],
       "hersteller": "Dopiopharm"
     },
@@ -8394,15 +10674,34 @@
       "dominanz": "indica",
       "terpene": [
         {
-          "name": "trans-Caryophyllen",
+          "name": "beta-Caryophyllen",
           "rang": 1,
           "konzentrationProzent": null,
-          "quelle": "https://www.cannabis-aerzte.de/medizinische-cannabissorten/"
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Myrcen",
+          "rang": 2,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Limonen",
+          "rang": 3,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Humulen",
+          "rang": 4,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
         }
       ],
       "quellen": [
         "https://www.cannabis-aerzte.de/medizinische-cannabissorten/",
-        "Sortensammlung des Betreibers (1.json, 2026-09)"
+        "Sortensammlung des Betreibers (1.json, 2026-09)",
+        "https://falken-apotheke-hannover.de/blueten/"
       ],
       "aromen": [
         "Kräuter",
@@ -8520,24 +10819,40 @@
       "anbauland": "Kanada",
       "terpene": [
         {
-          "name": "Linalool",
-          "konzentrationProzent": null
-        },
-        {
-          "name": "Limonen",
-          "konzentrationProzent": null
-        },
-        {
-          "name": "alpha-Pinen",
-          "konzentrationProzent": null
-        },
-        {
           "name": "Myrcen",
-          "konzentrationProzent": null
+          "rang": 1,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
         },
         {
           "name": "beta-Caryophyllen",
-          "konzentrationProzent": null
+          "rang": 2,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "alpha-Pinen",
+          "rang": 3,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Guajol",
+          "rang": 4,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "beta-Pinen",
+          "rang": 5,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Linalool",
+          "rang": 6,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
         }
       ],
       "aromen": [
@@ -8546,7 +10861,8 @@
       ],
       "pzn": null,
       "quellen": [
-        "Sortensammlung des Betreibers (1.json, 2026-09)"
+        "Sortensammlung des Betreibers (1.json, 2026-09)",
+        "https://falken-apotheke-hannover.de/blueten/"
       ]
     },
     {
@@ -10766,20 +13082,34 @@
       "anbauland": "Kanada",
       "terpene": [
         {
-          "name": "Limonen",
-          "konzentrationProzent": null
-        },
-        {
-          "name": "alpha-Pinen",
-          "konzentrationProzent": null
-        },
-        {
           "name": "Myrcen",
-          "konzentrationProzent": null
+          "rang": 1,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
         },
         {
           "name": "beta-Caryophyllen",
-          "konzentrationProzent": null
+          "rang": 2,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Limonen",
+          "rang": 3,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Nerolidol",
+          "rang": 4,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Linalool",
+          "rang": 5,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
         }
       ],
       "aromen": [
@@ -10789,7 +13119,8 @@
       ],
       "pzn": null,
       "quellen": [
-        "Sortensammlung des Betreibers (1.json, 2026-09)"
+        "Sortensammlung des Betreibers (1.json, 2026-09)",
+        "https://falken-apotheke-hannover.de/blueten/"
       ]
     },
     {
@@ -11130,20 +13461,34 @@
       "anbauland": "Kanada",
       "terpene": [
         {
-          "name": "Linalool",
-          "konzentrationProzent": null
+          "name": "Farnesen",
+          "rang": 1,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
         },
         {
           "name": "Limonen",
-          "konzentrationProzent": null
+          "rang": 2,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
         },
         {
-          "name": "Farnesen",
-          "konzentrationProzent": null
+          "name": "beta-Caryophyllen",
+          "rang": 3,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
         },
         {
           "name": "alpha-Pinen",
-          "konzentrationProzent": null
+          "rang": 4,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Linalool",
+          "rang": 5,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
         }
       ],
       "aromen": [
@@ -11153,7 +13498,8 @@
       ],
       "pzn": null,
       "quellen": [
-        "Sortensammlung des Betreibers (1.json, 2026-09)"
+        "Sortensammlung des Betreibers (1.json, 2026-09)",
+        "https://falken-apotheke-hannover.de/blueten/"
       ]
     },
     {
@@ -11583,20 +13929,34 @@
       "anbauland": "Kanada",
       "terpene": [
         {
-          "name": "Nerolidol",
-          "konzentrationProzent": null
-        },
-        {
-          "name": "Limonen",
-          "konzentrationProzent": null
+          "name": "Myrcen",
+          "rang": 1,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
         },
         {
           "name": "alpha-Pinen",
-          "konzentrationProzent": null
+          "rang": 2,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
         },
         {
-          "name": "Myrcen",
-          "konzentrationProzent": null
+          "name": "Limonen",
+          "rang": 3,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "beta-Pinen",
+          "rang": 4,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Nerolidol",
+          "rang": 5,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
         }
       ],
       "aromen": [
@@ -11605,7 +13965,8 @@
       ],
       "pzn": null,
       "quellen": [
-        "Sortensammlung des Betreibers (1.json, 2026-09)"
+        "Sortensammlung des Betreibers (1.json, 2026-09)",
+        "https://falken-apotheke-hannover.de/blueten/"
       ]
     },
     {
@@ -12140,20 +14501,34 @@
       "anbauland": "Kanada",
       "terpene": [
         {
-          "name": "Linalool",
-          "konzentrationProzent": null
-        },
-        {
           "name": "Limonen",
-          "konzentrationProzent": null
+          "rang": 1,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
         },
         {
-          "name": "Farnesen",
-          "konzentrationProzent": null
+          "name": "Linalool",
+          "rang": 2,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
         },
         {
-          "name": "alpha-Pinen",
-          "konzentrationProzent": null
+          "name": "beta-Caryophyllen",
+          "rang": 3,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Myrcen",
+          "rang": 4,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Guajol",
+          "rang": 5,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
         }
       ],
       "aromen": [
@@ -12163,7 +14538,8 @@
       ],
       "pzn": null,
       "quellen": [
-        "Sortensammlung des Betreibers (1.json, 2026-09)"
+        "Sortensammlung des Betreibers (1.json, 2026-09)",
+        "https://falken-apotheke-hannover.de/blueten/"
       ]
     },
     {
@@ -12960,16 +15336,28 @@
       "anbauland": "Kanada",
       "terpene": [
         {
-          "name": "Linalool",
-          "konzentrationProzent": null
+          "name": "beta-Caryophyllen",
+          "rang": 1,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
         },
         {
           "name": "Limonen",
-          "konzentrationProzent": null
+          "rang": 2,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
         },
         {
           "name": "Myrcen",
-          "konzentrationProzent": null
+          "rang": 3,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Linalool",
+          "rang": 4,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
         }
       ],
       "aromen": [
@@ -12979,7 +15367,8 @@
       ],
       "pzn": null,
       "quellen": [
-        "Sortensammlung des Betreibers (1.json, 2026-09)"
+        "Sortensammlung des Betreibers (1.json, 2026-09)",
+        "https://falken-apotheke-hannover.de/blueten/"
       ]
     },
     {
@@ -12999,16 +15388,34 @@
       "anbauland": "Portugal",
       "terpene": [
         {
-          "name": "Limonen",
-          "konzentrationProzent": null
-        },
-        {
           "name": "Myrcen",
-          "konzentrationProzent": null
+          "rang": 1,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
         },
         {
           "name": "beta-Caryophyllen",
-          "konzentrationProzent": null
+          "rang": 2,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Limonen",
+          "rang": 3,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Bisabolol",
+          "rang": 4,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Humulen",
+          "rang": 5,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
         }
       ],
       "aromen": [
@@ -13018,7 +15425,8 @@
       ],
       "pzn": null,
       "quellen": [
-        "Sortensammlung des Betreibers (1.json, 2026-09)"
+        "Sortensammlung des Betreibers (1.json, 2026-09)",
+        "https://falken-apotheke-hannover.de/blueten/"
       ]
     },
     {
@@ -14711,19 +17119,33 @@
       "terpene": [
         {
           "name": "Myrcen",
-          "konzentrationProzent": null
-        },
-        {
-          "name": "alpha-Pinen",
-          "konzentrationProzent": null
-        },
-        {
-          "name": "beta-Caryophyllen",
-          "konzentrationProzent": null
+          "rang": 1,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
         },
         {
           "name": "Humulen",
-          "konzentrationProzent": null
+          "rang": 2,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "beta-Pinen",
+          "rang": 3,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "alpha-Pinen",
+          "rang": 4,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "beta-Caryophyllen",
+          "rang": 5,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
         }
       ],
       "aromen": [
@@ -14733,7 +17155,8 @@
       ],
       "pzn": null,
       "quellen": [
-        "Sortensammlung des Betreibers (1.json, 2026-09)"
+        "Sortensammlung des Betreibers (1.json, 2026-09)",
+        "https://falken-apotheke-hannover.de/blueten/"
       ]
     },
     {
@@ -14975,15 +17398,33 @@
       "terpene": [
         {
           "name": "alpha-Pinen",
-          "konzentrationProzent": null
+          "rang": 1,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
         },
         {
           "name": "Myrcen",
-          "konzentrationProzent": null
+          "rang": 2,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Limonen",
+          "rang": 3,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
         },
         {
           "name": "beta-Caryophyllen",
-          "konzentrationProzent": null
+          "rang": 4,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "beta-Pinen",
+          "rang": 5,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
         }
       ],
       "aromen": [
@@ -14993,7 +17434,8 @@
       ],
       "pzn": null,
       "quellen": [
-        "Sortensammlung des Betreibers (1.json, 2026-09)"
+        "Sortensammlung des Betreibers (1.json, 2026-09)",
+        "https://falken-apotheke-hannover.de/blueten/"
       ]
     },
     {
@@ -15014,11 +17456,21 @@
       "terpene": [
         {
           "name": "Linalool",
-          "konzentrationProzent": null
+          "rang": 1,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Limonen",
+          "rang": 2,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
         },
         {
           "name": "Myrcen",
-          "konzentrationProzent": null
+          "rang": 3,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
         }
       ],
       "aromen": [
@@ -15028,7 +17480,8 @@
       ],
       "pzn": null,
       "quellen": [
-        "Sortensammlung des Betreibers (1.json, 2026-09)"
+        "Sortensammlung des Betreibers (1.json, 2026-09)",
+        "https://falken-apotheke-hannover.de/blueten/"
       ]
     },
     {
@@ -15817,24 +18270,40 @@
       "anbauland": "Kanada",
       "terpene": [
         {
-          "name": "Linalool",
-          "konzentrationProzent": null
-        },
-        {
-          "name": "Limonen",
-          "konzentrationProzent": null
+          "name": "Myrcen",
+          "rang": 1,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
         },
         {
           "name": "alpha-Pinen",
-          "konzentrationProzent": null
+          "rang": 2,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
         },
         {
-          "name": "Myrcen",
-          "konzentrationProzent": null
+          "name": "beta-Pinen",
+          "rang": 3,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Limonen",
+          "rang": 4,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Linalool",
+          "rang": 5,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
         },
         {
           "name": "beta-Caryophyllen",
-          "konzentrationProzent": null
+          "rang": 6,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
         }
       ],
       "aromen": [
@@ -15844,7 +18313,8 @@
       ],
       "pzn": null,
       "quellen": [
-        "Sortensammlung des Betreibers (1.json, 2026-09)"
+        "Sortensammlung des Betreibers (1.json, 2026-09)",
+        "https://falken-apotheke-hannover.de/blueten/"
       ]
     },
     {
@@ -16280,15 +18750,27 @@
       "terpene": [
         {
           "name": "Myrcen",
-          "konzentrationProzent": null
+          "rang": 1,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Farnesen",
+          "rang": 2,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
         },
         {
           "name": "Limonen",
-          "konzentrationProzent": null
+          "rang": 3,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
         },
         {
           "name": "beta-Caryophyllen",
-          "konzentrationProzent": null
+          "rang": 4,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
         }
       ],
       "aromen": [
@@ -16298,7 +18780,8 @@
       ],
       "pzn": null,
       "quellen": [
-        "Sortensammlung des Betreibers (1.json, 2026-09)"
+        "Sortensammlung des Betreibers (1.json, 2026-09)",
+        "https://falken-apotheke-hannover.de/blueten/"
       ]
     },
     {
@@ -16318,16 +18801,34 @@
       "anbauland": "Kanada",
       "terpene": [
         {
-          "name": "Myrcen",
-          "konzentrationProzent": null
+          "name": "Farnesen",
+          "rang": 1,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
         },
         {
-          "name": "Linalool",
-          "konzentrationProzent": null
+          "name": "Myrcen",
+          "rang": 2,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
         },
         {
           "name": "Limonen",
-          "konzentrationProzent": null
+          "rang": 3,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "beta-Caryophyllen",
+          "rang": 4,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Linalool",
+          "rang": 5,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
         }
       ],
       "aromen": [
@@ -16337,7 +18838,8 @@
       ],
       "pzn": null,
       "quellen": [
-        "Sortensammlung des Betreibers (1.json, 2026-09)"
+        "Sortensammlung des Betreibers (1.json, 2026-09)",
+        "https://falken-apotheke-hannover.de/blueten/"
       ]
     },
     {
@@ -17663,20 +20165,34 @@
       "anbauland": "Kanada",
       "terpene": [
         {
-          "name": "Terpinolen",
-          "konzentrationProzent": null
-        },
-        {
-          "name": "Linalool",
-          "konzentrationProzent": null
-        },
-        {
           "name": "beta-Caryophyllen",
-          "konzentrationProzent": null
+          "rang": 1,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Limonen",
+          "rang": 2,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Terpinolen",
+          "rang": 3,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
         },
         {
           "name": "Bisabolol",
-          "konzentrationProzent": null
+          "rang": 4,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Linalool",
+          "rang": 5,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
         }
       ],
       "aromen": [
@@ -17686,7 +20202,8 @@
       ],
       "pzn": null,
       "quellen": [
-        "Sortensammlung des Betreibers (1.json, 2026-09)"
+        "Sortensammlung des Betreibers (1.json, 2026-09)",
+        "https://falken-apotheke-hannover.de/blueten/"
       ]
     },
     {
@@ -18642,16 +21159,28 @@
       "anbauland": "Kanada",
       "terpene": [
         {
-          "name": "Linalool",
-          "konzentrationProzent": null
+          "name": "beta-Caryophyllen",
+          "rang": 1,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
         },
         {
-          "name": "beta-Caryophyllen",
-          "konzentrationProzent": null
+          "name": "Limonen",
+          "rang": 2,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Linalool",
+          "rang": 3,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
         },
         {
           "name": "Myrcen",
-          "konzentrationProzent": null
+          "rang": 4,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
         }
       ],
       "aromen": [
@@ -18661,7 +21190,8 @@
       ],
       "pzn": null,
       "quellen": [
-        "Sortensammlung des Betreibers (1.json, 2026-09)"
+        "Sortensammlung des Betreibers (1.json, 2026-09)",
+        "https://falken-apotheke-hannover.de/blueten/"
       ]
     },
     {
@@ -19569,16 +22099,28 @@
       "anbauland": "Kanada",
       "terpene": [
         {
-          "name": "Linalool",
-          "konzentrationProzent": null
+          "name": "beta-Caryophyllen",
+          "rang": 1,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
         },
         {
           "name": "Limonen",
-          "konzentrationProzent": null
+          "rang": 2,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
         },
         {
           "name": "Farnesen",
-          "konzentrationProzent": null
+          "rang": 3,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Linalool",
+          "rang": 4,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
         }
       ],
       "aromen": [
@@ -19588,7 +22130,8 @@
       ],
       "pzn": null,
       "quellen": [
-        "Sortensammlung des Betreibers (1.json, 2026-09)"
+        "Sortensammlung des Betreibers (1.json, 2026-09)",
+        "https://falken-apotheke-hannover.de/blueten/"
       ]
     },
     {
@@ -19772,16 +22315,34 @@
       "anbauland": "Kanada",
       "terpene": [
         {
-          "name": "Limonen",
-          "konzentrationProzent": null
+          "name": "beta-Caryophyllen",
+          "rang": 1,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
         },
         {
           "name": "Humulen",
-          "konzentrationProzent": null
+          "rang": 2,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
         },
         {
-          "name": "beta-Caryophyllen",
-          "konzentrationProzent": null
+          "name": "Myrcen",
+          "rang": 3,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Linalool",
+          "rang": 4,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Limonen",
+          "rang": 5,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
         }
       ],
       "aromen": [
@@ -19791,7 +22352,8 @@
       ],
       "pzn": null,
       "quellen": [
-        "Sortensammlung des Betreibers (1.json, 2026-09)"
+        "Sortensammlung des Betreibers (1.json, 2026-09)",
+        "https://falken-apotheke-hannover.de/blueten/"
       ]
     },
     {
@@ -22828,16 +25390,28 @@
       "anbauland": "Kanada",
       "terpene": [
         {
-          "name": "Limonen",
-          "konzentrationProzent": null
-        },
-        {
           "name": "Farnesen",
-          "konzentrationProzent": null
+          "rang": 1,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
         },
         {
           "name": "Myrcen",
-          "konzentrationProzent": null
+          "rang": 2,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "beta-Caryophyllen",
+          "rang": 3,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Limonen",
+          "rang": 4,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
         }
       ],
       "aromen": [
@@ -22847,7 +25421,8 @@
       ],
       "pzn": null,
       "quellen": [
-        "Sortensammlung des Betreibers (1.json, 2026-09)"
+        "Sortensammlung des Betreibers (1.json, 2026-09)",
+        "https://falken-apotheke-hannover.de/blueten/"
       ]
     },
     {
@@ -22867,16 +25442,28 @@
       "anbauland": "Kanada",
       "terpene": [
         {
-          "name": "alpha-Pinen",
-          "konzentrationProzent": null
+          "name": "Terpinolen",
+          "rang": 1,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
         },
         {
           "name": "Myrcen",
-          "konzentrationProzent": null
+          "rang": 2,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
         },
         {
-          "name": "beta-Caryophyllen",
-          "konzentrationProzent": null
+          "name": "Ocimen",
+          "rang": 3,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Limonen",
+          "rang": 4,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
         }
       ],
       "aromen": [
@@ -22885,7 +25472,8 @@
       ],
       "pzn": null,
       "quellen": [
-        "Sortensammlung des Betreibers (1.json, 2026-09)"
+        "Sortensammlung des Betreibers (1.json, 2026-09)",
+        "https://falken-apotheke-hannover.de/blueten/"
       ]
     },
     {
@@ -23765,15 +26353,27 @@
       "terpene": [
         {
           "name": "Limonen",
-          "konzentrationProzent": null
+          "rang": 1,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
         },
         {
           "name": "alpha-Pinen",
-          "konzentrationProzent": null
+          "rang": 2,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
         },
         {
           "name": "beta-Caryophyllen",
-          "konzentrationProzent": null
+          "rang": 3,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "beta-Pinen",
+          "rang": 4,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
         }
       ],
       "aromen": [
@@ -23783,7 +26383,8 @@
       ],
       "pzn": null,
       "quellen": [
-        "Sortensammlung des Betreibers (1.json, 2026-09)"
+        "Sortensammlung des Betreibers (1.json, 2026-09)",
+        "https://falken-apotheke-hannover.de/blueten/"
       ]
     },
     {
@@ -23845,20 +26446,34 @@
       "anbauland": "Kanada",
       "terpene": [
         {
-          "name": "alpha-Pinen",
-          "konzentrationProzent": null
+          "name": "Myrcen",
+          "rang": 1,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
         },
         {
-          "name": "Myrcen",
-          "konzentrationProzent": null
+          "name": "Linalool",
+          "rang": 2,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Humulen",
+          "rang": 3,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
         },
         {
           "name": "Limonen",
-          "konzentrationProzent": null
+          "rang": 4,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
         },
         {
           "name": "beta-Caryophyllen",
-          "konzentrationProzent": null
+          "rang": 5,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
         }
       ],
       "aromen": [
@@ -23868,7 +26483,8 @@
       ],
       "pzn": null,
       "quellen": [
-        "Sortensammlung des Betreibers (1.json, 2026-09)"
+        "Sortensammlung des Betreibers (1.json, 2026-09)",
+        "https://falken-apotheke-hannover.de/blueten/"
       ]
     },
     {
@@ -24458,28 +27074,46 @@
       "anbauland": "Kolumbien",
       "terpene": [
         {
-          "name": "Terpinolen",
-          "konzentrationProzent": null
+          "name": "Limonen",
+          "rang": 1,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
         },
         {
           "name": "Linalool",
-          "konzentrationProzent": null
+          "rang": 2,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
         },
         {
-          "name": "Limonen",
-          "konzentrationProzent": null
+          "name": "beta-Pinen",
+          "rang": 3,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
         },
         {
-          "name": "alpha-Pinen",
-          "konzentrationProzent": null
+          "name": "Terpinolen",
+          "rang": 4,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
         },
         {
           "name": "beta-Caryophyllen",
-          "konzentrationProzent": null
+          "rang": 5,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
         },
         {
           "name": "Humulen",
-          "konzentrationProzent": null
+          "rang": 6,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Valencen",
+          "rang": 7,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
         }
       ],
       "aromen": [
@@ -24489,7 +27123,8 @@
       ],
       "pzn": null,
       "quellen": [
-        "Sortensammlung des Betreibers (1.json, 2026-09)"
+        "Sortensammlung des Betreibers (1.json, 2026-09)",
+        "https://falken-apotheke-hannover.de/blueten/"
       ]
     },
     {
@@ -24798,16 +27433,34 @@
       "anbauland": "Kanada",
       "terpene": [
         {
-          "name": "Farnesen",
-          "konzentrationProzent": null
+          "name": "alpha-Pinen",
+          "rang": 1,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
         },
         {
           "name": "Myrcen",
-          "konzentrationProzent": null
+          "rang": 2,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
         },
         {
-          "name": "alpha-Pinen",
-          "konzentrationProzent": null
+          "name": "beta-Caryophyllen",
+          "rang": 3,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Limonen",
+          "rang": 4,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "beta-Pinen",
+          "rang": 5,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
         }
       ],
       "aromen": [
@@ -24817,7 +27470,8 @@
       ],
       "pzn": null,
       "quellen": [
-        "Sortensammlung des Betreibers (1.json, 2026-09)"
+        "Sortensammlung des Betreibers (1.json, 2026-09)",
+        "https://falken-apotheke-hannover.de/blueten/"
       ]
     },
     {
@@ -25050,15 +27704,27 @@
       "terpene": [
         {
           "name": "Myrcen",
-          "konzentrationProzent": null
+          "rang": 1,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
         },
         {
           "name": "Limonen",
-          "konzentrationProzent": null
+          "rang": 2,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
         },
         {
-          "name": "Farnesen",
-          "konzentrationProzent": null
+          "name": "beta-Caryophyllen",
+          "rang": 3,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Linalool",
+          "rang": 4,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
         }
       ],
       "aromen": [
@@ -25067,7 +27733,8 @@
       ],
       "pzn": null,
       "quellen": [
-        "Sortensammlung des Betreibers (1.json, 2026-09)"
+        "Sortensammlung des Betreibers (1.json, 2026-09)",
+        "https://falken-apotheke-hannover.de/blueten/"
       ]
     },
     {
@@ -25303,16 +27970,34 @@
       "anbauland": "Kanada",
       "terpene": [
         {
-          "name": "Humulen",
-          "konzentrationProzent": null
+          "name": "beta-Caryophyllen",
+          "rang": 1,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
         },
         {
-          "name": "Farnesen",
-          "konzentrationProzent": null
+          "name": "Limonen",
+          "rang": 2,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
         },
         {
           "name": "Myrcen",
-          "konzentrationProzent": null
+          "rang": 3,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Humulen",
+          "rang": 4,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "Farnesen",
+          "rang": 5,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
         }
       ],
       "aromen": [
@@ -25321,7 +28006,8 @@
       ],
       "pzn": null,
       "quellen": [
-        "Sortensammlung des Betreibers (1.json, 2026-09)"
+        "Sortensammlung des Betreibers (1.json, 2026-09)",
+        "https://falken-apotheke-hannover.de/blueten/"
       ]
     },
     {
@@ -25341,16 +28027,28 @@
       "anbauland": "Kanada",
       "terpene": [
         {
+          "name": "beta-Caryophyllen",
+          "rang": 1,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
           "name": "Limonen",
-          "konzentrationProzent": null
+          "rang": 2,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
         },
         {
           "name": "Myrcen",
-          "konzentrationProzent": null
+          "rang": 3,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
         },
         {
           "name": "Bisabolol",
-          "konzentrationProzent": null
+          "rang": 4,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
         }
       ],
       "aromen": [
@@ -25359,7 +28057,8 @@
       ],
       "pzn": null,
       "quellen": [
-        "Sortensammlung des Betreibers (1.json, 2026-09)"
+        "Sortensammlung des Betreibers (1.json, 2026-09)",
+        "https://falken-apotheke-hannover.de/blueten/"
       ]
     },
     {
@@ -25379,16 +28078,28 @@
       "anbauland": "Kanada",
       "terpene": [
         {
-          "name": "Limonen",
-          "konzentrationProzent": null
+          "name": "Myrcen",
+          "rang": 1,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
         },
         {
           "name": "Farnesen",
-          "konzentrationProzent": null
+          "rang": 2,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
         },
         {
-          "name": "Myrcen",
-          "konzentrationProzent": null
+          "name": "Limonen",
+          "rang": 3,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
+        },
+        {
+          "name": "beta-Caryophyllen",
+          "rang": 4,
+          "konzentrationProzent": null,
+          "quelle": "https://falken-apotheke-hannover.de/blueten/"
         }
       ],
       "aromen": [
@@ -25398,7 +28109,8 @@
       ],
       "pzn": null,
       "quellen": [
-        "Sortensammlung des Betreibers (1.json, 2026-09)"
+        "Sortensammlung des Betreibers (1.json, 2026-09)",
+        "https://falken-apotheke-hannover.de/blueten/"
       ]
     },
     {
