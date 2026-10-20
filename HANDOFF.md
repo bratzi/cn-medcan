@@ -3,7 +3,7 @@
 > Übergabemedium zwischen Sessions. Wird nach jedem Arbeitsblock aktualisiert und committet.
 > Wer hier weiterarbeitet, liest diese Datei zuerst und braucht den Chatverlauf nicht.
 
-**Letzte Aktualisierung:** 2026-10-20 (Session 72)
+**Letzte Aktualisierung:** 2026-10-20 (Session 74)
 **Repo:** https://github.com/bratzi/cn-medcan (public)
 **Branch:** `main` (Makeover „Grünes Buch“ Teilprojekt 1 ist seit 2026-09-24 auf `main`)
 
@@ -27,6 +27,15 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 ---
 
 ## ⇢ Hier geht es weiter
+
+### ⇢ SESSION 74 (2026-10-20): Spec Startseite + SOTM geschrieben, 1102 belegt
+
+**ALS ERSTES:** Nutzer prüft Spec `docs/superpowers/specs/2026-10-20-startseite-sotm-design.md`. Nach Ja: writing-plans, Plan A
+(Startseite), dann Plan B (SOTM). Entwurf ist freigegeben (Session 74).
+- 1102 belegt (Anhang der Spec): CPU-Limit bei Cache-Fehlern, seit Deploy 2026-10-19 23:41 UTC keine 1102 mehr. Observability-MCP ist
+  deprecated, Events-Ansicht bricht ab, Berechnungen gehen.
+- Publora: Nutzer verwarf nur die zwei Entwürfe; löschen und drei Posts einplanen steht noch aus.
+- Skills: jede Meldung nennt sichtbar „Skills: …“ (Memory aktualisiert).
 
 ### ⇢ SESSION 73 (2026-10-20): Strain-Wording, Startseite, Publora offen
 
