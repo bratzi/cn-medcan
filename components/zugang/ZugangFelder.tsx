@@ -33,7 +33,6 @@ export function ZugangFelder({ texte }: { texte: Woerterbuch["zugang"] }) {
           type="password"
           required
           autoComplete="current-password"
-          autoFocus
           aria-describedby={fehler ? "zugang-fehler" : undefined}
           aria-invalid={fehler ? true : undefined}
           className="h-11 rounded-md border border-border-strong bg-surface px-4 text-body text-text outline-none transition-colors duration-150 focus-visible:border-accent focus-visible:ring-2 focus-visible:ring-focus-ring"
