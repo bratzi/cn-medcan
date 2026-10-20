@@ -511,9 +511,13 @@ model Umfrage {
   /// passt, sichert ein Trigger in db/constraints.sql - nicht die Anwendung.
   aktiv String? @unique
 
+  /// Monat (JJJJ-MM) des Strain of the Month, ueber den diese Runde abstimmt.
+  /// Altrunden: NULL (mehrere NULL erlaubt).
+  monat String? @unique
+
   startAm        DateTime  @default(now()) @map("start_am")
   /// Ende der Vorschlagsphase. Rein informativ fuer die Oberflaeche - die
-  /// Phase schaltet der Betreiber, nicht die Uhr (es gibt keinen Cron).
+  /// Phase schaltet nicht die Uhr, sondern der Betreiber oder der Monatswechsel-Cron.
   vorschlagBisAm DateTime? @map("vorschlag_bis_am")
   endetAm        DateTime? @map("endet_am")
 
