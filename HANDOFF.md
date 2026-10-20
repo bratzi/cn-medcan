@@ -31,13 +31,11 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 ### ⇢ SESSION 76 (2026-10-20): SOTM Task 1–7 fertig, Terpen-Audit live, Kapitel spielt ab
 
 **ALS ERSTES:**
-1. SOTM Plan B: **Final-Review (opus) offen** (Subagent-Ausgabenlimit bis 04:50 Berlin). Ledger
-   `.superpowers/sdd/2026-10-20-strain-of-the-month/progress.md`, Paket über `git merge-base` 1fc1311^..HEAD.
-   Deferred Minors dort, u. a. T6: CRLF->LF-Churn in 6 Dateien (Titelblatt, VorschlagFormular, ig-feed,
-   proxy-regeln-Test, rechtliches-Test, Ergebnisse) zurückdrehen; Vorschlagsphase auf /sotm zeigt Überschrift
-   „Abstimmung / Wähl mit.“ statt „Schlag vor.“; aktiveUmfrage doppelt geladen; tote i18n-Schlüssel (allesFest).
-   Danach Rulings-Liste an den Nutzer, Workspace löschen.
-   Task 7 live erledigt: POST /api/sotm/takt -> ["UEBERNOMMEN"], zweiter Aufruf [] (idempotent); /umfragen 308 -> /sotm.
+1. ~~SOTM Final-Review~~ **erledigt** (merge-ready). Fix 54a186c: Browser-Takt auf /sotm greift jetzt auch bei
+   Phasenunterschied Runde/Kalender, Leitsatz „Schlag vor.“ in Vorschlagsphase, Aroma-Sätze gespiegelt (Suite 1304/1304 grün).
+   Rest-Minors (Nutzer entscheiden): CRLF-Churn nur kosmetisch (.gitattributes?), aktiveUmfrage doppelt geladen,
+   toter Schlüssel allesFest, worker.mjs scheduled ohne .catch, Stimmen nach Monatsende bis zum Takt möglich.
+   Workspace .superpowers/sdd/2026-10-20-strain-of-the-month löschen, sobald Nutzer Rulings gesehen hat.
 2. **Live per Browser prüfen** (Seite hinter /zugang): /sotm, Startseite SOTM-Sektion, Kapitel-Netz spielt nach
    600 ms Ruhe ab und rastet per scroll-snap proximity ein (8c75959; prüfen, dass der Snap nicht stört),
    Bewertungsmaske: Wirkung-Ring, Herstellerterpene voraktiviert, Community-Terpene pulsieren (6a3632b),
