@@ -30,6 +30,16 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 
 ### ⇢ SESSION 76 (2026-10-20): SOTM Task 1–7 fertig, Terpen-Audit live, Kapitel spielt ab
 
+**SAFE4CLEAR S76b – ALS ERSTES:**
+1. Live geprüft und ok: Startseite (kein Snap, Kapitel-Zahlen in Handschrift, Katalog startet mit Apples & Bananas,
+   Footer „Terpz 4 Nerdz“), /sotm Desktop (Oktober ohne SOTM, „Wähl mit.“ in der Abstimmung, 12 Tage Rest).
+2. **Bug offen:** Startseite zeigt beim Kandidaten „1 Stimmen“ (Pluralfehler), /sotm zeigt richtig 2 Stimmen.
+   Vermutung: statische Startseite, das Wort kommt aus dem gebauten HTML (alter Stand), die Zahl zählt im Browser
+   hoch (`components/umfrage/Kandidat.tsx:103-106`, data-ziel). Wort und Zahl müssen aus derselben Quelle kommen.
+3. Noch nicht live geprüft: Bewertungsmaske (Wirkung-Ring, Herstellerterpene, Community-Terpene pulsieren,
+   Alltagswort, 11 Achsen), 390 px Breite für Startseite und /sotm.
+4. Danach Info-Knöpfe (S75 Punkt 2, Nutzer-Ja steht aus; der Satz „Eine Änderung ist nicht vorgesehen.“ steht noch live).
+
 **Nachtrag S76 (nach Clear):** Rest-Minors SOTM behoben (b56fd8a: Stimme nach Monatsende stößt Takt an und wird
 abgelehnt, aktiveUmfrage per React cache, worker.mjs .catch, allesFest weg), .gitattributes LF + Renormalisierung (c2d5c37),
 Scroll-Halt am Kapitel entfernt (Nutzer: wirkt wie Anker), Kapitel-Zahlen als Handschrift-Akzent / Wort gedruckt,
