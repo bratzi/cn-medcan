@@ -29,7 +29,7 @@ type Props = {
   sprache: Sprache;
   /** Überschrift und Absatz der linken Spalte; das Bild der gewählten Sorte steht darunter. */
   kopf: ReactNode;
-  /** Steht, solange keine Sorte gewählt ist (Katalog-Reihe); mit `zu` startet der Explorer zugeklappt. */
+  /** Steht nach „Zurück zum Katalog“, solange keine Sorte gewählt ist (Katalog-Reihe). */
   zu?: ReactNode;
 };
 
@@ -42,7 +42,9 @@ export function SortenExplorer({ sorten, texte, typen, sprache, kopf, zu }: Prop
   const [zustand, senden] = useReducer(
     (z: ReturnType<typeof explorerStart>, a: Parameters<typeof explorerZustand>[0]) => explorerZustand(a, z),
     sorten,
-    (s) => explorerStart(s, zu === undefined),
+    // Nutzer 2026-10-20: auch auf der Startseite steht von Anfang an die erste Blüte, damit der
+    // erste Klick die Ansicht nicht umbaut. „Zurück zum Katalog“ klappt weiterhin zu.
+    (s) => explorerStart(s),
   );
   const [meldung, setMeldung] = useState("");
   // Die eben verlassene Sorte bleibt kurz stehen und geht ab, während die neue auftritt.
