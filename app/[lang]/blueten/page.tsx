@@ -34,13 +34,15 @@ export default async function BluetenPage() {
     vertreiber: daten.vertreiber.filter((v) => benoetigt.has(v.i)),
   };
 
+  // Volle Breite für das Raster (Task 2), Kopf im Lesemaß. Ein div statt main: das Root-Layout
+  // stellt schon das main-Element (id „inhalt“), ein zweites wäre ein doppelter Orientierungspunkt.
   return (
-    <main className="mx-auto w-full max-w-7xl px-4 py-10 sm:px-6 lg:py-16">
-      <header className="flex flex-col gap-2">
-        <h1 className="text-h1 text-text">{w.katalog.titel}</h1>
-        <p className="max-w-[68ch] text-body text-text-muted">{w.katalog.einleitung}</p>
+    <div className="w-full px-4 py-10 sm:px-8 lg:py-16">
+      <header className="flex max-w-[68ch] flex-col gap-2">
+        <h1 className="text-h1 text-balance text-text">{w.katalog.titel}</h1>
+        <p className="text-body text-pretty text-text-muted">{w.katalog.einleitung}</p>
       </header>
       <KatalogAnsicht start={start} w={w} sprache={sprache} />
-    </main>
+    </div>
   );
 }

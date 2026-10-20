@@ -494,6 +494,19 @@ export const de = {
       varianten: { one: "{anzahl} Variante", other: "{anzahl} Varianten" },
       srNote: { one: "Community-Note {note} von 5 aus {anzahl} Stimme", other: "Community-Note {note} von 5 aus {anzahl} Stimmen" },
     },
+    geschmack: {
+      titel: "Geschmack",
+      keiner: "Noch kein Geschmack bekannt.",
+      datenblatt: "Laut Datenblatt",
+      community: "Von der Community",
+      status: { bestaetigt: "bestätigt", nichtBestaetigt: "nicht bestätigt", offen: "noch offen", gefunden: "gefunden" },
+      sr: {
+        bestaetigt: "{geschmack}, von der Community bestätigt",
+        nichtBestaetigt: "{geschmack}, von der Community nicht bestätigt",
+        offen: "{geschmack}, laut Datenblatt, von der Community noch nicht bewertet",
+        gefunden: "{geschmack}, von der Community gefunden",
+      },
+    },
     cannabinoide: {
       keineAngabe: "{name} keine Angabe",
       unter: "{name} unter {wert} Prozent",

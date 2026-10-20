@@ -23,10 +23,15 @@ export function KATALOG_SQL_WAREN(fachkreis: boolean): string {
   )) AS j FROM strains s WHERE s.aktiv = 1`;
 }
 
-// Nur freigegebene Bewertungen zählen öffentlich (Review.freigegeben).
-const SQL_KULTIVARE = `SELECT json_group_array(json_object(
+/**
+ * Nur freigegebene Bewertungen zählen öffentlich (Review.freigegeben). `gm` ist der Geschmacks-Median
+ * der Community als eingebettetes JSON-Objekt; json(...) steht direkt im json_object, damit es kein
+ * String wird, und bekommt ohne Stimmen oder bei kaputtem Text NULL statt eines Abfragefehlers.
+ */
+export const KATALOG_SQL_KULTIVARE = `SELECT json_group_array(json_object(
   'i', k.id, 'n', k.name, 's', k.slug,
   'cn', CASE WHEN kk.anzahl > 0 THEN kk.gesamtnote_mittel END, 'ca', COALESCE(kk.anzahl, 0),
+  'gm', json(CASE WHEN kk.anzahl > 0 AND json_valid(kk.geschmack_median) THEN kk.geschmack_median END),
   'en', (SELECT avg(r.gesamtnote) FROM reviews r WHERE r.kultivar_id = k.id AND r.ist_redaktionell = 1 AND r.freigegeben = 1 AND r.gesamtnote IS NOT NULL),
   'lb', (SELECT max(r.erstellt_am) FROM reviews r WHERE r.kultivar_id = k.id AND r.freigegeben = 1)
 )) AS j FROM kultivare k LEFT JOIN kultivar_kennwerte kk ON kk.kultivar_id = k.id
@@ -41,14 +46,15 @@ async function baueKatalog(fachkreis: boolean): Promise<string> {
   const prisma = await getPrisma();
   const lies = async (sql: string) => (await prisma.$queryRawUnsafe<{ j: string }[]>(sql))[0]?.j ?? "[]";
   const [waren, kultivare, vertreiber, terpene, apotheken] = await Promise.all([
-    lies(KATALOG_SQL_WAREN(fachkreis)), lies(SQL_KULTIVARE), lies(SQL_VERTREIBER), lies(SQL_TERPENE),
+    lies(KATALOG_SQL_WAREN(fachkreis)), lies(KATALOG_SQL_KULTIVARE), lies(SQL_VERTREIBER), lies(SQL_TERPENE),
     fachkreis ? lies(SQL_APOTHEKEN) : Promise.resolve("[]"),
   ]);
   // Zusammensetzen per Text, nicht per JSON.parse/stringify: spart die CPU des Neubaus.
   return `{"stand":${JSON.stringify(new Date().toISOString())},"fachkreis":${fachkreis},"waren":${waren},"kultivare":${kultivare},"vertreiber":${vertreiber},"terpene":${terpene},"apotheken":${apotheken}}`;
 }
 
-const katalogGecacht = unstable_cache(baueKatalog, ["katalog-v1"], { revalidate: 3600, tags: ["katalog"] });
+// v2 mit `gm` (Task 2): eigener Schlüssel, damit kein gecachter Text der alten Form zurückkommt.
+const katalogGecacht = unstable_cache(baueKatalog, ["katalog-v2"], { revalidate: 3600, tags: ["katalog"] });
 
 export function ladeKatalog(fachkreis: boolean): Promise<string> {
   return katalogGecacht(fachkreis);
