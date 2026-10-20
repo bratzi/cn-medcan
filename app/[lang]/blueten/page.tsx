@@ -6,6 +6,7 @@ import { filtere, verdichte } from "@/lib/katalog/filtern";
 import { ladeKatalog } from "@/lib/katalog/laden";
 import type { KatalogDaten } from "@/lib/katalog/typen";
 import { leererFilter } from "@/lib/query/filter";
+import { sprachParameter } from "@/lib/i18n/vorrendern";
 
 export async function generateMetadata(): Promise<Metadata> {
   const w = await holeWoerterbuch();
@@ -19,6 +20,11 @@ export async function generateMetadata(): Promise<Metadata> {
  */
 export const dynamic = "force-static";
 export const revalidate = 3600;
+
+/** Beide Sprachen im Build vorrendern, wenn die lokale D1 den Live-Abzug trägt (scripts/cf-build.mjs). */
+export function generateStaticParams() {
+  return sprachParameter();
+}
 
 export default async function BluetenPage() {
   const [w, sprache, text] = await Promise.all([holeWoerterbuch(), holeSprache(), ladeKatalog(false)]);

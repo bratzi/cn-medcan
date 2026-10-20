@@ -81,6 +81,8 @@ Der Worker soll seltener am CPU-Limit von 10 ms je Anfrage scheitern.
 - Nach dem Abstimmen auf der Startseite lädt die Insel ihren Zustand neu. Die Stimmenzahlen der statischen
   Seite sind bis zu 300 s alt.
 
+**Nachtrag 2026-10-20 (Plan Vorrendern, Task 1):** Der Build rendert die statischen Seiten jetzt mit einem D1-Abzug in beiden Sprachen vor (`scripts/cf-build.mjs`, `generateStaticParams` über `sprachParameter()` je Seite; das Layout bleibt ohne). Grund: Die Cache-Schlüssel tragen die Build-ID, nach jedem Deploy war jede Seite kalt, und der erste Besucher baute sie im Request mit 700 bis 1300 ms CPU (Build-Log: nur 5 Cache-Einträge). Revalidierung markiert seitdem nur stale (`revalidateTag(tag, "max")`), statt die Einträge ablaufen zu lassen.
+
 ### 4.4 Cache (OpenNext)
 
 - `open-next.config.ts`: `incrementalCache: kvIncrementalCache` (ohne Regional Cache: die Cache API wirkt auf

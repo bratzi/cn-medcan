@@ -192,6 +192,13 @@ Konsequenz: Eine Änderung, die `revalidate` oder `unstable_cache` einführt, oh
 `wrangler.jsonc` und die OpenNext-Cache-Konfiguration zu ergänzen, ist unvollständig — es "funktioniert" in
 `next dev` und fällt im Worker still zurück oder um. Beides zusammen ändern oder gar nicht.
 
+### Vorrendern im Build und stale-while-revalidate (Plan 2026-10-20)
+
+- KV-Schlüssel des Inkrement-Caches tragen die Build-ID: nach jedem Deploy ist jede nicht vorgerenderte Seite kalt, der erste Besucher baut sie im Request (Startseite 700 bis 1300 ms CPU, /blueten 1033 ms → 1102).
+- Darum zieht `npm run cf-build` (`scripts/cf-build.mjs`) im Workers Build (`WORKERS_CI=1`) oder mit `VORRENDERN_DATEN=1` einen Abzug der Live-D1 in die lokale D1 und setzt `VORRENDERN=1`. Statische Seiten unter `/[lang]` exportieren `generateStaticParams() { return sprachParameter(); }` (`lib/i18n/vorrendern.ts`). Scheitert der Abzug, baut es ohne Vorrendern weiter (Warnung `[vorrendern]`).
+- Nicht vorrendern: Seiten, die Secrets lesen (impressum, datenschutz: `IMPRESSUM_JSON` fehlt im Build), und Seiten mit eigenen Parametern ohne eigenes `generateStaticParams`.
+- Revalidieren nur über `revalidiereSprachen`: `revalidateTag(<impliziter Pfad-Tag>, "max")` markiert stale (alte Seite ausliefern, Neubau im Hintergrund). Nie `revalidatePath` oder `revalidateTag` ohne Profil: OpenNext setzt dann `expire = now`, der nächste Besucher baut die Seite im Request.
+
 ## 7. Secrets
 
 - **Niemals in `wrangler.jsonc`.** Die Datei ist versioniert. Kein Service-Role-Key, kein

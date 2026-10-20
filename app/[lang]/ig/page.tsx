@@ -4,6 +4,7 @@ import Link from "next/link";
 import { seitenRahmen } from "@/components/layout/Seitenkopf";
 import { textLinkKlassen } from "@/components/ui/textlink";
 import { cn } from "@/lib/cn";
+import { sprachParameter } from "@/lib/i18n/vorrendern";
 
 /**
  * Landingpage aus der Instagram-Bio (Spec 2026-10-15). Vom Passwort-Gate
@@ -12,6 +13,11 @@ import { cn } from "@/lib/cn";
  */
 export const dynamic = "force-static";
 export const revalidate = 86400;
+
+/** Beide Sprachen im Build vorrendern, wenn die lokale D1 den Live-Abzug trägt (scripts/cf-build.mjs). */
+export function generateStaticParams() {
+  return sprachParameter();
+}
 
 export const metadata: Metadata = {
   title: "Book of Terpz auf Instagram",

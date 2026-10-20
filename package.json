@@ -11,7 +11,7 @@
     "farben": "node scripts/farben-pruefen.mjs",
     "preview": "npm run cf-build && opennextjs-cloudflare preview",
     "deploy": "npm run cf-build && opennextjs-cloudflare deploy",
-    "cf-build": "opennextjs-cloudflare build && node scripts/bundle-env-bereinigen.mjs",
+    "cf-build": "node scripts/cf-build.mjs",
     "cf-typegen": "wrangler types --env-interface CloudflareEnv cloudflare-env.d.ts",
     "typecheck": "tsc --noEmit",
     "db:generate": "prisma generate",
