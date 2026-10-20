@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useReducer, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
+import { useEffect, useReducer, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
 
 import { SortenBild } from "@/components/medien/Bild";
 
@@ -48,6 +48,13 @@ export function SortenExplorer({ sorten, texte, typen, sprache, kopf, zu }: Prop
   // Die eben verlassene Sorte bleibt kurz stehen und geht ab, während die neue auftritt.
   const [vorher, setVorher] = useState<ExplorerSorte | null>(null);
   const chips = useRef<Map<string, HTMLButtonElement>>(new Map());
+  // Fokus erst nach dem Commit setzen: beim Auf- und Zuklappen hängt die Pillen-Leiste neu ein.
+  const fokusZiel = useRef<string | null>(null);
+  useEffect(() => {
+    if (fokusZiel.current === null) return;
+    chips.current.get(fokusZiel.current)?.focus();
+    fokusZiel.current = null;
+  });
   // Treffer der Suche, die nicht zu den zwölf Start-Sorten gehören, kommen als weitere Pille dazu.
   const [gesucht, setGesucht] = useState<ExplorerSorte[]>([]);
 
@@ -168,7 +175,10 @@ export function SortenExplorer({ sorten, texte, typen, sprache, kopf, zu }: Prop
     <div className="flex min-w-0 flex-col gap-8">
       {auswahl}
       {zu !== undefined ? (
-        <button type="button" onClick={() => senden({ typ: "sorte", slug: "", ersteWare: null })} className={buttonKlassen("ghost", "sm", "self-start")}>
+        <button type="button" onClick={() => {
+            fokusZiel.current = gewaehlt?.slug ?? null;
+            senden({ typ: "sorte", slug: "", ersteWare: null });
+          }} className={buttonKlassen("ghost", "sm", "self-start")}>
           {texte.zurueck}
         </button>
       ) : null}
