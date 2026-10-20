@@ -25,6 +25,7 @@ import {
   leuchtendeTerpene,
   linienBreite,
   MIN_BREITE,
+  netzVersatz,
   radiusVon,
   sanft,
   SPUERBAR,
@@ -406,7 +407,7 @@ export function AromaKarte({
   // Name über dem Balken: 20 über der Achse, in der dichten Karte (Achsen rund 29 auseinander)
   // höchstens den halben Abstand, sonst streicht der Balken der Achse darüber den Namen durch.
   const nameUeber = Math.min(20, (karte[1].y - karte[0].y) / 2);
-  const knoten = karte.map((punkt, index) => mische(punkt, netzPunkt(index, MAX, radius + 34, mitte), t));
+  const knoten = karte.map((punkt, index) => mische(punkt, netzPunkt(index, MAX, radius + 14, mitte), t));
   const spalte = terpeneImKarte(reihe.length, aktBreite, aktHoehe);
   const platz = new Map(reihe.map((eintrag, index) => [eintrag.schluessel, spalte[index]]));
   const terpenKnoten = terpene.map((_, index) => platz.get(`t-${index}`)!);
@@ -1096,8 +1097,8 @@ export function AromaKarte({
             onMouseEnter={() => achseUeberfahren(index)}
             onFocus={() => achseUeberfahren(index)}
             className={cn(
-              "absolute inline-flex -translate-y-1/2 items-center gap-1.5 text-small font-medium uppercase tracking-wide whitespace-nowrap",
-              t < 0.5 ? "-translate-x-full pr-4" : "-translate-x-1/2",
+              "absolute inline-flex items-center gap-1.5 text-small font-medium uppercase tracking-wide whitespace-nowrap",
+              t < 0.5 && "-translate-x-full -translate-y-1/2 pr-4",
               achseBetont(index) ? "text-text" : "text-text-muted",
             )}
             style={{
@@ -1105,9 +1106,13 @@ export function AromaKarte({
               // auf schmalen Karten nicht links hinausragt.
               left: `${((t < 0.5 ? Math.max(punkt.x - 150 * kartenSichtbar, 124) : punkt.x) / aktBreite) * 100}%`,
               top: `${((punkt.y - nameUeber * kartenSichtbar) / aktHoehe) * 100}%`,
+              // Im Netz wächst die Beschriftung je Winkel vom Ankerpunkt nach außen, damit die
+              // Achsenpunkte keine Buchstaben verdecken (Live-Befund 2026-10-20).
+              translate: t < 0.5 ? undefined : `${netzVersatz(index).x}% ${netzVersatz(index).y}%`,
             }}
           >
-            <GeschmackIcon geschmack={GESCHMACKS_ACHSEN[index].enumWert} />
+            {/* Auf schmalen Karten fehlt im Netz seitlich der Platz fürs Icon. */}
+            {t < 0.5 || !schmal ? <GeschmackIcon geschmack={GESCHMACKS_ACHSEN[index].enumWert} /> : null}
             {achsenName(index)}
           </button>
         ))}
