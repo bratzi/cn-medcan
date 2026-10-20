@@ -82,6 +82,41 @@ const TABELLE: Record<string, readonly AromaAnteil[]> = {
     { geschmack: "HOLZIG", anteil: 0.15 },
     { geschmack: "SUESS", anteil: 0.15 },
   ],
+  valencen: [
+    { geschmack: "ZITRUS", anteil: 0.55 },
+    { geschmack: "FRUCHTIG", anteil: 0.3 },
+    { geschmack: "HOLZIG", anteil: 0.15 },
+  ],
+  geraniol: [
+    { geschmack: "BLUMIG", anteil: 0.6 },
+    { geschmack: "ZITRUS", anteil: 0.2 },
+    { geschmack: "FRUCHTIG", anteil: 0.2 },
+  ],
+  caryophyllenoxid: [
+    { geschmack: "HOLZIG", anteil: 0.45 },
+    { geschmack: "WUERZIG", anteil: 0.35 },
+    { geschmack: "ERDIG", anteil: 0.2 },
+  ],
+  camphen: [
+    { geschmack: "HOLZIG", anteil: 0.4 },
+    { geschmack: "MINZIG", anteil: 0.35 },
+    { geschmack: "KRAEUTRIG", anteil: 0.25 },
+  ],
+  "delta-3-caren": [
+    { geschmack: "HOLZIG", anteil: 0.5 },
+    { geschmack: "WUERZIG", anteil: 0.25 },
+    { geschmack: "ZITRUS", anteil: 0.25 },
+  ],
+  phellandren: [
+    { geschmack: "KRAEUTRIG", anteil: 0.4 },
+    { geschmack: "WUERZIG", anteil: 0.3 },
+    { geschmack: "MINZIG", anteil: 0.3 },
+  ],
+  selinen: [
+    { geschmack: "KRAEUTRIG", anteil: 0.5 },
+    { geschmack: "HOLZIG", anteil: 0.3 },
+    { geschmack: "ERDIG", anteil: 0.2 },
+  ],
   nerolidol: [
     { geschmack: "HOLZIG", anteil: 0.45 },
     { geschmack: "BLUMIG", anteil: 0.35 },
@@ -170,6 +205,13 @@ const SATZ: Record<string, string> = {
   borneol: "Kampferartig und holzig, mit einer erdigen Seite.",
   fenchol: "Kampferartig mit Kiefer und krautiger Frische.",
   guajol: "Holzig wie Guajakholz, mit einem Hauch Rose und Tee.",
+  valencen: "Kennt man aus Valencia-Orangen: süße Orange mit holzigem Unterton.",
+  geraniol: "Duftet nach Rose und Geranie, mit leichter Zitrusfrucht.",
+  caryophyllenoxid: "Entsteht aus beta-Caryophyllen an der Luft, trocken holzig und würzig.",
+  camphen: "Kampferartig wie Tannennadeln, holzig und kühl.",
+  "delta-3-caren": "Süß-harzig wie Kiefer, mit einem Hauch Zitrus.",
+  phellandren: "Pfeffrig und minzig, erinnert an Dill.",
+  selinen: "Krautig wie Sellerie, kommt auch im Hopfen vor.",
   ester: "Kein Terpen, sondern die Stoffe hinter vielen Fruchtaromen, etwa Birne oder Banane.",
   thiole: "Kein Terpen, sondern Schwefelverbindungen, die schon in winzigen Mengen nach Gas und Diesel riechen.",
 };

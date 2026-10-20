@@ -9,6 +9,7 @@ import { GESCHMACKS_KATEGORIEN } from "@/db/enums";
 const NAMEN = [
   "Myrcen", "Limonen", "beta-Caryophyllen", "Linalool", "alpha-Pinen", "Terpinolen", "Humulen", "Ocimen",
   "Farnesen", "Nerolidol", "Bisabolol", "beta-Pinen", "Terpineol", "Eukalyptol", "Borneol", "Fenchol", "Guajol",
+  "Valencen", "Geraniol", "Caryophyllenoxid", "Camphen", "delta-3-Caren", "Phellandren", "Selinen",
 ];
 
 test("Terpen-Audit: Anteile summieren zu 1, erster Eintrag ist die Datenbank-Hauptnote", () => {
@@ -25,12 +26,21 @@ test("Terpen-Audit: Anteile summieren zu 1, erster Eintrag ist die Datenbank-Hau
   }
   assert.ok(haupt.includes("'Farnesen';") && haupt.includes("'FRUCHTIG'"));
   assert.equal(hauptAroma("farnesen"), "FRUCHTIG");
+  const zweite = readFileSync("migrations/0031_terpen_katalog_zwei.sql", "utf-8");
+  for (const name of NAMEN.slice(17)) {
+    const m = new RegExp(`'${name}', '[^']+', '([A-Z]+)'`).exec(zweite);
+    assert.equal(m?.[1], aromaAnteile({ name, geschmack: "ERDIG" })[0].geschmack, `${name} in 0031`);
+  }
+});
+
+test("Zweite Prioritaet bleibt aus dem Terpen-Netz", () => {
+  assert.equal(TERPEN_ACHSEN.length, 11);
 });
 
 test("Terpen-Audit: Bisabolol ist elfte Achse, Minzig hat Kandidaten", () => {
   assert.equal(TERPEN_ACHSEN[10].schluessel, "bisabolol");
   const minzig = NAMEN.filter((n) => aromaAnteile({ name: n, geschmack: "ERDIG" }).some((x) => x.geschmack === "MINZIG" && istKandidatAnteil(x.anteil)));
-  assert.deepEqual(minzig.sort(), ["Borneol", "Eukalyptol", "Fenchol", "alpha-Pinen"]);
+  assert.deepEqual(minzig.sort(), ["Borneol", "Camphen", "Eukalyptol", "Fenchol", "Phellandren", "alpha-Pinen"]);
 });
 
 test("Schwelle 0,2 ist rundungsfest", () => {
