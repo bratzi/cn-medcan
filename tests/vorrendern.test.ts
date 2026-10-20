@@ -103,7 +103,7 @@ test("Vorgerenderte Seiten lesen beim Rendern keine Secrets (auch transitiv)", (
 
 // --- scripts/cf-build.mjs: Entscheidung ohne echte Prozesse ---
 
-import { anzahlAusJson, buildEnv, sollVorrendern, ziehAbzug } from "../scripts/cf-build.mjs";
+import { anzahlAusJson, buildEnv, sollVorrendern, trenneTrigger, ziehAbzug } from "../scripts/cf-build.mjs";
 import { sprachTags } from "@/lib/i18n/revalidiere";
 
 type Lauf = { status: number; stdout: string };
@@ -116,9 +116,23 @@ function stub(antworten: Partial<Record<"export" | "import" | "pruef", Lauf>>) {
     aufrufe.push(art);
     return antworten[art] ?? { status: 0, stdout: "" };
   };
-  const ergebnis = ziehAbzug(fuehreAus, { verzeichnis: "x", loesche: (p: string) => geloescht.push(p) });
+  const ergebnis = ziehAbzug(fuehreAus, {
+    verzeichnis: "x",
+    loesche: (p: string) => geloescht.push(p),
+    lies: () => SCHEMA,
+    schreibe: () => {},
+  });
   return { ergebnis, aufrufe, geloescht };
 }
+
+const SCHEMA = [
+  'CREATE TABLE "strains" ("id" TEXT, "kultivar_id" TEXT REFERENCES "kultivare" ("id"));',
+  "CREATE TRIGGER strains_check BEFORE INSERT ON strains",
+  "begin",
+  "  select case when NEW.id is null then raise(abort, 'x') end;",
+  "end;",
+  'CREATE TABLE "kultivare" ("id" TEXT);',
+].join("\n");
 
 const OK_JSON = { status: 0, stdout: JSON.stringify([{ results: [{ n: 42 }], success: true }]) };
 
@@ -132,7 +146,7 @@ test("cf-build: Abzug nur im Workers Build oder mit VORRENDERN_DATEN=1", () => {
 test("cf-build: Export, Import und Prüfung ok → Env mit VORRENDERN=1", () => {
   const { ergebnis, aufrufe, geloescht } = stub({ pruef: OK_JSON });
   assert.equal(ergebnis.ok, true);
-  assert.deepEqual(aufrufe, ["export", "import", "pruef"]);
+  assert.deepEqual(aufrufe, ["export", "export", "import", "import", "import", "pruef"]);
   assert.equal(geloescht.length, 1, "alte lokale D1 vor dem Import verworfen");
   assert.equal(buildEnv({ A: "b" }, ergebnis.ok).VORRENDERN, "1");
 });
@@ -141,6 +155,7 @@ test("cf-build: Export scheitert → kein Import, Env ohne VORRENDERN", () => {
   const { ergebnis, aufrufe, geloescht } = stub({ export: { status: 1, stdout: "" } });
   assert.equal(ergebnis.ok, false);
   assert.deepEqual(aufrufe, ["export"]);
+  assert.equal(stub({ export: { status: 1, stdout: "" } }).geloescht.length, 0);
   assert.deepEqual(geloescht, [], "lokale D1 bleibt unberührt");
   assert.equal(buildEnv({ VORRENDERN: "1" }, ergebnis.ok).VORRENDERN, undefined);
 });
@@ -150,6 +165,13 @@ test("cf-build: Import scheitert oder leere DB → ohne VORRENDERN", () => {
   const leer = { status: 0, stdout: JSON.stringify([{ results: [{ n: 0 }] }]) };
   assert.equal(stub({ pruef: leer }).ergebnis.ok, false);
   assert.equal(stub({ pruef: { status: 0, stdout: "Müll" } }).ergebnis.ok, false);
+});
+
+test("cf-build: Trigger getrennt, inneres end; der CASE-Klausel zählt nicht als Ende", () => {
+  const { ohneTrigger, trigger } = trenneTrigger(SCHEMA);
+  assert.doesNotMatch(ohneTrigger, /TRIGGER|begin|raise/);
+  assert.match(ohneTrigger, /CREATE TABLE "kultivare"/);
+  assert.match(trigger, /^CREATE TRIGGER strains_check[\s\S]*raise\(abort, 'x'\) end;\nend;$/);
 });
 
 test("cf-build: anzahlAusJson verträgt Vorspann vor dem JSON", () => {

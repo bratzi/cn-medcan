@@ -13,7 +13,7 @@
  * Exit-Code ungleich 0.
  */
 import { spawnSync } from "node:child_process";
-import { mkdtempSync, rmSync } from "node:fs";
+import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { pathToFileURL } from "node:url";
@@ -47,17 +47,43 @@ export function anzahlAusJson(ausgabe) {
 }
 
 /**
- * Zieht den Abzug: export --remote, lokale D1 verwerfen, import --local, Plausibilität.
+ * Trennt die Trigger aus einem Schema-Abzug. Trigger prüfen Inserts (etwa Abstimmungsphase der
+ * Umfrage) und würden den Datenimport abbrechen; sie kommen erst nach den Daten.
+ * Ein Trigger endet mit einer eigenen Zeile `END;` (inneres `… end;` in CASE zählt nicht).
+ */
+export function trenneTrigger(sql) {
+  const trigger = sql.match(/^CREATE TRIGGER[\s\S]*?^END;$/gim) ?? [];
+  const ohneTrigger = trigger.reduce((rest, t) => rest.replace(t, ""), sql);
+  return { ohneTrigger, trigger: trigger.join("\n") };
+}
+
+/**
+ * Zieht den Abzug: Schema und Daten getrennt exportieren (--remote), lokale D1 verwerfen, dann
+ * lokal importieren in der Reihenfolge Schema ohne Trigger, Daten, Trigger. Ein einziger
+ * Gesamtabzug lässt sich nicht einspielen: er fügt Zeilen ein, bevor referenzierte Tabellen
+ * (kultivare) existieren, und Trigger lehnen Altdaten ab. Danach Plausibilität.
  * `fuehreAus(befehl, args)` liefert { status, stdout } (im Test ein Stub, ohne echte Prozesse).
  * Gibt { ok, grund } zurück und wirft nie.
  */
-export function ziehAbzug(fuehreAus, { verzeichnis, loesche }) {
-  const datei = join(verzeichnis, "d1.sql");
-  const exp = fuehreAus("npx", ["wrangler", "d1", "export", DB, "--remote", "--output", datei]);
-  if (exp.status !== 0) return { ok: false, grund: "Export der Live-D1 fehlgeschlagen" };
+export function ziehAbzug(fuehreAus, { verzeichnis, loesche, lies, schreibe }) {
+  const pfad = (name) => join(verzeichnis, name);
+  const exportiere = (flag, datei) =>
+    fuehreAus("npx", ["wrangler", "d1", "export", DB, "--remote", flag, "--output", pfad(datei)]).status === 0;
+  if (!exportiere("--no-data", "schema.sql") || !exportiere("--no-schema", "daten.sql")) {
+    return { ok: false, grund: "Export der Live-D1 fehlgeschlagen" };
+  }
+  try {
+    const { ohneTrigger, trigger } = trenneTrigger(lies(pfad("schema.sql")));
+    schreibe(pfad("tabellen.sql"), ohneTrigger);
+    schreibe(pfad("trigger.sql"), trigger);
+  } catch {
+    return { ok: false, grund: "Schema-Abzug nicht lesbar" };
+  }
   loesche(LOKALE_D1);
-  const imp = fuehreAus("npx", ["wrangler", "d1", "execute", DB, "--local", "--file", datei]);
-  if (imp.status !== 0) return { ok: false, grund: "Import in die lokale D1 fehlgeschlagen" };
+  for (const datei of ["tabellen.sql", "daten.sql", "trigger.sql"]) {
+    const imp = fuehreAus("npx", ["wrangler", "d1", "execute", DB, "--local", "--file", pfad(datei)]);
+    if (imp.status !== 0) return { ok: false, grund: `Import in die lokale D1 fehlgeschlagen (${datei})` };
+  }
   const pruef = fuehreAus("npx", [
     "wrangler", "d1", "execute", DB, "--local", "--json",
     "--command", "SELECT count(*) AS n FROM strains WHERE aktiv = 1",
@@ -84,6 +110,8 @@ function main() {
       const ergebnis = ziehAbzug((b, a) => echterLauf(b, a, a.includes("--json")), {
         verzeichnis,
         loesche: (pfad) => rmSync(pfad, { recursive: true, force: true }),
+        lies: (pfad) => readFileSync(pfad, "utf8"),
+        schreibe: (pfad, inhalt) => writeFileSync(pfad, inhalt),
       });
       abzugOk = ergebnis.ok;
       console.log(
