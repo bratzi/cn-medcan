@@ -161,7 +161,7 @@ export async function bewertungSpeichern(formData: FormData): Promise<BewertungE
   if (kultivar.slug) revalidiereSprachen(`/blueten/${kultivar.slug}`);
   if (produktSlug) revalidiereSprachen(`/blueten/${produktSlug}`);
   revalidiereSprachen("/");
-  revalidiereKatalog();
+  await revalidiereKatalog();
   revalidiereSprachen("/reviews", "layout");
   revalidiereSprachen("/admin");
   revalidiereSprachen("/profil");

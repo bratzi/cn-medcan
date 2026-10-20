@@ -1,5 +1,6 @@
 import { unstable_cache } from "next/cache";
 
+import { bauKatalogNeu, liesOderBaueKatalog, type KatalogKv } from "@/lib/katalog/kv";
 import { getPrisma } from "@/lib/prisma";
 
 /**
@@ -51,4 +52,24 @@ const katalogGecacht = unstable_cache(baueKatalog, ["katalog-v1"], { revalidate:
 
 export function ladeKatalog(fachkreis: boolean): Promise<string> {
   return katalogGecacht(fachkreis);
+}
+
+/** KV-Binding für den vorgebauten Katalog, null außerhalb des Workers (Build, Tests). */
+async function katalogKv(): Promise<KatalogKv | null> {
+  try {
+    const { getEnv } = await import("@/lib/cloudflare");
+    return ((await getEnv()) as unknown as { NEXT_INC_CACHE_KV?: KatalogKv }).NEXT_INC_CACHE_KV ?? null;
+  } catch {
+    return null;
+  }
+}
+
+/** Öffentlicher Katalog für die Route: nur KV lesen, bei Fehlen einmal bauen und schreiben. */
+export async function ladeOeffentlichenKatalogText(): Promise<string> {
+  return liesOderBaueKatalog(await katalogKv(), () => baueKatalog(false));
+}
+
+/** Für revalidiereKatalog: öffentlichen Text neu bauen und in KV legen. */
+export async function bauOeffentlichenKatalogNeu(): Promise<void> {
+  await bauKatalogNeu(await katalogKv(), () => baueKatalog(false));
 }

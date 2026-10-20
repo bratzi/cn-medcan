@@ -79,10 +79,10 @@ async function reviewSlug(reviewId: string): Promise<string | null> {
   return satz?.strain.slug ?? null;
 }
 
-function bewertungPfadeNeuLaden(slug: string) {
+async function bewertungPfadeNeuLaden(slug: string): Promise<void> {
   revalidiereSprachen("/admin");
   revalidiereSprachen("/");
-  revalidiereKatalog();
+  await revalidiereKatalog();
   revalidiereSprachen("/reviews", "layout");
   revalidiereSprachen(`/blueten/${slug}`);
 }
@@ -113,7 +113,7 @@ export async function bewertungFreigeben(formData: FormData): Promise<AdminErgeb
   await kennwerteFortschreiben(review.strainId);
   await oeffentlichesNetzFortschreiben(review.autorId);
 
-  bewertungPfadeNeuLaden(slug);
+  await bewertungPfadeNeuLaden(slug);
   return { ok: true };
 }
 
@@ -143,7 +143,7 @@ export async function bewertungVerwerfen(formData: FormData): Promise<AdminErgeb
   await kennwerteFortschreiben(review.strainId);
   await oeffentlichesNetzFortschreiben(review.autorId);
 
-  bewertungPfadeNeuLaden(slug);
+  await bewertungPfadeNeuLaden(slug);
   return { ok: true };
 }
 

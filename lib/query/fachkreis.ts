@@ -18,6 +18,22 @@ import { COOKIE_NAME, tokenPruefen } from "@/lib/gate";
  * eine echte Mitgliedsrolle; bis dahin bleibt die Seite ohnehin komplett
  * hinter dem Gate.
  */
+/**
+ * Vorprüfung ohne Kryptografie: nennt das Token überhaupt die Rolle "fachkreis"? Nein heißt sicher
+ * öffentlich (gibt nie Rechte, spart nur die HMAC-Prüfung); Ja heißt: istFachkreis() entscheidet.
+ */
+export function tokenNenntFachkreis(token: string | undefined): boolean {
+  return token?.split(".")[1] === "fachkreis";
+}
+
+export async function koennteFachkreisSein(): Promise<boolean> {
+  try {
+    return tokenNenntFachkreis((await cookies()).get(COOKIE_NAME)?.value);
+  } catch {
+    return false;
+  }
+}
+
 export async function istFachkreis(): Promise<boolean> {
   const secret = process.env.SITE_SESSION_SECRET;
   if (!secret) return false;

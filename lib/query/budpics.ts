@@ -1,4 +1,6 @@
 import { BUDPIC_MAX_ANZEIGE, budpicAusBewertung } from "@/lib/budpics";
+import { BUDPICS_JE_KULTIVAR_SQL } from "@/lib/query/budpics-sql";
+import { alsIso } from "@/lib/katalog/verdichten";
 import { getPrisma } from "@/lib/prisma";
 import { aktuellesMitglied } from "@/lib/session";
 
@@ -42,20 +44,14 @@ export async function ladeFreieBudpicsJeKultivar(kultivarIds: readonly string[])
   const ergebnis = new Map<string, BudpicAnzeige[]>();
   if (kultivarIds.length === 0) return ergebnis;
   const prisma = await getPrisma();
-  const zeilen = await prisma.budpic.findMany({
-    where: { status: "FREIGEGEBEN", strain: { kultivarId: { in: [...kultivarIds] } } },
-    select: { id: true, erstelltAm: true, breite: true, hoehe: true, strain: { select: { kultivarId: true } }, mitglied: { select: { anzeigename: true } } },
-    orderBy: { erstelltAm: "desc" },
-    take: MAX_ZEILEN,
-  });
+  const zeilen = await prisma.$queryRawUnsafe<{ id: string; k: string; e: unknown; b: number; h: number; n: string }[]>(
+    BUDPICS_JE_KULTIVAR_SQL(kultivarIds.length),
+    ...kultivarIds,
+  );
   for (const z of zeilen) {
-    const kultivarId = z.strain.kultivarId;
-    if (!kultivarId) continue;
-    const liste = ergebnis.get(kultivarId) ?? [];
-    if (liste.length < BUDPIC_MAX_ANZEIGE) {
-      liste.push({ id: z.id, nutzer: z.mitglied.anzeigename, erstelltAm: z.erstelltAm, breite: z.breite, hoehe: z.hoehe });
-      ergebnis.set(kultivarId, liste);
-    }
+    const liste = ergebnis.get(z.k) ?? [];
+    liste.push({ id: z.id, nutzer: z.n, erstelltAm: new Date(alsIso(z.e) ?? 0), breite: Number(z.b), hoehe: Number(z.h) });
+    ergebnis.set(z.k, liste);
   }
   return ergebnis;
 }
