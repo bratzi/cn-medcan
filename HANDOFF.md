@@ -30,6 +30,16 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 
 ### ⇢ SESSION 77 (2026-10-20): Plural-Fix, Info-Knöpfe, feine Blätter, Stammdaten remote
 
+**NACHTRAG S77b (alles live geprüft, ok):**
+- Adresse jetzt **https://www.bookofterpz.workers.dev** (Konto-Subdomain bookofterpz, Worker per API in `www`
+  umbenannt, Secrets blieben, BETTER_AUTH_URL neu). Alte Adresse cn-medcan.w-helwich… ist tot. IG-Skripte biegen eine
+  alte IG_FEED_URL in umgebung() um (scripts/ig-gemeinsam.ts).
+- Platzhalterbilder: 16 Pexels-Fotos `stock-bluete-01..16` (docs/medien/stock-lizenzen.md), alte bluete-* gelöscht.
+- Terpene: alle 14 neuen in Cannabis belegt (Doku im Audit), Register-Texte + eigene Icons + Wächter-Test,
+  Migration 0031 und Stamm-Runde 4 remote eingespielt (data/stamm/terpene-runde4.sql: DELETE+INSERT je Strain).
+  Geraniol und Eukalyptol ohne Strain (keine Quelle). 9 Demecan-Produkte fehlen in D1 (keine THC-Angabe).
+- Offen: Publora fuenf-noten ab 23.10. planen; Info-Knöpfe 3–6 und 390 px nur teilweise live geprüft.
+
 **SAFE4CLEAR S77 – ALS ERSTES:**
 1. **Live prüfen** (Builds a71b1a8 und 949c39c liefen beim Clear, Status per Cloudflare-API, siehe „Lehre Deploy“):
    Startseite mit `?f=7`: Info-Knöpfe (rund 24 px, Hover/Fokus/Tippen, Escape), Blase an schmalen Rändern bei 390 px
