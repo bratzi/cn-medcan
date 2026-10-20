@@ -18,17 +18,20 @@ export function NoteUndErkundung({
   sprache,
   bild,
   noteStart = null,
+  dicht = false,
   ...erkundung
 }: Omit<ComponentProps<typeof AromaErkundung>, "eigeneGesamtnote"> & {
   blattTexte: BlattNoteTexte;
   sprache: Sprache;
   /** Vorbelegte eigene Note (Bewertungsformular); die Startseite beginnt leer. */
   noteStart?: number | null;
+  /** Startseite (Nutzer 2026-10-20: kompakter): Gesamtnote und Erkundung enger beieinander. */
+  dicht?: boolean;
 }) {
   const [note, setNote] = useState<number | null>(noteStart);
   return (
-    // Abstand wie im Bewertungsformular zwischen Blatt-Note und Erkundung.
-    <div className="flex flex-col gap-16 md:gap-24">
+    // Abstand wie im Bewertungsformular zwischen Blatt-Note und Erkundung, auf der Startseite enger.
+    <div className={dicht ? "flex flex-col gap-16" : "flex flex-col gap-16 md:gap-24"}>
       {/* Reihenfolge der Startseite (Nutzer 2026-10-06): Strainname im Sortenkopf, darunter die
           Gesamtnote, dann Overall. Der Sortenkopf steht deshalb hier und nicht in der Erkundung. */}
       {bild ? <div>{bild}</div> : null}

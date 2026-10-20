@@ -44,3 +44,11 @@ test("Route /api/aroma/[sorte]: 404 bei unbekannt, öffentlich cachebar, Tag kat
   assert.match(route, /unstable_cache/);
   assert.match(route, /tags: \["katalog"\]/);
 });
+
+test("Startseite kompakt: kein Sortenkopf unter dem Explorer, Bewertung folgt direkt", () => {
+  const wechsel = lies("components/story/AromaWechsel.tsx");
+  assert.doesNotMatch(wechsel, /SortenKopf/);
+  assert.doesNotMatch(wechsel, /bild=\{/);
+  assert.match(wechsel, /<NoteUndErkundung[\s\S]*?\bdicht\b/);
+  assert.doesNotMatch(lies("components/story/AromaSektion.tsx"), /kopfTexte/);
+});

@@ -6,7 +6,6 @@ import { useRef, useState, type ReactNode } from "react";
 import type { BlattNoteTexte } from "@/components/review/BlattNote";
 import { erkundungsDaten } from "@/components/review/erkundung-daten";
 import { NoteUndErkundung } from "@/components/review/NoteUndErkundung";
-import { SortenKopf, type SortenKopfProps } from "@/components/review/SortenKopf";
 import { SortenExplorer } from "@/components/story/SortenExplorer";
 import { buttonKlassen } from "@/components/ui/Button";
 import type { KultivarTyp } from "@/db/enums";
@@ -28,7 +27,6 @@ type Props = {
   start: Karte;
   blattTexte: BlattNoteTexte;
   aromaTexte: AromaTexte;
-  kopfTexte: SortenKopfProps["w"];
   serien: { hersteller: string; community: string };
   katalog: KatalogTerpen[];
   texte: Pick<Woerterbuch["start"]["aroma"], "zurSorte" | "nochNicht" | "bewerten">;
@@ -98,23 +96,9 @@ export function AromaWechsel(props: Props) {
             blattTexte={props.blattTexte}
             sprache={sprache}
             titel={sorte.handelsname}
-            bild={
-              <SortenKopf
-                handelsname={sorte.handelsname}
-                bildPfad={sorte.herstellerBildPfad}
-                kultivarName={sorte.kultivarName}
-                kultivarTyp={sorte.kultivarTyp}
-                genetik={sorte.genetik}
-                vertreiberName={sorte.vertreiberName}
-                thcMin={sorte.thcMinProzent}
-                thcMax={sorte.thcMaxProzent}
-                cbdMin={sorte.cbdMinProzent}
-                cbdMax={sorte.cbdMaxProzent}
-                terpene={sorte.terpene}
-                w={props.kopfTexte}
-                sprache={sprache}
-              />
-            }
+            // Kein Sortenkopf mehr (Nutzer 2026-10-20: der Block „Das bewerten wir“ hing allein unter
+            // dem Explorer). Name, Typ und Werte stehen schon im Explorer; die Bewertung folgt direkt.
+            dicht
             terpene={sorte.terpene}
             katalog={props.katalog}
             {...erkundungsDaten(sorte.terpene, sorte.reviews, props.serien, sorte.kennwerte)}

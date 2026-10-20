@@ -68,7 +68,6 @@ async function Inhalt({ w }: { w: Woerterbuch }) {
       start={{ slug: startSorte?.slug ?? vorzeige?.sorteSlug ?? "", name: startSorte?.name ?? vorzeige?.handelsname ?? "", daten }}
       blattTexte={w.bewerten}
       aromaTexte={aromaTexte(w, sprache)}
-      kopfTexte={{ aroma: { sortenKopf: w.aroma.sortenKopf }, label: { kultivarTyp: w.label.kultivarTyp } }}
       serien={w.aroma.serien}
       katalog={katalog}
       texte={w.start.aroma}
