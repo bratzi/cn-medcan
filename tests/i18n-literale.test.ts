@@ -28,8 +28,7 @@ const UMGESTELLT: string[] = [
   // Welle 2: Katalog und Aroma-Baum
   "app/[lang]/blueten/page.tsx",
   "app/[lang]/blueten/[slug]/page.tsx",
-  "components/produkt/FilterLeiste.tsx",
-  "components/produkt/AktiveFilter.tsx",
+  "components/katalog/KatalogAnsicht.tsx",
   "components/produkt/ProduktCard.tsx",
   "components/produkt/Titelblatt.tsx",
   "components/produkt/TerpenChips.tsx",

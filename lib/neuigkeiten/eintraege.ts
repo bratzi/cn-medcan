@@ -25,6 +25,17 @@ export type InArbeit = { id: string; titel: Zweisprachig; text: Zweisprachig };
 
 export const NEUIGKEITEN: readonly Neuigkeit[] = [
   {
+    id: "2026-10-20-bluetenseite-filtern",
+    datum: "2026-10-20",
+    art: "besser",
+    titel: { de: "Blütenseite: Filtern ohne Warten", en: "Flowers page: filter without waiting" },
+    text: {
+      de: "Filter, Sortierung und Blättern wirken sofort, ohne dass die Seite neu lädt. Die Community-Note steht jetzt vorn auf jeder Karte.",
+      en: "Filters, sorting and paging now apply instantly without reloading the page. The community rating now leads on every card.",
+    },
+    link: "/blueten",
+  },
+  {
     id: "2026-10-20-neuigkeiten",
     datum: "2026-10-20",
     art: "neu",

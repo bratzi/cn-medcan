@@ -35,7 +35,7 @@ test("Vorschlagen: Aktion prueft Anmeldung, nicht die Freigabe, und schreibt die
 
 test("Vorschlagen: Seite leitet ohne Anmeldung weiter, Katalog verlinkt mit Suchbegriff", () => {
   assert.match(lies("app/[lang]/vorschlagen/page.tsx"), /redirect\(`\/anmelden\?weiter=\$\{encodeURIComponent\(vorschlagPfad\(/);
-  const katalog = lies("app/[lang]/blueten/page.tsx");
+  const katalog = lies("components/katalog/KatalogAnsicht.tsx");
   assert.match(katalog, /href=\{vorschlagLink\(filter\.q\)\}/);
   assert.match(lies("components/umfrage/VorschlagFormular.tsx"), /href="\/vorschlagen"/);
 });
