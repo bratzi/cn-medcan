@@ -9,9 +9,15 @@ import { formatiereDatum } from "@/lib/format";
 import { holeSprache, holeWoerterbuch } from "@/lib/i18n";
 import { t } from "@/lib/i18n/text";
 import { ladeJuryFavourites } from "@/lib/query/jury";
+import { sprachParameter } from "@/lib/i18n/vorrendern";
 
 export const dynamic = "force-static";
 export const revalidate = 86400;
+
+/** Beide Sprachen im Build vorrendern, wenn die lokale D1 den Live-Abzug trägt (scripts/cf-build.mjs). */
+export function generateStaticParams() {
+  return sprachParameter();
+}
 
 export async function generateMetadata(): Promise<Metadata> {
   const w = await holeWoerterbuch();

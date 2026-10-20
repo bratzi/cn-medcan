@@ -12,6 +12,7 @@ import { TerpenBand } from "@/components/story/TerpenBand";
 import { TerpenRegister } from "@/components/story/TerpenRegister";
 import { TransparentMachen } from "@/components/story/TransparentMachen";
 import { WissenBuendeln } from "@/components/story/WissenBuendeln";
+import { sprachParameter } from "@/lib/i18n/vorrendern";
 
 /**
  * Die Startseite als Scroll-Story (Spec 5.1). Sektion 9 ist der Fuß im
@@ -28,6 +29,11 @@ import { WissenBuendeln } from "@/components/story/WissenBuendeln";
  */
 export const dynamic = "force-static";
 export const revalidate = 86400;
+
+/** Beide Sprachen im Build vorrendern, wenn die lokale D1 den Live-Abzug trägt (scripts/cf-build.mjs). */
+export function generateStaticParams() {
+  return sprachParameter();
+}
 
 export default function StartPage() {
   return (

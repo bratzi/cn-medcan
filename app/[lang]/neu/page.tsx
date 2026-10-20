@@ -9,12 +9,18 @@ import { formatiereDatum } from "@/lib/format";
 import { holeSprache, holeWoerterbuch } from "@/lib/i18n";
 import { IN_ARBEIT, NEUIGKEITEN, type Art } from "@/lib/neuigkeiten/eintraege";
 import { nachMonat } from "@/lib/neuigkeiten/gruppieren";
+import { sprachParameter } from "@/lib/i18n/vorrendern";
 
 /**
  * Neuigkeiten (Spec 2026-10-20-neuigkeiten-design.md): liest nur lib/neuigkeiten,
  * keine Anfrage, kein D1. Eine neue Meldung kommt mit dem nächsten Build.
  */
 export const dynamic = "force-static";
+
+/** Beide Sprachen im Build vorrendern, wenn die lokale D1 den Live-Abzug trägt (scripts/cf-build.mjs). */
+export function generateStaticParams() {
+  return sprachParameter();
+}
 
 export async function generateMetadata(): Promise<Metadata> {
   const w = await holeWoerterbuch();
