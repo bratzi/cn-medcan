@@ -28,6 +28,13 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 
 ## ⇢ Hier geht es weiter
 
+### ⇢ SESSION 81 (2026-10-20): Task 2 gemergt, Task 1 läuft
+- Fragen S80 beantwortet: Schwellen 1,25/2,5 bleiben; Filterspalte offen ab 1536 px. NICHT erneut fragen.
+- Task 2 Review APPROVED (task-2-review.md), gemergt auf main 16d2527 (lokal, nicht gepusht).
+- Task 1 Vorrendern: Agent lief beim Clear im Worktree ab Branch worktree-agent-aeebe763808702858. Prüfen, ob
+  task-1-report.md existiert; sonst Task 1 neu dispatchen (Brief task-1-brief.md). Danach Review, Merge, Suite, EIN Push.
+- Nebenpunkte aus Review: aria-expanded kurz false bei Hydration, drittes Inline-Skript im head, alter KV-Eintrag v1.
+
 ### ⇢ SESSION 80 (2026-10-20): /blueten-Ausfall 1102, Plan Vorrendern + Blütenseite voll
 
 **ALS ERSTES: diese Fragen in EINER AskUserQuestion stellen**
