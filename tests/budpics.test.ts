@@ -10,7 +10,7 @@ test("musterBildId ist je Slug stabil und zeigt auf ein vorhandenes Foto", () =>
     const id = musterBildId(slug);
     assert.equal(id, musterBildId(slug));
     assert.ok(ids.has(id), `${slug}: ${id} fehlt in lib/medien.ts`);
-    assert.match(id, /^bluete-(0[1-9]|10)$/);
+    assert.match(id, /^stock-bluete-(0[1-9]|1[0-6])$/);
   }
 });
 

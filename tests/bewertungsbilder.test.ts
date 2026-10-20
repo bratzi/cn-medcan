@@ -33,5 +33,5 @@ test("annehmbareDateien: nie mehr als frei, nie negativ", () => {
 test("ersatzBildId: Herstellerbild vor Musterbild, unbekanntes Herstellerbild zählt nicht", () => {
   assert.equal(ersatzBildId(null, "nebelharz-22"), musterBildId("nebelharz-22"));
   assert.equal(ersatzBildId("gibt-es-nicht", "nebelharz-22"), musterBildId("nebelharz-22"));
-  assert.equal(ersatzBildId("bluete-03", "nebelharz-22"), "bluete-03");
+  assert.equal(ersatzBildId("stock-bluete-03", "nebelharz-22"), "stock-bluete-03");
 });

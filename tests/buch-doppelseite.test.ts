@@ -237,7 +237,7 @@ test("Bildfeld: ohne Bild und ohne Herstellerbild das Musterbild, Symbolbild, nu
 
 test("Bildfeld: ohne Bild mit Herstellerbild dieses, ebenfalls als Symbolbild", () => {
   // Ein Herstellerbild, das nicht zufällig das Musterbild der Sorte ist.
-  const hersteller = musterBildId("nebelharz-22") === "bluete-03" ? "bluete-04" : "bluete-03";
+  const hersteller = musterBildId("nebelharz-22") === "stock-bluete-03" ? "stock-bluete-04" : "stock-bluete-03";
   const { links } = seiten(zeige({ bilder: [], bildPfad: hersteller }));
   assert.match(links, new RegExp(`/medien/${hersteller}-`));
   assert.doesNotMatch(links, new RegExp(`/medien/${musterBildId("nebelharz-22")}-`));

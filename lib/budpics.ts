@@ -24,8 +24,8 @@ export const BEWERTUNGSBILD_MAX = 3;
 export const BUDPIC_STATUS = ["OFFEN", "FREIGEGEBEN", "ABGELEHNT"] as const;
 export type BudpicStatus = (typeof BUDPIC_STATUS)[number];
 
-/** Die Musterbilder: alle Fotos bluete-01 bis bluete-10 aus lib/medien.ts. */
-export const MUSTER_ANZAHL = 10;
+/** Die Musterbilder: alle Fotos stock-bluete-01 bis stock-bluete-16 aus lib/medien.ts. */
+export const MUSTER_ANZAHL = 16;
 
 /** Einfacher, stabiler Streuwert (FNV-1a, 32 Bit) ueber die Zeichen des Slugs. */
 export function slugHash(slug: string): number {
@@ -40,7 +40,7 @@ export function slugHash(slug: string): number {
 /** Medien-Id des Musterbilds einer Sorte: zufaellig wirkend, aber je Slug immer dasselbe. */
 export function musterBildId(slug: string): string {
   const nr = (slugHash(slug) % MUSTER_ANZAHL) + 1;
-  return `bluete-${String(nr).padStart(2, "0")}`;
+  return `stock-bluete-${String(nr).padStart(2, "0")}`;
 }
 
 /** Zielmasse: die lange Kante hoechstens `max`, das Seitenverhaeltnis bleibt, nie hochskalieren. */
