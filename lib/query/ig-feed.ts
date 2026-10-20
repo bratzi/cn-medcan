@@ -91,6 +91,6 @@ export async function igUmfragen(ursprung: string): Promise<IgUmfrage[]> {
     titel: r.titel,
     beendetAm: r.endetAm ? r.endetAm.toISOString() : null,
     gewinner: r.plaetze.map((p) => ({ bluete: p.handelsname, stimmen: proOption.get(p.optionId) ?? 0 })),
-    url: `${ursprung}/umfragen`,
+    url: `${ursprung}/sotm`,
   }));
 }

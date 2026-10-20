@@ -53,7 +53,7 @@ export type StimmzettelAnzeige = StimmZustand["art"] | "laedt" | "fehler" | "ver
 /**
  * Welche Aktionszeile der statische Stimmzettel zeigt. "veraltet": Die Seite
  * kommt aus dem Cache (bis 300 s alt) und zeigt eine andere Runde als die
- * laufende; dann führt ein Link auf /umfragen statt eines falschen Zustands.
+ * laufende; dann führt ein Link auf /sotm statt eines falschen Zustands.
  */
 export function stimmzettelAnzeige(stand: SitzungsStand, umfrageId: string): StimmzettelAnzeige {
   if (stand.status === "laedt") return "laedt";

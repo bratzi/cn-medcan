@@ -8,7 +8,7 @@ import { de } from "@/lib/i18n/de";
 import { en } from "@/lib/i18n/en";
 
 test("Kern zuerst: Bewertungen, Abstimmung, Jury, Blüten; Profil als ein Knopf (Nutzer 2026-10-13)", () => {
-  assert.deepEqual(HAUPTNAVIGATION.map((eintrag) => eintrag.href), ["/reviews", "/umfragen", "/jury", "/blueten"]);
+  assert.deepEqual(HAUPTNAVIGATION.map((eintrag) => eintrag.href), ["/reviews", "/sotm", "/jury", "/blueten"]);
   assert.deepEqual(PROFIL_LINK, { href: "/profil", schluessel: "profil" });
   assert.equal(de.kopf.navigation.profil, "Mein Profil");
   assert.equal(en.kopf.navigation.profil, "My profile");
@@ -24,7 +24,7 @@ test("istAktiv: die Seite selbst und ihre Unterseiten", () => {
 test("istAktiv: kein Treffer über einen bloßen Namensanfang oder die Startseite", () => {
   assert.equal(istAktiv("/blueten-archiv", "/blueten"), false);
   assert.equal(istAktiv("/", "/reviews"), false);
-  assert.equal(istAktiv("/reviews", "/umfragen"), false);
+  assert.equal(istAktiv("/reviews", "/sotm"), false);
 });
 
 test("istAktiv: nur das eigene Profil, fremde Profile zählen nicht", () => {

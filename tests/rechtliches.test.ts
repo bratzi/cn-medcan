@@ -28,7 +28,7 @@ test("Impressum und Datenschutz sind vom Passwort-Gate ausgenommen", () => {
   for (const pfad of ["/impressum", "/datenschutz", "/zugang", "/api/sprache"]) {
     assert.equal(istOhneGate(pfad), true, `${pfad} liegt hinter dem Gate`);
   }
-  for (const pfad of ["/", "/reviews", "/mitglied", "/umfragen", "/admin"]) {
+  for (const pfad of ["/", "/reviews", "/mitglied", "/sotm", "/admin"]) {
     assert.equal(istOhneGate(pfad), false, `${pfad} ist nicht mehr geschützt`);
   }
 });

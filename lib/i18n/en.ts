@@ -19,7 +19,7 @@ export const en: Woerterbuch = {
     },
     navigation: {
       bewertungen: "Reviews",
-      abstimmung: "Vote",
+      sotm: "SOTM",
       jury: "Jury",
       blueten: "Strains",
       profil: "My profile",
@@ -636,6 +636,31 @@ export const en: Woerterbuch = {
     laden: "Load reel from Instagram",
     datenschutz: "Loading it sends your IP address and browser data to Meta.",
     mehr: "More in the privacy policy",
+  },
+  sotm: {
+    titel: "Strain of the Month",
+    metaBeschreibung: "The community's strain of the month: suggestions, vote and reviews.",
+    satz: "The community suggests and votes, one strain per month. Then we review it together.",
+    keiner: "There is no Strain of the Month this month.",
+    jetztBewerten: "Review now",
+    bildAlt: "Photo of the flower {name}",
+    mitglieder: {
+      one: "{anzahl} member reviews it, average {schnitt}",
+      other: "{anzahl} members review it, average {schnitt}",
+    },
+    nochKeineBewertung: "No review this month yet.",
+    betreiberNote: "Operator's rating: {note}",
+    rest: {
+      vorschlag: {
+        one: "Suggestions until {datum}, {anzahl} day left",
+        other: "Suggestions until {datum}, {anzahl} days left",
+      },
+      abstimmung: {
+        one: "Vote until {datum}, {anzahl} day left",
+        other: "Vote until {datum}, {anzahl} days left",
+      },
+    },
+    keineVorschlaege: "No suggestions in this round yet.",
   },
   umfrage: {
     titel: "Vote",

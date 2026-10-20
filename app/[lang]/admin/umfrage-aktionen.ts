@@ -5,13 +5,6 @@ import { revalidiereSprachen } from "@/lib/i18n/revalidiere";
 import { adminErforderlich } from "@/lib/session";
 import { getPrisma } from "@/lib/prisma";
 import { istEindeutigkeitsfehler } from "@/lib/prisma-fehler";
-import {
-  gewinnerErmitteln,
-  phasenwechselPruefen,
-  umfrageEingabePruefen,
-  vorschlagFristPruefen,
-  type OptionFuerAuswertung,
-} from "@/lib/umfrage-eingabe";
 
 export type AdminUmfrageErgebnis = { ok: true } | { ok: false; fehler: string };
 
@@ -23,54 +16,6 @@ export type AdminUmfrageErgebnis = { ok: true } | { ok: false; fehler: string };
  * vorbeikommt, schreibt.
  */
 
-/**
- * Eine neue Runde anlegen.
- *
- * `aktiv: "AKTIV"` ist kein Zierrat: die Spalte traegt den Unique-Index, der
- * "genau eine aktive Umfrage" erzwingt. Laeuft schon eine, weist die
- * Datenbank den Satz ab - nicht eine Pruefung davor, die auf D1 ohne
- * Transaktion nichts garantieren wuerde.
- */
-export async function umfrageAnlegen(formData: FormData): Promise<AdminUmfrageErgebnis> {
-  await adminErforderlich();
-
-  const geprueft = umfrageEingabePruefen(
-    String(formData.get("titel") ?? ""),
-    String(formData.get("beschreibung") ?? ""),
-    String(formData.get("communityPlaetze") ?? "2"),
-  );
-  if (!geprueft.ok) return geprueft;
-
-  const frist = vorschlagFristPruefen(String(formData.get("vorschlagBisAm") ?? ""));
-  if (!frist.ok) return frist;
-
-  const prisma = await getPrisma();
-  try {
-    await prisma.umfrage.create({
-      data: {
-        titel: geprueft.wert.titel,
-        beschreibung: geprueft.wert.beschreibung,
-        communityPlaetze: geprueft.wert.communityPlaetze,
-        vorschlagBisAm: frist.wert,
-        phase: "VORSCHLAG",
-        aktiv: "AKTIV",
-      },
-    });
-  } catch (fehler) {
-    if (istEindeutigkeitsfehler(fehler)) {
-      return {
-        ok: false,
-        fehler: "Es läuft bereits eine Umfrage. Beende sie, bevor du eine neue anlegst.",
-      };
-    }
-    throw fehler;
-  }
-
-  revalidiereSprachen("/admin");
-  revalidiereSprachen("/umfragen");
-  return { ok: true };
-}
-
 /** Naechste freie Reihenfolge einer Runde. Siehe Hinweis in den Aufrufern. */
 async function naechsteReihenfolge(umfrageId: string): Promise<number> {
   const prisma = await getPrisma();
@@ -80,57 +25,6 @@ async function naechsteReihenfolge(umfrageId: string): Promise<number> {
     select: { reihenfolge: true },
   });
   return (letzte?.reihenfolge ?? 0) + 1;
-}
-
-/**
- * Einen gesetzten Platz vergeben - die Wahl des Betreibers, ohne Abstimmung.
- *
- * Hinweis zur Reihenfolge: sie wird gelesen und dann geschrieben, ohne
- * Transaktion (D1 hat keine). Zwei gleichzeitige Aufrufe koennen dieselbe
- * Zahl ziehen; der Unique-Index `(umfrage_id, reihenfolge)` weist den
- * zweiten dann ab, und der Betreiber klickt noch einmal. Das ist hier
- * vertretbar: es gibt genau einen Betreiber, und der Fehlerfall ist sichtbar
- * und harmlos - im Gegensatz zu einer stillen doppelten Vergabe.
- */
-export async function gesetztenPlatzVergeben(
-  formData: FormData,
-): Promise<AdminUmfrageErgebnis> {
-  await adminErforderlich();
-
-  const umfrageId = String(formData.get("umfrageId") ?? "").trim();
-  const strainId = String(formData.get("strainId") ?? "").trim();
-  if (!umfrageId) return { ok: false, fehler: "Keine Umfrage angegeben." };
-  if (!strainId) return { ok: false, fehler: "Bitte einen Strain auswählen." };
-
-  const prisma = await getPrisma();
-  const umfrage = await prisma.umfrage.findUnique({
-    where: { id: umfrageId },
-    select: { phase: true },
-  });
-  if (!umfrage) return { ok: false, fehler: "Diese Umfrage gibt es nicht." };
-  if (umfrage.phase === "BEENDET") {
-    return { ok: false, fehler: "Die Runde ist beendet." };
-  }
-
-  try {
-    await prisma.umfrageOption.create({
-      data: {
-        umfrageId,
-        strainId,
-        herkunft: "GESETZT",
-        reihenfolge: await naechsteReihenfolge(umfrageId),
-      },
-    });
-  } catch (fehler) {
-    if (istEindeutigkeitsfehler(fehler)) {
-      return { ok: false, fehler: "Dieser Strain steht in dieser Runde schon auf der Liste." };
-    }
-    throw fehler;
-  }
-
-  revalidiereSprachen("/admin");
-  revalidiereSprachen("/umfragen");
-  return { ok: true };
 }
 
 /**
@@ -187,98 +81,7 @@ export async function vorschlagUebernehmen(
   });
 
   revalidiereSprachen("/admin");
-  revalidiereSprachen("/umfragen");
-  return { ok: true };
-}
-
-/**
- * Die Phase weiterschalten.
- *
- * Nur vorwaerts, siehe `phasenwechselPruefen`. Beim Wechsel nach BEENDET
- * passiert dreierlei in einem Zug: Gewinner markieren, Enddatum setzen und
- * `aktiv` auf NULL - erst damit ist der Platz fuer die naechste Runde frei.
- */
-export async function phaseWeiterschalten(
-  formData: FormData,
-): Promise<AdminUmfrageErgebnis> {
-  await adminErforderlich();
-
-  const umfrageId = String(formData.get("umfrageId") ?? "").trim();
-  if (!umfrageId) return { ok: false, fehler: "Keine Umfrage angegeben." };
-
-  const prisma = await getPrisma();
-  const umfrage = await prisma.umfrage.findUnique({
-    where: { id: umfrageId },
-    select: {
-      phase: true,
-      communityPlaetze: true,
-      optionen: {
-        select: { id: true, herkunft: true, reihenfolge: true },
-        take: 50,
-      },
-    },
-  });
-  if (!umfrage) return { ok: false, fehler: "Diese Umfrage gibt es nicht." };
-
-  const geprueft = phasenwechselPruefen(
-    umfrage.phase,
-    String(formData.get("ziel") ?? ""),
-  );
-  if (!geprueft.ok) return geprueft;
-
-  if (geprueft.wert.ziel === "ABSTIMMUNG") {
-    const abstimmbar = umfrage.optionen.filter((o) => o.herkunft === "COMMUNITY").length;
-    if (abstimmbar === 0) {
-      return {
-        ok: false,
-        fehler:
-          "Ohne übernommenen Vorschlag gibt es nichts zu wählen. Übernimm zuerst Kandidaten.",
-      };
-    }
-    await prisma.umfrage.update({
-      where: { id: umfrageId },
-      data: { phase: "ABSTIMMUNG" },
-    });
-    revalidiereSprachen("/admin");
-    revalidiereSprachen("/umfragen");
-    revalidiereSprachen("/");
-    return { ok: true };
-  }
-
-  // Ziel BEENDET: Stimmen zaehlen und Gewinner markieren.
-  const stimmenJeOption = await prisma.stimme.groupBy({
-    by: ["optionId"],
-    where: { umfrageId },
-    _count: { _all: true },
-  });
-  const zaehler = new Map(stimmenJeOption.map((z) => [z.optionId, z._count._all]));
-
-  const fuerAuswertung: OptionFuerAuswertung[] = umfrage.optionen.map((o) => ({
-    id: o.id,
-    herkunft: o.herkunft,
-    reihenfolge: o.reihenfolge,
-    stimmen: zaehler.get(o.id) ?? 0,
-  }));
-  const gewinnerIds = gewinnerErmitteln(fuerAuswertung, umfrage.communityPlaetze);
-
-  // Zwei Schreibvorgaenge ohne Transaktion (D1). Reihenfolge deshalb bewusst:
-  // erst die Gewinner setzen, dann die Runde schliessen. Bricht es dazwischen
-  // ab, steht eine laufende Runde mit schon markierten Gewinnern da - das ist
-  // sichtbar und nachbesserbar. Andersherum stuende eine beendete Runde ohne
-  // Ergebnis, und der Betreiber koennte es nicht mehr nachtragen, weil
-  // Phasen nur vorwaerts laufen.
-  await prisma.umfrageOption.updateMany({
-    where: { umfrageId, id: { in: gewinnerIds } },
-    data: { istGewinner: true },
-  });
-  await prisma.umfrage.update({
-    where: { id: umfrageId },
-    data: { phase: "BEENDET", aktiv: null, endetAm: new Date() },
-  });
-
-  revalidiereSprachen("/admin");
-  revalidiereSprachen("/umfragen");
-  revalidiereSprachen("/");
+  revalidiereSprachen("/sotm");
   return { ok: true };
 }
 
@@ -311,7 +114,7 @@ export async function ergebnisVerknuepfen(
       data: { ergebnisReviewId: null },
     });
     revalidiereSprachen("/admin");
-    revalidiereSprachen("/umfragen");
+    revalidiereSprachen("/sotm");
     return { ok: true };
   }
 
@@ -332,6 +135,6 @@ export async function ergebnisVerknuepfen(
   });
 
   revalidiereSprachen("/admin");
-  revalidiereSprachen("/umfragen");
+  revalidiereSprachen("/sotm");
   return { ok: true };
 }

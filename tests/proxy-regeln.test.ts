@@ -13,7 +13,7 @@ test("Alles andere liegt hinter dem Passwort, auch API, interne Pfade und Scanne
   const geschuetzt = [
     "/",
     "/reviews",
-    "/umfragen",
+    "/sotm",
     "/blueten/x",
     "/mitglied",
     "/admin",

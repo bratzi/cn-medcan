@@ -27,11 +27,11 @@ export type StimmZustand =
   | { art: "ABGESTIMMT"; optionId: string };
 
 /** Wo der Stimmzettel steht: bestimmt nur die Ziele der Links. */
-export type StimmzettelOrt = "startseite" | "umfragen";
+export type StimmzettelOrt = "startseite" | "sotm";
 
 const ZIELE: Record<StimmzettelOrt, { anmelden: string; vorschlagen: string }> = {
-  startseite: { anmelden: "/anmelden?weiter=%2F", vorschlagen: "/umfragen#vorschlaege" },
-  umfragen: { anmelden: "/anmelden?weiter=%2Fumfragen", vorschlagen: "#vorschlaege" },
+  startseite: { anmelden: "/anmelden?weiter=%2F", vorschlagen: "/sotm#vorschlaege" },
+  sotm: { anmelden: "/anmelden?weiter=%2Fsotm", vorschlagen: "#vorschlaege" },
 };
 
 type Props = {
@@ -116,7 +116,7 @@ function Aktionsbereich({
   const waehlbar = umfrage.optionen.filter((option) => option.herkunft === "COMMUNITY");
   if (waehlbar.length === 0) {
     return (
-      <p className="text-small text-text-muted">{texte.allesFest}</p>
+      <p className="text-small text-text-muted">{w.sotm.keineVorschlaege}</p>
     );
   }
 
@@ -125,7 +125,7 @@ function Aktionsbereich({
 
 /**
  * Die laufende Runde als Stimmzettel im Buch (Spec TP2 4.2, Spec TP3 8.6),
- * auf der Startseite und auf /umfragen gleich. Gesetzte Plätze gestempelt,
+ * auf der Startseite und auf /sotm gleich. Gesetzte Plätze gestempelt,
  * Community-Plätze von Hand vermerkt (Kandidat.tsx). Server Component.
  */
 export function UmfrageKarte({ umfrage, zustand, className, ort = "startseite", w, sprache }: Props) {
@@ -194,7 +194,7 @@ export function UmfrageKarte({ umfrage, zustand, className, ort = "startseite", 
               ),
               fehler: <p className="text-small text-text-muted">{w.start.abstimmung.fehler}</p>,
               veraltet: (
-                <Link prefetch={false} href="/umfragen" className={buttonKlassen("secondary", "md")}>
+                <Link prefetch={false} href="/sotm" className={buttonKlassen("secondary", "md")}>
                   {w.reviews.zurAbstimmung}
                 </Link>
               ),

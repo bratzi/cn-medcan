@@ -45,16 +45,6 @@ test("Vorschlagsfrist: kein gueltiges Datum wird abgewiesen", () => {
   }
 });
 
-test("Runde anlegen: Formular hat das Feld, die Aktion schreibt es", () => {
-  const formular = quelle("components/admin/RundeAnlegenFormular.tsx");
-  assert.match(formular, /name="vorschlagBisAm"/);
-  assert.match(formular, /type="date"/);
-
-  const aktion = quelle("app/[lang]/admin/umfrage-aktionen.ts");
-  assert.match(aktion, /vorschlagFristPruefen\(/);
-  assert.match(aktion, /vorschlagBisAm:/);
-});
-
 for (const datei of [
   "components/auth/AnmeldeFormular.tsx",
   "components/auth/RegistrierFormular.tsx",

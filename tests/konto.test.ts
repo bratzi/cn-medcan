@@ -81,7 +81,7 @@ test("UmfrageJetzt: Vorschlagsphase mit Datum; keine Runde mit Link", () => {
   assert.match(jetzt({ umfrage: umfrage("VORSCHLAG") }), /Vorschläge bis 10\.10\.2026/);
   const h = jetzt({ umfrage: null });
   assert.match(h, /Gerade läuft keine Runde/);
-  assert.match(h, /href="\/umfragen"/);
+  assert.match(h, /href="\/sotm"/);
 });
 
 const s = (p: Partial<StimmZeile>): StimmZeile => ({
@@ -116,7 +116,7 @@ test("MeineStimmen: Ausgang als Badge mit Text, Link zur Bewertung nur bei Gewin
 test("MeineStimmen: leer mit Weg zu den Umfragen", () => {
   const h = renderToStaticMarkup(createElement(MeineStimmen, { stimmen: [], texte: de.mitglied, sprache: "de" }));
   assert.match(h, /Noch keine Stimme abgegeben/);
-  assert.match(h, /href="\/umfragen"/);
+  assert.match(h, /href="\/sotm"/);
 });
 
 test("lib/query/konto: Stimmen mit take, Zahlen in einer Abfrage", () => {

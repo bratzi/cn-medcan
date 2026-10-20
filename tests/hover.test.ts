@@ -7,7 +7,7 @@ import { join } from "node:path";
 export const DATEIEN = [
   "app/[lang]/blueten/[slug]/page.tsx",
   "app/[lang]/reviews/page.tsx",
-  "app/[lang]/umfragen/page.tsx",
+  "app/[lang]/sotm/page.tsx",
   "components/produkt/BestandTabelle.tsx",
   "components/produkt/CannabinoidBar.tsx",
   "components/produkt/TerpenChips.tsx",

@@ -77,7 +77,7 @@ export function StartSitzung({ children }: { children: ReactNode }) {
   return <SitzungsKontext.Provider value={wert}>{children}</SitzungsKontext.Provider>;
 }
 
-/** null außerhalb der Startseite, etwa auf /umfragen: dort kennt der Server den Zustand. */
+/** null außerhalb der Startseite, etwa auf /sotm: dort kennt der Server den Zustand. */
 export function useStartSitzung(): Kontext | null {
   return useContext(SitzungsKontext);
 }

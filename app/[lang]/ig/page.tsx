@@ -38,7 +38,7 @@ const WEGE: Weg[] = [
     kante: "border-l-logo",
   },
   {
-    href: "/umfragen",
+    href: "/sotm",
     titel: "Mitmachen",
     nutzen: "Freiwillige Events: gemeinsam Strains vorschlagen, nach vorn bringen und zusammen bewerten.",
     kante: "border-l-violett-400",

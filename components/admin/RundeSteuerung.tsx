@@ -1,12 +1,9 @@
 import Link from "next/link";
 
-import { GesetztenPlatzFormular } from "@/components/admin/GesetztenPlatzFormular";
-import { PhasenSchalter } from "@/components/admin/PhasenSchalter";
 import {
   Badge,
   Card,
   CardBody,
-  CardFooter,
   CardHeader,
   Table,
   TableBody,
@@ -15,7 +12,6 @@ import {
   TableHeaderCell,
   TableRow,
 } from "@/components/ui";
-import type { SelectOption } from "@/components/ui";
 import { bluetenHref } from "@/lib/alte-adressen";
 import { formatiereDatum } from "@/lib/format";
 import type { UmfrageAnsicht } from "@/lib/query/umfragen";
@@ -33,8 +29,6 @@ const PHASEN_LABEL: Record<UmfragePhase, string> = {
 
 type Props = {
   umfrage: UmfrageAnsicht;
-  /** Katalogauswahl fuer den gesetzten Platz. */
-  strains: readonly SelectOption[];
 };
 
 /**
@@ -48,14 +42,11 @@ type Props = {
  * Server Component: die Schreibformulare darunter sind die einzigen
  * Client-Teile.
  */
-export function RundeSteuerung({ umfrage, strains }: Props) {
+export function RundeSteuerung({ umfrage }: Props) {
   // Wie auf der Startseite: in der Vorschlagsphase gibt es fachlich keine
   // Stimmen. Eine Spalte voller Nullen wuerde behaupten, niemand habe
   // gewaehlt - dabei konnte noch niemand.
   const zeigeStimmen = umfrage.phase !== "VORSCHLAG";
-  const abstimmbar = umfrage.optionen.filter(
-    (option) => option.herkunft === "COMMUNITY",
-  ).length;
 
   return (
     <section aria-labelledby={TITEL_ID}>
@@ -79,9 +70,6 @@ export function RundeSteuerung({ umfrage, strains }: Props) {
 
           <p className="text-small text-text-muted">
             {`Start ${formatiereDatum(umfrage.startAm)}`}
-            {` · ${ZAHL.format(umfrage.communityPlaetze)} ${
-              umfrage.communityPlaetze === 1 ? "Community-Platz" : "Community-Plätze"
-            }`}
             {zeigeStimmen
               ? ` · ${ZAHL.format(umfrage.stimmenGesamt)} ${
                   umfrage.stimmenGesamt === 1 ? "abgegebene Stimme" : "abgegebene Stimmen"
@@ -91,8 +79,7 @@ export function RundeSteuerung({ umfrage, strains }: Props) {
 
           {umfrage.optionen.length === 0 ? (
             <p className="max-w-[68ch] text-body text-text-muted">
-              Noch keine Kandidaten. Übernimm einen Vorschlag oder vergib einen gesetzten
-              Platz — ohne Kandidat lässt sich die Abstimmung nicht starten.
+              Noch keine Kandidaten. Vorschläge der Community erscheinen hier, sobald sie übernommen sind.
             </p>
           ) : (
             <Table caption="Kandidaten dieser Runde" captionVersteckt>
@@ -155,20 +142,12 @@ export function RundeSteuerung({ umfrage, strains }: Props) {
           )}
         </CardBody>
 
-        <CardFooter className="flex flex-col gap-6">
-          {/* Der `key` setzt den Schalter zurueck, sobald sich Phase oder Zahl
-            der waehlbaren Kandidaten aendert. Sonst stuende seine Meldung
-            "Uebernimm zuerst Kandidaten" noch da, nachdem genau das
-            geschehen ist - ein Satz, der dann nicht mehr stimmt. */}
-        <PhasenSchalter
-          key={`${umfrage.phase}-${abstimmbar}`}
-          umfrageId={umfrage.id}
-          phase={umfrage.phase}
-        />
-          {umfrage.phase === "BEENDET" ? null : (
-            <GesetztenPlatzFormular umfrageId={umfrage.id} strains={strains} />
-          )}
-        </CardFooter>
+        <CardBody className="border-t border-border">
+          <p className="max-w-[68ch] text-small text-text-muted">
+            Die Runde läuft nach Kalender: Vorschläge bis zum 15., danach Abstimmung bis zum Monatsende. Der Wechsel
+            geschieht automatisch, es gibt keinen Knopf dafür.
+          </p>
+        </CardBody>
       </Card>
     </section>
   );

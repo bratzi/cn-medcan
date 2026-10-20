@@ -88,3 +88,9 @@ export function abgeloesteSorteWeiterleitung(pfad: string, suche: string): strin
   const ziel = Object.hasOwn(ABGELOESTE_SORTEN, alt) ? ABGELOESTE_SORTEN[alt] : null;
   return ziel ? `/blueten/${ziel}${suche}` : null;
 }
+
+/** /umfragen heisst seit 2026-10-20 /sotm (Strain of the Month, Spec Teil B). */
+export const ALTE_UMFRAGEN_WEITERLEITUNGEN = [
+  { source: "/umfragen", destination: "/sotm", permanent: true },
+  { source: "/:lang/umfragen", destination: "/sotm", permanent: true },
+] as const satisfies ReadonlyArray<{ source: string; destination: string; permanent: boolean }>;

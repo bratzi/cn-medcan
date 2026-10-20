@@ -29,7 +29,7 @@ export function UmfrageJetzt({ umfrage, eigeneOptionId, freigegeben, texte, phas
     return (
       <div className="flex flex-col items-start gap-4">
         <p className="max-w-[68ch] text-body text-text-muted">{texte.umfrageKeine}</p>
-        <Link prefetch={false} href="/umfragen" className={textLinkKlassen()}>
+        <Link prefetch={false} href="/sotm" className={textLinkKlassen()}>
           {texte.zuDenUmfragen}
         </Link>
       </div>
@@ -62,7 +62,7 @@ export function UmfrageJetzt({ umfrage, eigeneOptionId, freigegeben, texte, phas
         freigegeben ? (
           <>
             <p className="text-body text-text">{texte.nochNichtGestimmt}</p>
-            <Link prefetch={false} href="/umfragen" className={buttonKlassen(aktion)}>
+            <Link prefetch={false} href="/sotm" className={buttonKlassen(aktion)}>
               {texte.zurAbstimmung}
             </Link>
           </>
@@ -71,7 +71,7 @@ export function UmfrageJetzt({ umfrage, eigeneOptionId, freigegeben, texte, phas
         )
       ) : null}
       {umfrage.phase !== "ABSTIMMUNG" ? (
-        <Link prefetch={false} href="/umfragen" className={textLinkKlassen()}>
+        <Link prefetch={false} href="/sotm" className={textLinkKlassen()}>
           {texte.zurRunde}
         </Link>
       ) : null}

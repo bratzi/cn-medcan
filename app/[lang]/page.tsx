@@ -1,7 +1,7 @@
-import { Abstimmung } from "@/components/story/Abstimmung";
 import { DeinKapitel } from "@/components/story/DeinKapitel";
 import { AromaSektion } from "@/components/story/AromaSektion";
 import { Empfehlungen } from "@/components/story/Empfehlungen";
+import { SotmSektion } from "@/components/sotm/SotmSektion";
 import { Auftakt } from "@/components/story/Auftakt";
 import { FeldbuchRaster } from "@/components/story/FeldbuchRaster";
 import { GemeinsamLernen } from "@/components/story/GemeinsamLernen";
@@ -50,7 +50,7 @@ export default function StartPage() {
         <GemeinsamLernen />
         <Empfehlungen />
         {/* Abstimmungen sind freiwillige Events, nicht im Fokus (Nutzer 2026-10-15): ans Ende, kompakt. */}
-        <Abstimmung />
+        <SotmSektion />
         <StoryBuehne />
       </div>
     </StartSitzung>

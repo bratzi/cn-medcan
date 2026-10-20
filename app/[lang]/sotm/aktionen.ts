@@ -68,7 +68,7 @@ export async function vorschlagEinreichen(formData: FormData): Promise<UmfrageEr
     throw fehler;
   }
 
-  revalidiereSprachen("/umfragen");
+  revalidiereSprachen("/sotm");
   return { ok: true };
 }
 
@@ -124,7 +124,7 @@ export async function stimmeAbgeben(formData: FormData): Promise<UmfrageErgebnis
     throw fehler;
   }
 
-  revalidiereSprachen("/umfragen");
+  revalidiereSprachen("/sotm");
   revalidiereSprachen("/");
   return { ok: true };
 }

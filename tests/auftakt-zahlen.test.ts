@@ -149,7 +149,7 @@ test("Kennzahlen springen ins passende Menü und stehen in der Akzentschrift (Nu
   const quelle = lies("components/story/AuftaktZahlen.tsx");
   assert.match(quelle, /sorten: "\/blueten"/);
   assert.match(quelle, /bewertungen: "\/reviews"/);
-  assert.match(quelle, /stimmen: "\/umfragen"/);
+  assert.match(quelle, /stimmen: "\/sotm"/);
   assert.match(quelle, /<Link[^>]*href=\{ZIEL\[eintrag\.schluessel\]\}/);
   // Die ganze Zelle ist Klickfläche, der Link trägt Zahl und Wort als Namen.
   assert.match(quelle, /after:absolute after:inset-0/);

@@ -6,8 +6,8 @@ const lies = (datei: string) => readFileSync(datei, "utf8");
 
 // Spec 2026-10-01 (statische Seiten), 4.3.
 test("Stimmzettel der Startseite liest keine Sitzung", () => {
-  assert.doesNotMatch(lies("components/story/Abstimmung.tsx"), /lib\/session|aktuellesMitglied|eigeneStimme|stimmZustand/);
-  assert.match(lies("components/story/Abstimmung.tsx"), /zustand="im-browser"/);
+  assert.doesNotMatch(lies("components/sotm/SotmSektion.tsx"), /lib\/session|aktuellesMitglied|eigeneStimme|stimmZustand/);
+  assert.match(lies("components/sotm/SotmSektion.tsx"), /zustand="im-browser"/);
 });
 
 test("Ein Abruf für alle Inseln, nur in StartSitzung", () => {
@@ -24,7 +24,7 @@ test("Zustände des Browser-Stimmzettels: laedt, fehler, veraltet", () => {
   const karte = lies("components/umfrage/UmfrageKarte.tsx");
   assert.match(karte, /laedt:\s*\(\s*<p aria-busy="true"[^>]*>\s*<span className="sr-only">\{w\.start\.skelett\.abstimmung\}<\/span>/);
   assert.match(karte, /fehler:\s*<p[^>]*>\{w\.start\.abstimmung\.fehler\}<\/p>/);
-  assert.match(karte, /veraltet:\s*\(\s*<Link[^>]*href="\/umfragen"[^>]*>\s*\{w\.reviews\.zurAbstimmung\}\s*<\/Link>/);
+  assert.match(karte, /veraltet:\s*\(\s*<Link[^>]*href="\/sotm"[^>]*>\s*\{w\.reviews\.zurAbstimmung\}\s*<\/Link>/);
   assert.match(lies("components/umfrage/StimmzettelImBrowser.tsx"), /varianten\[sitzung \? stimmzettelAnzeige\(sitzung\.stand, umfrageId\) : "laedt"\]/);
 });
 

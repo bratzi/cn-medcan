@@ -3,6 +3,7 @@ import Link from "next/link";
 
 import { ABSCHNITT_TITEL, Seitenkopf, seitenRahmen } from "@/components/layout/Seitenkopf";
 import { Avatar, Badge, Blatt, EmptyState, buttonKlassen, namenLinkKlassen, textLinkKlassen } from "@/components/ui";
+import { SotmSektion } from "@/components/sotm/SotmSektion";
 import { UmfrageKarte } from "@/components/umfrage/UmfrageKarte";
 import { VorschlagFormular } from "@/components/umfrage/VorschlagFormular";
 import { phasenLabel } from "@/components/umfrage/phasen";
@@ -29,7 +30,7 @@ export const dynamic = "force-dynamic";
 
 export async function generateMetadata(): Promise<Metadata> {
   const w = await holeWoerterbuch();
-  return { title: w.umfrage.titel, description: w.umfrage.metaBeschreibung };
+  return { title: w.sotm.titel, description: w.sotm.metaBeschreibung };
 }
 
 /** Handschrift-Überschrift: kurz, Imperativ, in Kopierstift (Spec TP3 10). */
@@ -86,26 +87,9 @@ async function UmfragenInhalt({ w, sprache }: { w: Woerterbuch; sprache: Sprache
 
   return (
     <div className="flex flex-col gap-16 sm:gap-24">
-      <section aria-labelledby="runde-titel" className="flex flex-col gap-8">
-        {umfrage ? (
-          <>
-            <h2 id="runde-titel" className={cn(HAND_TITEL, "self-start max-md:self-center")}>
-              {umfrage.phase === "VORSCHLAG" ? texte.schlagVor : texte.stimmAb}
-            </h2>
-            <UmfrageKarte umfrage={umfrage} zustand={zustand} ort="umfragen" w={w} sprache={sprache} />
-          </>
-        ) : (
-          <>
-            <h2 id="runde-titel" className="sr-only">
-              {texte.laufendeRunde}
-            </h2>
-            <EmptyState
-              titel={texte.keineRunde}
-              beschreibung={texte.keineRundeText}
-            />
-          </>
-        )}
-      </section>
+      <SotmSektion ort="sotm">
+        {umfrage ? <UmfrageKarte umfrage={umfrage} zustand={zustand} ort="sotm" w={w} sprache={sprache} /> : null}
+      </SotmSektion>
 
       {umfrage ? (
         <section id="vorschlaege" aria-labelledby="vorschlaege-titel" className="flex scroll-mt-8 flex-col gap-8">
@@ -131,7 +115,7 @@ async function UmfragenInhalt({ w, sprache }: { w: Woerterbuch; sprache: Sprache
               <p className="text-body text-text-muted">
                 {texte.vorschlagenAnonym}
               </p>
-              <Link prefetch={false} href="/anmelden?weiter=%2Fumfragen" className={buttonKlassen("primary")}>
+              <Link prefetch={false} href="/anmelden?weiter=%2Fsotm" className={buttonKlassen("primary")}>
                 {texte.anmelden}
               </Link>
             </div>
@@ -192,11 +176,11 @@ async function UmfragenInhalt({ w, sprache }: { w: Woerterbuch; sprache: Sprache
   );
 }
 
-export default async function UmfragenPage() {
+export default async function SotmPage() {
   const [w, sprache] = await Promise.all([holeWoerterbuch(), holeSprache()]);
   return (
     <>
-      <Seitenkopf titel={w.umfrage.titel} satz={w.umfrage.satz} />
+      <Seitenkopf titel={w.sotm.titel} satz={w.sotm.satz} />
       <div className={cn(seitenRahmen(), "pt-12 pb-24 max-md:text-center sm:pt-16")}>
         {/* Bewusst ohne Suspense-Grenze: der Inhalt steht im ersten HTML, damit er ohne JavaScript lesbar ist und Sprungziele (#eintrag-…) existieren. */}
         <UmfragenInhalt w={w} sprache={sprache} />

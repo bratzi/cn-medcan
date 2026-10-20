@@ -26,7 +26,7 @@ export function MeineStimmen({ stimmen, texte, sprache }: { stimmen: readonly St
     return (
       <div className="flex flex-col items-start gap-4">
         <p className="text-body text-text-muted">{texte.stimmenLeer}</p>
-        <Link prefetch={false} href="/umfragen" className={textLinkKlassen()}>
+        <Link prefetch={false} href="/sotm" className={textLinkKlassen()}>
           {texte.zuDenUmfragen}
         </Link>
       </div>

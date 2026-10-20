@@ -6,7 +6,7 @@ import { join } from "node:path";
 import { getPathMatch } from "next/dist/shared/lib/router/utils/path-match";
 import { prepareDestination } from "next/dist/shared/lib/router/utils/prepare-destination";
 
-import { ALTE_KATALOG_WEITERLEITUNGEN, bewertenWeiterleitung, bewertungHref } from "@/lib/alte-adressen";
+import { ALTE_KATALOG_WEITERLEITUNGEN, ALTE_UMFRAGEN_WEITERLEITUNGEN, bewertenWeiterleitung, bewertungHref } from "@/lib/alte-adressen";
 
 /** Spielt die Redirect-Regeln so durch, wie Next sie auswertet. */
 function weiterleiten(pfad: string, query: Record<string, string> = {}) {
@@ -69,7 +69,7 @@ test("Ziel existiert als Route, die alte Route ist weg, next.config nutzt die Re
   assert.ok(!existsSync(join(wurzel, "app/[lang]/bewerten")));
   assert.ok(existsSync(join(wurzel, "app/[lang]/blueten/[slug]/aktionen.ts")));
   const config = readFileSync(join(wurzel, "next.config.ts"), "utf8");
-  assert.match(config, /redirects\(\)\s*\{\s*return \[\.\.\.ALTE_KATALOG_WEITERLEITUNGEN, \.\.\.ALTE_KONTO_WEITERLEITUNGEN\]/);
+  assert.match(config, /redirects\(\)\s*\{\s*return \[\.\.\.ALTE_KATALOG_WEITERLEITUNGEN, \.\.\.ALTE_KONTO_WEITERLEITUNGEN, \.\.\.ALTE_UMFRAGEN_WEITERLEITUNGEN\]/);
 });
 
 test("bewertungHref: Sortenseite mit Vertreiber, sonst Produktadresse", () => {
@@ -79,4 +79,17 @@ test("bewertungHref: Sortenseite mit Vertreiber, sonst Produktadresse", () => {
   );
   assert.equal(bewertungHref({ strainSlug: "p", kultivarSlug: "mac-1", vertreiberId: null }, "r1"), "/blueten/mac-1#bewertung-r1");
   assert.equal(bewertungHref({ strainSlug: "p", kultivarSlug: null, vertreiberId: "v" }, "r1"), "/blueten/p#bewertung-r1");
+});
+
+test("/umfragen und /:lang/umfragen leiten dauerhaft auf /sotm, die alte Route ist weg", () => {
+  assert.deepEqual(
+    [...ALTE_UMFRAGEN_WEITERLEITUNGEN],
+    [
+      { source: "/umfragen", destination: "/sotm", permanent: true },
+      { source: "/:lang/umfragen", destination: "/sotm", permanent: true },
+    ],
+  );
+  assert.ok(existsSync(join(process.cwd(), "app/[lang]/sotm/page.tsx")));
+  assert.ok(existsSync(join(process.cwd(), "app/[lang]/sotm/aktionen.ts")));
+  assert.ok(!existsSync(join(process.cwd(), "app/[lang]/umfragen")));
 });

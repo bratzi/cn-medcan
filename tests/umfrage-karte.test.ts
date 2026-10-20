@@ -23,7 +23,7 @@ test("nur noch der Stimmzettel, keine Karten-Variante", () => {
 });
 
 test("Anmelden führt auf die Seite zurück, auf der der Stimmzettel steht", () => {
-  assert.match(QUELLE, /%2Fumfragen/);
+  assert.match(QUELLE, /%2Fsotm/);
   assert.match(QUELLE, /#vorschlaege/);
 });
 
@@ -40,13 +40,13 @@ test("Formulare der Abstimmung sprechen in der Ich-Form", () => {
 const lies = (datei: string) => readFileSync(join(process.cwd(), datei), "utf8");
 
 test("Phasennamen aus einer Quelle für Stimmzettel und Chronik", () => {
-  assert.doesNotMatch(lies("app/[lang]/umfragen/page.tsx"), /const PHASEN_LABEL/);
+  assert.doesNotMatch(lies("app/[lang]/sotm/page.tsx"), /const PHASEN_LABEL/);
   assert.doesNotMatch(QUELLE, /const PHASEN_LABEL/);
   assert.match(lies("components/umfrage/phasen.ts"), /export function phasenLabel/);
 });
 
 test("Startseite spricht von freigeschalteten Mitgliedern", () => {
-  assert.doesNotMatch(lies("components/story/Abstimmung.tsx"), /freigegebene Mitglieder/);
+  assert.doesNotMatch(lies("components/sotm/SotmSektion.tsx"), /freigegebene Mitglieder/);
 });
 
 test("Formulare der Abstimmung: Hover über Fläche, Fokus über die globale Regel", () => {
@@ -58,7 +58,7 @@ test("Formulare der Abstimmung: Hover über Fläche, Fokus über die globale Reg
 
 test("Lange Namen im gesetzten Platz und bei den Gewinnern brechen um", () => {
   assert.match(QUELLE, /namenLinkKlassen\("min-w-0 /);
-  assert.match(lies("app/[lang]/umfragen/page.tsx"), /<p className="text-body text-text wrap-break-word">\s*\{`\$\{w\.umfrage\.gewonnen\} `\}/);
+  assert.match(lies("app/[lang]/sotm/page.tsx"), /<p className="text-body text-text wrap-break-word">\s*\{`\$\{w\.umfrage\.gewonnen\} `\}/);
 });
 
 test("Stimmzettel auf derselben Ebene wie Doppelseite und Blatt", () => {

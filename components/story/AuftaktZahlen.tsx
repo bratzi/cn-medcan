@@ -23,7 +23,7 @@ import { auftaktZahlen } from "@/lib/query/start-zahlen";
 const ZIEL: Record<keyof Zahlen, string> = {
   sorten: "/blueten",
   bewertungen: "/reviews",
-  stimmen: "/umfragen",
+  stimmen: "/sotm",
 };
 
 export async function AuftaktZahlen() {

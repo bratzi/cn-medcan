@@ -43,7 +43,7 @@ export async function BewertungenSeite({ band }: { band: number }) {
             titel={w.reviews.leerTitel}
             beschreibung={w.reviews.leerText}
             aktion={
-              <Link prefetch={false} href="/umfragen" className={buttonKlassen("secondary")}>
+              <Link prefetch={false} href="/sotm" className={buttonKlassen("secondary")}>
                 {w.reviews.zurAbstimmung}
               </Link>
             }

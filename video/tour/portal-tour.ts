@@ -15,7 +15,7 @@ const OEFFENTLICH = new Set(["/ig"]);
 
 /** Klickziele je Pfad; nur Seiten ohne Sortennamen im Fokus. */
 const KLICKS: Record<string, string[]> = {
-  "/": ['a[href="/umfragen"]'],
+  "/": ['a[href="/sotm"]'],
 };
 
 function passwort(): string | undefined {

@@ -23,7 +23,7 @@ export const de = {
     },
     navigation: {
       bewertungen: "Bewertungen",
-      abstimmung: "Abstimmung",
+      sotm: "SOTM",
       jury: "Jury",
       blueten: "Strains",
       profil: "Mein Profil",
@@ -649,6 +649,31 @@ export const de = {
     laden: "Reel von Instagram laden",
     datenschutz: "Beim Laden gehen deine IP-Adresse und Browserdaten an Meta.",
     mehr: "Mehr dazu im Datenschutz",
+  },
+  sotm: {
+    titel: "Strain of the Month",
+    metaBeschreibung: "Der Strain des Monats, gewählt von der Community: Vorschläge, Abstimmung und Bewertungen.",
+    satz: "Die Community schlägt vor und wählt, ein Strain pro Monat. Dann bewerten wir ihn gemeinsam.",
+    keiner: "Diesen Monat gibt es keinen Strain of the Month.",
+    jetztBewerten: "Jetzt bewerten",
+    bildAlt: "Foto der Blüte {name}",
+    mitglieder: {
+      one: "{anzahl} Mitglied bewertet, Schnitt {schnitt}",
+      other: "{anzahl} Mitglieder bewerten, Schnitt {schnitt}",
+    },
+    nochKeineBewertung: "Noch keine Bewertung in diesem Monat.",
+    betreiberNote: "Note des Betreibers: {note}",
+    rest: {
+      vorschlag: {
+        one: "Vorschläge bis {datum}, noch {anzahl} Tag",
+        other: "Vorschläge bis {datum}, noch {anzahl} Tage",
+      },
+      abstimmung: {
+        one: "Abstimmung bis {datum}, noch {anzahl} Tag",
+        other: "Abstimmung bis {datum}, noch {anzahl} Tage",
+      },
+    },
+    keineVorschlaege: "Noch keine Vorschläge in dieser Runde.",
   },
   umfrage: {
     titel: "Abstimmung",

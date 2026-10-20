@@ -43,7 +43,7 @@ test("Meine Note ohne Charge: nur das Datum", () => {
 test("ohne eigene Bewertung: noch nicht getestet, Weg zur Abstimmung", () => {
   const html = zeige(BASIS);
   assert.match(html, /Noch nicht von uns getestet./);
-  assert.match(html, /href="\/umfragen"[^>]*>Zur Abstimmung</);
+  assert.match(html, /href="\/sotm"[^>]*>Zur Abstimmung</);
   assert.doesNotMatch(html, /Meine Note/);
 });
 

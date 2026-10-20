@@ -65,8 +65,8 @@ test("Schleife: jede Station gedruckt, das Verb als Schlagwort von Hand (Nutzer 
 });
 
 test("Abstimmung: „Wähl mit.“ von Hand, ohne Wasserzeichen und Drip", () => {
-  const quelle = lies("components/story/Abstimmung.tsx");
-  assert.match(quelle, /<p data-story="waehl-mit" className="farbverlauf font-hand text-vermerk">\s*\{texte\.waehlMit\}\s*<\/p>/);
+  const quelle = lies("components/sotm/SotmSektion.tsx");
+  assert.match(quelle, /<p data-story="waehl-mit" className="farbverlauf font-hand text-vermerk">\s*\{w\.start\.abstimmung\.waehlMit\}\s*<\/p>/);
   assert.doesNotMatch(quelle, /wasserzeichen|Textur|font-wand|rotate/);
   assert.match(lies("components/story/bewegung/abstimmung.ts"), /SCHREIBEN_AB/);
 });
@@ -148,10 +148,10 @@ test("Das x hängt an derselben Bedingung wie die Zähler: nie in der Vorschlags
   );
 });
 
-test("/umfragen: Community-Überschriften von Hand, ohne Nebel und ohne Drehung", () => {
-  const quelle = lies("app/[lang]/umfragen/page.tsx");
+test("/sotm: Community-Überschriften von Hand, ohne Nebel und ohne Drehung", () => {
+  const quelle = lies("app/[lang]/sotm/page.tsx");
   assert.match(quelle, /const HAND_TITEL = "font-hand text-notiz text-logo";/);
-  assert.equal(quelle.match(/className=\{cn\(HAND_TITEL, "self-start max-md:self-center"\)\}/g)?.length, 2);
+  assert.equal(quelle.match(/className=\{cn\(HAND_TITEL, "self-start max-md:self-center"\)\}/g)?.length, 1);
   assert.doesNotMatch(quelle, /Textur|font-wand|WAND_TITEL|rotate/);
 });
 

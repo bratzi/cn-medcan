@@ -18,7 +18,7 @@ export type KandidatProps = {
   option: UmfrageOptionAnsicht;
   gesamt: number;
   /**
-   * Liegt die eigene Stimme hier? true/false weiß der Server (/umfragen). Mit
+   * Liegt die eigene Stimme hier? true/false weiß der Server (/sotm). Mit
    * { umfrageId } entscheidet der Browser (statische Startseite, EigeneStimme).
    */
   gewaehlt: boolean | { umfrageId: string };
