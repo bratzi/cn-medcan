@@ -30,8 +30,13 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 
 ### ⇢ SESSION 74 (2026-10-20): Spec Startseite + SOTM geschrieben, 1102 belegt
 
-**ALS ERSTES:** Spec freigegeben („weiter“). Plan A `docs/superpowers/plans/2026-10-20-startseite-neu-geordnet.md` geschrieben,
-Nutzer prüft ihn und wählt Ausführung (empfohlen Native, keine parallelen Agents). Danach Plan B (SOTM) schreiben.
+**ALS ERSTES:** Plan B (SOTM) schreiben (writing-plans, Spec Teil B), Nutzer prüfen lassen, Native ausführen.
+- Plan A ist live (f2fe61f, Fix 54f6406): Reihenfolge, Sektion „So bewerten wir“ mit Schritt 1–3 und Beispiel Cosmic Cream,
+  Katalog zu mit 12 Pillen, Wahl klappt auf, „Zurück zum Katalog“. Offen live: Fokus nach Pfeiltaste/Zurück (54f6406),
+  dunkel/hell und 390 px, Absatz „Erst das Overall“ ragt bei ~1047 px unter den Video-Blob (prüfen, ob schon vorher so).
+- Deferred Minors: Beispielzeile nutzt Blüte statt Handelsname; Suspense um BewertungSchritte; Pillen ohne JS tot;
+  Terpenname im Beispiel nicht übersetzt (en).
+- Browser-Cache zeigte nach Deploy alte Startseite: mit `?f=2` laden.
 - 1102 belegt (Anhang der Spec): CPU-Limit bei Cache-Fehlern, seit Deploy 2026-10-19 23:41 UTC keine 1102 mehr. Observability-MCP ist
   deprecated, Events-Ansicht bricht ab, Berechnungen gehen.
 - Publora: zwei alte Entwürfe gelöscht; mach-mit 23.10. und terpene-erklaert 26.10. 17:00 UTC eingeplant. fuenf-noten liegt als
