@@ -31,6 +31,10 @@ type Props = {
   kopf: ReactNode;
   /** Steht nach „Zurück zum Katalog“, solange keine Sorte gewählt ist (Katalog-Reihe). */
   zu?: ReactNode;
+  /** Sorte, die zu Beginn gewählt ist (Startseite: die Sorte der vorgeführten Bewertung). */
+  vorwahl?: string;
+  /** Meldet jede neue Wahl, etwa damit die Aroma-Karte darunter mitwechselt. */
+  onSorte?: (sorte: ExplorerSorte) => void;
 };
 
 /**
@@ -38,13 +42,13 @@ type Props = {
  * Daten kommen statisch mit der Startseite; die Reihenfolge stammt aus waehleExplorerSorten
  * (Menge, dann Name), nie aus der Note (HWG). Ohne JavaScript steht die erste Sorte vollständig.
  */
-export function SortenExplorer({ sorten, texte, typen, sprache, kopf, zu }: Props) {
+export function SortenExplorer({ sorten, texte, typen, sprache, kopf, zu, vorwahl, onSorte }: Props) {
   const [zustand, senden] = useReducer(
     (z: ReturnType<typeof explorerStart>, a: Parameters<typeof explorerZustand>[0]) => explorerZustand(a, z),
     sorten,
     // Nutzer 2026-10-20: auch auf der Startseite steht von Anfang an die erste Blüte, damit der
     // erste Klick die Ansicht nicht umbaut. „Zurück zum Katalog“ klappt weiterhin zu.
-    (s) => explorerStart(s),
+    (s) => explorerStart(s, true, vorwahl),
   );
   const [meldung, setMeldung] = useState("");
   // Die eben verlassene Sorte bleibt kurz stehen und geht ab, während die neue auftritt.
@@ -72,6 +76,7 @@ export function SortenExplorer({ sorten, texte, typen, sprache, kopf, zu }: Prop
     if (neu.slug === gewaehlt?.slug) return;
     setVorher(gewaehlt?.bild ? gewaehlt : null);
     senden({ typ: "sorte", slug: neu.slug, ersteWare: neu.waren[0]?.vertreiberId ?? null });
+    onSorte?.(neu);
     setMeldung(t(texte.sorteGewechselt, { name: neu.name, waren: mehrzahl(sprache, texte.waren, neu.waren.length) }));
   }
 

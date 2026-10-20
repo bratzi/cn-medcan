@@ -66,6 +66,3 @@ test("Stimmzettel auf derselben Ebene wie Doppelseite und Blatt", () => {
   assert.match(QUELLE, /stimmzettel border border-border-strong bg-surface-raised shadow-md/);
 });
 
-test("Startseite: Katalog-Leerzustand im Kasten wie seine Nachbarn", () => {
-  assert.match(lies("components/story/Katalog.tsx"), /<EmptyState[\s\S]*?className="border border-border bg-surface-raised p-8 sm:p-12"/);
-});

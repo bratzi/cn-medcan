@@ -88,7 +88,7 @@ const UMGESTELLT: string[] = [
   "components/kapitel-start/KapitelAufschlag.tsx",
   "components/kapitel-start/KapitelImBrowser.tsx",
   "components/sotm/SotmSektion.tsx",
-  "components/story/Katalog.tsx",
+  "components/story/AromaWechsel.tsx",
   "components/story/Skelette.tsx",
   "components/medien/LoopSchalter.tsx",
   "lib/query/community.ts",

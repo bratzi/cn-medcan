@@ -12,9 +12,10 @@ export type ExplorerAktion =
   | { typ: "suche"; text: string };
 
 /** `offen = false`: keine Sorte gewählt, der Katalog steht (Spec 2026-10-20, Teil A). */
-export function explorerStart(sorten: readonly ExplorerSorte[], offen = true): ExplorerZustand {
+export function explorerStart(sorten: readonly ExplorerSorte[], offen = true, vorwahl?: string): ExplorerZustand {
   if (!offen) return { sorte: "", ware: null, vergleich: [], suche: "" };
-  const erste = sorten[0];
+  // Vorwahl (Startseite): die Sorte der vorgeführten Bewertung, sonst die erste.
+  const erste = sorten.find((s) => s.slug === vorwahl) ?? sorten[0];
   return { sorte: erste?.slug ?? "", ware: erste?.waren[0]?.vertreiberId ?? null, vergleich: [], suche: "" };
 }
 

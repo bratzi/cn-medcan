@@ -208,8 +208,6 @@ test("Fazit-Zahlen in Handschrift stehen tabellarisch", () => {
 
 test("Skelette haben die Maße der echten Inhalte", () => {
   const katalog = renderToStaticMarkup(createElement(KatalogSkelett, { ansage: "Blüten werden geladen" }));
-  // Wie die Karten der Reihe in components/story/Katalog.tsx.
-  assert.match(lies("components/story/Katalog.tsx"), /w-72 shrink-0 snap-start sm:w-88/);
   assert.equal(katalog.match(/\bw-72 shrink-0 sm:w-88\b/g)?.length, 3);
   const rand = renderToStaticMarkup(createElement(RandspaltenSkelett, { ansage: "Zahlen werden geladen" }));
   assert.equal(rand.match(/\bh-16 sm:h-20 lg:h-24\b/g)?.length, 3);

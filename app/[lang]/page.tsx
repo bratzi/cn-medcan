@@ -5,7 +5,6 @@ import { SotmSektion } from "@/components/sotm/SotmSektion";
 import { Auftakt } from "@/components/story/Auftakt";
 import { FeldbuchRaster } from "@/components/story/FeldbuchRaster";
 import { GemeinsamLernen } from "@/components/story/GemeinsamLernen";
-import { Katalog } from "@/components/story/Katalog";
 import { NeuesterEintrag } from "@/components/story/NeuesterEintrag";
 import { StartSitzung } from "@/components/story/StartSitzung";
 import { StoryBuehne } from "@/components/story/StoryBuehne";
@@ -39,13 +38,12 @@ export default function StartPage() {
         {/* Band der Terpene zwischen Hero und Story (Nutzer 2026-09-30). */}
         <TerpenBand />
         {/* Nutzer 2026-10-20: erst das komplette Storytelling (Manifest, Overall, Terpz, Qualität),
-            dann Dein Kapitel, dann die Bewertung (Aroma-Karte mit Beispielblüte), dann der Rest. */}
+            dann Dein Kapitel, dann Bewertung und Katalog in einer Sektion (Katalog steuert die Aroma-Karte), dann der Rest. */}
         <TransparentMachen />
         <DeinKapitel />
         <AromaSektion />
         <NeuesterEintrag />
         <TerpenRegister />
-        <Katalog />
         <WissenBuendeln />
         <GemeinsamLernen />
         <Empfehlungen />

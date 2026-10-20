@@ -20,7 +20,8 @@ export type SortenKopfProps = {
   cbdMin: number;
   cbdMax: number;
   terpene: readonly { name: string; konzentrationProzent: number | null; rang: number; aromaProfil?: string | null }[];
-  w: Woerterbuch;
+  /** Nur Sortenkopf-Texte und Typ-Labels: so passt auch ein schmaler Auszug aus dem Client. */
+  w: { aroma: Pick<Woerterbuch["aroma"], "sortenKopf">; label: Pick<Woerterbuch["label"], "kultivarTyp"> };
   sprache: Sprache;
 };
 

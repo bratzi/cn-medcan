@@ -103,9 +103,9 @@ test("Explorer-Bewegung: reduzierte Bewegung und Sparmodus schalten sie ab", () 
   assert.match(block, /:root:not\(\[data-sparmodus\]\) \.explorer-/);
 });
 
-test("Katalog: lädt den Explorer, alte Beispielkarte ist weg", () => {
-  const q = readFileSync("components/story/Katalog.tsx", "utf8");
+test("Bewertung und Katalog: lädt den Explorer, alte Beispielkarte ist weg", () => {
+  const q = readFileSync("components/story/AromaSektion.tsx", "utf8");
   assert.match(q, /ladeSortenExplorer/);
-  assert.match(q, /<SortenExplorer/);
+  assert.match(readFileSync("components/story/AromaWechsel.tsx", "utf8"), /<SortenExplorer/);
   assert.doesNotMatch(q, /VertreiberBeispiel/);
 });

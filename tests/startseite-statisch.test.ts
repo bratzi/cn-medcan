@@ -29,18 +29,16 @@ test("Zustände des Browser-Stimmzettels: laedt, fehler, veraltet", () => {
 });
 
 test("Empfehlungen und Katalog der Startseite lesen keine Sitzung und keinen Fachkreis", () => {
-  for (const datei of ["components/story/Empfehlungen.tsx", "components/story/Katalog.tsx"]) {
+  for (const datei of ["components/story/Empfehlungen.tsx", "components/story/AromaSektion.tsx", "components/story/AromaWechsel.tsx"]) {
     assert.doesNotMatch(lies(datei), /lib\/session|aktuellesMitglied|budpicZugang\(|istFachkreis|ladeEmpfehlungen/, datei);
   }
-  assert.match(lies("components/story/Katalog.tsx"), /ladeStrainListe\(leererFilter\(\), false\)/);
-  assert.match(lies("components/story/Katalog.tsx"), /zugang="im-browser"/);
   for (const datei of ["components/empfehlung/EmpfehlungenImBrowser.tsx", "components/produkt/BudpicBeitragenImBrowser.tsx"]) {
     assert.doesNotMatch(lies(datei), /fetch\(/, datei);
   }
 });
 
 test("Startseite nutzt den Rating-Code als Example, nicht als Anzeige (Nutzer 2026-10-03)", () => {
-  const sektion = lies("components/story/AromaSektion.tsx");
+  const sektion = lies("components/story/AromaWechsel.tsx");
   const erkundung = lies("components/review/AromaErkundung.tsx");
   assert.match(sektion, /modus="example"/);
   // Ein Baum, kein zweiter: der Modus steuert nur die versteckten Felder.
