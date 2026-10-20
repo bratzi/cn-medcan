@@ -6,6 +6,7 @@ const AUSNAHMEN_EN: Record<string, string> = {
   Thiole: "Thiols",
   Guajol: "Guaiol",
   Eukalyptol: "Eucalyptol",
+  Caryophyllenoxid: "Caryophyllene oxide",
 };
 
 /**

@@ -17,3 +17,8 @@ test("terpenAnzeige: englische Schreibung weicht bei Guajol und Eukalyptol ab", 
   assert.equal(terpenAnzeige("Eukalyptol", "en"), "Eucalyptol");
   assert.equal(terpenAnzeige("Guajol", "de"), "Guajol");
 });
+
+test("terpenAnzeige: Caryophyllenoxid heisst englisch Caryophyllene oxide", () => {
+  assert.equal(terpenAnzeige("Caryophyllenoxid", "en"), "Caryophyllene oxide");
+  assert.equal(terpenAnzeige("delta-3-Caren", "en"), "delta-3-Carene");
+});

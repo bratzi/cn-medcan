@@ -115,7 +115,7 @@ function synthetischeZeilen() {
   const terpene = [
     ["m", "Myrcen", "ERDIG"], ["l", "Limonen", "ZITRUS"], ["c", "beta-Caryophyllen", "WUERZIG"], ["li", "Linalool", "BLUMIG"],
     ["p", "alpha-Pinen", "HOLZIG"], ["te", "Terpinolen", "KRAEUTRIG"], ["h", "Humulen", "HOLZIG"], ["o", "Ocimen", "SUESS"],
-    ["f", "Farnesen", "FRUCHTIG"], ["n", "Nerolidol", "HOLZIG"], ["b", "Bisabolol", "BLUMIG"], ["g", "Geraniol", "BLUMIG"],
+    ["f", "Farnesen", "FRUCHTIG"], ["n", "Nerolidol", "HOLZIG"], ["b", "Bisabolol", "BLUMIG"], ["g", "Sabinen", "BLUMIG"],
   ].map(([id, name, geschmack]) => ({ id, name, geschmack }));
   const zeilen: SortenAromaZeile[] = Array.from({ length: 700 }, (_, i) => {
     const ids = [...new Set([0, 1, 2, 3, 4].map((j) => terpene[(i * (j + 3) + j * 5) % terpene.length].id))];
