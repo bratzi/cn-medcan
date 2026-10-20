@@ -23,7 +23,15 @@ Annahmen (vom Entwurf übernommen, nicht einzeln bestätigt):
 
 ## Teil A: Startseite
 
-### Reihenfolge
+### Korrektur Nutzer (2026-10-20, nach Plan A)
+
+„Bewertung“ ist die Aroma-Karte (`AromaSektion`: „Was das Datenblatt verspricht, prüfen wir nach.“ mit Beispielblüte,
+Overall, Terpz, Qualität). Das Storytelling (`TransparentMachen`) bleibt komplett mit Overall, Terpz, Qualität.
+Gültige Reihenfolge: Auftakt, Terpen-Band, Storytelling, Dein Kapitel, Bewertung (AromaSektion), Neuester Eintrag,
+Terpene und ihre Geschmäcker (TerpenRegister), Katalog, Wissen, Lernen, Empfehlungen, SOTM. Die Sektion
+`BewertungSchritte` und der Abschnitt „Bewertung (Sektion 5)“ unten sind verworfen.
+
+### Reihenfolge (ursprünglicher Entwurf, überholt)
 
 | # | Sektion | Quelle heute | Änderung |
 |---|---|---|---|

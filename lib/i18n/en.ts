@@ -714,14 +714,6 @@ export const en: Woerterbuch = {
         stimmen: { one: "vote cast", other: "votes cast" },
       },
     },
-    bewertung: {
-      titel: "How we rate",
-      schritt: "Step {nummer}",
-      beispiel: "Example: {bluete}",
-      overall: "{wert} of 5",
-      terpz: "Leading: {terpen}",
-      qualitaet: "{wert} % moisture",
-    },
     transparent: {
       satz: "We write down what is inside. Behind every trade name there is a",
       ueberlauf: "terpene profile.",

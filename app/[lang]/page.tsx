@@ -3,7 +3,6 @@ import { DeinKapitel } from "@/components/story/DeinKapitel";
 import { AromaSektion } from "@/components/story/AromaSektion";
 import { Empfehlungen } from "@/components/story/Empfehlungen";
 import { Auftakt } from "@/components/story/Auftakt";
-import { BewertungSchritte } from "@/components/story/BewertungSchritte";
 import { FeldbuchRaster } from "@/components/story/FeldbuchRaster";
 import { GemeinsamLernen } from "@/components/story/GemeinsamLernen";
 import { Katalog } from "@/components/story/Katalog";
@@ -39,15 +38,13 @@ export default function StartPage() {
         <Auftakt />
         {/* Band der Terpene zwischen Hero und Story (Nutzer 2026-09-30). */}
         <TerpenBand />
-        {/* Reihenfolge nach Spec 2026-10-20 (Teil A): Storytelling (Manifest, Bewertung), dann eigenes Kapitel,
-            Terpene, ein Katalog mit Vertreiber-Leiste, dann Wissen, Lernen, Empfehlungen. */}
+        {/* Nutzer 2026-10-20: erst das komplette Storytelling (Manifest, Overall, Terpz, Qualität),
+            dann Dein Kapitel, dann die Bewertung (Aroma-Karte mit Beispielblüte), dann der Rest. */}
         <TransparentMachen />
-        <BewertungSchritte />
-        {/* Nutzer 2026-10-20: Dein Kapitel erst nach dem ganzen Storytelling. */}
         <DeinKapitel />
+        <AromaSektion />
         <NeuesterEintrag />
         <TerpenRegister />
-        <AromaSektion />
         <Katalog />
         <WissenBuendeln />
         <GemeinsamLernen />
