@@ -65,6 +65,38 @@ TERPENE = {
     "nerolidol": ("Nerolidol", "HOLZIG", "Holz, Rinde"),
 }
 
+# Weitere Schreibweisen (deutsch, englisch, mit Stereo-Praefix), die Quellen nennen.
+for _alias, _ziel in {
+    "beta-myrcen": "myrcen", "myrcene": "myrcen", "beta-myrcene": "myrcen",
+    "trans-caryophyllen": "beta-caryophyllen", "beta-caryophyllene": "beta-caryophyllen",
+    "caryophyllene": "beta-caryophyllen", "trans-caryophyllene": "beta-caryophyllen",
+    "d-limonen": "limonen", "limonene": "limonen", "d-limonene": "limonen",
+    "linalol": "linalool",
+    "alpha-pinene": "alpha-pinen", "pinene": "pinen", "beta-pinene": "beta-pinen",
+    "guaiol": "guajol", "valencene": "valencen", "camphene": "camphen",
+    "caryophyllene-oxide": "caryophyllenoxid", "caryophyllenoxide": "caryophyllenoxid",
+    "delta-3-carene": "delta-3-caren", "3-carene": "delta-3-caren", "carene": "delta-3-caren",
+    "phellandrene": "phellandren", "alpha-phellandrene": "phellandren", "beta-phellandrene": "phellandren",
+    "selinene": "selinen", "beta-selinene": "selinen", "alpha-selinen": "selinen", "alpha-selinene": "selinen",
+    "eucalyptol": "eukalyptol", "eukalyptus": "eukalyptol", "cineol": "eukalyptol", "1,8-cineole": "eukalyptol",
+    "fenchyl-alkohol": "fenchol", "fenchyl alcohol": "fenchol", "endo-fenchol": "fenchol",
+    "alpha-bisabolol": "bisabolol", "terpinolene": "terpinolen", "humulene": "humulen",
+    "alpha-humulene": "humulen", "ocimene": "ocimen", "beta-ocimen": "ocimen", "beta-ocimene": "ocimen",
+    "farnesene": "farnesen", "beta-farnesen": "farnesen", "beta-farnesene": "farnesen",
+    "trans-nerolidol": "nerolidol", "alpha-terpineol": "terpineol",
+}.items():
+    TERPENE.setdefault(_alias, TERPENE[_ziel])
+
+
+def terpen_info(name):
+    """Schreibweise normalisieren (griechische Buchstaben, Leerzeichen) und nachschlagen."""
+    n = str(name or "").strip().lower()
+    for a, b in (("α", "alpha-"), ("β", "beta-"), ("δ", "delta-"), ("ß", "beta-"), ("Δ".lower(), "delta-")):
+        n = n.replace(a, b)
+    n = re.sub(r"^(alpha|beta|delta|a|b|d)[\s.-]+", lambda m: {"a": "alpha", "b": "beta"}.get(m.group(1), m.group(1)) + "-", n)
+    n = re.sub(r"-+", "-", n)
+    return TERPENE.get(n) or TERPENE.get(n.replace(" ", "-")) or TERPENE.get(n.replace("-", " "))
+
 
 def q(wert):
     if wert is None:
@@ -169,7 +201,7 @@ def main():
         rang = 0
         gesehen = set()
         for t in p.get("terpene") or []:
-            info = TERPENE.get(str(t.get("name", "")).strip().lower())
+            info = terpen_info(t.get("name"))
             if not info or info[0] in gesehen:
                 continue
             gesehen.add(info[0])
