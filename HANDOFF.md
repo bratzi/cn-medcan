@@ -28,6 +28,13 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 
 ## ⇢ Hier geht es weiter
 
+### ⇢ SESSION 83 (2026-10-21): Vorrendern bestätigt, S82-Schritte erledigt
+- Build ca1cb5e: „[vorrendern] D1-Abzug bereit (710 aktive Strains lokal)“, „populated cache with 24 entries“ (vorher 5).
+- Live: /blueten 200 ohne 1102, TTFB 185 ms; /, /reviews, /neu 200. Routen ohne /de-Präfix (/de/blueten, /en = 404, so gewollt).
+- Neuigkeit d4e4c16 gepusht. Worktree C:\cn-wt\vorrendern und Branch vorrendern-task1 entfernt.
+- Nicht geprüft: Sichtprüfung /blueten bei 390/1280/1536/1920 hell/dunkel. Offene Kleinpunkte aus S82 bleiben.
+- Hinweis: Neuigkeiten-Test vergleicht mit UTC-Datum, nach Mitternacht MESZ noch Vortag nehmen.
+
 ### ⇢ SESSION 82 (2026-10-21): Task 1+2+3 live gepusht, Abzug-Fix ca1cb5e – SAFE4CLEAR
 - Alles auf origin/main (ca1cb5e). Build 9dffbac lief durch, aber OHNE Vorrendern: Import des Gesamtabzugs
   scheiterte („no such table: main.kultivare“, danach Trigger „stimmen: Umfrage ist nicht in der Abstimmungsphase“).
