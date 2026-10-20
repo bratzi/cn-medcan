@@ -48,3 +48,5 @@ export { useHydriert } from "./useHydriert";
 
 export { Avatar } from "./Avatar";
 export type { AvatarGroesse } from "./Avatar";
+
+export { InfoKnopf, infoKnopfSchritt } from "./InfoKnopf";

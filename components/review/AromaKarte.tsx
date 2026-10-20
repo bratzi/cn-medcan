@@ -44,6 +44,7 @@ import { cn } from "@/lib/cn";
 import { LINIEN_FARBE, VERLAUF } from "@/lib/aroma-farben";
 import { GESCHMACKS_ACHSEN, type GeschmacksMatrix } from "@/lib/query/bewertung";
 import { GeschmackIcon, TerpenIcon } from "@/components/review/AromaIcon";
+import { InfoKnopf } from "@/components/ui/InfoKnopf";
 import { BEGLEITSTOFFE, istKandidatAnteil } from "@/lib/terpen-aromen";
 import { formatiereZahl } from "@/lib/format";
 import { rasten, tasteZuWert } from "@/lib/regler-raster";
@@ -1264,23 +1265,36 @@ export function AromaKarte({
             // Dicht (Buch, ab lg): ohne Hinweis; die Doppelseite reicht keine Ebenen, die Legende fiele ohnehin weg.
             className={cn("flex flex-col items-center gap-6 pt-8 transition-opacity duration-normal ease-out starting:opacity-0", kompakt && "lg:hidden")}
           >
-            <p className="max-w-md text-center font-buch text-body text-text-muted italic text-balance">
-              {regler ? kt.hinweisRegler : kt.hinweisErkunden}
-              {/* Nur mit Terpen-Reglern (Maske): der Satz zur rechten Seite. */}
-              {terpenSchalter ? ` ${kt.hinweisTerpenRegler}` : null}
-            </p>
-            {/* Legende der Ebenen (T5), nur wenn es mehr gibt als die Herstellerangabe: Strich,
-                Strichelung und Farbe wie die Bögen, damit die Ebene nicht nur an der Farbe hängt. */}
-            {[...vorhandeneEbenen].some((ebene) => ebene !== "hersteller") ? (
-              <ul className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-caption text-text-muted">
-                {EBENEN.filter((ebene) => vorhandeneEbenen.has(ebene)).map((ebene) => (
-                  <li key={ebene} className="inline-flex items-center gap-2">
-                    <EbenenMuster ebene={ebene} />
-                    {kt.ebenen[ebene]}
-                  </li>
-                ))}
-              </ul>
+            {/* Bedienhinweis mit Reglern und Legende der Ebenen liegen hinter dem Info-Knopf (Nutzer 2026-10-20).
+                Die Legende (T5) nur, wenn es mehr gibt als die Herstellerangabe: Strich, Strichelung und Farbe
+                wie die Bögen, damit die Ebene nicht nur an der Farbe hängt. */}
+            {regler || [...vorhandeneEbenen].some((ebene) => ebene !== "hersteller") ? (
+              <InfoKnopf
+                sprache={sprache}
+                text={
+                  <span className="flex flex-col gap-2">
+                    {regler ? (
+                      <span>
+                        {kt.hinweisRegler}
+                        {/* Nur mit Terpen-Reglern (Maske): der Satz zur rechten Seite. */}
+                        {terpenSchalter ? ` ${kt.hinweisTerpenRegler}` : null}
+                      </span>
+                    ) : null}
+                    {[...vorhandeneEbenen].some((ebene) => ebene !== "hersteller")
+                      ? EBENEN.filter((ebene) => vorhandeneEbenen.has(ebene)).map((ebene) => (
+                          <span key={ebene} className="inline-flex items-center gap-2 text-caption text-text-muted">
+                            <EbenenMuster ebene={ebene} />
+                            {kt.ebenen[ebene]}
+                          </span>
+                        ))
+                      : null}
+                  </span>
+                }
+              />
             ) : null}
+            {regler ? null : (
+              <p className="max-w-md text-center font-buch text-body text-text-muted italic text-balance">{kt.hinweisErkunden}</p>
+            )}
           </div>
         )}
       </div>

@@ -1,6 +1,6 @@
 import type { EintragDaten } from "@/components/review/eintrag";
 import { ablauf } from "@/components/review/eintritt";
-import { Badge, type BadgeVariante } from "@/components/ui";
+import { Badge, InfoKnopf, type BadgeVariante } from "@/components/ui";
 import { formatiereDatum, formatiereProzent, formatiereZahl } from "@/lib/format";
 import type { Sprache } from "@/lib/i18n/sprache-kern";
 import type { Woerterbuch } from "@/lib/i18n/typen";
@@ -59,9 +59,7 @@ export function BuchKolophon({ eintrag, w, sprache }: { eintrag: EintragDaten; w
       <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
         <Badge variante={FEUCHTIGKEIT[feuchtigkeit.einordnung]}>{feuchtigkeitsText}</Badge>
         {hinweis ? (
-          <p title={hinweis} className="max-w-[56ch] text-small text-text-muted text-pretty lg:line-clamp-2">
-            {hinweis}
-          </p>
+          <InfoKnopf sprache={sprache} text={hinweis} />
         ) : null}
       </div>
     </div>

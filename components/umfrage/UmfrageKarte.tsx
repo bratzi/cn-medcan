@@ -107,8 +107,7 @@ function Aktionsbereich({
   if (zustand.art === "ABGESTIMMT") {
     return (
       <p role="status" className="text-small text-text">
-        <span className="font-medium">{texte.gezaehlt} </span>
-        <span className="text-text-muted">{texte.keineAenderung}</span>
+        <span className="font-medium">{texte.gezaehlt}</span>
       </p>
     );
   }

@@ -1,8 +1,9 @@
 "use client";
 
-import { useId, useRef, useState } from "react";
+import { useRef, useState } from "react";
 
 import { BlattGlyphe, blattFuellungen } from "@/components/review/BlattAnzeige";
+import { InfoKnopf } from "@/components/ui/InfoKnopf";
 import { cn } from "@/lib/cn";
 import { formatiereWert } from "@/lib/format";
 import type { Sprache } from "@/lib/i18n/sprache-kern";
@@ -72,7 +73,6 @@ export function BlattNote({
   const [vorschau, setVorschau] = useState<number | null>(null);
   // Ansage nach Minus/Plus: der Fokus bleibt am Knopf, die Radios sagen den Wert dort nicht an.
   const [ansage, setAnsage] = useState("");
-  const hinweisId = useId();
   const erstesRadio = useRef<HTMLInputElement>(null);
   const fuellungen = blattFuellungen(vorschau ?? note);
   const wertText = (wert: number) => t(texte.blattWert, { wert: formatiereWert(wert, sprache) });
@@ -89,13 +89,21 @@ export function BlattNote({
   };
 
   return (
-    <fieldset className="blatt-note" aria-describedby={hinweisId}>
-      <legend className="w-full text-center font-buch text-h2 font-medium text-balance text-text">{texte.gesamtnote}</legend>
+    <fieldset className="blatt-note">
+      <legend className="w-full text-center font-buch text-h2 font-medium text-balance text-text">
+        {texte.gesamtnote}{" "}
+        <InfoKnopf
+          sprache={sprache}
+          className="ml-1"
+          text={
+            <>
+              <span className="pointer-coarse:hidden">{texte.gesamtnoteHinweis}</span>
+              <span className="hidden pointer-coarse:inline">{texte.gesamtnoteHinweisTouch}</span>
+            </>
+          }
+        />
+      </legend>
       <div className="mt-4 flex flex-col items-center gap-4 text-center">
-        <p id={hinweisId} className="max-w-[60ch] text-small text-pretty text-text-muted">
-          <span className="pointer-coarse:hidden">{texte.gesamtnoteHinweis}</span>
-          <span className="hidden pointer-coarse:inline">{texte.gesamtnoteHinweisTouch}</span>
-        </p>
         <div className="flex w-full max-w-176 gap-0.5" onPointerLeave={() => setVorschau(null)}>
           {BLAETTER.map((blatt, index) => (
             <span key={blatt} className="relative aspect-square min-w-0 flex-1">
