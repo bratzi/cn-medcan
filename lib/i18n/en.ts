@@ -407,6 +407,9 @@ export const en: Woerterbuch = {
       vertreiberSuche: "Search distributors",
       sortierung: "Sort by",
       sortierungen: {
+        community: "Community rating",
+        stimmen: "Most votes",
+        neueste: "Recently rated",
         relevanz: "Relevance",
         thc_absteigend: "THC descending",
         thc_aufsteigend: "THC ascending",

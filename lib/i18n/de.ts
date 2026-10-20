@@ -415,6 +415,9 @@ export const de = {
       vertreiberSuche: "Vertreiber suchen",
       sortierung: "Sortierung",
       sortierungen: {
+        community: "Community-Note",
+        stimmen: "Meiste Stimmen",
+        neueste: "Zuletzt bewertet",
         relevanz: "Relevanz",
         thc_absteigend: "THC absteigend",
         thc_aufsteigend: "THC aufsteigend",

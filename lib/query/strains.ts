@@ -441,6 +441,9 @@ function baueOrderBy(
       // halten die DB-Reihenfolge stabil, damit die Paginierung deterministisch
       // bleibt.
       return [{ handelsname: "asc" }];
+    case "community":
+    case "stimmen":
+    case "neueste":
     case "relevanz":
     default:
       // Ohne Volltextindex ist "Relevanz" bewusst eine stabile, fachlich
