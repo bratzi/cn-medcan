@@ -29,13 +29,10 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 ## ⇢ Hier geht es weiter
 
 ### ⇢ TO-DO-POOL (Nutzerauftrag 2026-10-20, S78)
-- **News-Blog „Was ist neu“ (große Aufgabe, eingetaktet):** neue Seite, oben im Header/Hauptmenü verlinkt.
-  Wirkt wie ein News-Portal, nicht wie ein Changelog: kurze, knappe Sätze für Nicht-Techies, was neu ist,
-  was sich verändert hat und woran gerade gebaut wird (Abschnitte „Neu“ und „In Arbeit“). Claude trägt
-  nach jeder ausgelieferten Änderung selbst einen Eintrag ein (fester Schritt im Sessionabschluss).
-  Vorgehen: brainstorming (Datenquelle: Einträge als Datei im Repo vs. D1, Rückbefüllung aus git-Historie,
-  Tonfall nach better-writing, HWG beachten), dann Plan, live prototypen, bauen. Startseite ggf. mit
-  Teaser „Zuletzt neu“ mitziehen.
+- **News-Blog „Was ist neu“: ERLEDIGT S78, live.** Seite `/neu`, Menüpunkt „Neu“ (Desktop einzeilig bei 1258 px),
+  25 Meldungen + 2 „Gerade in Arbeit“ in `lib/neuigkeiten/eintraege.ts`, Wächter `tests/neuigkeiten.test.ts`.
+  Spec/Plan: docs/superpowers/{specs,plans}/2026-10-20-neuigkeiten*. **Pflege:** Sessionabschluss trägt Meldung ein
+  (Memory „Sessionabschluss“). Nicht live geprüft: englische Fassung, dunkel. Pinsel-Logo hat keine Meldung (Datum fehlt).
 - S78: InfoKnopf-Blase wird beim Öffnen in den Viewport geschoben (Rand 16 px); live bei schmalem Fenster prüfen.
 
 ### ⇢ SESSION 77 (2026-10-20): Plural-Fix, Info-Knöpfe, feine Blätter, Stammdaten remote
