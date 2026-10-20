@@ -153,6 +153,114 @@ const TERPEN: Record<string, ReactNode> = {
       <path d="M17 7H7c-1.7 0-3 2.2-3 5s1.3 5 3 5h10M17 10.5v3" />
     </>
   ),
+  // Kamillenblüte
+  bisabolol: (
+    <>
+      <circle cx="12" cy="12" r="3" />
+      <path d="M12 3v4M12 17v4M3 12h4M17 12h4M5.6 5.6l2.8 2.8M15.6 15.6l2.8 2.8M18.4 5.6l-2.8 2.8M8.4 15.6l-2.8 2.8" />
+    </>
+  ),
+  // Tannenzweig
+  "beta-pinen": (
+    <path d="M12 21V3M12 7 8.5 4.5M12 7l3.5-2.5M12 11 7.5 8M12 11l4.5-3M12 15l-5-3.5M12 15l5-3.5M12 19l-5.5-4M12 19l5.5-4" />
+  ),
+  // Fliederrispe
+  terpineol: (
+    <>
+      <circle cx="12" cy="4" r="1.4" />
+      <circle cx="10" cy="7.2" r="1.4" />
+      <circle cx="14" cy="7.2" r="1.4" />
+      <circle cx="8.4" cy="10.6" r="1.4" />
+      <circle cx="12" cy="10.6" r="1.4" />
+      <circle cx="15.6" cy="10.6" r="1.4" />
+      <circle cx="10.2" cy="14" r="1.4" />
+      <circle cx="13.8" cy="14" r="1.4" />
+      <path d="M12 15.6V21" />
+    </>
+  ),
+  // Eukalyptusblatt, sichelförmig
+  eukalyptol: (
+    <>
+      <path d="M7 21C6 13 10 6 18 3c1 8-3 15-11 18z" />
+      <path d="M7 21C10 15 13 9 18 3" />
+    </>
+  ),
+  // Kampferblock
+  borneol: (
+    <>
+      <path d="M12 3l7.8 4.5v9L12 21l-7.8-4.5v-9z" />
+      <path d="M4.2 7.5 12 12l7.8-4.5M12 12v9" />
+    </>
+  ),
+  // Fenchelknolle mit Kraut
+  fenchol: (
+    <>
+      <path d="M8 21c-3-2-3-7 0-9h8c3 2 3 7 0 9z" />
+      <path d="M10 12 9 5M12 12V4M14 12l1-7M9 5 7 3M9 5l1-2.5M15 5l-1-2.5M15 5l2-2" />
+    </>
+  ),
+  // Teetasse
+  guajol: (
+    <>
+      <path d="M5 10h12v3a6 6 0 0 1-12 0z" />
+      <path d="M17 11h1.5a2.5 2.5 0 0 1 0 5h-2M9 3c-1 1.5 1 2.5 0 4M13 3c-1 1.5 1 2.5 0 4M4 21h14" />
+    </>
+  ),
+  // Orange mit Blatt
+  valencen: (
+    <>
+      <circle cx="12" cy="14" r="7" />
+      <path d="M12 7V5M12 6.5c1-2.5 3.5-3.5 6-3-1 2.5-3.5 3.5-6 3z" />
+    </>
+  ),
+  // Rose
+  geraniol: (
+    <>
+      <path d="M12 9.5c.8 0 1.2-.8.8-1.4-.6-.8-2-.6-2.4.4-.6 1.4.6 3 2.2 3 2.2 0 3.6-2 3.1-4-.6-2.6-3.6-3.6-5.8-2.4-2.8 1.4-3.2 5-1.4 7.2 1 1.2 2.4 1.8 3.5 1.8" />
+      <path d="M12 15.6V21M12 18.5c1.5-1.5 3.5-1.8 5-1-1.2 1.6-3.2 1.9-5 1z" />
+    </>
+  ),
+  // Baumscheibe mit Trockenriss
+  caryophyllenoxid: (
+    <>
+      <circle cx="12" cy="12" r="8" />
+      <circle cx="12" cy="12" r="5" />
+      <circle cx="12" cy="12" r="2" />
+      <path d="M12 4l1 4-1.5 2" />
+    </>
+  ),
+  // Muskatnuss
+  camphen: (
+    <>
+      <ellipse cx="12" cy="12" rx="6" ry="8" />
+      <path d="M9 5.5c2 3 2 10 0 13M15 5.5c-2 3-2 10 0 13M6.5 9.5c3.5 1 7.5 1 11 0M6.5 14.5c3.5-1 7.5-1 11 0" />
+    </>
+  ),
+  // Harztropfen am Ast
+  "delta-3-caren": (
+    <>
+      <path d="M3 6h18" />
+      <path d="M12 6c2.5 4 4 6 4 8.5a4 4 0 0 1-8 0C8 12 9.5 10 12 6z" />
+    </>
+  ),
+  // Dilldolde
+  phellandren: (
+    <>
+      <path d="M12 21v-9M12 12 5.5 7M12 12 8.5 5M12 12V4.5M12 12l3.5-7M12 12l6.5-5" />
+      <circle cx="5" cy="6.5" r="1" />
+      <circle cx="8" cy="4.2" r="1" />
+      <circle cx="12" cy="3.5" r="1" />
+      <circle cx="16" cy="4.2" r="1" />
+      <circle cx="19" cy="6.5" r="1" />
+    </>
+  ),
+  // Selleriestangen
+  selinen: (
+    <>
+      <path d="M9 21l1-12M12 21V9M15 21l-1-12M8 21h8" />
+      <path d="M10 9c-2-1-3-3-2.5-5 2 .3 3 2 2.5 5zM12 9c-1-2-1-4 0-6 1 2 1 4 0 6zM14 9c.5-2 1.5-4 3.5-4.5.3 2-1 4-3.5 4.5z" />
+    </>
+  ),
   // Begleitstoffe: Ester (Kolben), Thiole (Schwefel-S im Sechseck)
   ester: (
     <>
