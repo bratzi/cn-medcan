@@ -43,6 +43,8 @@ const MORPH_MS = 520;
 const MORPH_KURVE = (x: number) => (x < 0.5 ? 4 * x * x * x : 1 - (-2 * x + 2) ** 3 / 2);
 /** Takt beim Abspielen: Morph plus kurzes Stehen, damit jeder Stand lesbar bleibt. */
 const TAKT_MS = 1100;
+/** So lange muss das Netz ruhig im Bild stehen, bevor es von selbst abspielt. */
+const RUHE_MS = 600;
 const MODI: readonly NetzModus[] = ["geschmack", "terpene"];
 
 /**
@@ -58,7 +60,14 @@ const MODI: readonly NetzModus[] = ["geschmack", "terpene"];
  * synchron morphen. Reduzierte Bewegung springt. Screenreader bekommen die Werte als Liste und den
  * Stand im aria-valuetext; das SVG ist stumm. Nur Aroma, nie Wirkung (HWG).
  */
-export function AromaNetz({ staende, texte, achsen: achsenTexte, sprache, className = "w-full max-w-md" }: Props) {
+export function AromaNetz({
+  staende,
+  texte,
+  achsen: achsenTexte,
+  sprache,
+  className = "w-full max-w-md",
+  autoAbspielen = false,
+}: Props & { autoAbspielen?: boolean }) {
   const [gewaehlt, setModus] = useState<NetzModus>("geschmack");
   const [index, setIndex] = useState(staende.length - 1);
   const [aktiv, setAktiv] = useState<number | null>(null);
@@ -102,6 +111,34 @@ export function AromaNetz({ staende, texte, achsen: achsenTexte, sprache, classN
     rahmenId = requestAnimationFrame(schritt);
     return () => cancelAnimationFrame(rahmenId);
   }, [ziel]);
+
+  // Startseite (Nutzer 2026-10-20): bleibt der Leser am Netz stehen, spielt der Verlauf einmal von
+  // vorn ab, als Blickfang. Erst nach kurzer Ruhe im Bild, nicht schon beim Vorbeiscrollen; bei
+  // reduzierter Bewegung nie.
+  const schonGespielt = useRef(false);
+  useEffect(() => {
+    const el = rahmen.current;
+    if (!autoAbspielen || !el || staende.length < 2) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    let warte: ReturnType<typeof setTimeout> | undefined;
+    const beobachter = new IntersectionObserver(
+      ([eintrag]) => {
+        clearTimeout(warte);
+        if (!eintrag.isIntersecting || schonGespielt.current) return;
+        warte = setTimeout(() => {
+          schonGespielt.current = true;
+          setIndex(0);
+          setSpielt(true);
+        }, RUHE_MS);
+      },
+      { threshold: 0.6 },
+    );
+    beobachter.observe(el);
+    return () => {
+      clearTimeout(warte);
+      beobachter.disconnect();
+    };
+  }, [autoAbspielen, staende.length]);
 
   // Abspielen: ein Stand je Takt bis zum neuesten, dann halt.
   useEffect(() => {

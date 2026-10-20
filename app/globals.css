@@ -2531,3 +2531,14 @@ button.netz-marke:active .netz-marke-kreis {
     transform: none;
   }
 }
+
+/* Scroll-Halt (Nutzer 2026-10-20): das Kapitel-Netz der Startseite rastet beim Scrollen kurz in der
+   Bildmitte ein (proximity, nur in der Nähe, kein Zwang), damit es als Blickfang abspielt. */
+@media (prefers-reduced-motion: no-preference) {
+  html:has([data-scroll-halt]) {
+    scroll-snap-type: y proximity;
+  }
+  [data-scroll-halt] {
+    scroll-snap-align: center;
+  }
+}

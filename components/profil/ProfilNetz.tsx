@@ -21,6 +21,8 @@ type Props = {
   verlauf?: readonly VerlaufSchritt[];
   /** Breite des Netzes; die Startseite stellt es schmaler. */
   className?: string;
+  /** Startseite: Verlauf spielt einmal ab, sobald der Leser am Netz stehen bleibt. */
+  autoAbspielen?: boolean;
 };
 
 /**
@@ -30,7 +32,7 @@ type Props = {
  * 2026-10-09: zwei Netze nebeneinander wirkten doppelt). Darunter die Hinweise
  * zum Stand. Nur Aroma, nie Wirkung (HWG).
  */
-export function ProfilNetz({ werte, texte, achsen, sprache, verlauf = [], className }: Props) {
+export function ProfilNetz({ werte, texte, achsen, sprache, verlauf = [], className, autoAbspielen }: Props) {
   const staende: NetzStand[] =
     verlauf.length >= 2
       ? verlauf.map((s) => ({ geschmack: s.geschmack, terpene: s.terpene, datum: s.datum, anzahl: s.anzahl }))
@@ -42,7 +44,14 @@ export function ProfilNetz({ werte, texte, achsen, sprache, verlauf = [], classN
   return (
     <figure className="flex flex-col items-center gap-4">
       {werte.anzahl > 0 ? (
-        <AromaNetz staende={staende} texte={aromaNetzTexte(texte)} achsen={achsen} sprache={sprache} className={className} />
+        <AromaNetz
+          staende={staende}
+          texte={aromaNetzTexte(texte)}
+          achsen={achsen}
+          sprache={sprache}
+          className={className}
+          autoAbspielen={autoAbspielen}
+        />
       ) : (
         // Leere Skizze: Ringe und Marken ohne Fläche, darunter der Weg zur ersten Bewertung.
         <NetzGrafik mag={LEER} magNicht={LEER} marken className={className ?? "w-full max-w-md"} />
