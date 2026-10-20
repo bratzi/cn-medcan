@@ -482,6 +482,13 @@ export const de = {
       weitereVertreiber: { one: "auch bei einem weiteren Vertreiber", other: "auch bei {anzahl} weiteren Vertreibern" },
       keinTerpenprofil: "Kein Terpenprofil hinterlegt.",
       dominant: "dominant",
+      stimmen: { one: "{anzahl} Stimme", other: "{anzahl} Stimmen" },
+      keineStimmen: "noch keine Stimmen",
+      alsErsteBewerten: "als Erste:r bewerten",
+      buchNote: "Buch {note}",
+      wertDerBluete: "Wert der Blüte",
+      varianten: { one: "{anzahl} Variante", other: "{anzahl} Varianten" },
+      srNote: "Community-Note {note} von 5 aus {stimmen} Stimmen",
     },
     cannabinoide: {
       keineAngabe: "{name} keine Angabe",

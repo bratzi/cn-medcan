@@ -470,6 +470,13 @@ export const en: Woerterbuch = {
       weitereVertreiber: { one: "also from one other distributor", other: "also from {anzahl} other distributors" },
       keinTerpenprofil: "No terpene profile on record.",
       dominant: "dominant",
+      stimmen: { one: "{anzahl} vote", other: "{anzahl} votes" },
+      keineStimmen: "no votes yet",
+      alsErsteBewerten: "be the first to rate",
+      buchNote: "Book {note}",
+      wertDerBluete: "Value of the flower",
+      varianten: { one: "{anzahl} variant", other: "{anzahl} variants" },
+      srNote: "Community rating {note} out of 5 from {stimmen} votes",
     },
     cannabinoide: {
       keineAngabe: "{name} not stated",
