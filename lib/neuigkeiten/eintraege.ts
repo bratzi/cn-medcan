@@ -132,16 +132,6 @@ export const NEUIGKEITEN: readonly Neuigkeit[] = [
     link: "/sotm",
   },
   {
-    id: "2026-10-20-strain",
-    datum: "2026-10-20",
-    art: "besser",
-    titel: { de: "Strain statt Sorte", en: "Strain instead of variety" },
-    text: {
-      de: "Wir sagen jetzt überall Strain, so wie du es aus der Szene kennst.",
-      en: "We now say strain everywhere, just like you know it from the scene.",
-    },
-  },
-  {
     id: "2026-10-16-jury",
     datum: "2026-10-16",
     art: "neu",
@@ -308,14 +298,6 @@ export const NEUIGKEITEN: readonly Neuigkeit[] = [
 ];
 
 export const IN_ARBEIT: readonly InArbeit[] = [
-  {
-    id: "in-arbeit-startseite-neu",
-    titel: { de: "Neuigkeiten auch auf der Startseite", en: "Updates on the home page too" },
-    text: {
-      de: "Wir überlegen, die neuesten Meldungen auch auf der Startseite zu zeigen.",
-      en: "We're looking into showing the latest updates on the home page as well.",
-    },
-  },
   {
     id: "in-arbeit-terpene",
     titel: { de: "Mehr Wissen zu seltenen Terpenen", en: "More on rare terpenes" },
