@@ -159,6 +159,9 @@ const TABELLE: Record<string, readonly AromaAnteil[]> = {
   ],
 };
 
+/** Schlüssel aller Terpene mit eigener Tabelle; Wächter-Tests prüfen daran die Wörterbücher. */
+export const TERPEN_MIT_TABELLE: readonly string[] = Object.keys(TABELLE);
+
 /** Aromastoffe, die keine Terpene sind, aber Noten der Karte prägen (Nutzer 2026-09-26). */
 export type Begleitstoff = { name: string; hinweis: string; noten: readonly AromaAnteil[] };
 
