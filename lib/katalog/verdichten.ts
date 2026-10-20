@@ -54,6 +54,7 @@ export function verdichte(daten: KatalogDaten): { blueten: BlueteZeile[]; strain
       cbdMax: Math.max(...waren.map((w) => w.c1)),
       terpene: topTerpene(waren, geschmack), vertreiberIds: vIds, handelsnamen: waren.length,
       community: k && k.cn !== null && k.ca > 0 ? { note: k.cn, stimmen: k.ca } : null,
+      geschmackMedian: k?.gm ?? null,
       eigeneNote: k?.en ?? null, letzteBewertung: alsIso(k?.lb),
       bildSlug: waren[0]!.s, herstellerBildPfad: waren.find((w) => w.b)?.b ?? null,
       suchtext: normalisiere([name, ...waren.map((w) => `${w.h} ${w.g ?? ""}`), ...vIds.map((v) => vertreiber.get(v) ?? "")].join(" ")),
@@ -65,6 +66,7 @@ export function verdichte(daten: KatalogDaten): { blueten: BlueteZeile[]; strain
     return {
       ...w, kultivarName: k?.n ?? null,
       community: k && k.cn !== null && k.ca > 0 ? { note: k.cn, stimmen: k.ca } : null,
+      geschmackMedian: k?.gm ?? null,
       eigeneNote: k?.en ?? null, letzteBewertung: alsIso(k?.lb),
       terpenGeschmack: w.tp.map((n) => geschmack.get(n) ?? null),
       suchtext: normalisiere(`${w.h} ${k?.n ?? ""} ${w.g ?? ""} ${w.v ? vertreiber.get(w.v) ?? "" : ""}`),

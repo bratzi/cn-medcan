@@ -6,8 +6,11 @@
  *
  * Das Binding NEXT_INC_CACHE_KV teilt sich der Katalog mit OpenNexts Inkrement-Cache; dessen
  * Schlüssel tragen eigene Präfixe, dieser Schlüssel kollidiert nicht.
+ *
+ * v2 seit Task 2 (2026-10-20): je Blüte kommt `gm` (Geschmacks-Median) dazu. Ein neuer Schlüssel statt
+ * Überschreiben, damit nach dem Deploy kein Text ohne `gm` aus KV kommt; v1 bleibt ungelesen liegen.
  */
-export const KATALOG_KV_SCHLUESSEL = "cn-katalog/oeffentlich-v1";
+export const KATALOG_KV_SCHLUESSEL = "cn-katalog/oeffentlich-v2";
 
 /** Ausschnitt von KVNamespace, den der Katalog braucht (Tests reichen ein Fake). */
 export type KatalogKv = {

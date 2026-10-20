@@ -29,6 +29,11 @@ const UMGESTELLT: string[] = [
   "app/[lang]/blueten/page.tsx",
   "app/[lang]/blueten/[slug]/page.tsx",
   "components/katalog/KatalogAnsicht.tsx",
+  // Task 2 (2026-10-20): Karte, Geschmäcker, Werkzeugleiste, Sortierung.
+  "components/katalog/KatalogKarte.tsx",
+  "components/katalog/GeschmackZeile.tsx",
+  "components/katalog/Werkzeugleiste.tsx",
+  "components/katalog/SortierWahl.tsx",
   "components/produkt/ProduktCard.tsx",
   "components/produkt/Titelblatt.tsx",
   "components/produkt/TerpenChips.tsx",

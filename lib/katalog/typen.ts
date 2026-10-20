@@ -35,6 +35,11 @@ export type KatalogKultivar = {
   /** Anzahl Community-Stimmen */ ca: number;
   /** Mittel der redaktionellen Gesamtnoten oder null */ en: number | null;
   /** Letzte Bewertung ISO oder null */ lb: string | null;
+  /**
+   * Geschmacks-Median der Community je Achse 0–5 (Schlüssel wie „suess“), null ohne Kennwerte.
+   * Fehlt in Katalog-JSON von vor Task 2 (Browser-Cache bis 300 s): dann gelten alle als offen.
+   */
+  gm?: Record<string, number> | null;
 };
 
 export type KatalogDaten = {
@@ -59,6 +64,8 @@ export type BlueteZeile = {
   vertreiberIds: string[];
   handelsnamen: number;
   community: { note: number; stimmen: number } | null;
+  /** Geschmacks-Median der Community (KatalogKultivar.gm), null ohne Kennwerte. */
+  geschmackMedian: Record<string, number> | null;
   eigeneNote: number | null;
   letzteBewertung: string | null;
   bildSlug: string | null;
@@ -72,6 +79,8 @@ export type BlueteZeile = {
 export type StrainZeile = KatalogWare & {
   kultivarName: string | null;
   community: { note: number; stimmen: number } | null;
+  /** Geschmacks-Median der Blüte, zu der der Strain gehört; null ohne Kennwerte. */
+  geschmackMedian: Record<string, number> | null;
   eigeneNote: number | null;
   letzteBewertung: string | null;
   terpenGeschmack: (GeschmacksKategorie | null)[];

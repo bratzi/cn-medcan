@@ -15,6 +15,10 @@ function fakeKv(start: Record<string, string> = {}) {
   return { kv, daten, log };
 }
 
+test("KV-Schlüssel v2: das Katalog-JSON trägt seit Task 2 gm, alte Einträge (v1) werden nicht gelesen", () => {
+  assert.equal(KATALOG_KV_SCHLUESSEL, "cn-katalog/oeffentlich-v2");
+});
+
 test("KV-Treffer: Text kommt durch, kein Bau, kein Schreiben", async () => {
   const { kv, log } = fakeKv({ [KATALOG_KV_SCHLUESSEL]: '{"a":1}' });
   let gebaut = 0;

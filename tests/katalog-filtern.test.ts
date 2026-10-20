@@ -86,6 +86,17 @@ test("Strain-Ansicht: je Handelsname, mit Kultivarnote", () => {
   assert.equal(e.ansicht === "ware" && e.zeilen[0]!.community?.stimmen, 12);
 });
 
+test("Verdichten: Geschmacks-Median der Blüte (gm) landet an Blüte und Strain, ohne gm null", () => {
+  const gm = { suess: 4.5, erdig: 3.25 };
+  const mitGm = verdichte({ ...DATEN, kultivare: DATEN.kultivare.map((k) => (k.i === "k1" ? { ...k, gm } : k)) });
+  assert.deepEqual(mitGm.blueten.find((b) => b.id === "k1")!.geschmackMedian, gm);
+  assert.deepEqual(mitGm.strains.find((s) => s.i === "w4")!.geschmackMedian, gm);
+  // k2 ohne gm (Katalog-JSON von vor Task 2), w3 ohne Kultivar.
+  assert.equal(mitGm.blueten.find((b) => b.id === "k2")!.geschmackMedian, null);
+  assert.equal(mitGm.blueten.find((b) => b.id === "w3")!.geschmackMedian, null);
+  assert.equal(mitGm.strains.find((s) => s.i === "w3")!.geschmackMedian, null);
+});
+
 test("Zählen je Option: Gruppe ohne eigene Auswahl", () => {
   const z = zaehleOptionen(V, f({ terp: ["Myrcen"] }));
   assert.equal(z.terp["Myrcen"], 2);

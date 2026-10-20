@@ -2546,3 +2546,29 @@ button.netz-marke:active .netz-marke-kreis {
 .katalog-schublade::backdrop {
   background: color-mix(in oklab, var(--color-text) 40%, transparent);
 }
+
+/* Filterspalte der Blütenseite (Task 2, 2026-10-20): ab lg ein- und ausblendbar. Ohne Wahl offen
+   ab 2xl (96rem, dieselbe Grenze wie FILTER_STANDARD_OFFEN_AB), darunter zu. Die Wahl des Besuchers
+   steht als data-katalog-filter an <html>, gesetzt vom Kopf-Skript vor dem ersten Zeichnen
+   (lib/katalog/filterspalte.ts). So entscheidet CSS schon vor der Hydration: kein Springen.
+   Ohne Layer, damit nichts aus @layer utilities die Anzeige überstimmt (wie .kopf-menue-knopf).
+   Der Filter-Knopf zeigt den offenen Zustand am Rand in accent, aus derselben Quelle. */
+.katalog-filterspalte {
+  display: none;
+}
+@media (width >= 64rem) {
+  :root[data-katalog-filter="offen"] .katalog-filterspalte {
+    display: block;
+  }
+  :root[data-katalog-filter="offen"] .katalog-filterknopf {
+    border-color: var(--color-accent);
+  }
+}
+@media (width >= 96rem) {
+  :root:not([data-katalog-filter="zu"]) .katalog-filterspalte {
+    display: block;
+  }
+  :root:not([data-katalog-filter="zu"]) .katalog-filterknopf {
+    border-color: var(--color-accent);
+  }
+}
