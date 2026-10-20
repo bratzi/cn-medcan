@@ -30,11 +30,12 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 
 ### ⇢ SESSION 74 (2026-10-20): Spec Startseite + SOTM geschrieben, 1102 belegt
 
-**ALS ERSTES:** Nutzer prüft Spec `docs/superpowers/specs/2026-10-20-startseite-sotm-design.md`. Nach Ja: writing-plans, Plan A
-(Startseite), dann Plan B (SOTM). Entwurf ist freigegeben (Session 74).
+**ALS ERSTES:** Spec freigegeben („weiter“). Plan A `docs/superpowers/plans/2026-10-20-startseite-neu-geordnet.md` geschrieben,
+Nutzer prüft ihn und wählt Ausführung (empfohlen Native, keine parallelen Agents). Danach Plan B (SOTM) schreiben.
 - 1102 belegt (Anhang der Spec): CPU-Limit bei Cache-Fehlern, seit Deploy 2026-10-19 23:41 UTC keine 1102 mehr. Observability-MCP ist
   deprecated, Events-Ansicht bricht ab, Berechnungen gehen.
-- Publora: Nutzer verwarf nur die zwei Entwürfe; löschen und drei Posts einplanen steht noch aus.
+- Publora: zwei alte Entwürfe gelöscht; mach-mit 23.10. und terpene-erklaert 26.10. 17:00 UTC eingeplant. fuenf-noten liegt als
+  Entwurf `6ad6b0e772ec65f94122602a` (403 „Schedule horizon reached“); ab ~23.10. mit `update_post` auf 2026-10-30T17:00Z planen.
 - Skills: jede Meldung nennt sichtbar „Skills: …“ (Memory aktualisiert).
 
 ### ⇢ SESSION 73 (2026-10-20): Strain-Wording, Startseite, Publora offen
