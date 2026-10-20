@@ -1268,33 +1268,31 @@ export function AromaKarte({
             {/* Bedienhinweis mit Reglern und Legende der Ebenen liegen hinter dem Info-Knopf (Nutzer 2026-10-20).
                 Die Legende (T5) nur, wenn es mehr gibt als die Herstellerangabe: Strich, Strichelung und Farbe
                 wie die Bögen, damit die Ebene nicht nur an der Farbe hängt. */}
-            {regler || [...vorhandeneEbenen].some((ebene) => ebene !== "hersteller") ? (
-              <InfoKnopf
-                sprache={sprache}
-                text={
-                  <span className="flex flex-col gap-2">
-                    {regler ? (
-                      <span>
-                        {kt.hinweisRegler}
-                        {/* Nur mit Terpen-Reglern (Maske): der Satz zur rechten Seite. */}
-                        {terpenSchalter ? ` ${kt.hinweisTerpenRegler}` : null}
-                      </span>
-                    ) : null}
-                    {[...vorhandeneEbenen].some((ebene) => ebene !== "hersteller")
-                      ? EBENEN.filter((ebene) => vorhandeneEbenen.has(ebene)).map((ebene) => (
-                          <span key={ebene} className="inline-flex items-center gap-2 text-caption text-text-muted">
-                            <EbenenMuster ebene={ebene} />
-                            {kt.ebenen[ebene]}
-                          </span>
-                        ))
-                      : null}
-                  </span>
-                }
-              />
-            ) : null}
-            {regler ? null : (
-              <p className="max-w-md text-center font-buch text-body text-text-muted italic text-balance">{kt.hinweisErkunden}</p>
-            )}
+            <InfoKnopf
+              sprache={sprache}
+              text={
+                <span className="flex flex-col gap-2">
+                  {regler ? (
+                    <span>
+                      {kt.hinweisRegler}
+                      {/* Nur mit Terpen-Reglern (Maske): der Satz zur rechten Seite. */}
+                      {terpenSchalter ? ` ${kt.hinweisTerpenRegler}` : null}
+                    </span>
+                  ) : (
+                    // Erkunden ohne Regler: auch dieser Bedienhinweis liegt hinter dem Knopf.
+                    <span>{kt.hinweisErkunden}</span>
+                  )}
+                  {[...vorhandeneEbenen].some((ebene) => ebene !== "hersteller")
+                    ? EBENEN.filter((ebene) => vorhandeneEbenen.has(ebene)).map((ebene) => (
+                        <span key={ebene} className="inline-flex items-center gap-2 text-caption text-text-muted">
+                          <EbenenMuster ebene={ebene} />
+                          {kt.ebenen[ebene]}
+                        </span>
+                      ))
+                    : null}
+                </span>
+              }
+            />
           </div>
         )}
       </div>
