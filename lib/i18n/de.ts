@@ -727,6 +727,14 @@ export const de = {
         stimmen: { one: "Stimme abgegeben", other: "Stimmen abgegeben" },
       },
     },
+    bewertung: {
+      titel: "So bewerten wir",
+      schritt: "Schritt {nummer}",
+      beispiel: "Am Beispiel: {bluete}",
+      overall: "{wert} von 5",
+      terpz: "Führt: {terpen}",
+      qualitaet: "{wert} % Feuchte",
+    },
     transparent: {
       satz: "Wir schreiben auf, was drin ist. Hinter jedem Handelsnamen steckt ein",
       ueberlauf: "Terpenprofil.",

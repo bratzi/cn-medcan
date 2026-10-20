@@ -32,7 +32,7 @@ export function beobachtePunkte(): () => void {
 
   for (const [nummer, punkt] of document.querySelectorAll<HTMLElement>("[data-punkt]").entries()) {
     // Eigenbewegung nur im Storytelling, nicht an der Hero-Wortmarke.
-    const eigen = punkt.closest('[data-story="transparent"]') !== null;
+    const eigen = punkt.closest('[data-story="bewertung"]') !== null;
     if (!zeiger && !eigen) continue;
     const ebenen: Ebene[] = Array.from(punkt.querySelectorAll<HTMLElement>("[data-punkt-tiefe]"), (element) => ({
       element,
