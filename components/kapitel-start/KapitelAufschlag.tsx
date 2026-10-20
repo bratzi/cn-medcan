@@ -112,8 +112,7 @@ export function KapitelAufschlag({
       </div>
 
       {daten.netz ? (
-        // Scroll-Halt (Nutzer 2026-10-20): das Netz rastet sanft in der Bildmitte ein und spielt ab.
-        <div data-netz-erscheinen="" data-scroll-halt="" className="w-full max-w-160">
+        <div data-netz-erscheinen="" className="w-full max-w-160">
           <ProfilNetz
             werte={daten.netz}
             texte={art === "schaufenster" ? alle.profilOeffentlich : alle.profil}
