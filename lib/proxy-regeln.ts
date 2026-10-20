@@ -12,7 +12,7 @@ import type { Sprache } from "@/lib/i18n/sprache-kern";
  * diesen Seiten funktionieren muss.
  * /ig: Landingpage aus der Instagram-Bio, muss ohne Passwort erreichbar sein (Spec 2026-10-15).
  */
-const OHNE_GATE = ["/zugang", "/impressum", "/datenschutz", "/api/zugang", "/api/sprache", "/ig"] as const;
+const OHNE_GATE = ["/zugang", "/impressum", "/datenschutz", "/api/zugang", "/api/sprache", "/ig", "/api/sotm/takt"] as const;
 
 export function istOhneGate(pfad: string): boolean {
   return OHNE_GATE.some((frei) => pfad === frei || pfad.startsWith(`${frei}/`));
