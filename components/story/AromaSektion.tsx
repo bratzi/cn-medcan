@@ -1,9 +1,9 @@
 import Link from "next/link";
-import { Suspense } from "react";
+import { Suspense, type CSSProperties } from "react";
 
 import { AromaWechsel } from "@/components/story/AromaWechsel";
 import { Schlagwort } from "@/components/story/Schlagwort";
-import { UeberlaufWort, ueberlaufPlatz } from "@/components/story/UeberlaufWort";
+import { UeberlaufWort } from "@/components/story/UeberlaufWort";
 import { buttonKlassen } from "@/components/ui";
 import { ladeSortenExplorer } from "@/lib/query/sorten-explorer";
 import { ladeAromaVorzeige, ladeTerpenKatalog } from "@/lib/query/strains";
@@ -18,24 +18,23 @@ const EINSTIEGE = [
   { href: "/blueten?nurVerfuegbar=1", text: (w: Woerterbuch) => w.start.katalog.nurVerfuegbar },
 ] as const;
 
+/** Das Wort ist rund 4,7 em breit; 20cqi hält es in der Spalte der Überschrift. */
+const UEBERLAUF_SPALTE = { "--ueberlauf-grad": "clamp(2.5rem, 20cqi, 9rem)" } as CSSProperties;
+
 /** Überschrift und Absatz; stehen links über dem Bild der gewählten Sorte. */
 function Kopf({ w }: { w: Woerterbuch }) {
   const texte = w.start.aroma;
   return (
     <>
+      {/* Seit Explorer und Karte eine Sektion sind, steht der Kopf in der schmalen linken Spalte:
+          das Wort in eigener Zeile, Grad an der Spaltenbreite (cqi), sonst läuft es über die
+          Sortenwahl rechts (live 2026-10-20). */}
       <h2
         id="aroma-titel"
-        className="relative isolate max-w-4xl font-buch text-kapitel text-text text-balance max-md:mx-auto max-md:text-center"
-        style={ueberlaufPlatz}
+        className="@container relative isolate max-w-4xl font-buch text-kapitel text-text text-balance max-md:mx-auto max-md:text-center"
+        style={UEBERLAUF_SPALTE}
       >
-        {texte.titel}{" "}
-        {/* Schmal eigene Zeile unter dem Satz (Nutzer 2026-09-29: ragte rechts aus dem Bild). */}
-        <span className="max-md:hidden">
-          <UeberlaufWort wort={texte.ueberlauf} />
-        </span>
-        <span className="md:hidden">
-          <UeberlaufWort wort={texte.ueberlauf} absatz />
-        </span>
+        {texte.titel} <UeberlaufWort wort={texte.ueberlauf} absatz />
       </h2>
       <p className="max-w-[60ch] text-body text-text-muted text-pretty max-md:mx-auto max-md:text-center">{texte.text}</p>
     </>

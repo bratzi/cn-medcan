@@ -144,6 +144,10 @@ export function KatalogAnsicht({ start, w, sprache }: Props) {
   const daten = zustand.art === "bereit" ? zustand.daten : null;
   const verdichtet = useMemo(() => (daten ? verdichte(daten) : null), [daten]);
   const ergebnis: KatalogErgebnis | null = useMemo(() => (verdichtet ? filtere(verdichtet, filter) : null), [verdichtet, filter]);
+  // Deep-Link mit zu großer Seite: filtere() kappt sie, die Adresse zieht nach (ohne neuen Verlaufseintrag).
+  useEffect(() => {
+    if (ergebnis && ergebnis.seite !== filter.seite) window.history.replaceState(null, "", adresse({ ...filter, seite: ergebnis.seite }));
+  }, [ergebnis, filter]);
   // Zählen über alle Optionen ist teurer als Filtern: verzögert, damit Tippen flüssig bleibt.
   const verzoegert = useDeferredValue(filter);
   const zahlen = useMemo(() => (verdichtet ? zaehleOptionen(verdichtet, verzoegert) : null), [verdichtet, verzoegert]);

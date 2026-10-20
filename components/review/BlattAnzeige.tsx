@@ -82,8 +82,9 @@ export function BlattAnzeige({ note, text }: { note: number; text: string }) {
     // Zeile als inline-flex in einem Block: sie folgt der Textausrichtung der Seite
     // (/reviews ist schmal zentriert), statt als Flex-Kind die volle Breite zu nehmen.
     <div>
-      <p className="inline-flex flex-wrap items-center gap-4">
-        <span aria-hidden="true" className="flex w-60 shrink-0 gap-0.5 sm:w-72">
+      {/* max-w-full an Zeile und Blättern: in schmalen Karten (Explorer) schrumpfen die Blätter, statt überzustehen. */}
+      <p className="inline-flex max-w-full flex-wrap items-center gap-4">
+        <span aria-hidden="true" className="flex w-60 max-w-full gap-0.5 sm:w-72">
           {blattFuellungen(note).map((fuellung, index) => (
             <span key={BLAETTER[index]} className="relative aspect-square min-w-0 flex-1">
               <BlattGlyphe fuellung={fuellung} vorschau={false} />

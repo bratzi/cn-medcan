@@ -101,7 +101,7 @@ function CommunityZeile({
     <div data-community className="flex flex-col gap-2 border-b border-border pb-4">
       {zusatz ? <p className="text-caption text-text-muted">{zusatz}</p> : null}
       <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
-        <span aria-hidden="true" className="font-hand text-notiz leading-none text-logo">
+        <span aria-hidden="true" className="font-hand text-vermerk leading-none text-logo">
           {note}
         </span>
         <span className="sr-only">{mehrzahl(sprache, texte.srNote, community.stimmen, { note })}</span>
