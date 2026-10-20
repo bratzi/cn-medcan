@@ -30,12 +30,16 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 
 ### ⇢ SESSION 76 (2026-10-20): SOTM Task 1–7 fertig, Terpen-Audit live, Kapitel spielt ab
 
+**Nachtrag S76 (nach Clear):** Rest-Minors SOTM behoben (b56fd8a: Stimme nach Monatsende stößt Takt an und wird
+abgelehnt, aktiveUmfrage per React cache, worker.mjs .catch, allesFest weg), .gitattributes LF + Renormalisierung (c2d5c37),
+Scroll-Halt am Kapitel entfernt (Nutzer: wirkt wie Anker), Kapitel-Zahlen als Handschrift-Akzent / Wort gedruckt,
+Footer-Schlusszeile „Terpz 4 Nerdz“, Katalog startet mit erster Blüte geöffnet. Alles live zu prüfen (Punkt 2).
+
 **ALS ERSTES:**
 1. ~~SOTM Final-Review~~ **erledigt** (merge-ready). Fix 54a186c: Browser-Takt auf /sotm greift jetzt auch bei
    Phasenunterschied Runde/Kalender, Leitsatz „Schlag vor.“ in Vorschlagsphase, Aroma-Sätze gespiegelt (Suite 1304/1304 grün).
    Rest-Minors (Nutzer entscheiden): CRLF-Churn nur kosmetisch (.gitattributes?), aktiveUmfrage doppelt geladen,
    toter Schlüssel allesFest, worker.mjs scheduled ohne .catch, Stimmen nach Monatsende bis zum Takt möglich.
-   Workspace .superpowers/sdd/2026-10-20-strain-of-the-month löschen, sobald Nutzer Rulings gesehen hat.
 2. **Live per Browser prüfen** (Seite hinter /zugang): /sotm, Startseite SOTM-Sektion, Kapitel-Netz spielt nach
    600 ms Ruhe ab und rastet per scroll-snap proximity ein (8c75959; prüfen, dass der Snap nicht stört),
    Bewertungsmaske: Wirkung-Ring, Herstellerterpene voraktiviert, Community-Terpene pulsieren (6a3632b),
