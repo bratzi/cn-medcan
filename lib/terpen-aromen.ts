@@ -11,7 +11,10 @@ import type { GeschmacksKategorie } from "@/db/enums";
  * beta-Caryophyllen Pfeffer, Nelke, holzig; Linalool Lavendel; alpha-Pinen
  * Kiefer und Harz, frisch-kampferartig; Terpinolen frisch-kräutrig, blumig,
  * zitrisch, Kiefer; Humulen Hopfen, erdig-holzig; Ocimen süß-krautig,
- * tropisch; Farnesen grüner Apfel; Nerolidol Holz, Rinde, blumig).
+ * tropisch; Farnesen grüner Apfel; Nerolidol Holz, Rinde, blumig; Bisabolol
+ * Kamille; beta-Pinen grün-harzig; Terpineol Flieder; Eukalyptol, Borneol und
+ * Fenchol kampferartig-kühl, tragen Minzig; Guajol Guajakholz, Rose).
+ * Feinabstimmung nach Terpen-Audit 2026-10-20 (docs/terpene-audit-2026-10-20.md).
  *
  * Diesel und Gas stammen nicht aus Terpenen, sondern aus Schwefelverbindungen
  * (Thiole, v. a. 3-Methyl-2-buten-1-thiol; Oswald u. a., ACS Omega 2021).
@@ -19,6 +22,14 @@ import type { GeschmacksKategorie } from "@/db/enums";
  * Hexylacetat, Ethylester) viel vom Fruchtigen bei. Beide stehen als
  * Begleitstoffe (BEGLEITSTOFFE) mit eigenem Knoten in der Karte.
  */
+/**
+ * Ab diesem Anteil gilt eine Achse als Kandidat eines Terpens. Der Vergleich
+ * trägt eine kleine Toleranz, damit ein Anteil von genau 0,2 nicht an der
+ * Gleitkommarundung kippt (0,1 + 0,1 + ... oder 1 - 0,8).
+ */
+export const KANDIDATEN_SCHWELLE = 0.2;
+export const istKandidatAnteil = (anteil: number): boolean => anteil >= KANDIDATEN_SCHWELLE - 1e-9;
+
 export type AromaAnteil = { geschmack: GeschmacksKategorie; anteil: number };
 
 const TABELLE: Record<string, readonly AromaAnteil[]> = {
@@ -38,42 +49,78 @@ const TABELLE: Record<string, readonly AromaAnteil[]> = {
     { geschmack: "ERDIG", anteil: 0.15 },
   ],
   linalool: [
-    { geschmack: "BLUMIG", anteil: 0.65 },
-    { geschmack: "SUESS", anteil: 0.2 },
-    { geschmack: "KRAEUTRIG", anteil: 0.15 },
+    { geschmack: "BLUMIG", anteil: 0.6 },
+    { geschmack: "ZITRUS", anteil: 0.15 },
+    { geschmack: "SUESS", anteil: 0.15 },
+    { geschmack: "KRAEUTRIG", anteil: 0.1 },
   ],
   "alpha-pinen": [
-    { geschmack: "HOLZIG", anteil: 0.6 },
+    { geschmack: "HOLZIG", anteil: 0.55 },
     { geschmack: "KRAEUTRIG", anteil: 0.25 },
-    { geschmack: "MINZIG", anteil: 0.15 },
+    { geschmack: "MINZIG", anteil: 0.2 },
   ],
   terpinolen: [
-    { geschmack: "KRAEUTRIG", anteil: 0.35 },
-    { geschmack: "BLUMIG", anteil: 0.25 },
-    { geschmack: "ZITRUS", anteil: 0.2 },
-    { geschmack: "HOLZIG", anteil: 0.2 },
+    { geschmack: "KRAEUTRIG", anteil: 0.3 },
+    { geschmack: "HOLZIG", anteil: 0.25 },
+    { geschmack: "ZITRUS", anteil: 0.25 },
+    { geschmack: "SUESS", anteil: 0.2 },
   ],
   humulen: [
-    { geschmack: "HOLZIG", anteil: 0.4 },
-    { geschmack: "ERDIG", anteil: 0.4 },
-    { geschmack: "WUERZIG", anteil: 0.2 },
+    { geschmack: "HOLZIG", anteil: 0.45 },
+    { geschmack: "ERDIG", anteil: 0.3 },
+    { geschmack: "WUERZIG", anteil: 0.25 },
   ],
   ocimen: [
-    { geschmack: "SUESS", anteil: 0.35 },
+    { geschmack: "SUESS", anteil: 0.3 },
     { geschmack: "KRAEUTRIG", anteil: 0.3 },
+    { geschmack: "BLUMIG", anteil: 0.2 },
     { geschmack: "FRUCHTIG", anteil: 0.2 },
-    { geschmack: "HOLZIG", anteil: 0.15 },
   ],
   farnesen: [
-    { geschmack: "FRUCHTIG", anteil: 0.5 },
-    { geschmack: "SUESS", anteil: 0.2 },
+    { geschmack: "FRUCHTIG", anteil: 0.45 },
+    { geschmack: "KRAEUTRIG", anteil: 0.25 },
     { geschmack: "HOLZIG", anteil: 0.15 },
-    { geschmack: "KRAEUTRIG", anteil: 0.15 },
+    { geschmack: "SUESS", anteil: 0.15 },
   ],
   nerolidol: [
     { geschmack: "HOLZIG", anteil: 0.45 },
     { geschmack: "BLUMIG", anteil: 0.35 },
-    { geschmack: "ZITRUS", anteil: 0.2 },
+    { geschmack: "FRUCHTIG", anteil: 0.2 },
+  ],
+  bisabolol: [
+    { geschmack: "BLUMIG", anteil: 0.55 },
+    { geschmack: "SUESS", anteil: 0.3 },
+    { geschmack: "KRAEUTRIG", anteil: 0.15 },
+  ],
+  "beta-pinen": [
+    { geschmack: "HOLZIG", anteil: 0.45 },
+    { geschmack: "KRAEUTRIG", anteil: 0.35 },
+    { geschmack: "WUERZIG", anteil: 0.2 },
+  ],
+  terpineol: [
+    { geschmack: "BLUMIG", anteil: 0.5 },
+    { geschmack: "HOLZIG", anteil: 0.25 },
+    { geschmack: "ZITRUS", anteil: 0.25 },
+  ],
+  eukalyptol: [
+    { geschmack: "MINZIG", anteil: 0.7 },
+    { geschmack: "KRAEUTRIG", anteil: 0.2 },
+    { geschmack: "WUERZIG", anteil: 0.1 },
+  ],
+  borneol: [
+    { geschmack: "MINZIG", anteil: 0.45 },
+    { geschmack: "HOLZIG", anteil: 0.35 },
+    { geschmack: "ERDIG", anteil: 0.2 },
+  ],
+  fenchol: [
+    { geschmack: "MINZIG", anteil: 0.4 },
+    { geschmack: "KRAEUTRIG", anteil: 0.3 },
+    { geschmack: "HOLZIG", anteil: 0.3 },
+  ],
+  guajol: [
+    { geschmack: "HOLZIG", anteil: 0.6 },
+    { geschmack: "BLUMIG", anteil: 0.25 },
+    { geschmack: "SUESS", anteil: 0.15 },
   ],
 };
 

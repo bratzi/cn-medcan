@@ -10,10 +10,10 @@ test("farbKreis: gleiche Ausgabe wie bluetenKreis für Geschmäcker", () => {
   assert.equal(bluetenKreis(["ZITRUS", "ERDIG"]), farbKreis([vollFarbe("ZITRUS"), vollFarbe("ERDIG")]));
 });
 
-test("NetzGrafik mit Terpen-Achsen: zehn Marken, Limonen in der Farbe von Zitrus", () => {
+test("NetzGrafik mit Terpen-Achsen: elf Marken, Limonen in der Farbe von Zitrus", () => {
   const html = renderToStaticMarkup(
-    createElement(NetzGrafik, { mag: Array(10).fill(2), magNicht: Array(10).fill(0), marken: true, achsen: terpenAchsen() }),
+    createElement(NetzGrafik, { mag: Array(11).fill(2), magNicht: Array(11).fill(0), marken: true, achsen: terpenAchsen() }),
   );
-  assert.equal((html.match(/netz-marke /g) ?? []).length, 10);
+  assert.equal((html.match(/netz-marke /g) ?? []).length, 11);
   assert.ok(html.includes(`--netz-farbe:${vollFarbe("ZITRUS")}`));
 });

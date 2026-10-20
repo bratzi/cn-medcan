@@ -12,7 +12,7 @@ import {
   type GeschmacksMatrix,
 } from "@/lib/query/bewertung";
 import type { GeschmacksKategorie } from "@/db/enums";
-import { aromaAnteile } from "@/lib/terpen-aromen";
+import { aromaAnteile, istKandidatAnteil } from "@/lib/terpen-aromen";
 
 export type Punkt = { x: number; y: number };
 export type KartenTerpen = { name: string; geschmack: GeschmacksKategorie; konzentrationProzent: number | null; rang: number };
@@ -578,7 +578,7 @@ export function leuchtendeTerpene(
 ): string[] {
   return terpene
     .filter((terpen) => (ebenen[terpen.name] ?? "geist") !== "geist")
-    .filter((terpen) => terpenBoegen(terpen).some((b) => b.achse === achse && b.anteil >= 0.2))
+    .filter((terpen) => terpenBoegen(terpen).some((b) => b.achse === achse && istKandidatAnteil(b.anteil)))
     .map((terpen) => terpen.name);
 }
 
@@ -595,7 +595,7 @@ export function leuchtendeTerpene(
 export function terpenKandidaten(achse: number, terpene: readonly KartenTerpen[]): string[] {
   return terpene
     .flatMap((terpen) => {
-      const bogen = terpenBoegen(terpen).find((b) => b.achse === achse && b.anteil >= 0.2);
+      const bogen = terpenBoegen(terpen).find((b) => b.achse === achse && istKandidatAnteil(b.anteil));
       return bogen ? [{ name: terpen.name, anteil: bogen.anteil }] : [];
     })
     .sort((a, b) => b.anteil - a.anteil || a.name.localeCompare(b.name, "de"))

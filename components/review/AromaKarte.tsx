@@ -44,7 +44,7 @@ import { cn } from "@/lib/cn";
 import { LINIEN_FARBE, VERLAUF } from "@/lib/aroma-farben";
 import { GESCHMACKS_ACHSEN, type GeschmacksMatrix } from "@/lib/query/bewertung";
 import { GeschmackIcon, TerpenIcon } from "@/components/review/AromaIcon";
-import { BEGLEITSTOFFE } from "@/lib/terpen-aromen";
+import { BEGLEITSTOFFE, istKandidatAnteil } from "@/lib/terpen-aromen";
 import { formatiereZahl } from "@/lib/format";
 import { rasten, tasteZuWert } from "@/lib/regler-raster";
 import { terpenAnzeige } from "@/lib/i18n/terpen";
@@ -337,11 +337,11 @@ export function AromaKarte({
   const traeger = new Map<string, { achse: number; anteil: number }[]>([
     ...terpene.map(
       (terpen) =>
-        [terpen.name, terpenBoegen(terpen).filter((b) => b.anteil >= 0.2).sort((a, b) => b.anteil - a.anteil)] as const,
+        [terpen.name, terpenBoegen(terpen).filter((b) => istKandidatAnteil(b.anteil)).sort((a, b) => b.anteil - a.anteil)] as const,
     ),
     ...BEGLEITSTOFFE.map(
       (stoff) =>
-        [stoff.name, begleitBoegen(stoff.noten).filter((b) => b.anteil >= 0.2).sort((a, b) => b.anteil - a.anteil)] as const,
+        [stoff.name, begleitBoegen(stoff.noten).filter((b) => istKandidatAnteil(b.anteil)).sort((a, b) => b.anteil - a.anteil)] as const,
     ),
   ]);
   /** Achse gehört zum überfahrenen Terpen. */
@@ -1464,12 +1464,12 @@ function tragendeStoffe(
   const RANG: Record<TerpenEbene, number> = { hersteller: 0, ergaenzt: 1, geist: 2 };
   const terpene = lernen
     .filter((terpen) =>
-      terpenBoegen({ ...terpen, konzentrationProzent: null, rang: 99 }).some((b) => b.achse === achse && b.anteil >= 0.2),
+      terpenBoegen({ ...terpen, konzentrationProzent: null, rang: 99 }).some((b) => b.achse === achse && istKandidatAnteil(b.anteil)),
     )
     .map((terpen) => ({ name: terpen.name, ebene: ebeneVon?.(terpen.name) }))
     .sort((a, b) => (a.ebene && b.ebene ? RANG[a.ebene] - RANG[b.ebene] : 0));
   const stoffe = BEGLEITSTOFFE.filter((stoff) =>
-    begleitBoegen(stoff.noten).some((b) => b.achse === achse && b.anteil >= 0.2),
+    begleitBoegen(stoff.noten).some((b) => b.achse === achse && istKandidatAnteil(b.anteil)),
   ).map((stoff) => ({ name: stoff.name }));
   return [...terpene, ...stoffe];
 }

@@ -2,7 +2,7 @@ import type { GeschmacksKategorie } from "@/db/enums";
 import { aromaAnteile } from "@/lib/terpen-aromen";
 
 /**
- * Die zehn Achsen des Terpen-Netzes (Spec 2026-10-09 A): für jedes Mitglied dieselben, damit Netze
+ * Die elf Achsen des Terpen-Netzes (Spec 2026-10-09 A): für jedes Mitglied dieselben, damit Netze
  * vergleichbar bleiben und der Verlauf läuft. Namen wie in der Datenbank, Schlüssel wie in terpen-aromen.
  * Ester und Thiole sind keine Terpene und fehlen bewusst.
  */
@@ -17,6 +17,7 @@ export const TERPEN_ACHSEN = [
   { schluessel: "ocimen", name: "Ocimen" },
   { schluessel: "farnesen", name: "Farnesen" },
   { schluessel: "nerolidol", name: "Nerolidol" },
+  { schluessel: "bisabolol", name: "Bisabolol" },
 ] as const;
 
 export type TerpenSchluessel = (typeof TERPEN_ACHSEN)[number]["schluessel"];

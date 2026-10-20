@@ -5,10 +5,10 @@ import {
   TERPEN_ACHSEN, hauptAroma, leeresTerpenNetz, terpenNetzAusListe, terpenNetzAusVektor, terpenNetzLesen, terpenSchluessel,
 } from "@/lib/terpen-achsen";
 
-test("zehn feste Achsen in fester Reihenfolge, Namen wie in der Datenbank", () => {
+test("elf feste Achsen in fester Reihenfolge, Namen wie in der Datenbank", () => {
   assert.deepEqual(TERPEN_ACHSEN.map((a) => a.name), [
     "Myrcen", "Limonen", "beta-Caryophyllen", "Linalool", "alpha-Pinen",
-    "Terpinolen", "Humulen", "Ocimen", "Farnesen", "Nerolidol",
+    "Terpinolen", "Humulen", "Ocimen", "Farnesen", "Nerolidol", "Bisabolol",
   ]);
 });
 

@@ -27,8 +27,8 @@ test("baueTerpenRegister: jedes Terpen mit Schlüssel, Anker, Noten aus der Tabe
 });
 
 test("baueTerpenRegister: Terpen ohne Tabelleneintrag trägt nur seine Hauptnote aus der Datenbank", () => {
-  const { terpene } = baueTerpenRegister(KATALOG);
-  assert.deepEqual(terpene.find((t) => t.name === "Guajol")?.noten, [{ geschmack: "HOLZIG", anteil: 1 }]);
+  const { terpene } = baueTerpenRegister([...KATALOG, { name: "Camphen-Test", geschmack: "HOLZIG", sorten: 1 }]);
+  assert.deepEqual(terpene.find((t) => t.name === "Camphen-Test")?.noten, [{ geschmack: "HOLZIG", anteil: 1 }]);
 });
 
 test("baueTerpenRegister: Noten in fester Reihenfolge, je Note die Terpene nach Anteil absteigend", () => {
@@ -39,10 +39,10 @@ test("baueTerpenRegister: Noten in fester Reihenfolge, je Note die Terpene nach 
   assert.deepEqual(fruchtig?.terpene.map((t) => t.sorten), [12, 7]);
   assert.deepEqual(fruchtig?.begleitstoffe.map((b) => b.name), ["Ester"]);
   assert.equal(fruchtig?.anker, "register-note-fruchtig");
-  // Reihenfolge der Achsen wie GESCHMACKS_KATEGORIEN, leere Noten entfallen.
+  // Reihenfolge der Achsen wie GESCHMACKS_KATEGORIEN, leere Noten entfallen (Guajol bringt Blumig).
   assert.deepEqual(
     noten.map((n) => n.geschmack),
-    ["DIESEL", "ZITRUS", "ERDIG", "SUESS", "HOLZIG", "KRAEUTRIG", "FRUCHTIG"],
+    ["DIESEL", "ZITRUS", "ERDIG", "SUESS", "BLUMIG", "HOLZIG", "KRAEUTRIG", "FRUCHTIG"],
   );
 });
 

@@ -48,7 +48,7 @@ test("profilAnzeige: mag ich positiv, mag ich nicht negativ, stärkste Achse 1",
   assert.ok(w.terpenNetz.humulen < 0);
 });
 
-test("profilAnzeige: Terpen-Netz hat genau die zehn festen Achsen, fremde Terpene fallen weg", () => {
+test("profilAnzeige: Terpen-Netz hat genau die elf festen Achsen, fremde Terpene fallen weg", () => {
   const viel = sorte("viel", ["Myrcen", "Guajol"].map((n): [string, GeschmacksKategorie] => [n, "SUESS"]));
   const wenig = sorte("wenig", ["Nerolidol"].map((n): [string, GeschmacksKategorie] => [n, "ERDIG"]));
   const w = profilAnzeige(
@@ -58,7 +58,7 @@ test("profilAnzeige: Terpen-Netz hat genau die zehn festen Achsen, fremde Terpen
     ],
     [viel, wenig],
   );
-  assert.equal(Object.keys(w.terpenNetz).length, 10);
+  assert.equal(Object.keys(w.terpenNetz).length, 11);
   assert.ok(w.terpenNetz.myrcen > 0);
   assert.ok(w.terpenNetz.nerolidol < 0);
   assert.equal("guajol" in w.terpenNetz, false);
