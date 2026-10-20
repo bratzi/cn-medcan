@@ -22,6 +22,7 @@ export const en: Woerterbuch = {
       sotm: "SOTM",
       jury: "Jury",
       blueten: "Strains",
+      neu: "New",
       profil: "My profile",
     },
     ungelesen: {
@@ -688,6 +689,16 @@ export const en: Woerterbuch = {
     laden: "Load reel from Instagram",
     datenschutz: "Loading it sends your IP address and browser data to Meta.",
     mehr: "More in the privacy policy",
+  },
+  neu: {
+    titel: "What's new",
+    metaBeschreibung: "What changed on Book of Terpz and what we are building right now.",
+    satz: "What changed here and what we are building right now. Short and without jargon.",
+    inArbeit: "In the works",
+    meldungen: "News",
+    leer: "No news yet.",
+    ansehen: "Have a look",
+    art: { neu: "New", besser: "Better", behoben: "Fixed" },
   },
   sotm: {
     titel: "Strain of the Month",

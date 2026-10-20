@@ -8,6 +8,8 @@ export const HAUPTNAVIGATION = [
   { href: "/sotm", schluessel: "sotm" },
   { href: "/jury", schluessel: "jury" },
   { href: "/blueten", schluessel: "blueten" },
+  // Neuigkeiten seit 2026-10-20 (Nutzer): was sich ändert und woran wir bauen.
+  { href: "/neu", schluessel: "neu" },
   // Apotheken seit 2026-09-25 nur in Aussicht (Nutzer), deshalb nicht in der Navigation.
 ] as const;
 

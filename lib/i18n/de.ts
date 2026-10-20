@@ -26,6 +26,7 @@ export const de = {
       sotm: "SOTM",
       jury: "Jury",
       blueten: "Strains",
+      neu: "Neu",
       profil: "Mein Profil",
     },
     ungelesen: {
@@ -701,6 +702,16 @@ export const de = {
     laden: "Reel von Instagram laden",
     datenschutz: "Beim Laden gehen deine IP-Adresse und Browserdaten an Meta.",
     mehr: "Mehr dazu im Datenschutz",
+  },
+  neu: {
+    titel: "Was ist neu",
+    metaBeschreibung: "Was sich am Book of Terpz geändert hat und woran wir gerade bauen.",
+    satz: "Was sich hier verändert hat und woran wir gerade bauen. Kurz und ohne Fachchinesisch.",
+    inArbeit: "Gerade in Arbeit",
+    meldungen: "Neuigkeiten",
+    leer: "Noch keine Neuigkeiten.",
+    ansehen: "Ansehen",
+    art: { neu: "Neu", besser: "Besser", behoben: "Behoben" },
   },
   sotm: {
     titel: "Strain of the Month",
