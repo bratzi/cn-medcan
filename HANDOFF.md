@@ -3,7 +3,7 @@
 > Übergabemedium zwischen Sessions. Wird nach jedem Arbeitsblock aktualisiert und committet.
 > Wer hier weiterarbeitet, liest diese Datei zuerst und braucht den Chatverlauf nicht.
 
-**Letzte Aktualisierung:** 2026-10-20 (Session 74)
+**Letzte Aktualisierung:** 2026-10-20 (Session 75)
 **Repo:** https://github.com/bratzi/cn-medcan (public)
 **Branch:** `main` (Makeover „Grünes Buch“ Teilprojekt 1 ist seit 2026-09-24 auf `main`)
 
@@ -27,6 +27,32 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 ---
 
 ## ⇢ Hier geht es weiter
+
+### ⇢ SESSION 75 (2026-10-20): SOTM Plan B halb, Startseite korrigiert, Info-Knöpfe und Blätter offen
+
+**ALS ERSTES (Arbeitsmodus siehe Memory „Arbeitsmodus SDD“, unverändert fortsetzen):**
+1. Plan B `docs/superpowers/plans/2026-10-20-strain-of-the-month.md` subagent-driven weiter. Ledger:
+   `.superpowers/sdd/2026-10-20-strain-of-the-month/progress.md` (lokal, gitignoriert). Task 1–4 fertig + gepusht.
+   Task 5: Fix-Commit liegt (SOTM nur Community-Gewinner, wareGenau, Cache je Monat), **Re-Review offen**
+   (review-package d8addfd..HEAD, re-review-prompt). Dann Task 6 (Seite /sotm, Sektion, Menü, 301, Admin ohne Phasen-Knopf;
+   leere Abstimmungsrunde braucht UI-Text), Task 7 (live: einmal POST /api/sotm/takt → Sept-Runde wird Nov-Runde „UEBERNOMMEN“).
+   Danach Final-Review (opus) und Rulings-Liste an Nutzer.
+2. **Info-Knöpfe** (Nutzerauftrag): kleine Hinweistexte der Startseite hinter kleine Info-Knöpfe. Vorschlag-Tabelle wurde gezeigt,
+   **Nutzer-Ja steht aus**: Bewertung „Tipp links ins Blatt …“ (+ „Optional“ streichen, Note ist Pflicht), „Zieh die lila Punkte …“,
+   „Qualität, Restfeuchte und Frische gehören zur Charge …“, Legende „Laut Datenblatt enthalten/Nur über den Geschmack“;
+   Dein Kapitel „Geschmack, gemessen an … Fahr über ein Symbol …“; Neuester Eintrag „Unter 8 % Restfeuchte …“; Katalog „Skala 0 bis
+   35 %“; Abstimmung „Eine Änderung ist nicht vorgesehen.“ streichen; Storytelling-Texte bleiben. Baustein `InfoKnopf` (rund 24 px,
+   Hover/Fokus/Tippen, a11y), auch auf Blütenseiten. Texte in lib/i18n/de.ts (gesamtnoteHinweis Z.601, hinweisRegler 199,
+   chargeSatz 250, netzHinweis 1388, zuTrocken 182). Skills: critique-information-density, better-writing, ui-design-engine.
+3. **Gesamtnote-Blätter** (`components/review/BlattAnzeige.tsx`, `BlattNote.tsx`): größer (Prototyp: Reihe ~44rem statt max-w-100)
+   ist gut, aber Nutzer: Prototyp-Blätter zu dick. **Feiner, feingranularer, detaillierter ausgearbeitet, Award-Niveau** (Awwwards).
+   Neue Blattzeichnung entwerfen (mehr Finger/Zähne, Mittelrippe, Adern, feine Kontur), zuerst live per Browser-MCP prototypen,
+   Screenshot zeigen, dann coden. Gefüllt: Kontur in accent. Skills: build-awwwards-quality-sites, design-taste-frontend,
+   emil-design-eng, apple-design, ui-design-engine, frontend-design.
+- Startseite live (3ccc7d1): Storytelling komplett, Dein Kapitel, Bewertung (= AromaSektion), Neuester Eintrag, Terpene,
+  Katalog (zu, Pillen, klappt auf), Wissen, Lernen, Empfehlungen, Abstimmung. Memory „Startseite: Bewertung = Aroma-Karte“.
+- Publora: fuenf-noten Entwurf `6ad6b0e772ec65f94122602a` ab ~23.10. per update_post auf 2026-10-30T17:00Z planen.
+- Neue Regel: UI erst live per Browser-MCP prototypen (Memory „Live statt Dev“).
 
 ### ⇢ SESSION 74 (2026-10-20): Spec Startseite + SOTM geschrieben, 1102 belegt
 
