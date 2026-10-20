@@ -46,7 +46,7 @@ export const de = {
     },
   },
   fuss: {
-    schlusszeile: "Wir lesen mit. Wir wählen mit.",
+    schlusszeile: "Terpz 4 Nerdz",
     zurueckNachOben: "Zurück zum Anfang ↑",
     navigation: "Fußnavigation",
     inhalt: "Inhalt",

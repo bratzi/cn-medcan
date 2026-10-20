@@ -42,7 +42,7 @@ export const en: Woerterbuch = {
     },
   },
   fuss: {
-    schlusszeile: "We read along. We vote along.",
+    schlusszeile: "Terpz 4 Nerdz",
     zurueckNachOben: "Back to top ↑",
     navigation: "Footer navigation",
     inhalt: "Contents",
