@@ -25,6 +25,17 @@ export type InArbeit = { id: string; titel: Zweisprachig; text: Zweisprachig };
 
 export const NEUIGKEITEN: readonly Neuigkeit[] = [
   {
+    id: "2026-10-20-strains-laedt-wieder",
+    datum: "2026-10-20",
+    art: "behoben",
+    titel: { de: "Strains-Seite lädt wieder", en: "Strains page loads again" },
+    text: {
+      de: "Die Strains-Seite fiel manchmal mit einer Fehlermeldung aus. Jetzt ist sie fertig vorbereitet und öffnet sich schnell.",
+      en: "The strains page sometimes failed with an error. Now it is prepared ahead and opens fast.",
+    },
+    link: "/blueten",
+  },
+  {
     id: "2026-10-20-startseite-bewertung-katalog",
     datum: "2026-10-20",
     art: "besser",
