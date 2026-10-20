@@ -16,15 +16,19 @@ export { sotmAus, type SotmAnsicht };
  * Drei Queries: Runde samt Gewinner, Community-Aggregat, Betreiber-Review.
  * Zaehlung seit Monatsbeginn (UTC), nur freigegeben, Community ohne Redaktion.
  */
-export const aktuellerSotm = cache(async (jetzt: Date = new Date()): Promise<SotmAnsicht | null> => {
+export async function aktuellerSotm(jetzt: Date = new Date()): Promise<SotmAnsicht | null> {
+  return sotmFuerMonat(monatSchluessel(jetzt));
+}
+
+const sotmFuerMonat = cache(async (monat: string): Promise<SotmAnsicht | null> => {
   const prisma = await getPrisma();
-  const monat = monatSchluessel(jetzt);
+  const [jahr, mon] = monat.split("-").map(Number);
 
   const runde = await prisma.umfrage.findFirst({
     where: { monat, phase: "BEENDET" },
     select: {
       optionen: {
-        where: { istGewinner: true },
+        where: { istGewinner: true, herkunft: "COMMUNITY" },
         orderBy: { reihenfolge: "asc" },
         take: 1,
         select: {
@@ -45,10 +49,10 @@ export const aktuellerSotm = cache(async (jetzt: Date = new Date()): Promise<Sot
   const gewinner = runde?.optionen[0]?.strain;
   if (!gewinner) return null;
 
-  const monatsbeginn = new Date(Date.UTC(jetzt.getUTCFullYear(), jetzt.getUTCMonth(), 1));
+  const monatsbeginn = new Date(Date.UTC(jahr, mon - 1, 1));
   const [community, betreiber] = await Promise.all([
     prisma.review.aggregate({
-      where: { strainId: gewinner.id, freigegeben: true, istRedaktionell: false, erstelltAm: { gte: monatsbeginn } },
+      where: { strainId: gewinner.id, freigegeben: true, istRedaktionell: false, wareGenau: true, erstelltAm: { gte: monatsbeginn } },
       _count: { _all: true },
       _avg: { gesamtnote: true },
     }),
