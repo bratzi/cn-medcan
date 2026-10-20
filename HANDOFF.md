@@ -28,6 +28,13 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 
 ## ⇢ Hier geht es weiter
 
+### ⇢ SESSION 82 (2026-10-20): Task 1 reviewed, gemergt, GEPUSHT (9dffbac)
+- Review APPROVED (task-1-review.md). Fix ergänzt: Build mit VORRENDERN scheitert, dann zweiter Build ohne.
+- 1398 Tests, tsc, lint grün. NÄCHSTER SCHRITT: Workers-Build-Log prüfen (Token darf D1 exportieren?, Dauer,
+  getPlatformProxy in CI, Zeilen „[vorrendern]“, >5 Cache-Einträge), dann live /blueten 390/1280/1536/1920
+  hell/dunkel + Startseite, dann Neuigkeiten-Eintrag. Worktree C:\cn-wtorrendern noch nicht aufgeräumt
+  (node_modules ist Junction, nur lösen).
+
 ### ⇢ SESSION 81 (2026-10-20): Task 2 gemergt, Task 1 läuft
 - Fragen S80 beantwortet: Schwellen 1,25/2,5 bleiben; Filterspalte offen ab 1536 px. NICHT erneut fragen.
 - Task 2 Review APPROVED (task-2-review.md), gemergt auf main 16d2527 (lokal, nicht gepusht).
