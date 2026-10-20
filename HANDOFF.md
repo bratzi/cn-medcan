@@ -3,7 +3,7 @@
 > Übergabemedium zwischen Sessions. Wird nach jedem Arbeitsblock aktualisiert und committet.
 > Wer hier weiterarbeitet, liest diese Datei zuerst und braucht den Chatverlauf nicht.
 
-**Letzte Aktualisierung:** 2026-10-20 (Session 76)
+**Letzte Aktualisierung:** 2026-10-20 (Session 77)
 **Repo:** https://github.com/bratzi/cn-medcan (public)
 **Branch:** `main` (Makeover „Grünes Buch“ Teilprojekt 1 ist seit 2026-09-24 auf `main`)
 
@@ -27,6 +27,29 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 ---
 
 ## ⇢ Hier geht es weiter
+
+### ⇢ SESSION 77 (2026-10-20): Plural-Fix, Info-Knöpfe, feine Blätter, Stammdaten remote
+
+**SAFE4CLEAR S77 – ALS ERSTES:**
+1. **Live prüfen** (Builds a71b1a8 und 949c39c liefen beim Clear, Status per Cloudflare-API, siehe „Lehre Deploy“):
+   Startseite mit `?f=7`: Info-Knöpfe (rund 24 px, Hover/Fokus/Tippen, Escape), Blase an schmalen Rändern bei 390 px
+   nicht abgeschnitten (öffnet mittig nach oben, max 18rem); Satz „nicht vorgesehen“ weg; neue Blätter der Gesamtnote
+   (Reihe 44rem, Kontur fein); Bewertungsmaske (Wirkung-Ring, Herstellerterpene, Community-Terpene pulsieren, 11 Achsen);
+   /sotm bei 390 px. Plural-Fix „1 Stimme“ ist live bestätigt (data-stimmwort).
+2. Danach aus S75/S76 offen: Publora fuenf-noten ab 23.10. planen; Terpen-Audit zweite Priorität (Valencen, Geraniol,
+   Caryophyllenoxid, Camphen, Caren, Phellandren, Selinen) nicht umgesetzt.
+- Erledigt S77: 63fca7a Plural-Fix (Wort zählt mit der Zahl hoch); d46cc6d InfoKnopf (components/ui/InfoKnopf.tsx)
+  auf Startseite und Blütenseiten, „Optional“ und keineAenderung gestrichen; 949c39c auch Erkunden-Hinweis hinter
+  Knopf; 23e6a42 Blätter neu (7 gesägte Finger, Adern, Kontur 0,32), Stiel in lib/ig-grafik.tsx angepasst;
+  a808716 import.sql neu. Suite 1308/1308.
+- **Stammdaten remote eingespielt:** Farnesen FRUCHTIG, beta-Pinen an 4, Terpineol an 1 Strain, keine Rang-Doppel.
+  Lehre: import.sql nur Upsert, nachrückende Ränge kollidieren (UNIQUE strain_id, rang). Vorher Terpen-Zeilen der
+  geänderten Strains löschen. Remote hat 10 Handzeilen an 3 Strains (a5657e66, fc05aae2, f5745103), die nicht im
+  Import stehen: bleiben.
+- Offen klein: video/src/ErklaerReel.tsx hat eigene Kopie der alten Blattform; bei halber Note sind Adern auf der
+  gefüllten Hälfte unsichtbar (gewollt so gelassen). Hinweisblase ohne Animation (entschieden).
+- Nutzerwunsch: weniger fragen, mehr machen (Memory „Weniger fragen“).
+
 
 ### ⇢ SESSION 76 (2026-10-20): SOTM Task 1–7 fertig, Terpen-Audit live, Kapitel spielt ab
 
