@@ -132,16 +132,16 @@ export function KapitelAufschlag({
       ) : null}
 
       {/* Bewusst nicht components/kapitel/Randnotizen: die liegen im Subgrid des Profil-Rasters,
-          hier stehen die Zahlen frei und mittig in der Säule. Gleich bleibt das Muster: Zahl
-          gedruckt, Wort von Hand, vorgelesen ein Satz je Notiz. */}
+          hier stehen die Zahlen frei und mittig in der Säule. Akzent trägt das kurze Element
+          (Nutzer 2026-10-20): Zahl von Hand, Wort gedruckt, vorgelesen ein Satz je Notiz. */}
       <ul aria-label={texte.notizen} className="flex flex-wrap justify-center gap-x-16 gap-y-8">
         {notizen.map((n) => (
           <li key={n.wort} className="flex min-w-0 flex-col items-center gap-2">
             <span className="sr-only">{n.satz}</span>
-            <span aria-hidden="true" className="numeric text-display text-text">
+            <span aria-hidden="true" data-story="kapitel-wort" className="farbverlauf font-hand text-display text-logo">
               {n.zahl}
             </span>
-            <span aria-hidden="true" data-story="kapitel-wort" className="font-hand text-notiz text-logo wrap-break-word">
+            <span aria-hidden="true" className="text-body text-text-muted wrap-break-word">
               {n.wort}
             </span>
           </li>
