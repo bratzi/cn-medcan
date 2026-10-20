@@ -3,7 +3,7 @@
 > Übergabemedium zwischen Sessions. Wird nach jedem Arbeitsblock aktualisiert und committet.
 > Wer hier weiterarbeitet, liest diese Datei zuerst und braucht den Chatverlauf nicht.
 
-**Letzte Aktualisierung:** 2026-10-20 (Session 80)
+**Letzte Aktualisierung:** 2026-10-21 (Session 82)
 **Repo:** https://github.com/bratzi/cn-medcan (public)
 **Branch:** `main` (Makeover „Grünes Buch“ Teilprojekt 1 ist seit 2026-09-24 auf `main`)
 
@@ -28,12 +28,24 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 
 ## ⇢ Hier geht es weiter
 
-### ⇢ SESSION 82 (2026-10-20): Task 1 reviewed, gemergt, GEPUSHT (9dffbac)
-- Review APPROVED (task-1-review.md). Fix ergänzt: Build mit VORRENDERN scheitert, dann zweiter Build ohne.
-- 1398 Tests, tsc, lint grün. NÄCHSTER SCHRITT: Workers-Build-Log prüfen (Token darf D1 exportieren?, Dauer,
-  getPlatformProxy in CI, Zeilen „[vorrendern]“, >5 Cache-Einträge), dann live /blueten 390/1280/1536/1920
-  hell/dunkel + Startseite, dann Neuigkeiten-Eintrag. Worktree C:\cn-wtorrendern noch nicht aufgeräumt
-  (node_modules ist Junction, nur lösen).
+### ⇢ SESSION 82 (2026-10-21): Task 1+2+3 live gepusht, Abzug-Fix ca1cb5e – SAFE4CLEAR
+- Alles auf origin/main (ca1cb5e). Build 9dffbac lief durch, aber OHNE Vorrendern: Import des Gesamtabzugs
+  scheiterte („no such table: main.kultivare“, danach Trigger „stimmen: Umfrage ist nicht in der Abstimmungsphase“).
+- Fix ca1cb5e: zwei Exporte (--no-data, --no-schema), Import Tabellen, Daten, Trigger (trenneTrigger). Lokal mit
+  Live-Abzug in Wegwerf-DB geprüft: 710 aktive Strains. Plus: Build mit VORRENDERN scheitert, dann zweiter Build ohne.
+  1399 Tests, tsc, lint grün.
+- Build-Log lesen: Dashboard-Tab, dann im Seitenkontext
+  fetch('/api/v4/accounts/cd848694bd925a07b4257fc01078b426/builds/builds/<build-id>/logs',{headers:{'x-cross-site-security':'dash'}})
+  → result.lines; Build-ID aus `gh api repos/bratzi/cn-medcan/commits/<sha>/check-runs`. Cloudflare-Plugin-MCP braucht Auth.
+- NÄCHSTE SCHRITTE: 1) Build-Log ca1cb5e: „[vorrendern] D1-Abzug bereit (… aktive Strains)“ und deutlich >5 Cache-Einträge?
+  2) live /blueten 390/1280/1536/1920 hell/dunkel + Startseite, 1102 weg? 3) Neuigkeiten-Eintrag (lib/neuigkeiten/eintraege.ts).
+  4) Worktree C:\cn-wt\vorrendern aufräumen (node_modules ist Junction, nur lösen) und Branch vorrendern-task1 löschen.
+- Hinweis: d1 export sperrt die Live-D1 kurz („database will be unavailable“), zwei Exporte je Build. Bei Ausfällen
+  während Deploys daran denken.
+- Offene Kleinpunkte (Review task-1-review.md): VORRENDERN_DATEN=1 lokal überschreibt lokale D1 mit Live-Daten
+  (personenbezogen); Admins sehen nach Speichern kurz alte Seite; Hintergrund-Neubau kann 1102 loggen;
+  aria-expanded kurz false bei Hydration; drittes Inline-Skript im head; alter KV-Eintrag v1.
+- Keine offenen Fragen an den Nutzer.
 
 ### ⇢ SESSION 81 (2026-10-20): Task 2 gemergt, Task 1 läuft
 - Fragen S80 beantwortet: Schwellen 1,25/2,5 bleiben; Filterspalte offen ab 1536 px. NICHT erneut fragen.
