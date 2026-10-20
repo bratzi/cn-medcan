@@ -15,7 +15,7 @@ veröffentlichst nie selbst. Jeder Post bleibt ein **Entwurf in Publora**, bis d
 
 ## Quellen
 
-- Feed: `https://cn-medcan.w-helwich.workers.dev/api/ig-feed?key=<IG_FEED_KEY>`
+- Feed: `https://www.bookofterpz.workers.dev/api/ig-feed?key=<IG_FEED_KEY>`
   Liefert die letzten zehn freigegebenen Bewertungen des Betreibers. Jede hat `id`, `bluete`, `vertreiber`,
   `charge`, `gesamtnote`, `aromen`, `notiz`, `url` und `karte`.
 - Datei `gepostet.txt` in diesem Projekt: eine Bewertungs-Id je Zeile. Lege sie an, wenn sie fehlt.
