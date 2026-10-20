@@ -483,15 +483,18 @@ export function AromaErkundung({
         {beschaffenheit ? (
           // In der Maske gilt die Qualität der eigenen Charge, nicht der Sorte (Bewertung v2, T4).
           <Schritt nummer="3" titel={eingabe ? texte.aroma.erkundung.dieseCharge : texte.aroma.erkundung.qualitaet}>
-            {zuordnung ? (
-              <p className="text-caption text-text-muted">
-                {zuordnung.vertreiber
-                  ? t(texte.zuordnung.vertreiber, { name: zuordnung.vertreiber })
-                  : texte.zuordnung.vertreiberUnbekannt}
-              </p>
-            ) : null}
-            {eingabe ? (
-              <InfoKnopf sprache={texte.sprache} text={texte.aroma.erkundung.chargeSatz} />
+            {/* Zuordnung und Info-Knopf in einer Zeile, nicht der Knopf allein (Nutzer 2026-10-20). */}
+            {zuordnung || eingabe ? (
+              <div className="flex items-center gap-2">
+                {zuordnung ? (
+                  <p className="text-caption text-text-muted">
+                    {zuordnung.vertreiber
+                      ? t(texte.zuordnung.vertreiber, { name: zuordnung.vertreiber })
+                      : texte.zuordnung.vertreiberUnbekannt}
+                  </p>
+                ) : null}
+                {eingabe ? <InfoKnopf sprache={texte.sprache} text={texte.aroma.erkundung.chargeSatz} /> : null}
+              </div>
             ) : null}
             <BeschaffenheitsLeiste
               {...beschaffenheit}

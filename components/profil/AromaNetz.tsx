@@ -304,8 +304,11 @@ export function AromaNetz({
 
       {hatMag || hatMagNicht ? (
         <>
-          <NetzLegende mag={texte.magIch} magNicht={hatMagNicht ? texte.magIchNicht : null} vorher={hatKontur ? texte.vorher : null} />
-          <InfoKnopf sprache={sprache} className="self-center" text={`${modus === "terpene" ? texte.terpenSkala : texte.netzSkala}. ${texte.netzHinweis}`} />
+          {/* Knopf am Ende der Legende statt in eigener Zeile (Nutzer 2026-10-20). */}
+          <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2">
+            <NetzLegende mag={texte.magIch} magNicht={hatMagNicht ? texte.magIchNicht : null} vorher={hatKontur ? texte.vorher : null} />
+            <InfoKnopf sprache={sprache} text={`${modus === "terpene" ? texte.terpenSkala : texte.netzSkala}. ${texte.netzHinweis}`} />
+          </div>
           <ul className="sr-only">
             {beschreibung.map((satz, n) => (
               <li key={achsen[n].key}>{satz}</li>

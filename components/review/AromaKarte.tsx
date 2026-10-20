@@ -1268,34 +1268,27 @@ export function AromaKarte({
           <div
             key="hinweis"
             // Dicht (Buch, ab lg): ohne Hinweis; die Doppelseite reicht keine Ebenen, die Legende fiele ohnehin weg.
-            className={cn("flex flex-col items-center gap-6 pt-8 transition-opacity duration-normal ease-out starting:opacity-0", kompakt && "lg:hidden")}
+            className={cn("flex flex-wrap items-center justify-center gap-x-6 gap-y-2 pt-8 transition-opacity duration-normal ease-out starting:opacity-0", kompakt && "lg:hidden")}
           >
-            {/* Bedienhinweis mit Reglern und Legende der Ebenen liegen hinter dem Info-Knopf (Nutzer 2026-10-20).
+            {/* Legende der Ebenen sichtbar in der freien Zeile unter der Grafik, der Bedienhinweis allein
+                hinter dem Knopf an ihrem Ende (Nutzer 2026-10-20: Platz nutzen, weniger Text im Hinweis).
                 Die Legende (T5) nur, wenn es mehr gibt als die Herstellerangabe: Strich, Strichelung und Farbe
                 wie die Bögen, damit die Ebene nicht nur an der Farbe hängt. */}
+            {[...vorhandeneEbenen].some((ebene) => ebene !== "hersteller")
+              ? EBENEN.filter((ebene) => vorhandeneEbenen.has(ebene)).map((ebene) => (
+                  <span key={ebene} className="inline-flex items-center gap-2 text-caption text-text-muted">
+                    <EbenenMuster ebene={ebene} />
+                    {kt.ebenen[ebene]}
+                  </span>
+                ))
+              : null}
             <InfoKnopf
               sprache={sprache}
               text={
-                <span className="flex flex-col gap-2">
-                  {regler ? (
-                    <span>
-                      {kt.hinweisRegler}
-                      {/* Nur mit Terpen-Reglern (Maske): der Satz zur rechten Seite. */}
-                      {terpenSchalter ? ` ${kt.hinweisTerpenRegler}` : null}
-                    </span>
-                  ) : (
-                    // Erkunden ohne Regler: auch dieser Bedienhinweis liegt hinter dem Knopf.
-                    <span>{kt.hinweisErkunden}</span>
-                  )}
-                  {[...vorhandeneEbenen].some((ebene) => ebene !== "hersteller")
-                    ? EBENEN.filter((ebene) => vorhandeneEbenen.has(ebene)).map((ebene) => (
-                        <span key={ebene} className="inline-flex items-center gap-2 text-caption text-text-muted">
-                          <EbenenMuster ebene={ebene} />
-                          {kt.ebenen[ebene]}
-                        </span>
-                      ))
-                    : null}
-                </span>
+                regler
+                  ? // Nur mit Terpen-Reglern (Maske): der Satz zur rechten Seite.
+                    `${kt.hinweisRegler}${terpenSchalter ? ` ${kt.hinweisTerpenRegler}` : ""}`
+                  : kt.hinweisErkunden
               }
             />
           </div>
