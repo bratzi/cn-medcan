@@ -92,7 +92,7 @@ function aktiveChips(f: StrainFilter, w: Woerterbuch, sprache: Sprache, daten: K
 /** Platzhalter für einen Deep-Link mit Filter, solange der Katalog lädt (Startliste wäre falsch). */
 function ListenSkelett({ ansage }: { ansage: string }) {
   return (
-    <div role="status" className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
+    <div role="status" className="grid grid-cols-[repeat(auto-fill,minmax(min(16rem,100%),1fr))] gap-6">
       <SkelettAnsage text={ansage} />
       {[0, 1, 2, 3, 4, 5].map((stelle) => (
         <span key={stelle} aria-hidden="true" className={`${SKELETT_FLAECHE} h-96`} />
@@ -340,7 +340,7 @@ export function KatalogAnsicht({ start, w, sprache }: Props) {
               }
             />
           ) : (
-            <ul className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
+            <ul className="grid grid-cols-[repeat(auto-fill,minmax(min(16rem,100%),1fr))] gap-6">
               {ergebnis?.ansicht === "ware"
                 ? ergebnis.zeilen.map((zeile) => (
                     <li key={zeile.i} className="flex">
