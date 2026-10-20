@@ -28,6 +28,22 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 
 ## ⇢ Hier geht es weiter
 
+### ⇢ NÄCHSTE AUFGABE (eingetaktet 2026-10-21, S84): Strain-Seite /blueten agenturreif umbauen
+- Auftrag Nutzer: „Sortierung und Filter sind ugly af“. Filter, Sortierung und ganze Strain-Seite UX/UI auf
+  Agenturniveau heben. Mit dem vollen eigenen Skill-Set.
+- Ablauf: superpowers:brainstorming (Grundsatzfragen gebündelt, Rest selbst entscheiden), dann writing-plans,
+  parallel geschnittene Stränge in Worktrees (subagent-driven-development). UI erst live per Browser-JS prototypen,
+  Nutzer zeigen, dann coden, ein Push, Live-Prüfung als eigener Agent.
+- Skills: ui-design-engine, design-taste-frontend, frontend-design, better-interface (better-ui, better-layout,
+  better-typography, better-colors, better-accessibility, better-writing), emil-design-eng, apple-design,
+  critique-visual-hierarchy, critique-information-density, critique-composition, critique-affordance,
+  hicks-law, fitts-law, jakobs-law, law-of-common-region, law-of-proximity, animate, web-design-guidelines,
+  react-best-practices, edge-stack-master (kein CPU-Mehraufwand im Request, Free-Limit 10 ms).
+- Startseite mitziehen, falls Kartendarstellung sich ändert (Dauerregel). Wording: Blüte/Strain, Variante.
+- Betroffen: components/katalog/** (KatalogAnsicht, Werkzeugleiste, FilterFelder, KatalogKarte), app/globals.css
+  (.katalog-filterspalte), lib/katalog/filterspalte.ts. Festgelegt (nicht erneut fragen): Filterspalte offen ab 1536 px,
+  Geschmacks-Schwellen 1,25/2,5.
+
 ### ⇢ SESSION 84 (2026-10-21): Kartenüberlauf /blueten behoben (6bcfd95)
 - Bug: Karten mit Bewertung breiter als Rasterspalte (implizite auto-Spalte wuchs auf min-content), waagerechter Rollbalken.
   Fix: KARTEN_ZELLE und article in KatalogKarte mit min-w-0 grid-cols-1. Live per JS prototypt, gepusht, Neuigkeit drin.
