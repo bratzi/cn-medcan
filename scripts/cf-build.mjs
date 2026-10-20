@@ -9,7 +9,8 @@
  * nach jedem Deploy der erste Besucher jede Seite im Request (700 bis 1300 ms CPU).
  *
  * Scheitert Export, Import oder Prüfung: Warnung `[vorrendern] …`, Build ohne VORRENDERN wie
- * bisher. Scheitert der Build selbst: Exit-Code ungleich 0.
+ * bisher. Scheitert der Build mit VORRENDERN, folgt ein zweiter Build ohne; scheitert auch der:
+ * Exit-Code ungleich 0.
  */
 import { spawnSync } from "node:child_process";
 import { mkdtempSync, rmSync } from "node:fs";
@@ -97,14 +98,16 @@ function main() {
     console.log("[vorrendern] aus (weder WORKERS_CI=1 noch VORRENDERN_DATEN=1)");
   }
 
-  const env = buildEnv(process.env, abzugOk);
-  for (const [befehl, args] of [
-    ["npx", ["opennextjs-cloudflare", "build"]],
-    ["node", ["scripts/bundle-env-bereinigen.mjs"]],
-  ]) {
-    const r = spawnSync(befehl, args, { shell: process.platform === "win32", stdio: "inherit", env });
-    if (r.status !== 0) process.exit(r.status ?? 1);
+  const lauf = (befehl, args, env) =>
+    spawnSync(befehl, args, { shell: process.platform === "win32", stdio: "inherit", env }).status ?? 1;
+  let status = lauf("npx", ["opennextjs-cloudflare", "build"], buildEnv(process.env, abzugOk));
+  if (status !== 0 && abzugOk) {
+    console.log("[vorrendern] WARNUNG: Build mit Vorrendern fehlgeschlagen, zweiter Versuch ohne Vorrendern");
+    status = lauf("npx", ["opennextjs-cloudflare", "build"], buildEnv(process.env, false));
   }
+  if (status !== 0) process.exit(status);
+  status = lauf("node", ["scripts/bundle-env-bereinigen.mjs"], buildEnv(process.env, false));
+  if (status !== 0) process.exit(status);
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) main();
