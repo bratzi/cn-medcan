@@ -28,6 +28,12 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 
 ## ⇢ Hier geht es weiter
 
+### ⇢ SESSION 84 (2026-10-21): Kartenüberlauf /blueten behoben (6bcfd95)
+- Bug: Karten mit Bewertung breiter als Rasterspalte (implizite auto-Spalte wuchs auf min-content), waagerechter Rollbalken.
+  Fix: KARTEN_ZELLE und article in KatalogKarte mit min-w-0 grid-cols-1. Live per JS prototypt, gepusht, Neuigkeit drin.
+- OFFEN: Live-Prüfung nach Deploy (scrollWidth == innerWidth auf /blueten, 390/1280/1536/1920). Einmal sah man
+  „Filter konnten nicht geladen werden“, nach Neuladen weg (vermutlich D1-Export-Sperre beim Deploy).
+
 ### ⇢ SESSION 83 (2026-10-21): Vorrendern bestätigt, S82-Schritte erledigt
 - Build ca1cb5e: „[vorrendern] D1-Abzug bereit (710 aktive Strains lokal)“, „populated cache with 24 entries“ (vorher 5).
 - Live: /blueten 200 ohne 1102, TTFB 185 ms; /, /reviews, /neu 200. Routen ohne /de-Präfix (/de/blueten, /en = 404, so gewollt).
