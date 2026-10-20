@@ -10,12 +10,18 @@ import {
 export const TREFFER_PRO_SEITE = 24;
 
 export const SORTIERUNGEN = [
-  "relevanz",
+  "community",
+  "stimmen",
+  "neueste",
+  "name",
   "thc_absteigend",
   "thc_aufsteigend",
   "preis_aufsteigend",
-  "name",
+  "relevanz",
 ] as const;
+
+/** Wählbare Mindestnoten der Community (Spec 2026-10-20 Blütenseite). */
+export const NOTEN_STUFEN = [3, 3.5, 4, 4.5] as const;
 
 export type Sortierung = (typeof SORTIERUNGEN)[number];
 
@@ -67,6 +73,27 @@ function ersterWert(rohwert: unknown): string | undefined {
   return undefined;
 }
 
+/** Terpen-Namen aus der URL: nur Buchstaben, Ziffern, Leerzeichen, Punkt, Bindestrich; höchstens 8. */
+const terpListe = z
+  .unknown()
+  .transform((rohwert) => {
+    const teile = (Array.isArray(rohwert) ? rohwert : [rohwert])
+      .filter((teil): teil is string => typeof teil === "string")
+      .flatMap((teil) => teil.split(","))
+      .map((teil) => teil.trim())
+      .filter((teil) => /^[\p{L}0-9 .-]{2,40}$/u.test(teil));
+    return [...new Set(teile)].slice(0, 8);
+  })
+  .catch([] as string[]);
+
+const schalter = z
+  .unknown()
+  .transform((rohwert) => {
+    const wert = ersterWert(rohwert)?.toLowerCase();
+    return wert === "1" || wert === "true" || wert === "ja";
+  })
+  .catch(false);
+
 const zahl = (min: number, max: number, fallback: number) =>
   z
     .unknown()
@@ -107,13 +134,17 @@ export const strainFilterSchema = z.object({
     .pipe(z.number().int().min(0))
     .optional()
     .catch(undefined),
-  nurVerfuegbar: z
+  nurVerfuegbar: schalter,
+  /** Mindestnote der Community, nur Stufen aus NOTEN_STUFEN. */
+  note: z
     .unknown()
-    .transform((rohwert) => {
-      const wert = ersterWert(rohwert)?.toLowerCase();
-      return wert === "1" || wert === "true" || wert === "ja";
-    })
-    .catch(false),
+    .transform((rohwert) => Number(ersterWert(rohwert)))
+    .pipe(z.number().refine((n) => (NOTEN_STUFEN as readonly number[]).includes(n)))
+    .optional()
+    .catch(undefined),
+  bewertet: schalter,
+  terp: terpListe,
+  cbd: schalter,
   apotheke: slugListe,
   /** Unternehmen-Ids der Vertreiber (Spec 2026-10-13); alte Links mit `hersteller` liest parseStrainFilter mit. */
   vertreiber: slugListe,
@@ -138,7 +169,7 @@ export const strainFilterSchema = z.object({
     .unknown()
     .transform((rohwert) => ersterWert(rohwert))
     .pipe(z.enum(SORTIERUNGEN))
-    .catch("relevanz"),
+    .catch("community"),
   seite: ganzzahl(1, 1),
 });
 
@@ -161,8 +192,12 @@ const LEERER_FILTER: StrainFilter = {
   apotheke: [],
   vertreiber: [],
   kultivar: undefined,
+  note: undefined,
+  bewertet: false,
+  terp: [],
+  cbd: false,
   ansicht: "bluete",
-  sortierung: "relevanz",
+  sortierung: "community",
   seite: 1,
 };
 
@@ -224,9 +259,13 @@ export function serialisiereFilter(filter: StrainFilter): URLSearchParams {
     params.set("apotheke", filter.apotheke.join(","));
   if (filter.vertreiber.length > 0)
     params.set("vertreiber", filter.vertreiber.join(","));
+  if (filter.note !== undefined) params.set("note", String(filter.note));
+  if (filter.bewertet) params.set("bewertet", "1");
+  if (filter.terp.length > 0) params.set("terp", filter.terp.join(","));
+  if (filter.cbd) params.set("cbd", "1");
   if (filter.kultivar) params.set("kultivar", filter.kultivar);
   if (filter.ansicht !== standardAnsicht(filter)) params.set("ansicht", filter.ansicht);
-  if (filter.sortierung !== "relevanz")
+  if (filter.sortierung !== "community")
     params.set("sortierung", filter.sortierung);
   if (filter.seite > 1) params.set("seite", String(filter.seite));
   return params;
@@ -248,6 +287,10 @@ export function istFilterLeer(filter: StrainFilter): boolean {
     !filter.nurVerfuegbar &&
     filter.apotheke.length === 0 &&
     filter.vertreiber.length === 0 &&
+    filter.note === undefined &&
+    !filter.bewertet &&
+    filter.terp.length === 0 &&
+    !filter.cbd &&
     !filter.kultivar
   );
 }
