@@ -23,7 +23,7 @@ const MERKMAL: Record<string, string> = {
   community: '<circle cx="8" cy="8" r="3"/><circle cx="16.5" cy="9" r="2.5"/><path d="M2.5 20c.5-3.5 2.8-5.5 5.5-5.5s5 2 5.5 5.5M14 15c2.8-.6 6 .8 7 5"/>',
   abstimmen: '<rect x="4" y="4" width="16" height="16" rx="2"/><path d="m8 12 3 3 5-6"/>',
   buch: '<path d="M4 5c3-1.5 5.5-1.5 8 0v15c-2.5-1.5-5-1.5-8 0ZM12 5c2.5-1.5 5-1.5 8 0v15c-3-1.5-5.5-1.5-8 0"/>',
-  blatt: `<path d="${KONTUR}"/><path d="M12 17v4.5"/>`,
+  blatt: `<path d="${KONTUR}"/><path d="M12 18.2V22.6"/>`,
 };
 
 /** Name eines Icons: Merkmal (aussehen …), Geschmack (ZITRUS …) oder Terpen (myrcen …). */
@@ -45,7 +45,7 @@ function blaetter(note: number): string {
     .map((b) => {
       const links = note >= b - 0.5;
       const rechts = note >= b;
-      return `<svg aria-hidden="true" viewBox="0 0 24 24"><path d="${LINKS}" fill="currentColor" opacity="${links ? 1 : 0}"/><path d="${RECHTS}" fill="currentColor" opacity="${rechts ? 1 : 0}"/><path d="${KONTUR}" fill="none" stroke="currentColor" stroke-width="0.75" stroke-linejoin="round"/><path d="M12 17v4.5" stroke="currentColor" stroke-width="0.75" stroke-linecap="round"/></svg>`;
+      return `<svg aria-hidden="true" viewBox="0 0 24 24"><path d="${LINKS}" fill="currentColor" opacity="${links ? 1 : 0}"/><path d="${RECHTS}" fill="currentColor" opacity="${rechts ? 1 : 0}"/><path d="${KONTUR}" fill="none" stroke="currentColor" stroke-width="0.75" stroke-linejoin="round"/><path d="M12 18.2V22.6" stroke="currentColor" stroke-width="0.75" stroke-linecap="round"/></svg>`;
     })
     .join("");
 }

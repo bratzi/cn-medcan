@@ -96,7 +96,7 @@ export function BlattNote({
           <span className="pointer-coarse:hidden">{texte.gesamtnoteHinweis}</span>
           <span className="hidden pointer-coarse:inline">{texte.gesamtnoteHinweisTouch}</span>
         </p>
-        <div className="flex w-full max-w-100" onPointerLeave={() => setVorschau(null)}>
+        <div className="flex w-full max-w-176 gap-0.5" onPointerLeave={() => setVorschau(null)}>
           {BLAETTER.map((blatt, index) => (
             <span key={blatt} className="relative aspect-square min-w-0 flex-1">
               <BlattGlyphe fuellung={fuellungen[index]} vorschau={vorschau !== null} />
@@ -128,7 +128,7 @@ export function BlattNote({
             </span>
           ))}
         </div>
-        <div className="grid w-full max-w-100 grid-cols-[auto_1fr_auto] items-center gap-2">
+        <div className="grid w-full max-w-176 grid-cols-[auto_1fr_auto] items-center gap-2">
           <button
             type="button"
             aria-label={texte.halbWeniger}
