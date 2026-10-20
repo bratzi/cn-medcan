@@ -102,9 +102,10 @@ test("Kolophon: Restfeuchte als Badge mit dem erklärenden Satz, ohne Wert nur d
   assert.match(kolophon({ feuchtigkeitProzent: 5 }), />Zu trocken · 5,0\s%</);
 });
 
-test("Kolophon: der Hinweis klammert ab lg auf zwei Zeilen, der ganze Satz steht im title", () => {
+test("Kolophon: der Hinweis zur Restfeuchte liegt hinter dem Info-Knopf", () => {
   const html = kolophon({ feuchtigkeitProzent: 5 });
-  assert.match(html, /title="Unter 8 % Restfeuchte[^"]*" class="[^"]*\blg:line-clamp-2\b/);
+  assert.match(html, /<button[^>]*aria-label="Hinweis"[^>]*aria-expanded="false"/);
+  assert.match(html, /role="tooltip"[^>]*>Unter 8 % Restfeuchte/);
 });
 
 test("Kolophon: englische Begriffe und Datumsform", () => {

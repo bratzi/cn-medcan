@@ -128,7 +128,8 @@ test("Die Zahl der Bewertungen steht nur mit Zahl im Kolophon", () => {
 test("Ohne Text steht ruhig ein Hinweis, ohne Knopf", () => {
   const links = seiten(zeige({ notiz: null })).links;
   assert.match(links, /<p class="text-body text-text-muted italic">Kein Text zu dieser Bewertung\.<\/p>/);
-  assert.doesNotMatch(links, /Weiterlesen|<button/);
+  // Der Info-Knopf im Kolophon zählt nicht als Weiterlesen-Knopf.
+  assert.doesNotMatch(links, /Weiterlesen|<button(?![^>]*aria-label="Hinweis")/);
 });
 
 test("Langer Text: ab lg begrenzt mit Weiterlesen (nur ab lg), kurzer ohne Knopf", () => {

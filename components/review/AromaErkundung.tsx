@@ -4,6 +4,7 @@ import { useId, useRef, useState } from "react";
 
 import { AromaKarte, type AromaSerie } from "@/components/review/AromaKarte";
 import { FazitLauf } from "@/components/review/FazitLauf";
+import { InfoKnopf } from "@/components/ui/InfoKnopf";
 import { NetzGrafik, netzAusGeschmack } from "@/components/profil/NetzGrafik";
 import { bewertungsGewicht } from "@/lib/empfehlung";
 import { basisGeschmack, liveGeschmack, type LiveNetzBasis } from "@/lib/live-netz";
@@ -490,7 +491,7 @@ export function AromaErkundung({
               </p>
             ) : null}
             {eingabe ? (
-              <p className="max-w-[60ch] text-small text-text-muted text-pretty">{texte.aroma.erkundung.chargeSatz}</p>
+              <InfoKnopf sprache={texte.sprache} text={texte.aroma.erkundung.chargeSatz} />
             ) : null}
             <BeschaffenheitsLeiste
               {...beschaffenheit}

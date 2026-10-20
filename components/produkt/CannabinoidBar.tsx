@@ -1,3 +1,4 @@
+import { InfoKnopf } from "@/components/ui/InfoKnopf";
 import { cn } from "@/lib/cn";
 import { formatiereProzent, formatiereProzentSpanne, formatiereZahl, type Dezimalwert } from "@/lib/format";
 import type { Sprache } from "@/lib/i18n/sprache-kern";
@@ -110,14 +111,13 @@ export function CannabinoidBar({
   const label = `${beschreibe(texte, sprache, "THC", thcVon, thcBis)}, ${beschreibe(texte, sprache, "CBD", cbdVon, cbdBis)}`;
 
   return (
-    <div
-      role="img"
-      aria-label={label}
-      className={cn("flex flex-col gap-2", className)}
-    >
-      <Zeile name="THC" min={thcVon} max={thcBis} balkenKlasse="bg-text" sprache={sprache} keineAngabe={w.bluete.fakten.keineAngabe} />
-      <Zeile name="CBD" min={cbdVon} max={cbdBis} balkenKlasse="bg-text-muted" sprache={sprache} keineAngabe={w.bluete.fakten.keineAngabe} />
-      <p className="text-caption text-text-muted">{texte.skala}</p>
+    <div className={cn("flex items-start gap-2", className)}>
+      {/* Die Skala liegt hinter dem Info-Knopf, außerhalb der Grafik: in role="img" wäre der Knopf stumm. */}
+      <div role="img" aria-label={label} className="flex min-w-0 flex-1 flex-col gap-2">
+        <Zeile name="THC" min={thcVon} max={thcBis} balkenKlasse="bg-text" sprache={sprache} keineAngabe={w.bluete.fakten.keineAngabe} />
+        <Zeile name="CBD" min={cbdVon} max={cbdBis} balkenKlasse="bg-text-muted" sprache={sprache} keineAngabe={w.bluete.fakten.keineAngabe} />
+      </div>
+      <InfoKnopf sprache={sprache} text={texte.skala} />
     </div>
   );
 }

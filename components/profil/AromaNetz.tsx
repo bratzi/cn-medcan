@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 
 import { NetzGrafik, geschmacksAchsen, markenLage, terpenAchsen } from "@/components/profil/NetzGrafik";
 import { NetzLegende } from "@/components/profil/NetzLegende";
+import { InfoKnopf } from "@/components/ui/InfoKnopf";
 import { naechsteWahl } from "@/lib/ansicht-taste";
 import type { AromaNetzTexte } from "@/lib/aroma-netz-texte";
 import { formatiereDatum, formatiereWert } from "@/lib/format";
@@ -304,9 +305,7 @@ export function AromaNetz({
       {hatMag || hatMagNicht ? (
         <>
           <NetzLegende mag={texte.magIch} magNicht={hatMagNicht ? texte.magIchNicht : null} vorher={hatKontur ? texte.vorher : null} />
-          <p className="text-center text-small text-text-muted text-pretty">
-            {modus === "terpene" ? texte.terpenSkala : texte.netzSkala}. {texte.netzHinweis}
-          </p>
+          <InfoKnopf sprache={sprache} className="self-center" text={`${modus === "terpene" ? texte.terpenSkala : texte.netzSkala}. ${texte.netzHinweis}`} />
           <ul className="sr-only">
             {beschreibung.map((satz, n) => (
               <li key={achsen[n].key}>{satz}</li>
