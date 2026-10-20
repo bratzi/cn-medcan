@@ -19,7 +19,7 @@ const COVER: Array<{ datei: string; titel: string; saeule: IgSaeule }> = [
 ];
 
 async function main() {
-  const ursprung = new URL(umgebung().IG_FEED_URL ?? "https://cn-medcan.bookofterpz.workers.dev").origin;
+  const ursprung = new URL(umgebung().IG_FEED_URL ?? "https://www.bookofterpz.workers.dev").origin;
   const ordner = resolve("tmp/ig/highlights");
   mkdirSync(ordner, { recursive: true });
   for (const c of COVER) {

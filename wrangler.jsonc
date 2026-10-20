@@ -1,6 +1,6 @@
 {
 	"$schema": "node_modules/wrangler/config-schema.json",
-	"name": "cn-medcan",
+	"name": "www",
 	// Eigener Einstieg, laedt den Next-Server schon beim Start des Isolats (worker.mjs).
 	"main": "worker.mjs",
 	"compatibility_date": "2026-09-22",
@@ -62,7 +62,7 @@
 	"services": [
 		{
 			"binding": "WORKER_SELF_REFERENCE",
-			"service": "cn-medcan"
+			"service": "www"
 		}
 	],
 

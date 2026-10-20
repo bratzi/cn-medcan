@@ -20,7 +20,7 @@ async function main() {
   if (fehler.length) throw new Error(`abgelehnt: ${fehler.join("; ")}`);
 
   const marke = karussellMarke(karussell);
-  const ursprung = new URL(umgebung().IG_FEED_URL ?? "https://cn-medcan.bookofterpz.workers.dev").origin;
+  const ursprung = new URL(umgebung().IG_FEED_URL ?? "https://www.bookofterpz.workers.dev").origin;
   const probe = rest.includes("--probe");
   // Zeit vorab prüfen, damit kein Entwurf ohne gültigen Termin entsteht.
   const planArg = rest.find((a) => a.startsWith("--planen="))?.slice(9);

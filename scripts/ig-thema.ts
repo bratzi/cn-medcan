@@ -26,7 +26,7 @@ async function main() {
   if (fehler.length) throw new Error(`Caption abgelehnt: ${fehler.join("; ")}`);
 
   const marke = `bot-thema-${thema.art}-${schluessel}`;
-  const ursprung = new URL(umgebung().IG_FEED_URL ?? "https://cn-medcan.bookofterpz.workers.dev").origin;
+  const ursprung = new URL(umgebung().IG_FEED_URL ?? "https://www.bookofterpz.workers.dev").origin;
   const ordner = resolve("tmp/ig");
   mkdirSync(ordner, { recursive: true });
   const html = join(ordner, `${marke}.html`);

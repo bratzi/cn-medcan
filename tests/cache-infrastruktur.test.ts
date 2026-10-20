@@ -10,7 +10,7 @@ const lies = (datei: string) => readFileSync(datei, "utf8");
 test("ISR-Infrastruktur: KV, Service-Binding und OpenNext-Konfiguration gehören zusammen", () => {
   const wrangler = lies("wrangler.jsonc");
   assert.match(wrangler, /"binding": "NEXT_INC_CACHE_KV",\s*"id": "[0-9a-f]{32}"/);
-  assert.match(wrangler, /"binding": "WORKER_SELF_REFERENCE",\s*"service": "cn-medcan"/);
+  assert.match(wrangler, /"binding": "WORKER_SELF_REFERENCE",\s*"service": "www"/);
   assert.doesNotMatch(wrangler, /r2_buckets|durable_objects/);
 
   const config = lies("open-next.config.ts");

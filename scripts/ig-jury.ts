@@ -40,7 +40,7 @@ async function main() {
   if (!slug) throw new Error("Slug fehlt");
   const env = umgebung();
   const schluessel = feedSchluessel(env);
-  const ursprung = new URL(env.IG_FEED_URL ?? "https://cn-medcan.bookofterpz.workers.dev").origin;
+  const ursprung = new URL(env.IG_FEED_URL ?? "https://www.bookofterpz.workers.dev").origin;
   const probe = rest.includes("--probe");
   try {
     const feed = await fetch(`${ursprung}/api/jury-feed?key=${encodeURIComponent(schluessel)}`, { signal: AbortSignal.timeout(20_000) });

@@ -10,7 +10,7 @@ import { chromium, type Page } from "playwright";
 
 import { zuschnitt } from "./zuschnitt";
 
-const BASIS = process.env.IG_TOUR_BASIS ?? "https://cn-medcan.bookofterpz.workers.dev";
+const BASIS = process.env.IG_TOUR_BASIS ?? "https://www.bookofterpz.workers.dev";
 const OEFFENTLICH = new Set(["/ig"]);
 
 /** Klickziele je Pfad; nur Seiten ohne Sortennamen im Fokus. */

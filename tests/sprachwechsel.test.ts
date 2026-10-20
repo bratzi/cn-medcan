@@ -4,7 +4,7 @@ import { existsSync, readFileSync } from "node:fs";
 
 import { zielNachSprachwechsel } from "@/lib/i18n/sprachwechsel";
 
-const ORIGIN = "https://cn-medcan.bookofterpz.workers.dev";
+const ORIGIN = "https://www.bookofterpz.workers.dev";
 
 test("Sprachwechsel führt auf die Seite zurück, von der er kam", () => {
   assert.equal(zielNachSprachwechsel(`${ORIGIN}/blueten?typ=INDICA`, ORIGIN), "/blueten?typ=INDICA");
