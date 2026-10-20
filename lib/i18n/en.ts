@@ -395,6 +395,7 @@ export const en: Woerterbuch = {
       wirdAngewendet: "Applying filters …",
       treffer: { one: "{anzahl} result", other: "{anzahl} results" },
       suche: "Trade name or genetics",
+      sucheKurz: "Search",
       kultivarTyp: "Cultivar type",
       darreichungsform: "Dosage form",
       geschmack: "Dominant flavour",

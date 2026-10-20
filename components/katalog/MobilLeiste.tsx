@@ -53,7 +53,7 @@ export function MobilLeiste({ filter, aktiv, gesamt, setze, oeffne, texte }: Pro
         type="search"
         value={q}
         autoComplete="off"
-        placeholder={texte.suche}
+        placeholder={texte.sucheKurz}
         onChange={(event) => setQ(event.target.value)}
         className="h-11 min-w-0 flex-1 rounded-full border border-border-strong bg-surface px-4 text-body text-text placeholder:text-text-muted"
       />

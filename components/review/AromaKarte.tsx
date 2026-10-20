@@ -1268,7 +1268,7 @@ export function AromaKarte({
           <div
             key="hinweis"
             // Dicht (Buch, ab lg): ohne Hinweis; die Doppelseite reicht keine Ebenen, die Legende fiele ohnehin weg.
-            className={cn("flex flex-wrap items-center justify-center gap-x-6 gap-y-2 pt-8 transition-opacity duration-normal ease-out starting:opacity-0", kompakt && "lg:hidden")}
+            className={cn("pointer-events-auto flex flex-wrap items-center justify-center gap-x-6 gap-y-2 px-4 pt-8 transition-opacity duration-normal ease-out starting:opacity-0", kompakt && "lg:hidden")}
           >
             {/* Legende der Ebenen sichtbar in der freien Zeile unter der Grafik, der Bedienhinweis allein
                 hinter dem Knopf an ihrem Ende (Nutzer 2026-10-20: Platz nutzen, weniger Text im Hinweis).

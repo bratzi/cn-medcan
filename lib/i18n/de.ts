@@ -403,6 +403,7 @@ export const de = {
       wirdAngewendet: "Filter wird angewendet …",
       treffer: { one: "{anzahl} Treffer", other: "{anzahl} Treffer" },
       suche: "Handelsname oder Genetik",
+      sucheKurz: "Suchen",
       kultivarTyp: "Kultivar-Typ",
       darreichungsform: "Darreichungsform",
       geschmack: "Dominanter Geschmack",
