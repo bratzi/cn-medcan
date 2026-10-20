@@ -66,7 +66,7 @@ test("Schleife: jede Station gedruckt, das Verb als Schlagwort von Hand (Nutzer 
 
 test("Abstimmung: „Wähl mit.“ von Hand, ohne Wasserzeichen und Drip", () => {
   const quelle = lies("components/sotm/SotmSektion.tsx");
-  assert.match(quelle, /<p data-story="waehl-mit" className="farbverlauf font-hand text-vermerk">\s*\{w\.start\.abstimmung\.waehlMit\}\s*<\/p>/);
+  assert.match(quelle, /<p data-story="waehl-mit" className="farbverlauf font-hand text-vermerk">\s*\{umfrage\.phase === "VORSCHLAG" \? w\.umfrage\.schlagVor : w\.start\.abstimmung\.waehlMit\}\s*<\/p>/);
   assert.doesNotMatch(quelle, /wasserzeichen|Textur|font-wand|rotate/);
   assert.match(lies("components/story/bewegung/abstimmung.ts"), /SCHREIBEN_AB/);
 });

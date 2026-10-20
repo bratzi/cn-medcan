@@ -112,7 +112,8 @@ async function SotmInhalt({ ort, children }: { ort: Ort; children?: ReactNode })
 
   return (
     <div className="flex flex-col gap-16">
-      <SotmTaktImBrowser phaseEndet={lage.phaseEndet.toISOString()} />
+      {/* Fällig auch, wenn die Daten hinter dem Kalender liegen (Cron ausgefallen), nicht nur nach Phasenende. */}
+      <SotmTaktImBrowser phaseEndet={lage.phaseEndet.toISOString()} faellig={!umfrage || umfrage.phase !== lage.phase} />
       <div className="flex flex-col gap-8">
         <p className="numeric text-small text-text-muted max-lg:text-center">{monatLang(monat, sprache)}</p>
         {sotm ? (
@@ -127,7 +128,7 @@ async function SotmInhalt({ ort, children }: { ort: Ort; children?: ReactNode })
           <div className="flex flex-col items-start gap-2 max-lg:items-center max-lg:text-center">
             <h3 className="font-buch text-h2 text-text text-balance">{w.start.abstimmung.titel}</h3>
             <p data-story="waehl-mit" className="farbverlauf font-hand text-vermerk">
-              {w.start.abstimmung.waehlMit}
+              {umfrage.phase === "VORSCHLAG" ? w.umfrage.schlagVor : w.start.abstimmung.waehlMit}
             </p>
             <RestText umfrage={umfrage} w={w} sprache={sprache} jetzt={jetzt} />
           </div>
