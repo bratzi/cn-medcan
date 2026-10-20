@@ -25,6 +25,17 @@ export type InArbeit = { id: string; titel: Zweisprachig; text: Zweisprachig };
 
 export const NEUIGKEITEN: readonly Neuigkeit[] = [
   {
+    id: "2026-10-20-strainkarten-passen",
+    datum: "2026-10-20",
+    art: "behoben",
+    titel: { de: "Strain-Karten passen wieder", en: "Strain cards fit again" },
+    text: {
+      de: "Karten mit Bewertung ragten über ihre Spalte hinaus. Jetzt bleibt jede Karte in ihrem Platz.",
+      en: "Cards with a rating spilled over their column. Now every card stays in place.",
+    },
+    link: "/blueten",
+  },
+  {
     id: "2026-10-20-strains-laedt-wieder",
     datum: "2026-10-20",
     art: "behoben",

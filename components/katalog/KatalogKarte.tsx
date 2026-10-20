@@ -136,7 +136,7 @@ function KartenRahmen({
   fuss: ReactNode;
 }) {
   return (
-    <article className="kultivar-karte group relative isolate row-span-5 grid grid-rows-subgrid gap-y-2 border border-border bg-surface-raised shadow-sm transition-colors duration-fast ease-standard focus-within:border-border-strong hover:border-border-strong">
+    <article className="kultivar-karte group relative isolate row-span-5 grid min-w-0 grid-cols-1 grid-rows-subgrid gap-y-2 border border-border bg-surface-raised shadow-sm transition-colors duration-fast ease-standard focus-within:border-border-strong hover:border-border-strong">
       <span aria-hidden="true" className="kultivar-band absolute inset-x-0 top-0 h-1 bg-accent" />
       <h3 data-name className="px-4 pt-6 font-buch text-sorte text-balance text-text hyphens-none wrap-break-word [font-optical-sizing:auto]">
         <Link

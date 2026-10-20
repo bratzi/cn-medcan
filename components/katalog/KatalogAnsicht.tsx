@@ -58,7 +58,7 @@ type Props = {
  * vier, bei 1920 px mit Spalte fünf). Jede Karte spannt fünf Zeilen, die sie per subgrid teilt.
  */
 const RASTER = "grid grid-cols-[repeat(auto-fill,minmax(min(15rem,100%),1fr))] gap-6";
-const KARTEN_ZELLE = "row-span-5 grid grid-rows-subgrid";
+const KARTEN_ZELLE = "row-span-5 grid min-w-0 grid-cols-1 grid-rows-subgrid";
 
 const START: Ladezustand = { art: "start" };
 /** Höchstens so viele Kultivare je Budpic-Anfrage (Route begrenzt ebenso). */
