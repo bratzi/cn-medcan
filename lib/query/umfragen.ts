@@ -1,5 +1,7 @@
 import "server-only";
 
+import { cache } from "react";
+
 import { getPrisma } from "@/lib/prisma";
 import { istOptionHerkunft, istUmfragePhase, type OptionHerkunft, type UmfragePhase } from "@/db/enums";
 import { zuCommunityZahlen, type CommunityZahlen } from "@/lib/query/community";
@@ -69,11 +71,14 @@ export async function aktiveUmfrageId(): Promise<string | null> {
   return satz?.id ?? null;
 }
 
-/** Die laufende Umfrage mit Kandidaten und Stimmen, oder null. */
-export async function aktiveUmfrage(): Promise<UmfrageAnsicht | null> {
+/**
+ * Die laufende Umfrage mit Kandidaten und Stimmen, oder null. Je Anfrage nur
+ * einmal geladen (React `cache`): /sotm und die SOTM-Sektion fragen beide.
+ */
+export const aktiveUmfrage = cache(async (): Promise<UmfrageAnsicht | null> => {
   const id = await aktiveUmfrageId();
   return id ? umfrageLaden(id) : null;
-}
+});
 
 /** Eine bestimmte Umfrage mit Kandidaten und Stimmen. */
 export async function umfrageLaden(umfrageId: string): Promise<UmfrageAnsicht | null> {

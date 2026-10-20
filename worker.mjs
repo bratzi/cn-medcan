@@ -35,7 +35,7 @@ const einstieg = {
     ctx.waitUntil(
       env.WORKER_SELF_REFERENCE.fetch("https://cn-medcan.intern/api/sotm/takt", { method: "POST" }).then(async (antwort) => {
         if (!antwort.ok) console.error("sotm-cron", antwort.status, await antwort.text());
-      }),
+      }).catch((fehler) => console.error("sotm-cron", fehler)),
     );
   },
 };

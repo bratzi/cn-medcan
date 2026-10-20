@@ -1,6 +1,9 @@
 "use server";
 
+import { getEnv } from "@/lib/cloudflare";
 import { revalidiereSprachen } from "@/lib/i18n/revalidiere";
+import { sotmLage } from "@/lib/sotm/kalender";
+import { d1Ziel, sotmTakt } from "@/lib/sotm/takt";
 
 import { freigabeErforderlich } from "@/lib/session";
 import { getPrisma } from "@/lib/prisma";
@@ -104,6 +107,19 @@ export async function stimmeAbgeben(formData: FormData): Promise<UmfrageErgebnis
     return { ok: false, fehler: w.meldung["umfrage.kandidatFehlt"] };
   }
   if (option.umfrage.phase !== "ABSTIMMUNG") {
+    return { ok: false, fehler: w.meldung["umfrage.keineAbstimmung"] };
+  }
+  // Abgestimmt wird nur vom 15. bis Monatsende. Steht die Runde nach Monatsende
+  // noch auf ABSTIMMUNG (Cron ausgefallen), schaltet diese Stimme den Takt nach
+  // und wird abgelehnt.
+  if (sotmLage(new Date()).phase !== "ABSTIMMUNG") {
+    const { DB } = await getEnv();
+    const { schritte } = await sotmTakt(d1Ziel(DB), new Date());
+    if (schritte.length > 0) {
+      revalidiereSprachen("/");
+      revalidiereSprachen("/sotm");
+      revalidiereSprachen("/admin");
+    }
     return { ok: false, fehler: w.meldung["umfrage.keineAbstimmung"] };
   }
   if (option.herkunft !== "COMMUNITY") {

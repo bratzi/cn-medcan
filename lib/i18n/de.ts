@@ -748,7 +748,6 @@ export const de = {
       freigabe: "Sobald dein Konto freigeschaltet ist, kannst du abstimmen.",
       gezaehlt: "Deine Stimme ist gezählt.",
       keineAenderung: "Eine Änderung ist nicht vorgesehen.",
-      allesFest: "In dieser Runde stehen alle Plätze fest. Es gibt nichts zu wählen.",
       abgegeben: { one: "{anzahl} abgegebene Stimme", other: "{anzahl} abgegebene Stimmen" },
     },
     kandidat: {

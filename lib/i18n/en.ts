@@ -735,7 +735,6 @@ export const en: Woerterbuch = {
       freigabe: "You can vote as soon as your account is approved.",
       gezaehlt: "Your vote has been counted.",
       keineAenderung: "It cannot be changed.",
-      allesFest: "All places in this round are fixed. There is nothing to choose.",
       abgegeben: { one: "{anzahl} vote cast", other: "{anzahl} votes cast" },
     },
     kandidat: {
