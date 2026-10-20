@@ -25,6 +25,37 @@ export type InArbeit = { id: string; titel: Zweisprachig; text: Zweisprachig };
 
 export const NEUIGKEITEN: readonly Neuigkeit[] = [
   {
+    id: "2026-10-20-startseite-bewertung-katalog",
+    datum: "2026-10-20",
+    art: "besser",
+    titel: { de: "Startseite: Bewertung und Katalog in einem", en: "Home: review and catalogue in one" },
+    text: {
+      de: "Such dir auf der Startseite eine Sorte aus. Darunter siehst du gleich ihre Bewertung.",
+      en: "Pick a strain on the home page. Its review shows up right below.",
+    },
+    link: "/",
+  },
+  {
+    id: "2026-10-20-info-knoepfe-lesbar",
+    datum: "2026-10-20",
+    art: "behoben",
+    titel: { de: "Hinweise besser lesbar", en: "Hints easier to read" },
+    text: {
+      de: "Die kleinen i-Knöpfe zeigen ihren Hinweis jetzt ganz und kürzer. Er wird nicht mehr abgeschnitten.",
+      en: "The small i buttons now show their hint in full and shorter. It no longer gets cut off.",
+    },
+  },
+  {
+    id: "2026-10-20-zugang",
+    datum: "2026-10-20",
+    art: "besser",
+    titel: { de: "Schönerer Einstieg", en: "A nicer way in" },
+    text: {
+      de: "Die Seite mit dem Kennwort sieht jetzt aus wie unsere Startseite.",
+      en: "The password page now looks like our home page.",
+    },
+  },
+  {
     id: "2026-10-20-bluetenseite-filtern",
     datum: "2026-10-20",
     art: "besser",

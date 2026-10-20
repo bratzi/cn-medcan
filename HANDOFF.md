@@ -3,7 +3,7 @@
 > Übergabemedium zwischen Sessions. Wird nach jedem Arbeitsblock aktualisiert und committet.
 > Wer hier weiterarbeitet, liest diese Datei zuerst und braucht den Chatverlauf nicht.
 
-**Letzte Aktualisierung:** 2026-10-20 (Session 78)
+**Letzte Aktualisierung:** 2026-10-20 (Session 79)
 **Repo:** https://github.com/bratzi/cn-medcan (public)
 **Branch:** `main` (Makeover „Grünes Buch“ Teilprojekt 1 ist seit 2026-09-24 auf `main`)
 
@@ -27,6 +27,47 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 ---
 
 ## ⇢ Hier geht es weiter
+
+### ⇢ SESSION 79 (2026-10-20): Kennwortseite, Blütenseite im Browser, Info-Knöpfe, Startseite Bewertung+Katalog
+
+**ALS ERSTES: diese Fragen in EINER AskUserQuestion stellen**
+1. Startseite neue Sektion „Bewertung + Katalog“ (live seit 310237d): passt das Layout (Überschrift links über dem
+   Sortenbild im Explorer-Raster statt über voller Breite)? Erst nach der Live-Prüfung (Punkt 1 unten) fragen, mit Screenshot.
+2. `/blueten` Karten: Community-Note in `text-notiz` (2 bis 4,5 rem) wirkt in der Karte evtl. zu groß, kleiner setzen?
+3. Deep-Link mit zu großer `seite` behält `seite=2` in der URL (kosmetisch): bereinigen?
+
+**SAFE4CLEAR S79 – dann der Reihe nach:**
+1. **Live prüfen (Build 310237d + Neuigkeiten-Commit lief beim Clear):** Startseite Sektion Bewertung+Katalog bei 390 px
+   und 1280 px, hell/dunkel: Apples & Bananas vorgewählt und ohne JS vollständig, Sortenwechsel tauscht die Aroma-Karte
+   (alte gedimmt), Sorte ohne Bewertung zeigt „noch nicht bewertet“ + Link, Einstiege am Ende, keine zweite
+   Katalog-Sektion, `/api/aroma/gibts-nicht` = 404. Dabei Kritik nach critique-composition, critique-visual-hierarchy,
+   design-taste-frontend, emil-design-eng (der Agent hat diese Skills NICHT geladen, nachholen).
+2. **CPU messen** `/api/katalog` (Ziel einstellig ms, jetzt KV-Text `cn-katalog/oeffentlich-v1` in NEXT_INC_CACHE_KV)
+   und `/api/katalog/budpics` kalt (vorher 637 ms) über Cloudflare-Observability. `/blueten` baut beim statischen
+   Rendern noch über `ladeKatalog(false)` (unstable_cache), nicht über KV.
+3. `/blueten` live nachprüfen: Raster jetzt `auto-fill minmax(16rem)` (3 Spalten Desktop), Hinweiszeile der
+   Aroma-Karte ohne Scrollleiste, mobiler Platzhalter „Suchen“.
+4. Weiter offen aus S78: Publora-Entwurf `6ad74ad1d1ce69b57cdf73c5` auf 24.10. 17:00Z planen, sobald Limit frei;
+   Nutzer setzt IG-Link-Feld/Bio; Terpen-Audit zweite Priorität.
+
+- **Erledigt S79 (alles auf main, live bis auf 310237d geprüft):**
+  - Task A Kennwortseite: `/zugang` zeigt den Startseiten-Hero (Auftakt mit Slot `zugang`, Logo 34rem), Kennwortkarte
+    darunter, Video über `components/zugang/ZugangLoops.tsx`, kein autoFocus. Live ok 494 und 1280 px, hell/dunkel.
+  - Task B Blütenseite nach Spec/Plan `docs/superpowers/{specs,plans}/2026-10-20-bluetenseite-katalog-im-browser*`:
+    `/api/katalog` (JSON aus D1 per json_group_array), `lib/katalog/*` (verdichten, filtern, zaehleOptionen, zustand,
+    kv), `components/katalog/*` (FilterFelder, MobilLeiste, FilterSchublade als dialog, KatalogKarte, Blaettern,
+    KatalogAnsicht), Seite `force-static`. Neue URL-Parameter note, bewertet, terp, cbd; Standardsortierung community.
+    Live geprüft: Filtern/Blättern ohne Netzanfrage, Deep-Link, Zurück, Schublade mit Tastatur, 64 KB komprimiert.
+    Gelöscht: FilterLeiste, AktiveFilter, AnsichtUmschalter, KultivarKarte.
+  - CPU-Befund vorher: `/api/katalog` kalt 343 ms, warm 70 ms (unstable_cache-Overhead) → KV-Rückfall umgesetzt
+    (`lib/katalog/kv.ts`, `revalidiereKatalog()` jetzt async, baut und schreibt KV). Live noch nicht gemessen.
+  - Info-Knöpfe: `components/ui/InfoKnopf.tsx` Blase als `popover` (oberste Ebene, `blasenLage()` oben/unten, 16 px
+    Rand, Pfeil), Ebenen-Legende der Aroma-Karte sichtbar, Knopf an Legende/Zuordnung statt eigener Zeile, alle
+    Hinweistexte gekürzt (de/en). Live ok (6 Knöpfe). Fix d60f338: Hinweiszeile pointer-events-auto, px-4.
+  - Startseite: `AromaSektion` = Explorer + Aroma-Karte der gewählten Sorte (`components/story/AromaWechsel.tsx`,
+    `/api/aroma/[sorte]`, `lib/query/aroma-abfrage.ts`), `components/story/Katalog.tsx` gelöscht. Memory
+    „Startseite: Bewertung = Aroma-Karte“ auf neue Reihenfolge angepasst.
+  - Neuigkeiten: Blütenseite, Startseite, Info-Knöpfe, Kennwortseite eingetragen.
 
 ### ⇢ SESSION 78 (2026-10-20): Neuigkeiten-Seite live, IG-Bio-Link, Testnutzer-Posts
 
