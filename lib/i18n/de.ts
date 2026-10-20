@@ -113,6 +113,7 @@ export const de = {
   },
   zugang: {
     titel: "Zugang",
+    notiz: "komm rein.",
     ueberschrift: "Geschlossene Entwicklungsphase",
     satz: "Diese Seite ist noch nicht öffentlich. Bitte Zugangspasswort eingeben.",
     passwort: "Passwort",

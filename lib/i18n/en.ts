@@ -109,6 +109,7 @@ export const en: Woerterbuch = {
   },
   zugang: {
     titel: "Access",
+    notiz: "come on in.",
     ueberschrift: "Closed development phase",
     satz: "This site is not public yet. Please enter the access password.",
     passwort: "Password",

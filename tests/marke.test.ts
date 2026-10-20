@@ -117,7 +117,7 @@ test("Unterzeile: gedruckt, natürliche Schreibung, Versalien per CSS", () => {
 
 test("Auftakt: die h1 ist das Logo, schreibt sich, nie per Einstieg versteckt", () => {
   const quelle = lies("components/story/Auftakt.tsx");
-  const h1 = /<h1[^>]*>\s*<Logo className="[^"]+" \/>\s*<\/h1>/.exec(quelle)?.[0];
+  const h1 = /<h1[^>]*>\s*<Logo className=(?:"[^"]+"|\{logoBreite\}) \/>\s*<\/h1>/.exec(quelle)?.[0];
   assert.ok(h1, "die h1 enthält nicht genau das Logo");
   assert.match(h1, /className="auftakt-marke /);
   assert.doesNotMatch(h1, /data-story-einstieg/);
@@ -186,4 +186,13 @@ test("Der Hero hält mobil Abstand zum Displayrand", () => {
   const auftakt = lies("components/story/Auftakt.tsx");
   assert.doesNotMatch(auftakt, /flex-\[2\] flex-col items-center justify-center gap-4 px-4 /);
   assert.match(auftakt, /px-6 /);
+});
+
+test("Zugang: die Kennwortseite zeigt den Hero der Startseite, Formular an /api/zugang", () => {
+  const seite = lies("app/[lang]/zugang/page.tsx");
+  assert.match(seite, /<Auftakt\s+zugang=\{/);
+  assert.match(seite, /<form action="\/api\/zugang" method="post"/);
+  assert.match(seite, /<ZugangFelder /);
+  // Ohne StoryBuehne blendet niemand ein: auf /zugang darf nichts per Einstieg versteckt sein.
+  assert.match(lies("components/story/Auftakt.tsx"), /const einstieg = zugang \? undefined : ""/);
 });

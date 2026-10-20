@@ -1,7 +1,7 @@
 import { LoopSchalter } from "@/components/medien/LoopSchalter";
 import Link from "next/link";
 import { preload } from "react-dom";
-import { Suspense } from "react";
+import { Suspense, type ReactNode } from "react";
 
 import { Loop } from "@/components/medien/Loop";
 import { AuftaktZahlen } from "@/components/story/AuftaktZahlen";
@@ -24,9 +24,13 @@ import { holeWoerterbuch } from "@/lib/i18n";
  * Oberzeile und Satz. Der Button "Bewerte jetzt mit" trägt die Markierung bewusst
  * nicht: er ist ab dem ersten Frame bedienbar.
  */
-export async function Auftakt() {
+export async function Auftakt({ zugang }: { zugang?: ReactNode } = {}) {
   const w = await holeWoerterbuch();
   const texte = w.start.auftakt;
+  // Ohne StoryBuehne (auf /zugang) blendet niemand ein: die Texte stehen sofort.
+  const einstieg = zugang ? undefined : "";
+  // Auf /zugang eine Spur kleiner, damit die Kennwortkarte näher rückt (Nutzer 2026-10-20).
+  const logoBreite = zugang ? "w-[min(34rem,74vw)]" : "w-[min(40rem,82vw)]";
   // Standbild ist das größte Bild der ersten Ansicht: vor allem anderen anfordern.
   // Die Seite startet hell (lib/thema.ts), also das Standbild des hellen Videos.
   preload("/medien/auftakt-loop-hell-standbild.webp", { as: "image", fetchPriority: "high" });
@@ -58,12 +62,12 @@ export async function Auftakt() {
             und pulsiert wie das Community-Fazit (marke-puls). */}
         <div data-story="titel" className="relative flex justify-center">
           <h1 id="auftakt-titel" className="auftakt-marke marke-puls relative flex justify-center">
-            <Logo className="w-[min(40rem,82vw)]" />
+            <Logo className={logoBreite} />
           </h1>
         </div>
         <p
           data-story="oberzeile"
-          data-story-einstieg=""
+          data-story-einstieg={einstieg}
           className="mt-6 max-w-[28ch] text-center font-sans sm:mt-12 text-[clamp(1.75rem,1rem+2.4vw,3.25rem)] leading-tight font-light uppercase tracking-gesperrt text-balance text-text/90"
         >
           {texte.oberzeile}
@@ -71,7 +75,7 @@ export async function Auftakt() {
         {/* Zentriert und breit unter der Oberzeile; seit 2026-09-26 mit mehr Luft zur Wortmarke und zur Oberzeile (Nutzer). */}
         <p
           data-story="intro"
-          data-story-einstieg=""
+          data-story-einstieg={einstieg}
           className="mt-2 w-full text-center font-sans text-small uppercase sm:mt-4 leading-relaxed tracking-gesperrt text-text text-balance"
         >
           {/* Ab md je Satz eine eigene Zeile, breiter als die übrigen Texte (Nutzer 2026-09-25).
@@ -85,6 +89,10 @@ export async function Auftakt() {
       {/* Im freien Raum unter dem Intro: erst die Zahlenleiste (Spec 2026-10-08 Auftakt),
           dann "Bewerte jetzt mit", Verlaufsrahmen wie "Mein Konto", folgt dem Zeiger wie
           die Storytelling-Videos (Nutzer 2026-09-25). */}
+      {/* Kennwortseite (Nutzer 2026-10-20): statt Zahlen und "Bewerte jetzt mit" die Kennwortkarte. */}
+      {zugang ? (
+        <div className="flex flex-1 flex-col items-center justify-center px-4 py-8 sm:px-8">{zugang}</div>
+      ) : (
       <div className="flex flex-1 flex-col items-center justify-center gap-8 px-4 py-8 sm:gap-12 sm:px-8">
         <Suspense fallback={<AuftaktZahlenSkelett ansage={w.start.skelett.zahlen} />}>
           <AuftaktZahlen />
@@ -99,6 +107,7 @@ export async function Auftakt() {
           </Link>
         </div>
       </div>
+      )}
 
       <div className="mx-auto w-full max-w-360 px-4 sm:px-8">
         <div className="flex justify-end">
