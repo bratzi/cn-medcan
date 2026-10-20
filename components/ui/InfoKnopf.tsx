@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useId, useRef, useState, type ReactNode } from "react";
+import { useEffect, useId, useLayoutEffect, useRef, useState, type ReactNode } from "react";
 
 import { cn } from "@/lib/cn";
 import type { Sprache } from "@/lib/i18n/sprache-kern";
@@ -30,6 +30,9 @@ export function InfoKnopf({ text, sprache, className }: { text: ReactNode; sprac
   const id = useId();
   const [offen, setOffen] = useState(false);
   const huelle = useRef<HTMLSpanElement>(null);
+  const blase = useRef<HTMLSpanElement>(null);
+  // Waagerechte Verschiebung, damit die mittig hängende Blase am Rand nicht abgeschnitten wird.
+  const [versatz, setVersatz] = useState(0);
   // Fokus durch Zeigerdruck soll nicht öffnen, sonst schlösse der folgende Klick gleich wieder.
   const zeiger = useRef<string | null>(null);
   const schritt = (ereignis: InfoKnopfEreignis) => setOffen((jetzt) => infoKnopfSchritt(jetzt, ereignis));
@@ -48,6 +51,23 @@ export function InfoKnopf({ text, sprache, className }: { text: ReactNode; sprac
       document.removeEventListener("keydown", taste);
       document.removeEventListener("pointerdown", daneben);
     };
+  }, [offen]);
+
+  useLayoutEffect(() => {
+    if (!offen || !blase.current) {
+      setVersatz(0);
+      return;
+    }
+    const rand = 16;
+    const r = blase.current.getBoundingClientRect();
+    const links = r.left - versatz;
+    const rechts = r.right - versatz;
+    const breite = document.documentElement.clientWidth;
+    if (links < rand) setVersatz(rand - links);
+    else if (rechts > breite - rand) setVersatz(breite - rand - rechts);
+    else setVersatz(0);
+    // versatz bewusst nicht in den Abhängigkeiten: gemessen wird nur beim Öffnen.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [offen]);
 
   return (
@@ -89,8 +109,10 @@ export function InfoKnopf({ text, sprache, className }: { text: ReactNode; sprac
         <span aria-hidden="true">i</span>
       </button>
       <span
+        ref={blase}
         id={id}
         role="tooltip"
+        style={versatz ? { marginLeft: versatz } : undefined}
         hidden={!offen}
         className="absolute bottom-full left-1/2 z-20 mb-2 w-max max-w-[min(18rem,calc(100vw-2rem))] -translate-x-1/2 rounded-md border border-border bg-surface-raised px-3 py-2 text-left text-small text-text text-pretty shadow-md"
       >
