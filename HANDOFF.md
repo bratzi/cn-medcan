@@ -3,7 +3,7 @@
 > Übergabemedium zwischen Sessions. Wird nach jedem Arbeitsblock aktualisiert und committet.
 > Wer hier weiterarbeitet, liest diese Datei zuerst und braucht den Chatverlauf nicht.
 
-**Letzte Aktualisierung:** 2026-10-20 (Session 75)
+**Letzte Aktualisierung:** 2026-10-20 (Session 76)
 **Repo:** https://github.com/bratzi/cn-medcan (public)
 **Branch:** `main` (Makeover „Grünes Buch“ Teilprojekt 1 ist seit 2026-09-24 auf `main`)
 
@@ -27,6 +27,29 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 ---
 
 ## ⇢ Hier geht es weiter
+
+### ⇢ SESSION 76 (2026-10-20): SOTM Task 1–7 fertig, Terpen-Audit live, Kapitel spielt ab
+
+**ALS ERSTES:**
+1. SOTM Plan B: **Final-Review (opus) offen** (Subagent-Ausgabenlimit bis 04:50 Berlin). Ledger
+   `.superpowers/sdd/2026-10-20-strain-of-the-month/progress.md`, Paket über `git merge-base` 1fc1311^..HEAD.
+   Deferred Minors dort, u. a. T6: CRLF->LF-Churn in 6 Dateien (Titelblatt, VorschlagFormular, ig-feed,
+   proxy-regeln-Test, rechtliches-Test, Ergebnisse) zurückdrehen; Vorschlagsphase auf /sotm zeigt Überschrift
+   „Abstimmung / Wähl mit.“ statt „Schlag vor.“; aktiveUmfrage doppelt geladen; tote i18n-Schlüssel (allesFest).
+   Danach Rulings-Liste an den Nutzer, Workspace löschen.
+   Task 7 live erledigt: POST /api/sotm/takt -> ["UEBERNOMMEN"], zweiter Aufruf [] (idempotent); /umfragen 308 -> /sotm.
+2. **Live per Browser prüfen** (Seite hinter /zugang): /sotm, Startseite SOTM-Sektion, Kapitel-Netz spielt nach
+   600 ms Ruhe ab und rastet per scroll-snap proximity ein (8c75959; prüfen, dass der Snap nicht stört),
+   Bewertungsmaske: Wirkung-Ring, Herstellerterpene voraktiviert, Community-Terpene pulsieren (6a3632b),
+   Alltagswort/Achsen-Beispiele in der Karte (f4c08df), Terpen-Netz jetzt 11 Achsen (Bisabolol).
+3. **Stammdaten-Import neu erzeugen** (`scripts/stamm/sql-erzeugen.py` -> `data/stamm/import.sql`, >2000 Zeilen Diff):
+   sonst setzt ein Import Farnesen wieder auf SUESS; beta-Pinen (4 Strains) und Terpineol (1) werden erst damit
+   ihren Strains zugeordnet. Migration 0030_terpen_katalog.sql ist remote eingespielt.
+4. Aus S75 weiter offen: Info-Knöpfe (Nutzer-Ja steht aus), Gesamtnote-Blätter feiner, Publora fuenf-noten ab 23.10.
+- Terpen-Audit: docs/terpene-audit-2026-10-20.md (Quellen aus Modellwissen, nicht online geprüft). Zweite Priorität
+  (Valencen, Geraniol, Caryophyllenoxid, Camphen, Caren, Phellandren, Selinen) nicht umgesetzt.
+- Tooltips sind title-Attribute, auf Touch unsichtbar (nur Infotafel).
+- Lehre: zwei Agents im selben Worktree vermischten Commits (T6-Löschungen in 1f1c16a). Künftig nur explizite Pfade stagen.
 
 ### ⇢ SESSION 75 (2026-10-20): SOTM Plan B halb, Startseite korrigiert, Info-Knöpfe und Blätter offen
 
