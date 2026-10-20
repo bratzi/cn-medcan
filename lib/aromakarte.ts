@@ -667,3 +667,13 @@ export function nasenAbweichung(
   if (mittlereAbweichung === null) return null;
   return { delta: mittlereAbweichung, ergaenzt: ergaenzt.length };
 }
+
+/**
+ * Versatz der Netz-Beschriftung in Prozent der eigenen Größe (CSS translate), je Achswinkel:
+ * die Beschriftung wächst vom Ankerpunkt nach außen, damit Achsenpunkte keine Buchstaben verdecken.
+ */
+export function netzVersatz(index: number): { x: number; y: number } {
+  const winkel = ((-90 + (360 / GESCHMACKS_ACHSEN.length) * index) * Math.PI) / 180;
+  const r = (v: number) => Math.round(v) + 0;
+  return { x: r(-50 + 50 * Math.cos(winkel)), y: r(-50 + 50 * Math.sin(winkel)) };
+}
