@@ -4,7 +4,7 @@ import assert from "node:assert/strict";
 
 test("Startseite in der Reihenfolge der Spec 2026-10-20", () => {
   const q = readFileSync("app/[lang]/page.tsx", "utf8");
-  const folge = ["Auftakt", "TerpenBand", "TransparentMachen", "DeinKapitel", "BewertungSchritte", "NeuesterEintrag",
+  const folge = ["Auftakt", "TerpenBand", "TransparentMachen", "BewertungSchritte", "DeinKapitel", "NeuesterEintrag",
     "TerpenRegister", "AromaSektion", "Katalog", "WissenBuendeln", "GemeinsamLernen", "Empfehlungen", "Abstimmung"];
   const stellen = folge.map((n) => q.indexOf(`<${n} />`));
   assert.ok(stellen.every((s) => s >= 0), JSON.stringify(stellen));

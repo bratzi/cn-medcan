@@ -85,10 +85,10 @@ test("Name bricht nicht mitten im Wort: Grad text-kapitel statt text-titel (live
   assert.doesNotMatch(name, /text-titel/);
 });
 
-test("Dein Kapitel steht direkt hinter dem Storytelling, die Bewertung gleich danach (Nutzer 2026-10-20)", async () => {
+test("Dein Kapitel steht nach dem ganzen Storytelling samt Bewertung (Nutzer 2026-10-20)", async () => {
   const { readFileSync } = await import("node:fs");
   const seite = readFileSync("app/[lang]/page.tsx", "utf8");
-  assert.match(seite, /<TerpenBand \/>\s*(\{\/\*[^]*?\*\/\}\s*)?<TransparentMachen \/>\s*<DeinKapitel \/>\s*<BewertungSchritte \/>\s*<NeuesterEintrag \/>/);
+  assert.match(seite, /<TerpenBand \/>\s*(\{\/\*[^]*?\*\/\}\s*)?<TransparentMachen \/>\s*<BewertungSchritte \/>\s*(\{\/\*[^]*?\*\/\}\s*)?<DeinKapitel \/>\s*<NeuesterEintrag \/>/);
   const start = readFileSync("components/story/bewegung/start.ts", "utf8");
   assert.match(start, /transparent,\n\s*kapitel,\n\s*randnotizen,\n\s*register,/);
 });
