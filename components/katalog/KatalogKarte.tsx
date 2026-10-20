@@ -104,7 +104,7 @@ function CommunityZeile({
         <span aria-hidden="true" className="font-hand text-notiz leading-none text-logo">
           {note}
         </span>
-        <span className="sr-only">{t(texte.srNote, { note, stimmen: community.stimmen })}</span>
+        <span className="sr-only">{mehrzahl(sprache, texte.srNote, community.stimmen, { note })}</span>
         <div aria-hidden="true" className="min-w-0">
           <BlattAnzeige note={community.note} text={mehrzahl(sprache, texte.stimmen, community.stimmen)} />
         </div>

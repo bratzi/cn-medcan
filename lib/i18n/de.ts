@@ -396,6 +396,9 @@ export const de = {
     vorige: "Vorige Seite",
     naechste: "Nächste Seite",
     seiteVon: "Seite {seite} von {seiten}",
+    ladeFehler: "Die Filter konnten nicht geladen werden. Die Liste unten bleibt stehen.",
+    erneutVersuchen: "erneut versuchen",
+    alleLoeschen: "alle löschen",
     leiste: {
       wirdAngewendet: "Filter wird angewendet …",
       treffer: { one: "{anzahl} Treffer", other: "{anzahl} Treffer" },
@@ -488,7 +491,7 @@ export const de = {
       buchNote: "Buch {note}",
       wertDerBluete: "Wert der Blüte",
       varianten: { one: "{anzahl} Variante", other: "{anzahl} Varianten" },
-      srNote: "Community-Note {note} von 5 aus {stimmen} Stimmen",
+      srNote: { one: "Community-Note {note} von 5 aus {anzahl} Stimme", other: "Community-Note {note} von 5 aus {anzahl} Stimmen" },
     },
     cannabinoide: {
       keineAngabe: "{name} keine Angabe",

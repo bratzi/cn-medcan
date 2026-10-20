@@ -388,6 +388,9 @@ export const en: Woerterbuch = {
     vorige: "Previous page",
     naechste: "Next page",
     seiteVon: "Page {seite} of {seiten}",
+    ladeFehler: "The filters could not be loaded. The list below stays as it is.",
+    erneutVersuchen: "try again",
+    alleLoeschen: "clear all",
     leiste: {
       wirdAngewendet: "Applying filters …",
       treffer: { one: "{anzahl} result", other: "{anzahl} results" },
@@ -476,7 +479,7 @@ export const en: Woerterbuch = {
       buchNote: "Book {note}",
       wertDerBluete: "Value of the flower",
       varianten: { one: "{anzahl} variant", other: "{anzahl} variants" },
-      srNote: "Community rating {note} out of 5 from {stimmen} votes",
+      srNote: { one: "Community rating {note} out of 5 from {anzahl} vote", other: "Community rating {note} out of 5 from {anzahl} votes" },
     },
     cannabinoide: {
       keineAngabe: "{name} not stated",
