@@ -95,7 +95,7 @@ test("Kolophon: ohne Charge steht nicht angegeben, ohne Zahl entfällt die Zelle
 test("Kolophon: Restfeuchte als Badge mit dem erklärenden Satz, ohne Wert nur das Badge", () => {
   const mit = kolophon({ feuchtigkeitProzent: 11.2 });
   assert.match(mit, />Restfeuchte optimal · 11,2\s%</);
-  assert.match(mit, /8 bis 13 % Restfeuchte gelten als optimaler Bereich\./);
+  assert.match(mit, /8 bis 13 % gilt als optimal\./);
   const ohne = kolophon({ feuchtigkeitProzent: null });
   assert.match(ohne, />Restfeuchte unbekannt</);
   assert.doesNotMatch(ohne, /Keine Angabe zur Restfeuchte/);
@@ -105,7 +105,7 @@ test("Kolophon: Restfeuchte als Badge mit dem erklärenden Satz, ohne Wert nur d
 test("Kolophon: der Hinweis zur Restfeuchte liegt hinter dem Info-Knopf", () => {
   const html = kolophon({ feuchtigkeitProzent: 5 });
   assert.match(html, /<button[^>]*aria-label="Hinweis"[^>]*aria-expanded="false"/);
-  assert.match(html, /role="tooltip"[^>]*>Unter 8 % Restfeuchte/);
+  assert.match(html, /role="tooltip"[^>]*>Unter 8 %: zerfällt leicht/);
 });
 
 test("Kolophon: englische Begriffe und Datumsform", () => {
