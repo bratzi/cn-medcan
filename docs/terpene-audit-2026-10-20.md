@@ -94,3 +94,33 @@ Die Datenbank nutzt „beta-Caryophyllen“, „alpha-Pinen“ in ASCII. Fachlic
 6. **Seltene Terpene zurückhaltend.** Neue Nebenterpene nur einblenden, wenn der Hersteller sie nennt oder der Nutzer sie über „ergänzen“ wählt; die Auswahl bleibt klein (Hick).
 
 Alle Texte nur Duft und Geschmack, keine Wirkung, keine Heilversprechen.
+
+## Nachweis in Cannabis (online geprüft, 2026-10-20)
+
+Frage: Kommen die 14 neu aufgenommenen Terpene nachweislich in Cannabis sativa vor? Ergebnis: alle 14 belegt, keines wird entfernt. Größenordnung: Haupt (über 1 mg/g bzw. über 5 % des Öls in manchen Sorten), Neben (0,1 bis 1 mg/g bzw. 0,5 bis 5 %), Spur (darunter).
+
+Quellen:
+- [F] Fischedick 2017, Identification of Terpenoid Chemotypes Among High (−)-trans-Δ9-THC-Producing Cannabis sativa L. Cultivars, Cannabis Cannabinoid Res 2(1):34–47, doi:10.1089/can.2016.0040, https://pmc.ncbi.nlm.nih.gov/articles/PMC5436332/ (233 Blütenproben, 30 Sorten, GC)
+- [M] Micalizzi et al. 2021, Development of a Novel Microwave Distillation Technique for the Isolation of Cannabis sativa L. Essential Oil …, Molecules 26(6):1588, doi:10.3390/molecules26061588, https://pmc.ncbi.nlm.nih.gov/articles/PMC8000122/ (ätherische Öle aus Blütenständen, GC-MS/FID; Werte = relative Flächen-%)
+- [B] Booth, Page, Bohlmann 2017, Terpene synthases from Cannabis sativa, PLoS ONE 12(3):e0173911, doi:10.1371/journal.pone.0173911, https://pmc.ncbi.nlm.nih.gov/articles/PMC5371325/
+- [C] Costa et al. 2021, Antiseizure Effects of Fully Characterized Non-Psychoactive Cannabis sativa L. Extracts …, Pharmaceuticals 14(12):1259, doi:10.3390/ph14121259, https://pmc.ncbi.nlm.nih.gov/articles/PMC8703309/ (Hanfextrakte, GC-MS)
+- [R] Richins et al. 2018, Accumulation of bioactive metabolites in cultivated medical Cannabis, PLoS ONE, doi:10.1371/journal.pone.0201119, https://pmc.ncbi.nlm.nih.gov/articles/PMC6056047/ (72 Blütenproben)
+
+| Terpen (Isomer) | belegt | Nachweis | Größenordnung | Quelle |
+|---|---|---|---|---|
+| Bisabolol (α-Bisabolol) | ja | Blüten quantifiziert, u. a. Master Kush, Bubba Kush, Sour Diesel; im Öl 0,09–14 % | Neben, selten Haupt | [F], [M] |
+| β-Pinen | ja | Blüten bis ca. 2,0 mg/g (Blue Dream); in Finola 8,6 % der Monoterpene, von CsTPS1/5 gebildet | Neben bis Haupt | [F], [B] |
+| Terpineol (α-Terpineol) | ja | Blüten bis ca. 0,9 mg/g (Gelato), OG-Kush-Gruppe 0,5–0,7 mg/g; Öl 0,08–0,29 % | Neben | [F], [M] |
+| Eukalyptol (1,8-Cineol) | ja | im Blütenöl 0,16–0,61 % | Spur bis Neben | [M] |
+| Borneol | ja | im Blütenöl 0,08–0,23 % | Spur | [M] |
+| Fenchol (endo-Fenchylalkohol) | ja | Blüten quantifiziert, am höchsten in Gelato; Öl 0,10–0,39 % | Neben | [F], [M] |
+| Guajol (Guaiol) | ja | im Blütenöl 0,69–9,25 % | Neben bis Haupt | [M] |
+| Valencen | ja | im Blütenöl 0,03–6,68 %; Hauptprodukt von CsTPS8 (19,6 %) | Spur bis Neben | [M], [B] |
+| Geraniol | ja (schwächster Beleg) | als Analyt im Blütenpanel von 72 Proben geführt [R]; [B]: Monoterpenalkohole „such as linalool or geraniol, which are common in some cannabis strains“ | Spur | [R], [B] |
+| Caryophyllenoxid | ja | im Blütenöl 0,05 % bis hoch (oxidiert bei Lagerung); Hanfextrakt 8,25 µg/ml | Spur bis Neben | [M], [C] |
+| Camphen | ja | im Blütenöl 0,10–0,49 %; Nebenprodukt von CsTPS1 | Spur | [M], [B], [C] |
+| δ-3-Caren | ja | im Blütenöl 0,09–2,95 %; in Blüten meist unter Bestimmungsgrenze, per GC-MS bestätigt (Jack Herer) | Spur bis Neben | [M], [F] |
+| Phellandren (α-Phellandren) | ja | Blüten bis ca. 0,4 mg/g (Trainwreck, Terpinolen-Typ); Öl 0,02–0,23 % | Spur | [F], [M] |
+| Selinen (α-/β-Selinen) | ja | im Blütenöl α 0,11–17,9 %, β 0,08–25,5 % | Neben bis Haupt (sortenabhängig) | [M] |
+
+Folge: keine Migration, keine Entfernung. Geraniol hat den dünnsten Primärbeleg (Werte in Supplement S1 von [R] nicht eingesehen); fachlich unstrittig, aber nur in Spuren. Hinweis Abruf: PMC sperrte direkte Abrufe zeitweise, Volltexte über Europe PMC (ebi.ac.uk) gelesen.
