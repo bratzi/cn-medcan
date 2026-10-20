@@ -1,0 +1,7 @@
+# Zeilenenden im Repo immer LF, damit Windows-Editoren keinen CRLF-Churn erzeugen.
+* text=auto eol=lf
+*.png binary
+*.jpg binary
+*.webp binary
+*.woff2 binary
+*.mp4 binary
