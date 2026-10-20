@@ -139,7 +139,8 @@ test("BlattGlyphe: je Hälfte ein Pfad, halbes Blatt links gefüllt, leeres Blat
   const pfade = (html: string) => [...html.matchAll(/<path[^>]*>/g)].map(([tag]) => tag);
   const halb = renderToStaticMarkup(createElement(BlattGlyphe, { fuellung: "halb", vorschau: false }));
   const [links, rechts] = pfade(halb);
-  assert.equal(pfade(halb).length, 4);
+  // Zwei Hälften, Adern, Kontur, Stiel.
+  assert.equal(pfade(halb).length, 5);
   assert.match(links, /opacity-100/);
   assert.match(rechts, /opacity-0/);
   assert.match(halb, /text-accent/);
