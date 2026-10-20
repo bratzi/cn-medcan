@@ -138,7 +138,7 @@ export function KapitelAufschlag({
         {notizen.map((n) => (
           <li key={n.wort} className="flex min-w-0 flex-col items-center gap-2">
             <span className="sr-only">{n.satz}</span>
-            <span aria-hidden="true" data-story="kapitel-wort" className="farbverlauf font-hand text-display text-logo">
+            <span aria-hidden="true" data-story="kapitel-wort" className="farbverlauf font-hand text-notiz text-logo">
               {n.zahl}
             </span>
             <span aria-hidden="true" className="text-body text-text-muted wrap-break-word">
