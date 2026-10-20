@@ -245,6 +245,8 @@ export const en: Woerterbuch = {
       naehe: "Match with the data sheet:",
       deinEindruck: "Your impression:",
       anleitung: "Drag the purple dots on the left of the map: too little, just right or too much? The middle is the sweet spot. The terpenes of this strain that carry the flavour light up.",
+      voraktiv: "Terpenes listed by the producer are already on. Switch off what you cannot taste.",
+      vorschlag: "Pulsing terpenes are ones the community also tasted in this strain: tap them if you find them too.",
       nichtsGespeichert: "Nothing is saved here.",
       communityFazit: "Community score",
       chargenFazit: "Supplier/batch score",

@@ -18,7 +18,22 @@ export type EindruckKey = (typeof EINDRUCK_ACHSEN)[number]["key"];
 /** Alle Noten, mit Wirkung: nur in der Bewertungsmaske (Pflichtfeld), nie öffentlich. */
 export type NotenKey = (typeof BEWERTUNGS_ACHSEN)[number]["key"];
 
-export type Gesamteindruck = { werte: Partial<Record<EindruckKey, number>>; anzahl: number };
+export type Gesamteindruck = {
+  werte: Partial<Record<EindruckKey, number>>;
+  anzahl: number;
+  /**
+   * Community-Mittel der Wirkung, nur für die Bewertungsmaske (Ring am Regler, Nutzer 2026-10-20).
+   * Öffentliche Seiten bekommen den Wert nie (HWG-Nähe), deshalb getrennt von `werte`.
+   */
+  wirkung?: number;
+};
+
+/** Mittel der Wirkung über alle Bewertungen, eine Nachkommastelle; ohne Werte undefined. */
+export function mittleWirkung(reviews: readonly { wirkung?: number | null }[]): number | undefined {
+  const zahlen = reviews.flatMap((review) => (typeof review.wirkung === "number" ? [review.wirkung] : []));
+  if (zahlen.length === 0) return undefined;
+  return Math.round((zahlen.reduce((a, b) => a + b, 0) / zahlen.length) * 10) / 10;
+}
 
 /** Mittel je Note über alle Bewertungen, eine Nachkommastelle. */
 export function mittleNoten(reviews: readonly Partial<Record<EindruckKey, number>>[]): Gesamteindruck {
@@ -37,6 +52,7 @@ export function mittleNoten(reviews: readonly Partial<Record<EindruckKey, number
 export function GesamteindruckLeiste({
   werte,
   anzahl,
+  wirkung,
   className,
   bedienung,
   mitWirkung = false,
@@ -58,7 +74,7 @@ export function GesamteindruckLeiste({
 }) {
   const aus = mehrzahl(texte.sprache, texte.aroma.ausBewertungen, anzahl);
   const achsen = mitWirkung ? BEWERTUNGS_ACHSEN : EINDRUCK_ACHSEN;
-  const mittelWerte: Partial<Record<NotenKey, number>> = werte;
+  const mittelWerte: Partial<Record<NotenKey, number>> = mitWirkung ? { ...werte, wirkung } : werte;
   if (!bedienung && Object.keys(werte).length === 0) return null;
   return (
     <section className={cn("flex flex-col gap-4", className)}>

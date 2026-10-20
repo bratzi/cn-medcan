@@ -165,7 +165,11 @@ export function AromaErkundung({
     geschmack: vorbelegung?.geschmack ?? null,
     beschaffenheit: (vorbelegung?.beschaffenheit ?? {}) as Partial<Record<BeschaffenheitsSchluessel, number>>,
     noten: (vorbelegung?.noten ?? {}) as Partial<Record<NotenKey, number>>,
-    intensitaet: vorbelegung?.intensitaet ?? {},
+    // Neue Bewertung: die Herstellerterpene stehen schon an (Nutzer 2026-10-20: die meisten kennen
+    // Terpene kaum). Man schaltet ab, was man nicht schmeckt, statt alles selbst zu suchen.
+    intensitaet:
+      vorbelegung?.intensitaet ??
+      (eingabe ? Object.fromEntries(terpene.map((terpen) => [terpen.name, 1])) : {}),
   }));
   const [eigen, setEigen] = useState<GeschmacksMatrix | null>(anfang.geschmack);
   const [eigeneBeschaffenheit, setEigeneBeschaffenheit] = useState(anfang.beschaffenheit);
@@ -176,7 +180,17 @@ export function AromaErkundung({
   const aktiveTerpene = new Set(Object.entries(eigeneIntensitaet).flatMap(([name, wert]) => (wert > 0 ? [name] : [])));
   // Kandidaten, unter denen der Nutzer gerade wählen soll: gesetzt, wenn ein Geschmack über Null
   // steht und mehrere Terpene ihn tragen. Sie pulsieren in der Karte, bis eines an ist.
-  const [pulsierend, setPulsierend] = useState<ReadonlySet<string>>(new Set());
+  // Zu Beginn einer neuen Bewertung pulsieren als Vorschlag die Terpene, die die Community bei
+  // diesem Strain geschmeckt hat, der Hersteller aber nicht nennt (Nutzer 2026-10-20).
+  const [pulsierend, setPulsierend] = useState<ReadonlySet<string>>(() =>
+    eingabe && !vorbelegung?.intensitaet
+      ? new Set(
+          Object.entries(median?.terpene ?? {}).flatMap(([name, wert]) =>
+            wert > 0 && !terpene.some((terpen) => terpen.name === name) ? [name] : [],
+          ),
+        )
+      : new Set(),
+  );
   const geaendert =
     eigen !== anfang.geschmack ||
     eigeneBeschaffenheit !== anfang.beschaffenheit ||
@@ -412,6 +426,12 @@ export function AromaErkundung({
           <p className="max-w-[60ch] text-small text-text-muted text-pretty">
             {texte.aroma.erkundung.anleitung}{modus === "maske" ? "" : ` ${texte.aroma.erkundung.nichtsGespeichert}`}
           </p>
+          {eingabe && terpene.length > 0 ? (
+            <p className="max-w-[60ch] text-small text-text-muted text-pretty">
+              {texte.aroma.erkundung.voraktiv}
+              {pulsierend.size > 0 ? ` ${texte.aroma.erkundung.vorschlag}` : ""}
+            </p>
+          ) : null}
           <div className="w-full min-w-0">
             <AromaKarte
               titel={titel}

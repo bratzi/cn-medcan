@@ -251,6 +251,8 @@ export const de = {
       naehe: "Nähe zur Datenblattangabe:",
       deinEindruck: "Dein Eindruck:",
       anleitung: "Zieh die lila Punkte links in der Karte: zu wenig, genau richtig oder zu viel? Die Mitte ist der Sweet Spot. Dazu leuchten die Terpene dieses Strains auf, die die Richtung tragen.",
+      voraktiv: "Laut Hersteller enthaltene Terpene stehen schon an. Schalte ab, was du nicht schmeckst.",
+      vorschlag: "Pulsierende Terpene hat die Community bei diesem Strain zusätzlich geschmeckt: tippe sie an, wenn du sie auch findest.",
       nichtsGespeichert: "Hier wird nichts gespeichert.",
       communityFazit: "Community-Score",
       chargenFazit: "Vertreiber/Chargen-Score",

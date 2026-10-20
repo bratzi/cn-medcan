@@ -26,6 +26,7 @@ import { ladeJuryBeitraegeZuBewertungen } from "@/lib/query/jury";
 import { BlattAnzeige } from "@/components/review/BlattAnzeige";
 import { WareLeiste } from "@/components/sorte/WareLeiste";
 import { erkundungsDaten } from "@/components/review/erkundung-daten";
+import { mittleWirkung } from "@/components/review/GesamteindruckLeiste";
 import { eintragAnker } from "@/components/review/eintrag";
 import {
   Faktenliste,
@@ -542,6 +543,8 @@ async function SorteInhalt({ slug, suche, w, sprache }: { slug: string; suche: S
                 liveNetz={liveNetz}
                 zuordnung={zuordnung}
                 {...erkundung}
+                // Wirkung nur in der Maske: Ring am Community-Mittel (Nutzer 2026-10-20), nie öffentlich.
+                gesamteindruck={{ ...erkundung.gesamteindruck, wirkung: mittleWirkung(reviews) }}
               />
             </div>
           </>
