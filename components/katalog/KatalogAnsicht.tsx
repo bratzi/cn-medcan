@@ -1,13 +1,26 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useDeferredValue, useEffect, useMemo, useReducer, useRef, useState } from "react";
+import {
+  useCallback,
+  useDeferredValue,
+  useEffect,
+  useId,
+  useLayoutEffect,
+  useMemo,
+  useReducer,
+  useRef,
+  useState,
+  useSyncExternalStore,
+} from "react";
 
 import { Blaettern } from "@/components/katalog/Blaettern";
 import { FilterFelder } from "@/components/katalog/FilterFelder";
 import { FilterSchublade } from "@/components/katalog/FilterSchublade";
+import { GeschmackLegende } from "@/components/katalog/GeschmackZeile";
 import { BlueteKarte, StrainKarte, type KartenTexte } from "@/components/katalog/KatalogKarte";
 import { MobilLeiste } from "@/components/katalog/MobilLeiste";
+import { Werkzeugleiste } from "@/components/katalog/Werkzeugleiste";
 import type { DiashowBild } from "@/components/produkt/BudpicDiashow";
 import { SKELETT_FLAECHE, SkelettAnsage } from "@/components/story/Skelette";
 import { buttonKlassen } from "@/components/ui/Button";
@@ -20,6 +33,13 @@ import type { Sprache } from "@/lib/i18n/sprache-kern";
 import { mehrzahl, t } from "@/lib/i18n/text";
 import type { Woerterbuch } from "@/lib/i18n/typen";
 import { filtere, verdichte, zaehleOptionen, type KatalogErgebnis } from "@/lib/katalog/filtern";
+import {
+  abonniereFilterSpalte,
+  filterSpalteOffen,
+  gespeicherteFilterWahl,
+  setzeFilterWahl,
+  zeigeFilterWahl,
+} from "@/lib/katalog/filterspalte";
 import type { BlueteZeile, KatalogDaten } from "@/lib/katalog/typen";
 import { filterDeaktiviert, weiter, type Ladezustand } from "@/lib/katalog/zustand";
 import type { BudpicAnzeige } from "@/lib/query/budpics";
@@ -28,10 +48,17 @@ import { istFilterLeer, leererFilter, parseStrainFilter, serialisiereFilter, typ
 type Props = {
   /** Erste Seite ohne Filter, auf dem Server gerendert: steht, bis der Katalog geladen ist. */
   start: { zeilen: BlueteZeile[]; gesamt: number; seitenAnzahl: number; vertreiber: { i: string; n: string }[] };
-  /** Ganzes Wörterbuch: die Karten brauchen es für TerpenChips und Diashow. */
+  /** Ganzes Wörterbuch: die Karten brauchen es für Geschmäcker und Diashow. */
   w: Woerterbuch;
   sprache: Sprache;
 };
+
+/**
+ * Raster der Karten (Task 2): Spalten ab 15rem, so viele wie passen (bei 1280 px ohne Filterspalte
+ * vier, bei 1920 px mit Spalte fünf). Jede Karte spannt fünf Zeilen, die sie per subgrid teilt.
+ */
+const RASTER = "grid grid-cols-[repeat(auto-fill,minmax(min(15rem,100%),1fr))] gap-6";
+const KARTEN_ZELLE = "row-span-5 grid grid-rows-subgrid";
 
 const START: Ladezustand = { art: "start" };
 /** Höchstens so viele Kultivare je Budpic-Anfrage (Route begrenzt ebenso). */
@@ -92,7 +119,7 @@ function aktiveChips(f: StrainFilter, w: Woerterbuch, sprache: Sprache, daten: K
 /** Platzhalter für einen Deep-Link mit Filter, solange der Katalog lädt (Startliste wäre falsch). */
 function ListenSkelett({ ansage }: { ansage: string }) {
   return (
-    <div role="status" className="grid grid-cols-[repeat(auto-fill,minmax(min(16rem,100%),1fr))] gap-6">
+    <div role="status" className={RASTER}>
       <SkelettAnsage text={ansage} />
       {[0, 1, 2, 3, 4, 5].map((stelle) => (
         <span key={stelle} aria-hidden="true" className={`${SKELETT_FLAECHE} h-96`} />
@@ -114,6 +141,15 @@ export function KatalogAnsicht({ start, w, sprache }: Props) {
   const [budpics, setBudpics] = useState<ReadonlyMap<string, DiashowBild[]>>(new Map());
   const angefragt = useRef(new Set<string>());
   const listeRef = useRef<HTMLDivElement>(null);
+
+  // Filterspalte ab lg (lib/katalog/filterspalte.ts): sichtbar macht sie CSS, hier nur der Zustand für
+  // aria-expanded. Auf dem Server und bei der Hydration „zu“, danach aus Attribut und Breite.
+  const filterId = useId();
+  const filterOffen = useSyncExternalStore(abonniereFilterSpalte, filterSpalteOffen, () => false);
+  // Wahl aus dem Speicher nachziehen, vor dem Zeichnen: nach Reacts Entwicklungs-Remount (setzt die
+  // <html>-Attribute zurück) und falls das Kopf-Skript sie nicht setzen konnte.
+  useLayoutEffect(() => zeigeFilterWahl(gespeicherteFilterWahl()), []);
+  const filterUmschalten = useCallback(() => setzeFilterWahl(filterSpalteOffen() ? "zu" : "offen"), []);
 
   const laden = useCallback(() => {
     dispatch({ typ: "laden" });
@@ -253,43 +289,31 @@ export function KatalogAnsicht({ start, w, sprache }: Props) {
         {felder}
       </FilterSchublade>
 
-      <div className="mt-6 flex flex-col gap-10 lg:mt-0 lg:flex-row lg:gap-16">
-        <aside
-          aria-label={texte.filter}
-          className="sticky top-[calc(var(--kopf-h,4rem)+2rem)] hidden max-h-[calc(100dvh-var(--kopf-h,4rem)-4rem)] w-72 shrink-0 self-start overflow-y-auto lg:block"
-        >
-          {felder}
-        </aside>
+      {/* Werkzeugleiste über Filterspalte und Raster; Ziel beim Blättern, damit Sortierung und Zahl im Blick bleiben. */}
+      <div ref={listeRef} className="mt-6 flex scroll-mt-[calc(var(--kopf-h,4rem)+4.5rem)] flex-col gap-6 lg:mt-0">
+        <Werkzeugleiste
+          filter={filter}
+          aktiv={aktiv}
+          filterOffen={filterOffen}
+          filterId={filterId}
+          umschalten={filterUmschalten}
+          setze={setze}
+          deaktiviert={deaktiviert}
+          trefferText={zeigeSkelett ? texte.laedt : trefferText}
+          texte={texte}
+        />
 
-        <div ref={listeRef} className="flex min-w-0 flex-1 scroll-mt-[calc(var(--kopf-h,4rem)+4.5rem)] flex-col gap-6">
-          <nav aria-label={texte.ansicht.titel}>
-            <ul className="flex flex-wrap gap-2">
-              {(["bluete", "ware"] as const).map((ansicht) => {
-                const an = filter.ansicht === ansicht;
-                return (
-                  <li key={ansicht}>
-                    <button
-                      type="button"
-                      aria-pressed={an}
-                      disabled={deaktiviert}
-                      onClick={() => setze({ ansicht })}
-                      className={cn(
-                        "inline-flex min-h-11 items-center rounded-full border px-4 text-small transition-colors duration-fast ease-standard focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring disabled:cursor-not-allowed",
-                        an ? "border-accent bg-accent text-accent-fg" : "border-border-strong bg-surface-raised text-text hover:border-accent-hover",
-                      )}
-                    >
-                      {ansicht === "ware" ? texte.ansicht.ware : texte.ansicht.bluete}
-                    </button>
-                  </li>
-                );
-              })}
-            </ul>
-          </nav>
+        <div className="flex flex-col gap-10 lg:flex-row lg:gap-16">
+          {/* Sichtbar nur per CSS (.katalog-filterspalte): ab lg nach Wahl, ohne Wahl ab 2xl; ausgeblendet nimmt das Raster die ganze Breite. */}
+          <aside
+            id={filterId}
+            aria-label={texte.filter}
+            className="katalog-filterspalte sticky top-[calc(var(--kopf-h,4rem)+2rem)] max-h-[calc(100dvh-var(--kopf-h,4rem)-4rem)] w-72 shrink-0 self-start overflow-y-auto"
+          >
+            {felder}
+          </aside>
 
-          <p aria-live="polite" className="numeric text-small text-text-muted">
-            {zeigeSkelett ? texte.laedt : trefferText}
-          </p>
-
+          <div className="flex min-w-0 flex-1 flex-col gap-6">
           {zustand.art === "fehler" ? (
             <div role="alert" className="flex flex-wrap items-center gap-4 border-l-2 border-border-strong pl-4 text-small text-text">
               <span>{texte.ladeFehler}</span>
@@ -344,19 +368,22 @@ export function KatalogAnsicht({ start, w, sprache }: Props) {
               }
             />
           ) : (
-            <ul className="grid grid-cols-[repeat(auto-fill,minmax(min(16rem,100%),1fr))] gap-6">
-              {ergebnis?.ansicht === "ware"
-                ? ergebnis.zeilen.map((zeile) => (
-                    <li key={zeile.i} className="flex">
-                      <StrainKarte zeile={zeile} vertreiberName={vertreiberName} texte={kartenTexte} sprache={sprache} fachkreis={daten?.fachkreis ?? false} w={w} />
-                    </li>
-                  ))
-                : (ergebnis?.zeilen ?? start.zeilen).map((zeile) => (
-                    <li key={zeile.id} className="flex" data-kultivar={zeile.slug ? zeile.id : undefined}>
-                      <BlueteKarte zeile={zeile} vertreiberName={vertreiberName} budpics={budpics.get(zeile.id)} texte={kartenTexte} sprache={sprache} w={w} />
-                    </li>
-                  ))}
-            </ul>
+            <div className="flex flex-col gap-4">
+              <GeschmackLegende texte={w.katalog.geschmack} />
+              <ul className={RASTER}>
+                {ergebnis?.ansicht === "ware"
+                  ? ergebnis.zeilen.map((zeile) => (
+                      <li key={zeile.i} className={KARTEN_ZELLE}>
+                        <StrainKarte zeile={zeile} vertreiberName={vertreiberName} texte={kartenTexte} sprache={sprache} fachkreis={daten?.fachkreis ?? false} w={w} />
+                      </li>
+                    ))
+                  : (ergebnis?.zeilen ?? start.zeilen).map((zeile) => (
+                      <li key={zeile.id} className={KARTEN_ZELLE} data-kultivar={zeile.slug ? zeile.id : undefined}>
+                        <BlueteKarte zeile={zeile} vertreiberName={vertreiberName} budpics={budpics.get(zeile.id)} texte={kartenTexte} sprache={sprache} w={w} />
+                      </li>
+                    ))}
+              </ul>
+            </div>
           )}
 
           {ergebnis && ergebnis.zeilen.length > 0 ? (
@@ -378,6 +405,7 @@ export function KatalogAnsicht({ start, w, sprache }: Props) {
             }}
             texte={texte}
           />
+          </div>
         </div>
       </div>
     </div>

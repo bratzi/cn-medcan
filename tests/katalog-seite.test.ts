@@ -17,7 +17,9 @@ test("Blütenseite: statisch, kein Suspense-key am Filter, kein Router-Aufruf in
   assert.match(insel, /history\.pushState/);
   assert.match(insel, /popstate/);
   assert.match(insel, /window\.location\.search/);
-  assert.match(insel, /aria-live="polite"/);
+  // Die Trefferzahl sitzt seit Task 2 in der Werkzeugleiste, die die Insel rendert.
+  assert.match(insel, /<Werkzeugleiste/);
+  assert.match(readFileSync("components/katalog/Werkzeugleiste.tsx", "utf8"), /aria-live="polite"/);
 });
 
 test("Karte: Screenreader-Note mit Einzahl bei einer Stimme", () => {

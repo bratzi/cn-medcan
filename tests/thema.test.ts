@@ -48,7 +48,7 @@ test("Layout: startet hell, Skript im head, DOM gewinnt beim Hydrieren", () => {
   assert.match(layout, /suppressHydrationWarning/);
   assert.match(
     layout,
-    /<head>\s*<script dangerouslySetInnerHTML=\{\{ __html: THEMA_SKRIPT \}\} \/>\s*<script dangerouslySetInnerHTML=\{\{ __html: EINSTELLUNG_SKRIPT \}\} \/>\s*<\/head>/,
+    /<head>\s*<script dangerouslySetInnerHTML=\{\{ __html: THEMA_SKRIPT \}\} \/>\s*<script dangerouslySetInnerHTML=\{\{ __html: EINSTELLUNG_SKRIPT \}\} \/>\s*(\{\/\*[^*]*\*\/\}\s*)?<script dangerouslySetInnerHTML=\{\{ __html: FILTER_SKRIPT \}\} \/>\s*<\/head>/,
   );
 });
 

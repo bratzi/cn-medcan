@@ -2,10 +2,9 @@
 
 import { useEffect, useId, useState } from "react";
 
+import { SortierWahl } from "@/components/katalog/SortierWahl";
 import type { Woerterbuch } from "@/lib/i18n/typen";
-
-import { SORTIERUNGEN } from "@/lib/query/filter";
-import type { Sortierung, StrainFilter } from "@/lib/query/filter";
+import type { StrainFilter } from "@/lib/query/filter";
 
 type Props = {
   filter: StrainFilter;
@@ -70,17 +69,7 @@ export function MobilLeiste({ filter, aktiv, gesamt, setze, oeffne, texte }: Pro
           </span>
         ) : null}
       </button>
-      <label htmlFor={`${basisId}-sort`} className="sr-only">{texte.sortierung}</label>
-      <select
-        id={`${basisId}-sort`}
-        value={filter.sortierung}
-        onChange={(event) => setze({ sortierung: event.target.value as Sortierung, seite: 1 })}
-        className="h-11 w-28 shrink-0 rounded-full border border-border-strong bg-surface px-2 text-small text-text"
-      >
-        {SORTIERUNGEN.map((wert) => (
-          <option key={wert} value={wert}>{texte.sortierungen[wert]}</option>
-        ))}
-      </select>
+      <SortierWahl wert={filter.sortierung} setze={setze} texte={texte} kompakt />
     </div>
   );
 }

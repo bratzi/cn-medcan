@@ -482,6 +482,19 @@ export const en: Woerterbuch = {
       varianten: { one: "{anzahl} variant", other: "{anzahl} variants" },
       srNote: { one: "Community rating {note} out of 5 from {anzahl} vote", other: "Community rating {note} out of 5 from {anzahl} votes" },
     },
+    geschmack: {
+      titel: "Flavour",
+      keiner: "No flavour known yet.",
+      datenblatt: "Per data sheet",
+      community: "By the community",
+      status: { bestaetigt: "confirmed", nichtBestaetigt: "not confirmed", offen: "not yet rated", gefunden: "found" },
+      sr: {
+        bestaetigt: "{geschmack}, confirmed by the community",
+        nichtBestaetigt: "{geschmack}, not confirmed by the community",
+        offen: "{geschmack}, per data sheet, not yet rated by the community",
+        gefunden: "{geschmack}, found by the community",
+      },
+    },
     cannabinoide: {
       keineAngabe: "{name} not stated",
       unter: "{name} below {wert} percent",
