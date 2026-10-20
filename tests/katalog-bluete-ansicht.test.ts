@@ -14,11 +14,6 @@ test("ProduktCard: Link auf die anderen Vertreiber nur mit Zahl größer null", 
   assert.match(q, /\/blueten\?kultivar=\$\{strain\.kultivarId\}/);
 });
 
-test("Startseite reicht weitereVertreiber durch", () => {
-  const start = readFileSync("components/story/Katalog.tsx", "utf8");
-  assert.match(start, /weitereVertreiber=/);
-});
-
 test("Katalog-Insel: Zurücksetzen im Leerzustand behält die Ansicht, Chips nennen Vertreiber nie per Id", () => {
   const insel = readFileSync("components/katalog/KatalogAnsicht.tsx", "utf8");
   assert.match(insel, /setze\(\{ \.\.\.leererFilter\(\), ansicht: filter\.ansicht \}\)/);

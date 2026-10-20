@@ -922,6 +922,8 @@ export const de = {
       text: "Erst das Overall, dann die Terpz: Grün ist das Profil, das das Datenblatt erwarten lässt, Lila ist, was wir beim Probieren gefunden haben. Zum Schluss die Qualität. Zieh an den Reglern, und alles zeigt deinen Eindruck.",
       zwischenruf: "stimmt das?",
       zurSorte: "Zum Strain",
+      nochNicht: "{name} ist noch nicht bewertet. Deine Bewertung wäre die erste.",
+      bewerten: "Jetzt bewerten",
     },
     lernen: {
       kicker: "So läuft eine Runde",

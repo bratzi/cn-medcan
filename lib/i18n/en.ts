@@ -909,6 +909,8 @@ export const en: Woerterbuch = {
       text: "First the overall, then the terpz: green is the profile the data sheet suggests, purple is what we found when tasting. Finally the quality. Move the sliders and everything shows your impression.",
       zwischenruf: "does it match?",
       zurSorte: "To the strain",
+      nochNicht: "{name} has not been reviewed yet. Yours would be the first.",
+      bewerten: "Review it now",
     },
     lernen: {
       kicker: "How a round works",

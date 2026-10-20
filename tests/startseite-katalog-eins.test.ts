@@ -21,5 +21,5 @@ test("offen bleibt Standard", () => {
 test("Startseite hat genau eine Sortensuche", () => {
   const seite = readFileSync("app/[lang]/page.tsx", "utf8");
   assert.doesNotMatch(seite, /<VertreiberKapitel\b/);
-  assert.match(readFileSync("components/story/Katalog.tsx", "utf8"), /SortenExplorer/);
+  assert.match(readFileSync("components/story/AromaWechsel.tsx", "utf8"), /SortenExplorer/);
 });

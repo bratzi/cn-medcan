@@ -19,6 +19,7 @@ import { autorProfilAus } from "@/lib/autor-profil";
 import type { GespeicherteBewertung } from "@/lib/bewertung-vorbelegung";
 import { vertreiberFacette } from "@/lib/vertreiber-facette";
 import { getPrisma } from "@/lib/prisma";
+import { aromaAbfrage } from "@/lib/query/aroma-abfrage";
 
 import { ladeAutorZahlen } from "./autoren";
 import { TREFFER_PRO_SEITE, type StrainFilter } from "./filter";
@@ -1245,6 +1246,8 @@ export async function ladeStrainAuswahl({ mitInaktiven = false } = {}): Promise<
 export type AromaVorzeige = {
   handelsname: string;
   slug: string;
+  /** Slug der Sorte (Kultivar), damit der Explorer der Startseite sie vorwählt. */
+  sorteSlug: string | null;
   /** Stammdaten für den Sortenkopf (Nutzer 2026-09-25: man muss sehen, was bewertet wird). */
   kultivarName: string | null;
   kultivarTyp: KultivarTyp;
@@ -1272,56 +1275,18 @@ export type AromaVorzeige = {
 };
 
 /**
- * Die Sorte, an der die Startseite die Aroma-Karte vorführt: aktiv, mit
- * Terpenangaben, mit den meisten Bewertungen. Keine Preise, keine Bestände,
+ * Die Blüte, an der die Startseite die Aroma-Karte vorführt: aktiv, mit
+ * Terpenangaben, mit den meisten freigegebenen Bewertungen; mit Sorte nur aus dieser Sorte. Keine Preise, keine Bestände,
  * also unabhängig vom Fachkreis-Gate.
  */
-export async function ladeAromaVorzeige(): Promise<AromaVorzeige | null> {
+export async function ladeAromaVorzeige(kultivarSlug: string | null = null): Promise<AromaVorzeige | null> {
   const prisma = await getPrisma();
-  const zeile = await prisma.strain.findFirst({
-    where: { aktiv: true, terpene: { some: {} }, reviews: { some: { freigegeben: true } } },
-    orderBy: { reviews: { _count: "desc" } },
-    select: {
-      handelsname: true,
-      slug: true,
-      kultivarName: true,
-      kultivarTyp: true,
-      genetik: true,
-      thcMinProzent: true,
-      thcMaxProzent: true,
-      cbdMinProzent: true,
-      cbdMaxProzent: true,
-      vertreiber: { select: { name: true } },
-      herstellerBildPfad: true,
-      terpene: {
-        orderBy: { rang: "asc" },
-        select: {
-          rang: true,
-          konzentrationProzent: true,
-          terpen: { select: { name: true, aromaProfil: true, geschmack: true } },
-        },
-      },
-      reviews: {
-        where: { freigegeben: true },
-        take: 50,
-        select: {
-          geschmacksMatrix: true,
-          terpenIntensitaet: true,
-          beschaffenheit: true,
-          feuchtigkeitProzent: true,
-          aussehen: true,
-          geruch: true,
-          geschmack: true,
-          konsistenz: true,
-        },
-      },
-      kennwerte: KENNWERTE_SELECT,
-    },
-  });
+  const zeile = await prisma.strain.findFirst(aromaAbfrage(kultivarSlug));
   if (!zeile) return null;
   return {
     handelsname: zeile.handelsname,
     slug: zeile.slug,
+    sorteSlug: zeile.kultivar?.slug ?? null,
     kultivarName: zeile.kultivarName,
     kultivarTyp: alsKultivarTyp(zeile.kultivarTyp),
     genetik: zeile.genetik,
