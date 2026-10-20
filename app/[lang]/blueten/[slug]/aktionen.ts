@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidiereSprachen } from "@/lib/i18n/revalidiere";
+import { revalidiereKatalog } from "@/lib/katalog/revalidieren";
 
 import { bewertungPruefen } from "@/lib/bewertung-eingabe";
 import { kennwerteFortschreiben } from "@/lib/kennwerte";
@@ -160,6 +161,7 @@ export async function bewertungSpeichern(formData: FormData): Promise<BewertungE
   if (kultivar.slug) revalidiereSprachen(`/blueten/${kultivar.slug}`);
   if (produktSlug) revalidiereSprachen(`/blueten/${produktSlug}`);
   revalidiereSprachen("/");
+  revalidiereKatalog();
   revalidiereSprachen("/reviews", "layout");
   revalidiereSprachen("/admin");
   revalidiereSprachen("/profil");

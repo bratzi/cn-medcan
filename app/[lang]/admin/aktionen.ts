@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidiereSprachen } from "@/lib/i18n/revalidiere";
+import { revalidiereKatalog } from "@/lib/katalog/revalidieren";
 
 import { adminErforderlich } from "@/lib/session";
 import { kennwerteFortschreiben } from "@/lib/kennwerte";
@@ -81,6 +82,7 @@ async function reviewSlug(reviewId: string): Promise<string | null> {
 function bewertungPfadeNeuLaden(slug: string) {
   revalidiereSprachen("/admin");
   revalidiereSprachen("/");
+  revalidiereKatalog();
   revalidiereSprachen("/reviews", "layout");
   revalidiereSprachen(`/blueten/${slug}`);
 }
