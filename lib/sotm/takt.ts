@@ -23,7 +23,7 @@ export function d1Ziel(db: D1Database): SqlZiel {
   };
 }
 
-export type TaktErgebnis = { schritte: ("BEENDET" | "ABSTIMMUNG" | "KANDIDATEN" | "NEUE_RUNDE")[] };
+export type TaktErgebnis = { schritte: ("UEBERNOMMEN" | "BEENDET" | "ABSTIMMUNG" | "KANDIDATEN" | "NEUE_RUNDE")[] };
 
 /** So legt Prisma DateTime in D1 ab: ISO-Text mit +00:00. */
 const datum = (d: Date) => d.toISOString().replace("Z", "+00:00");
@@ -41,15 +41,33 @@ export async function sotmTakt(
   const lage = sotmLage(jetzt);
   const schritte: TaktErgebnis["schritte"] = [];
 
-  // 1./2. Abgelaufene (oder monatslose Alt-)Runde beenden.
   let aktive = await aktiveLesen(db);
+
+  // Altrunde ohne monat laeuft weiter und wird zur Runde des Zielmonats -
+  // ausser dieser Monat ist schon vergeben, dann wird sie unten beendet.
+  if (aktive && aktive.monat === null && (aktive.phase === "VORSCHLAG" || aktive.phase === "ABSTIMMUNG")) {
+    const belegt = await db.alle<{ id: string }>("SELECT id FROM umfragen WHERE monat = ?", lage.zielMonat);
+    if (belegt.length === 0) {
+      await db.batch([
+        {
+          sql: "UPDATE OR IGNORE umfragen SET monat = ?, community_plaetze = 1 WHERE id = ? AND monat IS NULL AND aktiv = 'AKTIV'",
+          werte: [lage.zielMonat, aktive.id],
+        },
+      ]);
+      aktive = await aktiveLesen(db);
+      if (aktive?.monat === lage.zielMonat) schritte.push("UEBERNOMMEN");
+    }
+  }
+
+  // 1./2. Abgelaufene (oder monatslose Alt-)Runde beenden.
   if (aktive && (aktive.monat === null || aktive.monat <= lage.laufenderMonat)) {
     const optionen = await db.alle<{ id: string; herkunft: string; reihenfolge: number; stimmen: number }>(
       "SELECT o.id, o.herkunft, o.reihenfolge, COUNT(s.id) AS stimmen FROM umfrage_optionen o LEFT JOIN stimmen s ON s.option_id = o.id WHERE o.umfrage_id = ? GROUP BY o.id",
       aktive.id,
     );
+    // Nur COMMUNITY zaehlt: GESETZTE Altoptionen werden nie Strain of the Month.
     const gewinner = gewinnerErmitteln(
-      optionen.map((o) => ({ ...o, stimmen: Number(o.stimmen), reihenfolge: Number(o.reihenfolge) })) as Parameters<
+      optionen.filter((o) => o.herkunft === "COMMUNITY").map((o) => ({ ...o, stimmen: Number(o.stimmen), reihenfolge: Number(o.reihenfolge) })) as Parameters<
         typeof gewinnerErmitteln
       >[0],
       1,

@@ -173,16 +173,49 @@ test("Gleichstand: früher übernommene Option gewinnt; keine Stimmen: kein Gewi
   }
 });
 
-test("Altrunde ohne monat wird beim ersten Takt beendet", async () => {
+function altrunde(db: Database, phase: string) {
+  db.prepare(`INSERT INTO umfragen (id, titel, phase, aktiv, start_am, community_plaetze, erstellt_am) VALUES ('alt', 'Alte Runde', '${phase}', 'AKTIV', '2026-09-28T07:05:45.077+00:00', 2, '2026-09-28T07:05:45.077+00:00')`).run();
+}
+
+test("Altrunde ohne monat in ABSTIMMUNG wird übernommen statt geschlossen", async () => {
   const { ziel, db } = testDb();
-  db.prepare("INSERT INTO umfragen (id, titel, phase, aktiv, start_am, community_plaetze, erstellt_am) VALUES ('alt', 'Alte Runde', 'ABSTIMMUNG', 'AKTIV', '2026-09-28T07:05:45.077+00:00', 2, '2026-09-28T07:05:45.077+00:00')").run();
+  altrunde(db, "ABSTIMMUNG");
   db.prepare("INSERT INTO umfrage_optionen (id, umfrage_id, strain_id, reihenfolge, herkunft, ist_gewinner, erstellt_am) VALUES ('oa', 'alt', 's1', 1, 'COMMUNITY', 0, 'x'), ('ob', 'alt', 's2', 2, 'COMMUNITY', 0, 'x')").run();
   stimme(db, "ob", "m1");
-  const r = await sotmTakt(ziel, new Date("2026-10-21T00:00:00Z"), ids());
-  assert.deepEqual(r.schritte, ["BEENDET", "NEUE_RUNDE", "ABSTIMMUNG"]);
-  assert.deepEqual(db.prepare("SELECT phase, aktiv FROM umfragen WHERE id = 'alt'").get(), { phase: "BEENDET", aktiv: null });
-  assert.deepEqual(db.prepare("SELECT id FROM umfrage_optionen WHERE ist_gewinner = 1").all(), [{ id: "ob" }]);
-  assert.deepEqual(db.prepare("SELECT monat, phase FROM umfragen WHERE aktiv = 'AKTIV'").get(), { monat: "2026-11", phase: "ABSTIMMUNG" });
+  const r = await sotmTakt(ziel, new Date("2026-10-20T00:00:00Z"), ids());
+  assert.deepEqual(r.schritte, ["UEBERNOMMEN"]);
+  assert.deepEqual(db.prepare("SELECT id, phase, aktiv, monat, community_plaetze FROM umfragen").all(),
+    [{ id: "alt", phase: "ABSTIMMUNG", aktiv: "AKTIV", monat: "2026-11", community_plaetze: 1 }]);
+  assert.equal((db.prepare("SELECT COUNT(*) AS n FROM umfrage_optionen WHERE ist_gewinner = 1").get() as { n: number }).n, 0);
+  assert.deepEqual((await sotmTakt(ziel, new Date("2026-10-20T00:05:00Z"), ids())).schritte, []);
+});
+
+test("Altrunde in VORSCHLAG nach dem 15.: übernommen und in die Abstimmung", async () => {
+  const { ziel, db } = testDb();
+  altrunde(db, "VORSCHLAG");
+  vorschlag(db, "s1", "m1", "2026-10-04T00:00:00.000+00:00");
+  const r = await sotmTakt(ziel, new Date("2026-10-20T00:00:00Z"), ids());
+  assert.deepEqual(r.schritte, ["UEBERNOMMEN", "KANDIDATEN", "ABSTIMMUNG"]);
+  assert.deepEqual(db.prepare("SELECT phase, monat FROM umfragen").all(), [{ phase: "ABSTIMMUNG", monat: "2026-11" }]);
+});
+
+test("Altrunde, aber Zielmonat schon belegt: Altrunde wird beendet", async () => {
+  const { ziel, db } = testDb();
+  db.prepare("INSERT INTO umfragen (id, titel, phase, aktiv, start_am, community_plaetze, erstellt_am, monat) VALUES ('nov', 'Alt Nov', 'BEENDET', NULL, 'a', 1, 'a', '2026-11')").run();
+  altrunde(db, "ABSTIMMUNG");
+  const r = await sotmTakt(ziel, new Date("2026-10-20T00:00:00Z"), ids());
+  assert.deepEqual(r.schritte, ["BEENDET"]);
+  assert.deepEqual(db.prepare("SELECT phase, aktiv, monat FROM umfragen WHERE id = 'alt'").get(), { phase: "BEENDET", aktiv: null, monat: null });
+});
+
+test("Gewinner nur aus COMMUNITY: GESETZTE Altoption wird nie Gewinner", async () => {
+  const { ziel, db } = testDb();
+  db.prepare("INSERT INTO umfragen (id, titel, phase, aktiv, start_am, community_plaetze, erstellt_am, monat) VALUES ('okt', 'Okt', 'ABSTIMMUNG', 'AKTIV', 'a', 1, 'a', '2026-10')").run();
+  db.prepare("INSERT INTO umfrage_optionen (id, umfrage_id, strain_id, reihenfolge, herkunft, ist_gewinner, erstellt_am) VALUES ('og', 'okt', 's0', 1, 'GESETZT', 0, 'x'), ('oc', 'okt', 's1', 2, 'COMMUNITY', 0, 'x')").run();
+  stimme(db, "oc", "m1");
+  const r = await sotmTakt(ziel, new Date("2026-10-03T00:00:00Z"), ids());
+  assert.deepEqual(r.schritte, ["BEENDET", "NEUE_RUNDE"]);
+  assert.deepEqual(db.prepare("SELECT id FROM umfrage_optionen WHERE ist_gewinner = 1").all(), [{ id: "oc" }]);
 });
 
 test("Cron verpasst: erster Takt am 20. November schließt Oktober-Runde, neue Dezember-Runde startet in ABSTIMMUNG", async () => {
