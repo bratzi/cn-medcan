@@ -215,6 +215,9 @@ export function AromaKarte({
   const reglerText = (wert: number) =>
     `${kt.sweetSkala[sweetSpotZone(wert)]}, ${text(texte.aroma.vonFuenf, { wert: WERT.format(wert) })}`;
   const achsenName = (index: number) => texte.geschmack[GESCHMACKS_ACHSEN[index].enumWert];
+  // Alltagswort je Terpen und Beispiele je Geschmacksrichtung (Terpen-Audit 2026-10-20): Duft, keine Wirkung.
+  const alltag = (name: string) => (texte.aroma.alltag as Record<string, string>)[name.trim().toLowerCase()] ?? null;
+  const beispiel = (index: number) => texte.aroma.beispiele[GESCHMACKS_ACHSEN[index].enumWert];
   const satz = (name: string) => (texte.aroma.satz as Record<string, string>)[name.trim().toLowerCase()] ?? null;
   const terpene = ungeordnet;
   // Karte erst nach dem Hydrieren (CPU-Limit der Startseite, Fehler 1102): Server und erster
@@ -1088,6 +1091,7 @@ export function AromaKarte({
             type="button"
             tabIndex={-1}
             aria-hidden="true"
+            title={beispiel(index)}
             onMouseEnter={() => achseUeberfahren(index)}
             onFocus={() => achseUeberfahren(index)}
             className={cn(
@@ -1121,6 +1125,7 @@ export function AromaKarte({
               // Tabelle für Screenreader).
               tabIndex={terpenSchalter ? undefined : -1}
               aria-hidden={terpenSchalter ? undefined : true}
+              title={alltag(name) ?? undefined}
               aria-pressed={terpenSchalter ? an : undefined}
               onClick={terpenSchalter ? () => terpenSchalter.umschalten(name) : undefined}
               onMouseEnter={() => terpenUeberfahren(name)}
@@ -1214,6 +1219,7 @@ export function AromaKarte({
             art={kt.geschmacksrichtung}
             icon={<GeschmackIcon geschmack={aktiveAchse.enumWert} className={ICON_TITEL} />}
             titel={texte.geschmack[aktiveAchse.enumWert]}
+            hinweis={texte.aroma.beispiele[aktiveAchse.enumWert]}
             bezugTitel={lernen ? kt.stecktIn : undefined}
             bezug={lernen ? tragendeStoffe(aktiv!, lernen, ebenen ? ebeneVon : null).map(({ name, ebene }) => (
               <Pille key={name} ebene={ebene} icon={<TerpenIcon name={name} className={ICON_PILLE} />}>
@@ -1238,6 +1244,7 @@ export function AromaKarte({
             art={BEGLEITSTOFFE.some((stoff) => stoff.name === terpenAktiv) ? kt.begleitstoff : kt.terpen}
             icon={<TerpenIcon name={terpenAktiv} className={ICON_TITEL} />}
             titel={terpenAnzeige(terpenAktiv, sprache)}
+            zusatz={alltag(terpenAktiv) ?? undefined}
             hinweis={ebenenHinweis(terpenAktiv)}
             bezugTitel={kt.traegt}
             bezug={(traeger.get(terpenAktiv) ?? []).map(({ achse }) => (
@@ -1384,6 +1391,7 @@ function InfoTafel({
   art,
   icon,
   titel,
+  zusatz,
   hinweis,
   bezugTitel,
   bezug,
@@ -1393,6 +1401,8 @@ function InfoTafel({
   art: string;
   icon: React.ReactNode;
   titel: string;
+  /** Alltagswort neben dem Namen, etwa „erdig, Mango“. */
+  zusatz?: string;
   /** Zusatz unter dem Namen, etwa „laut Hersteller nicht enthalten“ (T5). */
   hinweis?: string;
   bezugTitel?: string;
@@ -1410,6 +1420,7 @@ function InfoTafel({
           {icon}
         </span>
         {titel}
+        {zusatz ? <span className="text-small font-normal text-text-muted">· {zusatz}</span> : null}
       </p>
       {hinweis ? <p className={cn("text-caption text-text-muted text-pretty", kompakt && "lg:hidden")}>{hinweis}</p> : null}
       {children ? (

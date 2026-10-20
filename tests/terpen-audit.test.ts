@@ -39,3 +39,20 @@ test("Schwelle 0,2 ist rundungsfest", () => {
   assert.equal(istKandidatAnteil(0.1 + 0.1), true);
   assert.equal(istKandidatAnteil(0.19), false);
 });
+
+test("Alltagswörter und Beispiele: für jedes Terpen und jede Geschmacksrichtung, ohne Wirkversprechen", async () => {
+  const { de } = await import("@/lib/i18n/de");
+  const { en } = await import("@/lib/i18n/en");
+  for (const w of [de, en]) {
+    for (const name of NAMEN) {
+      const k = name.toLowerCase();
+      assert.ok((w.aroma.alltag as Record<string, string>)[k], `${name} Alltagswort`);
+      assert.ok((w.aroma.satz as Record<string, string>)[k], `${name} Satz`);
+    }
+    for (const g of GESCHMACKS_KATEGORIEN) assert.ok((w.aroma.beispiele as Record<string, string>)[g], `${g} Beispiel`);
+    const alles = JSON.stringify([w.aroma.alltag, w.aroma.beispiele]);
+    assert.ok(!/Ware|Stärke|Wirkung|heilt|lindert/.test(alles));
+  }
+  assert.match(de.aroma.beispiele.FRUCHTIG, /Ester/);
+  assert.match(de.aroma.beispiele.DIESEL, /Thiole/);
+});
