@@ -10,14 +10,14 @@ Stand 2026-10-15. Der Betreiber setzt Profil, Bio und Highlights in der Instagra
 | Profilbild | Signet „gB“ (`scripts/marke/signet.ts`) |
 | Name | Book of Terpz Strainbewertung (29 Zeichen, Suchwort im durchsuchten NAME-Feld) |
 | Kategorie | Website (keine Gesundheits-Kategorie) |
-| Link | keiner (Nutzer 2026-10-16): Vorabzugang nur per DM |
+| Link | https://www.bookofterpz.workers.dev (Nutzer 2026-10-20); Zugang per DM |
 
-Bio (drei Zeilen, 138 Zeichen, Limit 150; Nutzen, Thema, Beleg nach ig-profile-optimizer):
+Bio (drei Zeilen, 127 Zeichen, Limit 150; Nutzen, Thema, Beleg nach ig-profile-optimizer), Stand 2026-10-20:
 
 ```
 Unabhängige Strain-Bewertung: 5 Noten, ein Schema.
-Bei Events bringen wir Strains gemeinsam nach vorn.
-Vorabzugang und Testnutzer: schreib uns per DM.
+Wir suchen Testnutzer, die mitbewerten.
+Seite unten verlinkt, Zugang per DM.
 ```
 
 ## Highlights

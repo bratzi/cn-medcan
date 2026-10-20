@@ -46,7 +46,6 @@ export function karussellPruefen(k: IgKarussell): string[] {
     if (s.typ !== "cover" && (s.text ?? "").length > TEXT_MAX) fehler.push(`Slide ${i + 1}: Text länger als ${TEXT_MAX}`);
     if (s.typ === "inhalt" && s.punkte && (s.punkte.length > 5 || s.punkte.some((p) => p.length > PUNKT_MAX)))
       fehler.push(`Slide ${i + 1}: höchstens 5 Punkte zu je ${PUNKT_MAX}`);
-    if (/link in (der )?bio/i.test(texte(s).join(" "))) fehler.push(`Slide ${i + 1}: es gibt keinen Link in der Bio`);
     if (s.typ === "cta" && /DM/.test(s.text ?? "")) fehler.push(`Slide ${i + 1}: „${IG_CTA}“ steht schon fest auf der CTA`);
     // Jede Slide zeigt, wovon sie spricht (Nutzer 2026-10-16): Blätter oder Icons.
     if (!s.grafik) fehler.push(`Slide ${i + 1}: Grafik fehlt (Blätter oder Icons)`);

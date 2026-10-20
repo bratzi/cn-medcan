@@ -19,7 +19,8 @@ const ZITAT_MAX = 140;
  * Abschluss aller IG-Medien (Nutzer 2026-10-16): es gibt keinen Link in der Bio; Interessenten
  * schreiben per DM und bekommen Vorabzugang.
  */
-export const IG_CTA = "Vorabzugang per DM";
+// Seit 2026-10-20 (Nutzer) steht die Webseite in der Bio; den Zugang (Passwort-Gate) gibt es per DM.
+export const IG_CTA = "Zugang per DM";
 
 export const IG_SPERRE =
   /ballert|knallt|bal+ern|\bhigh\b|stoned|breit\b|wirk|rausch|rauch|kiff|dröhn|entspann|beruhig|schlaf|schmerz|angst|\bdaily\b|dosis|dosier|\bthc\b|\bcbd\b|hilft|lindert|gegen\s+(stress|schmerz|angst|übelkeit)|stimmungs|euphor|therap|heil/i;

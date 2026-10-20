@@ -1,0 +1,39 @@
+{
+  "karussell": {
+    "saeule": "portal",
+    "schluessel": "testnutzer-werden",
+    "slides": [
+      {
+        "typ": "cover",
+        "kicker": "Testnutzer gesucht",
+        "titel": "In 3 Schritten zu deiner ersten Bewertung",
+        "grafik": { "art": "icons", "namen": ["community"] }
+      },
+      {
+        "typ": "inhalt",
+        "titel": "1. Schreib uns",
+        "text": "Eine DM genügt. Du bekommst von uns den Zugang zur Seite.",
+        "grafik": { "art": "icons", "namen": ["buch"] }
+      },
+      {
+        "typ": "inhalt",
+        "titel": "2. Konto anlegen",
+        "text": "Registrieren, Anzeigename wählen. Wir schalten dich von Hand frei.",
+        "grafik": { "art": "icons", "namen": ["abstimmen"] }
+      },
+      {
+        "typ": "inhalt",
+        "titel": "3. Bewerte deine Blüte",
+        "punkte": ["Aussehen", "Geruch", "Geschmack", "Konsistenz"],
+        "grafik": { "art": "icons", "namen": ["aussehen", "geruch", "geschmack", "konsistenz"] }
+      },
+      {
+        "typ": "cta",
+        "titel": "Früh dabei, mehr Mitsprache",
+        "text": "Deine Noten zählen mit, und du sagst uns, was noch fehlt.",
+        "grafik": { "art": "icons", "namen": ["community", "blatt"] }
+      }
+    ]
+  },
+  "caption": "Wir suchen Testnutzer: in drei Schritten zu deiner ersten Bewertung im Book of Terpz.\n\nDu schreibst uns, legst ein Konto an und bewertest deine Blüte nach Aussehen, Geruch, Geschmack und Konsistenz. Freigeschaltet wird von Hand, damit die Community klein und ehrlich bleibt.\n\nDie Seite findest du über den Link in der Bio, den Zugang bekommst du per DM.\n\n#bookofterpz #strainbewertung #terpene #community"
+}

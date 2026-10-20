@@ -33,9 +33,7 @@ test("höchstens fünf Icons je Szene", () => {
   assert.ok(reelPruefen({ ...r, szenen: [{ ...r.szenen[0], icons }, ...r.szenen.slice(1)] }).some((f) => f.includes("Icons")));
 });
 
-test("jede Szene braucht Icons oder Blätter, kein Link in der Bio", () => {
+test("jede Szene braucht Icons oder Blätter", () => {
   const ohne = { ...r, szenen: [{ titel: "Leer", sekunden: 4 }, ...r.szenen.slice(1)] };
   assert.ok(reelPruefen(ohne).some((f) => f.includes("Icons oder Blätter")));
-  const bio = { ...r, szenen: [{ ...r.szenen[0], titel: "Link in Bio" }, ...r.szenen.slice(1)] };
-  assert.ok(reelPruefen(bio).some((f) => f.includes("Link in der Bio")));
 });

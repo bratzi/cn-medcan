@@ -49,12 +49,6 @@ test("Slide-HTML maskiert, zeigt Seitenzahl und Säulenfarbe", () => {
   assert.ok(!mitte.includes("undefined"));
 });
 
-test("karussellPruefen: kein Link in der Bio", () => {
-  const slides = [...k.slides.slice(0, -1), { typ: "cta" as const, titel: "Mehr im Buch", text: "Alle Noten. LINK IN BIO." }];
-  const fehler = karussellPruefen({ ...k, slides });
-  assert.ok(fehler.some((f) => f.includes("keinen Link in der Bio")), fehler.join("; "));
-});
-
 test("Marke", () => {
   assert.equal(karussellMarke(k), "bot-k-wissen-terpene-lesen");
 });
@@ -73,5 +67,5 @@ test("Grafik: Pflicht je Slide, nur bekannte Icons, Blätter 0 bis 5", () => {
   assert.ok(karussellPruefen(fremd).some((f) => f.includes("Icon unbekannt")));
   const zuviel = { ...k, slides: [k.slides[0], { typ: "inhalt" as const, titel: "X", grafik: { art: "blaetter" as const, note: 6 } }, k.slides[2]] };
   assert.ok(karussellPruefen(zuviel).some((f) => f.includes("Blätter")));
-  assert.match(igSlideHtml(k, 2, "https://x"), /Vorabzugang per DM/);
+  assert.match(igSlideHtml(k, 2, "https://x"), /Zugang per DM/);
 });

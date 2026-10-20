@@ -99,7 +99,7 @@ Der Wochentag (UTC) bestimmt, was du tust:
    Mittwoch die Erinnerung ans Reel mit Thema, übersprungen und warum (etwa Bremse), Fehler.
 
 Beispiel für `/tmp/karussell.json` (nur das Format: Texte immer selbst neu schreiben, nie aus diesem Beispiel kopieren).
-CTA-Text ohne „DM“, „Vorabzugang per DM“ steht fest auf der Slide. Jede Slide braucht `grafik` (siehe handwerk.md). Es gibt keinen Link in der Bio:
+CTA-Text ohne „DM“, „Zugang per DM“ steht fest (Bio-Link in der Caption nennen) auf der Slide. Jede Slide braucht `grafik` (siehe handwerk.md). Seit 2026-10-20 steht die Webseite in der Bio:
 
 ```json
 {
@@ -124,7 +124,7 @@ Aus dem Instagram-Skill-Bündel (ig-caption-writer, ig-hashtag-strategist, ig-hu
 - **Hook** in den ersten 125 Zeichen: eine Frage, ein überraschender Fakt oder ein klares Versprechen an die Neugier.
   Kein „Heute stellen wir vor“.
 - **Körper:** 2 bis 4 kurze Absätze, je 1 bis 2 Sätze, Leerzeile dazwischen. Deutsch, du-Form, ruhig und sachkundig.
-- **Abschluss:** eine Frage an die Leser oder „Vorabzugang per DM“, nie „Link in Bio“ (es gibt keinen).
+- **Abschluss:** eine Frage an die Leser oder „Seite im Link in der Bio, Zugang per DM“ (seit 2026-10-20 steht die Webseite in der Bio).
 - **Hashtags:** 3 bis 5, am Ende: `#bookofterpz #medizinalcannabis #terpene` plus 0 bis 2 thematische (z. B. `#aromakarte`).
   Keine Riesen-Tags wie `#cannabis` allein.
 - **Kein KI-Ton:** keine Gedankenstriche als Stilmittel, keine Emojis-Ketten (höchstens 1 Emoji), keine Floskeln

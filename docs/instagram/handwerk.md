@@ -30,7 +30,7 @@ eine Richtigstellung; eine fehlende nur ein schwächerer Post.
 | 1 Cover | **Versprechen plus offene Schleife**, nie bloßer Titel. Eine Idee, große Schrift. Eine Zahl vorne, wenn sie stimmt („4 Regeln, an die wir uns halten“). |
 | 2–3 | **Das Stärkste zuerst.** Durchwischen nimmt mit jeder Slide ab. |
 | 4 bis vorletzte | Ein Punkt pro Slide, jede für sich verständlich, in 2 Sekunden lesbar. |
-| Letzte (CTA) | **Zusammenfassung, die sich zu speichern lohnt, plus genau eine Bitte** (speichern, schicken oder Mitglied werden). „Vorabzugang per DM“ steht fest auf der Slide, nicht im Text. Es gibt **keinen Link in der Bio**: nie damit werben. |
+| Letzte (CTA) | **Zusammenfassung, die sich zu speichern lohnt, plus genau eine Bitte** (speichern, schicken oder Mitglied werden). „Zugang per DM“ steht fest (Bio-Link in der Caption nennen) auf der Slide, nicht im Text. Seit 2026-10-20 steht die Webseite in der Bio. |
 
 Formen (nach Ziel wählen): **Liste** (Speichern), **Mythos und Wahrheit** (Weiterleiten), **Vorher/Nachher**
 (Speichern, Folgen), **Rahmenwerk zum Mitnehmen** (Speichern). 5 bis 8 Slides sind üblich; nie auf eine runde Zahl
@@ -46,7 +46,7 @@ eine Idee pro Bild (critique-composition, critique-visual-hierarchy).
 
 - **Erste Zeile ist der Hook**, höchstens 125 Zeichen, muss allein funktionieren (danach kommt „mehr“).
 - Eine Idee pro Caption. Kurze Absätze mit Leerzeile.
-- **Genau eine Bitte:** eine echte Frage *oder* eine Speicher-/Schick-Bitte *oder* „Vorabzugang per DM“. Nie alles zugleich.
+- **Genau eine Bitte:** eine echte Frage *oder* eine Speicher-/Schick-Bitte *oder* „Link in Bio, Zugang per DM“. Nie alles zugleich.
   Tote Schlüsse wie „Was denkt ihr?“ sind verboten.
 - 0 bis 3 Emoji, gezielt. Höchstens zwei Gedankenstriche, nie einen Strich durch einen Punkt ersetzen.
 
@@ -57,7 +57,8 @@ eine Idee pro Bild (critique-composition, critique-visual-hierarchy).
 - **Jede Slide zeigt, wovon sie spricht:** Feld `grafik` (`blaetter` mit Note, oder `icons` mit Merkmal-, Geschmacks-
   oder Terpennamen, siehe `lib/ig-grafik.tsx`); `karussellPruefen` lehnt Slides ohne Grafik ab. Gleich viele Punkte wie
   Icons ergeben beschriftete Icons.
-- **Kein Link in der Bio.** Interessenten schreiben per DM und bekommen Vorabzugang.
+- **Webseite in der Bio** (Nutzer 2026-10-20, ersetzt „kein Link“ vom 2026-10-16). Die Seite hat ein Passwort-Gate:
+  den Zugang gibt es per DM.
 - **Testnutzer gesucht:** sobald das System stabil skaliert, suchen wir engagierte Testnutzer (per DM melden). Gern als
   Schluss eines Portal-Posts oder als eigener Post.
 
@@ -89,7 +90,7 @@ fasst zusammen. Caption stützt das Video und wiederholt den Hook vor dem Falz.
 ## Profil (ig-profile-optimizer)
 
 NAME-Feld höchstens 30 Zeichen mit Suchwort (es wird durchsucht, nicht das @handle). Bio höchstens 150 Zeichen:
-Nutzen, Thema, ein Beleg. Kein Link; Vorabzugang per DM. 4 Highlights in der Reihenfolge der Fragen eines Besuchers. Drei Pins:
+Nutzen, Thema, ein Beleg. Link: die Webseite; Zugang per DM. 4 Highlights in der Reihenfolge der Fragen eines Besuchers. Drei Pins:
 Manifest, So bewerten wir, Stimm mit ab. Die ersten neun Kacheln wirken als Ganzes: gleiche Vorlage, Säulenfarben im
 Wechsel.
 

@@ -3,7 +3,7 @@
 > Übergabemedium zwischen Sessions. Wird nach jedem Arbeitsblock aktualisiert und committet.
 > Wer hier weiterarbeitet, liest diese Datei zuerst und braucht den Chatverlauf nicht.
 
-**Letzte Aktualisierung:** 2026-10-20 (Session 77)
+**Letzte Aktualisierung:** 2026-10-20 (Session 78)
 **Repo:** https://github.com/bratzi/cn-medcan (public)
 **Branch:** `main` (Makeover „Grünes Buch“ Teilprojekt 1 ist seit 2026-09-24 auf `main`)
 
@@ -27,6 +27,35 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 ---
 
 ## ⇢ Hier geht es weiter
+
+### ⇢ SESSION 78 (2026-10-20): Neuigkeiten-Seite live, IG-Bio-Link, Testnutzer-Posts
+
+**SAFE4CLEAR S78 – ALS ERSTES (Reihenfolge):**
+1. **Großer Task A – Kennwortseite = schöne Startseite (Nutzer):** den aktuellen Hero der Startseite auf die
+   Kennwortseite (`app/[lang]/zugang/page.tsx`, Gate `proxy.ts`) setzen und beides kombinieren. Diese Seite ist die
+   Startseite für alle, die nicht angemeldet sind, solange die Entwicklungsphasen-Schranke steht. Brainstorming
+   (architektonisch? eher bounded), live per Browser-MCP prototypen, Skills: ui-design-engine, frontend-design,
+   build-awwwards-quality-sites, design-taste-frontend, emil-design-eng, critique-*.
+2. **Großer Task B – Blüten-/Strainseite überarbeiten (Nutzer, „alle Skills“):**
+   - Mobil sind die Filter oben viel zu groß: einklappbar oder als mitlaufende Leiste/Schublade an der Seite.
+   - Filter laden die Seite jedes Mal neu, Umblättern (Paginierung) auch: beides ohne Neuladen (Client-Zustand,
+     URL per history/`router.replace` mit `scroll:false`, Daten vorab oder per Route Handler; edge-stack-master beachten).
+   - Filter an die neuen Kriterien anpassen (Hersteller/Vertreiber, Terpene, Geschmack, Community-Score usw.),
+     ganze Filtersektion hochprofessionell, passend zum Versprechen der Seite (Community-Bewertung).
+   - Karten: Community-Bewertung prominenter als die Standardangaben (THC/CBD kennt jeder).
+   - Skills: brainstorming zuerst, dann ui-design-engine, frontend-design, better-layout, hicks-law, fitts-law,
+     critique-information-density, apple-design, emil-design-eng, react-best-practices, edge-stack-master.
+3. Publora: Entwurf `6ad74ad1d1ce69b57cdf73c5` (testnutzer-koennen) liegt als Entwurf, 403 „Scheduled post limit
+   reached“. Sobald ein geplanter Post raus ist (21.10. terpene-erklaert), per update_post auf 2026-10-24T17:00Z
+   planen. Eingeplant: testnutzer-werden 22.10. 17:00Z (`6ad74a9cd1ce69b57cdf7127`), mach-mit 23.10.
+4. **Nutzer macht in der IG-App:** Link-Feld = https://www.bookofterpz.workers.dev, Bio laut docs/instagram/profil.md
+   (keine API dafür).
+5. Klein offen: InfoKnopf-Blase am Rand (123be5d) live auf schmalem Gerät prüfen; /neu englisch und dunkel prüfen.
+
+- Erledigt S78: Seite `/neu` live (siehe TO-DO-POOL unten). IG-Regel umgestellt: Webseite in der Bio (Nutzer),
+  `IG_CTA` = „Zugang per DM“, Verbote „Link in Bio“ aus Prüfungen/Doku/Routine-Anweisung entfernt. Zwei neue
+  Karussells `docs/instagram/karussells/testnutzer-werden.json`, `testnutzer-koennen.json`. fuenf-noten ist schon
+  veröffentlicht (nicht mehr offen).
 
 ### ⇢ TO-DO-POOL (Nutzerauftrag 2026-10-20, S78)
 - **News-Blog „Was ist neu“: ERLEDIGT S78, live.** Seite `/neu`, Menüpunkt „Neu“ (Desktop einzeilig bei 1258 px),

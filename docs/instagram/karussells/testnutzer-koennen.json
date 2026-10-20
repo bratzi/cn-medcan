@@ -1,0 +1,51 @@
+{
+  "karussell": {
+    "saeule": "portal",
+    "schluessel": "testnutzer-koennen",
+    "slides": [
+      {
+        "typ": "cover",
+        "kicker": "Schon heute drin",
+        "titel": "5 Dinge, die Testnutzer bei uns schon machen",
+        "grafik": { "art": "icons", "namen": ["buch"] }
+      },
+      {
+        "typ": "inhalt",
+        "titel": "Aroma auf einer Karte",
+        "text": "Du ziehst Punkte für Geschmack und Terpene und siehst dein Aroma-Netz.",
+        "grafik": { "art": "icons", "namen": ["aromakarte"] }
+      },
+      {
+        "typ": "inhalt",
+        "titel": "Strain of the Month wählen",
+        "text": "Jeden Monat schlägt die Community Strains vor und stimmt ab.",
+        "grafik": { "art": "icons", "namen": ["abstimmen"] }
+      },
+      {
+        "typ": "inhalt",
+        "titel": "Gesamtnote in Blättern",
+        "text": "Ein bis fünf Blätter, auch halbe. Je mehr Blätter, desto besser gefällt dir die Blüte.",
+        "grafik": { "art": "blaetter", "note": 4.5 }
+      },
+      {
+        "typ": "inhalt",
+        "titel": "Herzen und Kommentare",
+        "text": "Unter jeder Bewertung kannst du antworten oder ein Herz dalassen.",
+        "grafik": { "art": "icons", "namen": ["community"] }
+      },
+      {
+        "typ": "inhalt",
+        "titel": "Sehen, was neu ist",
+        "text": "Eine eigene Seite zeigt, was wir gerade gebaut haben und woran wir arbeiten.",
+        "grafik": { "art": "icons", "namen": ["buch"] }
+      },
+      {
+        "typ": "cta",
+        "titel": "Lust, mitzubauen?",
+        "text": "Speicher dir den Post und meld dich, wenn du testen willst.",
+        "grafik": { "art": "icons", "namen": ["community", "blatt"] }
+      }
+    ]
+  },
+  "caption": "5 Dinge, die unsere Testnutzer schon heute im Book of Terpz machen, bevor die Seite offen ist.\n\nAroma-Karte, Strain of the Month, Gesamtnote in Blättern, Herzen und Kommentare und eine Seite, die zeigt, was neu ist. Alles davon testen Mitglieder gerade mit uns.\n\nSpeicher dir den Post, wenn du später nachschauen willst.\n\n#bookofterpz #aromaprofil #medizinalcannabis #community"
+}
