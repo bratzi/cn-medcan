@@ -29,7 +29,11 @@ function envLesen(datei: string): Record<string, string> {
 
 /** Lokale Dateien, darüber die echte Umgebung (Cloud-Routine setzt Variablen direkt). */
 export function umgebung(): Env {
-  return { ...envLesen(".env"), ...envLesen(".env.ig-feed"), ...process.env };
+  const env: Env = { ...envLesen(".env"), ...envLesen(".env.ig-feed"), ...process.env };
+  // Seit 2026-10-20 heißt die Adresse www.bookofterpz.workers.dev; die alte gibt es nicht mehr.
+  // Steht in einer Umgebung (Cloud-Routine) noch die alte, zeigt sie hier auf die neue.
+  if (env.IG_FEED_URL) env.IG_FEED_URL = env.IG_FEED_URL.replace("cn-medcan.w-helwich.workers.dev", "www.bookofterpz.workers.dev");
+  return env;
 }
 
 export function pflicht(env: Env, name: string): string {
