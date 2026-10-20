@@ -103,7 +103,11 @@ export function Kandidat({ option, gesamt, gewaehlt, zeigeStimmen, texte, sprach
                 <span data-stimmzahl="" data-ziel={option.stimmen}>
                   {formatiereZahl(option.stimmen, 0, sprache)}
                 </span>
-                {` ${mehrzahl(sprache, texte.stimmen, option.stimmen)}`}
+                {" "}
+                {/* Das Wort zählt mit: sonst steht beim Hochzählen kurz "1 Stimmen". */}
+                <span data-stimmwort="" data-one={texte.stimmen.one} data-other={texte.stimmen.other}>
+                  {mehrzahl(sprache, texte.stimmen, option.stimmen)}
+                </span>
               </span>
             </span>
           ) : null}
