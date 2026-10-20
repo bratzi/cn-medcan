@@ -28,6 +28,20 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 
 ## ⇢ Hier geht es weiter
 
+### ⇢ SESSION 85 (2026-10-21): Strain-Seite – Spec freigegeben, Prototyp gebaut – SAFE4CLEAR
+- Spec FREIGEGEBEN: docs/superpowers/specs/2026-10-21-strainseite-agentur-design.md (9c2f49e). Entscheidungen Nutzer:
+  Chipleiste mit Popovern statt Filterspalte (alte Festlegung „offen ab 1536 px“ hinfällig), Seite komplett neu,
+  Sortierung als Segment-Schalter (Community, Stimmen, Neueste, THC, Rest im „…“-Menü), Seitenkopf global volle
+  Breite (max-w-360 weg), Logo links, Menü + Konto rechts.
+- Live-Prototyp per Browser-JS gebaut (nur im Tab, nicht im Code): Zeile 1 Ansicht-Segment, Trefferzahl
+  (Zahl Handschrift), Sortier-Segment rechts; Zeile 2 Chips mit Zähler + Popover; Zeile 3 Aktiv-Chips + „Alle zurücksetzen“;
+  sticky unter Kopf. Screenshot: Nutzer hat ihn noch NICHT gesehen/freigegeben.
+- NÄCHSTER SCHRITT: Prototyp neu einspielen (Skript-Idee: [data-werkzeugleiste] ersetzen, Kopf-Container max-w-360 entfernen,
+  nav justify-self:end), bei 1920 zeigen, Freigabe holen. Offene Beobachtung: Legende „Laut Datenblatt … Von der
+  Community“ unter der Leiste wirkt doppelt, in Aktiv-Zeile oder Karte integrieren. Dann writing-plans, Stränge:
+  A Kopf global, B Werkzeugleiste/Chips/Popover/Sheet mobil, C Karten + Startseite. Skills siehe Abschnitt darunter.
+- S84-Live-Prüfung (scrollWidth == innerWidth) weiter offen, in Live-Prüfagent des Umbaus mitnehmen.
+
 ### ⇢ NÄCHSTE AUFGABE (eingetaktet 2026-10-21, S84): Strain-Seite /blueten agenturreif umbauen
 - Auftrag Nutzer: „Sortierung und Filter sind ugly af“. Filter, Sortierung und ganze Strain-Seite UX/UI auf
   Agenturniveau heben. Mit dem vollen eigenen Skill-Set.
