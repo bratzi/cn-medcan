@@ -3,7 +3,7 @@
 > Übergabemedium zwischen Sessions. Wird nach jedem Arbeitsblock aktualisiert und committet.
 > Wer hier weiterarbeitet, liest diese Datei zuerst und braucht den Chatverlauf nicht.
 
-**Letzte Aktualisierung:** 2026-10-20 (Session 79)
+**Letzte Aktualisierung:** 2026-10-20 (Session 80)
 **Repo:** https://github.com/bratzi/cn-medcan (public)
 **Branch:** `main` (Makeover „Grünes Buch“ Teilprojekt 1 ist seit 2026-09-24 auf `main`)
 
@@ -27,6 +27,29 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 ---
 
 ## ⇢ Hier geht es weiter
+
+### ⇢ SESSION 80 (2026-10-20): /blueten-Ausfall 1102, Plan Vorrendern + Blütenseite voll
+
+**ALS ERSTES: diese Fragen in EINER AskUserQuestion stellen**
+1. Geschmacks-Schwellen auf der Blütenkarte: „bestätigt“ ab Community-Median 1,25, „gefunden“ ab 2,5 – passt?
+2. Filterspalte /blueten: Standard offen erst ab 1536 px (darunter zu, damit ≥4 Spalten) – oder immer offen?
+
+**SAFE4CLEAR S80 – Stand (NICHTS gepusht seit b7c2ced; main lokal 608a65a, Sicherung auf origin/sicherung-s80):**
+- **Live-Ausfall:** /blueten (und zeitweise /api/katalog) liefert Error 1102. Ursache belegt: Build rendert keine
+  /[lang]-Seite vor (Build-Log „populated cache with 5 entries“), KV-Cache-Schlüssel tragen die Build-ID, also ist nach
+  jedem Deploy jede Seite kalt; Seitenbau im Request ~1000 ms CPU, Cloudflare Free bricht bei 10 ms ab. Dazu
+  revalidiereSprachen → revalidatePath = abgelaufen → Seitenbau im Request (revalidateTag(…,"max") wäre stale/SWR).
+- **Plan:** docs/superpowers/plans/2026-10-20-vorrendern-und-bluetenseite-voll.md, Ledger
+  .superpowers/sdd/2026-10-20-vorrendern-und-bluetenseite-voll/progress.md (Briefs, Rulings).
+- **Task 3 Startseite kompakt: erledigt** auf main 608a65a (Sortenkopf-Block weg, NoteUndErkundung dicht).
+- **Task 2 Blütenseite voll: implementiert** Branch worktree-agent-a386729411d58b360 Commit 49c6c1a (Report task-2-report.md).
+  Offen: Task-Review (Base 7e97cd5 ist NICHT Vorfahr, Branch basiert auf b7c2ced → review-package mit b7c2ced),
+  volle Testsuite einmal, Merge nach main.
+- **Task 1 Vorrendern: abgebrochen, WIP** Branch worktree-agent-aeebe763808702858 Commit 4160985 (sprachParameter,
+  Tests, erst app/[lang]/page.tsx). Neu dispatchen mit Brief task-1-brief.md und Hinweis auf WIP.
+- **Reihenfolge danach:** Task 1 fertig + Review → Merge 1,2 → Suite → EIN Push → Build-Log auf „[vorrendern]“ und
+  >5 Cache-Einträge prüfen → live /blueten 390/1280/1536/1920 hell/dunkel, Startseite → Neuigkeiten-Eintrag.
+- Nicht pushen, bevor Task 1 drin ist (jeder Deploy macht Seiten kalt, 1102-Risiko).
 
 ### ⇢ SESSION 79 (2026-10-20): Kennwortseite, Blütenseite im Browser, Info-Knöpfe, Startseite Bewertung+Katalog
 
