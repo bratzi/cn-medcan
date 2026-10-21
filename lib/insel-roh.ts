@@ -25,38 +25,29 @@ const ID = /^[A-Za-z0-9-]{1,64}$/;
 /** Wie lib/query/profil.ts (BEWERTUNGEN_HOECHSTENS). */
 const BEWERTUNGEN_HOECHSTENS = 1000;
 
-// lib/auth.ts: useSecureCookies in Produktion → __Secure-Präfix; lokal ohne. Better Auth liest nur diesen Namen.
-const SITZUNGS_COOKIES = ["__Secure-better-auth.session_token", "better-auth.session_token"];
-
 /**
  * Sitzungstoken aus dem signierten Cookie, geprüft wie better-call getSignedCookie:
  * Wert `token.signatur` (URL-kodiert), Signatur = Base64(HMAC-SHA256(secret, token)), 44 Zeichen.
+ * Cookie-Name wie Better Auth (lib/auth.ts, useSecureCookies in Produktion): über https nur
+ * `__Secure-better-auth.session_token`, lokal nur `better-auth.session_token`.
  */
-export async function sitzungsToken(cookies: Map<string, string>, secret: string): Promise<string | null> {
-  for (const name of SITZUNGS_COOKIES) {
-    const roh = cookies.get(name);
-    if (!roh) continue;
-    let wert: string;
-    try {
-      wert = decodeURIComponent(roh);
-    } catch {
-      return null;
-    }
+export async function sitzungsToken(cookies: Map<string, string>, secret: string, sicher: boolean): Promise<string | null> {
+  const roh = cookies.get(sicher ? "__Secure-better-auth.session_token" : "better-auth.session_token");
+  if (!roh) return null;
+  try {
+    const wert = decodeURIComponent(roh);
     const punkt = wert.lastIndexOf(".");
     if (punkt < 1) return null;
     const token = wert.slice(0, punkt);
     const signatur = wert.slice(punkt + 1);
     if (signatur.length !== 44 || !signatur.endsWith("=")) return null;
-    try {
-      const bytes = Uint8Array.from(atob(signatur), (c) => c.charCodeAt(0));
-      const key = await crypto.subtle.importKey("raw", new TextEncoder().encode(secret), { name: "HMAC", hash: "SHA-256" }, false, ["verify"]);
-      // subtle.verify vergleicht in konstanter Zeit.
-      return (await crypto.subtle.verify("HMAC", key, bytes, new TextEncoder().encode(token))) ? token : null;
-    } catch {
-      return null;
-    }
+    const bytes = Uint8Array.from(atob(signatur), (c) => c.charCodeAt(0));
+    const key = await crypto.subtle.importKey("raw", new TextEncoder().encode(secret), { name: "HMAC", hash: "SHA-256" }, false, ["verify"]);
+    // subtle.verify vergleicht in konstanter Zeit.
+    return (await crypto.subtle.verify("HMAC", key, bytes, new TextEncoder().encode(token))) ? token : null;
+  } catch {
+    return null;
   }
-  return null;
 }
 
 /** Prisma schreibt DateTime als ISO-Text mit Offset; ältere Zeilen können Millisekunden als Zahl tragen (db/README.md). */
@@ -82,6 +73,8 @@ async function mitgliedAusSitzung(db: D1Roh, token: string) {
   if (!z) return null;
   const ablauf = alsDatum(z.expiresAt);
   if (!ablauf || ablauf.getTime() <= Date.now()) return null;
+  // Bewusst nur lesen: die Sitzung wird hier nicht verlängert (updateAge); das macht Better Auth in Next
+  // auf anderen Anfragen des Mitglieds.
   // Ohne Mitgliedssatz legt Next ihn ohne Freigabe an; hier nur lesen, Antwort ist dieselbe („mitglied“).
   if (!z.mid) return { mitgliedId: "", freigegeben: false, rolle: "MITGLIED" };
   return { mitgliedId: z.mid, freigegeben: istWahr(z.freigegeben), rolle: z.rolle ?? "MITGLIED" };
@@ -163,36 +156,24 @@ export async function inselRoh(url: URL, cookies: Map<string, string>, env: Inse
   if (!ID.test(kultivarId) || !ID.test(strainId) || (vertreiber && !ID.test(vertreiber))) {
     return Response.json({ fehler: "parameter" }, { status: 400, headers: KOPF });
   }
-  const token = await sitzungsToken(cookies, secret);
+  const token = await sitzungsToken(cookies, secret, url.protocol === "https:");
 
-  // Eigene Bewertung, ihre Bilder, Netz-Bewertungen und Terpene in einem Rundgang; nur bei Bedarf.
-  let vorrat: Promise<{ eigene: EigeneZeile | null; bilder: never[]; netz: NetzZeile[]; terpene: TerpenZeile[] }> | null = null;
-  const laden = (autorId: string, vertreiberId: string | null) =>
-    (vorrat ??= (async () => {
-      const stmts = [db.prepare(NETZ_SQL).bind(autorId), db.prepare(TERPENE_SQL)];
-      if (vertreiberId) {
-        stmts.push(db.prepare(EIGENE_SQL).bind(autorId, kultivarId, vertreiberId));
-        stmts.push(db.prepare(EIGENE_BILDER_SQL).bind(autorId, kultivarId, vertreiberId));
-      }
-      const [netz, terpene, eigene, bilder] = await db.batch(stmts);
-      return {
-        netz: netz.results as NetzZeile[],
-        terpene: terpene.results as TerpenZeile[],
-        eigene: ((eigene?.results[0] as EigeneZeile | undefined) ?? null),
-        bilder: (bilder?.results ?? []) as never[],
-      };
-    })());
-
+  // Eigene Bewertung und Live-Netz getrennt (je ein Batch, parallel): ein Netz-Fehler kostet wie in Next
+  // nur liveNetz (ichStrain fängt ihn), die Vorbelegung bleibt.
   const daten = await ichStrain(
     {
       mitglied: async () => (token ? mitgliedAusSitzung(db, token) : null),
-      ladeEigeneBewertung: async (autorId, _k, vertreiberId) => {
-        const v = await laden(autorId, vertreiberId);
-        return v.eigene ? alsGespeichert(v.eigene, v.bilder) : null;
+      ladeEigeneBewertung: async (autorId, kId, vertreiberId) => {
+        const [eigene, bilder] = await db.batch([
+          db.prepare(EIGENE_SQL).bind(autorId, kId, vertreiberId),
+          db.prepare(EIGENE_BILDER_SQL).bind(autorId, kId, vertreiberId),
+        ]);
+        const zeile = eigene.results[0] as EigeneZeile | undefined;
+        return zeile ? alsGespeichert(zeile, bilder.results as never[]) : null;
       },
       ladeLiveNetzBasis: async (mitgliedId, sid) => {
-        const v = await laden(mitgliedId, vertreiber || null);
-        return liveNetzRoh(db, v.netz, v.terpene, sid);
+        const [netz, terpene] = await db.batch([db.prepare(NETZ_SQL).bind(mitgliedId), db.prepare(TERPENE_SQL)]);
+        return liveNetzRoh(db, netz.results as NetzZeile[], terpene.results as TerpenZeile[], sid);
       },
       vorbelegungAus: vorbelegungAus as never,
     },

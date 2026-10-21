@@ -29,7 +29,15 @@ export async function tor(request: Request, env: TorEnv): Promise<Response | nul
   if (url.pathname === "/api/ich/strain") {
     if (!(await gateOffen(env, cookies))) return zumGate(url);
     // Mit Sitzungscookie: rohe D1-Abfragen statt Next (HANDOFF S87, 623 ms CPU). Ohne Bindings übernimmt Next.
-    if (hatSitzung(cookies)) return inselRoh(url, cookies, env);
+    if (hatSitzung(cookies)) {
+      try {
+        return await inselRoh(url, cookies, env);
+      } catch (fehler) {
+        // Fehler im rohen Weg: Next beantwortet die Anfrage wie bisher (teurer, aber korrekt).
+        console.error(JSON.stringify({ tor: "insel", fehler: String(fehler) }));
+        return null;
+      }
+    }
     return Response.json({ zugang: "gast" }, { headers: { "Cache-Control": "private, no-store" } });
   }
   const sprache = bestimmeSprache({

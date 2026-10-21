@@ -93,13 +93,44 @@ async function anfrage(sitzung: string, query = "kultivar=k1&vertreiber=v1&strai
 
 test("sitzungsToken: gültige Signatur liefert das Token, falsche oder fehlende null", async () => {
   const gut = new Map([["__Secure-better-auth.session_token", await signiert("tok1")]]);
-  assert.equal(await sitzungsToken(gut, AUTH), "tok1");
+  assert.equal(await sitzungsToken(gut, AUTH, true), "tok1");
   const plain = new Map([["better-auth.session_token", await signiert("tok1")]]);
-  assert.equal(await sitzungsToken(plain, AUTH), "tok1");
+  // Wie Better Auth: über https nur der __Secure-Name, lokal (http) nur der schlichte.
+  assert.equal(await sitzungsToken(plain, AUTH, true), null);
+  assert.equal(await sitzungsToken(plain, AUTH, false), "tok1");
   const falsch = new Map([["__Secure-better-auth.session_token", await signiert("tok1", "b".repeat(40))]]);
-  assert.equal(await sitzungsToken(falsch, AUTH), null);
-  assert.equal(await sitzungsToken(new Map([["__Secure-better-auth.session_token", "tok1"]]), AUTH), null);
-  assert.equal(await sitzungsToken(new Map(), AUTH), null);
+  assert.equal(await sitzungsToken(falsch, AUTH, true), null);
+  assert.equal(await sitzungsToken(new Map([["__Secure-better-auth.session_token", "tok1"]]), AUTH, true), null);
+  assert.equal(await sitzungsToken(new Map(), AUTH, true), null);
+});
+
+test("Live-Netz-Fehler kostet nur das Netz: 200, Vorbelegung bleibt, liveNetz null", async () => {
+  const db = datenbank();
+  db.exec("DROP TABLE terpene");
+  const fehler = console.error;
+  console.error = () => {};
+  try {
+    const antwort = await tor(await anfrage(await signiert("tok1")), env(db));
+    assert.equal(antwort!.status, 200);
+    const daten = (await antwort!.json()) as Freigegeben;
+    assert.equal(daten.zugang, "freigegeben");
+    assert.equal(daten.vorbelegung?.chargenNr, "CH-42");
+    assert.equal(daten.liveNetz, null);
+  } finally {
+    console.error = fehler;
+  }
+});
+
+test("Fehler in der rohen Insel: Next übernimmt (null)", async () => {
+  const db = datenbank();
+  db.exec("DROP TABLE session");
+  const fehler = console.error;
+  console.error = () => {};
+  try {
+    assert.equal(await tor(await anfrage(await signiert("tok1")), env(db)), null);
+  } finally {
+    console.error = fehler;
+  }
 });
 
 test("Insel mit Sitzung: freigegeben, Vorbelegung und Live-Netz ohne Next", async () => {
