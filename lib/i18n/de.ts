@@ -564,7 +564,8 @@ export const de = {
     spalten: { charge: "Charge", thc: "THC gemessen", cbd: "CBD gemessen", analyse: "Analysedatum", verfall: "Verfall" },
     aussicht: "Apotheken und Preise: in Aussicht. Stand der Angaben: {datum}.",
     vertreiber: {
-      wahlTitel: "Deine Blüte ist von",
+      wahlKurz: "Deine Blüte ist von {name}",
+      wahlAendern: "Anderen Vertreiber wählen",
       wahlHinweis: "Dieselbe Blüte gibt es von mehreren Vertreibern. Wähl den, von dem deine Charge stammt.",
       fehlt: "Vertreiber fehlt? Vorschlagen",
       unbekannt: "Vertreiber unbekannt",

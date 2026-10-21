@@ -1,5 +1,5 @@
 /** Bereiche der Verwaltung (Spec 2026-10-16 Admin-Dashboard). Reihenfolge = Grundreihenfolge der Leiste. */
-export type AdminBereich = "bewertungen" | "mitglieder" | "gemeldet" | "budpics" | "vorschlaege" | "jury" | "instagram" | "abstimmung" | "kennwerte" | "strains";
+export type AdminBereich = "bewertungen" | "mitglieder" | "gemeldet" | "budpics" | "vorschlaege" | "jury" | "instagram" | "abstimmung" | "kennwerte" | "strains" | "hersteller";
 
 export const ADMIN_BEREICHE = [
   { id: "bewertungen", titel: "Bewertungen", href: "/admin/bewertungen", zaehlt: true },
@@ -12,6 +12,7 @@ export const ADMIN_BEREICHE = [
   { id: "abstimmung", titel: "Abstimmung", href: "/admin/abstimmung", zaehlt: false },
   { id: "kennwerte", titel: "Kennwerte", href: "/admin/kennwerte", zaehlt: false },
   { id: "strains", titel: "Strains", href: "/admin/strains", zaehlt: false },
+  { id: "hersteller", titel: "Hersteller", href: "/admin/hersteller", zaehlt: false },
 ] as const satisfies readonly { id: AdminBereich; titel: string; href: string; zaehlt: boolean }[];
 
 /** null = Abfrage gescheitert (Kachel zeigt „–“). */

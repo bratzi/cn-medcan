@@ -159,3 +159,21 @@ export function SortenBild({
     />
   );
 }
+
+/**
+ * Logo eines Herstellers oder Vertreibers aus public/marken/ (Spec 2026-10-21, 2): nur Kennzeichnung,
+ * unverändert, eingepasst statt beschnitten. Dekorativ (alt leer): der Name steht auf der Karte daneben.
+ */
+export function MarkenLogo({ pfad, className }: { pfad: string; className?: string }) {
+  return (
+    <img
+      src={pfad}
+      width={128}
+      height={48}
+      alt=""
+      loading="lazy"
+      decoding="async"
+      className={cn("block object-contain", className)}
+    />
+  );
+}

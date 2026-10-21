@@ -24,7 +24,7 @@ import { BewertungsFormular } from "@/components/review/BewertungsFormular";
 import { BewertungsBuch } from "@/components/review/BewertungsBuch";
 import { ladeJuryBeitraegeZuBewertungen } from "@/lib/query/jury";
 import { BlattAnzeige } from "@/components/review/BlattAnzeige";
-import { WareLeiste } from "@/components/sorte/WareLeiste";
+import { HerstellerLeiste } from "@/components/sorte/HerstellerLeiste";
 import { erkundungsDaten } from "@/components/review/erkundung-daten";
 import { mittleWirkung } from "@/components/review/GesamteindruckLeiste";
 import { eintragAnker } from "@/components/review/eintrag";
@@ -439,51 +439,22 @@ async function SorteInhalt({ slug, suche, w, sprache }: { slug: string; suche: S
         <LikeKnopf art="BLUETE" zielId={sorte.kultivar.id} anzahl={blueteLikes} text={w.reaktionen.knopf} />
       </p>
 
-      {/* Ware-Leiste (Spec Sorte im Fokus, 3): je Vertreiber eine Karte, neutral, ohne Kauflink (HWG),
-          gereiht nach Anzahl der Bewertungen. Die Wahl filtert das Buch und die Angaben darunter. */}
-      <div className={SEKTION}>
-        <WareLeiste
-          waren={sorte.waren}
-          aktiveVertreiberId={aktive.ware.vertreiberId}
-          slug={sorte.kultivar.slug}
-          texte={texte.vertreiber}
-          sprache={sprache}
-        />
-      </div>
-
       {strain.beschreibung ? (
         <p className="mt-8 max-w-[68ch] text-body text-pretty text-text">{strain.beschreibung}</p>
       ) : null}
 
       {angabenZurBluete}
 
-      {/* Bewertungen der Sorte als ein Buch zum Blättern (T7): Betreiber zuerst, dann die Community;
-          gefiltert auf den Vertreiber der Auswahl, umschaltbar auf alle Vertreiber. */}
-      <div className={SEKTION}>
-        <Schlagwort satz={texte.schlagwort.bewertungen} ton="lila" />
-        {aktive.ware.vertreiberId ? (
-          <nav aria-label={texte.vertreiber.bewertungenFilter} className="mb-8 flex flex-wrap justify-center gap-2">
-            <Link
-              prefetch={false}
-              scroll={false}
-              href={`${basis}?${auswahlQuery}`}
-              aria-current={alleVertreiber ? undefined : "true"}
-              className={buttonKlassen(alleVertreiber ? "secondary" : "primary", "md")}
-            >
-              {t(texte.vertreiber.nurAuswahl, { name: aktive.ware.vertreiberName || texte.vertreiber.unbekannt })}
-            </Link>
-            <Link
-              prefetch={false}
-              scroll={false}
-              href={`${basis}?${auswahlQuery}&${new URLSearchParams({ alle: "1" })}`}
-              aria-current={alleVertreiber ? "true" : undefined}
-              className={buttonKlassen(alleVertreiber ? "primary" : "secondary", "md")}
-            >
-              {texte.vertreiber.alleVertreiber}
-            </Link>
-          </nav>
-        ) : null}
-        <BewertungsBuch reviews={reviews} kennwerte={sorte.kennwerte} produkt={produkt} w={w} sprache={sprache} katalog={katalog} likes={reviewLikes} kommentare={reviewKommentare} juryBeitraege={juryBeitraege} />
+      {/* Reihenfolge Spec 2026-10-21, 1: Strain, Angaben, Auswahl des Vertreibers, Wertung, Buch, Rest.
+          Die Leiste filtert Buch und Angaben und belegt die Bewertung vor; ohne Kauflink (HWG). */}
+      <div className={ABSTAND}>
+        <HerstellerLeiste
+          waren={sorte.waren}
+          aktiveVertreiberId={aktive.ware.vertreiberId}
+          slug={sorte.kultivar.slug}
+          texte={texte.vertreiber}
+          sprache={sprache}
+        />
       </div>
 
       {/* Bewerten an der Stelle der Erkundung (Masterplan Bewertung v2, T4; /bewerten entfällt):
@@ -578,6 +549,35 @@ async function SorteInhalt({ slug, suche, w, sprache }: { slug: string; suche: S
         )}
         {erkundung.serien.length > 0 ? <Aufklaerung texte={w.aroma.aufklaerung} /> : null}
       </section>
+
+      {/* Bewertungen der Sorte als ein Buch zum Blättern (T7): Betreiber zuerst, dann die Community;
+          gefiltert auf den Vertreiber der Auswahl, umschaltbar auf alle Vertreiber. */}
+      <div className={SEKTION}>
+        <Schlagwort satz={texte.schlagwort.bewertungen} ton="lila" />
+        {aktive.ware.vertreiberId ? (
+          <nav aria-label={texte.vertreiber.bewertungenFilter} className="mb-8 flex flex-wrap justify-center gap-2">
+            <Link
+              prefetch={false}
+              scroll={false}
+              href={`${basis}?${auswahlQuery}`}
+              aria-current={alleVertreiber ? undefined : "true"}
+              className={buttonKlassen(alleVertreiber ? "secondary" : "primary", "md")}
+            >
+              {t(texte.vertreiber.nurAuswahl, { name: aktive.ware.vertreiberName || texte.vertreiber.unbekannt })}
+            </Link>
+            <Link
+              prefetch={false}
+              scroll={false}
+              href={`${basis}?${auswahlQuery}&${new URLSearchParams({ alle: "1" })}`}
+              aria-current={alleVertreiber ? "true" : undefined}
+              className={buttonKlassen(alleVertreiber ? "primary" : "secondary", "md")}
+            >
+              {texte.vertreiber.alleVertreiber}
+            </Link>
+          </nav>
+        ) : null}
+        <BewertungsBuch reviews={reviews} kennwerte={sorte.kennwerte} produkt={produkt} w={w} sprache={sprache} katalog={katalog} likes={reviewLikes} kommentare={reviewKommentare} juryBeitraege={juryBeitraege} />
+      </div>
 
       {aehnliche.length > 0 ? (
         <section aria-labelledby="aehnlich-titel" className={SEKTION}>

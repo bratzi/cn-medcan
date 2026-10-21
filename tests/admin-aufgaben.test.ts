@@ -4,7 +4,7 @@ import { ADMIN_BEREICHE, kachelReihenfolge, sicherZaehlen, summeOffen } from "@/
 
 test("Kacheln: offene nach Zahl absteigend vorn, Null und Werkzeuge hinten in Grundreihenfolge", () => {
   const r = kachelReihenfolge({ bewertungen: 2, mitglieder: 0, gemeldet: 5, budpics: null, vorschlaege: 0, jury: 1, instagram: 0 });
-  assert.deepEqual(r.map((b) => b.id), ["gemeldet", "bewertungen", "jury", "mitglieder", "budpics", "vorschlaege", "instagram", "abstimmung", "kennwerte", "strains"]);
+  assert.deepEqual(r.map((b) => b.id), ["gemeldet", "bewertungen", "jury", "mitglieder", "budpics", "vorschlaege", "instagram", "abstimmung", "kennwerte", "strains", "hersteller"]);
 });
 
 test("summeOffen ignoriert null und Werkzeuge", () => {

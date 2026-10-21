@@ -20,6 +20,8 @@ export type WareProdukt = {
 export type WareKarte = {
   vertreiberId: string;
   vertreiberName: string;
+  /** Logo des Vertreibers (Unternehmen.logoPfad); leer: Initialen-Marke. */
+  vertreiberLogo?: string | null;
   produkte: WareProdukt[];
   anzahl: number;
   gesamtnoteMittel: number | null;
@@ -35,7 +37,7 @@ export type SorteDetail = {
 /** Produkte ohne Vertreiber sammeln sich unter dieser Id; die Bewertung kennt sie nicht als Vertreiber. */
 export const UNBEKANNTER_VERTREIBER = "";
 
-type ProduktZeile = WareProdukt & { vertreiberId: string | null; vertreiberName: string | null; kultivarTyp: string; genetik: string | null };
+type ProduktZeile = WareProdukt & { vertreiberId: string | null; vertreiberName: string | null; vertreiberLogo?: string | null; kultivarTyp: string; genetik: string | null };
 
 /** Gruppiert Produkte je Vertreiber; Reihenfolge nach Anzahl Bewertungen, dann Name (nie nach Note, HWG). */
 export function gruppiereWaren(
@@ -48,7 +50,7 @@ export function gruppiereWaren(
     let ware = jeVertreiber.get(id);
     if (!ware) {
       const k = kennwerte.get(id);
-      ware = { vertreiberId: id, vertreiberName: p.vertreiberName ?? "", produkte: [], anzahl: k?.anzahl ?? 0, gesamtnoteMittel: k?.gesamtnoteMittel ?? null };
+      ware = { vertreiberId: id, vertreiberName: p.vertreiberName ?? "", vertreiberLogo: p.vertreiberLogo ?? null, produkte: [], anzahl: k?.anzahl ?? 0, gesamtnoteMittel: k?.gesamtnoteMittel ?? null };
       jeVertreiber.set(id, ware);
     }
     ware.produkte.push({ id: p.id, slug: p.slug, handelsname: p.handelsname, thcMin: p.thcMin, thcMax: p.thcMax, cbdMin: p.cbdMin, cbdMax: p.cbdMax });
@@ -114,7 +116,7 @@ export const ladeSorte = cache(async function ladeSorte(slug: string): Promise<S
           cbdMinProzent: true,
           cbdMaxProzent: true,
           vertreiberId: true,
-          vertreiber: { select: { name: true } },
+          vertreiber: { select: { name: true, logoPfad: true } },
         },
       },
     },
@@ -130,6 +132,7 @@ export const ladeSorte = cache(async function ladeSorte(slug: string): Promise<S
     cbdMax: s.cbdMaxProzent,
     vertreiberId: s.vertreiberId,
     vertreiberName: s.vertreiber?.name ?? null,
+    vertreiberLogo: s.vertreiber?.logoPfad ?? null,
     kultivarTyp: s.kultivarTyp,
     genetik: s.genetik,
   }));

@@ -57,6 +57,11 @@ test("WareWahlFeld: Stärken nur bei mehr als einem Produkt, „Weiß ich nicht�
   assert.match(mehrere, /Weiß ich nicht/);
   assert.match(mehrere, /aria-pressed="true"[^>]*>(?:<svg.*?<\/svg>)?Weiß ich nicht/);
   assert.match(mehrere, /THC 18/);
+  // Der Vertreiber kommt aus der Hersteller-Leiste: keine eigenen Vertreiber-Chips mehr (Spec 2026-10-21, 1.3).
+  assert.doesNotMatch(mehrere, /Deine Blüte ist von<\/h3>/);
+  assert.doesNotMatch(mehrere, /Alpha GmbH/);
+  assert.match(mehrere, /Deine Blüte ist von <strong[^>]*>Beta Pharma<\/strong>/);
+  assert.match(mehrere, /href="#hersteller-titel"/);
 
   const einer = renderToStaticMarkup(
     createElement(WareWahlFeld, { waren, vorgewaehlt: { vertreiberId: "v-a", strainId: null }, texte: de.bluete.vertreiber, sprache: "de" }),
