@@ -71,10 +71,12 @@
 		}
 	],
 
-	// Strain of the Month: Takt am 1. und 15. um 00:00 UTC (worker.mjs, scheduled).
-	"triggers": { "crons": ["0 0 1 * *", "0 0 15 * *"] }
+	// Strain of the Month: Takt am 1. und 15. um 00:00 UTC; taeglicher Neubau um 03:00 UTC
+	// (worker.mjs, scheduled, unterscheidet ueber controller.cron).
+	"triggers": { "crons": ["0 0 1 * *", "0 0 15 * *", "0 3 * * *"] }
 
 	// Secrets werden NICHT hier gesetzt, sondern mit `wrangler secret put <NAME>`.
 	// Lokal liegen sie in .dev.vars bzw. .env.local (beide gitignored).
 	// Benoetigt: SITE_PASSWORD, FACHKREIS_PASSWORD, SITE_SESSION_SECRET
+	// Neu: DEPLOY_HOOK_URL (Deploy-Hook fuer Neubauten, nie hier eintragen)
 }

@@ -1,5 +1,7 @@
 import { refresh, revalidateTag } from "next/cache";
 
+import { neubauVormerken } from "@/lib/neubau";
+
 import { SPRACHEN } from "./sprache-kern";
 
 /** Präfix der impliziten Pfad-Tags in Next (NEXT_CACHE_IMPLICIT_TAG_ID, next/dist/lib/constants.js). */
@@ -30,6 +32,8 @@ export function sprachTags(pfad: string, typ?: "layout" | "page"): string[] {
  * Actions (Cron, Route Handler) wirft refresh und wird übersprungen.
  */
 export function revalidiereSprachen(pfad: string, typ?: "layout" | "page"): void {
+  // Leseseiten liegen als Dateien in Assets (Spec 2026-10-21): erst ein Neubau macht die Änderung sichtbar.
+  if (!pfad.startsWith("/admin") && !pfad.startsWith("/profil")) neubauVormerken();
   for (const tag of sprachTags(pfad, typ)) revalidateTag(tag, "max");
   try {
     refresh();
