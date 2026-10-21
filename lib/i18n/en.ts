@@ -418,7 +418,7 @@ export const en: Woerterbuch = {
         thc_absteigend: "THC descending",
         thc_aufsteigend: "THC ascending",
         preis_aufsteigend: "Price ascending",
-        relevanz: "recently updated",
+        relevanz: "Relevance",
       },
       community: "Community",
       mindestnote: "Community rating",

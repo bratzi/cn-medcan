@@ -49,10 +49,14 @@ export function ChipFenster({ titel, zahl, offen, oeffne, schliesse, fussText, k
       const breit = window.matchMedia(BREIT).matches;
       dialog.dataset.art = breit ? "popover" : "sheet";
       delete dialog.dataset.rechts;
+      dialog.style.maxHeight = "";
       if (breit) {
         dialog.show();
         // Ragt das Popover rechts aus dem Viewport, richtet es sich an der rechten Chipkante aus.
-        if (dialog.getBoundingClientRect().right > document.documentElement.clientWidth) dialog.dataset.rechts = "";
+        const rahmen = dialog.getBoundingClientRect();
+        if (rahmen.right > document.documentElement.clientWidth) dialog.dataset.rechts = "";
+        // Höhe bis 16 px über den unteren Viewport-Rand, damit der Fuß nie abgeschnitten wird.
+        dialog.style.maxHeight = `${Math.min(512, Math.max(160, window.innerHeight - rahmen.top - 16))}px`;
       } else {
         dialog.showModal();
       }
@@ -129,7 +133,8 @@ export function ChipFenster({ titel, zahl, offen, oeffne, schliesse, fussText, k
           "data-[art=sheet]:fixed data-[art=sheet]:inset-x-0 data-[art=sheet]:top-auto data-[art=sheet]:bottom-0 data-[art=sheet]:max-h-[85dvh] data-[art=sheet]:w-full data-[art=sheet]:max-w-none data-[art=sheet]:shadow-lg",
           // Popover ab lg: unter dem Chip, eigenes Scrollen.
           "data-[art=popover]:absolute data-[art=popover]:top-full data-[art=popover]:start-0 data-[art=popover]:end-auto data-[art=popover]:z-30 data-[art=popover]:mt-2 data-[art=popover]:w-80 data-[art=popover]:max-h-[min(70dvh,32rem)] data-[art=popover]:border data-[art=popover]:border-border data-[art=popover]:shadow-md",
-          "data-rechts:start-auto data-rechts:end-0",
+          // Doppelte Bedingung: schlägt start-0 der Popover-Regel auch bei gleicher Reihenfolge im CSS.
+          "data-[art=popover]:data-rechts:start-auto data-[art=popover]:data-rechts:end-0",
         )}
       >
         <div aria-hidden="true" className="hidden justify-center pt-2 group-data-[art=sheet]:flex">

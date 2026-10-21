@@ -66,9 +66,9 @@ test("Werkzeugleiste: Sortierung aus Mehr-Menü markiert den …-Knopf", () => {
   assert.match(html, /aria-pressed="true"[^>]*>Name/);
 });
 
-test("Werkzeugleiste: Suchtext mit Relevanz zeigt den …-Knopf aktiv mit „zuletzt geändert“ (Review Focus 2)", () => {
+test("Werkzeugleiste: Suchtext mit Relevanz zeigt den …-Knopf aktiv mit „Relevanz“ (Review Focus 2)", () => {
   const html = leiste({ filter: { ...leererFilter(), q: "haze", sortierung: "relevanz" } });
-  assert.match(html, /aria-pressed="true"[^>]*>zuletzt geändert/);
+  assert.match(html, /aria-pressed="true"[^>]*>Relevanz/);
 });
 
 test("Werkzeugleiste: Mehr-Menü bietet genau die übrigen Sortierungen", () => {

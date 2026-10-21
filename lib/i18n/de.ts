@@ -426,7 +426,7 @@ export const de = {
         thc_absteigend: "THC absteigend",
         thc_aufsteigend: "THC aufsteigend",
         preis_aufsteigend: "Preis aufsteigend",
-        relevanz: "zuletzt geändert",
+        relevanz: "Relevanz",
       },
       community: "Community",
       mindestnote: "Community-Note",
