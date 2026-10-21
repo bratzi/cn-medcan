@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 
-import { planeVerschiebung } from "../scripts/seiten-in-assets.mjs";
+import { keineLeseseiten, planeVerschiebung } from "../scripts/seiten-in-assets.mjs";
 
 test("planeVerschiebung: Leseseiten nach _seiten, Rest bleibt", () => {
   const plan = planeVerschiebung([
@@ -21,4 +21,10 @@ test("planeVerschiebung: Leseseiten nach _seiten, Rest bleibt", () => {
     { quelle: "de/blueten/mac-1/v-x-alle.html", ziel: "_seiten/de/blueten/mac-1/v-x-alle.html" },
     { quelle: "de/jury/seite/2.html", ziel: "_seiten/de/jury/seite/2/index.html" },
   ]);
+});
+
+test("keineLeseseiten: nur im Workers Build ein Fehler", () => {
+  assert.equal(keineLeseseiten({ WORKERS_CI: "1" }, 0), true);
+  assert.equal(keineLeseseiten({ WORKERS_CI: "1" }, 5), false);
+  assert.equal(keineLeseseiten({}, 0), false);
 });

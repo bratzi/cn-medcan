@@ -36,6 +36,11 @@ export function brichtAb(env, abzugOk) {
   return env.WORKERS_CI === "1" && !abzugOk;
 }
 
+/** Gelang der Build nur im zweiten Versuch ohne Vorrendern, gibt es im Workers Build keine Leseseiten: Abbruch. */
+export function brichtNachBuildAb(env, nurOhneVorrendern) {
+  return env.WORKERS_CI === "1" && nurOhneVorrendern;
+}
+
 /** Env für `opennextjs-cloudflare build`: VORRENDERN=1 nur nach erfolgreichem Abzug. */
 export function buildEnv(env, abzugOk) {
   const neu = { ...env };
@@ -143,12 +148,18 @@ function main() {
 
   const lauf = (befehl, args, env) =>
     spawnSync(befehl, args, { shell: process.platform === "win32", stdio: "inherit", env }).status ?? 1;
+  let nurOhneVorrendern = false;
   let status = lauf("npx", ["opennextjs-cloudflare", "build"], buildEnv(process.env, abzugOk));
   if (status !== 0 && abzugOk) {
     console.log("[vorrendern] WARNUNG: Build mit Vorrendern fehlgeschlagen, zweiter Versuch ohne Vorrendern");
     status = lauf("npx", ["opennextjs-cloudflare", "build"], buildEnv(process.env, false));
+    nurOhneVorrendern = status === 0;
   }
   if (status !== 0) process.exit(status);
+  if (brichtNachBuildAb(process.env, nurOhneVorrendern)) {
+    console.error("[seiten] FEHLER: keine Leseseiten, Abbruch, die alte Version bleibt live");
+    process.exit(1);
+  }
   status = lauf("node", ["scripts/seiten-in-assets.mjs"], buildEnv(process.env, false));
   if (status !== 0) process.exit(status);
   status = lauf("node", ["scripts/bundle-env-bereinigen.mjs"], buildEnv(process.env, false));

@@ -103,7 +103,7 @@ test("Vorgerenderte Seiten lesen beim Rendern keine Secrets (auch transitiv)", (
 
 // --- scripts/cf-build.mjs: Entscheidung ohne echte Prozesse ---
 
-import { anzahlAusJson, brichtAb, buildEnv, sollVorrendern, trenneTrigger, ziehAbzug } from "../scripts/cf-build.mjs";
+import { anzahlAusJson, brichtAb, brichtNachBuildAb, buildEnv, sollVorrendern, trenneTrigger, ziehAbzug } from "../scripts/cf-build.mjs";
 import { sprachTags } from "@/lib/i18n/revalidiere";
 
 type Lauf = { status: number; stdout: string };
@@ -148,6 +148,12 @@ test("cf-build: ohne Abzug bricht nur der Workers Build ab (Spec 2026-10-21, 5)"
   assert.equal(brichtAb({ WORKERS_CI: "1" }, true), false);
   assert.equal(brichtAb({ VORRENDERN_DATEN: "1" }, false), false);
   assert.equal(brichtAb({}, false), false);
+});
+
+test("cf-build: Build nur im zweiten Versuch ohne Vorrendern bricht im Workers Build ab", () => {
+  assert.equal(brichtNachBuildAb({ WORKERS_CI: "1" }, true), true);
+  assert.equal(brichtNachBuildAb({ WORKERS_CI: "1" }, false), false);
+  assert.equal(brichtNachBuildAb({}, true), false);
 });
 
 test("cf-build: Export, Import und Prüfung ok → Env mit VORRENDERN=1", () => {

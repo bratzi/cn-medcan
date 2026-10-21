@@ -10,6 +10,11 @@ import { pathToFileURL } from "node:url";
 const FEST = /^(de|en)(\/(blueten|neu|jury(\/[a-z0-9-]+)*|reviews(\/[a-z0-9-]+)*))?\.html$/;
 const STRAIN = /^(de|en)\/blueten\/[a-z0-9-]+\/(standard|v-[A-Za-z0-9-]+)\.html$/;
 
+/** Im Workers Build ohne Leseseiten abbrechen: sonst fiele jede Seite auf den teuren Weg. */
+export function keineLeseseiten(env, anzahl) {
+  return env.WORKERS_CI === "1" && anzahl === 0;
+}
+
 export function planeVerschiebung(dateien) {
   const plan = [];
   for (const quelle of dateien) {
@@ -63,6 +68,11 @@ function entferneAusKvVorrat(projekt, plan) {
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   const { anzahl } = verschiebe(process.cwd());
   console.log(`[seiten] ${anzahl} Leseseiten nach .open-next/assets/_seiten`);
+  if (keineLeseseiten(process.env, anzahl)) {
+    console.error("[seiten] FEHLER: keine Leseseiten, Abbruch, die alte Version bleibt live");
+    process.exit(1);
+  }
+  if (anzahl === 0) console.warn("[seiten] WARNUNG: keine Leseseiten gefunden (lokal ohne Vorrendern ok)");
   if (anzahl > 19000) {
     console.error("[seiten] mehr als 19 000 Dateien, Grenze 20 000 je Version");
     process.exit(1);
