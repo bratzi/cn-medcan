@@ -28,24 +28,32 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 
 ## ⇢ Hier geht es weiter
 
-### ⇢ SESSION 87 (2026-10-21/22): LIVE-SEITE DOWN (1102) — Umbau „Seiten aus Assets“ läuft – SAFE4CLEAR
-- Befund: Live liefert fast nur Error 1102 (CPU). Strain-Seite force-dynamic 100–450 ms CPU, auch KV-Cache-Treffer 2–12 ms;
-  Free 10 ms wird jetzt hart durchgesetzt. Spec docs/superpowers/specs/2026-10-21-seiten-aus-assets-design.md, Plan
-  docs/superpowers/plans/2026-10-21-seiten-aus-assets.md (beide freigegeben). Nutzer: kostenlos, neue Bewertung nach ~5 min ok,
-  Beta-Hinweis nach jeder Bewertung.
-- SDD-Ledger: .superpowers/sdd/2026-10-21-seiten-aus-assets/progress.md (ZUERST LESEN, dort Rulings + Stand).
-- Worktrees (node_modules = Junction auf C:/cn/node_modules, lib/generated kopiert):
-  A C:/cn-assets-a Branch assets-a (Tasks 1–3, Tor + Build) bis 79d4538 – Re-Review offen.
-  B C:/cn-assets-b Branch assets-b (Tasks 4–5, Strain statisch + Insel) bis 4b389e9 – Review offen.
-  C C:/cn-assets-c Branch assets-c (Tasks 6–7, Neubau + Hinweis) bis bbb44d1 – FERTIG, review clean.
-- NÄCHSTE SCHRITTE: Re-Review A dispatchen; Review B dispatchen (Fix mit Rulings: Bewerten-Kopf durch Insel, Anker für
-  Buchfilter); dann mergen A, B, C nach main (Konflikte worker.mjs fetch/scheduled beide übernehmen, wrangler.jsonc assets
-  + crons, lib/seiten-tor.ts byte-gleich), npm test + typecheck; Task 8: Deploy-Hook im Dashboard anlegen (Worker www →
-  Settings → Builds → Deploy Hooks, Branch main), `wrangler secret put DEPLOY_HOOK_URL`, Migration 0033 remote +
-  db/constraints.sql remote, edge-stack-master §6 + /neu-Meldung, push, CI-Log prüfen ([seiten] N, html_handling none
-  liefert 200), Live-Prüfagent (inkl. offene S86-Prüfungen, Tab wieder dunkel), Observability cpuTimeMs ≤ 3 ms.
-- Regel neu (Memory): je Agent Skills vorab selbst laden und als feste Liste mitgeben; nach erledigten Agent-Aufgaben Safe4Clear.
-- Brief-/Review-Dateien unter .superpowers/sdd/2026-10-21-seiten-aus-assets/ (strang-*-report.md, strang-*-review.md).
+### ⇢ SESSION 87 (2026-10-21/22): Umbau „Seiten aus Assets“ AUF MAIN, Deploy läuft – SAFE4CLEAR
+- Anlass: Live fast nur Error 1102 (CPU, Free 10 ms). Spec/Plan: docs/superpowers/specs|plans/2026-10-21-seiten-aus-assets*.
+  Ledger mit allen Rulings: .superpowers/sdd/2026-10-21-seiten-aus-assets/progress.md. Tasks 1–7 complete, reviews clean.
+- Auf main (gepusht): Merge A (lib/tor.ts, worker.mjs-Tor, html_handling none, run_worker_first /_seiten/*, scripts/seiten-in-assets.mjs,
+  CI-Abbruch ohne Leseseiten), Merge C (lib/neubau*.ts, Deploy-Hook, Cron 0 3 * * *, Beta-Hinweis), Merge B (Strain statisch je
+  Vertreiber-Variante unter [slug]/[auswahl], Ausweichweg sorten-inhalt.tsx, Insel /api/ich/strain), Doku edge-stack-master §6
+  Stufe 0, /neu-Meldung, 5694820 (experimental.cpus 2, NEUBAU_JE_TAG 5), Merge Startseite-Rauschen (aroma.text + Hinweis hinter
+  InfoKnopf, ein „Zum Strain“ am Ende der Bewertungen 1–3, immer Sorten-Slug).
+- Erledigt remote: Migration 0033 (neubau_zaehler) + db/constraints.sql; Deploy-Hook „Neubau Leseseiten“ (Branch main) per API;
+  Secret DEPLOY_HOOK_URL gesetzt.
+- BUILD-STAND (22:50 UTC): Build 9a4a687 rendert 3064 Seiten mit 1 Worker in ~21 min, Build gesamt ~25 min (kein Abbruch bei 20 min!).
+  Danach ggf. Build für den letzten Push. NÄCHSTE SCHRITTE: Builds per API prüfen (Workers Builds, Worker www): Log-Zeile
+  `[seiten] N Leseseiten`, Deploy ok; dann Live-Prüfagent (Skills vorab laden und mitgeben): Startseite, /blueten, /blueten/mac-1,
+  ?vertreiber=<id>, &alle=1, beide Sprachen, ohne Gate-Cookie → /zugang, /_seiten/... direkt → /zugang bzw. 404, angemeldet:
+  Formular + Kopf „Deine Bewertung“, Bewertung speichern → Hinweis, Neubau-Zähler +1; offene S86-Prüfungen (Logo-Wechsel, /admin/strains
+  Formular, Sativa/Indica-InfoKnopf); Tab wieder dunkel. Observability cpuTimeMs Leseseiten ≤ 3 ms, /api/ich/strain messen.
+- PROBLEM Build-Budget: ~25 min/Build bei 3000 Min/Monat → nur ~4 Neubauten/Tag. Deckel steht auf 5. Hinweistext sagt „etwa 5 Minuten“,
+  real eher 25–30 → Text anpassen. VORSCHLAG (Nutzer noch nicht entschieden): eine Seite je Strain (854 statt 3064), Vertreiberwahl
+  clientseitig → Build ~8 min. Mit Nutzer klären, dann planen.
+- NÄCHSTE UI-AUFGABE (Nutzer freigegeben): /blueten-Kopf als Hero mit Hintergrundvideo pflanze-loop (NUR das Video der Startseiten-
+  Sektion „Ein Strain, gemeinsam“, nicht deren Aufbau), „Strains“ in Buchschrift + Zahl als Handschrift-Akzent, Pflichthinweis
+  „verschreibungspflichtig…“ ruhig sichtbar (HWG, kein InfoKnopf), kurze Einblendung, Standbild bei reduced motion, Pausen-Knopf.
+  Ablauf: erst live per Browser-JS prototypen, Screenshot zeigen, nach Ja coden. Skills: build-awwwards-quality-sites,
+  design-taste-frontend, frontend-design, animate, better-typography, critique-visual-hierarchy, better-accessibility, web-perf,
+  ui-design-engine. Achtung: /blueten ist Leseseite aus Assets (Hero ändert nur Build-Output).
+- Worktrees cn-assets-a/b/c und cn-startseite sind gemergt und können weg (git worktree remove).
 
 ### ⇢ SESSION 86 (2026-10-21): Strain-Liste + Strain-Seite umgebaut, live (e644324)
 - Live und geprüft (Agent): Chipleiste/Popover/Sheet, Sortier-Segment mit Richtung (richtung=auf|ab), „…“-Menü
