@@ -50,6 +50,11 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
   ?vertreiber=<id>, &alle=1, beide Sprachen, ohne Gate-Cookie → /zugang, /_seiten/... direkt → /zugang bzw. 404, angemeldet:
   Formular + Kopf „Deine Bewertung“, Bewertung speichern → Hinweis, Neubau-Zähler +1; offene S86-Prüfungen (Logo-Wechsel, /admin/strains
   Formular, Sativa/Indica-InfoKnopf); Tab wieder dunkel. Observability cpuTimeMs Leseseiten ≤ 3 ms, /api/ich/strain messen.
+- LIVE-PRÜFUNG 435bc69 (2026-10-21 23:45 UTC): Gate ok, Leseseiten 0–1 ms, kein 1102, Insel /api/ich/strain mit Sitzung
+  Median 4 / max 12 ms (vorher 623), Formular + „Deine Bewertung“ ok. Build-Fix: experimental.cpus raus (2 Worker → SQLITE_BUSY).
+  OFFEN: über Next teuer: ?vertreiber=…&alle=1 213–335 ms, /api/benachrichtigungen bis 470, /api/startseite 334, /admin/strains 357,
+  /en/* 404 aber 255 ms. Logo-Wechsel ?vertreiber= wirkt nicht (entfällt mit Umbau unten). Ungeprüft: Englisch (nur per Umschalter),
+  Sativa/Indica-InfoKnopf (Strain mit Typ nötig), 390/1280 px (resize griff nicht).
 - ENTSCHIEDEN (Nutzer 2026-10-22): Vertreiber ist Nebensache. Vertreiberwahl NUR im Bewertungsformular auf der Strain-Seite,
   nicht in Filtern, nicht in der Übersicht, keine Seitenvariante je Vertreiber. Hersteller-/Vertreiberübersicht bleibt, ruhig.
   → Umbau: eine statische Seite je Strain (854 statt 3064, Build ~8 min), [auswahl]-Segment und ?vertreiber= als Seitenzustand
