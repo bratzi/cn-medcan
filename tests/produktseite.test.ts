@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 
-const QUELLE = readFileSync(join(process.cwd(), "app/[lang]/blueten/[slug]/page.tsx"), "utf8");
+const QUELLE = readFileSync(join(process.cwd(), "app/[lang]/blueten/[slug]/sorten-inhalt.tsx"), "utf8");
 
 test("Produktseite: Rückweg als 44-px-Einzellink", () => {
   assert.match(QUELLE, /className=\{einzelLinkKlassen\(\)\}>\s*\{w\.bluete\.alleBlueten\}/);
@@ -11,7 +11,8 @@ test("Produktseite: Rückweg als 44-px-Einzellink", () => {
 
 test("Produktseite: die Bewertungsmaske sitzt am Anker #bewerten, kein Link führt mehr auf /bewerten", () => {
   assert.match(QUELLE, /id="bewerten"/);
-  assert.match(QUELLE, /<BewertungsFormular\b/);
+  // Statisch als Gast: die Maske kommt nicht mehr aus dem Server-Render (Spec 2026-10-21, Seiten aus Assets).
+  assert.doesNotMatch(QUELLE, /<BewertungsFormular\b/);
   // Der zweite Weg ("Erste Bewertung abgeben") steht seit T7 über dem Buch: tests/buch.test.ts.
   assert.equal(QUELLE.match(/href="#bewerten"/g)?.length, 1);
   assert.doesNotMatch(QUELLE, /["`]\/bewerten\//);

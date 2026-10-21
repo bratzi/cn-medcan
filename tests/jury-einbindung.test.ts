@@ -26,7 +26,7 @@ test("Abzeichen und Wording: Jury statt Betreiber, wo die Herkunft einer Bewertu
 });
 
 test("Sortenseite und Profil binden die Jury ein", () => {
-  assert.match(readFileSync("app/[lang]/blueten/[slug]/page.tsx", "utf8"), /ladeJuryBeitraegeZuBewertungen/);
+  assert.match(readFileSync("app/[lang]/blueten/[slug]/sorten-inhalt.tsx", "utf8"), /ladeJuryBeitraegeZuBewertungen/);
   assert.match(readFileSync("components/review/BuchDoppelseite.tsx", "utf8"), /\/jury\/\$\{eintrag\.juryBeitrag\}/);
   const profil = readFileSync("app/[lang]/profil/[kurzId]/page.tsx", "utf8");
   assert.match(profil, /ladeJuryProfil/);

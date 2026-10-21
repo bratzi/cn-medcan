@@ -37,12 +37,13 @@ test("Bewertungsmaske: Fazit steht auch ohne Community-Werte, Live-Netz daneben"
   assert.match(quelle, /eigenerSortenFazit !== null \|\| eigenerChargenFazit !== null \|\| netzLive !== null/);
   assert.match(quelle, /liveGeschmack\(liveNetz/);
   assert.match(quelle, /kontur=\{netzLive\.vorher\.mag\}/);
-  const seite = readFileSync("app/[lang]/blueten/[slug]/page.tsx", "utf8");
-  assert.match(seite, /ladeLiveNetzBasis\(freigegeben\.mitgliedId, aktive\.produkt\.id\)\.catch/);
+  // Die statische Seite rendert als Gast: das Live-Netz lädt die Insel (Spec 2026-10-21, Seiten aus Assets, 3.3).
+  const seite = readFileSync("app/[lang]/blueten/[slug]/sorten-inhalt.tsx", "utf8");
+  assert.doesNotMatch(seite, /ladeLiveNetzBasis/);
 });
 
 test("Blütenseite: Fazit-Spalte rechts neben der Maske wird nicht abgeschnitten (live 2026-10-09)", () => {
-  const seite = readFileSync("app/[lang]/blueten/[slug]/page.tsx", "utf8");
+  const seite = readFileSync("app/[lang]/blueten/[slug]/sorten-inhalt.tsx", "utf8");
   assert.match(seite, /min-\[118rem\]:overflow-x-visible/);
   assert.match(readFileSync("components/story/Schlagwort.tsx", "utf8"), /absolute inset-x-0 -z-10 overflow-x-clip/);
 });

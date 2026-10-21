@@ -5,7 +5,7 @@ import { join } from "node:path";
 
 /** Angefasste Dateien der Welle 1: Hover nie über Deckkraft (Spec TP2 3.10). */
 export const DATEIEN = [
-  "app/[lang]/blueten/[slug]/page.tsx",
+  "app/[lang]/blueten/[slug]/sorten-inhalt.tsx",
   "app/[lang]/reviews/page.tsx",
   "app/[lang]/sotm/page.tsx",
   "components/produkt/BestandTabelle.tsx",

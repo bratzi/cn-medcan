@@ -36,6 +36,9 @@ const EIGENE_PARAMETER = [
   "app/[lang]/reviews/band/[band]/page.tsx",
 ];
 
+/** Strain-Seite je Vertreiber-Variante (Spec 2026-10-21, Seiten aus Assets): eigene Parameter aus D1. */
+const STRAIN_VARIANTE = "app/[lang]/blueten/[slug]/[auswahl]/page.tsx";
+
 function mitVorrendern(wert: string | undefined, pruefe: () => void) {
   const vorher = process.env.VORRENDERN;
   if (wert === undefined) delete process.env.VORRENDERN;
@@ -73,6 +76,14 @@ test("Impressum, Datenschutz, Seiten mit eigenen Parametern und das Layout bleib
   }
 });
 
+test("Strain-Varianten: generateStaticParams über strainVarianten, ohne Cookies und searchParams", () => {
+  const quelle = lies(STRAIN_VARIANTE);
+  assert.match(quelle, /export function generateStaticParams\(\) \{\s*return strainVarianten\(\);\s*\}/);
+  assert.match(quelle, /export const revalidate = false;/);
+  assert.doesNotMatch(quelle, /searchParams|cookies\(|aktuellesMitglied|istFachkreis/);
+  assert.doesNotMatch(lies("app/[lang]/blueten/[slug]/sorten-inhalt.tsx"), /aktuellesMitglied|istFachkreis|ladeEigeneBewertung|searchParams/);
+});
+
 function seiten(ordner: string): string[] {
   return readdirSync(ordner).flatMap((name) => {
     const pfad = join(ordner, name).split("\\").join("/");
@@ -83,7 +94,7 @@ function seiten(ordner: string): string[] {
 
 test("Jede force-static-Seite ist vorgerendert oder bewusst ausgenommen", () => {
   const statisch = seiten("app/[lang]").filter((datei) => /export const dynamic = "force-static";/.test(lies(datei)));
-  assert.deepEqual(statisch.sort(), [...VORGERENDERT, ...MIT_SECRET, ...EIGENE_PARAMETER].sort());
+  assert.deepEqual(statisch.sort(), [...VORGERENDERT, ...MIT_SECRET, ...EIGENE_PARAMETER, STRAIN_VARIANTE].sort());
 });
 
 /**
@@ -93,7 +104,7 @@ test("Jede force-static-Seite ist vorgerendert oder bewusst ausgenommen", () => 
  */
 test("Vorgerenderte Seiten lesen beim Rendern keine Secrets (auch transitiv)", () => {
   const definitionen = new Set(["lib/cloudflare.ts", "lib/rechtliches.ts"]);
-  const baum = importbaum([...VORGERENDERT, "app/[lang]/layout.tsx"]);
+  const baum = importbaum([...VORGERENDERT, STRAIN_VARIANTE, "app/[lang]/layout.tsx"]);
   assert.ok(baum.size > VORGERENDERT.length, "Importbaum wurde nicht aufgelöst");
   for (const [datei, quelle] of baum) {
     if (definitionen.has(datei)) continue;

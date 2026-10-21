@@ -33,6 +33,6 @@ test("Kommentare: Client, lädt erst beim Aufklappen, Löschen und Melden mit 44
 });
 
 test("Zähler der Kommentare kommt mit den Likes aus derselben Abfrage", () => {
-  assert.match(lies("app/[lang]/blueten/[slug]/page.tsx"), /reaktionenFuer\("BEWERTUNG"/);
+  assert.match(lies("app/[lang]/blueten/[slug]/sorten-inhalt.tsx"), /reaktionenFuer\("BEWERTUNG"/);
   assert.match(lies("components/review/BuchDoppelseite.tsx"), /#bewertung-|bewertung-\$\{eintrag\.id\}/);
 });
