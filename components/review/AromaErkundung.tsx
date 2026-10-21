@@ -406,7 +406,20 @@ export function AromaErkundung({
           </Schritt>
         ) : null}
 
-        <Schritt nummer="2" titel={texte.aroma.erkundung.terpz}>
+        <Schritt
+          nummer="2"
+          titel={texte.aroma.erkundung.terpz}
+          info={
+            <InfoKnopf
+              sprache={texte.sprache}
+              text={
+                eingabe && terpene.length > 0
+                  ? `${texte.aroma.erkundung.anleitung} ${texte.aroma.erkundung.voraktiv}${pulsierend.size > 0 ? ` ${texte.aroma.erkundung.vorschlag}` : ""}`
+                  : texte.aroma.erkundung.anleitung
+              }
+            />
+          }
+        >
           {zaehltBluete}
           {treue || eigeneTreue !== null ? (
             <p className="text-small text-text-muted">
@@ -424,15 +437,11 @@ export function AromaErkundung({
               ) : null}
             </p>
           ) : null}
-          <p className="max-w-[60ch] text-small text-text-muted text-pretty">
-            {texte.aroma.erkundung.anleitung}{modus === "maske" ? "" : ` ${texte.aroma.erkundung.nichtsGespeichert}`}
-          </p>
-          {eingabe && terpene.length > 0 ? (
-            <p className="max-w-[60ch] text-small text-text-muted text-pretty">
-              {texte.aroma.erkundung.voraktiv}
-              {pulsierend.size > 0 ? ` ${texte.aroma.erkundung.vorschlag}` : ""}
-            </p>
-          ) : null}
+          {/* Anleitung und Vorbelegung liegen im Info-Knopf am Titel (Spec 2026-10-21, 1); sichtbar bleibt nur,
+              was die Bedienung trägt: Gäste sehen, dass nichts gespeichert wird. */}
+          {modus === "maske" ? null : (
+            <p className="max-w-[60ch] text-small text-text-muted text-pretty">{texte.aroma.erkundung.nichtsGespeichert}</p>
+          )}
           <div className="w-full min-w-0">
             <AromaKarte
               titel={titel}
@@ -605,9 +614,7 @@ export function AromaErkundung({
                 </div>
               ) : null}
             </dl>
-            <p className="max-w-[60ch] text-caption text-text-muted text-pretty">
-              {texte.aroma.erkundung.fazitErklaerung}
-            </p>
+            <InfoKnopf sprache={texte.sprache} text={texte.aroma.erkundung.fazitErklaerung} />
             {netzLive ? (
               <figure className="flex w-full flex-col items-center gap-4 border-t border-border pt-8">
                 <figcaption className="text-small uppercase tracking-wide text-text-muted">{texte.aroma.erkundung.liveNetzTitel}</figcaption>
@@ -639,10 +646,13 @@ export function AromaErkundung({
 function Schritt({
   nummer,
   titel,
+  info,
   children,
 }: {
   nummer: string;
   titel: string;
+  /** Info-Knopf mit der Erklärung des Schritts, direkt neben dem Titel (Spec 2026-10-21, 1). */
+  info?: React.ReactNode;
   children: React.ReactNode;
 }) {
   return (
@@ -663,12 +673,15 @@ function Schritt({
       {/* Links in Logoschrift und Farbverlauf wie die Schlagworte (Nutzer 2026-09-25).
           Rechter Ausgleich 0.25em statt 0.3em: bei 16 px Seitenrand ragte die Malfläche
           sonst mobil 1 px über die Seite (live 2026-10-06, 494 px). */}
-      <h3
-        className="farbverlauf border-t border-border pt-8 font-hand text-erzaehlung leading-[0.9]"
-        style={{ fontSize: "calc(var(--text-kapitel) * 1.35)", marginRight: "-0.25em", paddingRight: "0.25em" }}
-      >
-        {titel}
-      </h3>
+      <div className="flex items-center gap-4 border-t border-border pt-8">
+        <h3
+          className="farbverlauf font-hand text-erzaehlung leading-[0.9]"
+          style={{ fontSize: "calc(var(--text-kapitel) * 1.35)", marginRight: "-0.25em", paddingRight: "0.25em" }}
+        >
+          {titel}
+        </h3>
+        {info}
+      </div>
       {children}
     </section>
   );

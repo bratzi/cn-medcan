@@ -232,6 +232,7 @@ export function BewertungsFormular({
           meldungen={bildMeldungen}
           texte={texte}
           onGeaendert={() => router.refresh()}
+          sprache={aromaTexte.sprache}
         />
         {istBetreiber ? (
           <Input

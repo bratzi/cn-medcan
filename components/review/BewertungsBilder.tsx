@@ -5,6 +5,7 @@ import { useEffect, useRef, useState, type Dispatch, type SetStateAction } from 
 import { bewertungsbildEntfernen } from "@/app/[lang]/blueten/[slug]/bewertungsbild-aktionen";
 import { BudpicBild } from "@/components/medien/Bild";
 import { Button } from "@/components/ui";
+import { InfoKnopf } from "@/components/ui/InfoKnopf";
 import { useHydriert } from "@/components/ui/useHydriert";
 import type { VorbelegtesBild } from "@/lib/bewertung-vorbelegung";
 import { annehmbareDateien, bilderFrei } from "@/lib/bewertungsbilder";
@@ -12,6 +13,7 @@ import type { VorgemerktesBild } from "@/lib/bewertungsbilder-senden";
 import { bildVerkleinernFrei } from "@/lib/bild-verkleinern";
 import { BEWERTUNGSBILD_MAX, BUDPIC_MAX_BYTES, BUDPIC_MAX_KANTE } from "@/lib/budpics";
 import { t } from "@/lib/i18n/text";
+import type { Sprache } from "@/lib/i18n/sprache-kern";
 import type { Woerterbuch } from "@/lib/i18n/typen";
 
 type Props = {
@@ -28,6 +30,8 @@ type Props = {
   texte: Woerterbuch["bewerten"];
   /** Nach dem Entfernen eines gespeicherten Bildes: Seite neu vom Server. */
   onGeaendert: () => void;
+  /** Sprache des Info-Knopfs; Standard Deutsch. */
+  sprache?: Sprache;
 };
 
 /** 96 px Kante je Kachel (8-px-Raster). */
@@ -39,7 +43,7 @@ const KACHEL = "size-24 overflow-hidden border border-border bg-surface-sunken";
  * verkleinert; gesendet wird erst nach dem Speichern der Bewertung
  * (BewertungsFormular, lib/bewertungsbilder-senden.ts).
  */
-export function BewertungsBilder({ vorhanden, vorgemerkt, setVorgemerkt, onBeschaeftigt, istBetreiber, gesperrt, meldungen, texte, onGeaendert }: Props) {
+export function BewertungsBilder({ vorhanden, vorgemerkt, setVorgemerkt, onBeschaeftigt, istBetreiber, gesperrt, meldungen, texte, onGeaendert, sprache = "de" }: Props) {
   const hydriert = useHydriert();
   const eingabe = useRef<HTMLInputElement>(null);
   const zaehler = useRef(0);
@@ -118,11 +122,12 @@ export function BewertungsBilder({ vorhanden, vorgemerkt, setVorgemerkt, onBesch
 
   return (
     <div className="flex flex-col gap-4">
-      <h4 className="text-body font-medium text-text">{texte.bilder}</h4>
-      <p className="max-w-[60ch] text-small text-text-muted">
-        {t(texte.bilderHinweis, { max: BEWERTUNGSBILD_MAX })}
-        {istBetreiber ? null : ` ${texte.bilderPruefung}`}
-      </p>
+      {/* Der lange Verkleinerungs-Hinweis liegt im Info-Knopf (Spec 2026-10-21, 1); die Prüfung bleibt sichtbar. */}
+      <div className="flex items-center gap-2">
+        <h4 className="text-body font-medium text-text">{texte.bilder}</h4>
+        <InfoKnopf sprache={sprache} text={t(texte.bilderHinweis, { max: BEWERTUNGSBILD_MAX })} />
+      </div>
+      {istBetreiber ? null : <p className="max-w-[60ch] text-small text-text-muted">{texte.bilderPruefung}</p>}
       {vorhanden.length + vorgemerkt.length > 0 ? (
         <ul className="flex flex-wrap gap-4">
           {vorhanden.map((b) => (
