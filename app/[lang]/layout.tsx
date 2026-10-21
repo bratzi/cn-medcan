@@ -10,7 +10,6 @@ import { Kopf } from "@/components/layout/Kopf";
 import { holeSprache, holeWoerterbuch } from "@/lib/i18n";
 import { istSprache } from "@/lib/i18n/sprache-kern";
 import { EINSTELLUNG_SKRIPT } from "@/lib/einstellungen";
-import { FILTER_SKRIPT } from "@/lib/katalog/filterspalte";
 import { THEMA_SKRIPT, THEMA_STANDARD } from "@/lib/thema";
 import "../globals.css";
 
@@ -65,8 +64,6 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
       <head>
         <script dangerouslySetInnerHTML={{ __html: THEMA_SKRIPT }} />
         <script dangerouslySetInnerHTML={{ __html: EINSTELLUNG_SKRIPT }} />
-        {/* Filterspalte der Blütenseite: die Wahl des Besuchers vor dem ersten Zeichnen (Task 2). */}
-        <script dangerouslySetInnerHTML={{ __html: FILTER_SKRIPT }} />
       </head>
       <body className="min-h-full flex flex-col">
         <a

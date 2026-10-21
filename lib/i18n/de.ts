@@ -441,6 +441,21 @@ export const de = {
       trefferZeigen: { one: "1 Treffer zeigen", other: "{anzahl} Treffer zeigen" },
       schliessen: "Schließen",
       vertreiberSuchen: "Hersteller suchen",
+      // Chipleiste (Spec 2026-10-21): Beschriftung je Chip, Reihenfolge in lib/katalog/chipleiste.ts.
+      chips: {
+        community: "Community-Note",
+        terpene: "Terpene",
+        geschmack: "Geschmack",
+        typ: "Typ",
+        thc: "THC/CBD",
+        vertreiber: "Hersteller",
+        form: "Form",
+        verfuegbar: "Verfügbarkeit",
+        mehr: "Mehr",
+      },
+      sortierenKurz: { community: "Community", stimmen: "Stimmen", neueste: "Neueste", thc_absteigend: "THC" },
+      weitereSortierung: "Weitere Sortierungen",
+      legendeKurz: "✓ Datenblatt bestätigt · + Community gefunden",
     },
     aktiv: {
       titel: "Aktive Filter",

@@ -4,8 +4,8 @@ import { test } from "node:test";
 
 const lies = (p: string) => readFileSync(p, "utf8");
 
-test("Schublade: echtes dialog, Escape, reduzierte Bewegung", () => {
-  const s = lies("components/katalog/FilterSchublade.tsx");
+test("Chip-Fenster: echtes dialog, Escape, reduzierte Bewegung", () => {
+  const s = lies("components/katalog/ChipFenster.tsx");
   assert.match(s, /<dialog/);
   assert.match(s, /showModal\(\)/);
   assert.match(s, /onCancel=/);
@@ -22,7 +22,7 @@ test("Filterfelder: Reihenfolge Community vor Terpene vor Geschmack vor Typ", ()
 test("Filterfelder: Preis und Apotheke nur im Fachkreis, keine dark:-Klassen", () => {
   const s = lies("components/katalog/FilterFelder.tsx");
   assert.match(s, /daten\?\.fachkreis/);
-  for (const d of ["FilterFelder", "MobilLeiste", "FilterSchublade"])
+  for (const d of ["FilterFelder", "ChipFenster", "Werkzeugleiste", "SortierWahl"])
     assert.doesNotMatch(lies(`components/katalog/${d}.tsx`), /\bdark:/);
 });
 
