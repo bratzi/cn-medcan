@@ -113,7 +113,8 @@ function CommunityZeile({
 }
 
 /**
- * Gemeinsames Gerüst (Task 2, 2026-10-20): Name, Bild, Community-Zeile, Geschmäcker, Fuß. Die Karte
+ * Gemeinsames Gerüst (Task 2, 2026-10-20; C1 2026-10-21): Name, Bild, Community-Zeile, Geschmäcker,
+ * unten THC gedruckt und darunter der leise Fuß (Typ, CBD, Hersteller bzw. Varianten). Die Karte
  * teilt sich per subgrid fünf Zeilen mit den Nachbarn ihrer Rasterzeile (das li darum spannt sie
  * durch): Bilder, Noten und Füße stehen auf einer Linie, auch wenn ein Name umbricht. Ohne
  * subgrid-Unterstützung stapeln sich die Teile wie in einer normalen Karte.
@@ -126,6 +127,7 @@ function KartenRahmen({
   bildflaeche,
   community,
   geschmack,
+  thc,
   fuss,
 }: {
   name: string;
@@ -133,6 +135,7 @@ function KartenRahmen({
   bildflaeche: ReactNode;
   community: ReactNode;
   geschmack: ReactNode;
+  thc: string;
   fuss: ReactNode;
 }) {
   return (
@@ -150,7 +153,12 @@ function KartenRahmen({
       <div className="px-4 pt-2">{bildflaeche}</div>
       <div className="px-4 pt-4">{community}</div>
       <div className="px-4">{geschmack}</div>
-      <div className="px-4 pt-4 pb-4">{fuss}</div>
+      <div className="flex flex-col gap-4 px-4 pt-2 pb-4">
+        <p data-thc className="numeric text-small font-medium text-text">
+          {thc}
+        </p>
+        {fuss}
+      </div>
     </article>
   );
 }
@@ -214,11 +222,11 @@ export function BlueteKarte({
         />
       }
       geschmack={<Geschmaecker datenblatt={zeile.terpene.map((x) => x.geschmack)} median={zeile.geschmackMedian} w={w} />}
+      thc={thcText(zeile.thcMin, zeile.thcMax, sprache, w)}
       fuss={
         <Fuss
           teile={[
             texte.kultivarTyp[zeile.typ],
-            thcText(zeile.thcMin, zeile.thcMax, sprache, w),
             cbdText(zeile.cbdMax, sprache, w),
             vertreiber ?? mehrzahl(sprache, texte.varianten, zeile.handelsnamen),
           ]}
@@ -250,11 +258,11 @@ export function StrainKarte({ zeile, vertreiberName, texte, sprache, fachkreis, 
         />
       }
       geschmack={<Geschmaecker datenblatt={zeile.terpenGeschmack} median={zeile.geschmackMedian} w={w} />}
+      thc={thcText(zeile.t0, zeile.t1, sprache, w)}
       fuss={
         <Fuss
           teile={[
             texte.kultivarTyp[zeile.y],
-            thcText(zeile.t0, zeile.t1, sprache, w),
             cbdText(zeile.c1, sprache, w),
             zeile.v ? vertreiberName(zeile.v) : texte.vertreiberUnbekannt,
             preis,
