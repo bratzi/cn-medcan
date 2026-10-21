@@ -28,14 +28,6 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 
 ## ⇢ Hier geht es weiter
 
-### ⇢ NÄCHSTE AUFGABE nach S87-Abschluss (eingetaktet 2026-10-22, Nutzer): Admin-Schnellzugriff Drittsysteme
-- Im Admin-Menü übersichtlich (eigene Kachel-/Linkleiste) Ein-Klick-Direktlinks zu allen genutzten Drittsystemen:
-  Cloudflare Dashboard (Worker, D1-Datenbank direkt, Logs/Observability, DNS), GitHub-Repo + Actions, Publora,
-  Instagram, Supabase/sonstige laut wrangler.jsonc/.env-Namen (Bestand vorher per grep ermitteln, nichts erfinden).
-- Links öffnen in neuem Tab, Account-/Ressourcen-IDs aus Konfiguration, keine Geheimnisse ins Bundle.
-- Volles Skillset laut Memory (ui-design-engine, better-interface, better-layout, critique-*, frontend-design,
-  hicks-law/law-of-common-region, edge-stack-master); Ablauf SDD: Prototyp live per Browser, zeigen, dann Agent.
-
 ### ⇢ SESSION 87 (2026-10-21/22): Umbau „Seiten aus Assets“ AUF MAIN, Deploy läuft – SAFE4CLEAR
 - Anlass: Live fast nur Error 1102 (CPU, Free 10 ms). Spec/Plan: docs/superpowers/specs|plans/2026-10-21-seiten-aus-assets*.
   Ledger mit allen Rulings: .superpowers/sdd/2026-10-21-seiten-aus-assets/progress.md. Tasks 1–7 complete, reviews clean.
@@ -46,6 +38,12 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
   InfoKnopf, ein „Zum Strain“ am Ende der Bewertungen 1–3, immer Sorten-Slug).
 - Erledigt remote: Migration 0033 (neubau_zaehler) + db/constraints.sql; Deploy-Hook „Neubau Leseseiten“ (Branch main) per API;
   Secret DEPLOY_HOOK_URL gesetzt.
+- LIVE SEIT 22:49 UTC (Version d508c986, Build 9a4a687): Seite läuft wieder, /blueten/mac-1 kommt aus dem Tor (Header private,
+  no-cache, Vary Cookie). Build 1d47f2e (cpus 2, Deckel 5, Startseite) wartet/läuft.
+- DRINGEND FOLGEAUFGABE: /api/ich/strain mit Sitzung kostete live 623 ms CPU (Observability) → für angemeldete Mitglieder droht 1102,
+  dann fehlt das Formular. Plan: Insel ohne Next direkt in worker.mjs (rohe D1-Abfragen: Better-Auth-Sitzung per Token-Tabelle,
+  eigene Bewertung, Live-Netz) wie in Spec 3.3 ursprünglich vorgesehen. Skills: edge-stack-master, better-auth, cloudflare-d1,
+  cloudflare:workers-best-practices, security-review, test-driven-development.
 - BUILD-STAND (22:50 UTC): Build 9a4a687 rendert 3064 Seiten mit 1 Worker in ~21 min, Build gesamt ~25 min (kein Abbruch bei 20 min!).
   Danach ggf. Build für den letzten Push. NÄCHSTE SCHRITTE: Builds per API prüfen (Workers Builds, Worker www): Log-Zeile
   `[seiten] N Leseseiten`, Deploy ok; dann Live-Prüfagent (Skills vorab laden und mitgeben): Startseite, /blueten, /blueten/mac-1,
@@ -245,6 +243,13 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
   veröffentlicht (nicht mehr offen).
 
 ### ⇢ TO-DO-POOL (Nutzerauftrag 2026-10-20, S78)
+- **Admin-Schnellzugriff Drittsysteme (eingetaktet 2026-10-22, Nutzer):**
+  Im Admin-Menü übersichtlich (eigene Kachel-/Linkleiste) Ein-Klick-Direktlinks zu allen genutzten Drittsystemen:
+  Cloudflare Dashboard (Worker, D1-Datenbank direkt, Logs/Observability, DNS), GitHub-Repo + Actions, Publora,
+  Instagram, Supabase/sonstige laut wrangler.jsonc/.env-Namen (Bestand vorher per grep ermitteln, nichts erfinden).
+  Links öffnen in neuem Tab, Account-/Ressourcen-IDs aus Konfiguration, keine Geheimnisse ins Bundle.
+  Volles Skillset laut Memory (ui-design-engine, better-interface, better-layout, critique-*, frontend-design,
+  hicks-law/law-of-common-region, edge-stack-master); Ablauf SDD: Prototyp live per Browser, zeigen, dann Agent.
 - **News-Blog „Was ist neu“: ERLEDIGT S78, live.** Seite `/neu`, Menüpunkt „Neu“ (Desktop einzeilig bei 1258 px),
   25 Meldungen + 2 „Gerade in Arbeit“ in `lib/neuigkeiten/eintraege.ts`, Wächter `tests/neuigkeiten.test.ts`.
   Spec/Plan: docs/superpowers/{specs,plans}/2026-10-20-neuigkeiten*. **Pflege:** Sessionabschluss trägt Meldung ein
