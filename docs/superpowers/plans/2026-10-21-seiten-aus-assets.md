@@ -36,6 +36,8 @@
 
 ## Stränge (parallel, je ein Worktree)
 
+Jeder Implementer lädt vor dem ersten Edit die Skills seiner Task per Skill-Tool und nennt sie im Bericht. Reviews laden zusätzlich superpowers:requesting-code-review, bei UI better-interface und web-design-guidelines.
+
 - **Strang A** (Tor und Dateien): Task 1 → Task 2 → Task 3. Dateien: `lib/seiten-tor.ts`, `worker.mjs`, `wrangler.jsonc`, `scripts/seiten-in-assets.mjs`, `scripts/cf-build.mjs`.
 - **Strang B** (Strain-Seite statisch, Insel): Task 4 → Task 5. Dateien: `app/[lang]/blueten/[slug]/**`, `app/api/ich/strain/route.ts`, `components/sorte/**`, `components/produkt/Titelblatt.tsx`.
 - **Strang C** (Neubau und Hinweis): Task 6 → Task 7. Dateien: `lib/neubau.ts`, `lib/i18n/revalidiere.ts`, `migrations/0033_neubau.sql`, `lib/i18n/de.ts`, `lib/i18n/en.ts`, `components/review/BewertungsFormular.tsx`.
@@ -46,6 +48,8 @@ Berührungspunkte: Strang A erwartet die Dateinamen aus Task 4 (`<slug>/<auswahl
 ---
 
 ### Task 1: Adresse auf Datei abbilden (reine Funktion)
+
+**Skills:** superpowers:test-driven-development, edge-stack-master, cloudflare:workers-best-practices
 
 **Files:**
 - Create: `lib/seiten-tor.ts`
@@ -158,6 +162,8 @@ git commit -m "Tor: Adresse einer Leseseite auf ihre Asset-Datei abbilden"
 ---
 
 ### Task 2: Tor in `worker.mjs`
+
+**Skills:** superpowers:test-driven-development, edge-stack-master, cloudflare:workers-best-practices, cloudflare:wrangler, better-auth, security-review
 
 **Files:**
 - Create: `lib/tor.ts` (Tor-Logik als testbare Funktion)
@@ -370,6 +376,8 @@ git commit -m "Tor in worker.mjs: Gate prüfen, Leseseiten aus Assets ohne Next"
 
 ### Task 3: Build verschiebt Leseseiten nach Assets
 
+**Skills:** superpowers:test-driven-development, edge-stack-master, cloudflare:nextjs-on-cloudflare, cloudflare:wrangler
+
 **Files:**
 - Create: `scripts/seiten-in-assets.mjs`
 - Modify: `scripts/cf-build.mjs` (Aufruf nach `opennextjs-cloudflare build`; ohne D1-Abzug in CI abbrechen)
@@ -529,6 +537,8 @@ git commit -m "Build: vorgerenderte Leseseiten in Static Assets, raus aus dem KV
 
 ### Task 4: Strain-Seite statisch je Variante
 
+**Skills:** superpowers:test-driven-development, edge-stack-master, cloudflare:nextjs-on-cloudflare, react-best-practices, prisma-client-api, ui-design-engine
+
 **Files:**
 - Create: `app/[lang]/blueten/[slug]/[auswahl]/page.tsx` (die bisherige Seite, statisch)
 - Modify: `app/[lang]/blueten/[slug]/page.tsx` (wird zur Weiterleitung für den Ausweichweg), `components/sorte/HerstellerLeiste.tsx`, `components/sorte/WareLeiste.tsx` (`wareHref`)
@@ -687,6 +697,8 @@ git commit -m "Strain-Seite statisch je Vertreiber-Variante, Ausweichweg für fe
 ---
 
 ### Task 5: Persönliche Insel
+
+**Skills:** superpowers:test-driven-development, edge-stack-master, react-best-practices, better-auth, prisma-client-api, ui-design-engine, better-accessibility, better-interface
 
 **Files:**
 - Create: `app/api/ich/strain/route.ts`, `lib/ich-strain.ts`, `components/sorte/BewertenInsel.tsx`
@@ -904,6 +916,8 @@ git commit -m "Strain-Seite: Persönliches als Insel über /api/ich/strain"
 
 ### Task 6: Neubau über Deploy-Hook
 
+**Skills:** superpowers:test-driven-development, edge-stack-master, cloudflare:wrangler, cloudflare-d1, cloudflare:workers-best-practices, migration
+
 **Files:**
 - Create: `lib/neubau.ts`, `migrations/0033_neubau.sql`
 - Modify: `lib/i18n/revalidiere.ts`, `lib/cloudflare.ts` (Accessor `deployHookUrl()`), `worker.mjs` (`scheduled`: täglicher Neubau), `wrangler.jsonc` (Cron `0 3 * * *`)
@@ -1044,6 +1058,8 @@ git commit -m "Neubau über Deploy-Hook nach Änderungen, Deckel 15 am Tag, täg
 
 ### Task 7: Hinweis nach dem Speichern
 
+**Skills:** superpowers:test-driven-development, better-writing, ui-design-engine
+
 **Files:**
 - Modify: `lib/i18n/de.ts:713-714`, `lib/i18n/en.ts` (gleiche Schlüssel), `components/review/BewertungsFormular.tsx:156`
 - Test: `tests/bewertungs-hinweis.test.ts`
@@ -1106,6 +1122,8 @@ git commit -m "Bewertung: Hinweis auf Beta und etwa 5 Minuten bis zur Anzeige"
 ---
 
 ### Task 8: Zusammenführen, Doku, Deploy, Live-Prüfung
+
+**Skills:** edge-stack-master, cloudflare:wrangler, cloudflare-d1, cloudflare:web-perf, superpowers:verification-before-completion, web-design-guidelines, better-interface
 
 **Files:**
 - Modify: `.claude/skills/edge-stack-master.md` (§6: neue oberste Stufe „Assets mit Tor“, Begründung aus Spec 1), `HANDOFF.md`, `lib/neuigkeiten/eintraege.ts` (Meldung für /neu)
