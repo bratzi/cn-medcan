@@ -547,7 +547,7 @@ async function SorteInhalt({ slug, suche, w, sprache }: { slug: string; suche: S
             </div>
           </>
         )}
-        {erkundung.serien.length > 0 ? <Aufklaerung texte={w.aroma.aufklaerung} /> : null}
+        {erkundung.serien.length > 0 ? <Aufklaerung texte={w.aroma.aufklaerung} sprache={sprache} /> : null}
       </section>
 
       {/* Bewertungen der Sorte als ein Buch zum Blättern (T7): Betreiber zuerst, dann die Community;
