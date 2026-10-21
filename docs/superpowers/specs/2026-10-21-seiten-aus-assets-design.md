@@ -76,8 +76,10 @@ Was heute vom Mitglied abhängt, lädt nach dem Laden der Seite eine Client-Inse
 `GET /api/ich/strain?kultivar=<id>&vertreiber=<id>`:
 
 - Zugang (Gast, Mitglied, freigegeben, Admin), eigene Bewertung als Vorbelegung, Live-Netz-Basis.
-- Der Endpunkt läuft in `worker.mjs` ohne Next, mit wenigen rohen D1-Abfragen (Sitzung prüfen, eigene Bewertung,
-  Live-Netz). Antwort `Cache-Control: private, no-store`.
+- Ohne Sitzungscookie antwortet das Tor in `worker.mjs` direkt mit `{"zugang":"gast"}`, ohne Next. Mit Cookie
+  läuft ein Next-Route-Handler mit den vorhandenen Abfragen. Nur angemeldete Mitglieder zahlen dessen CPU.
+  Liegt er live über 10 ms, wandert er als Folgeaufgabe ohne Next nach `worker.mjs`.
+  Antwort `Cache-Control: private, no-store`.
 - Bis die Antwort da ist, zeigt der Abschnitt „Bewerten“ den Gastzustand (Erkundung und Anmelden-Hinweis).
   Für freigegebene Mitglieder tauscht die Insel ihn gegen das Bewertungsformular. Ohne JavaScript bleibt der Gastzustand.
 - Budpic-Upload-Zugang und „Meine Bewertung“ im Titelblatt kommen aus derselben Antwort.
@@ -86,10 +88,9 @@ Was heute vom Mitglied abhängt, lädt nach dem Laden der Seite eine Client-Inse
 
 ### 3.4 Aktualität: Neubau nach Bewertung
 
-- Speichern einer Bewertung (und jede Admin-Aktion, die heute `revalidiereSprachen` ruft) setzt in D1 eine Marke
-  „Neubau fällig seit“.
-- Ein Workers-Build wird über einen Deploy-Hook ausgelöst, gebündelt: höchstens ein Build gleichzeitig. Eine
-  Marke, die während eines Builds entsteht, löst nach dessen Ende genau einen weiteren aus.
+- Jede Aktion, die heute `revalidiereSprachen` ruft, stößt einmal je Request einen Workers-Build über den
+  Deploy-Hook an. Der Hook entdoppelt selbst, solange ein Build wartet (Cloudflare-Doku); läuft einer, wartet
+  genau ein weiterer. Ein Tageszähler in D1 (`neubau_zaehler`) deckelt bei 15 Anstößen am Tag.
 - Zusätzlich ein Neubau am Tag über den bestehenden Cron.
 - Budget Workers Builds Free: Build-Minuten im Monat begrenzt. Dauer eines Builds vorab messen; bei etwa
   5 Minuten Build reicht das Budget für rund 20 Builds am Tag. Vor der Umsetzung Grenze und Deploy-Hook gegen die
