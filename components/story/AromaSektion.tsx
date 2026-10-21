@@ -5,10 +5,12 @@ import { AromaWechsel } from "@/components/story/AromaWechsel";
 import { Schlagwort } from "@/components/story/Schlagwort";
 import { UeberlaufWort } from "@/components/story/UeberlaufWort";
 import { buttonKlassen } from "@/components/ui";
+import { InfoKnopf } from "@/components/ui/InfoKnopf";
 import { ladeSortenExplorer } from "@/lib/query/sorten-explorer";
 import { ladeAromaVorzeige, ladeTerpenKatalog } from "@/lib/query/strains";
 import { sicher } from "@/lib/sicher";
 import { holeSprache, holeWoerterbuch, type Woerterbuch } from "@/lib/i18n";
+import type { Sprache } from "@/lib/i18n/sprache-kern";
 import { aromaTexte } from "@/lib/i18n/typen";
 
 const EINSTIEGE = [
@@ -21,11 +23,13 @@ const EINSTIEGE = [
 /** Das Wort ist rund 4,7 em breit; 20cqi hält es in der Spalte der Überschrift. */
 const UEBERLAUF_SPALTE = { "--ueberlauf-grad": "clamp(2.5rem, 20cqi, 9rem)" } as CSSProperties;
 
-/** Überschrift und Absatz; stehen links über dem Bild der gewählten Sorte. */
-function Kopf({ w }: { w: Woerterbuch }) {
+/** Überschrift mit Erklärung im InfoKnopf; steht links über dem Bild der gewählten Sorte. */
+function Kopf({ w, sprache }: { w: Woerterbuch; sprache: Sprache }) {
   const texte = w.start.aroma;
   return (
-    <>
+    // Der lange Erklärtext war Rauschen neben Explorer und Karte (Nutzer 2026-10-22): er steht wie auf
+    // der Strain-Seite hinter dem InfoKnopf, am Ende der Überschrift beim Handschrift-Akzent.
+    <div className="flex items-end gap-2 max-md:justify-center">
       {/* Seit Explorer und Karte eine Sektion sind, steht der Kopf in der schmalen linken Spalte:
           das Wort in eigener Zeile, Grad an der Spaltenbreite (cqi), sonst läuft es über die
           Sortenwahl rechts (live 2026-10-20). */}
@@ -36,8 +40,8 @@ function Kopf({ w }: { w: Woerterbuch }) {
       >
         {texte.titel} <UeberlaufWort wort={texte.ueberlauf} absatz />
       </h2>
-      <p className="max-w-[60ch] text-body text-text-muted text-pretty max-md:mx-auto max-md:text-center">{texte.text}</p>
-    </>
+      <InfoKnopf sprache={sprache} text={texte.text} className="shrink-0" />
+    </div>
   );
 }
 
@@ -64,7 +68,7 @@ async function Inhalt({ w }: { w: Woerterbuch }) {
       explorerTexte={w.start.vertreiber}
       typen={w.label.kultivarTyp}
       sprache={sprache}
-      kopf={<Kopf w={w} />}
+      kopf={<Kopf w={w} sprache={sprache} />}
       start={{ slug: startSorte?.slug ?? vorzeige?.sorteSlug ?? "", name: startSorte?.name ?? vorzeige?.handelsname ?? "", daten }}
       blattTexte={w.bewerten}
       aromaTexte={aromaTexte(w, sprache)}

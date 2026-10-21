@@ -1049,7 +1049,6 @@ export const en: Woerterbuch = {
       vergleichTitel: "{a} and {b} compared",
       vergleichWahl: "Pick a second strain to compare.",
       vergleichEnde: "Close comparison",
-      zurSorte: "To the strain",
       wareBewerten: "Rate this strain",
       sorteGewechselt: "{name}, {waren}.",
       bildAlt: "Flower of the strain {name}",
