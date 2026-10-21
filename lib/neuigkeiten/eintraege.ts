@@ -25,6 +25,17 @@ export type InArbeit = { id: string; titel: Zweisprachig; text: Zweisprachig };
 
 export const NEUIGKEITEN: readonly Neuigkeit[] = [
   {
+    id: "2026-10-21-strainseite-ruhiger",
+    datum: "2026-10-21",
+    art: "besser",
+    titel: { de: "Strain-Seite aufgeräumt", en: "Strain page tidied up" },
+    text: {
+      de: "Erst der Strain, dann die Angaben, dann der Hersteller als Leiste mit Logos. Lange Erklärungen stehen hinter dem Info-Knopf, die Sortierung lässt sich umdrehen.",
+      en: "Strain first, then the facts, then the producer as a bar with logos. Long explanations sit behind the info button, and sorting can be reversed.",
+    },
+    link: "/blueten",
+  },
+  {
     id: "2026-10-21-strains-neue-filter",
     datum: "2026-10-21",
     art: "neu",
