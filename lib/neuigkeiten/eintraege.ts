@@ -25,6 +25,17 @@ export type InArbeit = { id: string; titel: Zweisprachig; text: Zweisprachig };
 
 export const NEUIGKEITEN: readonly Neuigkeit[] = [
   {
+    id: "2026-10-21-strains-neue-filter",
+    datum: "2026-10-21",
+    art: "neu",
+    titel: { de: "Strains filtern geht jetzt schneller", en: "Filtering strains is faster now" },
+    text: {
+      de: "Filter sitzen als Chips über der Liste, Sortierung mit einem Klick. Die Karten zeigen zuerst Note, Terpene und THC.",
+      en: "Filters sit as chips above the list, sorting takes one click. Cards show rating, terpenes and THC first.",
+    },
+    link: "/blueten",
+  },
+  {
     id: "2026-10-20-strainkarten-passen",
     datum: "2026-10-20",
     art: "behoben",
