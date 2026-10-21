@@ -3,9 +3,8 @@ import type { NextConfig } from "next";
 import { ALTE_KATALOG_WEITERLEITUNGEN, ALTE_KONTO_WEITERLEITUNGEN, ALTE_UMFRAGEN_WEITERLEITUNGEN } from "./lib/alte-adressen";
 
 const nextConfig: NextConfig = {
-  // Workers Builds hat 2 Kerne; Next nimmt sonst Kerne minus 1 und rendert die rund 3000 Leseseiten
-  // mit einem Worker in gut 20 Minuten (Build-Limit 20 min, Messung 2026-10-21).
-  experimental: { cpus: 2 },
+  // Kein experimental.cpus > 1: zwei Render-Worker sperren sich an der lokalen D1-Kopie (SQLITE_BUSY,
+  // Build 1d47f2e 2026-10-21). Ein Worker braucht ~21 min, passt (kein 20-min-Abbruch beobachtet).
   // /produkte -> /blueten , /mitglied -> /profil und /umfragen -> /sotm (308, Query bleibt), siehe lib/alte-adressen.ts.
   async redirects() {
     return [...ALTE_KATALOG_WEITERLEITUNGEN, ...ALTE_KONTO_WEITERLEITUNGEN, ...ALTE_UMFRAGEN_WEITERLEITUNGEN];
