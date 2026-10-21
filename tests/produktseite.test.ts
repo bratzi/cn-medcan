@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 
-const QUELLE = readFileSync(join(process.cwd(), "app/[lang]/blueten/[slug]/page.tsx"), "utf8");
+const QUELLE = readFileSync(join(process.cwd(), "app/[lang]/blueten/[slug]/sorten-inhalt.tsx"), "utf8");
 
 test("Produktseite: Rückweg als 44-px-Einzellink", () => {
   assert.match(QUELLE, /className=\{einzelLinkKlassen\(\)\}>\s*\{w\.bluete\.alleBlueten\}/);
@@ -11,7 +11,11 @@ test("Produktseite: Rückweg als 44-px-Einzellink", () => {
 
 test("Produktseite: die Bewertungsmaske sitzt am Anker #bewerten, kein Link führt mehr auf /bewerten", () => {
   assert.match(QUELLE, /id="bewerten"/);
-  assert.match(QUELLE, /<BewertungsFormular\b/);
+  // Statisch als Gast: die Maske tauscht die Insel ein (Spec 2026-10-21, Seiten aus Assets, 3.3).
+  assert.doesNotMatch(QUELLE, /<BewertungsFormular\b/);
+  assert.match(QUELLE, /<BewertenInsel\b/);
+  // Der Budpic-Zugang im Titelblatt fragt dieselbe Antwort wie die Maske.
+  assert.match(QUELLE, /insel: \{ kultivarId: sorte\.kultivar\.id, vertreiberId: aktive\.ware\.vertreiberId \|\| null \}/);
   // Der zweite Weg ("Erste Bewertung abgeben") steht seit T7 über dem Buch: tests/buch.test.ts.
   assert.equal(QUELLE.match(/href="#bewerten"/g)?.length, 1);
   assert.doesNotMatch(QUELLE, /["`]\/bewerten\//);
@@ -33,5 +37,20 @@ test("Angaben zur Blüte stehen oben, als ein Block mit dem Terpenprofil (Nutzer
   assert.doesNotMatch(QUELLE, /<SortenKopf/);
   // Der Block steht vor dem Bewertungsbuch und damit weit vor dem Rating.
   assert.ok(QUELLE.indexOf("{angabenZurBluete}") < QUELLE.indexOf("<BewertungsBuch"));
-  assert.ok(QUELLE.indexOf("{angabenZurBluete}") < QUELLE.indexOf("<AromaErkundung"));
+  // Die Erkundung steckt im Block, den die Bewerten-Insel für Gäste und Mitglieder zeigt.
+  assert.ok(QUELLE.indexOf("{angabenZurBluete}") < QUELLE.indexOf("{erkundungsBlock}"));
+});
+
+test("Bewerten-Kopf: die Insel tauscht ihn für Freigegebene wie vor dem Umbau, id bleibt", () => {
+  assert.match(QUELLE, /kopfFreigegeben=\{<SektionsKopf id="bewerten-titel" titel=\{texte\.bewerten\} satz=\{w\.bewerten\.satz\} \/>\}/);
+  assert.match(QUELLE, /kopfVorbelegt=\{<SektionsKopf id="bewerten-titel" titel=\{texte\.deineBewertung\} satz=\{w\.bewerten\.satz\} \/>\}/);
+  assert.match(QUELLE, /kopfGast=\{\s*<SektionsKopf\s+id="bewerten-titel"/);
+  const insel = readFileSync(join(process.cwd(), "components/sorte/BewertenInsel.tsx"), "utf8");
+  assert.ok(insel.includes("ich.vorbelegung ? kopfVorbelegt : kopfFreigegeben"));
+});
+
+test("Buchfilter springen an den Kopf des Buchs, nicht an den Seitenanfang", () => {
+  assert.match(QUELLE, /href=\{`\$\{basis\}\?\$\{auswahlQuery\}#bewertungen-titel`\}/);
+  assert.match(QUELLE, /href=\{`\$\{basis\}\?\$\{auswahlQuery\}&\$\{new URLSearchParams\(\{ alle: "1" \}\)\}#bewertungen-titel`\}/);
+  assert.match(readFileSync(join(process.cwd(), "components/review/BewertungsBuch.tsx"), "utf8"), /id="bewertungen-titel" className="scroll-mt-\[calc\(var\(--kopf-h,4rem\)\+2rem\)\] /);
 });

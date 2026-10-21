@@ -1,5 +1,3 @@
-import Link from "next/link";
-
 import { MarkenLogo } from "@/components/medien/Bild";
 import { wareHref } from "@/components/sorte/WareLeiste";
 import { InfoKnopf } from "@/components/ui/InfoKnopf";
@@ -21,15 +19,16 @@ type Props = {
 /**
  * Auswahl des Vertreibers als waagerechte Leiste mit Logo-Karten (Spec 2026-10-21, 1.3). Ersetzt die
  * große Ware-Leiste und die Vertreiber-Chips „Deine Blüte ist von“ im Formular: die Wahl hier filtert
- * Buch und Angaben und belegt die Bewertung vor. Karten sind Links (ohne JavaScript nutzbar, ohne
- * Sprung nach oben), die gewählte trägt `aria-current` und einen Haken, nicht nur Farbe. Gereiht nach
+ * Buch und Angaben und belegt die Bewertung vor. Karten sind echte Links mit Anker auf die Leiste: der
+ * Wechsel ist eine harte Navigation, das Tor liefert die vorgerenderte Datei der Variante (Spec
+ * 2026-10-21, Seiten aus Assets), die gewählte trägt `aria-current` und einen Haken, nicht nur Farbe. Gereiht nach
  * Zahl der Bewertungen, nie nach Note (HWG). Ohne Logo steht eine Initialen-Marke.
  */
 export function HerstellerLeiste({ waren, aktiveVertreiberId, slug, texte, sprache }: Props) {
   return (
     <nav aria-labelledby="hersteller-titel" className="flex flex-col gap-4">
       <div className="flex items-center justify-center gap-2">
-        <h2 id="hersteller-titel" className="font-buch text-h3 text-balance text-text">
+        <h2 id="hersteller-titel" className="scroll-mt-[calc(var(--kopf-h,4rem)+2rem)] font-buch text-h3 text-balance text-text">
           {texte.leisteTitel}
         </h2>
         <InfoKnopf sprache={sprache} text={texte.leisteSatz} />
@@ -42,10 +41,8 @@ export function HerstellerLeiste({ waren, aktiveVertreiberId, slug, texte, sprac
           const logo = sichererLogoPfad(ware.vertreiberLogo);
           return (
             <li key={ware.vertreiberId || "unbekannt"} className="flex shrink-0 snap-start">
-              <Link
-                prefetch={false}
-                scroll={false}
-                href={wareHref(slug, ware)}
+              <a
+                href={`${wareHref(slug, ware)}#hersteller-titel`}
                 aria-current={aktiv ? "true" : undefined}
                 className={cn(
                   "relative flex min-h-11 w-40 flex-col items-center gap-2 border px-4 py-4 text-center transition-[color,border-color,background-color,scale] duration-fast ease-out active:scale-97",
@@ -80,7 +77,7 @@ export function HerstellerLeiste({ waren, aktiveVertreiberId, slug, texte, sprac
                     <path d="M3 8.5l3 3 7-7" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                   </svg>
                 ) : null}
-              </Link>
+              </a>
             </li>
           );
         })}

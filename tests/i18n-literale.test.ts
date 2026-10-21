@@ -28,6 +28,8 @@ const UMGESTELLT: string[] = [
   // Welle 2: Katalog und Aroma-Baum
   "app/[lang]/blueten/page.tsx",
   "app/[lang]/blueten/[slug]/page.tsx",
+  "app/[lang]/blueten/[slug]/sorten-inhalt.tsx",
+  "app/[lang]/blueten/[slug]/[auswahl]/page.tsx",
   "components/katalog/KatalogAnsicht.tsx",
   // Task 2 (2026-10-20): Karte, Geschmäcker, Werkzeugleiste, Sortierung.
   "components/katalog/KatalogKarte.tsx",

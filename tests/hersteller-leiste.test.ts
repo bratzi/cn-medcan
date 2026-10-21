@@ -49,7 +49,8 @@ test("HerstellerLeiste: Logo-Karten in Reihenfolge, gewählte markiert, Initiale
     createElement(HerstellerLeiste, { waren, aktiveVertreiberId: "v-a", slug: "mac-1", texte: de.bluete.vertreiber, sprache: "de" }),
   );
   assert.ok(html.indexOf("Beta Pharma GmbH") < html.indexOf("Alpha GmbH"));
-  assert.match(html, /href="\/blueten\/mac-1\?vertreiber=v-b"/);
+  // Harte Navigation an die Leiste: das Tor liefert die Datei der Variante.
+  assert.match(html, /<a[^>]*href="\/blueten\/mac-1\?vertreiber=v-b#hersteller-titel"/);
   assert.match(html, /<img[^>]*src="\/marken\/hersteller\/beta.svg"[^>]*alt=""/);
   assert.equal(html.split('aria-current="true"').length - 1, 1);
   const alpha = html.split("<li").find((teil) => teil.includes("Alpha GmbH")) ?? "";

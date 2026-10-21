@@ -8,11 +8,15 @@ import { Button, einzelLinkKlassen, useHydriert } from "@/components/ui";
 import { bluetenHref } from "@/lib/alte-adressen";
 import { BUDPIC_MAX_BYTES, BUDPIC_MAX_DATEIEN, BUDPIC_MAX_KANTE } from "@/lib/budpics";
 import { bildVerkleinernFrei } from "@/lib/bild-verkleinern";
+import { useIchStrain } from "@/lib/ich-strain-client";
 import type { Sprache } from "@/lib/i18n/sprache-kern";
 import { mehrzahl, t } from "@/lib/i18n/text";
 import type { Woerterbuch } from "@/lib/i18n/typen";
 
 export type BudpicZugang = "gast" | "mitglied" | "freigegeben";
+
+/** Kultivar und Vertreiber der Seite, damit die Abfrage dieselbe ist wie die der Bewerten-Insel. */
+export type BudpicInsel = { kultivarId: string; vertreiberId: string | null };
 
 type Props = {
   zugang: BudpicZugang;
@@ -26,6 +30,8 @@ type Props = {
   meldungen: Record<string, string>;
   /** Fuer die Karte: ohne den langen Hinweis. */
   kompakt?: boolean;
+  /** Statische Seite: Zugang aus /api/ich/strain statt vom Server-Render. */
+  insel?: BudpicInsel;
 };
 
 export type BudpicBeitragenProps = Props;
@@ -40,8 +46,10 @@ export type BudpicBeitragenProps = Props;
  * verkleinert und einzeln gesendet; der Knopf wird in jedem Fall wieder
  * frei (try/finally), auch nach einem geworfenen Serverfehler.
  */
-export function BudpicBeitragen({ zugang, strainId, slug, kultivarSlug, sprache, texte, meldungen, kompakt = false }: Props) {
+export function BudpicBeitragen({ zugang: zugangVomServer, strainId, slug, kultivarSlug, sprache, texte, meldungen, kompakt = false, insel }: Props) {
   const hydriert = useHydriert();
+  const ich = useIchStrain(insel ? { kultivarId: insel.kultivarId, strainId, vertreiberId: insel.vertreiberId } : null);
+  const zugang: BudpicZugang = insel ? ich.zugang : zugangVomServer;
   const eingabe = useRef<HTMLInputElement>(null);
   const [laeuft, setLaeuft] = useState<{ nr: number; gesamt: number } | null>(null);
   const [fehler, setFehler] = useState<string[]>([]);
