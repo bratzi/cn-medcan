@@ -34,10 +34,14 @@ const einstieg = {
   // taeglicher Neubau der Leseseiten um 03:00 UTC ueber den Deploy-Hook (Spec 2026-10-21).
   async scheduled(controller, env, ctx) {
     if (controller.cron === "0 3 * * *") {
-      if (!env.DEPLOY_HOOK_URL) return;
+      if (!env.DEPLOY_HOOK_URL) {
+        console.warn("neubau-cron: DEPLOY_HOOK_URL fehlt");
+        return;
+      }
       ctx.waitUntil(
         fetch(env.DEPLOY_HOOK_URL, { method: "POST" }).then(async (antwort) => {
           if (!antwort.ok) console.error("neubau-cron", antwort.status, await antwort.text());
+          else await antwort.body?.cancel();
         }).catch((fehler) => console.error("neubau-cron", fehler)),
       );
       return;

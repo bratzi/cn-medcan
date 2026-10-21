@@ -1002,3 +1002,11 @@ model SyncStand {
 
   @@map("sync_stand")
 }
+
+/// Tageszähler für Neubauten über den Deploy-Hook (Migration 0033, Spec 2026-10-21). Zugriff per rohem D1-SQL (atomares Hochzählen).
+model NeubauZaehler {
+  tag    String @id
+  anzahl Int
+
+  @@map("neubau_zaehler")
+}

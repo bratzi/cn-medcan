@@ -14,5 +14,17 @@ export async function neubauAnstossen(deps: {
     console.error("neubau: Deploy-Hook", antwort.status, await antwort.text());
     return "fehler" as const;
   }
+  await antwort.body?.cancel();
   return "gesendet" as const;
+}
+
+/**
+ * Dedupe je Request: `true` beim ersten Mal für dieses Schlüsselobjekt (der Request-Kontext), sonst `false`.
+ * Ohne Schlüsselobjekt (Tests, außerhalb eines Requests) gibt es nichts zu merken: `true`.
+ */
+export function erstesMal(gesehen: WeakSet<object>, schluessel: object | null): boolean {
+  if (!schluessel) return true;
+  if (gesehen.has(schluessel)) return false;
+  gesehen.add(schluessel);
+  return true;
 }

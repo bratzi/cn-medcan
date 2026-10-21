@@ -37,3 +37,12 @@ export function deployHookUrl(): string | null {
   const url = process.env.DEPLOY_HOOK_URL || (getEnvSync() as unknown as Record<string, string | undefined>).DEPLOY_HOOK_URL;
   return url || null;
 }
+
+/** Der ExecutionContext des laufenden Requests (je Request ein eigenes Objekt); `null` außerhalb eines Requests. */
+export function anfrageKontext(): object | null {
+  try {
+    return getCloudflareContext().ctx;
+  } catch {
+    return null;
+  }
+}
