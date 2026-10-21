@@ -39,8 +39,12 @@ export async function tor(request: Request, env: TorEnv): Promise<Response | nul
   if (!datei) return null;
   if (!istOhneGate(url.pathname) && !(await gateOffen(env, cookies))) return zumGate(url);
   const antwort = await env.ASSETS.fetch(new URL(datei, url).toString());
-  if (antwort.status !== 200) return null;
-  return new Response(antwort.body, {
+  if (antwort.status !== 200) {
+    // 404 ist der erwartete Ausweichweg (neue Seite seit dem Build); alles andere ist ein Fehler im Aufbau.
+    if (antwort.status !== 404) console.warn(JSON.stringify({ tor: "asset", status: antwort.status, datei }));
+    return null;
+  }
+  return new Response(request.method === "HEAD" ? null : antwort.body, {
     status: 200,
     headers: {
       "Content-Type": "text/html; charset=utf-8",

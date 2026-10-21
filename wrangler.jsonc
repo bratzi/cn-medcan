@@ -8,6 +8,9 @@
 	"assets": {
 		"directory": ".open-next/assets",
 		"binding": "ASSETS",
+		// Ohne HTML-Sonderbehandlung: das Tor ruft /_seiten/.../index.html exakt so ab. Der Standard
+		// (auto-trailing-slash) antwortete auf .html-Pfade mit 307. public/ und .open-next/assets enthalten sonst keine .html-Dateien.
+		"html_handling": "none",
 		// Leseseiten liegen unter /_seiten, das Tor in worker.mjs prueft vorher das Gate (Spec 2026-10-21).
 		"run_worker_first": ["/_seiten/*"]
 	},

@@ -63,3 +63,50 @@ test("Sprache aus Cookie", async () => {
   const antwort = await tor(await mitGate("https://x.dev/", { cookie: `cn_gate=${await tokenErzeugen(SECRET, "besucher")}; sprache=en` }), env({ "/_seiten/en/index.html": "en" }));
   assert.equal(await antwort!.text(), "en");
 });
+
+test("Asset-Antwort 307 (Cloudflare html_handling): Rückfall an Next mit strukturierter Warnung", async () => {
+  const warnungen: string[] = [];
+  const original = console.warn;
+  console.warn = (...args: unknown[]) => void warnungen.push(args.join(" "));
+  try {
+    const e = {
+      ...env({}),
+      ASSETS: { fetch: async () => new Response(null, { status: 307, headers: { Location: "/x/" } }) },
+    };
+    assert.equal(await tor(await mitGate("https://x.dev/blueten/mac-1"), e), null);
+  } finally {
+    console.warn = original;
+  }
+  assert.equal(warnungen.length, 1);
+  assert.deepEqual(JSON.parse(warnungen[0]), { tor: "asset", status: 307, datei: "/_seiten/de/blueten/mac-1/standard.html" });
+});
+
+test("Asset-Antwort 404: Rückfall an Next ohne Warnung", async () => {
+  const warnungen: string[] = [];
+  const original = console.warn;
+  console.warn = (...args: unknown[]) => void warnungen.push(args.join(" "));
+  try {
+    assert.equal(await tor(await mitGate("https://x.dev/blueten/neu-da"), env({})), null);
+  } finally {
+    console.warn = original;
+  }
+  assert.equal(warnungen.length, 0);
+});
+
+test("Abrufpfad ist exakt der Dateipfad (html_handling none)", async () => {
+  const abgerufen: string[] = [];
+  const e = {
+    ...env({}),
+    ASSETS: { fetch: async (r: Request | string) => (abgerufen.push(new URL(typeof r === "string" ? r : r.url).pathname), new Response("x")) },
+  };
+  await tor(await mitGate("https://x.dev/jury/seite/2"), e);
+  await tor(await mitGate("https://x.dev/blueten/mac-1?vertreiber=v1&alle=1"), e);
+  assert.deepEqual(abgerufen, ["/_seiten/de/jury/seite/2/index.html", "/_seiten/de/blueten/mac-1/v-v1-alle.html"]);
+});
+
+test("wrangler.jsonc: assets mit html_handling none, sonst 307 auf .html-Pfade", async () => {
+  const { readFileSync } = await import("node:fs");
+  const wrangler = readFileSync("wrangler.jsonc", "utf8");
+  assert.match(wrangler, /"assets":\s*\{[^}]*"html_handling":\s*"none"[^}]*\}/);
+  assert.match(wrangler, /"run_worker_first":\s*\["\/_seiten\/\*"\]/);
+});
