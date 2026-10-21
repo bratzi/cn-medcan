@@ -433,20 +433,25 @@ async function SorteInhalt({ slug, wahl, w, sprache }: { slug: string; wahl: Sor
         className={cn(SEKTION, "flex scroll-mt-[calc(var(--kopf-h,4rem)+2rem)] flex-col gap-4 min-[118rem]:right-[max(0px,calc(5rem_-_(100vw_-_118rem)_/_2))] min-[118rem]:overflow-x-visible")}
       >
         <Schlagwort satz={texte.schlagwort.bewerten} ton="gruen" />
-        <SektionsKopf
-          id="bewerten-titel"
-          titel={erkundung.serien.length > 0 ? texte.profilFrage : texte.bewerten}
-          satz={
-            erkundung.serien.length > 0
-                ? aromaAnzahl >= 1
-                  ? t(texte.profilMitCommunity, { anzahl: aromaAnzahl })
-                  : texte.profilOhneCommunity
-              : undefined
-          }
-        />
         {/* Gäste sehen die Erkundung und den Anmelde-Hinweis; die Insel tauscht für Mitglieder
             den Hinweis bzw. für freigegebene die Maske ein (Spec 2026-10-21, Seiten aus Assets, 3.3). */}
         <BewertenInsel
+          // Kopf je Zugang wie vor dem Umbau; id="bewerten-titel" trägt in jedem Fall aria-labelledby.
+          kopfGast={
+            <SektionsKopf
+              id="bewerten-titel"
+              titel={erkundung.serien.length > 0 ? texte.profilFrage : texte.bewerten}
+              satz={
+                erkundung.serien.length > 0
+                  ? aromaAnzahl >= 1
+                    ? t(texte.profilMitCommunity, { anzahl: aromaAnzahl })
+                    : texte.profilOhneCommunity
+                  : undefined
+              }
+            />
+          }
+          kopfFreigegeben={<SektionsKopf id="bewerten-titel" titel={texte.bewerten} satz={w.bewerten.satz} />}
+          kopfVorbelegt={<SektionsKopf id="bewerten-titel" titel={texte.deineBewertung} satz={w.bewerten.satz} />}
           kultivarId={sorte.kultivar.id}
           strainId={strain.id}
           vorgewaehlt={vorgewaehlt}
@@ -498,14 +503,14 @@ async function SorteInhalt({ slug, wahl, w, sprache }: { slug: string; wahl: Sor
         {aktive.ware.vertreiberId ? (
           <nav aria-label={texte.vertreiber.bewertungenFilter} className="mb-8 flex flex-wrap justify-center gap-2">
             <a
-              href={`${basis}?${auswahlQuery}`}
+              href={`${basis}?${auswahlQuery}#bewertungen-titel`}
               aria-current={alleVertreiber ? undefined : "true"}
               className={buttonKlassen(alleVertreiber ? "secondary" : "primary", "md")}
             >
               {t(texte.vertreiber.nurAuswahl, { name: aktive.ware.vertreiberName || texte.vertreiber.unbekannt })}
             </a>
             <a
-              href={`${basis}?${auswahlQuery}&${new URLSearchParams({ alle: "1" })}`}
+              href={`${basis}?${auswahlQuery}&${new URLSearchParams({ alle: "1" })}#bewertungen-titel`}
               aria-current={alleVertreiber ? "true" : undefined}
               className={buttonKlassen(alleVertreiber ? "primary" : "secondary", "md")}
             >

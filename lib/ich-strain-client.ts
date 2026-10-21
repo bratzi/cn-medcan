@@ -16,7 +16,9 @@ export function ichStrainAdresse(a: IchStrainAbfrage): string {
 /**
  * Ein Abruf je Seite (Spec 2026-10-21, Seiten aus Assets, 3.3): Maske und Budpic-Zugang teilen sich die
  * Antwort. Ein Platz genügt, eine Seite fragt nur eine Adresse; ein Seitenwechsel lädt ohnehin neu.
- * Jeder Fehler zählt als Gast: die statische Seite bleibt dann einfach, wie sie ist.
+ * Jeder Fehler zählt als Gast: die statische Seite bleibt dann einfach, wie sie ist. Alle Wechsel auf
+ * der Strain-Seite sind harte Navigation; käme später Soft-Navigation (etwa nach dem Abmelden) dazu,
+ * muss dieser Platz geleert werden, sonst gilt eine veraltete Antwort.
  */
 let anfrage: { adresse: string; antwort: Promise<IchStrain> } | null = null;
 

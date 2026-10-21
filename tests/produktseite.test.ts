@@ -40,3 +40,17 @@ test("Angaben zur Blüte stehen oben, als ein Block mit dem Terpenprofil (Nutzer
   // Die Erkundung steckt im Block, den die Bewerten-Insel für Gäste und Mitglieder zeigt.
   assert.ok(QUELLE.indexOf("{angabenZurBluete}") < QUELLE.indexOf("{erkundungsBlock}"));
 });
+
+test("Bewerten-Kopf: die Insel tauscht ihn für Freigegebene wie vor dem Umbau, id bleibt", () => {
+  assert.match(QUELLE, /kopfFreigegeben=\{<SektionsKopf id="bewerten-titel" titel=\{texte\.bewerten\} satz=\{w\.bewerten\.satz\} \/>\}/);
+  assert.match(QUELLE, /kopfVorbelegt=\{<SektionsKopf id="bewerten-titel" titel=\{texte\.deineBewertung\} satz=\{w\.bewerten\.satz\} \/>\}/);
+  assert.match(QUELLE, /kopfGast=\{\s*<SektionsKopf\s+id="bewerten-titel"/);
+  const insel = readFileSync(join(process.cwd(), "components/sorte/BewertenInsel.tsx"), "utf8");
+  assert.ok(insel.includes("ich.vorbelegung ? kopfVorbelegt : kopfFreigegeben"));
+});
+
+test("Buchfilter springen an den Kopf des Buchs, nicht an den Seitenanfang", () => {
+  assert.match(QUELLE, /href=\{`\$\{basis\}\?\$\{auswahlQuery\}#bewertungen-titel`\}/);
+  assert.match(QUELLE, /href=\{`\$\{basis\}\?\$\{auswahlQuery\}&\$\{new URLSearchParams\(\{ alle: "1" \}\)\}#bewertungen-titel`\}/);
+  assert.match(readFileSync(join(process.cwd(), "components/review/BewertungsBuch.tsx"), "utf8"), /id="bewertungen-titel" className="scroll-mt-\[calc\(var\(--kopf-h,4rem\)\+2rem\)\] /);
+});

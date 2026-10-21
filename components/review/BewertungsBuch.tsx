@@ -51,7 +51,7 @@ export function BewertungsBuch({
     <section aria-labelledby="bewertungen-titel" className="flex flex-col gap-8">
       {/* Kopf mittig wie die Startseite (Nutzer 2026-10-08). */}
       <div className="mx-auto flex max-w-3xl flex-col items-center gap-4 text-center">
-        <h2 id="bewertungen-titel" className="font-buch text-kapitel text-balance text-text">
+        <h2 id="bewertungen-titel" className="scroll-mt-[calc(var(--kopf-h,4rem)+2rem)] font-buch text-kapitel text-balance text-text">
           {w.buch.titel}
         </h2>
         {median !== null && kennwerte ? (

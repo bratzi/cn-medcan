@@ -81,6 +81,6 @@ test("useIchStrain: ohne Effekt (Server, statische Datei) Gast, die Insel zeigt 
   }
   assert.equal(renderToStaticMarkup(createElement(Probe)), "<p>gast</p>");
   const insel = readFileSync("components/sorte/BewertenInsel.tsx", "utf8");
-  assert.ok(insel.includes(`if (ich.zugang === "mitglied") return nichtFreigegeben;`));
-  assert.ok(insel.includes(`if (ich.zugang !== "freigegeben") return gast;`));
+  assert.match(insel, /if \(ich\.zugang === "mitglied"\)\s*return \(\s*<>\s*\{kopfGast\}\s*\{nichtFreigegeben\}/);
+  assert.match(insel, /if \(ich\.zugang !== "freigegeben"\)\s*return \(\s*<>\s*\{kopfGast\}\s*\{gast\}/);
 });
