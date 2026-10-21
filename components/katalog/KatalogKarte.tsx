@@ -4,7 +4,7 @@ import type { ReactNode } from "react";
 import { GeschmackZeile } from "@/components/katalog/GeschmackZeile";
 import { Bild } from "@/components/medien/Bild";
 import { BudpicDiashow, type DiashowBild } from "@/components/produkt/BudpicDiashow";
-import { BlattAnzeige } from "@/components/review/BlattAnzeige";
+import { BlattGlyphe, blattFuellungen } from "@/components/review/BlattAnzeige";
 import { einzelLinkKlassen } from "@/components/ui/textlink";
 import type { GeschmacksKategorie } from "@/db/enums";
 import { musterBildId } from "@/lib/budpics";
@@ -57,10 +57,10 @@ function Bildflaeche({ name, bild, budpics, w }: { name: string; bild: string | 
 
 /**
  * Community-Zeile, der Blickfang der Karte (Von-Restorff): die Note als einziges Element in
- * Handschrift (Ausnahme Regel 3 wie AuftaktZahlen), daneben die Blätter, die Stimmen gedruckt.
- * Ohne Stimmen ein gedruckter Hinweis und ein eigenes Ziel zur Bewertungsmaske (#bewerten).
- * Ab 15rem Kartenbreite steht nichts über (Task 2): die Blätter teilen sich die Zeile mit der Note
- * und schrumpfen (flex-1 ab 8rem), der Stimmen-Text bricht unter ihnen um.
+ * Handschrift (Ausnahme Regel 3 wie AuftaktZahlen), daneben die Blätter auf derselben Mitte, direkt
+ * dahinter die Stimmen als gedruckter Zähler. Ohne Stimmen ein gedruckter Hinweis und ein eigenes
+ * Ziel zur Bewertungsmaske (#bewerten). Note und Blätter (rund 11rem) passen ab 15rem Kartenbreite
+ * immer in eine Zeile; wird es eng, bricht nur der Zähler darunter um.
  */
 function CommunityZeile({
   community,
@@ -98,14 +98,23 @@ function CommunityZeile({
   return (
     <div data-community className="flex flex-col gap-2">
       {zusatz ? <p className="text-caption text-text-muted">{zusatz}</p> : null}
-      <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
-        <span aria-hidden="true" className="font-hand text-vermerk leading-none text-logo">
-          {note}
-        </span>
+      <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
         <span className="sr-only">{mehrzahl(sprache, texte.srNote, community.stimmen, { note })}</span>
-        <div aria-hidden="true" className="min-w-0 flex-1 basis-32">
-          <BlattAnzeige note={community.note} text={mehrzahl(sprache, texte.stimmen, community.stimmen)} />
-        </div>
+        {/* Note und Blätter als ein Block (nowrap): gemeinsame Mitte, nie getrennt umbrochen. */}
+        <span data-note-zeile="" aria-hidden="true" className="inline-flex items-center gap-2 whitespace-nowrap">
+          <span className="font-hand text-vermerk leading-none text-logo">{note}</span>
+          <span className="flex items-center gap-0.5">
+            {blattFuellungen(community.note).map((fuellung, i) => (
+              <span key={i} className="relative size-6 shrink-0">
+                <BlattGlyphe fuellung={fuellung} vorschau={false} />
+              </span>
+            ))}
+          </span>
+        </span>
+        {/* Zähler direkt an der Note, gedruckt in Textfarbe statt leise abgesetzt (Spec 2026-10-21, 4). */}
+        <span data-stimmen="" aria-hidden="true" className="numeric text-small font-medium whitespace-nowrap text-text">
+          {mehrzahl(sprache, texte.stimmen, community.stimmen)}
+        </span>
         {buch}
       </div>
     </div>
