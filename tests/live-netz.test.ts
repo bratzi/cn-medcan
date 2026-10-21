@@ -40,6 +40,9 @@ test("Bewertungsmaske: Fazit steht auch ohne Community-Werte, Live-Netz daneben"
   // Die statische Seite rendert als Gast: das Live-Netz lädt die Insel (Spec 2026-10-21, Seiten aus Assets, 3.3).
   const seite = readFileSync("app/[lang]/blueten/[slug]/sorten-inhalt.tsx", "utf8");
   assert.doesNotMatch(seite, /ladeLiveNetzBasis/);
+  assert.match(readFileSync("lib/ich-strain.ts", "utf8"), /ladeLiveNetzBasis\(m\.mitgliedId, e\.strainId\)\.catch/);
+  // Wirkung nur in der Maske: Ring am Community-Mittel (Nutzer 2026-10-20), nie öffentlich.
+  assert.match(seite, /wirkung: mittleWirkung\(reviews\)/);
 });
 
 test("Blütenseite: Fazit-Spalte rechts neben der Maske wird nicht abgeschnitten (live 2026-10-09)", () => {

@@ -21,8 +21,10 @@ import { AromaErkundung } from "@/components/review/AromaErkundung";
 import { BewertungsBuch } from "@/components/review/BewertungsBuch";
 import { ladeJuryBeitraegeZuBewertungen } from "@/lib/query/jury";
 import { BlattAnzeige } from "@/components/review/BlattAnzeige";
+import { BewertenInsel } from "@/components/sorte/BewertenInsel";
 import { HerstellerLeiste } from "@/components/sorte/HerstellerLeiste";
 import { erkundungsDaten } from "@/components/review/erkundung-daten";
+import { mittleWirkung } from "@/components/review/GesamteindruckLeiste";
 import { eintragAnker } from "@/components/review/eintrag";
 import {
   Faktenliste,
@@ -315,6 +317,24 @@ async function SorteInhalt({ slug, wahl, w, sprache }: { slug: string; wahl: Sor
       </details>
     </section>
   );
+  const erkundungsBlock =
+    erkundung.serien.length > 0 ? (
+      <div className="mt-8">
+        <AromaErkundung
+          titel={sorte.kultivar.name}
+          terpene={strain.terpene}
+          katalog={katalog}
+          texte={aromaTexte(w, sprache)}
+          zuordnung={zuordnung}
+          {...erkundung}
+        />
+      </div>
+    ) : null;
+  // Variante vorwählen: ?ware= (Ausweichweg) oder die einzige; die eigene Bewertung und ?ware= im Browser ergänzt die Insel.
+  const vorgewaehlt = {
+    vertreiberId: aktive.ware.vertreiberId || null,
+    strainId: wahl.ware === aktive.produkt.slug || aktive.ware.produkte.length === 1 ? aktive.produkt.id : null,
+  };
   // Nach dem Anmelden zurück an die Maske; das Fragment kodiert, sonst gehört es zu /anmelden.
   const anmelden = `/anmelden?weiter=${encodeURIComponent(`${basis}?${auswahlQuery}#bewerten`)}`;
 
@@ -338,7 +358,9 @@ async function SorteInhalt({ slug, wahl, w, sprache }: { slug: string; wahl: Sor
           slug: strain.slug,
           kultivarSlug: sorte.kultivar.slug,
           bilder: alsDiashow(budpics, w, sprache),
+          // Statisch Gast; BudpicBeitragen fragt selbst nach (dieselbe Antwort wie die Maske).
           zugang: "gast",
+          insel: { kultivarId: sorte.kultivar.id, vertreiberId: aktive.ware.vertreiberId || null },
         }}
         w={w}
         sprache={sprache}
@@ -422,26 +444,50 @@ async function SorteInhalt({ slug, wahl, w, sprache }: { slug: string; wahl: Sor
               : undefined
           }
         />
-        <>
-            {erkundung.serien.length > 0 ? (
-              <div className="mt-8">
-                <AromaErkundung
-                  titel={sorte.kultivar.name}
-                  terpene={strain.terpene}
-                  katalog={katalog}
-                  texte={aromaTexte(w, sprache)}
-                  zuordnung={zuordnung}
-                  {...erkundung}
-                />
+        {/* Gäste sehen die Erkundung und den Anmelde-Hinweis; die Insel tauscht für Mitglieder
+            den Hinweis bzw. für freigegebene die Maske ein (Spec 2026-10-21, Seiten aus Assets, 3.3). */}
+        <BewertenInsel
+          kultivarId={sorte.kultivar.id}
+          strainId={strain.id}
+          vorgewaehlt={vorgewaehlt}
+          gast={
+            <>
+              {erkundungsBlock}
+              <div className="mt-8 flex flex-col items-center gap-4 text-center">
+                <p className="max-w-[60ch] text-body text-text">{w.bewerten.anmeldenHinweis}</p>
+                <a href={anmelden} className={buttonKlassen("primary", "md")}>
+                  {w.bewerten.anmelden}
+                </a>
               </div>
-            ) : null}
-            <div className="mt-8 flex flex-col items-center gap-4 text-center">
-              <p className="max-w-[60ch] text-body text-text">{w.bewerten.anmeldenHinweis}</p>
-              <a href={anmelden} className={buttonKlassen("primary", "md")}>
-                {w.bewerten.anmelden}
-              </a>
-            </div>
-          </>
+            </>
+          }
+          nichtFreigegeben={
+            <>
+              {erkundungsBlock}
+              <div className="mt-8 flex flex-col items-center gap-4 text-center">
+                <p className="max-w-[60ch] text-body text-text">{w.bewerten.nichtFreigegeben}</p>
+              </div>
+            </>
+          }
+          formular={{
+            strainId: strain.id,
+            kultivarId: sorte.kultivar.id,
+            waren: sorte.waren,
+            wareTexte: texte.vertreiber,
+            handelsname: sorte.kultivar.name,
+            terpene: strain.terpene,
+            chargen: strain.chargen.map((charge) => charge.chargenNr),
+            katalog,
+            aromaTexte: aromaTexte(w, sprache),
+            texte: w.bewerten,
+            bildMeldungen: budpicMeldungen(w),
+            achsen: w.label.geschmack,
+            zuordnung,
+            ...erkundung,
+            // Wirkung nur in der Maske: Ring am Community-Mittel (Nutzer 2026-10-20), nie öffentlich.
+            gesamteindruck: { ...erkundung.gesamteindruck, wirkung: mittleWirkung(reviews) },
+          }}
+        />
         {erkundung.serien.length > 0 ? <Aufklaerung texte={w.aroma.aufklaerung} sprache={sprache} /> : null}
       </section>
 

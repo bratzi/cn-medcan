@@ -11,8 +11,11 @@ test("Produktseite: Rückweg als 44-px-Einzellink", () => {
 
 test("Produktseite: die Bewertungsmaske sitzt am Anker #bewerten, kein Link führt mehr auf /bewerten", () => {
   assert.match(QUELLE, /id="bewerten"/);
-  // Statisch als Gast: die Maske kommt nicht mehr aus dem Server-Render (Spec 2026-10-21, Seiten aus Assets).
+  // Statisch als Gast: die Maske tauscht die Insel ein (Spec 2026-10-21, Seiten aus Assets, 3.3).
   assert.doesNotMatch(QUELLE, /<BewertungsFormular\b/);
+  assert.match(QUELLE, /<BewertenInsel\b/);
+  // Der Budpic-Zugang im Titelblatt fragt dieselbe Antwort wie die Maske.
+  assert.match(QUELLE, /insel: \{ kultivarId: sorte\.kultivar\.id, vertreiberId: aktive\.ware\.vertreiberId \|\| null \}/);
   // Der zweite Weg ("Erste Bewertung abgeben") steht seit T7 über dem Buch: tests/buch.test.ts.
   assert.equal(QUELLE.match(/href="#bewerten"/g)?.length, 1);
   assert.doesNotMatch(QUELLE, /["`]\/bewerten\//);
@@ -34,5 +37,6 @@ test("Angaben zur Blüte stehen oben, als ein Block mit dem Terpenprofil (Nutzer
   assert.doesNotMatch(QUELLE, /<SortenKopf/);
   // Der Block steht vor dem Bewertungsbuch und damit weit vor dem Rating.
   assert.ok(QUELLE.indexOf("{angabenZurBluete}") < QUELLE.indexOf("<BewertungsBuch"));
-  assert.ok(QUELLE.indexOf("{angabenZurBluete}") < QUELLE.indexOf("<AromaErkundung"));
+  // Die Erkundung steckt im Block, den die Bewerten-Insel für Gäste und Mitglieder zeigt.
+  assert.ok(QUELLE.indexOf("{angabenZurBluete}") < QUELLE.indexOf("{erkundungsBlock}"));
 });

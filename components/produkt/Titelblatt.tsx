@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 import { Bild } from "@/components/medien/Bild";
-import { BudpicBeitragen, type BudpicZugang } from "@/components/produkt/BudpicBeitragen";
+import { BudpicBeitragen, type BudpicInsel, type BudpicZugang } from "@/components/produkt/BudpicBeitragen";
 import { BudpicDiashow, type DiashowBild } from "@/components/produkt/BudpicDiashow";
 import { Badge } from "@/components/ui";
 import { einzelLinkKlassen } from "@/components/ui/textlink";
@@ -33,7 +33,15 @@ export type TitelblattProps = {
   /** Referenzbild (Medien-Id) oder null; ein Symbolbild, nicht die echte Sorte. */
   bild?: string | null;
   /** Budpics der Community (T9): Diashow statt Musterbild, dazu "Bild beitragen". */
-  budpic?: { strainId: string; slug: string; kultivarSlug?: string | null; bilder: readonly DiashowBild[]; zugang: BudpicZugang };
+  budpic?: {
+    strainId: string;
+    slug: string;
+    kultivarSlug?: string | null;
+    bilder: readonly DiashowBild[];
+    zugang: BudpicZugang;
+    /** Statische Seite: den Zugang aus /api/ich/strain nachladen (Spec 2026-10-21, Seiten aus Assets, 3.3). */
+    insel?: BudpicInsel;
+  };
   w: Woerterbuch;
   sprache: Sprache;
 };
@@ -101,6 +109,7 @@ function BudpicBeitragenLeiste({ props }: { props: TitelblattProps }) {
       strainId={props.budpic.strainId}
       slug={props.budpic.slug}
       kultivarSlug={props.budpic.kultivarSlug}
+      insel={props.budpic.insel}
       sprache={props.sprache}
       texte={props.w.budpic}
       meldungen={budpicMeldungen(props.w)}
