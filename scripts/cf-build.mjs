@@ -8,8 +8,10 @@
  * (lib/i18n/vorrendern.ts), und `opennextjs-cloudflare deploy` legt sie in KV. Ohne das baute
  * nach jedem Deploy der erste Besucher jede Seite im Request (700 bis 1300 ms CPU).
  *
- * Scheitert Export, Import oder Prüfung: Warnung `[vorrendern] …`, Build ohne VORRENDERN wie
- * bisher. Scheitert der Build mit VORRENDERN, folgt ein zweiter Build ohne; scheitert auch der:
+ * Scheitert Export, Import oder Prüfung: lokal Warnung `[vorrendern] …` und Build ohne VORRENDERN;
+ * im Workers Build (WORKERS_CI=1) Abbruch (Spec 2026-10-21, Seiten aus Assets, 5).
+ * Danach kopiert scripts/seiten-in-assets.mjs die vorgerenderten Leseseiten nach .open-next/assets/_seiten.
+ * Scheitert der Build mit VORRENDERN, folgt ein zweiter Build ohne; scheitert auch der:
  * Exit-Code ungleich 0.
  */
 import { spawnSync } from "node:child_process";
@@ -24,6 +26,14 @@ const LOKALE_D1 = join(".wrangler", "state", "v3", "d1");
 /** Soll der Build einen D1-Abzug ziehen? Nur im Workers Build oder ausdrücklich. */
 export function sollVorrendern(env) {
   return env.WORKERS_CI === "1" || env.VORRENDERN_DATEN === "1";
+}
+
+/**
+ * Im Workers Build ohne Abzug abbrechen (Spec 2026-10-21, 5): ohne vorgerenderte Dateien fiele
+ * jede Leseseite auf den teuren Weg zurück. Die alte Version bleibt live. Lokal bleibt es bei der Warnung.
+ */
+export function brichtAb(env, abzugOk) {
+  return env.WORKERS_CI === "1" && !abzugOk;
 }
 
 /** Env für `opennextjs-cloudflare build`: VORRENDERN=1 nur nach erfolgreichem Abzug. */
@@ -114,6 +124,11 @@ function main() {
         schreibe: (pfad, inhalt) => writeFileSync(pfad, inhalt),
       });
       abzugOk = ergebnis.ok;
+      if (brichtAb(process.env, ergebnis.ok)) {
+        console.error(`[vorrendern] FEHLER: ${ergebnis.grund}. Abbruch, die alte Version bleibt live`);
+        rmSync(verzeichnis, { recursive: true, force: true });
+        process.exit(1);
+      }
       console.log(
         ergebnis.ok
           ? `[vorrendern] D1-Abzug bereit (${ergebnis.grund}), Build rendert beide Sprachen vor`
@@ -133,6 +148,8 @@ function main() {
     console.log("[vorrendern] WARNUNG: Build mit Vorrendern fehlgeschlagen, zweiter Versuch ohne Vorrendern");
     status = lauf("npx", ["opennextjs-cloudflare", "build"], buildEnv(process.env, false));
   }
+  if (status !== 0) process.exit(status);
+  status = lauf("node", ["scripts/seiten-in-assets.mjs"], buildEnv(process.env, false));
   if (status !== 0) process.exit(status);
   status = lauf("node", ["scripts/bundle-env-bereinigen.mjs"], buildEnv(process.env, false));
   if (status !== 0) process.exit(status);
