@@ -2,7 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 
 import { bewertenWeiterleitung } from "@/lib/alte-adressen";
 import { COOKIE_NAME, passwortPruefen, tokenPruefen } from "@/lib/gate";
-import { I18N_OEFFENTLICH } from "@/lib/i18n/schalter";
+import { SPRACH_ERKENNUNG } from "@/lib/i18n/schalter";
 import { bestimmeSprache, SPRACH_COOKIE } from "@/lib/i18n/sprache-kern";
 import { igFeedSchluessel, internerPfad, istApiPfad, istOhneGate } from "@/lib/proxy-regeln";
 
@@ -39,7 +39,7 @@ export async function proxy(request: NextRequest) {
   const sprache = bestimmeSprache({
     cookie: request.cookies.get(SPRACH_COOKIE)?.value,
     acceptLanguage: request.headers.get("accept-language"),
-    erkennungAktiv: I18N_OEFFENTLICH,
+    erkennungAktiv: SPRACH_ERKENNUNG,
   });
   const intern = request.nextUrl.clone();
   intern.pathname = internerPfad(sprache, pathname);

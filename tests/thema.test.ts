@@ -22,11 +22,11 @@ function skriptMit(getItem: (schluessel: string) => string | null): string | und
   return gesetzt["data-theme"];
 }
 
-test("Kopf-Skript: gespeichertes Dunkel wird vor dem Zeichnen gesetzt", () => {
-  assert.equal(skriptMit((s) => (s === THEMA_SCHLUESSEL ? "dark" : null)), "dark");
+test("Kopf-Skript: gespeichertes Hell wird vor dem Zeichnen gesetzt", () => {
+  assert.equal(skriptMit((s) => (s === THEMA_SCHLUESSEL ? "light" : null)), "light");
 });
 
-test("Kopf-Skript: ohne Wahl bleibt es hell, ohne Speicher wirft es nicht", () => {
+test("Kopf-Skript: ohne Wahl bleibt es dunkel, ohne Speicher wirft es nicht", () => {
   assert.equal(skriptMit(() => null), undefined);
   assert.equal(skriptMit(() => "unsinn"), undefined);
   assert.equal(
@@ -42,7 +42,7 @@ test("Umschalten wechselt zwischen hell und dunkel", () => {
   assert.equal(anderesThema("dark"), "light");
 });
 
-test("Layout: startet hell, Skript im head, DOM gewinnt beim Hydrieren", () => {
+test("Layout: startet dunkel, Skript im head, DOM gewinnt beim Hydrieren", () => {
   const layout = lies("app/[lang]/layout.tsx");
   assert.match(layout, /data-theme=\{THEMA_STANDARD\}/);
   assert.match(layout, /suppressHydrationWarning/);

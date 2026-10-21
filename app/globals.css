@@ -2565,3 +2565,14 @@ button.netz-marke:active .netz-marke-kreis {
 .katalog-schublade::backdrop {
   background: color-mix(in oklab, var(--color-text) 40%, transparent);
 }
+
+/* Kennwortseite (Nutzer 2026-10-21): nur der Hero mit Kennwortmaske, ohne Kopf und Fuß.
+   Impressum und Datenschutz verlinkt die Karte selbst. */
+body:has([data-zugang]) > header[data-kopf],
+body:has([data-zugang]) > footer,
+body:has([data-zugang]) > .schalter-leiste {
+  display: none;
+}
+body:has([data-zugang]) > main {
+  padding-top: 0;
+}

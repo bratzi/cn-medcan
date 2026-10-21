@@ -22,7 +22,7 @@ export const en: Woerterbuch = {
       sotm: "SOTM",
       jury: "Jury",
       blueten: "Strains",
-      neu: "New",
+      neu: "News",
       profil: "My profile",
     },
     ungelesen: {

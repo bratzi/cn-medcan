@@ -26,7 +26,7 @@ export const de = {
       sotm: "SOTM",
       jury: "Jury",
       blueten: "Strains",
-      neu: "Neu",
+      neu: "News",
       profil: "Mein Profil",
     },
     ungelesen: {

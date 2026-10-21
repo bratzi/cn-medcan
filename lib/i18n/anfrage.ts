@@ -2,7 +2,7 @@ import "server-only";
 
 import { cookies, headers } from "next/headers";
 
-import { I18N_OEFFENTLICH } from "./schalter";
+import { SPRACH_ERKENNUNG } from "./schalter";
 import { bestimmeSprache, SPRACH_COOKIE, type Sprache } from "./sprache-kern";
 import type { Woerterbuch } from "./typen";
 import { WOERTERBUECHER } from "./woerterbuecher";
@@ -18,7 +18,7 @@ export async function holeSpracheAusAnfrage(): Promise<Sprache> {
   return bestimmeSprache({
     cookie: cookieSpeicher.get(SPRACH_COOKIE)?.value,
     acceptLanguage: anfrageHeader.get("accept-language"),
-    erkennungAktiv: I18N_OEFFENTLICH,
+    erkennungAktiv: SPRACH_ERKENNUNG,
   });
 }
 

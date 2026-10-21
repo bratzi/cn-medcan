@@ -33,7 +33,7 @@ export default async function ZugangPage() {
   // Nutzer 2026-10-20: die Kennwortseite ist die Startseite aller Gäste, also
   // derselbe Hero wie auf "/", die Karte sitzt darunter statt der Zahlen.
   return (
-    <div className="relative isolate bg-surface">
+    <div data-zugang="" className="relative isolate bg-surface">
       <ZugangLoops />
       <Auftakt
         zugang={
