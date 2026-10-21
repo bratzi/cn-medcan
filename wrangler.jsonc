@@ -7,7 +7,9 @@
 	"compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
 	"assets": {
 		"directory": ".open-next/assets",
-		"binding": "ASSETS"
+		"binding": "ASSETS",
+		// Leseseiten liegen unter /_seiten, das Tor in worker.mjs prueft vorher das Gate (Spec 2026-10-21).
+		"run_worker_first": ["/_seiten/*"]
 	},
 	"observability": {
 		"enabled": true

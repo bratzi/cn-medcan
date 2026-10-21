@@ -1,0 +1,84 @@
+import { COOKIE_NAME, tokenPruefen } from "./gate";
+import { SPRACH_ERKENNUNG } from "./i18n/schalter";
+import { bestimmeSprache, SPRACH_COOKIE } from "./i18n/sprache-kern";
+import { istOhneGate } from "./proxy-regeln";
+import { SEITEN_PRAEFIX, seitenDatei } from "./seiten-tor";
+
+export type TorEnv = {
+  ASSETS: { fetch(r: Request | string): Promise<Response> };
+  SITE_PASSWORD?: string;
+  SITE_SESSION_SECRET?: string;
+};
+
+/**
+ * Leichter Weg vor Next (Spec 2026-10-21, Seiten aus Assets, 3.2): Gate prüfen, Leseseite als Datei
+ * ausliefern. `null` heißt: Next übernimmt (Admin, Aktionen, API, Seiten ohne Datei).
+ * Dieselben Regeln wie proxy.ts; Gate-Prüfung über lib/gate.ts, nie über einen ungeprüften Cookie-Teil.
+ * Relative Importe, damit wrangler diese Datei ohne tsconfig-Alias bündelt (worker.mjs).
+ */
+export async function tor(request: Request, env: TorEnv): Promise<Response | null> {
+  if (request.method !== "GET" && request.method !== "HEAD") return null;
+  const url = new URL(request.url);
+  const cookies = leseCookies(request.headers.get("cookie"));
+
+  if (url.pathname.startsWith(`${SEITEN_PRAEFIX}/`) || url.pathname === SEITEN_PRAEFIX) {
+    if (!(await gateOffen(env, cookies))) return zumGate(url);
+    return new Response("Not Found", { status: 404, headers: { "Cache-Control": "no-store" } });
+  }
+  if (url.pathname === "/api/ich/strain") {
+    if (!(await gateOffen(env, cookies))) return zumGate(url);
+    if (hatSitzung(cookies)) return null;
+    return Response.json({ zugang: "gast" }, { headers: { "Cache-Control": "private, no-store" } });
+  }
+  const sprache = bestimmeSprache({
+    cookie: cookies.get(SPRACH_COOKIE),
+    acceptLanguage: request.headers.get("accept-language"),
+    erkennungAktiv: SPRACH_ERKENNUNG,
+  });
+  const datei = seitenDatei(sprache, url.pathname, url.searchParams);
+  if (!datei) return null;
+  if (!istOhneGate(url.pathname) && !(await gateOffen(env, cookies))) return zumGate(url);
+  const antwort = await env.ASSETS.fetch(new URL(datei, url).toString());
+  if (antwort.status !== 200) return null;
+  return new Response(antwort.body, {
+    status: 200,
+    headers: {
+      "Content-Type": "text/html; charset=utf-8",
+      // Hinter dem Gate: nie in geteilten Caches ablegen.
+      "Cache-Control": "private, no-cache",
+      Vary: "Cookie",
+    },
+  });
+}
+
+function leseCookies(kopf: string | null): Map<string, string> {
+  const karte = new Map<string, string>();
+  for (const teil of (kopf ?? "").split(";")) {
+    const i = teil.indexOf("=");
+    if (i > 0) karte.set(teil.slice(0, i).trim(), teil.slice(i + 1).trim());
+  }
+  return karte;
+}
+
+// Namen wie getSessionCookie aus better-auth/cookies (Punkt- und Bindestrich-Form, je mit __Secure-).
+const SITZUNGS_COOKIES = [
+  "better-auth.session_token",
+  "__Secure-better-auth.session_token",
+  "better-auth-session_token",
+  "__Secure-better-auth-session_token",
+];
+
+function hatSitzung(cookies: Map<string, string>): boolean {
+  return SITZUNGS_COOKIES.some((name) => Boolean(cookies.get(name)));
+}
+
+async function gateOffen(env: TorEnv, cookies: Map<string, string>): Promise<boolean> {
+  if (!env.SITE_PASSWORD || !env.SITE_SESSION_SECRET) return true;
+  return (await tokenPruefen(env.SITE_SESSION_SECRET, cookies.get(COOKIE_NAME))) !== null;
+}
+
+function zumGate(url: URL): Response {
+  const ziel = new URL("/zugang", url);
+  ziel.searchParams.set("weiter", url.pathname + url.search);
+  return new Response(null, { status: 307, headers: { Location: ziel.toString(), "Cache-Control": "no-store" } });
+}
