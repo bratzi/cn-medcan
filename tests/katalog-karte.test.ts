@@ -59,10 +59,23 @@ test("Karte: der Link-Überzug liegt weiter über der ganzen Karte", () => {
   assert.match(link, /after:absolute after:inset-0/);
 });
 
-test("Karte: Community-Zeile schrumpft die Blätter neben der Note, die Stimmen brechen um", () => {
+test("Karte: Note und Blätter auf einer Linie, Stimmen als klarer Zähler direkt daneben", () => {
   const html = bluete();
-  assert.match(html, /123 Stimmen/);
-  assert.match(html, /<div aria-hidden="true" class="min-w-0 flex-1 basis-32">/);
+  // Note und Blätter teilen einen nowrap-Container mit gemeinsamer Mitte.
+  const start = html.indexOf("data-note-zeile");
+  const ende = html.indexOf("<span data-stimmen");
+  assert.ok(start >= 0 && ende > start, "Note-Zeile fehlt oder Zähler steht nicht dahinter");
+  const zeile = html.slice(start, ende);
+  assert.match(zeile, /<\/span><\/span>$/, "Zähler folgt direkt auf die Note-Zeile");
+  const klasse = zeile.match(/class="([^"]*)"/)?.[1] ?? "";
+  for (const k of ["inline-flex", "items-center", "whitespace-nowrap"]) assert.match(klasse, new RegExp(`\\b${k}\\b`), k);
+  assert.match(zeile, /font-hand[^>]*>4,1</);
+  assert.equal((zeile.match(/<svg/g) ?? []).length, 5);
+  const zaehler = html.match(/<span data-stimmen=""[^>]*class="([^"]*)"[^>]*>([^<]*)</);
+  assert.equal(zaehler?.[2], "123 Stimmen");
+  assert.match(zaehler?.[1] ?? "", /\bfont-medium\b/);
+  assert.match(zaehler?.[1] ?? "", /\btext-text\b/);
+  assert.doesNotMatch(zaehler?.[1] ?? "", /text-muted|text-caption/);
 });
 
 test("Karte: Handelsname nie in Handschrift, Wert hat sr-only-Text", () => {

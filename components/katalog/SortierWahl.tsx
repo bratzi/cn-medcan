@@ -4,12 +4,22 @@ import { useId } from "react";
 
 import { ChipFenster } from "@/components/katalog/ChipFenster";
 import { cn } from "@/lib/cn";
+import { t } from "@/lib/i18n/text";
 import type { Woerterbuch } from "@/lib/i18n/typen";
-import { SORTIER_MEHR, SORTIER_SEGMENT } from "@/lib/katalog/chipleiste";
-import { SORTIERUNGEN, type Sortierung, type StrainFilter } from "@/lib/query/filter";
+import { SORTIER_MEHR, SORTIER_SEGMENT, naechsteSortierung } from "@/lib/katalog/chipleiste";
+import { SORTIERUNGEN, aktiveRichtung, type Richtung, type Sortierung, type StrainFilter } from "@/lib/query/filter";
+
+/** Richtungspfeil am aktiven Knopf; die Richtung steht für Screenreader im aria-label. */
+function Pfeil({ richtung }: { richtung: Richtung }) {
+  return (
+    <span aria-hidden="true" className="numeric">
+      {richtung === "auf" ? "↑" : "↓"}
+    </span>
+  );
+}
 
 type Props = {
-  wert: Sortierung;
+  filter: StrainFilter;
   setze: (teil: Partial<StrainFilter>) => void;
   texte: Woerterbuch["katalog"]["leiste"];
   offen: boolean;
@@ -33,16 +43,29 @@ const MENUE_EINTRAG =
  * Sortierung ab lg als Segment (Spec 2026-10-21): vier häufige direkt (Hick), der Rest im „…“-Menü.
  * Ist die aktive Sortierung im Menü, trägt „…“ den gedrückten Zustand und zeigt ihr Label.
  */
-export function SortierSegment({ wert, setze, texte, offen, oeffne, schliesse, fussText }: Props) {
+export function SortierSegment({ filter, setze, texte, offen, oeffne, schliesse, fussText }: Props) {
+  const wert = filter.sortierung;
   const imMenue = SORTIER_MEHR.includes(wert);
-  const waehle = (s: Sortierung) => setze({ sortierung: s, seite: 1 });
+  const waehle = (s: Sortierung) => setze(naechsteSortierung(filter, s));
+  const richtung = aktiveRichtung(filter);
   return (
     <div role="group" aria-label={texte.sortierung} className={SEGMENT_HUELLE}>
-      {SORTIER_SEGMENT.map((s) => (
-        <button key={s} type="button" aria-pressed={wert === s} onClick={() => waehle(s)} className={cn(SEGMENT_KNOPF, wert === s ? SEGMENT_AN : SEGMENT_AUS)}>
-          {texte.sortierenKurz[s]}
-        </button>
-      ))}
+      {SORTIER_SEGMENT.map((s) => {
+        const an = wert === s;
+        return (
+          <button
+            key={s}
+            type="button"
+            aria-pressed={an}
+            aria-label={an ? t(texte.richtungLabel, { name: texte.sortierenKurz[s], richtung: texte.richtung[richtung] }) : undefined}
+            onClick={() => waehle(s)}
+            className={cn(SEGMENT_KNOPF, "gap-1", an ? SEGMENT_AN : SEGMENT_AUS)}
+          >
+            {texte.sortierenKurz[s]}
+            {an ? <Pfeil richtung={richtung} /> : null}
+          </button>
+        );
+      })}
       <ChipFenster
         titel={texte.weitereSortierung}
         zahl={0}
@@ -53,7 +76,10 @@ export function SortierSegment({ wert, setze, texte, offen, oeffne, schliesse, f
         gedrueckt={imMenue}
         knopfText={
           imMenue ? (
-            texte.sortierungen[wert]
+            <>
+              {texte.sortierungen[wert]}
+              <Pfeil richtung={richtung} />
+            </>
           ) : (
             <>
               <span aria-hidden="true">…</span>
@@ -68,13 +94,15 @@ export function SortierSegment({ wert, setze, texte, offen, oeffne, schliesse, f
               <button
                 type="button"
                 aria-pressed={wert === s}
+                aria-label={wert === s ? t(texte.richtungLabel, { name: texte.sortierungen[s], richtung: texte.richtung[richtung] }) : undefined}
                 onClick={() => {
                   waehle(s);
                   schliesse();
                 }}
-                className={MENUE_EINTRAG}
+                className={cn(MENUE_EINTRAG, "gap-1")}
               >
                 {texte.sortierungen[s]}
+                {wert === s ? <Pfeil richtung={richtung} /> : null}
               </button>
             </li>
           ))}
@@ -85,10 +113,34 @@ export function SortierSegment({ wert, setze, texte, offen, oeffne, schliesse, f
 }
 
 /** Sortierung unter lg als eigener Chip mit Sheet, Radioliste aller Sortierungen. */
-export function SortierChip({ wert, setze, texte, offen, oeffne, schliesse, fussText }: Props) {
+export function SortierChip({ filter, setze, texte, offen, oeffne, schliesse, fussText }: Props) {
   const name = useId();
+  const wert = filter.sortierung;
+  const richtung = aktiveRichtung(filter);
   return (
-    <ChipFenster titel={texte.sortierung} zahl={0} offen={offen} oeffne={oeffne} schliesse={schliesse} fussText={fussText} knopfText={texte.sortierungen[wert]}>
+    <ChipFenster
+      titel={texte.sortierung}
+      zahl={0}
+      offen={offen}
+      oeffne={oeffne}
+      schliesse={schliesse}
+      fussText={fussText}
+      knopfText={
+        <>
+          {texte.sortierungen[wert]}
+          <Pfeil richtung={richtung} />
+        </>
+      }
+    >
+      {/* Mobil dreht ein eigener Knopf die Richtung (die Radios wählen nur die Sortierung). */}
+      <button
+        type="button"
+        onClick={() => setze(naechsteSortierung(filter, wert))}
+        className={cn(SEGMENT_KNOPF, "mb-2 gap-1 border border-border-strong", SEGMENT_AUS)}
+      >
+        {t(texte.richtungDrehen, { richtung: texte.richtung[richtung] })}
+        <Pfeil richtung={richtung} />
+      </button>
       <fieldset className="flex flex-col gap-1 border-0 p-0">
         <legend className="sr-only">{texte.sortierung}</legend>
         {SORTIERUNGEN.map((s) => (
@@ -97,7 +149,7 @@ export function SortierChip({ wert, setze, texte, offen, oeffne, schliesse, fuss
               type="radio"
               name={name}
               checked={wert === s}
-              onChange={() => setze({ sortierung: s, seite: 1 })}
+              onChange={() => setze(naechsteSortierung(filter, s))}
               className="size-4 shrink-0 accent-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring"
             />
             {texte.sortierungen[s]}

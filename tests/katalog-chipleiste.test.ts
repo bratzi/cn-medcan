@@ -32,9 +32,9 @@ test("Chip Mehr nur für Fachkreis", () => {
 });
 
 test("Suchtext gesetzt: Sortierung springt auf relevanz, geleert zurück auf community (Review Focus 2)", () => {
-  assert.deepEqual(suchTeil(f(), "haze"), { q: "haze", sortierung: "relevanz", seite: 1 });
+  assert.deepEqual(suchTeil(f(), "haze"), { q: "haze", sortierung: "relevanz", richtung: undefined, seite: 1 });
   assert.deepEqual(suchTeil(f({ q: "ha", sortierung: "relevanz" }), "haze"), { q: "haze", seite: 1 });
   assert.deepEqual(suchTeil(f({ q: "ha", sortierung: "name" }), "haze"), { q: "haze", seite: 1 });
-  assert.deepEqual(suchTeil(f({ q: "haze", sortierung: "relevanz" }), "  "), { q: undefined, sortierung: "community", seite: 1 });
+  assert.deepEqual(suchTeil(f({ q: "haze", sortierung: "relevanz" }), "  "), { q: undefined, sortierung: "community", richtung: undefined, seite: 1 });
   assert.deepEqual(suchTeil(f({ q: "haze", sortierung: "name" }), ""), { q: undefined, seite: 1 });
 });

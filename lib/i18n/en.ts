@@ -446,6 +446,9 @@ export const en: Woerterbuch = {
       },
       sortierenKurz: { community: "Community", stimmen: "Votes", neueste: "Newest", thc_absteigend: "THC" },
       weitereSortierung: "More sort options",
+      richtung: { auf: "ascending", ab: "descending" },
+      richtungLabel: "{name}, {richtung}. Select again to reverse",
+      richtungDrehen: "Order: {richtung}",
       legendeKurz: "✓ confirmed by data sheet · + found by the community",
     },
     aktiv: {

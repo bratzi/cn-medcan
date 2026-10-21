@@ -25,6 +25,18 @@ export const NOTEN_STUFEN = [3, 3.5, 4, 4.5] as const;
 
 export type Sortierung = (typeof SORTIERUNGEN)[number];
 
+export type Richtung = "auf" | "ab";
+
+/** Richtung ohne Angabe in der URL: wie die Sortierung bisher lief. */
+export function standardRichtung(s: Sortierung): Richtung {
+  return s === "name" || s === "thc_aufsteigend" || s === "preis_aufsteigend" ? "auf" : "ab";
+}
+
+/** Tatsächliche Richtung eines Filters. */
+export function aktiveRichtung(f: { sortierung: Sortierung; richtung?: Richtung }): Richtung {
+  return f.richtung ?? standardRichtung(f.sortierung);
+}
+
 const THC_MIN_DEFAULT = 0;
 const THC_MAX_DEFAULT = 100;
 
@@ -170,6 +182,14 @@ export const strainFilterSchema = z.object({
     .transform((rohwert) => ersterWert(rohwert))
     .pipe(z.enum(SORTIERUNGEN))
     .catch("community"),
+  /** Richtung der Sortierung (Spec 2026-10-21, 4). Ohne Angabe gilt `standardRichtung`. */
+  richtung: z
+    .unknown()
+    .transform((rohwert): Richtung | undefined => {
+      const wert = ersterWert(rohwert);
+      return wert === "auf" || wert === "ab" ? wert : undefined;
+    })
+    .catch(undefined),
   seite: ganzzahl(1, 1),
 });
 
@@ -198,6 +218,7 @@ const LEERER_FILTER: StrainFilter = {
   cbd: false,
   ansicht: "bluete",
   sortierung: "community",
+  richtung: undefined,
   seite: 1,
 };
 
@@ -267,6 +288,8 @@ export function serialisiereFilter(filter: StrainFilter): URLSearchParams {
   if (filter.ansicht !== standardAnsicht(filter)) params.set("ansicht", filter.ansicht);
   if (filter.sortierung !== "community")
     params.set("sortierung", filter.sortierung);
+  if (filter.richtung && filter.richtung !== standardRichtung(filter.sortierung))
+    params.set("richtung", filter.richtung);
   if (filter.seite > 1) params.set("seite", String(filter.seite));
   return params;
 }

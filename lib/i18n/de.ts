@@ -455,6 +455,9 @@ export const de = {
       },
       sortierenKurz: { community: "Community", stimmen: "Stimmen", neueste: "Neueste", thc_absteigend: "THC" },
       weitereSortierung: "Weitere Sortierungen",
+      richtung: { auf: "aufsteigend", ab: "absteigend" },
+      richtungLabel: "{name}, {richtung}. Erneut wählen dreht die Richtung",
+      richtungDrehen: "Richtung: {richtung}",
       legendeKurz: "✓ Datenblatt bestätigt · + Community gefunden",
     },
     aktiv: {

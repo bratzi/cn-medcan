@@ -1,4 +1,4 @@
-import { SORTIERUNGEN, leererFilter, type Sortierung, type StrainFilter } from "@/lib/query/filter";
+import { SORTIERUNGEN, aktiveRichtung, leererFilter, type Sortierung, type StrainFilter } from "@/lib/query/filter";
 
 /** Chips der Werkzeugleiste (Spec 2026-10-21), Reihenfolge = Anzeige. */
 export const CHIPS = ["community", "terpene", "geschmack", "typ", "thc", "vertreiber", "form", "verfuegbar", "mehr"] as const;
@@ -52,5 +52,15 @@ export function suchTeil(alt: StrainFilter, roh: string): Partial<StrainFilter> 
   const teil: Partial<StrainFilter> = { q, seite: 1 };
   if (q && !alt.q && alt.sortierung === standard) teil.sortierung = "relevanz";
   if (!q && alt.sortierung === "relevanz") teil.sortierung = standard;
+  if (teil.sortierung) teil.richtung = undefined;
   return teil;
+}
+
+/**
+ * URL-Teil für einen Klick auf eine Sortierung (Spec 2026-10-21, 4): die aktive ein zweites Mal
+ * gewählt dreht die Richtung, eine andere startet in ihrer Standardrichtung.
+ */
+export function naechsteSortierung(alt: StrainFilter, s: Sortierung): Pick<StrainFilter, "sortierung" | "richtung" | "seite"> {
+  if (alt.sortierung !== s) return { sortierung: s, richtung: undefined, seite: 1 };
+  return { sortierung: s, richtung: aktiveRichtung(alt) === "ab" ? "auf" : "ab", seite: 1 };
 }
