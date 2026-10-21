@@ -25,6 +25,17 @@ export type InArbeit = { id: string; titel: Zweisprachig; text: Zweisprachig };
 
 export const NEUIGKEITEN: readonly Neuigkeit[] = [
   {
+    id: "2026-10-22-bewerten-stabil",
+    datum: "2026-10-22",
+    art: "behoben",
+    titel: { de: "Bewerten klappt wieder", en: "Reviewing works again" },
+    text: {
+      de: "Angemeldet lädt dein Bewertungsformular auf der Strain-Seite jetzt zuverlässig und schnell.",
+      en: "When you are signed in, your review form on the strain page now loads reliably and fast.",
+    },
+    link: "/blueten",
+  },
+  {
     id: "2026-10-21-seiten-schneller",
     datum: "2026-10-21",
     art: "behoben",

@@ -28,6 +28,13 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 
 ## ⇢ Hier geht es weiter
 
+### ⇢ SESSION 88 (2026-10-22): SAFE4CLEAR – Start hier
+- Erledigt: Insel /api/ich/strain ohne Next (lib/insel-roh.ts, Merge 3e152c0, Review-Fixes), Build-Fix cpus (435bc69), live ok
+  (Details: Abschnitt S87 „LIVE-PRÜFUNG 435bc69“). Meldung /neu „Bewerten klappt wieder“.
+- OFFENE FRAGE an Nutzer bei Sessionstart: Vertreiber-Umbau (eine Seite je Strain, Wahl nur im Formular) jetzt starten,
+  danach /api/startseite + /api/benachrichtigungen (334/470 ms CPU) wie die Insel ohne Next? Empfehlung: ja, in der Reihenfolge.
+- Aufräumen offen: viele alte Worktrees unter .claude/worktrees und C:/cn-assets-*, C:/cn-startseite (gemergt) – prüfen, lösen.
+
 ### ⇢ SESSION 87 (2026-10-21/22): Umbau „Seiten aus Assets“ AUF MAIN, Deploy läuft – SAFE4CLEAR
 - Anlass: Live fast nur Error 1102 (CPU, Free 10 ms). Spec/Plan: docs/superpowers/specs|plans/2026-10-21-seiten-aus-assets*.
   Ledger mit allen Rulings: .superpowers/sdd/2026-10-21-seiten-aus-assets/progress.md. Tasks 1–7 complete, reviews clean.
