@@ -15,7 +15,7 @@ import {
 } from "react";
 
 import { Blaettern } from "@/components/katalog/Blaettern";
-import { FilterFelder } from "@/components/katalog/FilterFelder";
+import { FilterFeld, SuchFeld } from "@/components/katalog/FilterFelder";
 import { FilterSchublade } from "@/components/katalog/FilterSchublade";
 import { GeschmackLegende } from "@/components/katalog/GeschmackZeile";
 import { BlueteKarte, StrainKarte, type KartenTexte } from "@/components/katalog/KatalogKarte";
@@ -32,6 +32,7 @@ import { formatierePreisProGramm, formatiereZahl } from "@/lib/format";
 import type { Sprache } from "@/lib/i18n/sprache-kern";
 import { mehrzahl, t } from "@/lib/i18n/text";
 import type { Woerterbuch } from "@/lib/i18n/typen";
+import { CHIPS } from "@/lib/katalog/chipleiste";
 import { filtere, verdichte, zaehleOptionen, type KatalogErgebnis } from "@/lib/katalog/filtern";
 import {
   abonniereFilterSpalte,
@@ -266,8 +267,13 @@ export function KatalogAnsicht({ start, w, sprache }: Props) {
   const kartenTexte: KartenTexte = { ...texte.karte, kultivarTyp: w.label.kultivarTyp, darreichungsform: w.label.darreichungsform };
   const labels = { kultivarTyp: w.label.kultivarTyp, darreichungsform: w.label.darreichungsform, geschmack: w.label.geschmack };
   const zeigeSkelett = !ergebnis && mitDeepLink && zustand.art !== "fehler";
+  const feldProps = { filter, zahlen, daten, setze, texte: texte.leiste, labels, sprache, deaktiviert };
+  // Übergang bis zur Chipleiste (Task B4): Felder untereinander.
   const felder = (
-    <FilterFelder filter={filter} zahlen={zahlen} daten={daten} setze={setze} texte={texte.leiste} labels={labels} sprache={sprache} deaktiviert={deaktiviert} />
+    <div className="flex flex-col gap-6">
+      <SuchFeld {...feldProps} />
+      {CHIPS.map((chip) => <FilterFeld key={chip} chip={chip} {...feldProps} />)}
+    </div>
   );
 
   const trefferText = bluetenAnsicht
