@@ -25,6 +25,17 @@ export type InArbeit = { id: string; titel: Zweisprachig; text: Zweisprachig };
 
 export const NEUIGKEITEN: readonly Neuigkeit[] = [
   {
+    id: "2026-10-22-seiten-schneller",
+    datum: "2026-10-22",
+    art: "behoben",
+    titel: { de: "Seiten laden wieder", en: "Pages load again" },
+    text: {
+      de: "Strain-Seiten kommen jetzt fertig vom Server, statt bei jedem Aufruf neu zu entstehen. Wir sind noch in der Beta: eine neue Bewertung erscheint nach etwa 5 Minuten.",
+      en: "Strain pages now come ready-made from the server instead of being built on every visit. We are still in beta: a new review shows up after about 5 minutes.",
+    },
+    link: "/blueten",
+  },
+  {
     id: "2026-10-21-strainseite-ruhiger",
     datum: "2026-10-21",
     art: "besser",

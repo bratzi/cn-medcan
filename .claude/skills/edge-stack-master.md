@@ -155,6 +155,15 @@ Daraus folgt bindend:
 
 Reihenfolge der Prüfung — nimm immer die **oberste** Stufe, die die Anforderung erfüllt:
 
+0. **Leseseiten als Dateien in Static Assets, `worker.mjs`-Tor (seit 2026-10-22).** Startseite, `/blueten`,
+   Strain-Seiten je Vertreiber-Variante, Jury, `/neu`, `/reviews`: der Build rendert vor, `scripts/seiten-in-assets.mjs`
+   verschiebt das HTML nach `.open-next/assets/_seiten/` (raus aus dem KV-Vorrat), `lib/tor.ts` prüft das Gate und
+   liefert über `env.ASSETS.fetch` ohne Next (`html_handling: "none"`, `run_worker_first: ["/_seiten/*"]`).
+   Grund (Messung 2026-10-21): auf Free kostet schon ein OpenNext-Cache-Treffer 2 bis 12 ms, ein Neubau im Request
+   100 bis 450 ms und wird mit 1102 abgebrochen; KV-Vorrat aller Strains sprengt 1000 Writes/Tag. Persönliches lädt
+   die Insel `/api/ich/strain`. Aktualität: `revalidiereSprachen` stößt über `lib/neubau.ts` den Deploy-Hook an
+   (Secret `DEPLOY_HOOK_URL`, Deckel 15/Tag in `neubau_zaehler`, dazu Cron `0 3 * * *`). Neue Leseseite = Muster in
+   `lib/seiten-tor.ts` und `scripts/seiten-in-assets.mjs` ergänzen. Statische Seiten dürfen nie Cookies/Header lesen.
 1. **Statische RSC-Ausgabe (Build-Zeit).** Daten ändern sich nur mit einem Deploy oder selten und sind für
    alle gleich: Produktdetailseiten, Terpen-Profile, rechtliche Seiten. `generateStaticParams` + statisches
    Rendering. Null CPU-Zeit und null Sub-Requests im Request-Pfad. Für einen Produktkatalog ist das der
