@@ -50,7 +50,12 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
   ?vertreiber=<id>, &alle=1, beide Sprachen, ohne Gate-Cookie → /zugang, /_seiten/... direkt → /zugang bzw. 404, angemeldet:
   Formular + Kopf „Deine Bewertung“, Bewertung speichern → Hinweis, Neubau-Zähler +1; offene S86-Prüfungen (Logo-Wechsel, /admin/strains
   Formular, Sativa/Indica-InfoKnopf); Tab wieder dunkel. Observability cpuTimeMs Leseseiten ≤ 3 ms, /api/ich/strain messen.
-- PROBLEM Build-Budget: ~25 min/Build bei 3000 Min/Monat → nur ~4 Neubauten/Tag. Deckel steht auf 5. Hinweistext sagt „etwa 5 Minuten“,
+- ENTSCHIEDEN (Nutzer 2026-10-22): Vertreiber ist Nebensache. Vertreiberwahl NUR im Bewertungsformular auf der Strain-Seite,
+  nicht in Filtern, nicht in der Übersicht, keine Seitenvariante je Vertreiber. Hersteller-/Vertreiberübersicht bleibt, ruhig.
+  → Umbau: eine statische Seite je Strain (854 statt 3064, Build ~8 min), [auswahl]-Segment und ?vertreiber= als Seitenzustand
+  entfernen, Vertreiber-Select ins Formular, Vertreiberleiste zurücknehmen, Vertreiber-Filter raus. Nach Insel-Agent und Live-Prüfung
+  als Plan + Worktree-Agent starten (Skills: edge-stack-master, ui-design-engine, better-layout, hicks-law, lean-build, TDD).
+- PROBLEM Build-Budget (durch Entscheidung oben gelöst, sobald umgesetzt): ~25 min/Build bei 3000 Min/Monat → nur ~4 Neubauten/Tag. Deckel steht auf 5. Hinweistext sagt „etwa 5 Minuten“,
   real eher 25–30 → Text anpassen. VORSCHLAG (Nutzer noch nicht entschieden): eine Seite je Strain (854 statt 3064), Vertreiberwahl
   clientseitig → Build ~8 min. Mit Nutzer klären, dann planen.
 - NÄCHSTE UI-AUFGABE (Nutzer freigegeben): /blueten-Kopf als Hero mit Hintergrundvideo pflanze-loop (NUR das Video der Startseiten-
