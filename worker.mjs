@@ -11,6 +11,8 @@
 // laden), darum ist er vor der ersten Anfrage fertig.
 import worker from "./.open-next/worker.js";
 
+import { tor } from "./lib/tor.ts";
+
 export { BucketCachePurge, DOQueueHandler, DOShardedTagCache } from "./.open-next/worker.js";
 
 // Fehler hier nicht schlucken wollen, aber auch keinen unbehandelten Fehler beim
@@ -27,6 +29,9 @@ const einstieg = {
     if (new URL(request.url).pathname.startsWith("/_next/static/")) {
       return new Response("Not Found", { status: 404, headers: { "Cache-Control": "no-store" } });
     }
+    // Leseseiten aus Static Assets nach Gate-Pruefung, ohne Next (Spec 2026-10-21, Seiten aus Assets).
+    const antwort = await tor(request, env);
+    if (antwort) return antwort;
     return worker.fetch(request, env, ctx);
   },
 
