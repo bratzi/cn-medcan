@@ -1,6 +1,6 @@
 import type { BlueteZeile, KatalogWare, StrainZeile } from "@/lib/katalog/typen";
 import { normalisiere } from "@/lib/katalog/verdichten";
-import { NOTEN_STUFEN, TREFFER_PRO_SEITE, type StrainFilter } from "@/lib/query/filter";
+import { NOTEN_STUFEN, TREFFER_PRO_SEITE, aktiveRichtung, standardRichtung, type StrainFilter } from "@/lib/query/filter";
 
 export { normalisiere, verdichte } from "@/lib/katalog/verdichten";
 
@@ -78,7 +78,10 @@ type Sortierbar = { name: string; community: { note: number; stimmen: number } |
 function vergleiche(f: StrainFilter) {
   const name = (a: Sortierbar, b: Sortierbar) => a.name.localeCompare(b.name, "de");
   const note = (x: Sortierbar) => x.community?.note ?? -1;
-  return (a: Sortierbar, b: Sortierbar): number => {
+  // Gegen den Standard (Spec 2026-10-21, 4): die ganze Reihenfolge kippt.
+  const dreh = aktiveRichtung(f) === standardRichtung(f.sortierung) ? 1 : -1;
+  return (a: Sortierbar, b: Sortierbar): number => dreh * grund(a, b);
+  function grund(a: Sortierbar, b: Sortierbar): number {
     switch (f.sortierung) {
       case "community": return note(b) - note(a) || (b.community?.stimmen ?? 0) - (a.community?.stimmen ?? 0) || name(a, b);
       case "stimmen": return (b.community?.stimmen ?? 0) - (a.community?.stimmen ?? 0) || name(a, b);
@@ -89,7 +92,7 @@ function vergleiche(f: StrainFilter) {
       case "relevanz": return b.geaendert.localeCompare(a.geaendert) || name(a, b);
       default: return name(a, b);
     }
-  };
+  }
 }
 
 const minPreis = (waren: readonly KatalogWare[]) => {

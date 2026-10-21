@@ -48,6 +48,14 @@ test("Suche: ohne Umlaute und Großschreibung", () => {
   assert.deepEqual(ids(filtere(V, f({ q: "beta" }))).sort(), ["k1", "k2"]);
 });
 
+test("Sortierung: richtung dreht die Reihenfolge, Standard bleibt", () => {
+  const auf = ids(filtere(V, f({ sortierung: "name" })));
+  assert.deepEqual(ids(filtere(V, f({ sortierung: "name", richtung: "ab" }))), [...auf].reverse());
+  assert.deepEqual(ids(filtere(V, f({ sortierung: "name", richtung: "auf" }))), auf);
+  const thc = ids(filtere(V, f({ sortierung: "thc_absteigend" })));
+  assert.deepEqual(ids(filtere(V, f({ sortierung: "thc_absteigend", richtung: "auf" }))), [...thc].reverse());
+});
+
 test("Community: Mindestnote und nur bewertet lassen Zeilen ohne Note fallen", () => {
   assert.deepEqual(ids(filtere(V, f({ note: 4 }))), ["k1"]);
   assert.deepEqual(ids(filtere(V, f({ note: 4.5 }))), []);
