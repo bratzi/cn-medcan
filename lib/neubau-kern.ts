@@ -1,5 +1,5 @@
 /** Höchstens so viele Neubauten am Tag aus Änderungen; dazu einer täglich per Cron (Spec 2026-10-21, 3.4). */
-export const NEUBAU_JE_TAG = 15;
+export const NEUBAU_JE_TAG = 5;
 
 /** Reiner Kern ohne Next- und Cloudflare-Importe, damit er ohne Worker testbar ist. */
 export async function neubauAnstossen(deps: {
