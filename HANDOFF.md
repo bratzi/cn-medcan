@@ -3,7 +3,7 @@
 > Übergabemedium zwischen Sessions. Wird nach jedem Arbeitsblock aktualisiert und committet.
 > Wer hier weiterarbeitet, liest diese Datei zuerst und braucht den Chatverlauf nicht.
 
-**Letzte Aktualisierung:** 2026-10-21 (Session 86)
+**Letzte Aktualisierung:** 2026-10-22 (Session 87)
 **Repo:** https://github.com/bratzi/cn-medcan (public)
 **Branch:** `main` (Makeover „Grünes Buch“ Teilprojekt 1 ist seit 2026-09-24 auf `main`)
 
@@ -27,6 +27,25 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 ---
 
 ## ⇢ Hier geht es weiter
+
+### ⇢ SESSION 87 (2026-10-21/22): LIVE-SEITE DOWN (1102) — Umbau „Seiten aus Assets“ läuft – SAFE4CLEAR
+- Befund: Live liefert fast nur Error 1102 (CPU). Strain-Seite force-dynamic 100–450 ms CPU, auch KV-Cache-Treffer 2–12 ms;
+  Free 10 ms wird jetzt hart durchgesetzt. Spec docs/superpowers/specs/2026-10-21-seiten-aus-assets-design.md, Plan
+  docs/superpowers/plans/2026-10-21-seiten-aus-assets.md (beide freigegeben). Nutzer: kostenlos, neue Bewertung nach ~5 min ok,
+  Beta-Hinweis nach jeder Bewertung.
+- SDD-Ledger: .superpowers/sdd/2026-10-21-seiten-aus-assets/progress.md (ZUERST LESEN, dort Rulings + Stand).
+- Worktrees (node_modules = Junction auf C:/cn/node_modules, lib/generated kopiert):
+  A C:/cn-assets-a Branch assets-a (Tasks 1–3, Tor + Build) bis 79d4538 – Re-Review offen.
+  B C:/cn-assets-b Branch assets-b (Tasks 4–5, Strain statisch + Insel) bis 4b389e9 – Review offen.
+  C C:/cn-assets-c Branch assets-c (Tasks 6–7, Neubau + Hinweis) bis bbb44d1 – FERTIG, review clean.
+- NÄCHSTE SCHRITTE: Re-Review A dispatchen; Review B dispatchen (Fix mit Rulings: Bewerten-Kopf durch Insel, Anker für
+  Buchfilter); dann mergen A, B, C nach main (Konflikte worker.mjs fetch/scheduled beide übernehmen, wrangler.jsonc assets
+  + crons, lib/seiten-tor.ts byte-gleich), npm test + typecheck; Task 8: Deploy-Hook im Dashboard anlegen (Worker www →
+  Settings → Builds → Deploy Hooks, Branch main), `wrangler secret put DEPLOY_HOOK_URL`, Migration 0033 remote +
+  db/constraints.sql remote, edge-stack-master §6 + /neu-Meldung, push, CI-Log prüfen ([seiten] N, html_handling none
+  liefert 200), Live-Prüfagent (inkl. offene S86-Prüfungen, Tab wieder dunkel), Observability cpuTimeMs ≤ 3 ms.
+- Regel neu (Memory): je Agent Skills vorab selbst laden und als feste Liste mitgeben; nach erledigten Agent-Aufgaben Safe4Clear.
+- Brief-/Review-Dateien unter .superpowers/sdd/2026-10-21-seiten-aus-assets/ (strang-*-report.md, strang-*-review.md).
 
 ### ⇢ SESSION 86 (2026-10-21): Strain-Liste + Strain-Seite umgebaut, live (e644324)
 - Live und geprüft (Agent): Chipleiste/Popover/Sheet, Sortier-Segment mit Richtung (richtung=auf|ab), „…“-Menü
