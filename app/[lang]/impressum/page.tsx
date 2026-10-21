@@ -93,16 +93,6 @@ export default async function ImpressumPage() {
                   </a>
                 )}
               </dd>
-              <dt className="text-text-muted">Telefon</dt>
-              <dd>
-                {istPlatzhalter(b.telefon) ? (
-                  <Angabe wert={b.telefon} />
-                ) : (
-                  <a href={`tel:${b.telefon.replace(/[^\d+]/g, "")}`} className={textLinkKlassen("wrap-break-word")}>
-                    {b.telefon}
-                  </a>
-                )}
-              </dd>
             </dl>
           </section>
 
