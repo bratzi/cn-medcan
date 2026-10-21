@@ -50,6 +50,8 @@ model Unternehmen {
   rolle     String
   gdpNummer String? @map("gdp_nummer")
   website   String?
+  /// Logo als Datei unter public/marken/ (z. B. /marken/hersteller/aurora.svg); leer: Initialen-Marke.
+  logoPfad  String? @map("logo_pfad")
 
   hergestellt Strain[] @relation("Hersteller")
   importiert  Strain[] @relation("Importeur")
