@@ -548,7 +548,8 @@ export const en: Woerterbuch = {
     spalten: { charge: "Batch", thc: "THC measured", cbd: "CBD measured", analyse: "Analysis date", verfall: "Expiry" },
     aussicht: "Pharmacies and prices: coming later. Information as of {datum}.",
     vertreiber: {
-      wahlTitel: "Your strain is from",
+      wahlKurz: "Your strain is from {name}",
+      wahlAendern: "Pick another distributor",
       wahlHinweis: "The same flower comes from several distributors. Pick the one your batch is from.",
       fehlt: "Distributor missing? Suggest it",
       unbekannt: "Distributor unknown",

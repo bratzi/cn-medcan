@@ -34,7 +34,7 @@ function Haken() {
 }
 
 /**
- * Ware im Bewertungsformular (Spec Sorte im Fokus, 2): Vertreiber Pflicht, Stärke freiwillig und nur,
+ * Zuordnung im Bewertungsformular (Spec Sorte im Fokus, 2): Vertreiber Pflicht (aus der Hersteller-Leiste), Variante freiwillig und nur,
  * wenn der Vertreiber mehrere Produkte der Sorte führt. Schreibt die versteckten Felder `vertreiberId`
  * und `strainId` (leer = „Weiß ich nicht“); geprüft wird in der Server Action.
  */
@@ -42,49 +42,38 @@ export function WareWahlFeld({ waren, vorgewaehlt, texte, sprache, kultivarId }:
   // Ohne bekannten Vertreiber lässt sich nicht bewerten (Pflichtfeld); solche Waren stehen hier nicht.
   const waehlbar = waren.filter((w) => w.vertreiberId);
   const start = waehlbar.find((w) => w.vertreiberId === vorgewaehlt.vertreiberId) ?? waehlbar[0];
-  const [vertreiberId, setVertreiberId] = useState(start?.vertreiberId ?? "");
+  const vertreiberId = start?.vertreiberId ?? "";
   const [strainId, setStrainId] = useState(
     start && start.produkte.length > 1 && start.produkte.some((p) => p.id === vorgewaehlt.strainId) ? (vorgewaehlt.strainId ?? "") : "",
   );
   const ware = waehlbar.find((w) => w.vertreiberId === vertreiberId);
 
-  function vertreiberWaehlen(id: string) {
-    setVertreiberId(id);
-    setStrainId("");
-  }
+  const [vor, nach = ""] = texte.wahlKurz.split("{name}");
 
   return (
     <div className="flex flex-col gap-8">
       <input type="hidden" name="vertreiberId" value={vertreiberId} />
       <input type="hidden" name="strainId" value={strainId} />
 
-      <div role="group" aria-labelledby="ware-wahl-vertreiber" className="flex flex-col gap-4">
-        <h3 id="ware-wahl-vertreiber" className="text-h3 text-text">
-          {texte.wahlTitel}
-        </h3>
+      {/* Den Vertreiber wählt die Hersteller-Leiste über der Wertung (Spec 2026-10-21, 1.3); hier steht
+          nur noch ein Satz, wofür die Bewertung zählt, mit Rücksprung zur Leiste. */}
+      <p className="flex flex-wrap items-baseline gap-x-4 gap-y-2 text-body text-text">
+        <span>
+          {vor}
+          <strong className="font-medium">{ware?.vertreiberName || texte.unbekannt}</strong>
+          {nach}
+        </span>
         {waehlbar.length > 1 ? (
-          <ul className="flex flex-wrap gap-2">
-            {waehlbar.map((w) => {
-              const an = w.vertreiberId === vertreiberId;
-              return (
-                <li key={w.vertreiberId}>
-                  <button type="button" aria-pressed={an} onClick={() => vertreiberWaehlen(w.vertreiberId)} className={cn(CHIP, an ? AN : AUS)}>
-                    {an ? <Haken /> : null}
-                    {w.vertreiberName || texte.unbekannt}
-                  </button>
-                </li>
-              );
-            })}
-          </ul>
-        ) : (
-          <p className="text-body text-text">{ware?.vertreiberName || texte.unbekannt}</p>
-        )}
+          <a href="#hersteller-titel" className={namenLinkKlassen()}>
+            {texte.wahlAendern}
+          </a>
+        ) : null}
         {kultivarId ? (
-          <Link prefetch={false} href={`/vorschlagen?kultivar=${kultivarId}`} className={namenLinkKlassen("self-start")}>
+          <Link prefetch={false} href={`/vorschlagen?kultivar=${kultivarId}`} className={namenLinkKlassen()}>
             {texte.fehlt}
           </Link>
         ) : null}
-      </div>
+      </p>
 
       {ware && ware.produkte.length > 1 ? (
         <div role="group" aria-labelledby="ware-wahl-staerke" aria-describedby="ware-wahl-staerke-hinweis" className="flex flex-col gap-4">
