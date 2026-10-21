@@ -70,6 +70,43 @@ test("Karte: Handelsname nie in Handschrift, Wert hat sr-only-Text", () => {
   assert.match(karte, /sr-only/);
 });
 
+/** Direkte Kind-Elemente des <article>, ohne das absolut gesetzte Akzentband. */
+function kindZeilen(html: string): string[] {
+  const start = html.indexOf("<article");
+  const innen = html.slice(html.indexOf(">", start) + 1, html.lastIndexOf("</article>"));
+  const leer = new Set(["img", "br", "hr", "input", "source", "meta", "link"]);
+  const kinder: string[] = [];
+  let tiefe = 0;
+  for (const m of innen.matchAll(/<(\/?)([a-z0-9]+)([^>]*?)(\/?)>/g)) {
+    const [ganz, zu, tag, , selbst] = m;
+    if (zu) { tiefe--; continue; }
+    if (tiefe === 0) kinder.push(ganz);
+    if (!selbst && !leer.has(tag)) tiefe++;
+  }
+  return kinder.filter((k) => !k.includes("kultivar-band"));
+}
+
+test("Karte C1: Name, Note, Terpen-Punkte, THC, dann Fuß mit Hersteller, CBD", () => {
+  for (const html of [bluete(), strain()]) {
+    const pos = ["data-name", "data-community", "data-geschmack", "data-thc", "data-fuss"].map((m) => html.indexOf(m));
+    assert.ok(pos.every((p) => p >= 0), `Teil fehlt: ${pos.join(",")}`);
+    assert.deepEqual([...pos].sort((a, b) => a - b), pos);
+    assert.match(html.slice(pos[3], pos[4]), /THC/);
+    const fuss = html.slice(pos[4]);
+    assert.doesNotMatch(fuss, /THC/);
+    assert.match(fuss, /Alpha GmbH/);
+    assert.match(fuss, /CBD/);
+    assert.match(fuss, /text-caption text-text-muted/);
+    assert.equal(kindZeilen(html).length, 5);
+  }
+});
+
+test("Karte C1: keine verbotenen Wörter sichtbar", () => {
+  for (const html of [bluete(), strain()]) {
+    assert.doesNotMatch(html.replace(/<[^>]+>/g, " "), /Ware|Stärke/);
+  }
+});
+
 test("Blättern: Links funktionieren ohne JS, aktuelle Seite markiert", () => {
   const b = readFileSync("components/katalog/Blaettern.tsx", "utf8");
   assert.match(b, /href=\{hrefFuer\(/);
