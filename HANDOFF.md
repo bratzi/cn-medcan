@@ -28,6 +28,14 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 
 ## ⇢ Hier geht es weiter
 
+### ⇢ NÄCHSTE AUFGABE nach S87-Abschluss (eingetaktet 2026-10-22, Nutzer): Admin-Schnellzugriff Drittsysteme
+- Im Admin-Menü übersichtlich (eigene Kachel-/Linkleiste) Ein-Klick-Direktlinks zu allen genutzten Drittsystemen:
+  Cloudflare Dashboard (Worker, D1-Datenbank direkt, Logs/Observability, DNS), GitHub-Repo + Actions, Publora,
+  Instagram, Supabase/sonstige laut wrangler.jsonc/.env-Namen (Bestand vorher per grep ermitteln, nichts erfinden).
+- Links öffnen in neuem Tab, Account-/Ressourcen-IDs aus Konfiguration, keine Geheimnisse ins Bundle.
+- Volles Skillset laut Memory (ui-design-engine, better-interface, better-layout, critique-*, frontend-design,
+  hicks-law/law-of-common-region, edge-stack-master); Ablauf SDD: Prototyp live per Browser, zeigen, dann Agent.
+
 ### ⇢ SESSION 87 (2026-10-21/22): Umbau „Seiten aus Assets“ AUF MAIN, Deploy läuft – SAFE4CLEAR
 - Anlass: Live fast nur Error 1102 (CPU, Free 10 ms). Spec/Plan: docs/superpowers/specs|plans/2026-10-21-seiten-aus-assets*.
   Ledger mit allen Rulings: .superpowers/sdd/2026-10-21-seiten-aus-assets/progress.md. Tasks 1–7 complete, reviews clean.
