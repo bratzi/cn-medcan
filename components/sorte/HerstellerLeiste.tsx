@@ -57,7 +57,11 @@ export function HerstellerLeiste({ waren, aktiveVertreiberId, slug, texte, sprac
               >
                 <span className="flex h-12 w-full items-center justify-center">
                   {logo ? (
-                    <MarkenLogo pfad={logo} className="max-h-12 max-w-full" />
+                    // Helle Platte in beiden Farbschemata: Logos bringen eigene Farben mit, dunkle Marken
+                    // verschwänden sonst auf dunklem Grund. Das Logo selbst bleibt unverändert.
+                    <span className="flex h-12 w-full items-center justify-center rounded-sm bg-neutral-50 px-2">
+                      <MarkenLogo pfad={logo} className="max-h-10 max-w-full" />
+                    </span>
                   ) : (
                     <span
                       aria-hidden="true"
