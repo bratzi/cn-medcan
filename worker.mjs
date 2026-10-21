@@ -30,8 +30,18 @@ const einstieg = {
     return worker.fetch(request, env, ctx);
   },
 
-  // Strain of the Month (Spec 2026-10-20 Teil B): am 1. und 15. um 00:00 UTC. Die Route fuehrt nur Faelliges aus.
-  async scheduled(_controller, env, ctx) {
+  // Zwei Takte: Strain of the Month am 1. und 15. um 00:00 UTC (die Route fuehrt nur Faelliges aus),
+  // taeglicher Neubau der Leseseiten um 03:00 UTC ueber den Deploy-Hook (Spec 2026-10-21).
+  async scheduled(controller, env, ctx) {
+    if (controller.cron === "0 3 * * *") {
+      if (!env.DEPLOY_HOOK_URL) return;
+      ctx.waitUntil(
+        fetch(env.DEPLOY_HOOK_URL, { method: "POST" }).then(async (antwort) => {
+          if (!antwort.ok) console.error("neubau-cron", antwort.status, await antwort.text());
+        }).catch((fehler) => console.error("neubau-cron", fehler)),
+      );
+      return;
+    }
     ctx.waitUntil(
       env.WORKER_SELF_REFERENCE.fetch("https://cn-medcan.intern/api/sotm/takt", { method: "POST" }).then(async (antwort) => {
         if (!antwort.ok) console.error("sotm-cron", antwort.status, await antwort.text());

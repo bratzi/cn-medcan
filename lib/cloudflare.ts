@@ -31,3 +31,9 @@ export async function requireVar(name: string): Promise<string> {
   }
   return value;
 }
+
+/** Deploy-Hook-URL für Neubauten (Secret DEPLOY_HOOK_URL). `null`, wenn sie fehlt (lokal, Tests). */
+export function deployHookUrl(): string | null {
+  const url = process.env.DEPLOY_HOOK_URL || (getEnvSync() as unknown as Record<string, string | undefined>).DEPLOY_HOOK_URL;
+  return url || null;
+}
