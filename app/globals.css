@@ -2539,8 +2539,27 @@ button.netz-marke:active .netz-marke-kreis {
   transform: translateY(0);
 }
 @starting-style {
-  .katalog-schublade[open] {
+  .katalog-schublade[open][data-art="sheet"] {
     transform: translateY(100%);
+  }
+}
+/* Chip-Popover ab lg (ChipFenster, Spec 2026-10-21): erscheint vom Chip aus, kurz und nur
+   Deckkraft plus leichte Skalierung; bei reduzierter Bewegung sofort. */
+.katalog-schublade[data-art="popover"] {
+  transform-origin: top left;
+}
+.katalog-schublade[data-art="popover"][data-rechts] {
+  transform-origin: top right;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .katalog-schublade[data-art="popover"] {
+    transition: opacity var(--duration-fast) var(--ease-standard), scale var(--duration-fast) var(--ease-standard);
+  }
+  @starting-style {
+    .katalog-schublade[open][data-art="popover"] {
+      opacity: 0;
+      scale: 0.97;
+    }
   }
 }
 .katalog-schublade::backdrop {
