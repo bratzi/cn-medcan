@@ -3,7 +3,7 @@
 > Übergabemedium zwischen Sessions. Wird nach jedem Arbeitsblock aktualisiert und committet.
 > Wer hier weiterarbeitet, liest diese Datei zuerst und braucht den Chatverlauf nicht.
 
-**Letzte Aktualisierung:** 2026-10-21 (Session 82)
+**Letzte Aktualisierung:** 2026-10-21 (Session 86)
 **Repo:** https://github.com/bratzi/cn-medcan (public)
 **Branch:** `main` (Makeover „Grünes Buch“ Teilprojekt 1 ist seit 2026-09-24 auf `main`)
 
@@ -27,6 +27,22 @@ Wer hier Features priorisiert: dieser Kern hat Vorrang vor Katalogkomfort.
 ---
 
 ## ⇢ Hier geht es weiter
+
+### ⇢ SESSION 86 (2026-10-21): Strain-Liste + Strain-Seite umgebaut, live (e644324)
+- Live und geprüft (Agent): Chipleiste/Popover/Sheet, Sortier-Segment mit Richtung (richtung=auf|ab), „…“-Menü
+  rechtsbündig, Popover nie abgeschnitten, Relevanz bei Suchtext, Note+Blätter auf einer Linie, kein Überlauf
+  (494/1236, hell/dunkel), longtask max 85 ms. Strain-Seite Reihenfolge Kopf, Angaben, Hersteller-Leiste
+  (Logo-Karten, Initialen-Fallback), Formular, Buch, Rest; lange Texte hinter InfoKnopf (auch Sativa/Indica, e644324).
+- Neu: Unternehmen.logoPfad (Migration 0032, remote eingespielt), Logos Cannamedical/Cansativa/Avaay in
+  public/marken/hersteller; /admin/hersteller (Pfad, kein Upload), /admin/strains (Stammdaten, Terpen-Konz. bleibt).
+- Dazu: Dunkel + Deutsch Standard (SPRACH_ERKENNUNG=false), Kopf „News“, Kennwortseite ohne Kopf/Fuß, Telefon aus Impressum.
+- OFFEN: Live nicht geprüft: Logo-Wechsel ?vertreiber= auf Strain mit mehreren Vertreibern, /admin/strains
+  Bearbeiten-Formular öffnen, Sativa/Indica-InfoKnopf live. Browser-Tab steht nach Prüfung auf HELL (zurückstellen).
+- OFFEN Nutzer-Frage: Startseite „Kapitel“ soll Bewertung „Stand zum Zeitpunkt“ zeigen statt letzte; Stelle unklar,
+  Screenshot vom Nutzer erbeten (Vermutung: KapitelAufschlag „Zuletzt bewertet“).
+- OFFEN: Logos für Four 20 Pharma, enua, Noc Pharma, mediproCan, Jumis (Seiten nicht erreichbar); Admin-Upload
+  mit Browser-Verkleinerung (Spec 3) fehlt; Startseiten-Text „Erst das Overall, dann die Terpz …“ evtl. hinter InfoKnopf.
+- Spec: docs/superpowers/specs/2026-10-21-bewertungsseite-ruhe-design.md
 
 ### ⇢ SESSION 85 (2026-10-21): Strain-Seite – Spec freigegeben, Prototyp gebaut – SAFE4CLEAR
 - Spec FREIGEGEBEN: docs/superpowers/specs/2026-10-21-strainseite-agentur-design.md (9c2f49e). Entscheidungen Nutzer:
