@@ -25,8 +25,8 @@ export type InArbeit = { id: string; titel: Zweisprachig; text: Zweisprachig };
 
 export const NEUIGKEITEN: readonly Neuigkeit[] = [
   {
-    id: "2026-10-22-seiten-schneller",
-    datum: "2026-10-22",
+    id: "2026-10-21-seiten-schneller",
+    datum: "2026-10-21",
     art: "behoben",
     titel: { de: "Seiten laden wieder", en: "Pages load again" },
     text: {
