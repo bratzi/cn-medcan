@@ -42,11 +42,16 @@ export function AromaWechsel(props: Props) {
   const { sprache, start, texte } = props;
   const [karte, setKarte] = useState<Karte>(start);
   const [laedt, setLaedt] = useState(false);
+  // Gewählter Vertreiber aus dem Explorer: der Link zum Strain am Ende zeigt auf genau diese Variante.
+  const [vertreiber, setVertreiber] = useState<string | null>(
+    () => props.sorten.find((s) => s.slug === start.slug)?.waren[0]?.vertreiberId ?? null,
+  );
   const gemerkt = useRef(new Map<string, AromaVorzeige | null>([[start.slug, start.daten]]));
   const laufend = useRef<AbortController | null>(null);
 
   async function wechsle(sorte: ExplorerSorte) {
     laufend.current?.abort();
+    setVertreiber(sorte.waren[0]?.vertreiberId ?? null);
     if (gemerkt.current.has(sorte.slug)) {
       setLaedt(false);
       setKarte({ slug: sorte.slug, name: sorte.name, daten: gemerkt.current.get(sorte.slug) ?? null });
@@ -81,6 +86,7 @@ export function AromaWechsel(props: Props) {
           kopf={props.kopf}
           vorwahl={start.slug}
           onSorte={wechsle}
+          onWare={setVertreiber}
         />
       ) : (
         <div className="flex flex-col gap-6">{props.kopf}</div>
@@ -105,7 +111,9 @@ export function AromaWechsel(props: Props) {
             texte={props.aromaTexte}
             zwischenruf={props.zwischenruf}
           >
-            <Link prefetch={false} href={`/blueten/${sorte.slug}`} className={buttonKlassen("secondary", "md")}>
+            {/* Einziger Link zum Strain (Nutzer 2026-10-22), zusammengeführt mit dem früheren im Explorer:
+                genauer ist Sorte plus gewählter Vertreiber, also die vorgerenderte Variante. */}
+            <Link prefetch={false} href={vertreiber ? `/blueten/${karte.slug}?vertreiber=${encodeURIComponent(vertreiber)}` : `/blueten/${sorte.slug}`} className={buttonKlassen("secondary", "md")}>
               {texte.zurSorte}
             </Link>
           </NoteUndErkundung>

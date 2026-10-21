@@ -9,7 +9,7 @@ import { ExplorerWareKarte } from "@/components/story/ExplorerWareKarte";
 import { SortenSuche } from "@/components/story/SortenSuche";
 import { differenz, explorerStart, explorerZustand, filtereSorten } from "@/components/story/explorer-zustand";
 import { buttonKlassen } from "@/components/ui/Button";
-import { einzelLinkKlassen } from "@/components/ui/textlink";
+import { InfoKnopf } from "@/components/ui/InfoKnopf";
 import { cn } from "@/lib/cn";
 import type { KultivarTyp } from "@/db/enums";
 import { formatiereZahl } from "@/lib/format";
@@ -35,6 +35,8 @@ type Props = {
   vorwahl?: string;
   /** Meldet jede neue Wahl, etwa damit die Aroma-Karte darunter mitwechselt. */
   onSorte?: (sorte: ExplorerSorte) => void;
+  /** Meldet den gewählten Vertreiber, damit der Link zum Strain am Ende der Bewertung auf ihn zeigt. */
+  onWare?: (vertreiberId: string) => void;
 };
 
 /**
@@ -42,7 +44,7 @@ type Props = {
  * Daten kommen statisch mit der Startseite; die Reihenfolge stammt aus waehleExplorerSorten
  * (Menge, dann Name), nie aus der Note (HWG). Ohne JavaScript steht die erste Sorte vollständig.
  */
-export function SortenExplorer({ sorten, texte, typen, sprache, kopf, zu, vorwahl, onSorte }: Props) {
+export function SortenExplorer({ sorten, texte, typen, sprache, kopf, zu, vorwahl, onSorte, onWare }: Props) {
   const [zustand, senden] = useReducer(
     (z: ReturnType<typeof explorerStart>, a: Parameters<typeof explorerZustand>[0]) => explorerZustand(a, z),
     sorten,
@@ -209,7 +211,10 @@ export function SortenExplorer({ sorten, texte, typen, sprache, kopf, zu, vorwah
             imVergleich={vergleich.some((v) => v.vertreiberId === w.vertreiberId)}
             texte={texte}
             sprache={sprache}
-            onWaehlen={() => senden({ typ: "ware", id: w.vertreiberId })}
+            onWaehlen={() => {
+              senden({ typ: "ware", id: w.vertreiberId });
+              onWare?.(w.vertreiberId);
+            }}
             onVergleichen={() => senden({ typ: "vergleichen", id: w.vertreiberId })}
           />
         ))}
@@ -239,25 +244,27 @@ export function SortenExplorer({ sorten, texte, typen, sprache, kopf, zu, vorwah
       ) : null}
 
       {ware ? (
-        <div className="flex flex-col gap-4 border-t border-border pt-8">
-          <p className="text-body text-text">
-            <span className="font-medium">{ware.vertreiberName}</span>
-            <span className="text-text-muted">, {mehrzahl(sprache, texte.staerken, ware.staerken)}</span>
-          </p>
-          {/* Von Restorff und Peak-End: eine gefüllte Aktion, sie lädt zur eigenen Bewertung ein. */}
-          <div className="flex flex-wrap items-center gap-x-8 gap-y-4">
-            <Link prefetch={false} href={`/blueten/${sorte.slug}?vertreiber=${encodeURIComponent(ware.vertreiberId)}#bewerten`} className={buttonKlassen("primary", "md")}>
-              {texte.wareBewerten}
-            </Link>
-            <Link prefetch={false} href={`/blueten/${sorte.slug}?vertreiber=${encodeURIComponent(ware.vertreiberId)}`} className={einzelLinkKlassen("text-body")}>
-              {texte.zurSorte}
-            </Link>
+        // Nähe: Vertreiberzeile und Bewerten bilden eine Gruppe (8 px) direkt unter den Karten.
+        // „Zum Strain“ steht nur noch einmal, am Ende der Bewertung (Nutzer 2026-10-22); der
+        // HWG-Hinweis bleibt erreichbar im InfoKnopf neben der Vertreiberzeile.
+        <div className="flex flex-col items-start gap-2 border-t border-border pt-8 max-md:items-center">
+          <div className="flex items-center gap-2">
+            <p className="text-body text-text">
+              <span className="font-medium">{ware.vertreiberName}</span>
+              <span className="text-text-muted">, {mehrzahl(sprache, texte.staerken, ware.staerken)}</span>
+            </p>
+            <InfoKnopf sprache={sprache} text={texte.hinweis} />
           </div>
+          {/* Von Restorff und Peak-End: eine gefüllte Aktion, sie lädt zur eigenen Bewertung ein. */}
+          <Link prefetch={false} href={`/blueten/${sorte.slug}?vertreiber=${encodeURIComponent(ware.vertreiberId)}#bewerten`} className={buttonKlassen("primary", "md")}>
+            {texte.wareBewerten}
+          </Link>
         </div>
-      ) : null}
+      ) : (
+        <InfoKnopf sprache={sprache} text={texte.hinweis} />
+      )}
 
       {meldungZeile}
-      <p className="text-small text-text-muted">{texte.hinweis}</p>
     </div>
     </div>
   );
