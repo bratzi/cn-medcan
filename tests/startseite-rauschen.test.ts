@@ -23,3 +23,8 @@ test("Am Ende der Bewertung genau ein Link zum Strain, mit gewähltem Vertreiber
   assert.equal((wechsel.match(/texte\.zurSorte/g) ?? []).length, 1);
   assert.match(wechsel, /\?vertreiber=\$\{encodeURIComponent\(vertreiber\)\}/);
 });
+
+test("Link zum Strain zeigt nie auf den Produkt-Slug, auch ohne Vertreiber", () => {
+  const wechsel = lies("components/story/AromaWechsel.tsx");
+  assert.doesNotMatch(wechsel, /\/blueten\/\$\{sorte\.slug\}/);
+});

@@ -113,7 +113,7 @@ export function AromaWechsel(props: Props) {
           >
             {/* Einziger Link zum Strain (Nutzer 2026-10-22), zusammengeführt mit dem früheren im Explorer:
                 genauer ist Sorte plus gewählter Vertreiber, also die vorgerenderte Variante. */}
-            <Link prefetch={false} href={vertreiber ? `/blueten/${karte.slug}?vertreiber=${encodeURIComponent(vertreiber)}` : `/blueten/${sorte.slug}`} className={buttonKlassen("secondary", "md")}>
+            <Link prefetch={false} href={vertreiber ? `/blueten/${karte.slug}?vertreiber=${encodeURIComponent(vertreiber)}` : `/blueten/${karte.slug}`} className={buttonKlassen("secondary", "md")}>
               {texte.zurSorte}
             </Link>
           </NoteUndErkundung>

@@ -1063,7 +1063,6 @@ export const de = {
       vergleichTitel: "{a} und {b} im Vergleich",
       vergleichWahl: "Wähl eine zweite Blüte zum Vergleichen.",
       vergleichEnde: "Vergleich schließen",
-      zurSorte: "Zum Strain",
       wareBewerten: "Diese Blüte bewerten",
       sorteGewechselt: "{name}, {waren}.",
       bildAlt: "Blüte des Strains {name}",
