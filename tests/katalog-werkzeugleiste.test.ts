@@ -46,6 +46,21 @@ test("Werkzeugleiste: Sortier-Segment zeigt vier Knöpfe, aktiver pressed", () =
   assert.match(html, /aria-pressed="true"[^>]*>Stimmen</);
 });
 
+test("Werkzeugleiste: aktiver Segment-Knopf zeigt Pfeil und nennt die Richtung", () => {
+  const ab = leiste({ filter: { ...leererFilter(), sortierung: "stimmen" } });
+  assert.match(ab, /aria-pressed="true" aria-label="Stimmen, absteigend[^"]*"[^>]*>Stimmen<span aria-hidden="true"[^>]*>↓</);
+  const auf = leiste({ filter: { ...leererFilter(), sortierung: "stimmen", richtung: "auf" } });
+  assert.match(auf, /aria-label="Stimmen, aufsteigend[^"]*"[^>]*>Stimmen<span aria-hidden="true"[^>]*>↑</);
+  assert.doesNotMatch(ab, />Neueste<span aria-hidden/);
+});
+
+test("SortierSegment: Klick auf aktiven Knopf dreht die Richtung, anderer setzt Standard", async () => {
+  const { naechsteSortierung } = await import("@/lib/katalog/chipleiste");
+  assert.deepEqual(naechsteSortierung({ ...leererFilter(), sortierung: "stimmen" }, "stimmen"), { sortierung: "stimmen", richtung: "auf", seite: 1 });
+  assert.deepEqual(naechsteSortierung({ ...leererFilter(), sortierung: "stimmen", richtung: "auf" }, "stimmen"), { sortierung: "stimmen", richtung: "ab", seite: 1 });
+  assert.deepEqual(naechsteSortierung({ ...leererFilter(), sortierung: "stimmen", richtung: "auf" }, "neueste"), { sortierung: "neueste", richtung: undefined, seite: 1 });
+});
+
 test("Werkzeugleiste: Sortierung aus Mehr-Menü markiert den …-Knopf", () => {
   const html = leiste({ filter: { ...leererFilter(), sortierung: "name" } });
   assert.match(html, /aria-pressed="true"[^>]*>Name/);

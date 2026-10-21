@@ -82,10 +82,10 @@ export function Werkzeugleiste({ texte, trefferText, gesamt, aktiveChips, zuruec
         <Treffer text={trefferText} />
 
         <div className="ms-auto lg:hidden">
-          <SortierChip wert={filter.sortierung} setze={setze} texte={texte.leiste} {...steuerung("sortierung")} />
+          <SortierChip filter={filter} setze={setze} texte={texte.leiste} {...steuerung("sortierung")} />
         </div>
         <div className="ms-auto hidden lg:block">
-          <SortierSegment wert={filter.sortierung} setze={setze} texte={texte.leiste} {...steuerung("sortierMehr")} />
+          <SortierSegment filter={filter} setze={setze} texte={texte.leiste} {...steuerung("sortierMehr")} />
         </div>
       </div>
 
