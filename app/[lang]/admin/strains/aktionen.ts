@@ -5,14 +5,14 @@ import { revalidiereKatalog } from "@/lib/katalog/revalidieren";
 import { getPrisma } from "@/lib/prisma";
 import { istEindeutigkeitsfehler } from "@/lib/prisma-fehler";
 import { adminErforderlich } from "@/lib/session";
-import { strainStammPruefen, strainSuchtext } from "@/lib/strain-stamm-eingabe";
+import { strainStammPruefen, strainSuchtext, terpenAbgleich } from "@/lib/strain-stamm-eingabe";
 
 export type StammErgebnis = { ok: true } | { ok: false; fehler: string } | null;
 
 /**
  * Stammdaten einer Strain speichern (Spec 2026-10-21, Abschnitt 3). Gate als erste Zeile:
  * die Aktion ist über ihre Id auch ohne die Seite aufrufbar. Der Slug bleibt, damit Links halten.
- * D1 ohne Transaktion: Terpene werden ersetzt; ein zweites Speichern heilt einen Abbruch.
+ * D1 ohne Transaktion: Terpene werden abgeglichen; ein zweites Speichern heilt einen Abbruch.
  */
 export async function strainStammSpeichern(_vorher: StammErgebnis, formData: FormData): Promise<StammErgebnis> {
   await adminErforderlich();
@@ -73,11 +73,19 @@ export async function strainStammSpeichern(_vorher: StammErgebnis, formData: For
     throw fehler;
   }
 
-  await prisma.strainTerpen.deleteMany({ where: { strainId: w.strainId } });
-  if (w.terpenIds.length) {
-    await prisma.strainTerpen.createMany({
-      data: w.terpenIds.map((terpenId, i) => ({ strainId: w.strainId, terpenId, rang: i + 1 })),
-    });
+  // Konzentrationen bleiben erhalten: bleibende Zeilen bekommen nur den neuen Rang.
+  const vorhanden = await prisma.strainTerpen.findMany({ where: { strainId: w.strainId }, select: { terpenId: true, rang: true } });
+  const { loeschen, rangNeu, anlegen } = terpenAbgleich(vorhanden, w.terpenIds);
+  if (loeschen.length) await prisma.strainTerpen.deleteMany({ where: { strainId: w.strainId, terpenId: { in: loeschen } } });
+  // Rang ist je Strain eindeutig: erst auf freie negative Ränge parken, dann auf den Zielrang.
+  for (const r of rangNeu) {
+    await prisma.strainTerpen.update({ where: { strainId_terpenId: { strainId: w.strainId, terpenId: r.terpenId } }, data: { rang: -r.rang } });
+  }
+  for (const r of rangNeu) {
+    await prisma.strainTerpen.update({ where: { strainId_terpenId: { strainId: w.strainId, terpenId: r.terpenId } }, data: { rang: r.rang } });
+  }
+  if (anlegen.length) {
+    await prisma.strainTerpen.createMany({ data: anlegen.map((a) => ({ strainId: w.strainId, terpenId: a.terpenId, rang: a.rang })) });
   }
 
   await revalidiereKatalog();

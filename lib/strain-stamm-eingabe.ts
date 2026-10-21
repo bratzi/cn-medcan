@@ -88,3 +88,25 @@ export function strainStammPruefen(eingabe: Record<string, unknown>): StammPruef
 export function strainSuchtext(handelsname: string, kultivarName: string | null): string {
   return [handelsname, kultivarName].filter(Boolean).join(" ").toLowerCase();
 }
+
+export type TerpenRang = { terpenId: string; rang: number };
+
+/**
+ * Abgleich der Terpen-Zeilen: bleibende Terpene behalten ihre Zeile samt Konzentration und
+ * bekommen nur den neuen Rang, entfernte werden gelöscht, neue ohne Konzentration angelegt.
+ */
+export function terpenAbgleich(
+  vorhanden: TerpenRang[],
+  neu: string[],
+): { loeschen: string[]; rangNeu: TerpenRang[]; anlegen: TerpenRang[] } {
+  const alt = new Map(vorhanden.map((v) => [v.terpenId, v.rang]));
+  const ziel = new Set(neu);
+  const rangNeu: TerpenRang[] = [];
+  const anlegen: TerpenRang[] = [];
+  neu.forEach((terpenId, i) => {
+    const rang = i + 1;
+    if (!alt.has(terpenId)) anlegen.push({ terpenId, rang });
+    else if (alt.get(terpenId) !== rang) rangNeu.push({ terpenId, rang });
+  });
+  return { loeschen: vorhanden.filter((v) => !ziel.has(v.terpenId)).map((v) => v.terpenId), rangNeu, anlegen };
+}

@@ -1,6 +1,27 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { strainStammPruefen, strainSuchtext } from "@/lib/strain-stamm-eingabe";
+import { strainStammPruefen, strainSuchtext, terpenAbgleich } from "@/lib/strain-stamm-eingabe";
+
+test("Terpen-Abgleich: bleibende behalten Konzentration (nur Rang), entfernte gelöscht, neue angelegt", () => {
+  const r = terpenAbgleich(
+    [
+      { terpenId: "a", rang: 1 },
+      { terpenId: "b", rang: 2 },
+      { terpenId: "c", rang: 3 },
+    ],
+    ["c", "a", "d"],
+  );
+  assert.deepEqual(r.loeschen, ["b"]);
+  assert.deepEqual(r.rangNeu, [
+    { terpenId: "c", rang: 1 },
+    { terpenId: "a", rang: 2 },
+  ]);
+  assert.deepEqual(r.anlegen, [{ terpenId: "d", rang: 3 }]);
+});
+
+test("Terpen-Abgleich: unveränderte Reihenfolge ändert nichts", () => {
+  assert.deepEqual(terpenAbgleich([{ terpenId: "a", rang: 1 }], ["a"]), { loeschen: [], rangNeu: [], anlegen: [] });
+});
 
 const basis = {
   strainId: "s1",
