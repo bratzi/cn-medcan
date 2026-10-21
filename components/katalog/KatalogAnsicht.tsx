@@ -5,42 +5,27 @@ import {
   useCallback,
   useDeferredValue,
   useEffect,
-  useId,
-  useLayoutEffect,
   useMemo,
   useReducer,
   useRef,
   useState,
-  useSyncExternalStore,
 } from "react";
 
 import { Blaettern } from "@/components/katalog/Blaettern";
-import { FilterFeld, SuchFeld } from "@/components/katalog/FilterFelder";
-import { FilterSchublade } from "@/components/katalog/FilterSchublade";
-import { GeschmackLegende } from "@/components/katalog/GeschmackZeile";
+import { SuchFeld } from "@/components/katalog/FilterFelder";
 import { BlueteKarte, StrainKarte, type KartenTexte } from "@/components/katalog/KatalogKarte";
-import { MobilLeiste } from "@/components/katalog/MobilLeiste";
-import { Werkzeugleiste } from "@/components/katalog/Werkzeugleiste";
+import { Werkzeugleiste, type AktiverChip } from "@/components/katalog/Werkzeugleiste";
 import type { DiashowBild } from "@/components/produkt/BudpicDiashow";
 import { SKELETT_FLAECHE, SkelettAnsage } from "@/components/story/Skelette";
 import { buttonKlassen } from "@/components/ui/Button";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { einzelLinkKlassen, textLinkKlassen } from "@/components/ui/textlink";
 import { alsDiashow } from "@/lib/budpic-anzeige";
-import { cn } from "@/lib/cn";
 import { formatierePreisProGramm, formatiereZahl } from "@/lib/format";
 import type { Sprache } from "@/lib/i18n/sprache-kern";
 import { mehrzahl, t } from "@/lib/i18n/text";
 import type { Woerterbuch } from "@/lib/i18n/typen";
-import { CHIPS } from "@/lib/katalog/chipleiste";
 import { filtere, verdichte, zaehleOptionen, type KatalogErgebnis } from "@/lib/katalog/filtern";
-import {
-  abonniereFilterSpalte,
-  filterSpalteOffen,
-  gespeicherteFilterWahl,
-  setzeFilterWahl,
-  zeigeFilterWahl,
-} from "@/lib/katalog/filterspalte";
 import type { BlueteZeile, KatalogDaten } from "@/lib/katalog/typen";
 import { filterDeaktiviert, weiter, type Ladezustand } from "@/lib/katalog/zustand";
 import type { BudpicAnzeige } from "@/lib/query/budpics";
@@ -55,10 +40,10 @@ type Props = {
 };
 
 /**
- * Raster der Karten (Task 2): Spalten ab 15rem, so viele wie passen (bei 1280 px ohne Filterspalte
- * vier, bei 1920 px mit Spalte fünf). Jede Karte spannt fünf Zeilen, die sie per subgrid teilt.
+ * Raster der Karten (Spec 2026-10-21): volle Breite ohne Filterspalte, 1/2/3/4/5 Spalten.
+ * Jede Karte spannt fünf Zeilen, die sie per subgrid teilt.
  */
-const RASTER = "grid grid-cols-[repeat(auto-fill,minmax(min(15rem,100%),1fr))] gap-6";
+const RASTER = "grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5";
 const KARTEN_ZELLE = "row-span-5 grid min-w-0 grid-cols-1 grid-rows-subgrid";
 
 const START: Ladezustand = { art: "start" };
@@ -75,23 +60,13 @@ function adresse(filter: StrainFilter): string {
   return `${window.location.pathname}${query ? `?${query}` : ""}`;
 }
 
-function aktiveAnzahl(f: StrainFilter, leer: StrainFilter): number {
-  return (
-    (f.q ? 1 : 0) + f.typ.length + f.form.length + f.geschmack.length + f.terp.length + f.vertreiber.length + f.apotheke.length +
-    (f.thcMin !== leer.thcMin || f.thcMax !== leer.thcMax ? 1 : 0) + (f.preisMax !== undefined ? 1 : 0) +
-    (f.note !== undefined ? 1 : 0) + (f.bewertet ? 1 : 0) + (f.cbd ? 1 : 0) + (f.nurVerfuegbar ? 1 : 0) + (f.kultivar ? 1 : 0)
-  );
-}
-
-type Chip = { schluessel: string; text: string; ohne: Partial<StrainFilter> };
-
-function aktiveChips(f: StrainFilter, w: Woerterbuch, sprache: Sprache, daten: KatalogDaten | null): Chip[] {
+function aktiveChips(f: StrainFilter, w: Woerterbuch, sprache: Sprache, daten: KatalogDaten | null): AktiverChip[] {
   const a = w.katalog.aktiv;
   const l = w.katalog.leiste;
   const leer = leererFilter();
   const vertreiber = new Map(daten?.vertreiber.map((v) => [v.i, v.n]) ?? []);
   const apotheken = new Map(daten?.apotheken.map((x) => [x.s, x.n]) ?? []);
-  const chips: Chip[] = [];
+  const chips: AktiverChip[] = [];
   if (f.q) chips.push({ schluessel: "q", text: t(a.suche, { wert: f.q }), ohne: { q: undefined } });
   for (const x of f.typ) chips.push({ schluessel: `typ-${x}`, text: w.label.kultivarTyp[x], ohne: { typ: f.typ.filter((y) => y !== x) } });
   for (const x of f.form) chips.push({ schluessel: `form-${x}`, text: w.label.darreichungsform[x], ohne: { form: f.form.filter((y) => y !== x) } });
@@ -137,20 +112,10 @@ export function KatalogAnsicht({ start, w, sprache }: Props) {
   const texte = w.katalog;
   const [filter, setFilter] = useState<StrainFilter>(() => leererFilter());
   const [zustand, dispatch] = useReducer(weiter, START);
-  const [schubladeOffen, setSchubladeOffen] = useState(false);
   const [mitDeepLink, setMitDeepLink] = useState(false);
   const [budpics, setBudpics] = useState<ReadonlyMap<string, DiashowBild[]>>(new Map());
   const angefragt = useRef(new Set<string>());
   const listeRef = useRef<HTMLDivElement>(null);
-
-  // Filterspalte ab lg (lib/katalog/filterspalte.ts): sichtbar macht sie CSS, hier nur der Zustand für
-  // aria-expanded. Auf dem Server und bei der Hydration „zu“, danach aus Attribut und Breite.
-  const filterId = useId();
-  const filterOffen = useSyncExternalStore(abonniereFilterSpalte, filterSpalteOffen, () => false);
-  // Wahl aus dem Speicher nachziehen, vor dem Zeichnen: nach Reacts Entwicklungs-Remount (setzt die
-  // <html>-Attribute zurück) und falls das Kopf-Skript sie nicht setzen konnte.
-  useLayoutEffect(() => zeigeFilterWahl(gespeicherteFilterWahl()), []);
-  const filterUmschalten = useCallback(() => setzeFilterWahl(filterSpalteOffen() ? "zu" : "offen"), []);
 
   const laden = useCallback(() => {
     dispatch({ typ: "laden" });
@@ -257,8 +222,6 @@ export function KatalogAnsicht({ start, w, sprache }: Props) {
   }, [sichtbareKultivare, w, sprache]);
 
   const deaktiviert = filterDeaktiviert(zustand);
-  const leer = leererFilter();
-  const aktiv = aktiveAnzahl(filter, leer);
   const chips = aktiveChips(filter, w, sprache, daten);
   const gesamt = ergebnis?.gesamt ?? start.gesamt;
   const bluetenAnsicht = ergebnis ? ergebnis.ansicht === "bluete" : true;
@@ -268,91 +231,34 @@ export function KatalogAnsicht({ start, w, sprache }: Props) {
   const labels = { kultivarTyp: w.label.kultivarTyp, darreichungsform: w.label.darreichungsform, geschmack: w.label.geschmack };
   const zeigeSkelett = !ergebnis && mitDeepLink && zustand.art !== "fehler";
   const feldProps = { filter, zahlen, daten, setze, texte: texte.leiste, labels, sprache, deaktiviert };
-  // Übergang bis zur Chipleiste (Task B4): Felder untereinander.
-  const felder = (
-    <div className="flex flex-col gap-6">
-      <SuchFeld {...feldProps} />
-      {CHIPS.map((chip) => <FilterFeld key={chip} chip={chip} {...feldProps} />)}
-    </div>
-  );
 
   const trefferText = bluetenAnsicht
     ? mehrzahl(sprache, texte.kultivar.anzahl, gesamt)
     : mehrzahl(sprache, texte.anzahl, gesamt, { sichtbar: ergebnis?.zeilen.length ?? 0 });
 
   return (
-    <div className="mt-10">
-      <MobilLeiste filter={filter} aktiv={aktiv} gesamt={gesamt} setze={setze} oeffne={() => setSchubladeOffen(true)} texte={texte.leiste} />
-      <FilterSchublade
-        offen={schubladeOffen}
-        schliesse={() => setSchubladeOffen(false)}
-        gesamt={gesamt}
-        zuruecksetzen={zuruecksetzen}
-        zuruecksetzenText={texte.zuruecksetzen}
-        texte={texte.leiste}
-        sprache={sprache}
-      >
-        {felder}
-      </FilterSchublade>
+    <div className="mt-10 flex flex-col gap-6">
+      {/* Suche über der Leiste, volle Inhaltsbreite (Spec 2026-10-21). */}
+      <SuchFeld {...feldProps} />
 
-      {/* Werkzeugleiste über Filterspalte und Raster; Ziel beim Blättern, damit Sortierung und Zahl im Blick bleiben. */}
-      <div ref={listeRef} className="mt-6 flex scroll-mt-[calc(var(--kopf-h,4rem)+4.5rem)] flex-col gap-6 lg:mt-0">
+      {/* Ziel beim Blättern: Leiste und Raster, damit Sortierung und Zahl im Blick bleiben. */}
+      <div ref={listeRef} className="flex scroll-mt-(--kopf-h,4rem) flex-col gap-6">
         <Werkzeugleiste
-          filter={filter}
-          aktiv={aktiv}
-          filterOffen={filterOffen}
-          filterId={filterId}
-          umschalten={filterUmschalten}
-          setze={setze}
-          deaktiviert={deaktiviert}
-          trefferText={zeigeSkelett ? texte.laedt : trefferText}
+          {...feldProps}
           texte={texte}
+          trefferText={zeigeSkelett ? texte.laedt : trefferText}
+          gesamt={gesamt}
+          aktiveChips={chips}
+          zuruecksetzen={zuruecksetzen}
         />
 
-        <div className="flex flex-col gap-10 lg:flex-row lg:gap-16">
-          {/* Sichtbar nur per CSS (.katalog-filterspalte): ab lg nach Wahl, ohne Wahl ab 2xl; ausgeblendet nimmt das Raster die ganze Breite. */}
-          <aside
-            id={filterId}
-            aria-label={texte.filter}
-            className="katalog-filterspalte sticky top-[calc(var(--kopf-h,4rem)+2rem)] max-h-[calc(100dvh-var(--kopf-h,4rem)-4rem)] w-72 shrink-0 self-start overflow-y-auto"
-          >
-            {felder}
-          </aside>
-
-          <div className="flex min-w-0 flex-1 flex-col gap-6">
+        <div className="flex min-w-0 flex-col gap-6">
           {zustand.art === "fehler" ? (
             <div role="alert" className="flex flex-wrap items-center gap-4 border-l-2 border-border-strong pl-4 text-small text-text">
               <span>{texte.ladeFehler}</span>
               <button type="button" onClick={laden} className={einzelLinkKlassen()}>
                 {texte.erneutVersuchen}
               </button>
-            </div>
-          ) : null}
-
-          {chips.length > 0 ? (
-            <div className="flex flex-col gap-2">
-              <h2 className="sr-only">{texte.aktiv.titel}</h2>
-              <ul className="flex flex-wrap items-center gap-2">
-                {chips.map((chip) => (
-                  <li key={chip.schluessel}>
-                    <button
-                      type="button"
-                      disabled={deaktiviert}
-                      onClick={() => setze(chip.ohne)}
-                      aria-label={t(texte.aktiv.entfernen, { wert: chip.text })}
-                      className="inline-flex min-h-11 items-center gap-2 rounded-full border border-border-strong bg-surface px-4 text-small text-text hover:border-text focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring disabled:cursor-not-allowed"
-                    >
-                      {chip.text}
-                      <span aria-hidden="true">×</span>
-                    </button>
-                  </li>
-                ))}
-                <li>
-                  <button type="button" disabled={deaktiviert} onClick={zuruecksetzen} className={cn("min-h-11 px-2", einzelLinkKlassen())}>
-                    {texte.alleLoeschen}
-                  </button>
-                </li>
-              </ul>
             </div>
           ) : null}
 
@@ -375,7 +281,6 @@ export function KatalogAnsicht({ start, w, sprache }: Props) {
             />
           ) : (
             <div className="flex flex-col gap-4">
-              <GeschmackLegende texte={w.katalog.geschmack} />
               <ul className={RASTER}>
                 {ergebnis?.ansicht === "ware"
                   ? ergebnis.zeilen.map((zeile) => (
@@ -411,7 +316,6 @@ export function KatalogAnsicht({ start, w, sprache }: Props) {
             }}
             texte={texte}
           />
-          </div>
         </div>
       </div>
     </div>

@@ -1,72 +1,107 @@
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { test } from "node:test";
 import { createElement, type ComponentProps } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 
 import { KatalogAnsicht } from "@/components/katalog/KatalogAnsicht";
-import { MobilLeiste } from "@/components/katalog/MobilLeiste";
 import { Werkzeugleiste } from "@/components/katalog/Werkzeugleiste";
 import { de } from "@/lib/i18n/de";
+import { SORTIER_MEHR, SORTIER_SEGMENT } from "@/lib/katalog/chipleiste";
 import type { BlueteZeile } from "@/lib/katalog/typen";
-import { SORTIERUNGEN, leererFilter } from "@/lib/query/filter";
+import { leererFilter, type StrainFilter } from "@/lib/query/filter";
 
 const lies = (pfad: string) => readFileSync(pfad, "utf8");
 
-const leiste = (teil: Partial<ComponentProps<typeof Werkzeugleiste>> = {}) =>
+type LeistenProps = ComponentProps<typeof Werkzeugleiste>;
+const daten = (fachkreis: boolean): LeistenProps["daten"] => ({
+  vertreiber: [{ i: "v1", n: "Aurora" }],
+  terpene: [{ n: "Myrcen", g: "ERDIG" }],
+  apotheken: [{ s: "a1", n: "Apotheke Eins" }],
+  fachkreis,
+});
+
+const leiste = (teil: Partial<LeistenProps> = {}) =>
   renderToStaticMarkup(
     createElement(Werkzeugleiste, {
       filter: { ...leererFilter(), sortierung: "stimmen" },
-      aktiv: 2,
-      filterOffen: false,
-      filterId: "katalog-filter",
-      umschalten: () => undefined,
+      zahlen: null,
+      daten: daten(false),
       setze: () => undefined,
       deaktiviert: false,
       trefferText: "123 Blüten",
+      gesamt: 123,
+      aktiveChips: [],
+      zuruecksetzen: () => undefined,
       texte: de.katalog,
+      labels: de.label,
+      sprache: "de",
       ...teil,
     }),
   );
 
-const optionen = (html: string) => [...html.matchAll(/<option value="([^"]+)"[^>]*>([^<]+)<\/option>/g)];
-
-test("Werkzeugleiste: der Filter-Knopf steuert die Filterspalte und nennt die Zahl aktiver Filter", () => {
-  const knopf = leiste().match(/<button[^>]*aria-controls="katalog-filter"[^>]*>[\s\S]*?<\/button>/)?.[0] ?? "";
-  assert.match(knopf, /aria-expanded="false"/);
-  assert.match(knopf, />Filter</);
-  assert.match(knopf, />2<\/span>/);
-  assert.match(leiste({ filterOffen: true }), /aria-expanded="true"/);
+test("Werkzeugleiste: Sortier-Segment zeigt vier Knöpfe, aktiver pressed", () => {
+  const html = leiste({ filter: { ...leererFilter(), sortierung: "stimmen" } });
+  for (const s of SORTIER_SEGMENT) assert.match(html, new RegExp(`>${de.katalog.leiste.sortierenKurz[s]}<`));
+  assert.match(html, /aria-pressed="true"[^>]*>Stimmen</);
 });
 
-test("Werkzeugleiste: Sortierung als select mit derselben Liste wie mobil, die gewählte steht", () => {
+test("Werkzeugleiste: Sortierung aus Mehr-Menü markiert den …-Knopf", () => {
+  const html = leiste({ filter: { ...leererFilter(), sortierung: "name" } });
+  assert.match(html, /aria-pressed="true"[^>]*>Name/);
+});
+
+test("Werkzeugleiste: Suchtext mit Relevanz zeigt den …-Knopf aktiv mit „zuletzt geändert“ (Review Focus 2)", () => {
+  const html = leiste({ filter: { ...leererFilter(), q: "haze", sortierung: "relevanz" } });
+  assert.match(html, /aria-pressed="true"[^>]*>zuletzt geändert/);
+});
+
+test("Werkzeugleiste: Mehr-Menü bietet genau die übrigen Sortierungen", () => {
   const html = leiste();
-  assert.deepEqual(optionen(html).map((o) => o[1]), [...SORTIERUNGEN]);
-  assert.deepEqual(optionen(html).map((o) => o[2]), SORTIERUNGEN.map((s) => de.katalog.leiste.sortierungen[s]));
-  assert.match(html, /<option value="stimmen" selected="">/);
-  assert.match(html, /<label[^>]*>Sortierung<\/label>/);
+  for (const s of SORTIER_MEHR) assert.match(html, new RegExp(`>${de.katalog.leiste.sortierungen[s]}<`));
 });
 
-test("Werkzeugleiste: Filter-Knopf und Sortierung erst ab lg, Ansicht und Trefferzahl auch mobil", () => {
+test("Werkzeugleiste: Chip zeigt Zahl aktiver Werte", () => {
+  const html = leiste({ filter: { ...leererFilter(), terp: ["Myrcen", "Limonen"] } });
+  assert.match(html, />Terpene<[\s\S]*?>2</);
+});
+
+test("Werkzeugleiste: Chip „Mehr“ nur mit Fachkreis (Review Focus 3)", () => {
+  assert.doesNotMatch(leiste({ daten: daten(false) }), />Mehr</);
+  assert.match(leiste({ daten: daten(true) }), />Mehr</);
+});
+
+test("Werkzeugleiste: Chipleiste scrollt mobil waagerecht, ab lg umbrechend (Review Focus 4)", () => {
   const html = leiste();
-  const knopf = html.match(/<button[^>]*aria-controls="katalog-filter"[^>]*>/)?.[0] ?? "";
-  assert.match(knopf, /class="[^"]*\bhidden\b[^"]*\blg:inline-flex\b/);
-  assert.match(html, /<div class="hidden[^"]*lg:flex[^"]*"><label/);
-  assert.match(html, /<nav aria-label="Ansicht">/);
-  assert.match(html, /<p aria-live="polite"[^>]*>123 Blüten<\/p>/);
+  const zeile = html.match(/<div[^>]*data-chipleiste[^>]*>/)?.[0] ?? "";
+  for (const k of ["flex-nowrap", "overflow-x-auto", "overscroll-x-contain", "lg:flex-wrap", "lg:overflow-visible", "min-w-0"])
+    assert.match(zeile, new RegExp(`\\b${k.replace(":", "\\:")}\\b`), k);
 });
 
-test("Sortierung: MobilLeiste und Werkzeugleiste teilen eine Komponente statt Doppelcode", () => {
-  for (const datei of ["MobilLeiste", "Werkzeugleiste"]) {
-    const s = lies(`components/katalog/${datei}.tsx`);
-    assert.match(s, /<SortierWahl/, datei);
-    assert.doesNotMatch(s, /SORTIERUNGEN\.map/, datei);
-  }
-  const mobil = renderToStaticMarkup(
-    createElement(MobilLeiste, { filter: leererFilter(), aktiv: 0, gesamt: 3, setze: () => undefined, oeffne: () => undefined, texte: de.katalog.leiste }),
-  );
-  assert.deepEqual(optionen(mobil).map((o) => o[1]), [...SORTIERUNGEN]);
-  assert.match(mobil, /<label[^>]*class="sr-only"[^>]*>Sortierung<\/label>/);
+test("Werkzeugleiste: sticky unter dem Seitenkopf, Trefferzahl in Handschrift, Wort gedruckt", () => {
+  const html = leiste();
+  assert.match(html, /<div[^>]*data-werkzeugleiste[^>]*class="[^"]*\bsticky\b[^"]*top-\(--kopf-h,4rem\)/);
+  assert.match(html, /<p aria-live="polite"[^>]*><span class="[^"]*font-hand[^"]*text-accent[^"]*">123<\/span> Blüten<\/p>/);
+});
+
+test("Werkzeugleiste: Ansicht als Segment mit aria-pressed", () => {
+  const html = leiste();
+  assert.match(html, /aria-pressed="true"[^>]*>Blüten</);
+  assert.match(html, /aria-pressed="false"[^>]*>Handelsnamen</);
+});
+
+test("Aktiv-Zeile: Chips entfernbar, Zurücksetzen, Legende", () => {
+  const html = leiste({
+    aktiveChips: [{ schluessel: "terp-Myrcen", text: "Myrcen", ohne: { terp: [] } as Partial<StrainFilter> }],
+  });
+  assert.match(html, /aria-label="Filter Myrcen entfernen"/);
+  assert.match(html, new RegExp(`>${de.katalog.zuruecksetzen}<`));
+  assert.match(html, /data-legende/);
+});
+
+test("Sichtbare Texte ohne Ware und Stärke", () => {
+  const html = leiste({ daten: daten(true) });
+  assert.doesNotMatch(html, /Ware|Stärke/);
 });
 
 const ZEILE: BlueteZeile = {
@@ -80,29 +115,31 @@ const ansicht = () =>
     createElement(KatalogAnsicht, { start: { zeilen: [ZEILE], gesamt: 1, seitenAnzahl: 1, vertreiber: [] }, w: de, sprache: "de" }),
   );
 
-test("Katalog-Insel: Werkzeugleiste über Filterspalte und Raster, aria-controls zeigt auf die Spalte", () => {
+test("Aktiv-Zeile nur bei aktiven Filtern", () => {
+  assert.doesNotMatch(ansicht(), /Alle zurücksetzen|Alle löschen|Alle Filter zurücksetzen/);
+});
+
+test("Katalog-Insel: Suche über der Leiste, Legende genau einmal, kein aside", () => {
   const html = ansicht();
-  const ziel = html.match(/aria-controls="([^"]+)"/)?.[1];
-  assert.ok(ziel, "Filter-Knopf ohne aria-controls");
-  const spalte = html.match(new RegExp(`<aside[^>]*id="${ziel.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}"[^>]*>`))?.[0] ?? "";
-  assert.match(spalte, /class="katalog-filterspalte /);
-  const pos = ["data-werkzeugleiste", `id="${ziel}"`, "data-legende", "data-kultivar"].map((m) => html.indexOf(m));
+  const pos = ['type="search"', "data-werkzeugleiste", "data-kultivar"].map((m) => html.indexOf(m));
   assert.ok(pos.every((p) => p >= 0), `Teil fehlt: ${pos.join(",")}`);
   assert.deepEqual([...pos].sort((a, b) => a - b), pos);
   assert.equal(html.split("data-legende").length - 1, 1, "Legende genau einmal");
+  assert.doesNotMatch(html, /<aside/);
 });
 
-test("Katalog-Insel: Raster ab 15rem je Spalte mit gap-6, Karten teilen ihre Zeilen per subgrid", () => {
+test("Katalog-Insel: Raster volle Breite 1/2/3/4/5 Spalten", () => {
   const html = ansicht();
-  assert.match(html, /<ul class="grid grid-cols-\[repeat\(auto-fill,minmax\(min\(15rem,100%\),1fr\)\)\] gap-6">/);
-  assert.match(html, /<li class="row-span-5 grid grid-rows-subgrid" data-kultivar="k1">/);
-  assert.doesNotMatch(lies("components/katalog/KatalogAnsicht.tsx"), /16rem/);
+  assert.match(html, /<ul class="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">/);
+  assert.match(html, /<li class="[^"]*grid-rows-subgrid[^"]*" data-kultivar="k1">/);
 });
 
-test("Katalog-Insel: Zustand der Spalte aus useSyncExternalStore, Wahl beim Mount aus dem Speicher nachgezogen", () => {
-  const s = lies("components/katalog/KatalogAnsicht.tsx");
-  assert.match(s, /useSyncExternalStore\(abonniereFilterSpalte, filterSpalteOffen, \(\) => false\)/);
-  assert.match(s, /useLayoutEffect\(\(\) => zeigeFilterWahl\(gespeicherteFilterWahl\(\)\), \[\]\)/);
+test("Altes ist weg", () => {
+  for (const p of ["components/katalog/MobilLeiste.tsx", "components/katalog/FilterSchublade.tsx", "lib/katalog/filterspalte.ts", "tests/katalog-filterspalte.test.ts"])
+    assert.ok(!existsSync(p), p);
+  assert.doesNotMatch(lies("app/globals.css"), /katalog-filterspalte|katalog-filterknopf/);
+  assert.doesNotMatch(lies("app/[lang]/layout.tsx"), /FILTER_SKRIPT/);
+  assert.doesNotMatch(lies("components/katalog/KatalogAnsicht.tsx"), /GeschmackLegende/);
 });
 
 test("Blütenseite: volle Breite mit Seitenrand, Kopf im Lesemaß, kein zweites main", () => {
@@ -110,5 +147,4 @@ test("Blütenseite: volle Breite mit Seitenrand, Kopf im Lesemaß, kein zweites 
   assert.doesNotMatch(seite, /max-w-7xl/);
   assert.doesNotMatch(seite, /<main/);
   assert.match(seite, /className="w-full px-4 py-10 sm:px-8 lg:py-16"/);
-  assert.match(seite, /<header className="flex max-w-\[68ch\] flex-col gap-2">/);
 });

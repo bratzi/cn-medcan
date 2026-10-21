@@ -40,3 +40,17 @@ export function chipZahl(f: StrainFilter, chip: ChipSchluessel): number {
 export function sichtbareChips(fachkreis: boolean): ChipSchluessel[] {
   return CHIPS.filter((c) => fachkreis || c !== "mehr");
 }
+
+/**
+ * URL-Teil für einen neuen Suchtext (Spec 2026-10-21: bei Suchtext ist Relevanz Standard). Erster
+ * Suchtext springt vom Standard auf `relevanz`; geleert fällt `relevanz` auf den Standard zurück.
+ * Eine bewusst gewählte andere Sortierung bleibt stehen.
+ */
+export function suchTeil(alt: StrainFilter, roh: string): Partial<StrainFilter> {
+  const q = roh.trim() === "" ? undefined : roh.trim();
+  const standard = leererFilter().sortierung;
+  const teil: Partial<StrainFilter> = { q, seite: 1 };
+  if (q && !alt.q && alt.sortierung === standard) teil.sortierung = "relevanz";
+  if (!q && alt.sortierung === "relevanz") teil.sortierung = standard;
+  return teil;
+}

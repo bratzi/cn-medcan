@@ -8,7 +8,7 @@ import { GeschmackIcon, TerpenIcon } from "@/components/review/AromaIcon";
 import { Field, RangeSlider } from "@/components/ui";
 import { cn } from "@/lib/cn";
 import { formatierePreisProGramm, formatiereProzent, formatiereZahl } from "@/lib/format";
-import type { ChipSchluessel } from "@/lib/katalog/chipleiste";
+import { suchTeil, type ChipSchluessel } from "@/lib/katalog/chipleiste";
 import type { KatalogDaten } from "@/lib/katalog/typen";
 import type { Sprache } from "@/lib/i18n/sprache-kern";
 import { t } from "@/lib/i18n/text";
@@ -137,10 +137,8 @@ const sofortAus = (setze: FeldProps["setze"]) => (teil: Partial<StrainFilter>) =
 /** Freitextsuche über der Werkzeugleiste, eigener Entwurf für `q`. */
 export function SuchFeld({ filter, setze, texte, deaktiviert }: FeldProps) {
   const id = useId();
-  const [q, setQ] = useEntwurf(filter.q ?? "", (wert) => {
-    const sauber = wert.trim();
-    setze({ q: sauber === "" ? undefined : sauber, seite: 1 });
-  });
+  // Erster Suchtext springt auf Relevanz (lib/katalog/chipleiste.ts suchTeil).
+  const [q, setQ] = useEntwurf(filter.q ?? "", (wert) => setze(suchTeil(filter, wert)));
   return (
     <Field id={`${id}-q`} label={texte.suche}>
       {(attribute) => (
