@@ -3,8 +3,9 @@ import { SPRACH_ERKENNUNG } from "./i18n/schalter";
 import { bestimmeSprache, SPRACH_COOKIE } from "./i18n/sprache-kern";
 import { istOhneGate } from "./proxy-regeln";
 import { SEITEN_PRAEFIX, seitenDatei } from "./seiten-tor";
+import { inselRoh, type InselEnv } from "./insel-roh";
 
-export type TorEnv = {
+export type TorEnv = InselEnv & {
   ASSETS: { fetch(r: Request | string): Promise<Response> };
   SITE_PASSWORD?: string;
   SITE_SESSION_SECRET?: string;
@@ -27,7 +28,8 @@ export async function tor(request: Request, env: TorEnv): Promise<Response | nul
   }
   if (url.pathname === "/api/ich/strain") {
     if (!(await gateOffen(env, cookies))) return zumGate(url);
-    if (hatSitzung(cookies)) return null;
+    // Mit Sitzungscookie: rohe D1-Abfragen statt Next (HANDOFF S87, 623 ms CPU). Ohne Bindings übernimmt Next.
+    if (hatSitzung(cookies)) return inselRoh(url, cookies, env);
     return Response.json({ zugang: "gast" }, { headers: { "Cache-Control": "private, no-store" } });
   }
   const sprache = bestimmeSprache({
