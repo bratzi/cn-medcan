@@ -8,7 +8,7 @@ import { seitenRahmen } from "@/components/layout/Seitenkopf";
 import { Schlagwort } from "@/components/story/Schlagwort";
 import { CannabinoidBar } from "@/components/produkt/CannabinoidBar";
 import { TerpenProfil } from "@/components/review/SortenKopf";
-import { Titelblatt } from "@/components/produkt/Titelblatt";
+import { StrainKopf } from "@/components/sorte/StrainKopf";
 import { blueteBild } from "@/lib/medien";
 import { alsDiashow, budpicMeldungen } from "@/lib/budpic-anzeige";
 import { musterBildId } from "@/lib/budpics";
@@ -20,15 +20,12 @@ import { Aufklaerung } from "@/components/review/Aufklaerung";
 import { AromaErkundung } from "@/components/review/AromaErkundung";
 import { BewertungsBuch } from "@/components/review/BewertungsBuch";
 import { ladeJuryBeitraegeZuBewertungen } from "@/lib/query/jury";
-import { BlattAnzeige } from "@/components/review/BlattAnzeige";
 import { BewertenInsel } from "@/components/sorte/BewertenInsel";
 import { erkundungsDaten } from "@/components/review/erkundung-daten";
 import { mittleWirkung } from "@/components/review/GesamteindruckLeiste";
-import { eintragAnker } from "@/components/review/eintrag";
 import {
   Faktenliste,
   buttonKlassen,
-  einzelLinkKlassen,
   Table,
   TableBody,
   TableCell,
@@ -44,12 +41,11 @@ import {
   formatiereDatum,
   formatiereProzent,
   formatiereProzentSpanne,
-  formatiereZahl,
 } from "@/lib/format";
 import { holeSprache, holeWoerterbuch, type Sprache, type Woerterbuch } from "@/lib/i18n";
-import { mehrzahl, t } from "@/lib/i18n/text";
+import { t } from "@/lib/i18n/text";
 import { aromaTexte } from "@/lib/i18n/typen";
-import { teileBewertungen, verdichteGeschmacksMatrix } from "@/lib/query/bewertung";
+import { verdichteGeschmacksMatrix } from "@/lib/query/bewertung";
 import {
   ladeStrainDetail,
   ladeTerpenKatalog,
@@ -57,7 +53,7 @@ import {
   type UnternehmenEintrag,
 } from "@/lib/query/strains";
 import { likeZahlenFuer, reaktionenFuer, teileZaehler } from "@/lib/query/reaktionen";
-import { ladeSorte, ladeSortenBewertungen, waehleAktiveWare } from "@/lib/query/sorte";
+import { ladeAlleVertreiber, ladeSorte, ladeSortenBewertungen, waehleAktiveWare } from "@/lib/query/sorte";
 
 /** Metadaten der Strain-Seite; ladeSorte ist je Request gecacht, die Seite liest dieselbe Zeile ohne zweite Abfrage. */
 export async function sortenMetadaten(slug: string): Promise<Metadata> {
@@ -112,7 +108,11 @@ function kernFakten(strain: StrainDetail, w: Woerterbuch): Fakt[] {
     { begriff: f.kultivar, wert: strain.kultivarName ?? ka },
     { begriff: f.kultivartyp, wert: w.label.kultivarTyp[strain.kultivarTyp] },
     { begriff: f.vertreiber, wert: strain.vertreiber?.name ?? ka },
-    { begriff: f.bestrahlung, wert: w.label.bestrahlung[strain.bestrahlung as Bestrahlung] ?? strain.bestrahlung },
+    // Unter dem Begriff „Bestrahlung“ nur der Wert (Nutzer 2026-10-22): „unbekannt“ statt „Bestrahlung unbekannt“.
+    {
+      begriff: f.bestrahlung,
+      wert: strain.bestrahlung === "UNBEKANNT" ? w.bluete.bestrahlungUnbekannt : (w.label.bestrahlung[strain.bestrahlung as Bestrahlung] ?? strain.bestrahlung),
+    },
   ];
 }
 
@@ -192,13 +192,15 @@ async function SorteInhalt({ slug, w, sprache }: { slug: string; w: Woerterbuch;
   if (!sorte) notFound();
   const aktive = waehleAktiveWare(sorte.waren, {});
   if (!aktive) notFound();
-  const [strain, reviews, budpicListe, blueteLikeZahlen] = await Promise.all([
+  const [strain, reviews, budpicListe, blueteLikeZahlen, alleVertreiber] = await Promise.all([
     // Nur Angaben, Terpene, Chargen: das Buch lädt ladeSortenBewertungen.
     ladeStrainDetail(aktive.produkt.slug, fachkreis, { ohneBewertungen: true }),
     ladeSortenBewertungen(sorte.kultivar.id, null),
     ladeFreieBudpics([aktive.produkt.id]),
     // Likes der Blüte aus dem Zähler; ob ich geliket habe, lädt erst die Insel (Seite bleibt statisch).
     likeZahlenFuer("BLUETE", [sorte.kultivar.id]),
+    // Alle Vertreiber für die Wahl im Formular; beim statischen Erzeugen, nicht je Anfrage.
+    ladeAlleVertreiber(),
   ]);
   if (!strain) notFound();
   // „Ähnlich im Aroma“ (T11) rechnet D1, nicht der Worker; ohne Terpene entfällt es.
@@ -224,8 +226,6 @@ async function SorteInhalt({ slug, w, sprache }: { slug: string; w: Woerterbuch;
   const budpics = budpicListe.get(strain.id) ?? [];
   const eigeneTerpene = strain.terpene.map((terpen) => terpen.name);
 
-  const { eigene, community, meineNote } = teileBewertungen(reviews);
-  const neuesteEigene = eigene[0];
   const geschmack = verdichteGeschmacksMatrix(reviews);
   const produkt = { handelsname: sorte.kultivar.name, slug: sorte.kultivar.slug, terpene: strain.terpene, bildPfad: strain.herstellerBildPfad };
   // Das Aroma gilt der Blüte: die Mediane über alle Handelsnamen des Kultivars, sonst die eigenen.
@@ -244,70 +244,34 @@ async function SorteInhalt({ slug, w, sprache }: { slug: string; w: Woerterbuch;
   const sortenAnzahl = sorte.kennwerte?.anzahl ?? 0;
   const basis = `/blueten/${sorte.kultivar.slug}`;
   /**
-   * Angaben zur Blüte (Nutzer 2026-10-03 und 2026-10-05): standen als eigene Sektion weit
-   * unter der Erkundung. Sie stehen jetzt als ein Block oben, direkt hinter dem Titelblatt,
-   * und tragen das Terpenprofil mit Anteilsbalken mit. Nicht gesplittet und nicht doppelt:
-   * die alten Terpen-Chips entfallen, und der Sortenkopf der Erkundung bleibt der Startseite,
-   * weil er auf dieser Seite Handelsname, Kultivar und Wirkstoffe des Titelblatts wiederholt.
+   * Die übrigen Angaben zur Blüte (Nutzer 2026-10-22): keine eigene Sektion mehr, sie stecken hinter
+   * „Alle Angaben“ im Kopf. Die vier Kernangaben stehen dort offen; der Name steht nur einmal.
    */
-  const angabenZurBluete = (
-    <section aria-labelledby="daten-titel" className={SEKTION}>
-      <Schlagwort satz={texte.schlagwort.angaben} ton="gruen" />
-      <SektionsKopf id="daten-titel" titel={t(texte.sorte.angabenZu, { handelsname: strain.handelsname })} />
-      {/* Zugeklappt nur die vier Kernangaben (Nutzer 2026-10-08): die volle Liste
-          zog die Seite in die Länge. Der Rest liegt in <details>, ohne JavaScript. */}
-      <dl className="mx-auto mt-12 grid max-w-4xl grid-cols-2 gap-8 text-center sm:grid-cols-4">
-        {kernFakten(strain, w).map((fakt) => (
-          <div key={fakt.begriff} className="flex min-w-0 flex-col gap-2">
-            <dt className="text-small text-text-muted">{fakt.begriff}</dt>
-            <dd className="font-buch text-h3 text-text text-balance wrap-break-word">{fakt.wert}</dd>
-          </div>
-        ))}
-      </dl>
-      <details className="group mt-12 text-center">
-        <summary
-          className={buttonKlassen(
-            "secondary",
-            "md",
-            "cursor-pointer list-none [&::-webkit-details-marker]:hidden",
-          )}
-        >
-          <span className="group-open:hidden">{texte.alleAngaben}</span>
-          <span className="hidden group-open:inline">{texte.wenigerAngaben}</span>
-          <svg
-            aria-hidden="true"
-            viewBox="0 0 16 16"
-            className="size-4 transition-transform duration-normal ease-standard group-open:rotate-180"
-          >
-            <path d="M3 6l5 5 5-5" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-        </summary>
-        <div className="mt-12 grid grid-cols-1 gap-12 text-start lg:grid-cols-2">
-          <Faktenliste zeilen={produktFakten(strain, w)} />
-          <div className="flex flex-col gap-12">
-            <div>
-              <h3 className="text-h3 text-text">{texte.wirkstoffspannen}</h3>
-              <CannabinoidBar
-                className="mt-4"
-                thcMin={strain.thcMinProzent}
-                thcMax={strain.thcMaxProzent}
-                cbdMin={strain.cbdMinProzent}
-                cbdMax={strain.cbdMaxProzent}
-                w={w}
-                sprache={sprache}
-              />
-              <p className="mt-4 text-caption text-text-muted">
-                {t(texte.herstellerangabe, {
-                  thc: formatiereProzentSpanne(strain.thcMinProzent, strain.thcMaxProzent, 1, sprache),
-                  cbd: formatiereProzentSpanne(strain.cbdMinProzent, strain.cbdMaxProzent, 1, sprache),
-                })}
-              </p>
-            </div>
-            {strain.terpene.length > 0 ? <TerpenProfil terpene={strain.terpene} w={w} sprache={sprache} /> : null}
-          </div>
+  const alleAngaben = (
+    <div className="grid grid-cols-1 gap-12 text-start lg:grid-cols-2">
+      <Faktenliste zeilen={produktFakten(strain, w)} />
+      <div className="flex flex-col gap-12">
+        <div>
+          <h3 className="text-h3 text-text">{texte.wirkstoffspannen}</h3>
+          <CannabinoidBar
+            className="mt-4"
+            thcMin={strain.thcMinProzent}
+            thcMax={strain.thcMaxProzent}
+            cbdMin={strain.cbdMinProzent}
+            cbdMax={strain.cbdMaxProzent}
+            w={w}
+            sprache={sprache}
+          />
+          <p className="mt-4 text-caption text-text-muted">
+            {t(texte.herstellerangabe, {
+              thc: formatiereProzentSpanne(strain.thcMinProzent, strain.thcMaxProzent, 1, sprache),
+              cbd: formatiereProzentSpanne(strain.cbdMinProzent, strain.cbdMaxProzent, 1, sprache),
+            })}
+          </p>
         </div>
-      </details>
-    </section>
+        {strain.terpene.length > 0 ? <TerpenProfil terpene={strain.terpene} w={w} sprache={sprache} /> : null}
+      </div>
+    </div>
   );
   const erkundungsBlock =
     erkundung.serien.length > 0 ? (
@@ -333,18 +297,17 @@ async function SorteInhalt({ slug, w, sprache }: { slug: string; w: Woerterbuch;
 
   return (
     <EigeneLikes>
-      {/* Kopf der Sorte (Spec Sorte im Fokus, 3): Name, Genetik, Typ, Spanne über alle Vertreiber. */}
-      <Titelblatt
-        handelsname={sorte.kultivar.name}
-        kultivarName={sorte.kultivar.genetik}
-        vertreiberZeile={texte.sorte.spanne}
-        kultivarTyp={sorte.kultivar.typ}
-        darreichungsform={strain.darreichungsform}
-        anzahlApothekenVerfuegbar={strain.anzahlApothekenVerfuegbar}
-        thcMin={sorte.spanne.thcMin ?? strain.thcMinProzent}
-        thcMax={sorte.spanne.thcMax ?? strain.thcMaxProzent}
-        cbdMin={sorte.spanne.cbdMin ?? strain.cbdMinProzent}
-        cbdMax={sorte.spanne.cbdMax ?? strain.cbdMaxProzent}
+      {/* Kopf der Sorte als eine Sektion (Nutzer 2026-10-22, Prototyp freigegeben): Name einmal, Kernangaben,
+          Bild und Note. „Diesen Strain bewerten“ entfällt, das Formular folgt direkt darunter. */}
+      <StrainKopf
+        name={sorte.kultivar.name}
+        chips={[w.label.kultivarTyp[sorte.kultivar.typ], w.label.darreichungsform[strain.darreichungsform]]}
+        thc={{ min: sorte.spanne.thcMin ?? strain.thcMinProzent, max: sorte.spanne.thcMax ?? strain.thcMaxProzent }}
+        cbd={{ min: sorte.spanne.cbdMin ?? strain.cbdMinProzent, max: sorte.spanne.cbdMax ?? strain.cbdMaxProzent }}
+        fakten={kernFakten(strain, w)}
+        alleAngaben={alleAngaben}
+        note={hauptnote}
+        anzahl={sortenAnzahl}
         bild={blueteBild(strain.herstellerBildPfad) ?? musterBildId(strain.slug)}
         budpic={{
           strainId: strain.id,
@@ -355,50 +318,14 @@ async function SorteInhalt({ slug, w, sprache }: { slug: string; w: Woerterbuch;
           zugang: "gast",
           insel: { kultivarId: sorte.kultivar.id, vertreiberId: null },
         }}
+        like={<LikeKnopf art="BLUETE" zielId={sorte.kultivar.id} anzahl={blueteLikes} text={w.reaktionen.knopf} />}
         w={w}
         sprache={sprache}
-        meineBewertung={
-          neuesteEigene && meineNote !== null
-            ? { note: meineNote, erstelltAm: neuesteEigene.erstelltAm, chargenNr: neuesteEigene.chargenNr }
-            : null
-        }
       />
-
-      {/* Hauptnote der Sorte über alle Vertreiber (KultivarKennwerte), mit Anzahl. */}
-      <div className="mt-8 flex flex-col gap-2">
-        {hauptnote !== null && sortenAnzahl > 0 ? (
-          <>
-            <BlattAnzeige note={hauptnote} text={t(texte.sorte.hauptnote, { note: formatiereZahl(hauptnote, 1, sprache) })} />
-            <p className="numeric text-small text-text-muted">{mehrzahl(sprache, texte.sorte.anzahl, sortenAnzahl)}</p>
-          </>
-        ) : (
-          <p className="text-small text-text-muted">{texte.sorte.ohneNote}</p>
-        )}
-      </div>
-
-      {/* Jede Sorte ist bewertbar, unabhängig von einer Umfrage; die Umfrage rückt
-          eine Sorte nur zeitweise nach vorn. */}
-      <p className="mt-8 flex flex-wrap items-center gap-4">
-        <a href="#bewerten" className={buttonKlassen("primary", "md")}>
-          {texte.bewerten}
-        </a>
-        {/* Mit Community-Bewertungen schlägt der Link im Buch deren erste Seite auf (Anker #eintrag-…). */}
-        <a
-          href={community.length > 0 ? `#${eintragAnker(community[0].id)}` : "#bewertungen-titel"}
-          className="text-small text-accent underline underline-offset-4 hover:text-accent-hover"
-        >
-          {community.length > 0
-            ? mehrzahl(sprache, texte.communityLesen, community.length)
-            : texte.nochKeineCommunity}
-        </a>
-        <LikeKnopf art="BLUETE" zielId={sorte.kultivar.id} anzahl={blueteLikes} text={w.reaktionen.knopf} />
-      </p>
 
       {strain.beschreibung ? (
         <p className="mt-8 max-w-[68ch] text-body text-pretty text-text">{strain.beschreibung}</p>
       ) : null}
-
-      {angabenZurBluete}
 
       {/* Bewerten an der Stelle der Erkundung (Masterplan Bewertung v2, T4; /bewerten entfällt):
           freigeschaltete Mitglieder sehen die Maske, vorbelegt mit ihrer eigenen Bewertung; alle
@@ -459,6 +386,7 @@ async function SorteInhalt({ slug, w, sprache }: { slug: string; w: Woerterbuch;
             strainId: strain.id,
             kultivarId: sorte.kultivar.id,
             waren: sorte.waren,
+            alleVertreiber,
             wareTexte: texte.vertreiber,
             handelsname: sorte.kultivar.name,
             terpene: strain.terpene,
@@ -530,14 +458,22 @@ async function SorteInhalt({ slug, w, sprache }: { slug: string; w: Woerterbuch;
 export async function SortenSeite({ slug }: { slug: string }) {
   const [w, sprache] = await Promise.all([holeWoerterbuch(), holeSprache()]);
   return (
-    <div className={cn(seitenRahmen(), "pt-16 pb-24 sm:pt-24")}>
-      <p className="mb-8">
+    <div className={cn(seitenRahmen(), "pt-8 pb-24 sm:pt-12")}>
+      {/* Zurück als leiser Brotkrumen über dem Namen (Nutzer 2026-10-22): keine Überschrift, kein eigener
+          Abstand. Sichtbar klein, Trefferfläche 44 px über Padding; der Pfeil rückt beim Überfahren nach links. */}
+      <nav aria-label={w.bluete.alleBlueten} className="-ms-2 mb-2">
         {/* Bewusst harte Navigation: /blueten ist eine Datei aus Static Assets (lib/tor.ts), kein RSC-Ziel. */}
         {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
-        <a href="/blueten" className={einzelLinkKlassen()}>
-          {w.bluete.alleBlueten}
+        <a
+          href="/blueten"
+          className="group inline-flex min-h-11 items-center gap-2 rounded-full px-2 text-small text-text-muted transition-colors duration-fast ease-out hover:text-text focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring"
+        >
+          <svg aria-hidden="true" viewBox="0 0 16 16" className="size-4 transition-transform duration-fast ease-out motion-safe:group-hover:-translate-x-0.5">
+            <path d="M10 3L5 8l5 5" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+          {w.bluete.brotkrume}
         </a>
-      </p>
+      </nav>
       {/* Bewusst ohne Suspense-Grenze: notFound() antwortet so mit 404, der Inhalt ist ohne JavaScript lesbar und #eintrag-… existiert beim Sprung. */}
       <SorteInhalt slug={slug} w={w} sprache={sprache} />
     </div>

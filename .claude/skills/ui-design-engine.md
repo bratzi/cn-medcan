@@ -48,7 +48,7 @@ Größen: `text-caption` 13, `text-small` 14, `text-body` 16, `text-h3` 20, `tex
 (clamp 3.5 bis 8rem, 300). Handschrift-Grade: `text-marke` (2.5rem, Kopf), `text-umschlag`
 (clamp 5 bis 20rem, Wortmarke im Auftakt und im Fuß), `text-notiz` (clamp 2 bis 4.5rem, Randnotizen,
 „Wähl mit.“, Überschriften auf `/umfragen`), `text-vermerk` (2rem, Vermerke am Stimmzettel und in der
-Schleife).
+Schleife). `text-urteil` (clamp 4 bis 7rem): die Note des Strains im Kopf der Strain-Seite, seit 2026-10-22 (Nutzer).
 - Newsreader im Text: 400, 500, 600; Newsreader 200 **nur ab 40 px** (`text-manifest`, `text-erzaehlung`, `text-titel`, `text-kapitel`), sonst 500; 800 nur für kurze Kapitelmarken.
 - `text-erzaehlung` (clamp 2.5 bis 3.75rem, 200) ist der Grad des Storytellings (TransparentMachen), eine Stufe unter `text-manifest`; `font-hand` darf ihn tragen.
 - Große Grade tragen negative Laufweite aus dem Token; nie per Klasse überschreiben.

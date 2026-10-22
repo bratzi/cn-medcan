@@ -147,6 +147,7 @@ Haarstriche hat. Datengrafiken stehen in Tinte (`text`), nicht in Grün. Kein re
 | `text-notiz` | `clamp(2rem, 1.25rem + 3vw, 4.5rem)` | 1.2 | Inspiration |
 | `text-marke` | `2.5rem` | 1 | Inspiration |
 | `text-vermerk` | `2rem` | 1.2 | Inspiration |
+| `text-urteil` | `clamp(4rem, 2.5rem + 5vw, 7rem)` | 1 | Note des Strains im Kopf der Strain-Seite (Nutzer 2026-10-22) |
 
 Handschrift nie unter 32 px, keine Versalien, keine Laufweite, keine synthetischen Schnitte, Texte in
 natürlicher Schreibung. Nie für Handelsnamen, Daten, Zahlen, Formulare, Fließtext, Rechtshinweise.

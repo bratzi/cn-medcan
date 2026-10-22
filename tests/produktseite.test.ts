@@ -5,8 +5,10 @@ import { join } from "node:path";
 
 const QUELLE = readFileSync(join(process.cwd(), "app/[lang]/blueten/[slug]/sorten-inhalt.tsx"), "utf8");
 
-test("Produktseite: Rückweg als 44-px-Einzellink", () => {
-  assert.match(QUELLE, /className=\{einzelLinkKlassen\(\)\}>\s*\{w\.bluete\.alleBlueten\}/);
+test("Produktseite: Rückweg als leiser Brotkrumen mit 44-px-Trefferfläche (Nutzer 2026-10-22)", () => {
+  assert.match(QUELLE, /<nav aria-label=\{w\.bluete\.alleBlueten\}/);
+  assert.match(QUELLE, /href="\/blueten"\s+className="group inline-flex min-h-11/);
+  assert.match(QUELLE, /\{w\.bluete\.brotkrume\}/);
 });
 
 test("Produktseite: die Bewertungsmaske sitzt am Anker #bewerten, kein Link führt mehr auf /bewerten", () => {
@@ -18,7 +20,8 @@ test("Produktseite: die Bewertungsmaske sitzt am Anker #bewerten, kein Link füh
   // Ohne Vertreiber, wie BewertenInsel (Plan 2026-10-22): ein Abruf je Seite.
   assert.match(QUELLE, /insel: \{ kultivarId: sorte\.kultivar\.id, vertreiberId: null \}/);
   // Der zweite Weg ("Erste Bewertung abgeben") steht seit T7 über dem Buch: tests/buch.test.ts.
-  assert.equal(QUELLE.match(/href="#bewerten"/g)?.length, 1);
+  // „Diesen Strain bewerten“ entfällt im Kopf (Nutzer 2026-10-22): das Formular folgt direkt darunter.
+  assert.equal(QUELLE.match(/href="#bewerten"/g), null);
   assert.doesNotMatch(QUELLE, /["`]\/bewerten\//);
   // Gäste kommen nach dem Anmelden zurück an die Maske: das Fragment steckt kodiert im Ziel.
   assert.match(QUELLE, /\/anmelden\?weiter=\$\{encodeURIComponent\(`\$\{basis\}#bewerten`\)\}/);

@@ -28,7 +28,7 @@ test("Farbprüfung misst Kopierstift auf allen drei Papieren", () => {
   assert.doesNotMatch(skript, /spray/);
 });
 
-const HAND_GRADE = ["marke", "umschlag", "notiz", "vermerk", "plakat", "kulisse"] as const;
+const HAND_GRADE = ["marke", "umschlag", "notiz", "vermerk", "plakat", "kulisse", "urteil"] as const;
 
 function token(name: string): string {
   const treffer = new RegExp(`--text-${name}:\\s*([^;]+);`).exec(css);
@@ -162,7 +162,7 @@ test("keine Reste von Wand und Graffiti in app, components, lib (Spec TP3 15.2)"
 });
 
 test("Handschrift nur in den Handschrift-Graden: nie unter 32 px (Spec TP3 15.3)", () => {
-  const GRAD = /text-(marke|umschlag|notiz|vermerk|plakat|kulisse|manifest|erzaehlung)\b/;
+  const GRAD = /text-(marke|umschlag|notiz|vermerk|plakat|kulisse|manifest|erzaehlung|urteil)\b/;
   // Wortmarke und Logo bekommen ihren Grad vom Aufrufer; "Book of" im Logo ist als Teil
   // des Zeichens bewusst kleiner (Nutzer 2026-09-26).
   const eigenerGrad = [join("marke", "Wortmarke.tsx"), join("marke", "Logo.tsx")];

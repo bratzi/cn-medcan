@@ -10,11 +10,12 @@ import type { AromaSerie } from "@/components/review/AromaKarte";
 import type { BeschaffenheitsWerte } from "@/components/review/BeschaffenheitsLeiste";
 import type { Gesamteindruck } from "@/components/review/GesamteindruckLeiste";
 import { BewertungsBilder } from "@/components/review/BewertungsBilder";
-import { WareWahlFeld } from "@/components/sorte/WareWahlFeld";
+import { WareWahlFeld, type VertreiberEintrag } from "@/components/sorte/WareWahlFeld";
 import { MiniNetz } from "@/components/review/MiniNetz";
 import { NoteUndErkundung } from "@/components/review/NoteUndErkundung";
-import { Button, Field, Input, Meldung } from "@/components/ui";
+import { Button, Input, Meldung } from "@/components/ui";
 import { useHydriert } from "@/components/ui/useHydriert";
+import { cn } from "@/lib/cn";
 import type { CommunityMedian, KartenTerpen, KatalogEintrag, TerpenZeile, Treue } from "@/lib/aromakarte";
 import { MAX_NOTIZ } from "@/lib/bewertung-eingabe";
 import type { Vorbelegung } from "@/lib/bewertung-vorbelegung";
@@ -32,6 +33,8 @@ type Props = {
   kultivarId: string | null;
   /** Waren der Sorte für Vertreiber und Stärke (WareWahlFeld). */
   waren: readonly WareKarte[];
+  /** Alle Vertreiber der Datenbank; jeder ist wählbar, die gelisteten stehen oben (Nutzer 2026-10-22). */
+  alleVertreiber: readonly VertreiberEintrag[];
   vorgewaehlt: { vertreiberId: string | null; strainId: string | null };
   wareTexte: Woerterbuch["bluete"]["vertreiber"];
   handelsname: string;
@@ -68,6 +71,40 @@ type Props = {
 };
 
 /**
+ * Zeichenring wie in sozialen Netzen: füllt sich mit der Notiz, wird ab 90 % rot und zeigt dann den Rest
+ * als Zahl. Die genaue Angabe liest der Screenreader aus dem versteckten Text.
+ */
+function ZeichenRing({ laenge, max, text }: { laenge: number; max: number; text: string }) {
+  const anteil = Math.min(laenge / max, 1);
+  const knapp = laenge > max * 0.9;
+  const umfang = 2 * Math.PI * 10;
+  return (
+    <span id="bewertung-notiz-zaehler" className="inline-flex items-center gap-2">
+      <span className="sr-only">{text}</span>
+      {knapp ? (
+        <span aria-hidden="true" className="numeric text-caption text-danger">
+          {max - laenge}
+        </span>
+      ) : null}
+      <svg aria-hidden="true" viewBox="0 0 24 24" className="size-6 -rotate-90">
+        <circle cx="12" cy="12" r="10" fill="none" strokeWidth="2" className="stroke-border" />
+        <circle
+          cx="12"
+          cy="12"
+          r="10"
+          fill="none"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeDasharray={umfang}
+          strokeDashoffset={umfang * (1 - anteil)}
+          className={cn("transition-[stroke-dashoffset] duration-fast ease-out", knapp ? "stroke-danger" : "stroke-accent")}
+        />
+      </svg>
+    </span>
+  );
+}
+
+/**
  * Bewertungsmaske in der Blütenseite (Masterplan Bewertung v2, T4, Nutzer
  * 2026-09-29; zuvor eigene Seite /bewerten). Ganz oben die Gesamtnote in
  * Blättern, darunter exakt die Aroma-Erkundung der Startseite mit ihren
@@ -81,6 +118,7 @@ export function BewertungsFormular({
   strainId,
   kultivarId,
   waren,
+  alleVertreiber,
   vorgewaehlt,
   wareTexte,
   handelsname,
@@ -104,6 +142,7 @@ export function BewertungsFormular({
   const [bildLauf, setBildLauf] = useState<{ nr: number; gesamt: number } | null>(null);
   const [fehler, setFehler] = useState<string | null>(null);
   const [erfolg, setErfolg] = useState<string | null>(null);
+  const [notizLaenge, setNotizLaenge] = useState(vorbelegung?.notiz?.length ?? 0);
   const [netz, setNetz] = useState<{ vorher: Geschmack | null; nachher: Geschmack; geformt: boolean } | null>(null);
   // Nach dem ersten Speichern gibt es die Bewertung, auch bevor die Seite neu vom Server kommt.
   const [gespeichert, setGespeichert] = useState(false);
@@ -168,6 +207,7 @@ export function BewertungsFormular({
       <WareWahlFeld
         key={`ware-${stand}-${vorgewaehlt.vertreiberId ?? ""}`}
         waren={waren}
+        alleVertreiber={alleVertreiber}
         vorgewaehlt={vorgewaehlt}
         texte={wareTexte}
         sprache={aromaTexte.sprache}
@@ -191,37 +231,72 @@ export function BewertungsFormular({
         istBetreiber={istBetreiber}
         texte={aromaTexte}
         {...daten}
+        // Die Zuordnung steht schon im Vertreiber-Feld; kein zweiter Satz darunter (Nutzer 2026-10-22).
+        zuordnung={undefined}
       />
 
-      <section className="flex flex-col gap-6 border-t border-border pt-8">
-        <h3 className="font-buch text-h2 font-medium text-text">{texte.chargeNotiz}</h3>
-        <Input
-          id="bewertung-charge"
-          label={texte.charge}
-          hinweis={texte.chargeHinweis}
-          name="chargenNr"
-          list="bewertung-chargen"
-          maxLength={40}
-          autoComplete="off"
-          defaultValue={vorbelegung?.chargenNr ?? undefined}
-        />
-        <datalist id="bewertung-chargen">
-          {chargen.map((nummer) => (
-            <option key={nummer} value={nummer} />
-          ))}
-        </datalist>
-        <Field id="bewertung-notiz" label={texte.notiz} hinweis={t(texte.notizHinweis, { anzahl: MAX_NOTIZ })}>
-          {(attribute) => (
-            <textarea
-              {...attribute}
-              name="notiz"
-              rows={6}
-              maxLength={MAX_NOTIZ}
-              defaultValue={vorbelegung?.notiz ?? undefined}
-              className="w-full rounded-md border border-border-strong bg-surface p-4 text-body text-text"
-            />
-          )}
-        </Field>
+      {/* Notiz und Charge (Nutzer 2026-10-22): ein Composer, die Charge als kleine freiwillige Pille darin. */}
+      <section aria-labelledby="bewertung-notiz-titel" className="flex flex-col gap-8 border-t border-border pt-12">
+        <div className="flex flex-col items-center gap-2 text-center">
+          <p aria-hidden="true" className="font-hand text-vermerk text-logo">
+            {texte.chargeNotizVermerk}
+          </p>
+          <h3 id="bewertung-notiz-titel" className="font-buch text-h2 font-medium text-balance text-text">
+            {texte.chargeNotiz}
+          </h3>
+          <p className="max-w-[52ch] text-small text-pretty text-text-muted">{texte.chargeNotizSatz}</p>
+        </div>
+        {/* Notiz als Composer im Social-Media-Stil (Nutzer 2026-10-22): eine Fläche mit eigener Marke, Feld ohne
+            Rahmen, unten eine Leiste mit der Charge als kleiner, freiwilliger Pille und dem Zeichenring. */}
+        <div className="mx-auto w-full max-w-2xl rounded-2xl border border-border bg-surface transition-[border-color,box-shadow] duration-fast ease-out focus-within:border-accent focus-within:ring-1 focus-within:ring-accent">
+          <div className="flex gap-4 p-4 sm:p-6">
+            <span aria-hidden="true" className="flex size-10 shrink-0 items-center justify-center rounded-full bg-accent/15 font-buch text-small font-medium text-accent">
+              {texte.notizDu}
+            </span>
+            <div className="flex min-w-0 flex-1 flex-col gap-1">
+              <label htmlFor="bewertung-notiz" className="sr-only">
+                {texte.notiz}
+              </label>
+              <textarea
+                id="bewertung-notiz"
+                name="notiz"
+                rows={4}
+                maxLength={MAX_NOTIZ}
+                aria-describedby="bewertung-notiz-zaehler"
+                defaultValue={vorbelegung?.notiz ?? undefined}
+                placeholder={texte.notizPlatzhalter}
+                onInput={(e) => setNotizLaenge(e.currentTarget.value.length)}
+                className="field-sizing-content min-h-24 w-full resize-none bg-transparent py-2 text-body text-text placeholder:text-text-muted focus:outline-none"
+              />
+            </div>
+          </div>
+          <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border px-4 py-3 sm:px-6">
+            <label className="inline-flex min-h-11 items-center gap-2 rounded-full border border-border-strong px-3 text-small text-text-muted transition-colors duration-fast ease-out focus-within:border-accent hover:border-accent-hover">
+              <span>{texte.chargeKurz}</span>
+              <input
+                id="bewertung-charge"
+                name="chargenNr"
+                list="bewertung-chargen"
+                maxLength={40}
+                autoComplete="off"
+                spellCheck={false}
+                placeholder={texte.chargePlatzhalter}
+                aria-describedby="bewertung-charge-hinweis"
+                defaultValue={vorbelegung?.chargenNr ?? undefined}
+                className="numeric w-28 bg-transparent text-small text-text placeholder:text-text-muted focus:outline-none"
+              />
+              <span id="bewertung-charge-hinweis" className="sr-only">
+                {`${texte.freiwillig}. ${texte.chargeHinweis}`}
+              </span>
+            </label>
+            <datalist id="bewertung-chargen">
+              {chargen.map((nummer) => (
+                <option key={nummer} value={nummer} />
+              ))}
+            </datalist>
+            <ZeichenRing laenge={notizLaenge} max={MAX_NOTIZ} text={t(texte.notizZaehler, { n: notizLaenge, max: MAX_NOTIZ })} />
+          </div>
+        </div>
         <BewertungsBilder
           vorhanden={vorbelegung?.bilder ?? []}
           vorgemerkt={vorgemerkt}
