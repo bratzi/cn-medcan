@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 
-import { namenLinkKlassen, Select } from "@/components/ui";
+import { Select, textLinkKlassen } from "@/components/ui";
 import { cn } from "@/lib/cn";
 import { formatiereProzentSpanne } from "@/lib/format";
 import type { Sprache } from "@/lib/i18n/sprache-kern";
@@ -11,14 +11,30 @@ import { t } from "@/lib/i18n/text";
 import type { Woerterbuch } from "@/lib/i18n/typen";
 import type { WareKarte } from "@/lib/query/sorte";
 
+export type VertreiberEintrag = { id: string; name: string };
+
 type Props = {
   waren: readonly WareKarte[];
+  /** Alle Vertreiber aus der Datenbank (ladeAlleVertreiber); jeder ist bei jedem Strain wählbar. */
+  alleVertreiber: readonly VertreiberEintrag[];
   vorgewaehlt: { vertreiberId: string | null; strainId: string | null };
   texte: Woerterbuch["bluete"]["vertreiber"];
   sprache: Sprache;
-  /** Für „Vertreiber fehlt? Vorschlagen“; ohne entfällt der Link. */
+  /** Für „Vertreiber vorschlagen“; ohne entfällt der Link. */
   kultivarId?: string;
 };
+
+/**
+ * Zwei Gruppen für die Wahl (Nutzer 2026-10-22): zuerst die Vertreiber, die diesen Strain gelistet
+ * führen, in der Reihenfolge der Waren (nach Zahl der Bewertungen); dann alle übrigen alphabetisch.
+ * Waren ohne bekannten Vertreiber entfallen, eine Option „Vertreiber unbekannt“ gibt es nicht.
+ */
+export function vertreiberGruppen(waren: readonly WareKarte[], alle: readonly VertreiberEintrag[]) {
+  const gelistet = waren.filter((w) => w.vertreiberId).map((w) => ({ id: w.vertreiberId, name: w.vertreiberName }));
+  const ids = new Set(gelistet.map((v) => v.id));
+  const weitere = alle.filter((v) => !ids.has(v.id)).sort((a, b) => a.name.localeCompare(b.name, "de"));
+  return { gelistet, weitere };
+}
 
 /** Chip: Pille, mindestens 44 px hoch (Fitts); gewählt gefüllt und mit Haken, nicht nur über Farbe. */
 const CHIP = "inline-flex min-h-11 items-center gap-2 rounded-full border px-4 py-2 text-small transition-colors duration-fast ease-standard";
@@ -34,72 +50,88 @@ function Haken() {
 }
 
 /**
- * Zuordnung im Bewertungsformular (Spec Sorte im Fokus, 2; Plan 2026-10-22): der Vertreiber ist Nebensache
- * und wird nur hier gewählt. Mehrere Vertreiber: Pflicht-Select, ohne Vorwahl offen; einer: nur ein Satz.
- * Variante freiwillig und nur, wenn der Vertreiber mehrere Produkte der Sorte führt. Schreibt die Felder
- * `vertreiberId` und `strainId` (leer = „Weiß ich nicht“); geprüft wird in der Server Action.
+ * Zuordnung im Bewertungsformular (Spec Sorte im Fokus, 2; Nutzer 2026-10-22): der Vertreiber ist Pflicht,
+ * aber Nebensache. Eine zentrierte Karteikarte zwischen zwei Linien: Vermerk, Frage, Hinweis, Wahl, darunter
+ * die Bestätigung im Buchsatz. Alle Vertreiber sind wählbar, die gelisteten stehen oben. Variante freiwillig
+ * und nur, wenn der gewählte Vertreiber mehrere Produkte der Sorte führt. Schreibt `vertreiberId` und
+ * `strainId` (leer = „Weiß ich nicht“); geprüft wird in der Server Action.
  */
-export function WareWahlFeld({ waren, vorgewaehlt, texte, sprache, kultivarId }: Props) {
-  // Ohne bekannten Vertreiber lässt sich nicht bewerten (Pflichtfeld); solche Waren stehen hier nicht.
-  const waehlbar = waren.filter((w) => w.vertreiberId);
-  const einziger = waehlbar.length === 1 ? waehlbar[0] : null;
-  const start = einziger ?? waehlbar.find((w) => w.vertreiberId === vorgewaehlt.vertreiberId);
-  const [vertreiberId, setVertreiberId] = useState(start?.vertreiberId ?? "");
+export function WareWahlFeld({ waren, alleVertreiber, vorgewaehlt, texte, sprache, kultivarId }: Props) {
+  const { gelistet, weitere } = vertreiberGruppen(waren, alleVertreiber);
+  const bekannt = [...gelistet, ...weitere];
+  const startId =
+    (vorgewaehlt.vertreiberId && bekannt.some((v) => v.id === vorgewaehlt.vertreiberId) ? vorgewaehlt.vertreiberId : null) ??
+    (gelistet.length === 1 ? gelistet[0].id : "");
+  const startWare = waren.find((w) => w.vertreiberId === startId);
+  const [vertreiberId, setVertreiberId] = useState(startId);
   const [strainId, setStrainId] = useState(
-    start && start.produkte.length > 1 && start.produkte.some((p) => p.id === vorgewaehlt.strainId) ? (vorgewaehlt.strainId ?? "") : "",
+    startWare && startWare.produkte.length > 1 && startWare.produkte.some((p) => p.id === vorgewaehlt.strainId)
+      ? (vorgewaehlt.strainId ?? "")
+      : "",
   );
-  const ware = waehlbar.find((w) => w.vertreiberId === vertreiberId);
-
-  const [vor, nach = ""] = texte.wahlKurz.split("{name}");
-  const vorschlagen = kultivarId ? (
-    <Link prefetch={false} href={`/vorschlagen?kultivar=${kultivarId}`} className={namenLinkKlassen()}>
-      {texte.fehlt}
-    </Link>
-  ) : null;
+  const ware = waren.find((w) => w.vertreiberId && w.vertreiberId === vertreiberId);
+  const gewaehlt = bekannt.find((v) => v.id === vertreiberId);
 
   return (
-    <div className="flex flex-col gap-8">
+    <div
+      role="group"
+      aria-labelledby="ware-wahl-titel"
+      className="mx-auto flex w-full max-w-xl flex-col items-center gap-6 border-y border-border py-12 text-center"
+    >
       <input type="hidden" name="strainId" value={strainId} />
-
-      {einziger ? (
-        <p className="flex flex-wrap items-baseline gap-x-4 gap-y-2 text-body text-text">
-          <input type="hidden" name="vertreiberId" value={vertreiberId} />
-          <span>
-            {vor}
-            <strong className="font-medium">{einziger.vertreiberName || texte.unbekannt}</strong>
-            {nach}
-          </span>
-          {vorschlagen}
+      <div className="flex flex-col items-center gap-2">
+        <p aria-hidden="true" className="font-hand text-vermerk text-logo">
+          {texte.wahlVermerk}
         </p>
-      ) : (
-        <div className="flex max-w-md flex-col gap-2">
-          <Select
-            id="ware-wahl-vertreiber"
-            name="vertreiberId"
-            required
-            label={texte.wahlLabel}
-            hinweis={texte.wahlHinweis}
-            platzhalter={texte.wahlPlatzhalter}
-            optionen={waehlbar.map((w) => ({ wert: w.vertreiberId, label: w.vertreiberName || texte.unbekannt }))}
-            value={vertreiberId}
-            onChange={(e) => {
-              setVertreiberId(e.target.value);
-              setStrainId("");
-            }}
-          />
-          {vorschlagen ? <p className="text-small">{vorschlagen}</p> : null}
-        </div>
-      )}
+        <h3 id="ware-wahl-titel" className="font-buch text-h3 font-medium text-balance text-text">
+          {texte.wahlLabel}
+        </h3>
+        <p className="max-w-[52ch] text-small text-pretty text-text-muted">{texte.wahlHinweis}</p>
+      </div>
+
+      <Select
+        id="ware-wahl-vertreiber"
+        name="vertreiberId"
+        required
+        label={texte.wahlLabel}
+        labelVersteckt
+        platzhalter={texte.wahlPlatzhalter}
+        optionen={[]}
+        gruppen={[
+          { label: texte.gruppeGelistet, optionen: gelistet.map((v) => ({ wert: v.id, label: v.name })) },
+          { label: texte.gruppeWeitere, optionen: weitere.map((v) => ({ wert: v.id, label: v.name })) },
+        ]}
+        value={vertreiberId}
+        onChange={(e) => {
+          setVertreiberId(e.target.value);
+          setStrainId("");
+        }}
+        feldClassName="w-full max-w-sm"
+      />
+
+      {/* Gewählter Vertreiber steht im Select, nicht noch einmal als Satz (Nutzer 2026-10-22); nur der Hinweis bei Ungelisteten. */}
+      {gewaehlt && !ware ? (
+        <p aria-live="polite" className="max-w-[52ch] text-small text-pretty text-text-muted">
+          {texte.nichtGelistet}
+        </p>
+      ) : null}
 
       {ware && ware.produkte.length > 1 ? (
-        <div role="group" aria-labelledby="ware-wahl-staerke" aria-describedby="ware-wahl-staerke-hinweis" className="flex flex-col gap-4">
-          <h3 id="ware-wahl-staerke" className="text-h3 text-text">
+        <div
+          role="group"
+          aria-labelledby="ware-wahl-staerke"
+          aria-describedby="ware-wahl-staerke-hinweis"
+          key={ware.vertreiberId}
+          // Varianten erscheinen direkt mit der Wahl, kurz eingeblendet (@starting-style, ohne JS-Timer).
+          className="flex flex-col items-center gap-4 border-t border-border pt-6 transition-[opacity,translate] duration-normal ease-out starting:-translate-y-2 starting:opacity-0 motion-reduce:transition-none"
+        >
+          <h4 id="ware-wahl-staerke" className="font-buch text-h3 font-medium text-text">
             {texte.staerkeTitel}
-          </h3>
-          <p id="ware-wahl-staerke-hinweis" className="max-w-[68ch] text-small text-pretty text-text-muted">
+          </h4>
+          <p id="ware-wahl-staerke-hinweis" className="max-w-[52ch] text-small text-pretty text-text-muted">
             {texte.staerkeHinweis}
           </p>
-          <ul className="flex flex-wrap gap-2">
+          <ul className="flex flex-wrap justify-center gap-2">
             {ware.produkte.map((p) => {
               const an = p.id === strainId;
               return (
@@ -119,6 +151,15 @@ export function WareWahlFeld({ waren, vorgewaehlt, texte, sprache, kultivarId }:
             </li>
           </ul>
         </div>
+      ) : null}
+
+      {kultivarId ? (
+        <p className="text-small text-text-muted">
+          {texte.fehltFrage}{" "}
+          <Link prefetch={false} href={`/vorschlagen?kultivar=${kultivarId}`} className={textLinkKlassen("inline-flex min-h-11 items-center")}>
+            {texte.fehltLink}
+          </Link>
+        </p>
       ) : null}
     </div>
   );

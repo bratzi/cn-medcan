@@ -57,7 +57,7 @@ import {
   type UnternehmenEintrag,
 } from "@/lib/query/strains";
 import { likeZahlenFuer, reaktionenFuer, teileZaehler } from "@/lib/query/reaktionen";
-import { ladeSorte, ladeSortenBewertungen, waehleAktiveWare } from "@/lib/query/sorte";
+import { ladeAlleVertreiber, ladeSorte, ladeSortenBewertungen, waehleAktiveWare } from "@/lib/query/sorte";
 
 /** Metadaten der Strain-Seite; ladeSorte ist je Request gecacht, die Seite liest dieselbe Zeile ohne zweite Abfrage. */
 export async function sortenMetadaten(slug: string): Promise<Metadata> {
@@ -192,13 +192,15 @@ async function SorteInhalt({ slug, w, sprache }: { slug: string; w: Woerterbuch;
   if (!sorte) notFound();
   const aktive = waehleAktiveWare(sorte.waren, {});
   if (!aktive) notFound();
-  const [strain, reviews, budpicListe, blueteLikeZahlen] = await Promise.all([
+  const [strain, reviews, budpicListe, blueteLikeZahlen, alleVertreiber] = await Promise.all([
     // Nur Angaben, Terpene, Chargen: das Buch lädt ladeSortenBewertungen.
     ladeStrainDetail(aktive.produkt.slug, fachkreis, { ohneBewertungen: true }),
     ladeSortenBewertungen(sorte.kultivar.id, null),
     ladeFreieBudpics([aktive.produkt.id]),
     // Likes der Blüte aus dem Zähler; ob ich geliket habe, lädt erst die Insel (Seite bleibt statisch).
     likeZahlenFuer("BLUETE", [sorte.kultivar.id]),
+    // Alle Vertreiber für die Wahl im Formular; beim statischen Erzeugen, nicht je Anfrage.
+    ladeAlleVertreiber(),
   ]);
   if (!strain) notFound();
   // „Ähnlich im Aroma“ (T11) rechnet D1, nicht der Worker; ohne Terpene entfällt es.
@@ -459,6 +461,7 @@ async function SorteInhalt({ slug, w, sprache }: { slug: string; w: Woerterbuch;
             strainId: strain.id,
             kultivarId: sorte.kultivar.id,
             waren: sorte.waren,
+            alleVertreiber,
             wareTexte: texte.vertreiber,
             handelsname: sorte.kultivar.name,
             terpene: strain.terpene,

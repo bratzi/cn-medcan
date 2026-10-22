@@ -5,6 +5,7 @@ import Link from "next/link";
 
 import { budpicHochladen } from "@/app/[lang]/blueten/[slug]/budpic-aktionen";
 import { Button, einzelLinkKlassen, useHydriert } from "@/components/ui";
+import { InfoKnopf } from "@/components/ui/InfoKnopf";
 import { bluetenHref } from "@/lib/alte-adressen";
 import { BUDPIC_MAX_BYTES, BUDPIC_MAX_DATEIEN, BUDPIC_MAX_KANTE } from "@/lib/budpics";
 import { bildVerkleinernFrei } from "@/lib/bild-verkleinern";
@@ -117,10 +118,13 @@ export function BudpicBeitragen({ zugang: zugangVomServer, strainId, slug, kulti
         tabIndex={-1}
         aria-hidden="true"
       />
-      <Button variante="secondary" groesse="sm" disabled={!hydriert || laeuft !== null} onClick={() => eingabe.current?.click()}>
-        {laeuft ? t(texte.laeuft, laeuft) : texte.beitragen}
-      </Button>
-      {kompakt ? null : <p className="max-w-[56ch] text-small text-text-muted">{t(texte.hinweis, { max: BUDPIC_MAX_DATEIEN })}</p>}
+      {/* Knopf und Hinweis als eine Einheit (Nutzer 2026-10-22): der Hinweis steckt im Info-Knopf daneben. */}
+      <div className="flex items-center gap-2">
+        <Button variante="secondary" groesse="sm" disabled={!hydriert || laeuft !== null} onClick={() => eingabe.current?.click()}>
+          {laeuft ? t(texte.laeuft, laeuft) : texte.beitragen}
+        </Button>
+        {kompakt ? null : <InfoKnopf sprache={sprache} text={t(texte.hinweis, { max: BUDPIC_MAX_DATEIEN })} />}
+      </div>
       {fehler.length > 0 ? (
         <ul role="alert" className="flex flex-col gap-1 text-small text-danger">
           {fehler.map((zeile, i) => (

@@ -6,7 +6,7 @@ import { revalidiereKatalog } from "@/lib/katalog/revalidieren";
 import { bewertungPruefen } from "@/lib/bewertung-eingabe";
 import { kennwerteFortschreiben } from "@/lib/kennwerte";
 import { istEindeutigkeitsfehler } from "@/lib/prisma-fehler";
-import { waehleWare, waehleZielBewertung } from "@/lib/ware-wahl";
+import { platzhalterProdukt, waehleWare, waehleZielBewertung } from "@/lib/ware-wahl";
 import { ladeProfil, profilFortschreiben } from "@/lib/query/profil";
 import { netzGeformt, noteOderErsatz } from "@/lib/profil";
 import type { Geschmack } from "@/lib/profil-typen";
@@ -52,6 +52,28 @@ function text(w: Woerterbuch, sprache: Sprache, meldung: Meldung): string {
   return meldungText(w, { ...meldung, parameter: label === undefined ? p : { ...p, label } });
 }
 
+/** Legt den Platzhalter je Sorte und Vertreiber an (oder liest ihn nach einem parallelen Anlegen); null bei fremdem Vertreiber. */
+async function platzhalterAnlegen(kultivarId: string, kultivarName: string, kultivarSlug: string, vertreiberId: string) {
+  const prisma = await getPrisma();
+  const [vertreiber, vorlage] = await Promise.all([
+    prisma.unternehmen.findFirst({ where: { id: vertreiberId, vertrieben: { some: { aktiv: true } } }, select: { id: true, name: true } }),
+    prisma.strain.findFirst({
+      where: { kultivarId, aktiv: true },
+      orderBy: { handelsname: "asc" },
+      select: { kultivarName: true, kultivarTyp: true, genetik: true, darreichungsform: true, thcMinProzent: true, thcMaxProzent: true, cbdMinProzent: true, cbdMaxProzent: true },
+    }),
+  ]);
+  if (!vertreiber || !vorlage) return null;
+  const daten = platzhalterProdukt({ id: kultivarId, name: kultivarName, slug: kultivarSlug }, vertreiber, vorlage);
+  const auswahl = { id: true, slug: true, vertreiberId: true, handelsname: true, aktiv: true } as const;
+  try {
+    return await prisma.strain.create({ data: daten, select: auswahl });
+  } catch (fehler) {
+    if (!istEindeutigkeitsfehler(fehler)) throw fehler;
+    return prisma.strain.findUnique({ where: { slug: daten.slug }, select: auswahl });
+  }
+}
+
 export async function bewertungSpeichern(formData: FormData): Promise<BewertungErgebnis> {
   const [w, sprache] = await Promise.all([holeWoerterbuchAusAnfrage(), holeSpracheAusAnfrage()]);
   let mitglied;
@@ -73,10 +95,19 @@ export async function bewertungSpeichern(formData: FormData): Promise<BewertungE
   const e = geprueft.wert;
   const kultivar = await prisma.kultivar.findUnique({
     where: { id: e.kultivarId },
-    select: { id: true, slug: true, strains: { select: { id: true, slug: true, vertreiberId: true, handelsname: true, aktiv: true } } },
+    select: { id: true, name: true, slug: true, strains: { select: { id: true, slug: true, vertreiberId: true, handelsname: true, aktiv: true } } },
   });
   if (!kultivar) return { ok: false, fehler: text(w, sprache, { schluessel: "bewertung.sorteWeg" }) };
-  const ware = waehleWare(kultivar.strains, e.vertreiberId, e.strainId);
+  let ware = waehleWare(kultivar.strains, e.vertreiberId, e.strainId);
+  if (!ware.ok && ware.grund === "vertreiberFremd" && !e.strainId && kultivar.slug) {
+    // Alle Vertreiber sind wählbar (Nutzer 2026-10-22): führt dieser den Strain nicht gelistet,
+    // trägt ein inaktiver Platzhalter die Bewertung. Nur echte Vertreiber (mit gelistetem Produkt).
+    const platz = await platzhalterAnlegen(kultivar.id, kultivar.name, kultivar.slug, e.vertreiberId);
+    if (platz) {
+      kultivar.strains.push(platz);
+      ware = waehleWare(kultivar.strains, e.vertreiberId, null);
+    }
+  }
   if (!ware.ok) return { ok: false, fehler: text(w, sprache, { schluessel: "bewertung.wareFremd" }) };
   if (e.instagramReelUrl && !istBetreiber) return { ok: false, fehler: text(w, sprache, { schluessel: "bewertung.reelNurBetreiber" }) };
 
@@ -89,7 +120,7 @@ export async function bewertungSpeichern(formData: FormData): Promise<BewertungE
     },
     select: { id: true, strainId: true, wareGenau: true },
   });
-  const produkteBeimVertreiber = kultivar.strains.filter((s) => s.vertreiberId === e.vertreiberId && s.aktiv).map((s) => s.id);
+  const produkteBeimVertreiber = kultivar.strains.filter((s) => s.vertreiberId === e.vertreiberId && (s.aktiv || s.id === ware.strainId)).map((s) => s.id);
   const ziel = waehleZielBewertung(kandidaten, ware, e.strainId !== null, produkteBeimVertreiber);
   const produktSlug = kultivar.strains.find((s) => s.id === ziel.strainId)?.slug ?? null;
 

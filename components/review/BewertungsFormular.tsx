@@ -10,11 +10,12 @@ import type { AromaSerie } from "@/components/review/AromaKarte";
 import type { BeschaffenheitsWerte } from "@/components/review/BeschaffenheitsLeiste";
 import type { Gesamteindruck } from "@/components/review/GesamteindruckLeiste";
 import { BewertungsBilder } from "@/components/review/BewertungsBilder";
-import { WareWahlFeld } from "@/components/sorte/WareWahlFeld";
+import { WareWahlFeld, type VertreiberEintrag } from "@/components/sorte/WareWahlFeld";
 import { MiniNetz } from "@/components/review/MiniNetz";
 import { NoteUndErkundung } from "@/components/review/NoteUndErkundung";
 import { Button, Field, Input, Meldung } from "@/components/ui";
 import { useHydriert } from "@/components/ui/useHydriert";
+import { cn } from "@/lib/cn";
 import type { CommunityMedian, KartenTerpen, KatalogEintrag, TerpenZeile, Treue } from "@/lib/aromakarte";
 import { MAX_NOTIZ } from "@/lib/bewertung-eingabe";
 import type { Vorbelegung } from "@/lib/bewertung-vorbelegung";
@@ -32,6 +33,8 @@ type Props = {
   kultivarId: string | null;
   /** Waren der Sorte für Vertreiber und Stärke (WareWahlFeld). */
   waren: readonly WareKarte[];
+  /** Alle Vertreiber der Datenbank; jeder ist wählbar, die gelisteten stehen oben (Nutzer 2026-10-22). */
+  alleVertreiber: readonly VertreiberEintrag[];
   vorgewaehlt: { vertreiberId: string | null; strainId: string | null };
   wareTexte: Woerterbuch["bluete"]["vertreiber"];
   handelsname: string;
@@ -81,6 +84,7 @@ export function BewertungsFormular({
   strainId,
   kultivarId,
   waren,
+  alleVertreiber,
   vorgewaehlt,
   wareTexte,
   handelsname,
@@ -104,6 +108,7 @@ export function BewertungsFormular({
   const [bildLauf, setBildLauf] = useState<{ nr: number; gesamt: number } | null>(null);
   const [fehler, setFehler] = useState<string | null>(null);
   const [erfolg, setErfolg] = useState<string | null>(null);
+  const [notizLaenge, setNotizLaenge] = useState(vorbelegung?.notiz?.length ?? 0);
   const [netz, setNetz] = useState<{ vorher: Geschmack | null; nachher: Geschmack; geformt: boolean } | null>(null);
   // Nach dem ersten Speichern gibt es die Bewertung, auch bevor die Seite neu vom Server kommt.
   const [gespeichert, setGespeichert] = useState(false);
@@ -168,6 +173,7 @@ export function BewertungsFormular({
       <WareWahlFeld
         key={`ware-${stand}-${vorgewaehlt.vertreiberId ?? ""}`}
         waren={waren}
+        alleVertreiber={alleVertreiber}
         vorgewaehlt={vorgewaehlt}
         texte={wareTexte}
         sprache={aromaTexte.sprache}
@@ -191,37 +197,69 @@ export function BewertungsFormular({
         istBetreiber={istBetreiber}
         texte={aromaTexte}
         {...daten}
+        // Die Zuordnung steht schon im Vertreiber-Feld; kein zweiter Satz darunter (Nutzer 2026-10-22).
+        zuordnung={undefined}
       />
 
-      <section className="flex flex-col gap-6 border-t border-border pt-8">
-        <h3 className="font-buch text-h2 font-medium text-text">{texte.chargeNotiz}</h3>
-        <Input
-          id="bewertung-charge"
-          label={texte.charge}
-          hinweis={texte.chargeHinweis}
-          name="chargenNr"
-          list="bewertung-chargen"
-          maxLength={40}
-          autoComplete="off"
-          defaultValue={vorbelegung?.chargenNr ?? undefined}
-        />
-        <datalist id="bewertung-chargen">
-          {chargen.map((nummer) => (
-            <option key={nummer} value={nummer} />
-          ))}
-        </datalist>
-        <Field id="bewertung-notiz" label={texte.notiz} hinweis={t(texte.notizHinweis, { anzahl: MAX_NOTIZ })}>
-          {(attribute) => (
-            <textarea
-              {...attribute}
-              name="notiz"
-              rows={6}
-              maxLength={MAX_NOTIZ}
-              defaultValue={vorbelegung?.notiz ?? undefined}
-              className="w-full rounded-md border border-border-strong bg-surface p-4 text-body text-text"
+      {/* Notiz und Charge (Nutzer 2026-10-22): als eigene Karteikarte zwischen Linien, Notiz zuerst und breit,
+          die Charge schmal daneben und ausdrücklich freiwillig (keine Chargen im Fokus). */}
+      <section aria-labelledby="bewertung-notiz-titel" className="flex flex-col gap-8 border-t border-border pt-12">
+        <div className="flex flex-col items-center gap-2 text-center">
+          <p aria-hidden="true" className="font-hand text-vermerk text-logo">
+            {texte.chargeNotizVermerk}
+          </p>
+          <h3 id="bewertung-notiz-titel" className="font-buch text-h2 font-medium text-balance text-text">
+            {texte.chargeNotiz}
+          </h3>
+          <p className="max-w-[52ch] text-small text-pretty text-text-muted">{texte.chargeNotizSatz}</p>
+        </div>
+        <div className="grid grid-cols-1 gap-8 md:grid-cols-[minmax(0,2fr)_minmax(0,1fr)] md:items-start">
+          <Field id="bewertung-notiz" label={texte.notiz} pflicht={texte.freiwillig} hinweis={t(texte.notizHinweis, { anzahl: MAX_NOTIZ })}>
+            {(attribute) => (
+              <div className="flex flex-col gap-2">
+                <textarea
+                  {...attribute}
+                  name="notiz"
+                  rows={6}
+                  maxLength={MAX_NOTIZ}
+                  defaultValue={vorbelegung?.notiz ?? undefined}
+                  placeholder={texte.notizPlatzhalter}
+                  onInput={(e) => setNotizLaenge(e.currentTarget.value.length)}
+                  className="min-h-40 w-full resize-y rounded-md border border-border-strong bg-surface p-4 text-body text-text transition-colors duration-fast ease-standard placeholder:text-text-muted hover:border-accent-hover focus-visible:border-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring"
+                />
+                <p
+                  className={cn(
+                    "numeric self-end text-caption transition-colors duration-fast",
+                    notizLaenge > MAX_NOTIZ * 0.9 ? "text-danger" : "text-text-muted",
+                  )}
+                >
+                  {t(texte.notizZaehler, { n: notizLaenge, max: MAX_NOTIZ })}
+                </p>
+              </div>
+            )}
+          </Field>
+          <div className="flex flex-col gap-2">
+            <Input
+              id="bewertung-charge"
+              label={texte.charge}
+              pflicht={texte.freiwillig}
+              hinweis={texte.chargeHinweis}
+              name="chargenNr"
+              list="bewertung-chargen"
+              maxLength={40}
+              autoComplete="off"
+              spellCheck={false}
+              placeholder={texte.chargePlatzhalter}
+              className="numeric"
+              defaultValue={vorbelegung?.chargenNr ?? undefined}
             />
-          )}
-        </Field>
+            <datalist id="bewertung-chargen">
+              {chargen.map((nummer) => (
+                <option key={nummer} value={nummer} />
+              ))}
+            </datalist>
+          </div>
+        </div>
         <BewertungsBilder
           vorhanden={vorbelegung?.bilder ?? []}
           vorgemerkt={vorgemerkt}

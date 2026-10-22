@@ -15,6 +15,8 @@ export type SelectProps = Omit<
   id: string;
   label: string;
   optionen: readonly SelectOption[];
+  /** Optionen in benannten Gruppen (optgroup), nach `optionen`; leere Gruppen entfallen. */
+  gruppen?: readonly { label: string; optionen: readonly SelectOption[] }[];
   /** Label nur fuer Screenreader, siehe Field. */
   labelVersteckt?: boolean;
   /** Erste, nicht-auswaehlbare Zeile. Ersetzt kein Label. */
@@ -37,6 +39,7 @@ export function Select({
   id,
   label,
   optionen,
+  gruppen,
   platzhalter,
   hinweis,
   fehler,
@@ -90,6 +93,17 @@ export function Select({
               {option.label}
             </option>
           ))}
+          {gruppen?.map((gruppe) =>
+            gruppe.optionen.length > 0 ? (
+              <optgroup key={gruppe.label} label={gruppe.label}>
+                {gruppe.optionen.map((option) => (
+                  <option key={option.wert} value={option.wert} disabled={option.deaktiviert}>
+                    {option.label}
+                  </option>
+                ))}
+              </optgroup>
+            ) : null,
+          )}
         </select>
       )}
     </Field>

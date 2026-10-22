@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { waehleWare, waehleZielBewertung } from "@/lib/ware-wahl";
+import { platzhalterProdukt, waehleWare, waehleZielBewertung } from "@/lib/ware-wahl";
 
 const p = (id: string, v: string, h: string) => ({ id, vertreiberId: v, handelsname: h, aktiv: true });
 const produkte = [p("x1", "V1", "B 22/1"), p("x2", "V1", "A 27/1"), p("y1", "V2", "C 20/1")];
@@ -43,4 +43,34 @@ test("Ziel: keine Bewertung, neu anlegen", () => {
   assert.deepEqual(waehleZielBewertung([], { strainId: "x2", wareGenau: false }, false, ["x1", "x2"]), {
     zielId: null, alteStrainId: null, strainId: "x2", wareGenau: false,
   });
+});
+
+test("nur ein inaktiver Platzhalter beim Vertreiber: ungenau darauf", () => {
+  const mit = [...produkte, { id: "z0", vertreiberId: "V3", handelsname: "Platz", aktiv: false }];
+  assert.deepEqual(waehleWare(mit, "V3", null), { ok: true, strainId: "z0", wareGenau: false });
+  // Eine Variante gibt es beim Platzhalter nicht zu wählen.
+  assert.deepEqual(waehleWare(mit, "V3", "z0"), { ok: false, grund: "produktFremd" });
+});
+
+test("Platzhalter-Produkt: inaktiv, nicht gelistet, Werte aus der Vorlage, eindeutige Namen", () => {
+  const vorlage = {
+    kultivarName: "Nebel",
+    kultivarTyp: "INDICA",
+    genetik: "A x B",
+    darreichungsform: "BLUETE",
+    thcMinProzent: 20,
+    thcMaxProzent: 24,
+    cbdMinProzent: 0,
+    cbdMaxProzent: 1,
+  };
+  const d = platzhalterProdukt({ id: "k1", name: "Nebelharz", slug: "nebelharz" }, { id: "V9", name: "Grün Pharma GmbH" }, vorlage);
+  assert.equal(d.aktiv, false);
+  assert.equal(d.bfarmGelistet, false);
+  assert.equal(d.kultivarId, "k1");
+  assert.equal(d.vertreiberId, "V9");
+  assert.equal(d.slug, "nebelharz-gruen-pharma-gmbh-v9");
+  assert.equal(d.handelsname, "Nebelharz (Grün Pharma GmbH)");
+  assert.equal(d.thcMaxProzent, 24);
+  assert.equal(d.kultivarTyp, "INDICA");
+  assert.equal(d.suchtext, "nebelharz (grün pharma gmbh) nebel a x b");
 });

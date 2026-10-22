@@ -91,6 +91,19 @@ function spanneAus(produkte: readonly WareProdukt[]): SorteDetail["spanne"] {
  * Die Sortenseite in einer Abfrage: Kultivar mit aktiven Produkten samt Vertreiber,
  * Kennwerten und Note je Vertreiber. Gruppiert wird im Code (höchstens 30 Produkte).
  */
+/**
+ * Alle Vertreiber mit mindestens einem gelisteten Produkt, für die Wahl im Bewertungsformular (Nutzer
+ * 2026-10-22: jeder Vertreiber bei jedem Strain). Läuft beim statischen Erzeugen der Seite, nie je Anfrage.
+ */
+export const ladeAlleVertreiber = cache(async function ladeAlleVertreiber(): Promise<{ id: string; name: string }[]> {
+  const prisma = await getPrisma();
+  return prisma.unternehmen.findMany({
+    where: { vertrieben: { some: { aktiv: true } } },
+    orderBy: { name: "asc" },
+    select: { id: true, name: true },
+  });
+});
+
 export const ladeSorte = cache(async function ladeSorte(slug: string): Promise<SorteDetail | null> {
   const prisma = await getPrisma();
   const k = await prisma.kultivar.findUnique({
