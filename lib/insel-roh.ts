@@ -80,15 +80,15 @@ async function mitgliedAusSitzung(db: D1Roh, token: string) {
   return { mitgliedId: z.mid, freigegeben: istWahr(z.freigegeben), rolle: z.rolle ?? "MITGLIED" };
 }
 
-const EIGENE_SQL = `SELECT r.strain_id AS strainId, r.ware_genau AS wareGenau, r.aussehen, r.geruch, r.geschmack, r.wirkung,
+const EIGENE_SPALTEN = `SELECT r.id AS id, r.vertreiber_id AS vertreiberId, r.strain_id AS strainId, r.ware_genau AS wareGenau, r.aussehen, r.geruch, r.geschmack, r.wirkung,
     r.konsistenz, r.gesamtnote, r.feuchtigkeit_prozent AS feuchtigkeitProzent, r.geschmacks_matrix AS geschmacksMatrix,
     r.terpen_intensitaet AS terpenIntensitaet, r.beschaffenheit, r.notiz, r.instagram_reel_url AS instagramReelUrl,
     r.aktualisiert_am AS aktualisiertAm, c.chargen_nr AS chargenNr
-  FROM reviews r LEFT JOIN chargen c ON c.id = r.charge_id
-  WHERE r.autor_id = ? AND r.kultivar_id = ? AND r.vertreiber_id = ? ORDER BY r.id ASC LIMIT 1`;
-const EIGENE_BILDER_SQL = `SELECT id, breite, hoehe, status FROM budpics WHERE review_id = (
-    SELECT id FROM reviews WHERE autor_id = ? AND kultivar_id = ? AND vertreiber_id = ? ORDER BY id ASC LIMIT 1
-  ) ORDER BY erstellt_am ASC LIMIT 10`;
+  FROM reviews r LEFT JOIN chargen c ON c.id = r.charge_id`;
+/** Je Sorte und Vertreiber wie lib/query/strains.ts; ohne Vertreiber die jüngste eigene der Sorte (Plan 2026-10-22). */
+const EIGENE_SQL = `${EIGENE_SPALTEN} WHERE r.autor_id = ? AND r.kultivar_id = ? AND r.vertreiber_id = ? ORDER BY r.id ASC LIMIT 1`;
+const EIGENE_JUENGSTE_SQL = `${EIGENE_SPALTEN} WHERE r.autor_id = ? AND r.kultivar_id = ? ORDER BY r.aktualisiert_am DESC LIMIT 1`;
+const EIGENE_BILDER_SQL = `SELECT id, breite, hoehe, status FROM budpics WHERE review_id = ? ORDER BY erstellt_am ASC LIMIT 10`;
 const NETZ_SQL = `SELECT strain_id AS strainId, gesamtnote, aussehen, geruch, geschmack, wirkung, konsistenz,
     terpen_intensitaet AS terpenIntensitaet, geschmacks_matrix AS geschmacksMatrix
   FROM reviews WHERE autor_id = ? ORDER BY erstellt_am DESC LIMIT ${BEWERTUNGEN_HOECHSTENS}`;
@@ -109,6 +109,7 @@ type NetzZeile = {
 function alsGespeichert(z: EigeneZeile, bilder: { id: string; breite: number; hoehe: number; status: string }[]): GespeicherteBewertung {
   return {
     strainId: String(z.strainId),
+    vertreiberId: (z.vertreiberId as string | null) ?? null,
     wareGenau: istWahr(z.wareGenau),
     aussehen: Number(z.aussehen),
     geruch: Number(z.geruch),
@@ -164,12 +165,13 @@ export async function inselRoh(url: URL, cookies: Map<string, string>, env: Inse
     {
       mitglied: async () => (token ? mitgliedAusSitzung(db, token) : null),
       ladeEigeneBewertung: async (autorId, kId, vertreiberId) => {
-        const [eigene, bilder] = await db.batch([
-          db.prepare(EIGENE_SQL).bind(autorId, kId, vertreiberId),
-          db.prepare(EIGENE_BILDER_SQL).bind(autorId, kId, vertreiberId),
-        ]);
-        const zeile = eigene.results[0] as EigeneZeile | undefined;
-        return zeile ? alsGespeichert(zeile, bilder.results as never[]) : null;
+        const zeile = await (vertreiberId
+          ? db.prepare(EIGENE_SQL).bind(autorId, kId, vertreiberId)
+          : db.prepare(EIGENE_JUENGSTE_SQL).bind(autorId, kId)
+        ).first<EigeneZeile>();
+        if (!zeile) return null;
+        const { results: bilder } = await db.prepare(EIGENE_BILDER_SQL).bind(zeile.id).all();
+        return alsGespeichert(zeile, bilder as never[]);
       },
       ladeLiveNetzBasis: async (mitgliedId, sid) => {
         const [netz, terpene] = await db.batch([db.prepare(NETZ_SQL).bind(mitgliedId), db.prepare(TERPENE_SQL)]);

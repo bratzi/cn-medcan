@@ -38,13 +38,18 @@ test("freigegeben: Vorbelegung und Live-Netz, Fehler im Netz kostet nur das Netz
   assert.equal(r.liveNetz, null);
 });
 
-test("ohne Vertreiber: keine eigene Bewertung", async () => {
-  let gefragt = false;
-  await ichStrain(
-    { ...basis, mitglied: async () => ({ mitgliedId: "m", freigegeben: true, rolle: "MITGLIED" }) as never, ladeEigeneBewertung: async () => ((gefragt = true), null) },
+test("ohne Vertreiber: jüngste eigene Bewertung der Sorte, gleich bei welchem Vertreiber", async () => {
+  const gefragt: unknown[] = [];
+  const r = await ichStrain(
+    {
+      ...basis,
+      mitglied: async () => ({ mitgliedId: "m", freigegeben: true, rolle: "MITGLIED" }) as never,
+      ladeEigeneBewertung: async (...args: unknown[]) => (gefragt.push(args), { id: "r", vertreiberId: "v7" }) as never,
+    },
     { ...eingabe, vertreiberId: null },
   );
-  assert.equal(gefragt, false);
+  assert.deepEqual(gefragt, [["m", "k", null]]);
+  assert.equal(r.zugang === "freigegeben" && (r.vorbelegung as unknown as { vertreiberId: string }).vertreiberId, "v7");
 });
 
 import { createElement } from "react";

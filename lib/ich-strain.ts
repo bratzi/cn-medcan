@@ -8,7 +8,7 @@ export type IchStrain =
 
 type Deps = {
   mitglied: () => Promise<{ mitgliedId: string; freigegeben: boolean; rolle: string } | null>;
-  ladeEigeneBewertung: (autorId: string, kultivarId: string, vertreiberId: string) => Promise<unknown | null>;
+  ladeEigeneBewertung: (autorId: string, kultivarId: string, vertreiberId: string | null) => Promise<unknown | null>;
   ladeLiveNetzBasis: (mitgliedId: string, strainId: string) => Promise<LiveNetzBasis | null>;
   vorbelegungAus: (review: never) => Vorbelegung;
 };
@@ -19,7 +19,8 @@ export async function ichStrain(deps: Deps, e: { kultivarId: string; vertreiberI
   if (!m) return { zugang: "gast" };
   if (!m.freigegeben) return { zugang: "mitglied" };
   const [eigene, liveNetz] = await Promise.all([
-    e.vertreiberId ? deps.ladeEigeneBewertung(m.mitgliedId, e.kultivarId, e.vertreiberId) : Promise.resolve(null),
+    // Ohne Vertreiber die jüngste eigene Bewertung der Sorte (Plan 2026-10-22): die Maske wählt deren Vertreiber vor.
+    deps.ladeEigeneBewertung(m.mitgliedId, e.kultivarId, e.vertreiberId),
     deps.ladeLiveNetzBasis(m.mitgliedId, e.strainId).catch((fehler: unknown) => {
       console.error("ladeLiveNetzBasis fehlgeschlagen", fehler);
       return null;

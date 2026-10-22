@@ -63,16 +63,15 @@ export function bluetenHref(produktSlug: string, kultivarSlug: string | null | u
 }
 
 /**
- * Direkter Link auf eine Bewertung ohne 308-Umweg: mit Sorten-Slug die Sortenseite,
- * auf den Vertreiber gefiltert, sonst die Produktadresse.
+ * Direkter Link auf eine Bewertung ohne 308-Umweg: mit Sorten-Slug die Sortenseite
+ * (eine Seite je Strain, Plan 2026-10-22), sonst die Produktadresse.
  */
 export function bewertungHref(
   ziel: { strainSlug: string; kultivarSlug: string | null | undefined; vertreiberId: string | null | undefined },
   id: string,
 ): string {
   if (!ziel.kultivarSlug) return `/blueten/${ziel.strainSlug}#bewertung-${id}`;
-  const frage = ziel.vertreiberId ? `?vertreiber=${encodeURIComponent(ziel.vertreiberId)}` : "";
-  return `/blueten/${ziel.kultivarSlug}${frage}#bewertung-${id}`;
+  return `/blueten/${ziel.kultivarSlug}#bewertung-${id}`;
 }
 
 /** Zusammengelegte Sorten-Dubletten: alter Sorten-Slug -> behaltener (Migration 0025). */

@@ -32,7 +32,7 @@ export function OeffentlicheBewertungen({ bewertungen, anzahl, texte, w, sprache
             <div className="flex min-w-0 flex-col">
               <Link
                 prefetch={false}
-                href={b.ware ? sortenEintragHref({ slug: b.slug, vertreiberId: b.ware.vertreiberId }, b.id) : eintragHref(b.slug, b.id)}
+                href={b.ware ? sortenEintragHref({ slug: b.slug }, b.id) : eintragHref(b.slug, b.id)}
                 className={namenLinkKlassen("inline-flex min-h-11 min-w-0 items-center text-body wrap-break-word")}
               >
                 {b.handelsname}

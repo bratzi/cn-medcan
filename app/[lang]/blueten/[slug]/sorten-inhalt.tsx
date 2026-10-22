@@ -22,7 +22,6 @@ import { BewertungsBuch } from "@/components/review/BewertungsBuch";
 import { ladeJuryBeitraegeZuBewertungen } from "@/lib/query/jury";
 import { BlattAnzeige } from "@/components/review/BlattAnzeige";
 import { BewertenInsel } from "@/components/sorte/BewertenInsel";
-import { HerstellerLeiste } from "@/components/sorte/HerstellerLeiste";
 import { erkundungsDaten } from "@/components/review/erkundung-daten";
 import { mittleWirkung } from "@/components/review/GesamteindruckLeiste";
 import { eintragAnker } from "@/components/review/eintrag";
@@ -69,9 +68,6 @@ export async function sortenMetadaten(slug: string): Promise<Metadata> {
     description: t(w.bluete.metaBeschreibung, { handelsname: sorte.kultivar.name }),
   };
 }
-
-/** Welche Variante die Seite zeigt: ?ware= vor ?vertreiber=, sonst die meistbewertete; alle = Buch über alle Vertreiber. */
-export type SortenWahl = { ware?: string; vertreiber?: string; alle: boolean };
 
 const ABSTAND = "mt-16 sm:mt-24";
 /** Sektion mit Schlagwort: der Satz steht im oberen Polster, deshalb Polster statt Rand. */
@@ -180,12 +176,12 @@ function Chargentabelle({ chargen, w, sprache }: { chargen: StrainDetail["charge
 }
 
 /**
- * Die Sortenseite (Spec Sorte im Fokus, 3): Kopf der Sorte, darunter die Ware-Leiste je Vertreiber.
- * Die gewählte Ware (`?ware=` vor `?vertreiber=`, sonst die meistbewertete) filtert das Buch und
- * liefert die Produktangaben (Angaben, Terpene, Chargen). Leere Abschnitte entfallen, statt einen
- * Leerzustand zu zeigen (Spec 13.3).
+ * Die Sortenseite (Spec Sorte im Fokus, 3; Plan 2026-10-22, eine Seite je Strain): Kopf der Sorte,
+ * das Buch über alle Vertreiber. Die Produktangaben (Angaben, Terpene, Chargen) stammen von der
+ * meistbewerteten Blüte; den Vertreiber wählt nur das Bewertungsformular. Leere Abschnitte entfallen,
+ * statt einen Leerzustand zu zeigen (Spec 13.3).
  */
-async function SorteInhalt({ slug, wahl, w, sprache }: { slug: string; wahl: SortenWahl; w: Woerterbuch; sprache: Sprache }) {
+async function SorteInhalt({ slug, w, sprache }: { slug: string; w: Woerterbuch; sprache: Sprache }) {
   const texte = w.bluete;
   // Immer als Gast und ohne Fachkreis (Spec 2026-10-21, Seiten aus Assets, 3.1): keine Cookies, kein Mitglied.
   // Persönliches (Maske, eigene Bewertung, Live-Netz, Budpic-Zugang) lädt die Insel über /api/ich/strain.
@@ -194,13 +190,12 @@ async function SorteInhalt({ slug, wahl, w, sprache }: { slug: string; wahl: Sor
   const [sorte, katalog] = await Promise.all([ladeSorte(slug), ladeTerpenKatalog()]);
   // Alte Produktadressen leitet der Ausweichweg (page.tsx) weiter, bevor er hierher kommt.
   if (!sorte) notFound();
-  const aktive = waehleAktiveWare(sorte.waren, wahl);
+  const aktive = waehleAktiveWare(sorte.waren, {});
   if (!aktive) notFound();
-  const alleVertreiber = wahl.alle || !aktive.ware.vertreiberId;
   const [strain, reviews, budpicListe, blueteLikeZahlen] = await Promise.all([
     // Nur Angaben, Terpene, Chargen: das Buch lädt ladeSortenBewertungen.
     ladeStrainDetail(aktive.produkt.slug, fachkreis, { ohneBewertungen: true }),
-    ladeSortenBewertungen(sorte.kultivar.id, alleVertreiber ? null : aktive.ware.vertreiberId),
+    ladeSortenBewertungen(sorte.kultivar.id, null),
     ladeFreieBudpics([aktive.produkt.id]),
     // Likes der Blüte aus dem Zähler; ob ich geliket habe, lädt erst die Insel (Seite bleibt statisch).
     likeZahlenFuer("BLUETE", [sorte.kultivar.id]),
@@ -248,9 +243,6 @@ async function SorteInhalt({ slug, wahl, w, sprache }: { slug: string; wahl: Sor
   const hauptnote = sorte.kennwerte?.gesamtnoteMittel ?? sorte.kennwerte?.gesamtnoteMedian ?? null;
   const sortenAnzahl = sorte.kennwerte?.anzahl ?? 0;
   const basis = `/blueten/${sorte.kultivar.slug}`;
-  const auswahlQuery = aktive.ware.vertreiberId
-    ? `vertreiber=${encodeURIComponent(aktive.ware.vertreiberId)}`
-    : `ware=${encodeURIComponent(aktive.produkt.slug)}`;
   /**
    * Angaben zur Blüte (Nutzer 2026-10-03 und 2026-10-05): standen als eigene Sektion weit
    * unter der Erkundung. Sie stehen jetzt als ein Block oben, direkt hinter dem Titelblatt,
@@ -330,13 +322,14 @@ async function SorteInhalt({ slug, wahl, w, sprache }: { slug: string; wahl: Sor
         />
       </div>
     ) : null;
-  // Variante vorwählen: ?ware= (Ausweichweg) oder die einzige; die eigene Bewertung und ?ware= im Browser ergänzt die Insel.
+  // Vorwahl nur, wenn es nichts zu wählen gibt (ein Vertreiber); die eigene Bewertung und ?ware= ergänzt die Insel.
+  const einzige = sorte.waren.length === 1 ? sorte.waren[0] : null;
   const vorgewaehlt = {
-    vertreiberId: aktive.ware.vertreiberId || null,
-    strainId: wahl.ware === aktive.produkt.slug || aktive.ware.produkte.length === 1 ? aktive.produkt.id : null,
+    vertreiberId: einzige?.vertreiberId || null,
+    strainId: einzige && einzige.produkte.length === 1 ? einzige.produkte[0].id : null,
   };
   // Nach dem Anmelden zurück an die Maske; das Fragment kodiert, sonst gehört es zu /anmelden.
-  const anmelden = `/anmelden?weiter=${encodeURIComponent(`${basis}?${auswahlQuery}#bewerten`)}`;
+  const anmelden = `/anmelden?weiter=${encodeURIComponent(`${basis}#bewerten`)}`;
 
   return (
     <EigeneLikes>
@@ -360,7 +353,7 @@ async function SorteInhalt({ slug, wahl, w, sprache }: { slug: string; wahl: Sor
           bilder: alsDiashow(budpics, w, sprache),
           // Statisch Gast; BudpicBeitragen fragt selbst nach (dieselbe Antwort wie die Maske).
           zugang: "gast",
-          insel: { kultivarId: sorte.kultivar.id, vertreiberId: aktive.ware.vertreiberId || null },
+          insel: { kultivarId: sorte.kultivar.id, vertreiberId: null },
         }}
         w={w}
         sprache={sprache}
@@ -406,18 +399,6 @@ async function SorteInhalt({ slug, wahl, w, sprache }: { slug: string; wahl: Sor
       ) : null}
 
       {angabenZurBluete}
-
-      {/* Reihenfolge Spec 2026-10-21, 1: Strain, Angaben, Auswahl des Vertreibers, Wertung, Buch, Rest.
-          Die Leiste filtert Buch und Angaben und belegt die Bewertung vor; ohne Kauflink (HWG). */}
-      <div className={ABSTAND}>
-        <HerstellerLeiste
-          waren={sorte.waren}
-          aktiveVertreiberId={aktive.ware.vertreiberId}
-          slug={sorte.kultivar.slug}
-          texte={texte.vertreiber}
-          sprache={sprache}
-        />
-      </div>
 
       {/* Bewerten an der Stelle der Erkundung (Masterplan Bewertung v2, T4; /bewerten entfällt):
           freigeschaltete Mitglieder sehen die Maske, vorbelegt mit ihrer eigenen Bewertung; alle
@@ -497,27 +478,9 @@ async function SorteInhalt({ slug, wahl, w, sprache }: { slug: string; wahl: Sor
       </section>
 
       {/* Bewertungen der Sorte als ein Buch zum Blättern (T7): Betreiber zuerst, dann die Community;
-          gefiltert auf den Vertreiber der Auswahl, umschaltbar auf alle Vertreiber. */}
+          über alle Vertreiber (Vertreiber ist Nebensache, Nutzer 2026-10-22). */}
       <div className={SEKTION}>
         <Schlagwort satz={texte.schlagwort.bewertungen} ton="lila" />
-        {aktive.ware.vertreiberId ? (
-          <nav aria-label={texte.vertreiber.bewertungenFilter} className="mb-8 flex flex-wrap justify-center gap-2">
-            <a
-              href={`${basis}?${auswahlQuery}#bewertungen-titel`}
-              aria-current={alleVertreiber ? undefined : "true"}
-              className={buttonKlassen(alleVertreiber ? "secondary" : "primary", "md")}
-            >
-              {t(texte.vertreiber.nurAuswahl, { name: aktive.ware.vertreiberName || texte.vertreiber.unbekannt })}
-            </a>
-            <a
-              href={`${basis}?${auswahlQuery}&${new URLSearchParams({ alle: "1" })}#bewertungen-titel`}
-              aria-current={alleVertreiber ? "true" : undefined}
-              className={buttonKlassen(alleVertreiber ? "primary" : "secondary", "md")}
-            >
-              {texte.vertreiber.alleVertreiber}
-            </a>
-          </nav>
-        ) : null}
         <BewertungsBuch reviews={reviews} kennwerte={sorte.kennwerte} produkt={produkt} w={w} sprache={sprache} katalog={katalog} likes={reviewLikes} kommentare={reviewKommentare} juryBeitraege={juryBeitraege} />
       </div>
 
@@ -563,18 +526,20 @@ async function SorteInhalt({ slug, wahl, w, sprache }: { slug: string; wahl: Sor
   );
 }
 
-/** Rahmen der Strain-Seite; [auswahl]/page.tsx (statisch) und der Ausweichweg page.tsx teilen ihn. */
-export async function SortenSeite({ slug, wahl }: { slug: string; wahl: SortenWahl }) {
+/** Rahmen der Strain-Seite (page.tsx, statisch). */
+export async function SortenSeite({ slug }: { slug: string }) {
   const [w, sprache] = await Promise.all([holeWoerterbuch(), holeSprache()]);
   return (
     <div className={cn(seitenRahmen(), "pt-16 pb-24 sm:pt-24")}>
       <p className="mb-8">
+        {/* Bewusst harte Navigation: /blueten ist eine Datei aus Static Assets (lib/tor.ts), kein RSC-Ziel. */}
+        {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
         <a href="/blueten" className={einzelLinkKlassen()}>
           {w.bluete.alleBlueten}
         </a>
       </p>
       {/* Bewusst ohne Suspense-Grenze: notFound() antwortet so mit 404, der Inhalt ist ohne JavaScript lesbar und #eintrag-… existiert beim Sprung. */}
-      <SorteInhalt slug={slug} wahl={wahl} w={w} sprache={sprache} />
+      <SorteInhalt slug={slug} w={w} sprache={sprache} />
     </div>
   );
 }

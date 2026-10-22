@@ -156,7 +156,8 @@ Daraus folgt bindend:
 Reihenfolge der Prüfung — nimm immer die **oberste** Stufe, die die Anforderung erfüllt:
 
 0. **Leseseiten als Dateien in Static Assets, `worker.mjs`-Tor (seit 2026-10-22).** Startseite, `/blueten`,
-   Strain-Seiten je Vertreiber-Variante, Jury, `/neu`, `/reviews`: der Build rendert vor, `scripts/seiten-in-assets.mjs`
+   eine Strain-Seite je Strain (seit 2026-10-22, ~854 Dateien, Build ~8 min; Vertreiber nur im Formular,
+   alte `/[auswahl]`- und `?vertreiber=`-Adressen leitet `lib/tor.ts` per 308 um), Jury, `/neu`, `/reviews`: der Build rendert vor, `scripts/seiten-in-assets.mjs`
    verschiebt das HTML nach `.open-next/assets/_seiten/` (raus aus dem KV-Vorrat), `lib/tor.ts` prüft das Gate und
    liefert über `env.ASSETS.fetch` ohne Next (`html_handling: "none"`, `run_worker_first: ["/_seiten/*"]`).
    Grund (Messung 2026-10-21): auf Free kostet schon ein OpenNext-Cache-Treffer 2 bis 12 ms, ein Neubau im Request

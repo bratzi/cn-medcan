@@ -1314,12 +1314,14 @@ export async function ladeAromaVorzeige(kultivarSlug: string | null = null): Pro
  * und Vertreiber; aus der Zeit „eine je Produkt“ kann es mehrere geben, dann die kleinste id wie
  * beim Speichern (waehleZielBewertung).
  */
-export async function ladeEigeneBewertung(autorId: string, kultivarId: string, vertreiberId: string): Promise<GespeicherteBewertung | null> {
+/** Eigene Bewertung je Sorte und Vertreiber; ohne Vertreiber die jüngste der Sorte (Plan 2026-10-22). */
+export async function ladeEigeneBewertung(autorId: string, kultivarId: string, vertreiberId: string | null): Promise<GespeicherteBewertung | null> {
   const prisma = await getPrisma();
   const zeile = await prisma.review.findFirst({
-    where: { autorId, kultivarId, vertreiberId },
-    orderBy: { id: "asc" },
+    where: vertreiberId ? { autorId, kultivarId, vertreiberId } : { autorId, kultivarId },
+    orderBy: vertreiberId ? { id: "asc" } : { aktualisiertAm: "desc" },
     select: {
+      vertreiberId: true,
       strainId: true,
       wareGenau: true,
       aussehen: true,

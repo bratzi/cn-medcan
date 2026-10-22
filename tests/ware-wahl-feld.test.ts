@@ -3,7 +3,6 @@ import assert from "node:assert/strict";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 
-import { WareLeiste } from "@/components/sorte/WareLeiste";
 import { WareWahlFeld } from "@/components/sorte/WareWahlFeld";
 import { de } from "@/lib/i18n/de";
 import { gruppiereWaren, waehleAktiveWare, type WareKarte } from "@/lib/query/sorte";
@@ -28,7 +27,7 @@ test("gruppiereWaren: Reihenfolge nach Anzahl, dann Name, nie nach Note", () => 
   assert.deepEqual(gruppiereWaren(zeilen, kennwerte).map((w) => w.vertreiberId), ["v-m", "v-z", "v-a"]);
 });
 
-test("waehleAktiveWare: ?ware vor ?vertreiber, sonst die meistbewertete", () => {
+test("waehleAktiveWare: ?ware vor Vertreiber, sonst die meistbewertete", () => {
   assert.equal(waehleAktiveWare(waren, {})?.produkt.id, "b1");
   assert.equal(waehleAktiveWare(waren, { vertreiber: "v-a" })?.ware.vertreiberId, "v-a");
   assert.equal(waehleAktiveWare(waren, { ware: "slug-b2", vertreiber: "v-a" })?.produkt.id, "b2");
@@ -36,38 +35,32 @@ test("waehleAktiveWare: ?ware vor ?vertreiber, sonst die meistbewertete", () => 
   assert.equal(waehleAktiveWare([], {}), null);
 });
 
-test("WareLeiste: Karten in Reihenfolge, gewählte markiert, Links ohne Sprung", () => {
-  const html = renderToStaticMarkup(
-    createElement(WareLeiste, { waren, aktiveVertreiberId: "v-a", slug: "mac-1", texte: de.bluete.vertreiber, sprache: "de" }),
-  );
-  assert.ok(html.indexOf("Beta Pharma") < html.indexOf("Alpha GmbH"));
-  assert.match(html, /href="\/blueten\/mac-1\?vertreiber=v-b"/);
-  assert.equal(html.split('aria-current="true"').length - 1, 1);
-  const alpha = html.split("<li").find((teil) => teil.includes("Alpha GmbH")) ?? "";
-  assert.match(alpha, /aria-current="true"/);
-  assert.match(html, /Note 3,8 von 5/);
-});
-
-test("WareWahlFeld: Stärken nur bei mehr als einem Produkt, „Weiß ich nicht“ lässt strainId leer", () => {
+test("WareWahlFeld: mehrere Vertreiber als Pflicht-Select, Varianten des gewählten, „Weiß ich nicht“ lässt strainId leer", () => {
   const mehrere = renderToStaticMarkup(
     createElement(WareWahlFeld, { waren, vorgewaehlt: { vertreiberId: "v-b", strainId: null }, texte: de.bluete.vertreiber, sprache: "de" }),
   );
-  assert.match(mehrere, /name="vertreiberId" value="v-b"/);
+  assert.match(mehrere, /<select[^>]*name="vertreiberId"[^>]*required/);
+  assert.match(mehrere, /<option value="v-b" selected="">Beta Pharma<\/option>/);
+  assert.match(mehrere, /<option value="v-a">Alpha GmbH<\/option>/);
+  assert.match(mehrere, /Von welchem Vertreiber ist deine Blüte\?/);
   assert.match(mehrere, /name="strainId" value=""/);
-  assert.match(mehrere, /Weiß ich nicht/);
   assert.match(mehrere, /aria-pressed="true"[^>]*>(?:<svg.*?<\/svg>)?Weiß ich nicht/);
   assert.match(mehrere, /THC 18/);
-  // Der Vertreiber kommt aus der Hersteller-Leiste: keine eigenen Vertreiber-Chips mehr (Spec 2026-10-21, 1.3).
-  assert.doesNotMatch(mehrere, /Deine Blüte ist von<\/h3>/);
-  assert.doesNotMatch(mehrere, /Alpha GmbH/);
-  assert.match(mehrere, /Deine Blüte ist von <strong[^>]*>Beta Pharma<\/strong>/);
-  assert.match(mehrere, /href="#hersteller-titel"/);
+  assert.doesNotMatch(mehrere, /hersteller-titel/);
+
+  const offen = renderToStaticMarkup(
+    createElement(WareWahlFeld, { waren, vorgewaehlt: { vertreiberId: null, strainId: null }, texte: de.bluete.vertreiber, sprache: "de" }),
+  );
+  assert.match(offen, /<option value="" disabled="" selected="">Vertreiber wählen<\/option>/);
+  assert.doesNotMatch(offen, /THC 18/);
 
   const einer = renderToStaticMarkup(
-    createElement(WareWahlFeld, { waren, vorgewaehlt: { vertreiberId: "v-a", strainId: null }, texte: de.bluete.vertreiber, sprache: "de" }),
+    createElement(WareWahlFeld, { waren: [waren[1]], vorgewaehlt: { vertreiberId: null, strainId: null }, texte: de.bluete.vertreiber, sprache: "de" }),
   );
+  assert.doesNotMatch(einer, /<select/);
   assert.doesNotMatch(einer, /Weiß ich nicht/);
   assert.match(einer, /name="vertreiberId" value="v-a"/);
+  assert.match(einer, /Deine Blüte ist von <strong[^>]*>Alpha GmbH<\/strong>/);
 
   const gewaehlt = renderToStaticMarkup(
     createElement(WareWahlFeld, { waren, vorgewaehlt: { vertreiberId: "v-b", strainId: "b2" }, texte: de.bluete.vertreiber, sprache: "de" }),

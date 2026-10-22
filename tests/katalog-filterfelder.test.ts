@@ -29,7 +29,7 @@ const feld = (chip: ChipSchluessel, fachkreis = false) =>
   renderToStaticMarkup(createElement(FilterFeld, { ...basis(fachkreis), chip }));
 const such = () => renderToStaticMarkup(createElement(SuchFeld, basis(false)));
 
-for (const chip of ["community", "terpene", "geschmack", "typ", "thc", "vertreiber", "form", "verfuegbar"] as const) {
+for (const chip of ["community", "terpene", "geschmack", "typ", "thc", "form", "verfuegbar"] as const) {
   test(`FilterFeld ${chip} rendert ohne details-Hülle`, () => {
     const html = feld(chip);
     assert.ok(html.length > 0);
@@ -62,4 +62,9 @@ test("SuchFeld ist type=search mit Label", () => {
 test("Klappe und Sammelkomponente FilterFelder sind entfernt", () => {
   const s = readFileSync("components/katalog/FilterFelder.tsx", "utf8");
   assert.doesNotMatch(s, /<details|function Klappe/);
+});
+
+test("Kein Vertreiber-Filter in der Chipleiste (Vertreiber ist Nebensache, Nutzer 2026-10-22)", async () => {
+  const { CHIPS } = await import("@/lib/katalog/chipleiste");
+  assert.ok(!(CHIPS as readonly string[]).includes("vertreiber"));
 });

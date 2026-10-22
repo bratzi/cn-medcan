@@ -256,7 +256,7 @@ export function SortenExplorer({ sorten, texte, typen, sprache, kopf, zu, vorwah
             <InfoKnopf sprache={sprache} text={texte.hinweis} />
           </div>
           {/* Von Restorff und Peak-End: eine gefüllte Aktion, sie lädt zur eigenen Bewertung ein. */}
-          <Link prefetch={false} href={`/blueten/${sorte.slug}?vertreiber=${encodeURIComponent(ware.vertreiberId)}#bewerten`} className={buttonKlassen("primary", "md")}>
+          <Link prefetch={false} href={`/blueten/${sorte.slug}#bewerten`} className={buttonKlassen("primary", "md")}>
             {texte.wareBewerten}
           </Link>
         </div>

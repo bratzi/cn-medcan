@@ -42,7 +42,9 @@ export function BewertenInsel({
   const ich = useIchStrain({
     kultivarId,
     strainId,
-    vertreiberId: vorgewaehlt.vertreiberId,
+    // Ohne Vertreiber (Plan 2026-10-22): die Insel liefert die jüngste eigene Bewertung der Sorte samt Vertreiber.
+    // Dieselbe Adresse wie BudpicBeitragen, also ein Abruf je Seite.
+    vertreiberId: null,
   });
 
   if (ich.zugang === "mitglied")
@@ -59,11 +61,13 @@ export function BewertenInsel({
         {gast}
       </>
     );
-  // Variante vorwählen: die eigene, sonst die per ?ware= gewählte, sonst die der Seite; offen bleibt „Weiß ich nicht“.
+  // Vertreiber und Variante vorwählen: die eigene Bewertung, sonst die per ?ware= gewählte Blüte, sonst die
+  // einzige; sonst bleibt die Wahl offen und das Formular verlangt sie.
   const ware = new URLSearchParams(window.location.search).get("ware");
   const perWare = ware
-    ? formular.waren.flatMap((w) => w.produkte).find((p) => p.slug === ware)?.id
+    ? formular.waren.find((w) => w.produkte.some((p) => p.slug === ware))
     : undefined;
+  const perWareProdukt = perWare?.produkte.find((p) => p.slug === ware)?.id;
   return (
     <>
       {ich.vorbelegung ? kopfVorbelegt : kopfFreigegeben}
@@ -74,12 +78,13 @@ export function BewertenInsel({
           istBetreiber={ich.istBetreiber}
           vorbelegung={ich.vorbelegung}
           liveNetz={ich.liveNetz}
-          vorgewaehlt={{
-            vertreiberId: vorgewaehlt.vertreiberId,
-            strainId: ich.vorbelegung
-              ? ich.vorbelegung.strainId
-              : (perWare ?? vorgewaehlt.strainId),
-          }}
+          vorgewaehlt={
+            ich.vorbelegung
+              ? { vertreiberId: ich.vorbelegung.vertreiberId, strainId: ich.vorbelegung.strainId }
+              : perWare
+                ? { vertreiberId: perWare.vertreiberId || null, strainId: perWareProdukt ?? null }
+                : vorgewaehlt
+          }
         />
       </div>
     </>

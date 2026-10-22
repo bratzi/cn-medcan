@@ -1,7 +1,7 @@
 import { SORTIERUNGEN, aktiveRichtung, leererFilter, type Sortierung, type StrainFilter } from "@/lib/query/filter";
 
 /** Chips der Werkzeugleiste (Spec 2026-10-21), Reihenfolge = Anzeige. */
-export const CHIPS = ["community", "terpene", "geschmack", "typ", "thc", "vertreiber", "form", "verfuegbar", "mehr"] as const;
+export const CHIPS = ["community", "terpene", "geschmack", "typ", "thc", "form", "verfuegbar", "mehr"] as const;
 export type ChipSchluessel = (typeof CHIPS)[number];
 
 /** Sortierungen, die ab lg direkt als Segment stehen. */
@@ -25,8 +25,6 @@ export function chipZahl(f: StrainFilter, chip: ChipSchluessel): number {
       return f.typ.length;
     case "thc":
       return (f.thcMin !== leer.thcMin || f.thcMax !== leer.thcMax ? 1 : 0) + (f.cbd ? 1 : 0);
-    case "vertreiber":
-      return f.vertreiber.length;
     case "form":
       return f.form.length;
     case "verfuegbar":

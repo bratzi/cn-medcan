@@ -4,11 +4,10 @@ import { pathToFileURL } from "node:url";
 
 /**
  * Verschiebt vorgerenderte Leseseiten in die Static Assets (Spec 2026-10-21, Seiten aus Assets, 3.1).
- * Strain-Varianten behalten ihren Dateinamen, alle anderen werden zu <pfad>/index.html, passend zu
- * lib/seiten-tor.ts. Die Seiten fliegen aus dem KV-Vorrat: sonst kostet jeder Deploy Schreibvorgänge.
+ * Jede Seite wird zu <pfad>/index.html, passend zu lib/seiten-tor.ts; eine Datei je Strain (seit
+ * 2026-10-22, ca. 854 statt 3064). Die Seiten fliegen aus dem KV-Vorrat: sonst kostet jeder Deploy Schreibvorgänge.
  */
-const FEST = /^(de|en)(\/(blueten|neu|jury(\/[a-z0-9-]+)*|reviews(\/[a-z0-9-]+)*))?\.html$/;
-const STRAIN = /^(de|en)\/blueten\/[a-z0-9-]+\/(standard|v-[A-Za-z0-9-]+)\.html$/;
+const FEST = /^(de|en)(\/(blueten(\/[a-z0-9-]+)?|neu|jury(\/[a-z0-9-]+)*|reviews(\/[a-z0-9-]+)*))?\.html$/;
 
 /** Im Workers Build ohne Leseseiten abbrechen: sonst fiele jede Seite auf den teuren Weg. */
 export function keineLeseseiten(env, anzahl) {
@@ -18,8 +17,7 @@ export function keineLeseseiten(env, anzahl) {
 export function planeVerschiebung(dateien) {
   const plan = [];
   for (const quelle of dateien) {
-    if (STRAIN.test(quelle)) plan.push({ quelle, ziel: `_seiten/${quelle}` });
-    else if (FEST.test(quelle)) plan.push({ quelle, ziel: `_seiten/${quelle.replace(/\.html$/, "")}/index.html` });
+    if (FEST.test(quelle)) plan.push({ quelle, ziel: `_seiten/${quelle.replace(/\.html$/, "")}/index.html` });
   }
   return plan;
 }

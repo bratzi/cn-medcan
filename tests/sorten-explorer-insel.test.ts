@@ -66,7 +66,7 @@ test("SortenExplorer: Sorte mit nur einem Vertreiber hat keinen Vergleich, aber 
   );
   assert.equal((html.match(/class="explorer-karte/g) ?? []).length, 1);
   assert.ok(!html.includes(`${de.start.vertreiber.vergleichen}<`));
-  assert.match(html, /href="\/blueten\/solo\?vertreiber=z#bewerten"/);
+  assert.match(html, /href="\/blueten\/solo#bewerten"/);
 });
 
 test("SortenExplorer: Server rendert die erste Sorte vollständig", () => {
@@ -79,7 +79,7 @@ test("SortenExplorer: Server rendert die erste Sorte vollständig", () => {
   assert.match(html, /aria-pressed="true"/);
   // „Zum Strain“ steht nur noch am Ende der Bewertung (AromaWechsel), nicht im Explorer.
   assert.doesNotMatch(html, /href="\/blueten\/gelato\?vertreiber=a"/);
-  assert.match(html, /href="\/blueten\/gelato\?vertreiber=a#bewerten"/);
+  assert.match(html, /href="\/blueten\/gelato#bewerten"/);
   assert.match(html, /aria-live="polite"/);
   assert.match(html, /Overall 4,2 von 5/);
   assert.match(html, new RegExp(de.start.vertreiber.hinweis));

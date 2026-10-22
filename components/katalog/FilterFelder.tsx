@@ -271,41 +271,6 @@ function ThcFeld({ filter, zahlen, setze, texte, sprache, deaktiviert }: FeldPro
   );
 }
 
-function VertreiberFeld({ filter, zahlen, daten, setze, texte, sprache, deaktiviert }: FeldProps) {
-  const id = useId();
-  const [suche, setSuche] = useState("");
-  const sofort = sofortAus(setze);
-  if ((daten?.vertreiber.length ?? 0) === 0) return null;
-  const s = suche.trim().toLowerCase();
-  const liste = [...(daten?.vertreiber ?? [])]
-    .sort((a, b) => a.n.localeCompare(b.n, sprache))
-    .filter((v) => filter.vertreiber.includes(v.i) || v.n.toLowerCase().includes(s));
-  return (
-    <Gruppe titel={texte.vertreiber}>
-      <label htmlFor={`${id}-vs`} className="sr-only">{texte.vertreiberSuchen}</label>
-      <input
-        id={`${id}-vs`}
-        type="search"
-        value={suche}
-        onChange={(event) => setSuche(event.target.value)}
-        placeholder={texte.vertreiberSuchen}
-        className="min-h-11 rounded-md border border-border-strong bg-surface px-4 text-small text-text placeholder:text-text-muted"
-      />
-      <div className="flex flex-col gap-1">
-        {liste.map((v) => {
-          const an = filter.vertreiber.includes(v.i);
-          const anzahl = zahlen?.vertreiber[v.i];
-          return (
-            <Haken key={v.i} an={an} deaktiviert={deaktiviert} gedaempft={anzahl === 0 && !an} onChange={() => sofort({ vertreiber: umschalten(filter.vertreiber, v.i) })}>
-              {v.n} <Zahl wert={anzahl} />
-            </Haken>
-          );
-        })}
-      </div>
-    </Gruppe>
-  );
-}
-
 function FormFeld({ filter, zahlen, setze, texte, labels, deaktiviert }: FeldProps) {
   const sofort = sofortAus(setze);
   return (
@@ -388,7 +353,6 @@ export function FilterFeld({ chip, ...props }: FeldProps & { chip: ChipSchluesse
     case "geschmack": return <GeschmackFeld {...props} />;
     case "typ": return <TypFeld {...props} />;
     case "thc": return <ThcFeld {...props} />;
-    case "vertreiber": return <VertreiberFeld {...props} />;
     case "form": return <FormFeld {...props} />;
     case "verfuegbar": return <VerfuegbarFeld {...props} />;
     case "mehr": return <MehrFeld {...props} />;

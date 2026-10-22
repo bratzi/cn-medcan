@@ -214,7 +214,7 @@ export function BuchDoppelseite({ eintrag, ueberschrift: Ueberschrift, w, sprach
           {sorte && eintrag.kommentare !== undefined ? (
             <Link
               prefetch={false}
-              href={`/blueten/${eintrag.sorte?.slug ?? eintrag.slug}${eintrag.sorte?.vertreiberId ? `?vertreiber=${encodeURIComponent(eintrag.sorte.vertreiberId)}` : ""}#bewertung-${eintrag.id}`}
+              href={`/blueten/${eintrag.sorte?.slug ?? eintrag.slug}#bewertung-${eintrag.id}`}
               className={namenLinkKlassen("inline-flex min-h-11 items-center whitespace-nowrap text-small")}
             >
               {w.reaktionen.kommentare.titel} (<span className="numeric">{eintrag.kommentare}</span>)

@@ -35,6 +35,8 @@ export type GespeicherteBewertung = {
   /** Produkt und ob die Stärke bekannt ist (Spec 2026-10-15); fehlt bei Altaufrufen. */
   strainId?: string;
   wareGenau?: boolean;
+  /** Vertreiber der Bewertung (Plan 2026-10-22); fehlt bei Altaufrufen. */
+  vertreiberId?: string | null;
 };
 
 export type VorbelegtesBild = { id: string; breite: number; hoehe: number; status: BudpicStatus };
@@ -55,6 +57,8 @@ export type Vorbelegung = {
   bilder: VorbelegtesBild[];
   /** Gewählte Stärke; null, wenn sie offen blieb (`wareGenau = false`) oder unbekannt ist. */
   strainId: string | null;
+  /** Vertreiber der Bewertung: die Maske wählt ihn vor (Plan 2026-10-22); null, wenn unbekannt. */
+  vertreiberId: string | null;
 };
 
 export function vorbelegungAus(review: GespeicherteBewertung): Vorbelegung {
@@ -85,5 +89,6 @@ export function vorbelegungAus(review: GespeicherteBewertung): Vorbelegung {
       status: (BUDPIC_STATUS as readonly string[]).includes(b.status) ? (b.status as BudpicStatus) : "ABGELEHNT",
     })),
     strainId: review.strainId && review.wareGenau !== false ? review.strainId : null,
+    vertreiberId: review.vertreiberId ?? null,
   };
 }
