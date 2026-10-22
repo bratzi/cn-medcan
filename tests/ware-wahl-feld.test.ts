@@ -41,13 +41,15 @@ test("waehleAktiveWare: ?ware vor Vertreiber, sonst die meistbewertete", () => {
   assert.equal(waehleAktiveWare([], {}), null);
 });
 
-test("WareWahlFeld: mehrere Vertreiber als Pflicht-Select, Varianten des gewählten, „Weiß ich nicht“ lässt strainId leer", () => {
+test("WareWahlFeld: mehrere Vertreiber als Pflicht-Karten (Radios), Varianten des gewählten, „Weiß ich nicht“ lässt strainId leer", () => {
   const mehrere = renderToStaticMarkup(
     createElement(WareWahlFeld, { waren, alleVertreiber, vorgewaehlt: { vertreiberId: "v-b", strainId: null }, texte: de.bluete.vertreiber, sprache: "de" }),
   );
-  assert.match(mehrere, /<select[^>]*name="vertreiberId"[^>]*required/);
-  assert.match(mehrere, /<option value="v-b" selected="">Beta Pharma<\/option>/);
-  assert.match(mehrere, /<option value="v-a">Alpha GmbH<\/option>/);
+  // Logo-Karten im Karussell (Nutzer 2026-10-22): native Radios, das erste ist Pflicht.
+  assert.match(mehrere, /role="radiogroup"/);
+  assert.match(mehrere, /<input type="radio" required=""[^>]*name="vertreiberId" checked="" value="v-b"/);
+  assert.match(mehrere, /<input type="radio" class="sr-only" name="vertreiberId" value="v-a"\/>/);
+  assert.match(mehrere, /Beta Pharma/);
   assert.match(mehrere, /Von welchem Vertreiber ist deine Blüte\?/);
   assert.match(mehrere, /name="strainId" value=""/);
   assert.match(mehrere, /aria-pressed="true"[^>]*>(?:<svg.*?<\/svg>)?Weiß ich nicht/);
@@ -57,15 +59,15 @@ test("WareWahlFeld: mehrere Vertreiber als Pflicht-Select, Varianten des gewähl
   const offen = renderToStaticMarkup(
     createElement(WareWahlFeld, { waren, alleVertreiber, vorgewaehlt: { vertreiberId: null, strainId: null }, texte: de.bluete.vertreiber, sprache: "de" }),
   );
-  assert.match(offen, /<option value="" disabled="" selected="">Vertreiber wählen<\/option>/);
+  assert.doesNotMatch(offen, /checked=""/);
   assert.doesNotMatch(offen, /THC 18/);
 
   const einer = renderToStaticMarkup(
     createElement(WareWahlFeld, { waren: [waren[1]], alleVertreiber, vorgewaehlt: { vertreiberId: null, strainId: null }, texte: de.bluete.vertreiber, sprache: "de" }),
   );
   // Auch mit einem gelisteten Vertreiber bleibt die Wahl offen für alle (Nutzer 2026-10-22), vorgewählt ist er.
-  assert.match(einer, /<select[^>]*name="vertreiberId"[^>]*required/);
-  assert.match(einer, /<option value="v-a" selected="">Alpha GmbH<\/option>/);
+  assert.match(einer, /<input type="radio" required=""[^>]*name="vertreiberId" checked="" value="v-a"/);
+  assert.match(einer, /value="v-b"/);
   assert.doesNotMatch(einer, /Weiß ich nicht/);
   // Kein Bestätigungssatz unter der Wahl (Nutzer 2026-10-22).
   assert.doesNotMatch(einer, /Deine Blüte ist von/);
@@ -88,10 +90,10 @@ test("WareWahlFeld: alle Vertreiber wählbar, gelistete zuerst, kein „Vertreib
     }),
   );
   assert.doesNotMatch(html, /Vertreiber unbekannt/);
-  const gelistet = html.indexOf('label="Für diesen Strain gelistet"');
-  const weitere = html.indexOf('label="Weitere Vertreiber"');
-  assert.ok(gelistet > -1 && weitere > gelistet);
-  // Gelistete nur einmal, im ersten Block; der Rest alphabetisch im zweiten.
+  // Gelistete zuerst (Reihenfolge der Waren), eine Trennlinie, dann der Rest alphabetisch.
+  const gelistet = html.indexOf('value="v-b"');
+  const weitere = html.indexOf('<li aria-hidden="true" class="w-px');
+  assert.ok(gelistet > -1 && weitere > html.indexOf('value="v-a"'));
   assert.equal(html.match(/value="v-a"/g)?.length, 1);
   assert.ok(html.indexOf('value="v-c"') > weitere);
   assert.ok(html.indexOf('value="v-d"') > html.indexOf('value="v-c"'));
@@ -100,7 +102,7 @@ test("WareWahlFeld: alle Vertreiber wählbar, gelistete zuerst, kein „Vertreib
   const fremd = renderToStaticMarkup(
     createElement(WareWahlFeld, { waren, alleVertreiber, vorgewaehlt: { vertreiberId: "v-d", strainId: null }, texte: de.bluete.vertreiber, sprache: "de" }),
   );
-  assert.match(fremd, /<option value="v-d" selected="">Delta AG<\/option>/);
+  assert.match(fremd, /checked="" value="v-d"/);
   assert.match(fremd, /noch nicht gelistet/);
 });
 

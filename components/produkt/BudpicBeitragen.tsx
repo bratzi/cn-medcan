@@ -4,8 +4,9 @@ import { useRef, useState } from "react";
 import Link from "next/link";
 
 import { budpicHochladen } from "@/app/[lang]/blueten/[slug]/budpic-aktionen";
-import { Button, einzelLinkKlassen, useHydriert } from "@/components/ui";
+import { einzelLinkKlassen, useHydriert } from "@/components/ui";
 import { InfoKnopf } from "@/components/ui/InfoKnopf";
+import { cn } from "@/lib/cn";
 import { bluetenHref } from "@/lib/alte-adressen";
 import { BUDPIC_MAX_BYTES, BUDPIC_MAX_DATEIEN, BUDPIC_MAX_KANTE } from "@/lib/budpics";
 import { bildVerkleinernFrei } from "@/lib/bild-verkleinern";
@@ -107,7 +108,7 @@ export function BudpicBeitragen({ zugang: zugangVomServer, strainId, slug, kulti
   }
 
   return (
-    <div className="flex flex-col items-start gap-2">
+    <div className="flex flex-col items-center gap-2">
       <input
         ref={eingabe}
         type="file"
@@ -118,12 +119,25 @@ export function BudpicBeitragen({ zugang: zugangVomServer, strainId, slug, kulti
         tabIndex={-1}
         aria-hidden="true"
       />
-      {/* Knopf und Hinweis als eine Einheit (Nutzer 2026-10-22): der Hinweis steckt im Info-Knopf daneben. */}
-      <div className="flex items-center gap-2">
-        <Button variante="secondary" groesse="sm" disabled={!hydriert || laeuft !== null} onClick={() => eingabe.current?.click()}>
+      {/* Knopf und Hinweis als eine Pille mit Trenner (Nutzer 2026-10-22): je Teil 44 px Trefferfläche. */}
+      <div className="inline-flex items-center rounded-full border border-border-strong bg-surface text-small text-text transition-colors duration-fast ease-standard hover:border-accent-hover">
+        <button
+          type="button"
+          disabled={!hydriert || laeuft !== null}
+          onClick={() => eingabe.current?.click()}
+          className={cn("inline-flex min-h-11 items-center gap-2 py-2 pl-4 font-medium", kompakt ? "rounded-full pr-4" : "rounded-l-full pr-2", " transition-[color,scale] duration-fast ease-out hover:text-accent active:scale-97 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring disabled:opacity-60")}
+        >
+          <svg aria-hidden="true" viewBox="0 0 16 16" className="size-4 shrink-0">
+            <path d="M8 3v10M3 8h10" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+          </svg>
           {laeuft ? t(texte.laeuft, laeuft) : texte.beitragen}
-        </Button>
-        {kompakt ? null : <InfoKnopf sprache={sprache} text={t(texte.hinweis, { max: BUDPIC_MAX_DATEIEN })} />}
+        </button>
+        {kompakt ? null : (
+          <>
+            <span aria-hidden="true" className="h-6 w-px bg-border" />
+            <InfoKnopf sprache={sprache} text={t(texte.hinweis, { max: BUDPIC_MAX_DATEIEN })} className="px-2" />
+          </>
+        )}
       </div>
       {fehler.length > 0 ? (
         <ul role="alert" className="flex flex-col gap-1 text-small text-danger">

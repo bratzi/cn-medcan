@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useEffect, useRef, useState, useTransition } from "react";
 
 import { ladeKommentareSeite, loescheKommentar, meldeKommentar } from "@/app/[lang]/reaktionen/kommentar-aktionen";
-import { KommentarFeld } from "@/components/reaktionen/KommentarFeld";
+import { KommentarFeld, type KommentarFeldSteuerung } from "@/components/reaktionen/KommentarFeld";
 import { Avatar, buttonKlassen, namenLinkKlassen } from "@/components/ui";
 import type { KommentarZiel } from "@/db/enums";
 import { cn } from "@/lib/cn";
@@ -64,6 +64,7 @@ export function Kommentare({
   const [laedt, starteLaden] = useTransition();
   const laeuftSchon = useRef(false);
   const detailsRef = useRef<HTMLDetailsElement>(null);
+  const feldSteuerung = useRef<KommentarFeldSteuerung>(null);
   const anker = `kommentare-${zielId}`;
 
   // Ein Link auf `#kommentare-<id>` (auch von derselben Seite aus) klappt den Bereich auf und scrollt dorthin.
@@ -160,13 +161,14 @@ export function Kommentare({
         ) : null}
 
         {eintraege.length > 0 ? (
-          <ol className="flex flex-col divide-y divide-border">
+          <ol className="flex flex-col gap-4">
             {eintraege.map((k) => (
               <Eintrag
                 key={k.id}
                 k={k}
                 text={text}
                 sprache={sprache}
+                beiAntwort={() => feldSteuerung.current?.antworten(k.autor.name)}
                 beiWeg={() => {
                   setEintraege((alt) => alt.filter((e) => e.id !== k.id));
                   setDifferenz((d) => d - 1);
@@ -191,6 +193,7 @@ export function Kommentare({
           ziel={ziel}
           zielId={zielId}
           text={text}
+          steuerung={feldSteuerung}
           beiNeu={(k) => {
             setEintraege((alt) => (alt.some((e) => e.id === k.id) ? alt : [...alt, k]));
             setDifferenz((d) => d + 1);
@@ -202,7 +205,7 @@ export function Kommentare({
   );
 }
 
-function Eintrag({ k, text, sprache, beiWeg }: { k: KommentarAnsicht; text: Texte; sprache: Sprache; beiWeg: () => void }) {
+function Eintrag({ k, text, sprache, beiWeg, beiAntwort }: { k: KommentarAnsicht; text: Texte; sprache: Sprache; beiWeg: () => void; beiAntwort: () => void }) {
   const [laeuft, starte] = useTransition();
   const [meldung, setMeldung] = useState<"gemeldet" | "fehler" | null>(null);
   const [grund, setGrund] = useState("");
@@ -230,25 +233,31 @@ function Eintrag({ k, text, sprache, beiWeg }: { k: KommentarAnsicht; text: Text
     });
 
   return (
-    <li className="flex gap-4 py-4 first:pt-0">
+    // Eintrag im Social-Media-Stil (Nutzer 2026-10-22): Avatar, Blase mit Name, Zeit und Text, darunter die Aktionen.
+    <li className="flex gap-3">
       <Avatar name={name} bildId={k.autor.avatarId} groesse="sm" />
       <div className="flex min-w-0 flex-1 flex-col gap-1">
-        <p className="flex flex-wrap items-baseline gap-x-2 text-small">
-          <span className="font-medium text-text wrap-break-word">
-            {k.autor.kurzId ? (
-              <Link prefetch={false} href={profilHref(k.autor.kurzId)} className={namenLinkKlassen()}>
-                {name}
-              </Link>
-            ) : (
-              name
-            )}
-          </span>
-          <time dateTime={k.erstelltAm} title={formatiereDatum(k.erstelltAm, sprache)} suppressHydrationWarning className="text-caption text-text-muted">
-            {formatiereRelativ(k.erstelltAm, undefined, sprache)}
-          </time>
-        </p>
-        <p className="text-body text-text whitespace-pre-line break-words">{k.text}</p>
-        <div className="flex flex-wrap items-center gap-x-2">
+        <div className="w-fit max-w-full rounded-2xl rounded-tl-md bg-surface-raised px-4 py-3">
+          <p className="flex flex-wrap items-baseline gap-x-2 text-small">
+            <span className="font-medium text-text wrap-break-word">
+              {k.autor.kurzId ? (
+                <Link prefetch={false} href={profilHref(k.autor.kurzId)} className={namenLinkKlassen()}>
+                  {name}
+                </Link>
+              ) : (
+                name
+              )}
+            </span>
+            <time dateTime={k.erstelltAm} title={formatiereDatum(k.erstelltAm, sprache)} suppressHydrationWarning className="text-caption text-text-muted">
+              {formatiereRelativ(k.erstelltAm, undefined, sprache)}
+            </time>
+          </p>
+          <p className="mt-1 text-body text-text whitespace-pre-line break-words">{k.text}</p>
+        </div>
+        <div className="flex flex-wrap items-center gap-x-1 ps-2">
+          <button type="button" onClick={beiAntwort} aria-label={t(text.antwortenAn, { name })} className={TEXTKNOPF}>
+            {text.antworten}
+          </button>
           {k.darfLoeschen ? (
             <button type="button" onClick={loesche} disabled={laeuft} aria-label={t(text.loeschenFuer, { name })} className={TEXTKNOPF}>
               {text.loeschen}

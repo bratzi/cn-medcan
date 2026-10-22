@@ -95,12 +95,13 @@ function spanneAus(produkte: readonly WareProdukt[]): SorteDetail["spanne"] {
  * Alle Vertreiber mit mindestens einem gelisteten Produkt, für die Wahl im Bewertungsformular (Nutzer
  * 2026-10-22: jeder Vertreiber bei jedem Strain). Läuft beim statischen Erzeugen der Seite, nie je Anfrage.
  */
-export const ladeAlleVertreiber = cache(async function ladeAlleVertreiber(): Promise<{ id: string; name: string }[]> {
+export const ladeAlleVertreiber = cache(async function ladeAlleVertreiber(): Promise<{ id: string; name: string; logoPfad: string | null }[]> {
   const prisma = await getPrisma();
   return prisma.unternehmen.findMany({
     where: { vertrieben: { some: { aktiv: true } } },
     orderBy: { name: "asc" },
-    select: { id: true, name: true },
+    // Logo für die Karten der Vertreiberwahl im Formular (Nutzer 2026-10-22).
+    select: { id: true, name: true, logoPfad: true },
   });
 });
 

@@ -119,6 +119,11 @@
   --text-notiz--line-height: 1.2;
   --text-notiz--font-weight: 400;
 
+  /* Note des Strains im Kopf der Strain-Seite (Nutzer 2026-10-22): groß, etwa 112 px am Desktop. */
+  --text-urteil: clamp(4rem, 2.5rem + 5vw, 7rem);
+  --text-urteil--line-height: 1;
+  --text-urteil--font-weight: 400;
+
   /* Kurze Vermerke am Stimmzettel und in der Schleife: die Mindestgröße. */
   --text-vermerk: 2rem;
   --text-vermerk--line-height: 1.2;
