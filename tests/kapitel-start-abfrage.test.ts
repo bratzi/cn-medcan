@@ -17,6 +17,12 @@ test("Schaufenster nur aus öffentlichem, freigegebenem Betreiber-Profil", () =>
   assert.doesNotMatch(teil, /profilAusDaten\(/);
 });
 
+test("Schaufenster zeigt auch Gästen den Verlauf des Netzes (Nutzer 2026-10-22)", () => {
+  const teil = quelle.slice(quelle.indexOf("export const ladeSchaufensterKapitel"), quelle.indexOf("export async function ladeEigenesKapitel"));
+  assert.match(teil, /profil: \{ select: \{ oeffentlich: true, verlauf: true \} \}/);
+  assert.match(teil, /verlauf: verlaufAusDaten\(m\.profil\?\.verlauf \?\? null\)/);
+});
+
 test("Zählungen nur freigegeben und aktive Sorte", () => {
   assert.match(quelle, /freigegeben: true, strain: \{ aktiv: true \}/);
 });

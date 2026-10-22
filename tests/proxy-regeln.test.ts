@@ -1,40 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 
-import { igFeedSchluessel, internerPfad, istApiPfad, istOhneGate, ohneSprachPraefix } from "@/lib/proxy-regeln";
-
-test("Ohne Passwort: Login, Rechtsseiten, Sprachwechsel", () => {
-  for (const pfad of ["/zugang", "/impressum", "/datenschutz", "/api/zugang", "/api/sprache"]) {
-    assert.equal(istOhneGate(pfad), true, pfad);
-  }
-});
-
-test("Alles andere liegt hinter dem Passwort, auch API, interne Pfade und Scanner-Pfade", () => {
-  const geschuetzt = [
-    "/",
-    "/reviews",
-    "/sotm",
-    "/blueten/x",
-    "/mitglied",
-    "/admin",
-    "/api",
-    "/api/startseite",
-    "/api/benachrichtigungen",
-    "/wp-login.php",
-    "/zugangsdaten",
-    "/de/impressum",
-  ];
-  for (const pfad of geschuetzt) assert.equal(istOhneGate(pfad), false, pfad);
-});
-
-test("Landingpage /ig aus der Instagram-Bio: ohne Passwort, Nachbarn bleiben gesperrt", () => {
-  assert.equal(istOhneGate("/ig"), true);
-  // /de/ig gibt es nur intern nach dem Rewrite; der Proxy prüft den sichtbaren Pfad.
-  assert.equal(istOhneGate(ohneSprachPraefix("/de/ig")), true);
-  for (const pfad of ["/ig-irgendwas", "/ig-feed", "/igel", "/reviews", "/api/ig-feed"]) {
-    assert.equal(istOhneGate(pfad), false, pfad);
-  }
-});
+import { internerPfad, istApiPfad, ohneSprachPraefix } from "@/lib/proxy-regeln";
 
 test("API-Pfade: nur /api und darunter", () => {
   assert.equal(istApiPfad("/api"), true);
@@ -65,29 +32,3 @@ test("ohneSprachPraefix kehrt internerPfad um und lässt Wörter in Ruhe", () =>
   assert.equal(ohneSprachPraefix(""), "");
 });
 
-test("IG-Feed: Schlüssel nur auf /api/ig-feed, sonst nichts", () => {
-  assert.equal(igFeedSchluessel("/api/ig-feed", "?key=abc"), "abc");
-  assert.equal(igFeedSchluessel("/api/ig-feed", "?x=1&key=abc"), "abc");
-  assert.equal(igFeedSchluessel("/api/ig-feed", ""), null);
-  assert.equal(igFeedSchluessel("/api/ig-feed", "?key="), null);
-  assert.equal(igFeedSchluessel("/api/ig-feed/x", "?key=abc"), null);
-  assert.equal(igFeedSchluessel("/reviews", "?key=abc"), null);
-  assert.equal(istOhneGate("/api/ig-feed"), false);
-});
-
-test("IG-Karte: Schlüssel nur auf /api/ig-karte/<id>", () => {
-  assert.equal(igFeedSchluessel("/api/ig-karte/abc-1", "?key=k"), "k");
-  assert.equal(igFeedSchluessel("/api/ig-karte/", "?key=k"), null);
-  assert.equal(igFeedSchluessel("/api/ig-karte", "?key=k"), null);
-  assert.equal(igFeedSchluessel("/api/ig-karte/a/b", "?key=k"), null);
-  assert.equal(igFeedSchluessel("/ig-karte/a", "?key=k"), null);
-});
-
-test("Jury-Instagram: Schlüssel auf Feed, Meldung und Bild", () => {
-  assert.equal(igFeedSchluessel("/api/jury-feed", "?key=k"), "k");
-  assert.equal(igFeedSchluessel("/api/jury-ig", "?key=k"), "k");
-  assert.equal(igFeedSchluessel("/api/publora-sync", "?key=k"), "k");
-  assert.equal(igFeedSchluessel("/api/bild/abc-1", "?key=k"), "k");
-  assert.equal(igFeedSchluessel("/api/jury-feed/x", "?key=k"), null);
-  assert.equal(igFeedSchluessel("/api/bild/offen/abc", "?key=k"), null);
-});

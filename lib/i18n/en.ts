@@ -25,6 +25,7 @@ export const en: Woerterbuch = {
       neu: "News",
       profil: "My profile",
     },
+    gastKonto: "Sign in",
     ungelesen: {
       one: "{anzahl} unread notification",
       other: "{anzahl} unread notifications",

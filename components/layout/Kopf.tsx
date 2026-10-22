@@ -86,7 +86,7 @@ export function Kopf({ sprache, w }: Props) {
             <circle cx="12" cy="8.5" r="3.5" />
             <path d="M5 20c.8-3.6 3.6-5.5 7-5.5s6.2 1.9 7 5.5" />
           </svg>
-          <KontoZaehler texte={w.kopf.ungelesen} sprache={sprache} beschriftung={w.kopf.navigation[PROFIL_LINK.schluessel]} />
+          <KontoZaehler texte={w.kopf.ungelesen} sprache={sprache} beschriftung={w.kopf.gastKonto} />
         </NavLink>
 
         <KopfMenue texte={w.kopf.menue}>

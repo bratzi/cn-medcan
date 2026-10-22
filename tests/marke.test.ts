@@ -188,11 +188,3 @@ test("Der Hero hält mobil Abstand zum Displayrand", () => {
   assert.match(auftakt, /px-6 /);
 });
 
-test("Zugang: die Kennwortseite zeigt den Hero der Startseite, Formular an /api/zugang", () => {
-  const seite = lies("app/[lang]/zugang/page.tsx");
-  assert.match(seite, /<Auftakt\s+zugang=\{/);
-  assert.match(seite, /<form action="\/api\/zugang" method="post"/);
-  assert.match(seite, /<ZugangFelder /);
-  // Ohne StoryBuehne blendet niemand ein: auf /zugang darf nichts per Einstieg versteckt sein.
-  assert.match(lies("components/story/Auftakt.tsx"), /const einstieg = zugang \? undefined : ""/);
-});

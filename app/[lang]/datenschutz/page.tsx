@@ -22,8 +22,8 @@ export const revalidate = 86400;
  * Jede Aussage ist am Code geprüft (Stand dieser Datei):
  * - Hosting: wrangler.jsonc (Workers, Assets, Images, D1 mit
  *   `--jurisdiction eu`, observability.enabled = Workers Logs).
- * - Cookies: lib/gate.ts + app/api/zugang/route.ts (cn_gate, 7 Tage,
- *   httpOnly, secure, lax); lib/auth.ts + better-auth/dist/cookies
+ * - Cookies: keine Passwortschranke mehr seit 2026-10-22 (cn_gate entfällt);
+ *   app/api/sprache/route.ts (sprache, 1 Jahr); lib/auth.ts + better-auth/dist/cookies
  *   (session_token, 30 Tage, täglich verlängert, ohne cookieCache, also
  *   kein session_data-Cookie; Vorsatz __Secure- in Produktion).
  * - Sitzung speichert IP-Adresse und User-Agent: prisma/schema.prisma
@@ -71,7 +71,6 @@ export const metadata: Metadata = {
 };
 
 const ABSCHNITT = "font-buch text-h3 font-medium text-balance text-text";
-const CODE = "font-sans text-small wrap-break-word";
 
 /** Platzhalter fallen auf: Warnfläche statt Fließtext, damit keine Lücke als Angabe durchgeht. */
 function Angabe({ wert }: { wert: string }) {
@@ -97,17 +96,16 @@ type Speicher = { name: string; art: string; zweck: string; dauer: string };
 
 const SPEICHER: Speicher[] = [
   {
-    name: "cn_gate",
-    art: "Cookie",
-    zweck:
-      "Merkt sich, dass du das Zugangspasswort eingegeben hast. Enthält Ablaufzeit, Zugangsstufe und eine Signatur, nie das Passwort.",
-    dauer: "7 Tage",
-  },
-  {
     name: "better-auth.session_token",
     art: "Cookie, auf der Live-Seite mit dem Vorsatz __Secure-",
     zweck: "Hält dich nach der Anmeldung angemeldet. Wird nur gesetzt, wenn du dich anmeldest.",
     dauer: "30 Tage, verlängert sich bei Nutzung; endet mit dem Abmelden",
+  },
+  {
+    name: "sprache",
+    art: "Cookie",
+    zweck: "Merkt sich, ob du die Seite auf Deutsch oder Englisch sehen willst. Wird nur gesetzt, wenn du die Sprache umschaltest.",
+    dauer: "1 Jahr",
   },
   {
     name: "gruenes-buch-thema",
@@ -136,7 +134,7 @@ export default async function DatenschutzPage() {
       <div lang="de">
       <Seitenkopf
         titel="Datenschutz"
-        satz="Welche Daten wir verarbeiten, wofür und wie lange. Kurz gesagt: nur, was die Seite zum Funktionieren braucht, keine Analyse, keine Werbung."
+        satz="Welche Daten wir verarbeiten, wofür und wie lange. Kurz gesagt: nur, was die Seite zum Funktionieren braucht, keine Analyse, keine Werbung. Lesen geht ohne Konto."
       />
 
       <div className={cn(seitenRahmen(), "pt-16 pb-24")}>
@@ -195,14 +193,6 @@ export default async function DatenschutzPage() {
             </p>
           </Abschnitt>
 
-          <Abschnitt id="ds-zugang" titel="Zugangsschutz in der Entwicklungsphase">
-            <p className="text-pretty">
-              Solange die Seite nicht öffentlich ist, fragt sie ein Zugangspasswort ab. Danach setzt
-              sie das Cookie <span className={CODE}>cn_gate</span>. Es speichert keine Angaben zu
-              deiner Person. Impressum und Datenschutzerklärung erreichst du ohne Passwort.
-            </p>
-          </Abschnitt>
-
           <Abschnitt id="ds-konto" titel="Dein Konto">
             <p className="text-pretty">
               Für die Registrierung speichern wir Anzeigename, E-Mail-Adresse und dein Passwort, das
@@ -212,8 +202,11 @@ export default async function DatenschutzPage() {
             </p>
             <p className="text-pretty">
               Solange du angemeldet bist, speichern wir zu deiner Sitzung IP-Adresse und
-              Browserkennung. Wir versenden keine E-Mails; freigegeben wird dein Konto von Hand durch
-              uns.
+              Browserkennung. Wir versenden keine E-Mails. Lesen kann jede und jeder ohne Konto;
+              nach der Registrierung prüfen wir dein Konto und geben es von Hand frei. Erst dann kannst
+              du bewerten, kommentieren, Bilder beitragen und abstimmen. Die Angaben bei der
+              Registrierung brauchen wir für die Mitgliedschaft; ohne sie können wir kein Konto
+              anlegen.
             </p>
             <p className="text-pretty">
               Ein Profilbild ist freiwillig. Dein Browser schneidet es auf 128 × 128 Punkte zu und
@@ -364,12 +357,23 @@ export default async function DatenschutzPage() {
             </p>
           </Abschnitt>
 
+          <Abschnitt id="ds-empfaenger" titel="Empfänger und automatisierte Entscheidungen">
+            <p className="text-pretty">
+              Deine Daten verarbeitet in unserem Auftrag nur Cloudflare (Hosting und Datenbank, siehe
+              oben). Wir verkaufen keine Daten und geben sie nicht an Dritte weiter, außer wir sind
+              gesetzlich dazu verpflichtet. Über die Freigabe deines Kontos und deiner Beiträge
+              entscheiden Menschen, nicht ein automatisiertes Verfahren (Art. 22 DSGVO).
+            </p>
+          </Abschnitt>
+
           <Abschnitt id="ds-rechte" titel="Deine Rechte">
             <p className="text-pretty">
               Du hast das Recht auf Auskunft, Berichtigung, Löschung, Einschränkung der Verarbeitung
               und Datenübertragbarkeit (Art. 15 bis 20 DSGVO). Einer Verarbeitung auf Grundlage
-              unseres berechtigten Interesses kannst du widersprechen (Art. 21 DSGVO). Schreib uns
-              dafür an die oben genannte Adresse.
+              unseres berechtigten Interesses kannst du widersprechen (Art. 21 DSGVO). Eine
+              Einwilligung kannst du jederzeit für die Zukunft widerrufen (Art. 7 Abs. 3 DSGVO), etwa
+              indem du ein Bild löschst oder dein öffentliches Profil ausschaltest; was bis dahin
+              geschah, bleibt rechtmäßig. Schreib uns dafür an die oben genannte Adresse.
             </p>
             <p className="text-pretty">
               Du kannst dich außerdem bei einer Datenschutz-Aufsichtsbehörde beschweren (Art. 77

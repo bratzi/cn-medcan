@@ -6,7 +6,7 @@ const lies = (pfad: string) => readFileSync(pfad, "utf8");
 
 test("Zaehler: Kopf bleibt statisch, Zahl kommt aus der API", () => {
   const kopf = lies("components/layout/Kopf.tsx");
-  assert.match(kopf, /<KontoZaehler texte=\{w\.kopf\.ungelesen\} sprache=\{sprache\} beschriftung=\{w\.kopf\.navigation\[PROFIL_LINK\.schluessel\]\} \/>/);
+  assert.match(kopf, /<KontoZaehler texte=\{w\.kopf\.ungelesen\} sprache=\{sprache\} beschriftung=\{w\.kopf\.gastKonto\} \/>/);
   assert.doesNotMatch(kopf, /aktuellesMitglied|headers\(\)|cookies\(\)/);
   const route = lies("app/api/benachrichtigungen/route.ts");
   assert.match(route, /export async function GET/);

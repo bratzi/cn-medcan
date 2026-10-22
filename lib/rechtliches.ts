@@ -130,9 +130,9 @@ export const HOSTING_GRUNDLAGE =
   "Cloudflare, Inc. sitzt in den USA und ist nach dem EU-US Data Privacy Framework zertifiziert. Die Übermittlung dorthin beruht auf dem Angemessenheitsbeschluss der EU-Kommission vom 10. Juli 2023 (Art. 45 DSGVO). Mit Cloudflare besteht ein Auftragsverarbeitungsvertrag nach Art. 28 DSGVO über das Cloudflare Data Processing Addendum.";
 
 /** Stand der Datenschutzerklärung. */
-export const DATENSCHUTZ_STAND = "14. Oktober 2026";
+export const DATENSCHUTZ_STAND = "22. Oktober 2026";
 
-/** Links auf die beiden Seiten, gemeinsam für Fuß und Zugangsseite. Texte unter fuss[schluessel]. */
+/** Links auf die beiden Seiten im Fuß. Texte unter fuss[schluessel]. */
 export const RECHTLICHE_LINKS = [
   { href: "/impressum", schluessel: "impressum" },
   { href: "/datenschutz", schluessel: "datenschutz" },

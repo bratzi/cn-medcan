@@ -1,14 +1,10 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 
-import { tokenErzeugen } from "@/lib/gate";
 import { tor } from "@/lib/tor";
 
-const SECRET = "s".repeat(32);
 function env(dateien: Record<string, string>) {
   return {
-    SITE_PASSWORD: "pw",
-    SITE_SESSION_SECRET: SECRET,
     ASSETS: {
       async fetch(r: Request | string) {
         const pfad = new URL(typeof r === "string" ? r : r.url).pathname;
@@ -18,16 +14,14 @@ function env(dateien: Record<string, string>) {
   };
 }
 async function mitGate(url: string, extra: Record<string, string> = {}) {
-  const token = await tokenErzeugen(SECRET, "besucher");
-  return new Request(url, { headers: { cookie: `cn_gate=${token}`, ...extra } });
+  return new Request(url, { headers: extra });
 }
 
-test("ohne Gate-Cookie: Umleitung auf /zugang, auch für /_seiten", async () => {
-  for (const pfad of ["/blueten/mac-1", "/_seiten/de/blueten/mac-1/index.html"]) {
-    const antwort = await tor(new Request(`https://x.dev${pfad}`), env({}));
-    assert.equal(antwort?.status, 307);
-    assert.match(antwort!.headers.get("location")!, /\/zugang\?weiter=/);
-  }
+test("ohne Passwortschranke (2026-10-22): Leseseite ohne Cookie, /_seiten direkt bleibt 404", async () => {
+  const seite = await tor(new Request("https://x.dev/blueten/mac-1"), env({ "/_seiten/de/blueten/mac-1/index.html": "<p>v1</p>" }));
+  assert.equal(seite?.status, 200);
+  const direkt = await tor(new Request("https://x.dev/_seiten/de/blueten/mac-1/index.html"), env({ "/_seiten/de/blueten/mac-1/index.html": "x" }));
+  assert.equal(direkt?.status, 404);
 });
 
 test("mit Gate: liefert die Datei des Strains als HTML", async () => {
@@ -72,7 +66,7 @@ test("Insel ohne Sitzungscookie: gast ohne Next", async () => {
 });
 
 test("Sprache aus Cookie", async () => {
-  const antwort = await tor(await mitGate("https://x.dev/", { cookie: `cn_gate=${await tokenErzeugen(SECRET, "besucher")}; sprache=en` }), env({ "/_seiten/en/index.html": "en" }));
+  const antwort = await tor(await mitGate("https://x.dev/", { cookie: "sprache=en" }), env({ "/_seiten/en/index.html": "en" }));
   assert.equal(await antwort!.text(), "en");
 });
 

@@ -13,7 +13,6 @@ import {
   platzhalter,
   RECHTLICHE_LINKS,
 } from "../lib/rechtliches";
-import { istOhneGate } from "../lib/proxy-regeln";
 
 const lesen = (datei: string) => readFileSync(join(process.cwd(), datei), "utf8");
 
@@ -24,20 +23,11 @@ function proxyMuster(): RegExp {
   return new RegExp(`^${treffer[1].replace(/\\\\/g, "\\")}$`);
 }
 
-test("Impressum und Datenschutz sind vom Passwort-Gate ausgenommen", () => {
-  for (const pfad of ["/impressum", "/datenschutz", "/zugang", "/api/sprache"]) {
-    assert.equal(istOhneGate(pfad), true, `${pfad} liegt hinter dem Gate`);
-  }
-  for (const pfad of ["/", "/reviews", "/mitglied", "/sotm", "/admin"]) {
-    assert.equal(istOhneGate(pfad), false, `${pfad} ist nicht mehr geschützt`);
-  }
-});
-
 // Seit 2026-10-01 laufen auch Rechtsseiten (Sprach-Rewrite) und Pfade mit Punkt
 // (Scanner sollen am Gate enden, nicht im Cache) durch den Proxy.
 test("Der Proxy läuft für alle Seiten, auch Rechtsseiten und Pfade mit Punkt", () => {
   const muster = proxyMuster();
-  for (const pfad of ["/", "/reviews", "/impressum", "/datenschutz", "/zugang", "/wp-login.php", "/api/benachrichtigungen"]) {
+  for (const pfad of ["/", "/reviews", "/impressum", "/datenschutz", "/wp-login.php", "/api/benachrichtigungen"]) {
     assert.equal(muster.test(pfad), true, `${pfad} läuft am Proxy vorbei`);
   }
   for (const pfad of ["/_next/static/chunks/a.js", "/_next/image", "/favicon.ico", "/icon.png", "/apple-icon.png"]) {
@@ -45,12 +35,12 @@ test("Der Proxy läuft für alle Seiten, auch Rechtsseiten und Pfade mit Punkt",
   }
 });
 
-test("Fuß und Zugangsseite verlinken beide Seiten", () => {
+test("Der Fuß verlinkt beide Seiten", () => {
   assert.deepEqual(
     RECHTLICHE_LINKS.map((l) => l.href),
     ["/impressum", "/datenschutz"],
   );
-  for (const datei of ["components/layout/Fuss.tsx", "app/[lang]/zugang/page.tsx"]) {
+  for (const datei of ["components/layout/Fuss.tsx"]) {
     assert.match(lesen(datei), /RECHTLICHE_LINKS\.map/, datei);
   }
 });
@@ -147,12 +137,20 @@ test("Rechtsseiten ohne Geviertstrich und ohne Gedankenstrich als Trenner", () =
 
 test("Datenschutzerklärung nennt alle Cookies und Speicher, die der Code setzt", () => {
   const text = lesen("app/[lang]/datenschutz/page.tsx");
-  const gate = lesen("lib/gate.ts").match(/COOKIE_NAME = "([^"]+)"/)?.[1];
+  const sprache = lesen("lib/i18n/sprache-kern.ts").match(/SPRACH_COOKIE = "([^"]+)"/)?.[1];
   const thema = lesen("lib/thema.ts").match(/THEMA_SCHLUESSEL = "([^"]+)"/)?.[1];
   const zaehler = lesen("components/layout/konto-zaehler-speicher.ts").match(/ZAEHLER_SPEICHER = "([^"]+)"/)?.[1];
-  for (const name of [gate, thema, zaehler, "better-auth.session_token"]) {
+  for (const name of [sprache, thema, zaehler, "better-auth.session_token"]) {
     assert.ok(name && text.includes(`"${name}"`), `${name} fehlt in der Datenschutzerklärung`);
   }
+});
+
+test("Ohne Passwortschranke: kein cn_gate mehr; Impressum mit DSA-Kontaktstelle, ohne Telefon", () => {
+  assert.doesNotMatch(lesen("app/[lang]/datenschutz/page.tsx"), /name: "cn_gate"/);
+  const impressum = lesen("app/[lang]/impressum/page.tsx");
+  assert.match(impressum, /Art\. 11 und 12/);
+  assert.match(impressum, /Art\. 16 DSA/);
+  assert.doesNotMatch(impressum, /b\.telefon/);
 });
 
 test("Datenschutz beschreibt Instagram als Zwei-Klick-Lösung mit Einwilligung", () => {

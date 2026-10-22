@@ -29,6 +29,8 @@ export const de = {
       neu: "News",
       profil: "Mein Profil",
     },
+    // Ohne Sitzung (seit der offenen Seite 2026-10-22): der Kontoknopf lädt zur Anmeldung ein.
+    gastKonto: "Anmelden",
     ungelesen: {
       one: "{anzahl} ungelesene Benachrichtigung",
       other: "{anzahl} ungelesene Benachrichtigungen",

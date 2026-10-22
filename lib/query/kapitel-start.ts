@@ -42,14 +42,15 @@ async function eigeneZahlen(autorId: string) {
 /**
  * Schaufenster für Gäste (Spec Dein Kapitel 4.1): das öffentliche Kapitel des Betreibers, nur was
  * /profil/<kurzId> ohnehin zeigt. Privat oder nicht freigegeben: null, die Sektion zeigt dann die
- * leere Gast-Fassung. Statisch mit der Seite (300 s).
+ * leere Gast-Fassung. Statisch mit der Seite (300 s). Seit 2026-10-22 mit dem Verlauf des Netzes
+ * (Nutzer): auch Gäste sehen, wie sich das Kapitel des Betreibers entwickelt hat.
  */
 export const ladeSchaufensterKapitel = cache(async (): Promise<KapitelDaten | null> => {
   const prisma = await getPrisma();
   const m = await prisma.mitglied.findFirst({
     where: { rolle: "ADMIN", profilOeffentlich: true, freigegeben: true },
     orderBy: { erstelltAm: "asc" },
-    select: { id: true, anzeigename: true, erstelltAm: true, avatar: { select: { id: true } }, profil: { select: { oeffentlich: true } } },
+    select: { id: true, anzeigename: true, erstelltAm: true, avatar: { select: { id: true } }, profil: { select: { oeffentlich: true, verlauf: true } } },
   });
   if (!m) return null;
   const [zahlen, vonEuch] = await Promise.all([
@@ -64,6 +65,7 @@ export const ladeSchaufensterKapitel = cache(async (): Promise<KapitelDaten | nu
     ...zahlen,
     dritte: { art: "vonEuch", zahl: vonEuch },
     netz: oeffentlicheWerte(m.profil?.oeffentlich ?? null),
+    verlauf: verlaufAusDaten(m.profil?.verlauf ?? null),
   });
 });
 

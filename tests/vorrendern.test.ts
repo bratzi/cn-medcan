@@ -22,7 +22,6 @@ const VORGERENDERT = [
   "app/[lang]/jury/page.tsx",
   "app/[lang]/jury/team/page.tsx",
   "app/[lang]/jury/favourites/page.tsx",
-  "app/[lang]/zugang/page.tsx",
   "app/[lang]/ig/page.tsx",
 ];
 

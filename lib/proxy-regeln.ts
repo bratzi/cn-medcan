@@ -6,31 +6,7 @@ import type { Sprache } from "@/lib/i18n/sprache-kern";
  * Ohne Next-Abhaengigkeit: NavLink nutzt ohneSprachPraefix im Browser.
  */
 
-/**
- * Ohne Passwort erreichbar: die Login-Seite samt Route, Impressum und
- * Datenschutz (§ 5 DDG, Art. 13 DSGVO) und der Sprachwechsel, der auch auf
- * diesen Seiten funktionieren muss.
- * /ig: Landingpage aus der Instagram-Bio, muss ohne Passwort erreichbar sein (Spec 2026-10-15).
- */
-const OHNE_GATE = ["/zugang", "/impressum", "/datenschutz", "/api/zugang", "/api/sprache", "/ig", "/api/sotm/takt"] as const;
-
-export function istOhneGate(pfad: string): boolean {
-  return OHNE_GATE.some((frei) => pfad === frei || pfad.startsWith(`${frei}/`));
-}
-
-/**
- * Instagram-Feed und -Karten für Cowork (Nutzer 2026-10-14): bleiben hinter dem Gate, außer die
- * Anfrage trägt ?key=. Liefert den Schlüssel zum Prüfen gegen IG_FEED_KEY, sonst null.
- * Gilt nur für genau /api/ig-feed und /api/ig-karte/<id>, nie für Seiten oder andere Routen.
- */
-export function igFeedSchluessel(pfad: string, suche: string): string | null {
-  // Terpz-Jury (Task 9): Feed, Statusmeldung und die Jury-Fotos, die das Skript herunterlädt.
-  const frei = pfad === "/api/ig-feed" || pfad === "/api/jury-feed" || pfad === "/api/jury-ig" || pfad === "/api/publora-sync" || /^\/api\/(ig-karte|bild)\/[^/]+$/.test(pfad);
-  if (!frei || pfad === "/api/bild/offen") return null;
-  return new URLSearchParams(suche).get("key") || null;
-}
-
-/** Route Handler: hinter dem Gate, aber ohne Sprach-Rewrite. */
+/** Route Handler: ohne Sprach-Rewrite. */
 export function istApiPfad(pfad: string): boolean {
   return pfad === "/api" || pfad.startsWith("/api/");
 }

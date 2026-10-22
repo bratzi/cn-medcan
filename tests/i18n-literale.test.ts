@@ -23,8 +23,6 @@ const UMGESTELLT: string[] = [
   "components/auth/RegistrierFormular.tsx",
   "components/auth/AbmeldeButton.tsx",
   "components/auth/fehlertexte.ts",
-  "app/[lang]/zugang/page.tsx",
-  "components/zugang/ZugangFelder.tsx",
   // Welle 2: Katalog und Aroma-Baum
   "app/[lang]/blueten/page.tsx",
   "app/[lang]/blueten/[slug]/page.tsx",

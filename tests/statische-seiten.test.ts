@@ -19,7 +19,6 @@ const STATISCH: Record<string, string> = {
   "app/[lang]/reviews/band/[band]/page.tsx": "86400",
   "app/[lang]/impressum/page.tsx": "86400",
   "app/[lang]/datenschutz/page.tsx": "86400",
-  "app/[lang]/zugang/page.tsx": "false",
 };
 
 test("Statische Seiten schalten selbst um", () => {

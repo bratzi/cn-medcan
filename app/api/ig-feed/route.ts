@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 
+import { igSchluesselOk } from "@/lib/ig-schluessel";
 import { igReviews } from "@/lib/query/ig-feed";
 
 /**
@@ -9,6 +10,8 @@ import { igReviews } from "@/lib/query/ig-feed";
  * `igUmfragen` steht bereit, falls sie zurückkommen.
  */
 export async function GET(anfrage: Request) {
+  // Ohne Passwortschranke (2026-10-22) prüft die Route ihren Schlüssel selbst.
+  if (!(await igSchluesselOk(anfrage))) return Response.json({ fehler: "kein Zugriff" }, { status: 401 });
   const ursprung = new URL(anfrage.url).origin;
   const reviews = await igReviews(ursprung);
   return NextResponse.json(

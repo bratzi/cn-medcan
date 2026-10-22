@@ -1,20 +1,16 @@
-import { COOKIE_NAME, tokenPruefen } from "./gate";
 import { SPRACH_ERKENNUNG } from "./i18n/schalter";
 import { bestimmeSprache, SPRACH_COOKIE } from "./i18n/sprache-kern";
-import { istOhneGate } from "./proxy-regeln";
 import { alteStrainAdresse, SEITEN_PRAEFIX, seitenDatei } from "./seiten-tor";
 import { inselRoh, type InselEnv } from "./insel-roh";
 
 export type TorEnv = InselEnv & {
   ASSETS: { fetch(r: Request | string): Promise<Response> };
-  SITE_PASSWORD?: string;
-  SITE_SESSION_SECRET?: string;
 };
 
 /**
- * Leichter Weg vor Next (Spec 2026-10-21, Seiten aus Assets, 3.2): Gate prüfen, Leseseite als Datei
- * ausliefern. `null` heißt: Next übernimmt (Admin, Aktionen, API, Seiten ohne Datei).
- * Dieselben Regeln wie proxy.ts; Gate-Prüfung über lib/gate.ts, nie über einen ungeprüften Cookie-Teil.
+ * Leichter Weg vor Next (Spec 2026-10-21, Seiten aus Assets, 3.2): Leseseite als Datei ausliefern.
+ * `null` heißt: Next übernimmt (Admin, Aktionen, API, Seiten ohne Datei). Ohne Passwortschranke seit
+ * 2026-10-22 (Nutzer): die Leseseiten sind öffentlich, Rechte prüft die Schreibschicht.
  * Relative Importe, damit wrangler diese Datei ohne tsconfig-Alias bündelt (worker.mjs).
  */
 export async function tor(request: Request, env: TorEnv): Promise<Response | null> {
@@ -23,11 +19,9 @@ export async function tor(request: Request, env: TorEnv): Promise<Response | nul
   const cookies = leseCookies(request.headers.get("cookie"));
 
   if (url.pathname.startsWith(`${SEITEN_PRAEFIX}/`) || url.pathname === SEITEN_PRAEFIX) {
-    if (!(await gateOffen(env, cookies))) return zumGate(url);
     return new Response("Not Found", { status: 404, headers: { "Cache-Control": "no-store" } });
   }
   if (url.pathname === "/api/ich/strain") {
-    if (!(await gateOffen(env, cookies))) return zumGate(url);
     // Mit Sitzungscookie: rohe D1-Abfragen statt Next (HANDOFF S87, 623 ms CPU). Ohne Bindings übernimmt Next.
     if (hatSitzung(cookies)) {
       try {
@@ -50,7 +44,6 @@ export async function tor(request: Request, env: TorEnv): Promise<Response | nul
   });
   const datei = seitenDatei(sprache, url.pathname, url.searchParams);
   if (!datei) return null;
-  if (!istOhneGate(url.pathname) && !(await gateOffen(env, cookies))) return zumGate(url);
   const antwort = await env.ASSETS.fetch(new URL(datei, url).toString());
   if (antwort.status !== 200) {
     // 404 ist der erwartete Ausweichweg (neue Seite seit dem Build); alles andere ist ein Fehler im Aufbau.
@@ -61,7 +54,7 @@ export async function tor(request: Request, env: TorEnv): Promise<Response | nul
     status: 200,
     headers: {
       "Content-Type": "text/html; charset=utf-8",
-      // Hinter dem Gate: nie in geteilten Caches ablegen.
+      // Vary Cookie: die Seite ist für alle gleich, aber Sprache und Insel hängen am Cookie.
       "Cache-Control": "private, no-cache",
       Vary: "Cookie",
     },
@@ -89,13 +82,3 @@ function hatSitzung(cookies: Map<string, string>): boolean {
   return SITZUNGS_COOKIES.some((name) => Boolean(cookies.get(name)));
 }
 
-async function gateOffen(env: TorEnv, cookies: Map<string, string>): Promise<boolean> {
-  if (!env.SITE_PASSWORD || !env.SITE_SESSION_SECRET) return true;
-  return (await tokenPruefen(env.SITE_SESSION_SECRET, cookies.get(COOKIE_NAME))) !== null;
-}
-
-function zumGate(url: URL): Response {
-  const ziel = new URL("/zugang", url);
-  ziel.searchParams.set("weiter", url.pathname + url.search);
-  return new Response(null, { status: 307, headers: { Location: ziel.toString(), "Cache-Control": "no-store" } });
-}

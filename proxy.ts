@@ -1,22 +1,21 @@
 import { NextResponse, type NextRequest } from "next/server";
 
 import { bewertenWeiterleitung } from "@/lib/alte-adressen";
-import { COOKIE_NAME, passwortPruefen, tokenPruefen } from "@/lib/gate";
 import { SPRACH_ERKENNUNG } from "@/lib/i18n/schalter";
 import { bestimmeSprache, SPRACH_COOKIE } from "@/lib/i18n/sprache-kern";
-import { igFeedSchluessel, internerPfad, istApiPfad, istOhneGate } from "@/lib/proxy-regeln";
+import { internerPfad, istApiPfad } from "@/lib/proxy-regeln";
 
 /**
- * Zwei Aufgaben vor jeder Seite (Spec 2026-10-01, statische Seiten, 4.1):
+ * Vor jeder Seite (Spec 2026-10-01, statische Seiten, 4.1):
  *
- * 1. Das Entwicklungs-Passwort. Ausgenommen sind Login, Impressum, Datenschutz
- *    (ohne Hürde erreichbar, § 5 DDG, Art. 13 DSGVO) und der Sprachwechsel,
- *    siehe lib/proxy-regeln.ts. Ohne gesetztes SITE_PASSWORD bleibt die Seite
- *    offen, damit ein fehlendes Secret nicht die lokale Entwicklung blockiert.
- *    In Produktion muss das Secret gesetzt sein, siehe README.
- * 2. Die Sprache als internes Pfadsegment: /x wird zu /de/x oder /en/x
+ * - Alte Adressen dauerhaft umleiten (/bewerten, /zugang).
+ * - Die Sprache als internes Pfadsegment: /x wird zu /de/x oder /en/x
  *    umgeschrieben (Rewrite, die URL im Browser bleibt). So legt Next jede
  *    Seite je Sprache getrennt ab, ohne dass das Layout Cookies liest.
+ *
+ * Die Passwortschranke ist seit 2026-10-22 weg (Nutzer): die Seite ist öffentlich, wer schreiben will,
+ * registriert sich und wird in /admin freigegeben (lib/session.ts). Schnittstellen für Skripte prüfen
+ * ihren Schlüssel selbst (lib/ig-schluessel.ts).
  *
  * Gecachte Seiten laufen trotzdem hier durch: OpenNext ruft den Proxy vor der
  * Cache-Interception auf (core/routingHandler.js).
@@ -24,15 +23,11 @@ import { igFeedSchluessel, internerPfad, istApiPfad, istOhneGate } from "@/lib/p
 export async function proxy(request: NextRequest) {
   const { pathname, search } = request.nextUrl;
 
-  // Alte Bewertungsadresse, dauerhaft; vor dem Gate, das greift auf dem Ziel.
+  // Alte Bewertungsadresse, dauerhaft.
   const bewerten = bewertenWeiterleitung(pathname, search);
   if (bewerten) return NextResponse.redirect(new URL(bewerten, request.url), 308);
-
-  if (!istOhneGate(pathname) && !(await feedSchluesselOk(pathname, search)) && !(await gateOffen(request))) {
-    const ziel = new URL("/zugang", request.url);
-    ziel.searchParams.set("weiter", pathname + search);
-    return NextResponse.redirect(ziel);
-  }
+  // Die Kennwortseite gibt es nicht mehr; alte Lesezeichen landen auf der Startseite.
+  if (pathname === "/zugang" || pathname === "/api/zugang") return NextResponse.redirect(new URL("/", request.url), 308);
 
   if (istApiPfad(pathname)) return NextResponse.next();
 
@@ -44,21 +39,6 @@ export async function proxy(request: NextRequest) {
   const intern = request.nextUrl.clone();
   intern.pathname = internerPfad(sprache, pathname);
   return NextResponse.rewrite(intern);
-}
-
-/** IG-Feed mit eigenem Schlüssel (Secret IG_FEED_KEY); ohne Secret nie offen. */
-async function feedSchluesselOk(pfad: string, suche: string): Promise<boolean> {
-  const schluessel = igFeedSchluessel(pfad, suche);
-  const erwartet = process.env.IG_FEED_KEY;
-  if (!schluessel || !erwartet) return false;
-  return passwortPruefen(erwartet, schluessel);
-}
-
-async function gateOffen(request: NextRequest): Promise<boolean> {
-  const passwort = process.env.SITE_PASSWORD;
-  const secret = process.env.SITE_SESSION_SECRET;
-  if (!passwort || !secret) return true;
-  return (await tokenPruefen(secret, request.cookies.get(COOKIE_NAME)?.value)) !== null;
 }
 
 export const config = {

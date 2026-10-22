@@ -44,8 +44,8 @@ test("Kopf: Leiste erst ab lg, darunter Menüknopf mit Popover und Konto als Sym
   assert.match(html, /<button type="button" popoverTarget="kopf-menue" class="kopf-menue-knopf [^"]*lg:hidden">/i);
   assert.match(html, /<div id="kopf-menue" popover="auto"/);
   assert.match(html, /Menü öffnen/);
-  // Ein Knopf statt Profil und Konto (Nutzer 2026-10-13); ohne Sitzung „Mein Profil“.
-  assert.match(html, /<span class="max-lg:sr-only inline-block max-w-28 truncate align-bottom ">Mein Profil<\/span>/);
+  // Ein Knopf statt Profil und Konto (Nutzer 2026-10-13); ohne Sitzung „Anmelden“ (offene Seite, 2026-10-22).
+  assert.match(html, /<span class="max-lg:sr-only inline-block max-w-28 truncate align-bottom ">Anmelden<\/span>/);
   assert.doesNotMatch(html, /Mein Konto/);
   assert.equal((html.match(/href="\/profil"/g) ?? []).length, 2, "Knopf und Eintrag im Aufklappmenü");
 });

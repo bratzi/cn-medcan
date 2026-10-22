@@ -22,8 +22,10 @@ export const revalidate = 86400;
  * redaktionellen Bewertungen). Alle Betreiberdaten kommen zur Laufzeit aus
  * dem Secret IMPRESSUM_JSON (lib/rechtliches.ts); fehlende stehen dort als
  * sichtbarer Platzhalter.
- * Die Seite ist vom Passwort-Gate ausgenommen (lib/proxy-regeln.ts), weil das
- * Impressum ohne Hürde erreichbar sein muss.
+ * Seit 2026-10-22 ist die ganze Seite öffentlich (keine Passwortschranke mehr).
+ * Kontakt nur per E-Mail, keine Telefonnummer (Nutzer 2026-10-21 und 2026-10-22).
+ * Nutzerbeiträge (Bewertungen, Kommentare, Bilder) machen die Seite zum Hostingdienst:
+ * Kontaktstelle und Meldeweg nach Art. 11, 12 und 16 DSA stehen deshalb hier.
  */
 
 export const metadata: Metadata = {
@@ -133,6 +135,64 @@ export default async function ImpressumPage() {
             </address>
           </section>
 
+          <section aria-labelledby="impressum-dsa" className="flex flex-col gap-4">
+            <h2 id="impressum-dsa" className={ABSCHNITT}>
+              Kontaktstelle und Meldung rechtswidriger Inhalte
+            </h2>
+            <p className="text-pretty">
+              Zentrale Kontaktstelle für Behörden, die EU-Kommission und Nutzerinnen und Nutzer nach
+              Art. 11 und 12 der Verordnung (EU) 2022/2065 (Digital Services Act) ist die oben genannte
+              E-Mail-Adresse. Du kannst uns auf Deutsch oder Englisch schreiben.
+            </p>
+            <p className="text-pretty">
+              Bewertungen, Kommentare und Bilder stammen zum Teil von Mitgliedern. Hältst du einen
+              Inhalt für rechtswidrig, schreib uns an dieselbe Adresse (Art. 16 DSA). Nenne bitte die
+              genaue Adresse der Seite, beschreibe den Inhalt und warum er aus deiner Sicht rechtswidrig
+              ist, und gib deinen Namen und deine E-Mail-Adresse an. Kommentare kannst du als Mitglied
+              auch direkt am Kommentar melden. Wir prüfen jede Meldung zügig, entfernen rechtswidrige
+              Inhalte und sagen dir, wie wir entschieden haben.
+            </p>
+          </section>
+
+          <section aria-labelledby="impressum-haftung" className="flex flex-col gap-4">
+            <h2 id="impressum-haftung" className={ABSCHNITT}>
+              Haftung für Inhalte und Links
+            </h2>
+            <p className="text-pretty">
+              Für eigene Inhalte sind wir nach den allgemeinen Gesetzen verantwortlich. Für Beiträge von
+              Mitgliedern haften wir nach §§ 7 bis 10 DDG erst, wenn wir von einer Rechtsverletzung
+              wissen; dann entfernen wir den Inhalt umgehend. Neue Bewertungen und Bilder von Mitgliedern
+              erscheinen erst nach unserer Freigabe.
+            </p>
+            <p className="text-pretty">
+              Für die Inhalte verlinkter fremder Seiten ist allein deren Anbieter verantwortlich. Beim
+              Setzen eines Links haben wir keine Rechtsverstöße erkannt; erfahren wir von einem, entfernen
+              wir den Link.
+            </p>
+          </section>
+
+          <section aria-labelledby="impressum-urheber" className="flex flex-col gap-4">
+            <h2 id="impressum-urheber" className={ABSCHNITT}>
+              Urheberrecht
+            </h2>
+            <p className="text-pretty">
+              Texte, Bilder und Gestaltung dieser Seite unterliegen dem deutschen Urheberrecht. Bilder von
+              Mitgliedern gehören den Mitgliedern; mit dem Hochladen räumen sie uns das Recht ein, sie hier
+              zu zeigen. Herstellerlogos und Produktnamen gehören ihren Inhabern und dienen nur der
+              Zuordnung.
+            </p>
+          </section>
+
+          <section aria-labelledby="impressum-streit" className="flex flex-col gap-4">
+            <h2 id="impressum-streit" className={ABSCHNITT}>
+              Verbraucherstreitbeilegung
+            </h2>
+            <p className="text-pretty">
+              Wir sind nicht bereit und nicht verpflichtet, an Streitbeilegungsverfahren vor einer
+              Verbraucherschlichtungsstelle teilzunehmen (§ 36 VSBG).
+            </p>
+          </section>
+
           <section aria-labelledby="impressum-hinweis" className="flex flex-col gap-4">
             <h2 id="impressum-hinweis" className={ABSCHNITT}>
               Hinweis zu den Inhalten
@@ -140,7 +200,8 @@ export default async function ImpressumPage() {
             <p className="text-pretty">
               Alle gelisteten Arzneimittel sind verschreibungspflichtig. Die Angaben dienen der
               Information und ersetzen keine medizinische oder pharmazeutische Beratung. Über diese
-              Seite werden keine Arzneimittel abgegeben.
+              Seite werden keine Arzneimittel abgegeben, beworben oder vermittelt. Bewertungen geben
+              persönliche Erfahrungen wieder, keine Empfehlung und kein Heilversprechen.
             </p>
             <p className="text-pretty">
               Wie wir mit deinen Daten umgehen, steht in der{" "}

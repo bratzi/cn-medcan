@@ -2,8 +2,6 @@ import { readFileSync } from "node:fs";
 import { test } from "node:test";
 import assert from "node:assert/strict";
 
-import { istOhneGate } from "@/lib/proxy-regeln";
-
 test("Cron: zwei Termine, Handler ruft die Route über das Service-Binding", () => {
   const w = readFileSync("wrangler.jsonc", "utf8");
   assert.match(w, /"0 0 1 \* \*"/);
@@ -20,9 +18,3 @@ test("Route revalidiert Start, SOTM und Admin nur bei Änderung", () => {
   for (const p of ['"/"', '"/sotm"', '"/admin"']) assert.ok(r.includes(`revalidiereSprachen(${p}`), p);
 });
 
-test("Takt-Route ist ohne Passwort erreichbar (Service-Binding, Browser-Fallback), Nachbarn bleiben gesperrt", () => {
-  assert.equal(istOhneGate("/api/sotm/takt"), true);
-  for (const pfad of ["/api/sotm", "/api/sotm/andere", "/sotm", "/api/sotm-takt"]) {
-    assert.equal(istOhneGate(pfad), false, pfad);
-  }
-});

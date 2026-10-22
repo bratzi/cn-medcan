@@ -25,6 +25,28 @@ export type InArbeit = { id: string; titel: Zweisprachig; text: Zweisprachig };
 
 export const NEUIGKEITEN: readonly Neuigkeit[] = [
   {
+    id: "2026-10-22-seite-offen",
+    datum: "2026-10-22",
+    art: "neu",
+    titel: { de: "Lesen ohne Passwort", en: "Read without a password" },
+    text: {
+      de: "Die Seite ist offen, lesen kann jede und jeder. Zum Bewerten registrierst du dich, wir geben dein Konto von Hand frei.",
+      en: "The site is open, anyone can read it. To review, sign up and we approve your account by hand.",
+    },
+    link: "/registrieren",
+  },
+  {
+    id: "2026-10-22-strainseite-neu",
+    datum: "2026-10-22",
+    art: "besser",
+    titel: { de: "Strain-Seite aufgeräumt", en: "Strain page tidied up" },
+    text: {
+      de: "Name, Angaben, Bild und Note stehen oben zusammen. Den Vertreiber wählst du per Logo, Kommentare lesen sich wie im Chat.",
+      en: "Name, details, image and score now sit together at the top. Pick the distributor by logo, comments read like a chat.",
+    },
+    link: "/blueten",
+  },
+  {
     id: "2026-10-21-bewerten-stabil",
     datum: "2026-10-21",
     art: "behoben",

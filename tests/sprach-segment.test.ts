@@ -27,14 +27,15 @@ test("Unbekannte Pfade enden im 404 der Sprache", () => {
   assert.equal(existsSync("app/[lang]/not-found.tsx"), true);
 });
 
-test("Proxy: erst Gate, dann Sprach-Rewrite; API ohne Rewrite", () => {
+test("Proxy: ohne Passwortschranke, alte /zugang-Adresse auf die Startseite, dann Sprach-Rewrite; API ohne Rewrite", () => {
   const proxy = lies("proxy.ts");
-  assert.match(proxy, /!istOhneGate\(pathname\)/);
+  assert.doesNotMatch(proxy, /istOhneGate|tokenPruefen|SITE_PASSWORD/);
+  assert.match(proxy, /pathname === "\/zugang"/);
   assert.match(proxy, /if \(istApiPfad\(pathname\)\) return NextResponse\.next\(\);/);
   assert.match(proxy, /acceptLanguage: request\.headers\.get\("accept-language"\)/);
   assert.match(proxy, /intern\.pathname = internerPfad\(sprache, pathname\);/);
   assert.match(proxy, /return NextResponse\.rewrite\(intern\);/);
-  assert.ok(proxy.indexOf("istOhneGate(pathname)") < proxy.indexOf("NextResponse.rewrite(intern)"));
+  assert.ok(proxy.indexOf('pathname === "/zugang"') < proxy.indexOf("NextResponse.rewrite(intern)"));
 });
 
 test("NavLink vergleicht ohne Sprachpräfix", () => {
