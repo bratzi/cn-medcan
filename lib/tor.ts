@@ -2,7 +2,7 @@ import { COOKIE_NAME, tokenPruefen } from "./gate";
 import { SPRACH_ERKENNUNG } from "./i18n/schalter";
 import { bestimmeSprache, SPRACH_COOKIE } from "./i18n/sprache-kern";
 import { istOhneGate } from "./proxy-regeln";
-import { SEITEN_PRAEFIX, seitenDatei } from "./seiten-tor";
+import { alteStrainAdresse, SEITEN_PRAEFIX, seitenDatei } from "./seiten-tor";
 import { inselRoh, type InselEnv } from "./insel-roh";
 
 export type TorEnv = InselEnv & {
@@ -40,6 +40,9 @@ export async function tor(request: Request, env: TorEnv): Promise<Response | nul
     }
     return Response.json({ zugang: "gast" }, { headers: { "Cache-Control": "private, no-store" } });
   }
+  // Vertreiber ist seit 2026-10-22 kein Seitenzustand mehr: alte Adressen dauerhaft auf die eine Strain-Seite.
+  const neu = alteStrainAdresse(url.pathname, url.searchParams);
+  if (neu) return new Response(null, { status: 308, headers: { Location: new URL(neu, url).toString() } });
   const sprache = bestimmeSprache({
     cookie: cookies.get(SPRACH_COOKIE),
     acceptLanguage: request.headers.get("accept-language"),

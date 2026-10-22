@@ -18,10 +18,10 @@ test("Explorer: kein eigener Strain-Link, Hinweis im InfoKnopf neben der Vertrei
   assert.match(explorer, /onWare\?\.\(/);
 });
 
-test("Am Ende der Bewertung genau ein Link zum Strain, mit gewähltem Vertreiber", () => {
+test("Am Ende der Bewertung genau ein Link zum Strain, ohne Vertreiber", () => {
   const wechsel = lies("components/story/AromaWechsel.tsx");
   assert.equal((wechsel.match(/texte\.zurSorte/g) ?? []).length, 1);
-  assert.match(wechsel, /\?vertreiber=\$\{encodeURIComponent\(vertreiber\)\}/);
+  assert.doesNotMatch(wechsel, /\?vertreiber=/);
 });
 
 test("Link zum Strain zeigt nie auf den Produkt-Slug, auch ohne Vertreiber", () => {

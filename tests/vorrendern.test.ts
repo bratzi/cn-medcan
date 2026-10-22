@@ -37,8 +37,8 @@ const EIGENE_PARAMETER = [
   "app/[lang]/reviews/band/[band]/page.tsx",
 ];
 
-/** Strain-Seite je Vertreiber-Variante (Spec 2026-10-21, Seiten aus Assets): eigene Parameter aus D1. */
-const STRAIN_VARIANTE = "app/[lang]/blueten/[slug]/[auswahl]/page.tsx";
+/** Eine Strain-Seite je Strain (Plan 2026-10-22, eine Seite je Strain): eigene Parameter aus D1. */
+const STRAIN_VARIANTE = "app/[lang]/blueten/[slug]/page.tsx";
 
 function mitVorrendern(wert: string | undefined, pruefe: () => void) {
   const vorher = process.env.VORRENDERN;
@@ -77,9 +77,9 @@ test("Impressum, Datenschutz, Seiten mit eigenen Parametern und das Layout bleib
   }
 });
 
-test("Strain-Varianten: generateStaticParams über strainVarianten, ohne Cookies und searchParams", () => {
+test("Strain-Seite: generateStaticParams über strainSlugs, ohne Cookies und searchParams", () => {
   const quelle = lies(STRAIN_VARIANTE);
-  assert.match(quelle, /export function generateStaticParams\(\) \{\s*return strainVarianten\(\);\s*\}/);
+  assert.match(quelle, /export function generateStaticParams\(\) \{\s*return strainSlugs\(\);\s*\}/);
   assert.match(quelle, /export const revalidate = false;/);
   assert.doesNotMatch(quelle, /searchParams|cookies\(|aktuellesMitglied|istFachkreis/);
   assert.doesNotMatch(lies("app/[lang]/blueten/[slug]/sorten-inhalt.tsx"), /aktuellesMitglied|istFachkreis|ladeEigeneBewertung|searchParams/);

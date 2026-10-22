@@ -153,6 +153,7 @@ test("Insel mit Sitzung: freigegeben, Vorbelegung und Live-Netz ohne Next", asyn
     instagramReelUrl: null,
     bilder: [{ id: "b1", breite: 800, hoehe: 600, status: "FREIGEGEBEN" }],
     strainId: "st1",
+    vertreiberId: "v1",
   });
   const terpene = [
     { id: "t1", name: "Myrcen", geschmack: "ERDIG" },
@@ -177,6 +178,17 @@ test("Insel ohne passende eigene Bewertung: Vorbelegung null", async () => {
   const daten = (await (await tor(await anfrage(await signiert("tok1"), "kultivar=k9&vertreiber=v9&strain=st1"), env()))!.json()) as Freigegeben;
   assert.equal(daten.zugang, "freigegeben");
   assert.equal(daten.vorbelegung, null);
+});
+
+test("Insel ohne Vertreiber: jüngste eigene Bewertung der Sorte samt Vertreiber", async () => {
+  const db = datenbank();
+  db.exec(`INSERT INTO reviews VALUES ('r3','st3',NULL,'k1','v3',0,'m1',3,3,3,3,3,NULL,NULL,NULL,NULL,3,NULL,NULL,
+    '2026-10-05T10:00:00.000+00:00','2026-10-05T10:00:00.000+00:00')`);
+  const daten = (await (await tor(await anfrage(await signiert("tok1"), "kultivar=k1&strain=st1"), env(db)))!.json()) as Freigegeben;
+  assert.equal(daten.vorbelegung?.vertreiberId, "v3");
+  assert.equal(daten.vorbelegung?.strainId, null);
+  const mitV1 = (await (await tor(await anfrage(await signiert("tok1")), env(db)))!.json()) as Freigegeben;
+  assert.equal(mitV1.vorbelegung?.vertreiberId, "v1");
 });
 
 test("abgelaufene Sitzung, falsche Signatur, unbekanntes Token: gast", async () => {

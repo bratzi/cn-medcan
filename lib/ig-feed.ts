@@ -9,7 +9,7 @@ export function igReview(z: IgReviewZeile, ursprung: string): IgReview | null {
   return {
     id: z.id,
     url: z.sorte
-      ? `${ursprung}/blueten/${z.sorte.slug}${z.sorte.vertreiberId ? `?vertreiber=${encodeURIComponent(z.sorte.vertreiberId)}` : ""}`
+      ? `${ursprung}/blueten/${z.sorte.slug}`
       : `${ursprung}/blueten/${z.slug}`,
     karte: `${ursprung}/api/ig-karte/${z.id}`,
     bluete: z.sorte?.name ?? z.handelsname,

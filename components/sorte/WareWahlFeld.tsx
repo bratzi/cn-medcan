@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 
-import { namenLinkKlassen } from "@/components/ui";
+import { namenLinkKlassen, Select } from "@/components/ui";
 import { cn } from "@/lib/cn";
 import { formatiereProzentSpanne } from "@/lib/format";
 import type { Sprache } from "@/lib/i18n/sprache-kern";
@@ -34,46 +34,62 @@ function Haken() {
 }
 
 /**
- * Zuordnung im Bewertungsformular (Spec Sorte im Fokus, 2): Vertreiber Pflicht (aus der Hersteller-Leiste), Variante freiwillig und nur,
- * wenn der Vertreiber mehrere Produkte der Sorte führt. Schreibt die versteckten Felder `vertreiberId`
- * und `strainId` (leer = „Weiß ich nicht“); geprüft wird in der Server Action.
+ * Zuordnung im Bewertungsformular (Spec Sorte im Fokus, 2; Plan 2026-10-22): der Vertreiber ist Nebensache
+ * und wird nur hier gewählt. Mehrere Vertreiber: Pflicht-Select, ohne Vorwahl offen; einer: nur ein Satz.
+ * Variante freiwillig und nur, wenn der Vertreiber mehrere Produkte der Sorte führt. Schreibt die Felder
+ * `vertreiberId` und `strainId` (leer = „Weiß ich nicht“); geprüft wird in der Server Action.
  */
 export function WareWahlFeld({ waren, vorgewaehlt, texte, sprache, kultivarId }: Props) {
   // Ohne bekannten Vertreiber lässt sich nicht bewerten (Pflichtfeld); solche Waren stehen hier nicht.
   const waehlbar = waren.filter((w) => w.vertreiberId);
-  const start = waehlbar.find((w) => w.vertreiberId === vorgewaehlt.vertreiberId) ?? waehlbar[0];
-  const vertreiberId = start?.vertreiberId ?? "";
+  const einziger = waehlbar.length === 1 ? waehlbar[0] : null;
+  const start = einziger ?? waehlbar.find((w) => w.vertreiberId === vorgewaehlt.vertreiberId);
+  const [vertreiberId, setVertreiberId] = useState(start?.vertreiberId ?? "");
   const [strainId, setStrainId] = useState(
     start && start.produkte.length > 1 && start.produkte.some((p) => p.id === vorgewaehlt.strainId) ? (vorgewaehlt.strainId ?? "") : "",
   );
   const ware = waehlbar.find((w) => w.vertreiberId === vertreiberId);
 
   const [vor, nach = ""] = texte.wahlKurz.split("{name}");
+  const vorschlagen = kultivarId ? (
+    <Link prefetch={false} href={`/vorschlagen?kultivar=${kultivarId}`} className={namenLinkKlassen()}>
+      {texte.fehlt}
+    </Link>
+  ) : null;
 
   return (
     <div className="flex flex-col gap-8">
-      <input type="hidden" name="vertreiberId" value={vertreiberId} />
       <input type="hidden" name="strainId" value={strainId} />
 
-      {/* Den Vertreiber wählt die Hersteller-Leiste über der Wertung (Spec 2026-10-21, 1.3); hier steht
-          nur noch ein Satz, wofür die Bewertung zählt, mit Rücksprung zur Leiste. */}
-      <p className="flex flex-wrap items-baseline gap-x-4 gap-y-2 text-body text-text">
-        <span>
-          {vor}
-          <strong className="font-medium">{ware?.vertreiberName || texte.unbekannt}</strong>
-          {nach}
-        </span>
-        {waehlbar.length > 1 ? (
-          <a href="#hersteller-titel" className={namenLinkKlassen()}>
-            {texte.wahlAendern}
-          </a>
-        ) : null}
-        {kultivarId ? (
-          <Link prefetch={false} href={`/vorschlagen?kultivar=${kultivarId}`} className={namenLinkKlassen()}>
-            {texte.fehlt}
-          </Link>
-        ) : null}
-      </p>
+      {einziger ? (
+        <p className="flex flex-wrap items-baseline gap-x-4 gap-y-2 text-body text-text">
+          <input type="hidden" name="vertreiberId" value={vertreiberId} />
+          <span>
+            {vor}
+            <strong className="font-medium">{einziger.vertreiberName || texte.unbekannt}</strong>
+            {nach}
+          </span>
+          {vorschlagen}
+        </p>
+      ) : (
+        <div className="flex max-w-md flex-col gap-2">
+          <Select
+            id="ware-wahl-vertreiber"
+            name="vertreiberId"
+            required
+            label={texte.wahlLabel}
+            hinweis={texte.wahlHinweis}
+            platzhalter={texte.wahlPlatzhalter}
+            optionen={waehlbar.map((w) => ({ wert: w.vertreiberId, label: w.vertreiberName || texte.unbekannt }))}
+            value={vertreiberId}
+            onChange={(e) => {
+              setVertreiberId(e.target.value);
+              setStrainId("");
+            }}
+          />
+          {vorschlagen ? <p className="text-small">{vorschlagen}</p> : null}
+        </div>
+      )}
 
       {ware && ware.produkte.length > 1 ? (
         <div role="group" aria-labelledby="ware-wahl-staerke" aria-describedby="ware-wahl-staerke-hinweis" className="flex flex-col gap-4">

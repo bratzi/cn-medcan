@@ -69,10 +69,9 @@ export function eintragHref(slug: string, id: string): string {
   return `/blueten/${slug}#${eintragAnker(id)}`;
 }
 
-/** Sprungziel auf der Sortenseite, auf den Vertreiber der Bewertung gefiltert, wenn er bekannt ist. */
-export function sortenEintragHref(sorte: { slug: string; vertreiberId: string | null }, id: string): string {
-  const frage = sorte.vertreiberId ? `?vertreiber=${encodeURIComponent(sorte.vertreiberId)}` : "";
-  return `/blueten/${sorte.slug}${frage}#${eintragAnker(id)}`;
+/** Sprungziel auf der Sortenseite (eine Seite je Strain, Plan 2026-10-22). */
+export function sortenEintragHref(sorte: { slug: string }, id: string): string {
+  return `/blueten/${sorte.slug}#${eintragAnker(id)}`;
 }
 
 /**

@@ -22,7 +22,6 @@ const DATEIEN = [
   "app/[lang]/sotm/page.tsx",
   "app/[lang]/blueten/[slug]/page.tsx",
   "app/[lang]/blueten/[slug]/sorten-inhalt.tsx",
-  "app/[lang]/blueten/[slug]/[auswahl]/page.tsx",
   "components/produkt/Titelblatt.tsx",
   "components/produkt/CannabinoidBar.tsx",
   "components/produkt/TerpenChips.tsx",
